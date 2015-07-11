@@ -5,6 +5,10 @@
 * visual/commandline
 * REST programmable interface
 * distributed
+* real time
+* distributed (computing/storage)
+* shareable URLs (shortened version and long versions)
+* multi-user / multi-profile (work, home) per user
 
 ## Resources
 ### Identification of Resources
@@ -39,4 +43,6 @@
 ## User Interface
 
 ## Application Programming Interface
+* versioning?
+* asynchronous/synchronous operations?
 
