@@ -10,8 +10,6 @@
 - shareable URLs (shortened version and long versions)
 - multi-user / multi-profile (work, home) per user
 - real-time
-- collaborative
-- interactive 
 
 ## Resources
 ### Identification of Resources
