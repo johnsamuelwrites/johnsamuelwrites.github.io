@@ -1,18 +1,23 @@
 # Requirements
 
+## Features
 - data-driven
 - configurable storage backend
 - configurable environment
 - visual/commandline
 - REST programmable interface
-- distributed
-- real time
 - distributed (computing/storage)
 - shareable URLs (shortened version and long versions)
 - multi-user / multi-profile (work, home) per user
+- real-time
+- collaborative
+- interactive 
 
 ## Resources
 ### Identification of Resources
+- group (id, name, creation date, access date, updation date)
+- user (id, name, creation date, access date, updation date)
+- profile (id, name, creation date, access date, updation date)
 
 ### Allowed Operations on Resources
 - Creation (Import data from external sources)
@@ -31,8 +36,6 @@
 - Who? (target audience)
 - How?
 
-## Features
-
 ## Platform
 ### target devices
 - Desktop
@@ -40,6 +43,8 @@
 - Internet Web browsers
 
 ## Storage
+- different stores?
+- distributed?
 
 ## User Interface
 
