@@ -1,5 +1,5 @@
-johnsamuelwrites.github.io
-==========================
+John Samuel
+===========
 
 John Samuel
 ## Wiki
