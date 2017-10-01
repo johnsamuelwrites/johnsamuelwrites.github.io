@@ -900,7 +900,7 @@ body {
 	</section>
 	<section class="slide" id="slide28">
 		<div class="header">
-			<h1>Réseau: Architecture cliente-serveur</h1>
+			<h1>Réseau: Architecture client-serveur</h1>
 		</div>
 		<div class="content">
                         <div style="position: relative; top: 50%; left: 25%; transform: translateX(-20%) translateY(-50%);">
@@ -914,11 +914,31 @@ body {
 			</div>
 		</div>
 	</section>
-	<section class="slide" id="slide29">
+        <section class="slide" id="slide29">
 		<div class="header">
-			<h1>Réseau: Architecture cliente-serveur</h1>
+			<h1>Réseau: Client</h1>
 		</div>
 		<div class="content">
+                   <code>
+                    <span style="color: purple">#define</span> PORT 8089</br></br>
+                    <span style="color: green">int</span> main() {</br>
+                    &nbsp;<span style="color: green">int</span> socketfd;</br>
+                    &nbsp;<span style="color: green">int</span> bind_status;</br>
+                    &nbsp;<span style="color: green">struct</span> sockaddr_in server_addr, client_addr;</br>
+                    </br>
+                    &nbsp;<span style="color: blue">/*</br>
+                    &nbsp;&nbsp;* Creation of a socket</br>
+                    &nbsp;&nbsp;* AF_INET: IPv4 Internet protocols</br>
+                    &nbsp;&nbsp;* SOCK_STREAM: two-way, connection-based byte streams</br>
+                    &nbsp;&nbsp;*/</span></br>
+                    &nbsp;socketfd = socket(AF_INET, SOCK_STREAM, 0);</br>
+                    &nbsp;<span style="color: green">if</span> ( socketfd < 0 ) {</br>
+                    &nbsp;&nbsp;perror(<span style="color: red">"Unable to open a socket"</span>);</br>
+                    &nbsp;&nbsp;<span style="color: green">return</span> -1;</br>
+                    &nbsp;}</br>
+
+                  </code>
+                   <img src="../../../../../en/teaching/courses/2017/C/images/clientsocket.svg" height="400vh"/>
 		</div>
 		<div class="footer">
 			<div class="contact">Programmation en C | John Samuel</div>
@@ -929,9 +949,25 @@ body {
 	</section>
 	<section class="slide" id="slide30">
 		<div class="header">
-			<h1>Réseau: Architecture cliente-serveur</h1>
+			<h1>Réseau: Client</h1>
 		</div>
 		<div class="content">
+                   <code>
+                      &nbsp;<span style="color: blue">//server address details</span></br>
+                      &nbsp;memset(&server_addr, 0, sizeof(server_addr));</br>
+                      &nbsp;server_addr.sin_family = AF_INET;</br>
+                      &nbsp;server_addr.sin_port = htons(PORT);</br>
+                      &nbsp;server_addr.sin_addr.s_addr = INADDR_ANY;</br>
+                    </br>
+                      &nbsp;<span style="color: blue">//Connect to the server</span></br>
+                      &nbsp;<span style="color: green">int</span> connect_status = connect(socketfd, (struct sockaddr *) </br>
+                       &nbsp;  &nbsp;&server_addr, sizeof(server_addr));</br>
+                      &nbsp;<span style="color: green">if</span> ( connect_status < 0 ) {</br>
+                        &nbsp;&nbsp;perror(<span style="color: red">"Unable to connect to server"</span>);</br>
+                        &nbsp;&nbsp;<span style="color: green">return</span> -1;</br>
+                      &nbsp;}</br>
+                   </code>
+                   <img src="../../../../../en/teaching/courses/2017/C/images/clientsocket.svg" height="400vh"/>
 		</div>
 		<div class="footer">
 			<div class="contact">Programmation en C | John Samuel</div>
@@ -942,9 +978,30 @@ body {
 	</section>
 	<section class="slide" id="slide31">
 		<div class="header">
-			<h1>Réseau: Architecture cliente-serveur</h1>
+			<h1>Réseau: serveur</h1>
 		</div>
 		<div class="content">
+                   <code>
+                    <span style="color: green">int</span> main() {</br>
+                    </br>
+                    &nbsp;<span style="color: green">int</span> socketfd;</br>
+                    &nbsp;<span style="color: green">int</span> bind_status;</br>
+                    </br>
+                    &nbsp;<span style="color: green">struct</span> sockaddr_in server_addr, client_addr;</br>
+                    </br>
+                    &nbsp;<span style="color: blue">/*</br>
+                    &nbsp;&nbsp;* Creation of a socket</br>
+                    &nbsp;&nbsp;* AF_INET: IPv4 Internet protocols</br>
+                    &nbsp;&nbsp;* SOCK_STREAM: two-way, connection-based byte streams</br>
+                    &nbsp;&nbsp;*/</span></br>
+                    &nbsp;socketfd = socket(AF_INET, SOCK_STREAM, 0);</br>
+                    &nbsp;<span style="color: green">if</span> ( socketfd < 0 ) {</br>
+                    &nbsp;&nbsp;perror(<span style="color: red">"Unable to open a socket"</span>);</br>
+                    &nbsp;&nbsp;<span style="color: green">return</span> -1;</br>
+                    &nbsp;}</br>
+                    </br>
+                   </code>
+                   <img src="../../../../../en/teaching/courses/2017/C/images/serversocket.svg" height="600vh"/>
 		</div>
 		<div class="footer">
 			<div class="contact">Programmation en C | John Samuel</div>
@@ -958,6 +1015,28 @@ body {
 			<h1>Réseau: Architecture cliente-serveur</h1>
 		</div>
 		<div class="content">
+                   <code>
+                      &nbsp;<span style="color: green">int</span> option = 1;</br>
+                      &nbsp;setsockopt(socketfd, SOL_SOCKET, SO_REUSEADDR, </br>
+                      &nbsp;&nbsp;&option, sizeof(option));</br>
+                    </br>
+                      &nbsp;<span style="color: blue">//server address details</span></br>
+                      &nbsp;memset(&server_addr, 0, sizeof(server_addr));</br>
+                      &nbsp;server_addr.sin_family = AF_INET;</br>
+                      &nbsp;server_addr.sin_port = htons(PORT);</br>
+                      &nbsp;server_addr.sin_addr.s_addr = INADDR_ANY;</br>
+                    </br>
+                      &nbsp;bind_status = bind(socketfd, (struct sockaddr *) </br>
+                      &nbsp;&nbsp;&nbsp;&server_addr, sizeof(server_addr));</br>
+                      &nbsp;<span style="color: green">if</span> (bind_status < 0 ) {</br>
+                      &nbsp;&nbsp;perror("Unable to bind to socket");</br>
+                      &nbsp;&nbsp;<span style="color: green">return</span> -1;</br>
+                      &nbsp;}</br>
+                    </br>
+                      &nbsp;<span style="color: blue">// Start listening to the socket</span></br>
+                      &nbsp;listen(socketfd, 10);</br>
+                   </code>
+                   <img src="../../../../../en/teaching/courses/2017/C/images/serversocket.svg" height="600vh"/>
 		</div>
 		<div class="footer">
 			<div class="contact">Programmation en C | John Samuel</div>
@@ -968,9 +1047,21 @@ body {
 	</section>
 	<section class="slide" id="slide33">
 		<div class="header">
-			<h1>Réseau: Architecture cliente-serveur</h1>
+			<h1>Réseau: serveur</h1>
 		</div>
 		<div class="content">
+                   <code>
+                      &nbsp;<span style="color: green">char</span> data[1024];</br>
+                    </br>
+                      &nbsp;<span style="color: green">int</span> client_addr_len = sizeof(client_addr);</br>
+                      &nbsp;<span style="color: green">int</span> client_socket_fd = accept(socketfd, </br>
+                      &nbsp;&nbsp;&nbsp;(struct sockaddr *) &client_addr, &client_addr_len);</br>
+                      &nbsp;<span style="color: green">if</span>(client_socket_fd < 0 ) {</br>
+                      &nbsp;&nbsp;perror("Unable to accept client requests");</br>
+                      &nbsp;&nbsp;<span style="color: green">return</span> -1;</br>
+                      &nbsp;}</br>
+                   </code>
+                   <img src="../../../../../en/teaching/courses/2017/C/images/serversocket.svg" height="600vh"/>
 		</div>
 		<div class="footer">
 			<div class="contact">Programmation en C | John Samuel</div>
@@ -1138,6 +1229,11 @@ body {
 			<h1>La chaine de compilation</h1>
 		</div>
 		<div class="content">
+                  <h3>Génération de code</h3>
+                  <code>
+                  $ gcc -march=i686 -m32 bonjour.c</br>
+                  $ gcc -S -march=i686 -m32 bonjour.c</br>
+                  </code>
                   <img src="../../../../../en/teaching/courses/2017/C/images/compiler.svg" height="600vh"/>
 		</div>
 		<div class="footer">
@@ -1152,6 +1248,12 @@ body {
 			<h1>La chaine de compilation</h1>
 		</div>
 		<div class="content">
+                <h3>Code objet</h3>
+                <code>
+                $ gcc -c operators.c </br>
+                $ gcc -c bonjour.c </br>
+                $ gcc -c operators.o bonjour.o </br>
+                </code>
 		</div>
 		<div class="footer">
 			<div class="contact">Programmation en C | John Samuel</div>
@@ -1162,9 +1264,21 @@ body {
 	</section>
 	<section class="slide" id="slide42">
 		<div class="header">
-			<h1>Systèmes embarqués</h1>
+			<h1>La chaine de compilation</h1>
 		</div>
 		<div class="content">
+                <h3>Code objet (Modifications et recompilation)</h3>
+                <code>
+                $ gcc -c operators.c </br>
+                $ gcc -c bonjour.c </br>
+                $ gcc -c operators.o bonjour.o </br>
+                $ vim bonjour.c </br>
+                $ gcc -c bonjour.c </br>
+                $ gcc -c operators.o bonjour.o </br>
+                $ vim operators.c </br>
+                $ gcc -c operators.c </br>
+                $ gcc -c operators.o bonjour.o </br>
+                </code>
 		</div>
 		<div class="footer">
 			<div class="contact">Programmation en C | John Samuel</div>
@@ -1175,9 +1289,21 @@ body {
 	</section>
 	<section class="slide" id="slide43">
 		<div class="header">
-			<h1>Systèmes embarqués</h1>
+			<h1>La chaine de compilation</h1>
 		</div>
 		<div class="content">
+                <h3>Makefile</h3>
+                <code>
+                    <span style="color: green">CC</span> ?= gcc</br>
+                    </br>
+                    <span style="color: green">COBJS</span> ?= client.o color.o</br>
+                    <span style="color: green">SOBJS</span> ?= server.o color.o</br>
+                    </br>
+                    <span style="color: green">.SUFFIXES</span>: .c .o</br>
+                    </br>
+                    <span style="color: green">SERVER</span> = server</br>
+                    <span style="color: green">CLIENT</span> = client</br>
+                </code>
 		</div>
 		<div class="footer">
 			<div class="contact">Programmation en C | John Samuel</div>
@@ -1188,9 +1314,22 @@ body {
 	</section>
 	<section class="slide" id="slide44">
 		<div class="header">
-			<h1>Systèmes embarqués</h1>
+			<h1>La chaine de compilation</h1>
 		</div>
 		<div class="content">
+                <h3>Makefile</h3>
+                <code>
+                    <span style="color: green">all</span>: $(SERVER) $(CLIENT)</br>
+                    </br>
+                    $(<span style="color: green">SERVER</span>): $(SOBJS)</br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;$(CC) -o $(SERVER) $(SOBJS)</br>
+                    </br>
+                    $(<span style="color: green">CLIENT</span>): $(COBJS)</br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;$(CC) -o $(CLIENT) $(COBJS)</br>
+                    </br>
+                    .c.o: </br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;$(CC) -c $*.c</br>
+                </code>
 		</div>
 		<div class="footer">
 			<div class="contact">Programmation en C | John Samuel</div>
@@ -1201,9 +1340,18 @@ body {
 	</section>
 	<section class="slide" id="slide45">
 		<div class="header">
-			<h1>Systèmes embarqués</h1>
+			<h1>La chaine de compilation</h1>
 		</div>
 		<div class="content">
+                <h3>Exécution d'un Makefile</h3>
+                <code>
+                $ vim server.c </br>
+                $ vim client.c </br>
+                $ vim color.c </br>
+                $ make</br>
+                $ vim color.c </br>
+                $ make</br>
+                </code>
 		</div>
 		<div class="footer">
 			<div class="contact">Programmation en C | John Samuel</div>
@@ -1214,128 +1362,15 @@ body {
 	</section>
 	<section class="slide" id="slide46">
 		<div class="header">
-			<h1>Embedded C</h1>
-		</div>
-		<div class="content">
-			<h1>Embedded C Programming</h1>
-			<p>Ponters, Function pointers</p>
-			<p>memory alignment</p>
-			<p>Portable Code</p>
-			<p>Self-referential data types</p>
-			<p>Hardware: C program for a particular hardware</p>
-			<p>Assembler and C</p>
-			<p>Compilation for different machines (code generation based on the machine type. e.g., multiplexer, adder etc.)</p>
-			<p>Optimization and best practices for embedded programming</p>
-			<p>Interrupt routines</p>
-			<p>stdint.h standard c data	types, unint8_t_k etc.</p>
-			<p>variables: automatic, static, external, register, volatile</p>
-			<p>bit operations: complement, bit mask</p>
-			<p>functions: pass by value/reference, return values from functions, recursive functions</p>
-		</div>
-		<div class="footer">
-			<div class="contact">Programmation en C | John Samuel</div>
-			<div class="navigation">46
-				<a class="prev" href="#slide45"></a><a class="next" href="#slide47"></a>
-			</div>
-		</div>
-	</section>
-
-	
-	<section class="slide" id="slide47">
-		<div class="header">
-			<h1>Programmation en C</h1>
-		</div>
-		<div class="content">
-			<h1>const, volatile</h1>
-			<p>int, float, char, double</p>
-		</div>
-		<div class="footer">
-			<div class="contact">Programmation en C | John Samuel</div>
-			<div class="navigation">47
-				<a class="prev" href="#slide46"></a><a class="next" href="#slide48"></a>
-			</div>
-		</div>
-	</section>
-
-	<section class="slide" id="slide48">
-		<div class="header">
-			<h1>Programmation en C</h1>
-		</div>
-		<div class="content">
-			<h1>Variable scope and visibility</h1>
-			<p>auto, extern (global), local</p>
-		</div>
-		<div class="footer">
-			<div class="contact">Programmation en C | John Samuel</div>
-			<div class="navigation">48
-				<a class="prev" href="#slide47"></a><a class="next" href="#slide49"></a>
-			</div>
-		</div>
-	</section>
-	
-	<section class="slide" id="slide49">
-		<div class="header">
-			<h1>Buffers</h1>
-		</div>
-		<div class="content">
-			<p>*, [], program readability</p>
-		</div>
-		<div class="footer">
-			<div class="contact">Programmation en C | John Samuel</div>
-			<div class="navigation">49
-				<a class="prev" href="#slide48"></a><a class="next" href="#slide50"></a>
-			</div>
-		</div>
-	</section>
-	
-	<section class="slide" id="slide50">
-		<div class="header">
-			<h1>Circular Buffers</h1>
-		</div>
-		<div class="content">
-			<p>*, [], program readability</p>
-		</div>
-		<div class="footer">
-			<div class="contact">Programmation en C | John Samuel</div>
-			<div class="navigation">50
-				<a class="prev" href="#slide49"></a><a class="next" href="#slide51"></a>
-			</div>
-		</div>
-	</section>
-
-
-	<section class="slide" id="slide51">
-		<div class="header">
-			<h1>Embedded C</h1>
-		</div>
-		<div class="content">
-			<h1>Embedded C Programming</h1>
-			<p>Ponters, Function pointers</p>
-			<p>Portable Code</p>
-			<p>Self-referential data types</p>
-			<p>Hardware: C program for a particular hardware</p>
-			<p>Assembler and C</p>
-			<p>Compilation for different machines (code generation based on the machine type. e.g., multiplexer, adder etc.)</p>
-			<p>Optimization and best practices for embedded programming</p>
-			<p>stdint.h standard c data	types, unint8_t_k etc.</p>
-			<p>variables: automatic, static, external, register, volatile</p>
-		</div>
-		<div class="footer">
-			<div class="contact">Programmation en C | John Samuel</div>
-			<div class="navigation">51
-				<a class="prev" href="#slide50"></a><a class="next" href="#slide52"></a>
-			</div>
-		</div>
-	</section>
-	<section class="slide" id="slide52">
-		<div class="header">
-			<h1>Programmation en C</h1>
+			<h1>Références</h1>
 		</div>
 		<div class="content">
 			<h1>Références</h1>
 			<ul>
 				<li>Langage C, Claude Delannoy</li>
 				<li><a href="https://fr.wikipedia.org/wiki/Alignement_en_m%C3%A9moire">https://fr.wikipedia.org/wiki/Alignement_en_mémoire</a>
+				<li><a href="https://fr.wikipedia.org/wiki/Compilateur">https://fr.wikipedia.org/wiki/Compilateur</a>
+				<li><a href="https://fr.wikipedia.org/wiki/G%C3%A9n%C3%A9ration_de_code_natif">https://fr.wikipedia.org/wiki/G%C3%A9n%C3%A9ration_de_code_natif</a>
 			</ul>
 			<h1>Crédits d'images</h1>
 			<ul>
@@ -1344,8 +1379,8 @@ body {
 		</div>
 		<div class="footer">
 			<div class="contact">Programmation en C | John Samuel</div>
-			<div class="navigation">52
-				<a class="prev" href="#slide51"></a>
+			<div class="navigation">46
+				<a class="prev" href="#slide45"></a>
 			</div>
 		</div>
 	</section>
@@ -1359,9 +1394,11 @@ body {
 				if (!Number.isNaN(slideIdString)) {
 					slideId = parseInt(slideIdString);
 					if (isIncrement) {
+                                               if (slideId  < 46) {
 						slideId = slideId + 1;
+                                               }
 					} else {
-						if (slideId > 0) {
+						if (slideId > 1) {
 							slideId = slideId - 1;
 						}
 					}
