@@ -62,6 +62,17 @@ function courbebezier() {
   context.stroke();
 }
 
+function maison() {
+  var id = document.getElementById("courbebezier");
+  var context = id.getContext("2d");
+  context.strokeStyle =  "#00b33c";
+  context.lineWidth = 10;
+  context.beginPath();
+  context.moveTo(10,20);
+  context.bezierCurveTo(10, 150, 210, 150, 210, 20);
+  context.stroke();
+}
+
 ligne();
 arc();
 cirque();
