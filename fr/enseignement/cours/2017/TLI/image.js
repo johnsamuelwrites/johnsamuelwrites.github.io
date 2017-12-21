@@ -24,27 +24,28 @@ function imageScale() {
   context.drawImage(img, 200, 0, 400, 600);
 }
 
-function imageData() {
-  var id = document.getElementById("imageData");
+function imageTranslate() {
+  var id = document.getElementById("imageTranslate");
   var context = id.getContext("2d");
   var img = new Image();
   img.src = "rose.bmp";
-  context.drawImage(img, 200, 0, 400, 600);
-
-  var data = context.getImageData(300,300,150,150);
-  console.log(data);
-  for(i=0; i< data.data.length; i+=4)
-    if(data.data[i]<255 && data.data[i]>190) {
-      data.data[i]=205;
-      data.data[i+1]=205;
-      data.data[i+2]=205;
-      data.data[i+3]=205;
-    }
-  context.putImageData(data, 300,300);
+  context.drawImage(img, 0, 0, 400, 600);
+  context.translate(200, 200);
+  context.drawImage(img, 0, 0, 400, 600);
 }
 
+function imageTransform() {
+  var id = document.getElementById("imageTransform");
+  var context = id.getContext("2d");
+  var img = new Image();
+  img.src = "rose.bmp";
+  context.drawImage(img, 0, 0, 400, 600);
+  context.transform(0.5, 0.5, -0.5, 0.5, 300,10);
+  context.drawImage(img, 0, 0, 400, 600);
+}
 
 image();
 imageRotate();
 imageScale();
-imageData();
+imageTranslate();
+imageTransform();
