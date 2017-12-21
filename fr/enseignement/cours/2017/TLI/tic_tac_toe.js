@@ -1,12 +1,15 @@
-var vide = new Array(3);
+var pion = new Array(3);
 for (i = 0; i< 3; i++) {
-  vide[i] = new Array(3);
+  pion[i] = new Array(3);
   for (j = 0; j< 3; j++) {
-    vide[i][j] = 0; //vide
+    pion[i][j] = 0; //vide
   }
 }
 
-turnX = false;
+var fini = false;
+var turnX = false;
+var id = document.getElementById("tic_tac_toe");
+var context = id.getContext("2d");
 tic_tac_toe();
 
 document.getElementById("tic_tac_toe").onmousedown  = function(event) {
@@ -15,31 +18,52 @@ document.getElementById("tic_tac_toe").onmousedown  = function(event) {
   ajouter(this, event);
 }
 
+function ligne(type, x, y) {
+  context.strokeStyle =  "#ff0000";
+  context.lineWidth = 10;
+  context.beginPath();
+  if (type == 'horizontal') {
+    context.moveTo(0,y+100);
+    context.lineTo(600,y+100);
+  }
+  else if (type == 'vertical') {
+    context.moveTo(x+100,0);
+    context.lineTo(x+100,600);
+  }
+  else if (type == 'diagonal-left') {
+    context.moveTo(0, 0);
+    context.lineTo(600,600);
+  }
+  else if (type == 'diagonal-right') {
+    context.moveTo(0, 600);
+    context.lineTo(600,0);
+  }
+  context.closePath();
+  context.stroke();
+}
+
 function lignes(x,y) {
-  var id = document.getElementById("tic_tac_toe");
-  var context = id.getContext("2d");
   context.strokeStyle =  "#00b33c";
   context.lineWidth = 10;
+  context.beginPath();
   context.moveTo(x+20,y+20);
   context.lineTo(x+180,y+180);
   context.moveTo(x+180,y+20);
   context.lineTo(x+20,y+180);
+  context.closePath();
   context.stroke();
 }
 
 function cirque(x, y) {
-  var id = document.getElementById("tic_tac_toe");
-  var context = id.getContext("2d");
   context.strokeStyle =  "#00b33c";
   context.lineWidth = 10;
   context.beginPath();
   context.arc(x, y, 80, 0, 2 * Math.PI);
+  context.closePath();
   context.stroke();
 }
 
 function tic_tac_toe() {
-  var id = document.getElementById("tic_tac_toe");
-  var context = id.getContext("2d");
   context.strokeStyle =  "#ffb33c";
   context.lineWidth = 10;
   context.moveTo(0,200);
@@ -54,11 +78,55 @@ function tic_tac_toe() {
   context.stroke();
 }
 
+function indiceDiagonale(indexX, indexY) {
+  if((indexX == 0 && indexY == 0)  ||
+     (indexX == 1 && indexY == 1 ) ||
+     (indexX == 2 && indexY == 2 ) ||
+     (indexX == 2 && indexY == 0 ) ||
+     (indexX == 0 && indexY == 2 ) ) {
+    return true;
+  }
+  return false;
+}
+
 function verifier(indexX, indexY) {
-    
+  var milieu = false;
+  if ( indiceDiagonale(indexX, indexY)) {
+      if(pion[indexX][indexY] == pion[0][0] &&
+         pion[0][0] == pion[1][1] &&
+         pion[1][1] == pion[2][2]) {
+         ligne('diagonal-left', 0, 0);
+         fini = true;
+         return;
+      }
+      else if(pion[indexX][indexY] == pion[0][2] &&
+         pion[0][2] == pion[1][1] &&
+         pion[1][1] == pion[2][0]) {
+         ligne('diagonal-right', 0, 0);
+         fini = true;
+         return;
+      }
+  }
+  if (pion[indexX][indexY] ==  pion[0][indexY] &&
+       (pion[0][indexY] == pion[1][indexY] && 
+       pion[1][indexY] == pion[2][indexY] )) {
+       ligne('horizontal', 0, indexY * 200);
+       fini = true;
+       return;
+  }
+  if (pion[indexX][indexY] ==  pion[indexX][0] &&
+        pion[indexX][0] == pion[indexX][1] && 
+        pion[indexX][1] == pion[indexX][2] ) {
+       ligne('vertical', indexX * 200, 0);
+       fini = true;
+  }    
 }
 
 function ajouter(canvas, event) {
+  if(fini) {
+    return;
+  }
+
   var posX = event.pageX - canvas.offsetLeft;
   var posY = event.pageY - canvas.offsetTop;
   var indexX = -1;
@@ -86,16 +154,16 @@ function ajouter(canvas, event) {
  console.log(posX + " " + posY); 
  console.log(indexX + " " + indexY); 
   if (indexX != -1 && indexY != -1) {
-     if (vide[indexX][indexY] == 0) {
+     if (pion[indexX][indexY] == 0) {
        if(turnX) {
           lignes(indexX * 200, indexY * 200);
           turnX = false;
-          vide[indexX][indexY] = 1;
+          pion[indexX][indexY] = 1;
         }
         else {
           cirque(indexX * 200 + 100, indexY * 200 + 100);
           turnX = true;
-          vide[indexX][indexY] = 2;
+          pion[indexX][indexY] = 2;
         }
         verifier(indexX, indexY);
      }
