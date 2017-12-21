@@ -62,14 +62,14 @@ function courbebezier() {
   context.stroke();
 }
 
-function maison() {
-  var id = document.getElementById("courbebezier");
+function courbebezier2() {
+  var id = document.getElementById("courbebezier2");
   var context = id.getContext("2d");
   context.strokeStyle =  "#00b33c";
   context.lineWidth = 10;
   context.beginPath();
   context.moveTo(10,20);
-  context.bezierCurveTo(10, 150, 210, 150, 210, 20);
+  context.bezierCurveTo(30, 150, 210, 180, 210, 20);
   context.stroke();
 }
 
@@ -79,3 +79,4 @@ cirque();
 rectangle();
 courbequadratique();
 courbebezier();
+courbebezier2();
