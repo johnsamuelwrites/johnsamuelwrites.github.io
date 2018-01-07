@@ -357,6 +357,65 @@ function alignement(nom){
   context.fillText("centre", 250, 340);
 }
 
+function base(nom){
+  var id = document.getElementById(nom);
+  var context = id.getContext("2d");
+
+  context.strokeStyle = "red";
+  context.lineWidth = 2;
+  context.beginPath();
+  context.moveTo(0,200);
+  context.lineTo(500,200);
+  context.closePath();
+  context.stroke();
+
+  context.font = "25px Arial";
+  context.textBaseline = "top";
+  context.fillText("haut", 0, 200);
+
+  context.textBaseline = "middle";
+  context.fillText("moyen", 150, 200);
+
+  context.textBaseline = "alphabetic";
+  context.fillText("alphabetique", 250, 200);
+
+  context.textBaseline = "bottom";
+  context.fillText("en bas", 420, 200);
+}
+
+function image() {
+  var id = document.getElementById("image");
+  var context = id.getContext("2d");
+  var img = new Image();
+  img.src = "800px-Detailaufnahme_Weihnachtsstern_-_groß.bmp";
+  img.onload = function() {
+    context.drawImage(img, 0, 0);
+  }
+}
+
+function imagezone() {
+  var id = document.getElementById("imagezone");
+  var context = id.getContext("2d");
+  var img = new Image();
+  img.src = "800px-Detailaufnahme_Weihnachtsstern_-_groß.bmp";
+  img.onload = function() {
+    context.drawImage(img, 0, 0, 500, 400);
+  }
+}
+
+function imagezone2() {
+  var id = document.getElementById("imagezone2");
+  var context = id.getContext("2d");
+  var img = new Image();
+  img.src = "800px-Detailaufnahme_Weihnachtsstern_-_groß.bmp";
+  img.onload = function() {
+    context.drawImage(img, 0, 0, 250, 200);
+    context.drawImage(img, 250, 0, 250, 200);
+    context.drawImage(img, 0, 200, 250, 200);
+    context.drawImage(img, 250, 200, 250, 200);
+  }
+}
+
 cirque("introduction");
 rectangle("introduction", false);
 moncanvastexte();
@@ -390,3 +449,8 @@ bonjour("texte2", true);
 
 pointeur("pointeur");
 alignement("alignement");
+base("alignementbase");
+
+image();
+imagezone();
+imagezone2();

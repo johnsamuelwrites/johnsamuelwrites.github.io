@@ -2,7 +2,9 @@ var id = document.getElementById("imageData");
 var context = id.getContext("2d");
 var img = new Image();
 img.src = "800px-Detailaufnahme_Weihnachtsstern_-_groß.bmp";
-context.drawImage(img, 200, 0, 400, 600);
+img.onload = function() {
+  context.drawImage(img, 200, 0, 400, 600);
+}
 
 function imageData(r, g, b) {
   context.clearRect(0, 0, 400, 600)

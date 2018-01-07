@@ -3,7 +3,9 @@ function image() {
   var context = id.getContext("2d");
   var img = new Image();
   img.src = "800px-Detailaufnahme_Weihnachtsstern_-_groß.bmp";
-  context.drawImage(img, 0, 0, 400, 600);
+  img.onload = function() {
+    context.drawImage(img, 0, 0, 400, 600);
+  }
 }
 
 function imageRotate() {
@@ -11,8 +13,10 @@ function imageRotate() {
   var context = id.getContext("2d");
   var img = new Image();
   img.src = "800px-Detailaufnahme_Weihnachtsstern_-_groß.bmp";
-  context.rotate(10*Math.PI/180);
-  context.drawImage(img, 200, 0, 400, 600);
+  img.onload = function() {
+    context.rotate(10*Math.PI/180);
+    context.drawImage(img, 200, 0, 400, 600);
+  }
 }
 
 function imageScale() {
@@ -20,8 +24,10 @@ function imageScale() {
   var context = id.getContext("2d");
   var img = new Image();
   img.src = "800px-Detailaufnahme_Weihnachtsstern_-_groß.bmp";
-  context.scale(0.5, 0.5);
-  context.drawImage(img, 200, 0, 400, 600);
+  img.onload = function() {
+    context.scale(0.5, 0.5);
+    context.drawImage(img, 200, 0, 400, 600);
+  }
 }
 
 function imageTranslate() {
@@ -29,9 +35,11 @@ function imageTranslate() {
   var context = id.getContext("2d");
   var img = new Image();
   img.src = "800px-Detailaufnahme_Weihnachtsstern_-_groß.bmp";
-  context.drawImage(img, 0, 0, 400, 600);
-  context.translate(200, 200);
-  context.drawImage(img, 0, 0, 400, 600);
+  img.onload = function() {
+    context.drawImage(img, 0, 0, 400, 600);
+    context.translate(200, 200);
+    context.drawImage(img, 0, 0, 400, 600);
+  }
 }
 
 function imageTransform() {
@@ -39,9 +47,11 @@ function imageTransform() {
   var context = id.getContext("2d");
   var img = new Image();
   img.src = "800px-Detailaufnahme_Weihnachtsstern_-_groß.bmp";
-  context.drawImage(img, 0, 0, 400, 600);
-  context.transform(0.5, 0.5, -0.5, 0.5, 300,10);
-  context.drawImage(img, 0, 0, 400, 600);
+  img.onload = function() {
+    context.drawImage(img, 0, 0, 400, 600);
+    context.transform(0.5, 0.5, -0.5, 0.5, 300,10);
+    context.drawImage(img, 0, 0, 400, 600);
+  }
 }
 
 image();
