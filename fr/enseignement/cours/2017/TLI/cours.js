@@ -1,5 +1,5 @@
-function cirque() {
-  var id = document.getElementById("introduction");
+function cirque(nom) {
+  var id = document.getElementById(nom);
   var context = id.getContext("2d");
   context.strokeStyle =  "#00b33c";
   context.lineWidth = 10;
@@ -8,14 +8,19 @@ function cirque() {
   context.stroke();
 }
 
-function rectangle() {
-  var id = document.getElementById("introduction");
+function rectangle(nom, fill) {
+  var id = document.getElementById(nom);
   var context = id.getContext("2d");
   context.strokeStyle =  "#00b33c";
   context.lineWidth = 10;
-  context.beginPath();
-  context.rect(10, 10, 280, 280);
-  context.stroke();
+  if(fill) {
+    context.fillStyle =  "#00b33c";
+    context.fillRect(10, 10, 280, 280);
+  }
+  else {
+    context.rect(10, 10, 280, 280);
+    context.stroke();
+  }
 }
 
 function moncanvastexte() {
@@ -23,7 +28,6 @@ function moncanvastexte() {
   var context = id.getContext("2d");
   context.strokeStyle =  "#00b33c";
   context.lineWidth = 10;
-  context.beginPath();
   context.rect(10, 10, 280, 380);
   context.stroke();
   context.font = "20px Arial";
@@ -192,8 +196,169 @@ function arc3(nom, fill) {
   context.fillText("(200, 270)", 210, 270);
 }
 
-cirque();
-rectangle();
+function courbequadratique(nom, bezier) {
+  var id = document.getElementById(nom);
+  var context = id.getContext("2d");
+  context.strokeStyle =  "#00b33c";
+  context.lineWidth = 10;
+  context.beginPath();
+  context.moveTo(0,70);
+  context.lineTo(120,70);
+  if(bezier) {
+    context.bezierCurveTo(280, 120, 240, 220, 150, 270);
+  }
+  else {
+    context.quadraticCurveTo(280, 120, 200, 270);
+  }
+  context.stroke();
+  if(bezier) {
+    context.fillStyle =  "red";
+    context.lineWidth = 10;
+    context.beginPath();
+    context.arc(150, 270, 10, 0, 2 * Math.PI);
+    context.fill();
+
+    context.fillStyle =  "red";
+    context.lineWidth = 10;
+    context.beginPath();
+    context.arc(240, 220, 10, 0, 2 * Math.PI);
+    context.fill();
+  }
+  else {
+    context.fillStyle =  "red";
+    context.lineWidth = 10;
+    context.beginPath();
+    context.arc(200, 270, 10, 0, 2 * Math.PI);
+    context.fill();
+  }
+  context.fillStyle =  "red";
+  context.lineWidth = 10;
+  context.beginPath();
+  context.arc(280, 120, 10, 0, 2 * Math.PI);
+  context.fill();
+  context.fillStyle =  "red";
+  context.lineWidth = 10;
+  context.beginPath();
+  context.arc(120, 70, 10, 0, 2 * Math.PI);
+  context.fill();
+  context.strokeStyle =  "black";
+  context.fillStyle =  "black";
+  context.font = "20px Arial";
+  context.fillText("(120, 70)", 100, 100);
+  context.fillText("(280, 120)", 180, 150);
+  if(bezier) {
+    context.fillText("(240, 220)", 210, 250);
+    context.fillText("(150, 270)", 50, 270);
+  }
+  else {
+    context.fillText("(200, 270)", 210, 270);
+  }
+}
+
+function triangle(nom, fill) {
+  var id = document.getElementById(nom);
+  var context = id.getContext("2d");
+  context.strokeStyle =  "#00b33c";
+  context.lineWidth = 10;
+  context.beginPath
+  context.moveTo(10,10);
+  context.lineTo(150,380);
+  context.lineTo(280,10);
+  context.closePath();
+  if(fill) {
+    context.fillStyle =  "#00b33c";
+    context.fill()
+  }
+  else {
+    context.stroke();
+  }
+}
+
+function hexagone(nom, fill) {
+  var id = document.getElementById(nom);
+  var context = id.getContext("2d");
+  context.strokeStyle =  "#00b33c";
+  context.lineWidth = 10;
+  context.beginPath();
+  context.moveTo(10,200);
+  context.lineTo(80,10);
+  context.lineTo(200,10);
+  context.lineTo(270,200);
+  context.lineTo(200,380);
+  context.lineTo(80,380);
+  context.closePath();
+  if(fill) {
+    context.fillStyle =  "#00b33c";
+    context.fill()
+  }
+  else {
+    context.stroke();
+  }
+}
+
+function effacer(nom){
+  var id = document.getElementById(nom);
+  var context = id.getContext("2d");
+  hexagone(nom, true);
+  context.clearRect(90, 140, 100, 100); 
+}
+
+function bonjour(nom, fill){
+  var id = document.getElementById(nom);
+  var context = id.getContext("2d");
+
+  context.font = "40px Arial";
+  if (fill) {
+    context.fillText("Bonjour!", 100, 100);
+  }
+  else {
+    context.strokeText("Bonjour!", 100, 100);
+  }
+}
+
+function pointeur(nom){
+  var id = document.getElementById(nom);
+  var context = id.getContext("2d");
+  bonjour(nom);
+
+  context.fillStyle =  "red";
+  context.lineWidth = 10;
+  context.beginPath();
+  context.arc(100, 100, 10, 0, 2 * Math.PI);
+  context.fill();
+}
+
+function alignement(nom){
+  var id = document.getElementById(nom);
+  var context = id.getContext("2d");
+
+  context.strokeStyle = "red";
+  context.lineWidth = 10;
+  context.beginPath();
+  context.moveTo(250,0);
+  context.lineTo(250,400);
+  context.closePath();
+  context.stroke();
+
+  context.font = "30px Arial";
+  context.textAlign = "start";
+  context.fillText("début", 250, 20);
+
+  context.textAlign = "end";
+  context.fillText("fin1 fin2 fin3 fin4 fin5 fin6", 250, 100);
+
+  context.textAlign = "left";
+  context.fillText("gauche1 gauche2 gauche3 gauche4", 250, 180);
+
+  context.textAlign = "right";
+  context.fillText("droite1 droite2 droite3 droite4", 250, 260);
+
+  context.textAlign = "center";
+  context.fillText("centre", 250, 340);
+}
+
+cirque("introduction");
+rectangle("introduction", false);
 moncanvastexte();
 
 ligne();
@@ -206,3 +371,22 @@ arc1();
 arc2();
 arc3("arc3", false);
 arc3("arc4", true);
+courbequadratique("courbe1", false);
+courbequadratique("courbe2", true);
+
+cirque("cirque");
+rectangle("rectangle1", false);
+rectangle("rectangle2", true);
+triangle("triangle1", false);
+triangle("triangle2", true);
+
+hexagone("hexagone1", false);
+hexagone("hexagone2", true);
+
+effacer("clearrect");
+
+bonjour("texte1", false);
+bonjour("texte2", true);
+
+pointeur("pointeur");
+alignement("alignement");
