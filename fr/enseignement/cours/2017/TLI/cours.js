@@ -416,6 +416,68 @@ function imagezone2() {
   }
 }
 
+function imagedecoupage() {
+  var id = document.getElementById("imagedecoupage");
+  var context = id.getContext("2d");
+  var img = new Image();
+  img.src = "800px-Detailaufnahme_Weihnachtsstern_-_groß.bmp";
+  img.onload = function() {
+    context.drawImage(img, 100, 100, 500, 400, 250, 250, 150, 150);
+  }
+}
+
+function imageRotate() {
+  var id = document.getElementById("imageRotate");
+  var context = id.getContext("2d");
+  var img = new Image();
+  img.src = "800px-Detailaufnahme_Weihnachtsstern_-_groß.bmp";
+  img.onload = function() {
+    context.rotate(10*Math.PI/180);
+    context.drawImage(img, 200, 0, 200, 200);
+  }
+}
+
+function imageScale() {
+  var id = document.getElementById("imageScale");
+  var context = id.getContext("2d");
+  var img = new Image();
+  img.src = "800px-Detailaufnahme_Weihnachtsstern_-_groß.bmp";
+  img.onload = function() {
+    context.scale(0.5, 0.5);
+    context.drawImage(img, 200, 0, 200, 200);
+  }
+}
+
+function imageTranslate() {
+  var id = document.getElementById("imageTranslate");
+  var context = id.getContext("2d");
+  var img = new Image();
+  img.src = "800px-Detailaufnahme_Weihnachtsstern_-_groß.bmp";
+  img.onload = function() {
+    context.drawImage(img, 0, 0, 200, 200);
+    context.translate(200, 200);
+    context.drawImage(img, 0, 0, 400, 400);
+  }
+}
+
+function imageTransform() {
+  var id = document.getElementById("imageTransform");
+  var context = id.getContext("2d");
+  var img = new Image();
+  img.src = "800px-Detailaufnahme_Weihnachtsstern_-_groß.bmp";
+  img.onload = function() {
+    context.drawImage(img, 0, 0, 200, 200);
+    context.transform(0.5, 0.5, -0.5, 0.5, 300,10);
+    context.drawImage(img, 0, 0, 400, 400);
+  }
+}
+
+image();
+imageRotate();
+imageScale();
+imageTranslate();
+imageTransform();
+
 cirque("introduction");
 rectangle("introduction", false);
 moncanvastexte();
@@ -454,3 +516,4 @@ base("alignementbase");
 image();
 imagezone();
 imagezone2();
+imagedecoupage();
