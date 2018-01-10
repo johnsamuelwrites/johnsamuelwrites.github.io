@@ -1,3 +1,4 @@
+/*Initialisation du matrice 3*3 */
 var pion = new Array(3);
 for (i = 0; i< 3; i++) {
   pion[i] = new Array(3);
@@ -12,6 +13,7 @@ var id = document.getElementById("tic_tac_toe");
 var context = id.getContext("2d");
 tic_tac_toe();
 
+/*Detection du clic souris*/
 document.getElementById("tic_tac_toe").onmousedown  = function(event) {
   event = event || window.event;
   event.preventDefault();
@@ -89,6 +91,7 @@ function indiceDiagonale(indexX, indexY) {
   return false;
 }
 
+/*Verification*/
 function verifier(indexX, indexY) {
   var milieu = false;
   if ( indiceDiagonale(indexX, indexY)) {
@@ -122,6 +125,7 @@ function verifier(indexX, indexY) {
   }    
 }
 
+/*Ajouter un pion*/
 function ajouter(canvas, event) {
   if(fini) {
     return;
