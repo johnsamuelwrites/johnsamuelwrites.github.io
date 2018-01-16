@@ -1,4 +1,4 @@
-function cirque(nom) {
+function cercle(nom) {
   var id = document.getElementById(nom);
   var context = id.getContext("2d");
   context.strokeStyle =  "#00b33c";
@@ -478,7 +478,7 @@ imageScale();
 imageTranslate();
 imageTransform();
 
-cirque("introduction");
+cercle("introduction");
 rectangle("introduction", false);
 moncanvastexte();
 
@@ -495,7 +495,7 @@ arc3("arc4", true);
 courbequadratique("courbe1", false);
 courbequadratique("courbe2", true);
 
-cirque("cirque");
+cercle("cercle");
 rectangle("rectangle1", false);
 rectangle("rectangle2", true);
 triangle("triangle1", false);
