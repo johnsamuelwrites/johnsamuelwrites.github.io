@@ -285,13 +285,41 @@
         </div>
         <h4>Exercise 1.4</h4>
         <div class="exercise">
-          <p> </p>
+          <p>
+        In this exercise, we will take a look at how to download data from external data sources using special query interfaces. Take for example, above data was obtained from <a href="https://query.wikidata.org/">Wikidata query</a> interface with the <a href="./references.html">query examples</a>. See the screenshot given below.
+          </p>
           <p>
             <img src="./images/wikidataquery.png"></img>
+          </p>
+          <p> Given below is the code to read data from an external data source. 
+          Use this <a href="ttps://query.wikidata.org/sparql?query=SELECT%20%3FlanguageLabel%20(YEAR(%3Finception)%20as%20%3Fyear)%0AWHERE%0A%7B%0A%20%20%23instances%20of%20programming%20language%0A%20%20%3Flanguage%20wdt%3AP31%20wd%3AQ9143%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20wdt%3AP571%20%3Finception%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20rdfs%3Alabel%20%3FlanguageLabel.%0A%20%20FILTER(lang(%3FlanguageLabel)%20%3D%20%22en%22)%0A%7D%0AORDER%20BY%20%3Fyear%0ALIMIT%20100&format=json">url</a> and replace ".." by the previous URL value.
+          </p>
+          <p>
+            <code>
+              <span style="color:green">import</span> urllib</br>
+              <span style="color:green">import</span> json</br>
+              </br>
+              url = <span style="color:red">"..."</span></br>
+              response = <span style="color:green">urllib.request.urlopen</span>(url)</br>
+              responsedata =  <span style="color:green">json.loads</span>(response.read().decode('utf-8'))</br>
+              </br>
+              array = []</br>
+              </br>
+              <span style="color:green">for</span> data <span style="color:green">in</span> responsedata[<span style="color:red">'results'</span>][<span style="color:red">'bindings'</span>]:</br>
+              &nbsp;&nbsp;<span style="color:green">array.append</span>([data[<span style="color:red">'year'</span>][<span style="color:red">'value'</span>], data[<span style="color:red">'languageLabel'</span>][<span style="color:red">'value'</span>]])</br>
+              dataframe = <span style="color:green">pd.DataFrame</span>(array, columns=[<span style="color:red">'year'</span>, <span style="color:red">'languageLabel'</span>])
+            </code>
           </p>
         </div>
         <h4>Exercise 1.5</h4>
         <div class="exercise">
+          <p>This final exercise will use some basic data analyses. Continuing with the code in Exercise 1.4, le's count the number of programming languages released in a year.</p>
+          <p>
+            <code>
+              grouped = <span style="color:green">dataframe.groupby</span>(<span style="color:red">'year'</span>).count()</br>
+              <span style="color:green">print</span>(grouped)</br>
+            </code>
+          </p>
         </div>
         <h4>References</h4>
         <p><a href="./references.html">Link</a></p>
