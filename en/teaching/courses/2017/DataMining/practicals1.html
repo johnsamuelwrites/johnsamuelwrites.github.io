@@ -323,7 +323,68 @@
               <span style="color:green">print</span>(grouped)</br>
             </code>
           </p>
+          <p>You can also use multiple aggregate functions using agg()</p>
+          <p>
+            <code>
+              grouped = <span style="color:green">dataframe.groupby</span>(<span style="color:red">'year'</span>).agg([<span style="color:red">'count'</span>])</br>
+              <span style="color:green">print</span>(grouped)</br>
+            </code>
+          </p>
+          <p>Till now, we worked with tables having two columns. Now we focus on tables with three columns (programming language, year, paradigm). Copy the file <a href="./plparadigm.json">plparadigm.json</a> to your working directory. And test the following program.</p>
+          <p>
+            <code>
+              <span style="color:green">from</span> pandas.io.json <span style="color:green">import</span> json_normalize</br>
+              <span style="color:green">import</span> pandas <span style="color:green">as</span> pd</br>
+              <span style="color:green">import</span> json</br>
+              </br>
+              data = <span style="color:green">json.load</span>(open(<span style="color:red">'plparadigm.json'</span>))</br>
+              array = []</br>
+              </br>
+              <span style="color:green">for</span> data <span style="color:green">in</span> jsondata:</br>
+              &nbsp;&nbsp;<span style="color:green">array.append</span>([data[<span style="color:red">'year'</span>], data[<span style="color:red">'languageLabel'</span>], data[<span style="color:red">'paradigmLabel'</span>]])</br>
+              dataframe = <span style="color:green">pd.DataFrame</span>(array, columns=[<span style="color:red">'year'</span>, <span style="color:red">'languageLabel'</span>, <span style="color:red">'paradigmLabel'</span>]) </br>
+              dataframe = <span style="color:green">dataframe.astype</span>(dtype= {<span style="color:red">"year"</span> : <span style="color:red">"int64"</span>, <span style="color:red">"languageLabel"</span> : <span style="color:red">"&lt;U200"</span>, <span style="color:red">"paradigmLabel"</span> : <span style="color:red">"&lt;U200"</span>})</br>
+              </br>
+              grouped = <span style="color:green">dataframe.groupby</span>([<span style="color:red">'year'</span>, <span style="color:red">'paradigmLabel'</span>]).agg([<span style="color:red">'count'</span>])</br>
+              <span style="color:green">print</span>(grouped)</br>
+            </code>
+          </p>
+          <p>Now test the following program. Compare the difference in output.</p>
+          <p>
+            <code>
+              grouped = <span style="color:green">dataframe.groupby</span>([<span style="color:red">'paradigmLabel'</span>, <span style="color:red">'year'</span>]).agg([<span style="color:red">'count'</span>])</br>
+              <span style="color:green">print</span>(grouped)</br>
+            </code>
+          </p>
+          <p>Your next goal is to run the following query to get the population information of different countries (limited to 1000 rows). Run the following query on <a href=="https://query.wikidata.org">Wikidata query service</a> and download the JSON file.</p>
+          <p>
+            <code>
+            SELECT DISTINCT ?countryLabel (YEAR(?date) as ?year) ?population</br>
+            WHERE {</br>
+            &nbsp;?country wdt:P31 wd:Q6256; #Country </br>
+            &nbsp;&nbsp; p:P1082 ?populationStatement;</br>
+            &nbsp;&nbsp;rdfs:label ?countryLabel. #Label</br>
+            &nbsp;?populationStatement ps:P1082 ?population; #population</br>
+            &nbsp;&nbsp;pq:P585 ?date. #period in time</br>
+            &nbsp;FILTER(lang(?countryLabel)="en") #Label in English</br>
+            }</br>
+            ORDER by ?countryLabel ?year</br>
+            LIMIT 1000</br>
+            </code>
+          </p>
+          Now, compute and display the following information (using various <a href="https://pandas.pydata.org/pandas-docs/stable/10min.html">operations available in pandas library</a>):
+          <ol>
+            <li>The population of countries in alphabetical order of their names and ascending order of year.</li>
+            <li>The latest available population of every country</li>
+            <li>The country with the lowest and highest population (considering the latest population)</li>
+          </ol>
         </div>
+        <h4>Submission</h4>
+        <ul>
+          <li>Rename your notebook as Name1_Name2_[Name3].ipynb, where Name1, Name2 are your names.</li>
+          <li>Submit your notebook online.</li>
+          <li>Please <b>don't</b> submit your JSON, TSV and CSV files.</li>
+        </ul>
         <h4>References</h4>
         <p><a href="./references.html">Link</a></p>
       </div>
