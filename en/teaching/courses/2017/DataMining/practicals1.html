@@ -292,12 +292,13 @@
             <img src="./images/wikidataquery.png"></img>
           </p>
           <p> Given below is the code to read data from an external data source. 
-          Use this <a href="ttps://query.wikidata.org/sparql?query=SELECT%20%3FlanguageLabel%20(YEAR(%3Finception)%20as%20%3Fyear)%0AWHERE%0A%7B%0A%20%20%23instances%20of%20programming%20language%0A%20%20%3Flanguage%20wdt%3AP31%20wd%3AQ9143%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20wdt%3AP571%20%3Finception%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20rdfs%3Alabel%20%3FlanguageLabel.%0A%20%20FILTER(lang(%3FlanguageLabel)%20%3D%20%22en%22)%0A%7D%0AORDER%20BY%20%3Fyear%0ALIMIT%20100&format=json">url</a> and replace ".." by the previous URL value.
+          Use this <a href="https://query.wikidata.org/sparql?query=SELECT%20%3FlanguageLabel%20(YEAR(%3Finception)%20as%20%3Fyear)%0AWHERE%0A%7B%0A%20%20%23instances%20of%20programming%20language%0A%20%20%3Flanguage%20wdt%3AP31%20wd%3AQ9143%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20wdt%3AP571%20%3Finception%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20rdfs%3Alabel%20%3FlanguageLabel.%0A%20%20FILTER(lang(%3FlanguageLabel)%20%3D%20%22en%22)%0A%7D%0AORDER%20BY%20%3Fyear%0ALIMIT%20100&format=json">url</a> and replace ".." by the previous URL value.
           </p>
           <p>
             <code>
-              <span style="color:green">import</span> urllib</br>
+              <span style="color:green">import</span> urllib.request</br>
               <span style="color:green">import</span> json</br>
+              <span style="color:green">import</span> pandas <span style="color:green">as</span> pd</br>
               </br>
               url = <span style="color:red">"..."</span></br>
               response = <span style="color:green">urllib.request.urlopen</span>(url)</br>
@@ -307,7 +308,9 @@
               </br>
               <span style="color:green">for</span> data <span style="color:green">in</span> responsedata[<span style="color:red">'results'</span>][<span style="color:red">'bindings'</span>]:</br>
               &nbsp;&nbsp;<span style="color:green">array.append</span>([data[<span style="color:red">'year'</span>][<span style="color:red">'value'</span>], data[<span style="color:red">'languageLabel'</span>][<span style="color:red">'value'</span>]])</br>
-              dataframe = <span style="color:green">pd.DataFrame</span>(array, columns=[<span style="color:red">'year'</span>, <span style="color:red">'languageLabel'</span>])
+              dataframe = <span style="color:green">pd.DataFrame</span>(array, columns=[<span style="color:red">'year'</span>, <span style="color:red">'languageLabel'</span>])</br>
+              dataframe = <span style="color:green">dataframe.astype</span>(dtype= {<span style="color:red">"year"</span>:<span style="color:red">"&lt;i4"</span>, <span style="color:red">"languageLabel"</span>:<span style="color:red">"&lt;U200"</span>})</br>
+              <span style="color:green">print</span>(dataframe)</br>
             </code>
           </p>
         </div>
