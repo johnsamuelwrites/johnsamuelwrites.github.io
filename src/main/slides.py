@@ -2,12 +2,12 @@
 # Author: John Samuel
 
 import argparse
-from shutil import move
+from shutil import copy
 from os import remove
 import re
 
 def enumerate_slides(filename):
-  outputfile = open("/tmp/temp"+filename, "w") 
+  outputfile = open("/tmp/temp.html", "w") 
 
   count = 1
 
@@ -47,6 +47,11 @@ def enumerate_slides(filename):
          line = innersectionline2
        elif (line != innersectionline3):
          line = innersectionline3
+       else:
+         #No change, but section number need to be incremented
+         if ('<a class="next" href="#slide' in line):
+           count = count + 1
+           
 
        outputfile.write(line+"\n")
   outputfile.close()
@@ -54,7 +59,8 @@ def enumerate_slides(filename):
 
   #Replacing the old file
   remove(filename)
-  move("/tmp/temp"+filename, filename)
+  copy("/tmp/temp.html", filename)
+  remove("/tmp/temp.html")
 
 def modify_files(files):
   for filename in files:
