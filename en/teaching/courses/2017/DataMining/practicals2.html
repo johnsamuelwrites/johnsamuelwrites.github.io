@@ -297,6 +297,108 @@
              print(imgfile.size, imgfile.format)</br>
           </code>
          </p>
+         <p>We use Image module of Python PIL library (<a href="http://www.effbot.org/imagingbook/image.htm">Documentation</a>). We will now try to get data of 100 pixels from an image. </p>
+         <p class= codeexample>
+          <code>
+             import os,sys</br>
+             from PIL import Image</br>
+             imgfile = Image.open("flower.jpg")</br>
+             </br>
+             data = imgfile.getdata()</br>
+             </br>
+             for i in range(10):</br>
+             &nbsp;&nbsp;&nbsp;&nbsp;for j in range(10):</br>
+             &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;print(i,j, data.getpixel((i,j)))</br>
+          </code>
+         </p>
+         <p>You may notice the pixel position and pixel values (a tuple of 3 values). Let's try to get additional metadata of the images, i.e., mode of image (e.g., RGB), number of bands, number of bits for each band, width and height of image (in pixels).</p>
+         <p class= codeexample>
+          <code>
+             import os,sys</br>
+             from PIL import Image</br>
+             imgfile = Image.open("flower.jpg")</br>
+             </br>
+             print(imgfile.mode, imgfile.bands, imgfile.bits, imgfile.width, imgfile.height)</br>
+          </code>
+         </p>
+         <p>Let's now get an histogram of colors. When you execute the following code, you will get a single array of values, frequency of each band (R, G, B etc.) concatenated together. In the following code, we will assume that we are working with a image with 3 bands (RGB mode) and each band is represented by 8 bits. We will plot the <a href="http://www.effbot.org/imagingbook/image.htm#tag-Image.Image.histogram">histogram</a> of different colors.</p>
+         <p class= codeexample>
+          <code>
+             from PIL import Image</br>
+             import matplotlib.pyplot as plot</br>
+             </br>
+             imgfile = Image.open("flower.jpg")</br>
+             </br>
+             histogram = imgfile.histogram()</br>
+             red = histogram[0:255]</br>
+             green = histogram[256:511]</br>
+             blue = histogram[512:767]</br>
+             </br>
+             fig, (axis1, axis2, axis3) = plot.subplots(nrows=3, ncols=1)</br>
+             axis1.plot(red, color='red')</br>
+             axis2.plot(green, color='green')</br>
+             axis3.plot(blue, color='blue')</br>
+             plot.show()</br>
+           </code>
+          </p>
+          <p>
+            <img style="width:40%" src="./images/histogramsubplots.png"></img>
+          </p>
+          <p>But if wish to see all of them in one single plot.</p>
+          <p class= codeexample>
+           <code>
+             from PIL import Image</br>
+             import matplotlib.pyplot as plot</br>
+             </br>
+             imgfile = Image.open("flower.jpg")</br>
+             </br>
+             histogram = imgfile.histogram()</br>
+             red = histogram[0:255]</br>
+             green = histogram[256:511]</br>
+             blue = histogram[512:767]</br>
+             </br>
+             x=range(255)</br>
+             </br>
+             y = []</br>
+             for i in x:</br>
+             &nbsp;&nbsp;&nbsp;&nbsp;y.append((red[i],green[i],blue[i]))</br>
+             </br>
+             plot.plot(x,y)</br>
+             plot.show()</br>
+           </code>
+          </p>
+          <p>
+            <img style="width:40%" src="./images/histogramplot.png"></img>
+          </p>
+          <p>But we do not wish to loose the band colors.</p>
+          <p class= codeexample>
+           <code>
+             from PIL import Image</br>
+             import matplotlib.pyplot as plot</br>
+             </br>
+             imgfile = Image.open("flower.jpg")</br>
+             </br>
+             histogram = imgfile.histogram()</br>
+             red = histogram[0:255]</br>
+             green = histogram[256:511]</br>
+             blue = histogram[512:767]</br>
+             </br>
+             x=range(255)</br>
+             </br>
+             y = []</br>
+             for i in x:</br>
+             &nbsp;&nbsp;&nbsp;&nbsp;y.append((red[i],green[i],blue[i]))</br>
+             </br>
+             figure, axes = plot.subplots()</br>
+             axes.set_prop_cycle('color', ['red', 'green', 'blue'])</br>
+             plot.plot(x,y)</br>
+             plot.show()</br>
+           </code>
+          </p>
+          <p>
+            <img style="width:40%" src="./images/histogramplotcolors.png"></img>
+          </p>
+          <p>Your next question is to get the top 20 colors in each band and create a single plot of histogram of these top colors. Write a python program that can achieve this. </p>
         </div>
         <h4>Exercise 2.3 <span style="color:red">&#9733;&#9733;</span></h4>
         <div class="exercise">
