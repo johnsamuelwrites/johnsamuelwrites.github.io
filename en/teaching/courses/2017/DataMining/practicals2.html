@@ -84,7 +84,7 @@
      color:#00363a;
     }
     .exercise {
-     margin-left:2vw;
+     margin-left:1vw;
     }
     .exercise p{
      margin-left:1vw;
@@ -140,32 +140,165 @@
         <h3>Goals</h3>
         <ol>
           <li>Plotting graphs using <a href="https://matplotlib.org/api/pyplot_api.html">matplotlib</a></li>
-          <li></li>
-          <li></li>
-          <li></li>
-          <li></li>
+          <li>Reading and plotting image histograms.</li>
+          <li>Working with clustering and classification algorithms</li>
+          <li>Start building a recommender system</li>
+        </ol>
+        <h3>Scoring</h3>
+        <p>Every exercise has an associated difficulty level. Easy and medium-difficult exercises help you understand the fundamentals and give you ideas to work on difficult exercises. It is highly recommended that you finish easy and medium-difficult exercises to have a good score. Given below is the difficulty scale: </p>
+        <ol>
+          <li><span style="color:red">&#9733;</span>: Easy</li>
+          <li><span style="color:red">&#9733;&#9733;</span>: Medium</li>
+          <li><span style="color:red">&#9733;&#9733;&#9733;</span>: Difficult</li>
         </ol>
         <h4>Installation</h4>
         <div class="exercise">
           <p>Please refer <a href="./installation.html">installation</a> page.</p>
         </div>
-        <h4>Exercise 2.1</h4>
+        <h4>Exercise 2.1 <span style="color:red">&#9733</span></h4>
+        <div class="exercise">
+          <p><a href="https://matplotlib.org/api/pyplot_api.html">matplotlib</a> can be used to plot graphs. Given below is a very simple code with only x values. After importing the <i>matplotlib</i> library, we initialize x values and plot it.</p>
+          <p class= codeexample>
+           <code>
+             import matplotlib.pyplot as plot</br>
+             </br>
+             x = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]</br>
+             plot.plot(x)</br>
+             plot.show()</br>
+           </code>
+          <p>
+          <p>
+            <img style="width:40%" src="./images/plot.png"></img>
+          </p>
+          <p>Now let's change the color and width of the line.</p>
+          <p class= codeexample>
+           <code>
+             import matplotlib.pyplot as plot</br>
+             </br>
+             x = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]</br>
+             plot.plot(x, linewidth=3, drawstyle="steps", color="#00363a")</br>
+             plot.show()</br>
+           </code>
+          </p>
+          <p>We will now initialize the y-values and plot the graph.</p>
+          <p class= codeexample>
+           <code>
+             import matplotlib.pyplot as plot</br>
+             </br>
+             x = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]</br>
+             y = [0, 1, 0, 0, 1, 0, 1, 1, 1, 0]</br>
+             plot.plot(x, y, linewidth=3, drawstyle="steps", color="#00363a")</br>
+             plot.show()</br>
+           </code>
+          </p>
+          <p>
+            <img style="width:40%" src="./images/stepploty.png"></img>
+          </p>
+          <p>In the <a href="./practicals1.html">first practical session,</a>, we saw how to parse JSON files. Continuing with the same JSON file, we will now plot the results of number of programming languages released per year. Verify the output.</p>
+          <p class= codeexample>
+           <code>
+             from pandas.io.json import json_normalize</br>
+             import pandas as pd</br>
+             import json</br>
+             import matplotlib.pyplot as plot</br>
+             </br>
+             data = json.load(open('pl.json'))</br>
+             dataframe = json_normalize(data)</br>
+             grouped = dataframe.groupby('year').count()</br>
+             plot.plot(grouped)</br>
+             plot.show()</br>
+           </code>
+          </p>
+          <p>Following program will add title and labels to the x-axis and y-axis.</p>
+          <p class= codeexample>
+           <code>
+             from pandas.io.json import json_normalize</br>
+             import pandas as pd</br>
+             import json</br>
+             import matplotlib.pyplot as plot</br>
+             </br>
+             data = json.load(open('pl.json'))</br>
+             dataframe = json_normalize(data)</br>
+             grouped = dataframe.groupby('year').count()</br>
+             plot.plot(grouped)</br>
+             plot.title("Programming languages per year")</br>
+             plot.xlabel('year',  fontsize=16)</br>
+             plot.ylabel('count',  fontsize=16)</br>
+             plot.show()</br>
+           </code>
+          </p>
+          <p>There is yet another way to plot the dataframes, by using <a href="https://pandas.pydata.org/pandas-docs/stable/generated/pandas.DataFrame.plot.html">pandas.DataFrame.plot</a>.</p>
+          <p class= codeexample>
+           <code>
+             from pandas.io.json import json_normalize</br>
+             import pandas as pd</br>
+             import json</br>
+             import matplotlib.pyplot as plot</br>
+             </br>
+             data = json.load(open('pl.json'))</br>
+             dataframe = json_normalize(data)</br>
+             </br>
+             grouped = dataframe.groupby('year').count()</br>
+             grouped = grouped.rename(columns={'languageLabel':'count'}).reset_index()</br>
+             </br>
+             grouped.plot(x=0, kind='bar', title="Programming languages per year")</br>
+           </code>
+          </p>
+          <p>
+            <img style="width:40%" src="./images/dataframeplot.png"></img>
+          </p>
+          <p>Now, we want to create multiple subplots. A simple way is given below. Recall in <a href="./practicals1.html">first practical session</a>, we did group by on multiple columns. Subplots can be used to visualize these data.
+          </p>
+          <p class= codeexample>
+           <code>
+             from pandas.io.json import json_normalize</br>
+             import pandas as pd</br>
+             import json</br>
+             import math</br>
+             import matplotlib.pyplot as plot</br>
+             </br>
+             jsondata = json.load(open('plparadigm.json'))</br>
+             array = []</br>
+             </br>
+             for data in jsondata:</br>
+                 array.append([data['year'], data['languageLabel'], data['paradigmLabel']])</br>
+             dataframe = pd.DataFrame(array, columns=['year', 'languageLabel', 'paradigmLabel'])</br>
+             dataframe = dataframe.astype(dtype= {"year" : "int64", "languageLabel" : "<U200", "paradigmLabel" : "<U200"})</br>
+             </br>
+             grouped = dataframe.groupby(['paradigmLabel', 'year']).count()</br>
+             grouped = grouped.rename(columns={'languageLabel':'count'})</br>
+             grouped = grouped.groupby(['paradigmLabel'])</br>
+             </br>
+             #Initialization of subplots</br>
+             nr = math.ceil(grouped.ngroups/2)</br>
+             fig, axes = plot.subplots(nrows=nr, ncols=2, figsize=(20,25))</br>
+             </br>
+             #Creation of subplots</br>
+             for i, group in enumerate(grouped.groups.keys()):</br>
+                 g = grouped.get_group(group).reset_index()</br>
+                 g.plot(x='year', y='count', kind='bar', title=group, ax=axes[math.floor(i/2),i%2])</br>
+             </br>
+             plot.show()</br>
+           </code>
+          </p>
+          <p>
+            <img style="width:50%" src="./images/subplots.png"></img>
+          </p>
+          Make changes to the above code, so that we can get visual information on count of different programming paradigms released in every available year.
+        </div>
+        <h4>Exercise 2.2 <span style="color:red">&#9733;</span></h4>
         <div class="exercise">
         <p></p>
         </div>
-        <h4>Exercise 2.2</h4>
+        <h4>Exercise 2.3 <span style="color:red">&#9733;&#9733;</span></h4>
         <div class="exercise">
         <p></p>
         </div>
-        <h4>Exercise 2.3</h4>
+        <h4>Exercise 2.4 <span style="color:red">&#9733;&#9733</span></h4>
         <div class="exercise">
         <p></p>
         </div>
-        <h4>Exercise 2.4</h4>
-        <div class="exercise">
-        <p></p>
-        </div>
-        <h4>Exercise 2.5</h4>
+        <h4>Exercise 2.5 <span style="color:red">&#9733;&#9733;&#9733;</span></h4>
         <div class="exercise">
         <p></p>
         </div>
