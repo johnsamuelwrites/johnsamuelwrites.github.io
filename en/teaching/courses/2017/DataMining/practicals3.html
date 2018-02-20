@@ -170,7 +170,7 @@
         <div class="exercise">
           <p>During practical session 2, we saw a clustering algorithm called KMeans. In this practical session, we see some more clustering algorithms. We will try to get more clusters and also check the time taken by each of these algorithms.</p>
           <p>Let's start once again with <b>KMeans</b> and try to get clusters of size between 2 and 11.</p> 
-          <p>
+          <p class="codeexample">
             <code>
              from PIL import Image<br/>
              import numpy<br/>
@@ -218,7 +218,8 @@
             <img style="width:50%" src="./images/kmeans.png"></img>
           </p>
           <p>Now we modify the above algorithm to use <b>MiniBatchKMeans</b> clustering algorithm. Observe the changes.</p>
-          <code>
+          <p class="codeexample">
+            <code>
              from PIL import Image<br/>
              import numpy<br/>
              import math<br/>
@@ -257,7 +258,8 @@
              <br/>
              <br/>
              plot.show()<br/>
-          </code>
+            </code>
+          </p>
           <p>What did you observe? Your next goal is to test the above code for cluster sizes between 2 and 21 which will give you the figure given below.</p> 
           <p>What did you observe? What are your conclusions?</p> 
           <p>
@@ -265,7 +267,7 @@
           </p>
           <p>In order to understand time taken by each of these algorithms, we will repeat the above experiment, but this time we will plot the time taken to obtain clusters of different sizes.</p> 
           <p>We start with <b>KMeans</b>.</p>
-          <p>
+          <p class="codeexample">
             <code>
              from PIL import Image<br/>
              import numpy<br/>
@@ -301,7 +303,7 @@
             <img style="width:50%" src="./images/kmeanstime.png"></img>
           </p>
           <p>We now use <b>MiniBatchKMeans</b>.</p>
-          <p>
+          <p class="codeexample">
             <code>
              from PIL import Image<br/>
              import numpy<br/>
@@ -337,6 +339,146 @@
             <img style="width:40%" src="./images/minibatchkmeanstime.png"></img>
           </p>
           <p>Now test the above code using <b>MiniBatchKMeans</b> algorithm with cluster sizes between 2 and 50. What are your observations? </p>
+          <p>Finally we want to see whether we get the same cluster centers from both the algorithms. Run the following program to see the cluster centers produced by the two algorithms. We use two different colors (red and black) to distinguish the cluster centers from the two algorithms.</p>
+          <p>
+          <p class="codeexample">
+            <code>
+              from PIL import Image<br/>
+              import numpy<br/>
+              import math<br/>
+              import matplotlib.pyplot as plot<br/>
+              from sklearn.cluster import KMeans<br/>
+              from sklearn.cluster import MiniBatchKMeans<br/>
+              <br/>
+              imgfile = Image.open("flower.jpg")<br/>
+              numarray = numpy.array(imgfile.getdata(), numpy.uint8)<br/>
+              <br/>
+              cluster_count = 10<br/>
+              <br/>
+              clusters = KMeans(n_clusters = cluster_count)<br/>
+              clusters.fit(numarray)<br/>
+              <br/>
+              mclusters = MiniBatchKMeans(n_clusters = cluster_count)<br/>
+              mclusters.fit(numarray)<br/>
+              <br/>
+              fig, axes = plot.subplots(nrows=3, ncols=1, figsize=(20,25))<br/>
+              #Scatter plot for RG (RGB)<br/>
+              axes[0].scatter(numarray[:,0],numarray[:,1])<br/>
+              axes[0].scatter(clusters.cluster_centers_[:,0], clusters.cluster_centers_[:,1], c='red')<br/>
+              axes[0].scatter(mclusters.cluster_centers_[:,0], mclusters.cluster_centers_[:,1], c='black')<br/>
+              <br/>
+              #Scatter plot of RB (RGB)<br/>
+              axes[1].scatter(numarray[:,0],numarray[:,2])<br/>
+              axes[1].scatter(clusters.cluster_centers_[:,0], clusters.cluster_centers_[:,2], c='red')<br/>
+              axes[1].scatter(mclusters.cluster_centers_[:,0], mclusters.cluster_centers_[:,2], c='black')<br/>
+              <br/>
+              #Scatter plot of GB (RGB)<br/>
+              axes[2].scatter(numarray[:,1],numarray[:,2])<br/>
+              axes[2].scatter(clusters.cluster_centers_[:,1], clusters.cluster_centers_[:,2], c='red')<br/>
+              axes[2].scatter(mclusters.cluster_centers_[:,1], mclusters.cluster_centers_[:,2], c='black')<br/>
+            </code>
+          </p>
+          <p>
+            <img style="width:40%" src="./images/scatterplots.png"></img>
+          </p>
+          <p>We would like to see how the individual pixel values have been clustered. Run the following program a couple of times.</p>
+          <p class="codeexample">
+            <code>
+              from PIL import Image<br/>
+              import numpy<br/>
+              import math<br/>
+              import time<br/>
+              import matplotlib.pyplot as plot<br/>
+              from sklearn.cluster import KMeans<br/>
+              from sklearn.cluster import MiniBatchKMeans<br/>
+              <br/>
+              imgfile = Image.open("flower.jpg")<br/>
+              numarray = numpy.array(imgfile.getdata(), numpy.uint8)<br/>
+              <br/>
+              cluster_count = 10<br/>
+              <br/>
+              mclusters = MiniBatchKMeans(n_clusters = cluster_count)<br/>
+              mclusters.fit(numarray)<br/>
+              <br/>
+              npbins = numpy.arange(0, cluster_count + 1)<br/>
+              histogram = numpy.histogram(mclusters.labels_, bins=npbins)<br/>
+              labels = numpy.unique(mclusters.labels_)<br/>
+              <br/>
+              fig, axes = plot.subplots(nrows=3, ncols=2, figsize=(20,25))<br/>
+              <br/>
+              #Scatter plot for RG (RGB)<br/>
+              colors = []<br/>
+              for i in range(len(numarray)):<br/>
+              &nbsp;&nbsp;&nbsp;&nbsp;j = mclusters.labels_[i]<br/>
+              &nbsp;&nbsp;&nbsp;&nbsp;colors.append('#%02x%02x%02x' % (math.ceil(mclusters.cluster_centers_[j][0]),<br/>
+              &nbsp;&nbsp;&nbsp;&nbsp;       math.ceil(mclusters.cluster_centers_[j][1]), 0))<br/>
+              &nbsp;&nbsp;&nbsp;&nbsp;              <br/>
+              axes[0,0].scatter(numarray[:,0],numarray[:,1], c=colors)<br/>
+              axes[0,0].scatter(mclusters.cluster_centers_[:,0], mclusters.cluster_centers_[:,1], marker="+", c='red')<br/>
+              <br/>
+              #Scatter plot for RB (RGB)<br/>
+              colors = []<br/>
+              for i in range(len(numarray)):<br/>
+              &nbsp;&nbsp;&nbsp;&nbsp;j = mclusters.labels_[i]<br/>
+              &nbsp;&nbsp;&nbsp;&nbsp;colors.append('#%02x%02x%02x' % (math.ceil(mclusters.cluster_centers_[j][0]),<br/>
+              &nbsp;&nbsp;&nbsp;&nbsp;       0, math.ceil(mclusters.cluster_centers_[j][2])))<br/>
+              &nbsp;&nbsp;&nbsp;&nbsp;              <br/>
+              axes[1,0].scatter(numarray[:,0],numarray[:,2], c=colors)<br/>
+              axes[1,0].scatter(mclusters.cluster_centers_[:,0], mclusters.cluster_centers_[:,2], marker="+", c='white')<br/>
+              <br/>
+              #Scatter plot for GB (RGB)<br/>
+              colors = []<br/>
+              for i in range(len(numarray)):<br/>
+              &nbsp;&nbsp;&nbsp;&nbsp;j = mclusters.labels_[i]<br/>
+              &nbsp;&nbsp;&nbsp;&nbsp;colors.append('#%02x%02x%02x' % (0, math.ceil(mclusters.cluster_centers_[j][1]),<br/>
+              &nbsp;&nbsp;&nbsp;&nbsp;        math.ceil(mclusters.cluster_centers_[j][2])))<br/>
+              &nbsp;&nbsp;&nbsp;&nbsp;              <br/>
+              axes[2,0].scatter(numarray[:,1],numarray[:,2], c=colors)<br/>
+              axes[2,0].scatter(mclusters.cluster_centers_[:,1], mclusters.cluster_centers_[:,2], marker="+", c='yellow')<br/>
+              <br/>
+              clusters = KMeans(n_clusters = cluster_count)<br/>
+              clusters.fit(numarray)<br/>
+              <br/>
+              npbins = numpy.arange(0, cluster_count + 1)<br/>
+              histogram = numpy.histogram(clusters.labels_, bins=npbins)<br/>
+              labels = numpy.unique(clusters.labels_)<br/>
+              <br/>
+              #Scatter plot for RG (RGB)<br/>
+              colors = []<br/>
+              for i in range(len(numarray)):<br/>
+              &nbsp;&nbsp;&nbsp;&nbsp;j = clusters.labels_[i]<br/>
+              &nbsp;&nbsp;&nbsp;&nbsp;colors.append('#%02x%02x%02x' % (math.ceil(clusters.cluster_centers_[j][0]),<br/>
+              &nbsp;&nbsp;&nbsp;&nbsp;       math.ceil(clusters.cluster_centers_[j][1]), 0))<br/>
+              &nbsp;&nbsp;&nbsp;&nbsp;              <br/>
+              axes[0,1].scatter(numarray[:,0],numarray[:,1], c=colors)<br/>
+              axes[0,1].scatter(clusters.cluster_centers_[:,0], clusters.cluster_centers_[:,1], marker="+", c='red')<br/>
+              <br/>
+              #Scatter plot for RB (RGB)<br/>
+              colors = []<br/>
+              for i in range(len(numarray)):<br/>
+              &nbsp;&nbsp;&nbsp;&nbsp;j = clusters.labels_[i]<br/>
+              &nbsp;&nbsp;&nbsp;&nbsp;colors.append('#%02x%02x%02x' % (math.ceil(clusters.cluster_centers_[j][0]),<br/>
+              &nbsp;&nbsp;&nbsp;&nbsp;       0, math.ceil(clusters.cluster_centers_[j][2])))<br/>
+              &nbsp;&nbsp;&nbsp;&nbsp;              <br/>
+              axes[1,1].scatter(numarray[:,0],numarray[:,2], c=colors)<br/>
+              axes[1,1].scatter(clusters.cluster_centers_[:,0], clusters.cluster_centers_[:,2], marker="+", c='white')<br/>
+              <br/>
+              #Scatter plot for GB (RGB)<br/>
+              colors = []<br/>
+              for i in range(len(numarray)):<br/>
+              &nbsp;&nbsp;&nbsp;&nbsp;j = clusters.labels_[i]<br/>
+              &nbsp;&nbsp;&nbsp;&nbsp;colors.append('#%02x%02x%02x' % (0, math.ceil(clusters.cluster_centers_[j][1]),<br/>
+              &nbsp;&nbsp;&nbsp;&nbsp;        math.ceil(clusters.cluster_centers_[j][2])))<br/>
+              &nbsp;&nbsp;&nbsp;&nbsp;              <br/>
+              axes[2,1].scatter(numarray[:,1],numarray[:,2], c=colors)<br/>
+              axes[2,1].scatter(clusters.cluster_centers_[:,1], clusters.cluster_centers_[:,2], marker="+", c='yellow')<br/>
+              plot.show()<br/>
+            </code>
+          </p>
+          <p>
+            <img style="width:40%" src="./images/kmeansminibatchcomparison.png"></img>
+          </p>
+          <p>What are your conclusions? </p>
         </div>
         <h4>Exercise 3.2</h4>
         <div class="exercise">
