@@ -168,12 +168,13 @@
         </div>
         <h4>Exercise 3.1</h4>
         <div class="exercise">
-          <p>Clustering algorithms and time taken</p>
-          <code>
+          <p>During practical session 2, we saw a clustering algorithm called KMeans. In this practical session, we see some more clustering algorithms. We will try to get more clusters and also check the time taken by each of these algorithms.</p>
+          <p>Let's start once again with <b>KMeans</b> and try to get clusters of size between 2 and 11.</p> 
+          <p>
+            <code>
              from PIL import Image<br/>
              import numpy<br/>
              import math<br/>
-             import time<br/>
              import matplotlib.pyplot as plot<br/>
              from sklearn.cluster import KMeans<br/>
              <br/>
@@ -183,21 +184,62 @@
              X = []<br/>
              Y = []<br/>
              <br/>
-             fig, axes = plot.subplots(nrows=10, ncols=2, figsize=(20,25))<br/>
+             fig, axes = plot.subplots(nrows=5, ncols=2, figsize=(20,25))<br/>
              <br/>
              xaxis = 0<br/>
              yaxis = 0<br/>
-             for x in range(2, 22):<br/>
+             for x in range(2, 12):<br/>
              &nbsp;&nbsp;&nbsp;&nbsp;cluster_count = x <br/>
              &nbsp;&nbsp;&nbsp;&nbsp;<br/>
-             &nbsp;&nbsp;&nbsp;&nbsp;start_time = time.time()<br/>
              &nbsp;&nbsp;&nbsp;&nbsp;clusters = KMeans(n_clusters = cluster_count)<br/>
              &nbsp;&nbsp;&nbsp;&nbsp;clusters.fit(numarray)<br/>
-             &nbsp;&nbsp;&nbsp;&nbsp;end_time = time.time()<br/>
-             &nbsp;&nbsp;&nbsp;&nbsp;total_time = end_time - start_time<br/>
-             &nbsp;&nbsp;&nbsp;&nbsp;print("Total time: ", x, ":", total_time)<br/>
-             &nbsp;&nbsp;&nbsp;&nbsp;X.append(x)<br/>
-             &nbsp;&nbsp;&nbsp;&nbsp;Y.append(total_time)<br/>
+             &nbsp;&nbsp;&nbsp;&nbsp;<br/>
+             &nbsp;&nbsp;&nbsp;&nbsp;npbins = numpy.arange(0, cluster_count + 1)<br/>
+             &nbsp;&nbsp;&nbsp;&nbsp;histogram = numpy.histogram(clusters.labels_, bins=npbins)<br/>
+             &nbsp;&nbsp;&nbsp;&nbsp;labels = numpy.unique(clusters.labels_)<br/>
+             <br/>
+             &nbsp;&nbsp;&nbsp;&nbsp;barlist = axes[xaxis, yaxis].bar(labels, histogram[0])<br/>
+             &nbsp;&nbsp;&nbsp;&nbsp;if(yaxis == 0):<br/>
+             &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;  yaxis = 1<br/>
+             &nbsp;&nbsp;&nbsp;&nbsp;else:<br/>
+             &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;  xaxis = xaxis + 1<br/>
+             &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;  yaxis = 0<br/>
+             &nbsp;&nbsp;&nbsp;&nbsp;for i in range(cluster_count):<br/>
+             &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;  barlist[i].set_color('#%02x%02x%02x' % (math.ceil(clusters.cluster_centers_[i][0]),<br/>
+             &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;      math.ceil(clusters.cluster_centers_[i][1]), math.ceil(clusters.cluster_centers_[i][2])))<br/>
+             <br/>
+             <br/>
+             plot.show()<br/>
+            </code>
+          </p>
+          <p>Your next goal is to test the above code for cluster sizes between 2 and 21 which will give you the figure given below.</p> 
+          <p><span style='color:"red"'>Note:</span> The following image was generated after 6 minutes. Optionally, you can add <i>print</i> statements to test whether your code is working fine.</p>
+          <p>
+            <img style="width:50%" src="./images/kmeans.png"></img>
+          </p>
+          <p>Now we modify the above algorithm to use <b>MiniBatchKMeans</b> clustering algorithm. Observe the changes.</p>
+          <code>
+             from PIL import Image<br/>
+             import numpy<br/>
+             import math<br/>
+             import matplotlib.pyplot as plot<br/>
+             from sklearn.cluster import MiniBatchKMeans<br/>
+             <br/>
+             imgfile = Image.open("flower.jpg")<br/>
+             numarray = numpy.array(imgfile.getdata(), numpy.uint8)<br/>
+             <br/>
+             X = []<br/>
+             Y = []<br/>
+             <br/>
+             fig, axes = plot.subplots(nrows=5, ncols=2, figsize=(20,25))<br/>
+             <br/>
+             xaxis = 0<br/>
+             yaxis = 0<br/>
+             for x in range(2, 12):<br/>
+             &nbsp;&nbsp;&nbsp;&nbsp;cluster_count = x <br/>
+             &nbsp;&nbsp;&nbsp;&nbsp;<br/>
+             &nbsp;&nbsp;&nbsp;&nbsp;clusters = MiniBatchKMeans(n_clusters = cluster_count)<br/>
+             &nbsp;&nbsp;&nbsp;&nbsp;clusters.fit(numarray)<br/>
              &nbsp;&nbsp;&nbsp;&nbsp;<br/>
              &nbsp;&nbsp;&nbsp;&nbsp;npbins = numpy.arange(0, cluster_count + 1)<br/>
              &nbsp;&nbsp;&nbsp;&nbsp;histogram = numpy.histogram(clusters.labels_, bins=npbins)<br/>
@@ -216,47 +258,15 @@
              <br/>
              plot.show()<br/>
           </code>
-          <p>
-            <img style="width:50%" src="./images/kmeans.png"></img>
-          </p>
-          <p>MiniBatchKMeans</p>
-          <code>
-             from PIL import Image<br/>
-             import numpy<br/>
-             import math<br/>
-             import time<br/>
-             import matplotlib.pyplot as plot<br/>
-             from sklearn.cluster import MiniBatchKMeans<br/>
-             <br/>
-             imgfile = Image.open("flower.jpg")<br/>
-             numarray = numpy.array(imgfile.getdata(), numpy.uint8)<br/>
-             <br/>
-             X = []<br/>
-             Y = []<br/>
-             <br/>
-             for x in range(1, 20):<br/>
-             &nbsp;&nbsp;&nbsp;&nbsp;cluster_count = x <br/>
-             &nbsp;&nbsp;&nbsp;&nbsp;<br/>
-             &nbsp;&nbsp;&nbsp;&nbsp;start_time = time.time()<br/>
-             &nbsp;&nbsp;&nbsp;&nbsp;clusters = MiniBatchKMeans(n_clusters = cluster_count)<br/>
-             &nbsp;&nbsp;&nbsp;&nbsp;clusters.fit(numarray)<br/>
-             &nbsp;&nbsp;&nbsp;&nbsp;end_time = time.time()<br/>
-             &nbsp;&nbsp;&nbsp;&nbsp;total_time = end_time - start_time<br/>
-             &nbsp;&nbsp;&nbsp;&nbsp;print("Total time: ", x, ":", total_time)<br/>
-             &nbsp;&nbsp;&nbsp;&nbsp;X.append(x)<br/>
-             &nbsp;&nbsp;&nbsp;&nbsp;Y.append(total_time)<br/>
-             <br/>
-             plot.bar(X, Y)<br/>
-             plot.show()<br/>
-          </code>
+          <p>What did you observe? Your next goal is to test the above code for cluster sizes between 2 and 21 which will give you the figure given below.</p> 
+          <p>What did you observe? What are your conclusions?</p> 
           <p>
             <img style="width:50%" src="./images/minibatchkmeans.png"></img>
           </p>
-          <ul>
-            <li>KMeans</li>
-            <li>MiniBatchKMeans</li>
-          </ul>
-          <code>
+          <p>In order to understand time taken by each of these algorithms, we will repeat the above experiment, but this time we will plot the time taken to obtain clusters of different sizes.</p> 
+          <p>We start with <b>KMeans</b>.</p>
+          <p>
+            <code>
              from PIL import Image<br/>
              import numpy<br/>
              import math<br/>
@@ -284,12 +294,15 @@
              <br/>
              plot.bar(X, Y)<br/>
              plot.show()<br/>
-          </code>
+            </code>
+          </p>
+          <p>You may get a graph similar to the following.</p>
           <p>
             <img style="width:50%" src="./images/kmeanstime.png"></img>
           </p>
-          <p>MiniBatchKMeans</p>
-          <code>
+          <p>We now use <b>MiniBatchKMeans</b>.</p>
+          <p>
+            <code>
              from PIL import Image<br/>
              import numpy<br/>
              import math<br/>
@@ -317,10 +330,13 @@
              <br/>
              plot.bar(X, Y)<br/>
              plot.show()<br/>
-          </code>
+            </code>
+          </p>
+          <p>You may get a graph similar to the following.</p>
           <p>
             <img style="width:40%" src="./images/minibatchkmeanstime.png"></img>
           </p>
+          <p>Now test the above code using <b>MiniBatchKMeans</b> algorithm with cluster sizes between 2 and 50. What are your observations? </p>
         </div>
         <h4>Exercise 3.2</h4>
         <div class="exercise">
