@@ -482,9 +482,151 @@
         </div>
         <h4>Exercise 3.2 <span style="color:red">&#9733;</span></h4>
         <div class="exercise">
-          <ul>
-            <li></li>
-          </ul>
+         <p>Download the file <a href="./population.csv">population.csv</a> (source: query given in <a href="./references.html">references</a>). We will first plot this multi-annual population.</p>
+         <p class="codeexample">
+          <code>
+           import numpy as np<br/>
+           import matplotlib.pyplot as plot<br/>
+           import pandas as pd<br/>
+           dataset = np.loadtxt("population.csv", dtype={'names': ('year', 'population'), 'formats': ('i4', 'i')},<br/>
+           &nbsp;&nbsp;&nbsp;&nbsp;skiprows=1, delimiter=",", encoding="UTF-8")<br/>
+           <br/>
+           df = pd.DataFrame(dataset)<br/>
+           df.plot(x='year', y='population', kind='scatter')<br/>
+          </code>
+         </p>
+         <p>
+           <img style="width:40%" src="./images/populationscatterplot.png"></img>
+         </p>
+         <p>We will focus on data starting from 1960 (why?). Our goal is to use regression techniques to predict population. But we don't know how to verify. So with the available data, we create two categories: training data and test data.</p>
+         <p>We will first start with <b>linear regression</b>. We split data into two: training data and test data. We will plot the actual population values and the predicted values.</p>
+         <p class="codeexample">
+          <code>
+           import numpy as np<br/>
+           import matplotlib.pyplot as plot<br/>
+           import pandas as pd<br/>
+           from sklearn.linear_model import LinearRegression<br/>
+           dataset = np.loadtxt("population.csv", dtype={'names': ('year', 'population'), 'formats': ('i4', 'i')},<br/>
+           &nbsp;&nbsp;&nbsp;&nbsp;skiprows=1, delimiter=",", encoding="UTF-8")<br/>
+           <br/>
+           df = pd.DataFrame(dataset[4:])<br/>
+           <br/>
+           #training data<br/>
+           x_train = df['year'][:40].values.reshape(-1, 1)<br/>
+           y_train = df['population'][:40].values.reshape(-1, 1)<br/>
+           <br/>
+           #training<br/>
+           lr = LinearRegression()<br/>
+           lr.fit(x_train, y_train)<br/>
+           <br/>
+           #printing coefficients<br/>
+           print(lr.intercept_, lr.coef_)<br/>
+           <br/>
+           #prediction<br/>
+           x_predict = x_train = df['year'][41:].values.reshape(-1, 1)<br/>
+           y_actual = df['population'][41:].values.reshape(-1, 1) <br/>
+           y_predict = lr.predict(x_predict)<br/>
+           <br/>
+           plot.scatter(x_predict, y_actual)<br/>
+           plot.plot(x_predict, y_predict, color='red', linewidth=2)<br/>
+           plot.show()<br/>
+          </code>
+         </p>
+         <p>
+           <img style="width:40%" src="./images/populationlinearregression.png"></img>
+         </p>
+         <p>Now test the above program including the data before 1960. What did you notice? You may have got the following graph.</p>
+         <p>
+           <img style="width:40%" src="./images/allpopulationlinearregression.png"></img>
+         </p>
+         <p>What are your observations? So the above program using linear regression perfectly fit for a subset of data. Let's now try with <b>polynomial regression</b> with degree 2.</p>
+         <p class="codeexample">
+          <code>
+           import numpy as np<br/>
+           import matplotlib.pyplot as plot<br/>
+           import pandas as pd<br/>
+           from sklearn.linear_model import LinearRegression<br/>
+           from sklearn.preprocessing import PolynomialFeatures<br/>
+           dataset = np.loadtxt("population.csv", dtype={'names': ('year', 'population'), 'formats': ('i4', 'i')},<br/>
+           &nbsp;&nbsp;&nbsp;&nbsp;skiprows=1, delimiter=",", encoding="UTF-8")<br/>
+           <br/>
+           df = pd.DataFrame(dataset[4:])<br/>
+           <br/>
+           #training data<br/>
+           <br/>
+           x_train = df['year'][:50].values.reshape(-1, 1)<br/>
+           y_train = df['population'][:50].values.reshape(-1, 1)<br/>
+           <br/>
+           pf = PolynomialFeatures(degree=2)<br/>
+           x_poly = pf.fit_transform(x_train)<br/>
+           <br/>
+           #training<br/>
+           lr = LinearRegression()<br/>
+           lr.fit(x_poly, y_train)<br/>
+           <br/>
+           #printing coefficients<br/>
+           print(lr.intercept_, lr.coef_)<br/>
+           <br/>
+           #prediction<br/>
+           x_predict = x_train = df['year'][41:].values.reshape(-1, 1)<br/>
+           y_actual = df['population'][41:].values.reshape(-1, 1) <br/>
+           y_predict = lr.predict(pf.fit_transform(x_predict))<br/>
+           <br/>
+           plot.scatter(x_predict, y_actual)<br/>
+           plot.plot(x_predict, y_predict, color='red', linewidth=2)<br/>
+           plot.show()<br/>
+          </code>
+         </p>
+         <p>
+           <img style="width:40%" src="./images/populationpolynomialregression.png"></img>
+         </p>
+         <p>Before jumping into a conclusion, let's consider the entire data and see.</p>
+         <p class="codeexample">
+          <code>
+           import numpy as np<br/>
+           import matplotlib.pyplot as plot<br/>
+           import pandas as pd<br/>
+           from sklearn.linear_model import LinearRegression<br/>
+           from sklearn.preprocessing import PolynomialFeatures<br/>
+           dataset = np.loadtxt("population.csv", dtype={'names': ('year', 'population'), 'formats': ('i4', 'i')},<br/>
+           &nbsp;&nbsp;&nbsp;&nbsp;skiprows=1, delimiter=",", encoding="UTF-8")<br/>
+           <br/>
+           df = pd.DataFrame(dataset)<br/>
+           <br/>
+           #training data<br/>
+           <br/>
+           x_train = df['year'][:40].values.reshape(-1, 1)<br/>
+           y_train = df['population'][:40].values.reshape(-1, 1)<br/>
+           <br/>
+           pf = PolynomialFeatures(degree=2)<br/>
+           x_poly = pf.fit_transform(x_train)<br/>
+           <br/>
+           #training<br/>
+           lr = LinearRegression()<br/>
+           lr.fit(x_poly, y_train)<br/>
+           <br/>
+           #printing coefficients<br/>
+           print(lr.intercept_, lr.coef_)<br/>
+           <br/>
+           #prediction<br/>
+           x_predict = x_train = df['year'][41:].values.reshape(-1, 1)<br/>
+           <br/>
+           # Let's add some more years<br/>
+           x_predict = np.append(range(1900, 1959), x_predict)<br/>
+           x_predict = x_predict.reshape(-1, 1)<br/>
+           <br/>
+           y_actual = df['population'][41:].values.reshape(-1, 1) <br/>
+           y_predict = lr.predict(pf.fit_transform(x_predict))<br/>
+           <br/>
+           plot.scatter(df['year'], df['population'])<br/>
+           plot.plot(x_predict, y_predict, color='red', linewidth=2)<br/>
+           plot.show()<br/>
+          </code>
+         </p>
+         <p>
+           <img style="width:40%" src="./images/allpopulationpolynomialregression.png"></img>
+         </p>
+         <p>What do you think? Can we use this program to predict the missing data (especially in the absence of other external source of information)? Try the above program with different degrees.</p>
         </div>
         <h4>Exercise 3.3 <span style="color:red">&#9733;&#9733;</span></h4>
         <div class="exercise">
