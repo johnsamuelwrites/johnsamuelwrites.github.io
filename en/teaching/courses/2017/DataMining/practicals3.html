@@ -630,21 +630,208 @@
         </div>
         <h4>Exercise 3.3 <span style="color:red">&#9733;&#9733;</span></h4>
         <div class="exercise">
-          <ul>
-            <li></li>
-          </ul>
+         <p>In this exercise, we will continue to use scikit-learn to recognize handwriting. Scikit-learn has a lot of datasets. We will use one such dataset called digits dataset, which consists of labeled handwriting images of digits. The following program will show the labels.</p>
+         <p class="codeexample">
+          <code>
+             from sklearn import datasets<br/>
+             import numpy as np<br/>
+             <br/>
+             digits = datasets.load_digits()<br/>
+             <br/>
+             print(np.unique(digits.target))<br/>
+          </code>
+         </p>
+         <p>We will now see the total number of images and the contents of one test image.</p>
+         <p class="codeexample">
+          <code>
+             from sklearn import datasets<br/>
+             import numpy as np<br/>
+             import matplotlib.pyplot as plot<br/>
+             <br/>
+             digits = datasets.load_digits()<br/>
+             <br/>
+             print("Number of images: ", digits.images.size)<br/>
+             print("Input data: ", digits.images[0])<br/>
+             print("Label:", digits.target[0])<br/>
+             <br/>
+             plot.imshow(digits.images[0], cmap=plot.cm.gray_r)<br/>
+             plot.show()<br/>
+          </code>
+         </p>
+         <p>We will now use a support vector classifier to train the data. We will split our data into two: training data and test data. Remember that we already have labels for the entire dataset.</p>
+         <p class="codeexample">
+          <code>
+             from sklearn import datasets, svm<br/>
+             import numpy as np<br/>
+             import matplotlib.pyplot as plot<br/>
+             <br/>
+             digits = datasets.load_digits()<br/>
+             <br/>
+             training_images = digits.images[:int(digits.images.shape[0]/2)]<br/>
+             training_images = training_images.reshape((training_images.shape[0], -1))<br/>
+             <br/>
+             training_target = digits.target[0:int(digits.target.shape[0]/2)]<br/>
+             <br/>
+             classifier = svm.SVC(gamma=0.001, C=100.)<br/>
+             #training<br/>
+             classifier.fit(training_images, training_target)<br/>
+             <br/>
+             #prediction<br/>
+             predict_image = digits.images[int(digits.images.shape[0]/2)+2]<br/>
+             print("Predicted value: ", classifier.predict(predict_image.reshape(1,-1)))<br/>
+             <br/>
+             plot.imshow(predict_image, cmap=plot.cm.gray_r)<br/>
+             plot.show()<br/>
+          </code>
+         </p>
+         <p>
+           <img style="width:40%" src="./images/scikitlearnfour.png"></img>
+         </p>
+         <p>Now let's try predicting the remaining labels and use the classifcation report to get the precision of prediction.</p>
+         <p class="codeexample">
+          <code>
+             from sklearn import datasets, svm, metrics<br/>
+             import numpy as np<br/>
+             import matplotlib.pyplot as plot<br/>
+             <br/>
+             digits = datasets.load_digits()<br/>
+             <br/>
+             training_images = digits.images[:int(digits.images.shape[0]/2)]<br/>
+             training_images = training_images.reshape((training_images.shape[0], -1))<br/>
+             <br/>
+             training_target = digits.target[0:int(digits.target.shape[0]/2)]<br/>
+             <br/>
+             classifier = svm.SVC(gamma=0.001, C=100.)<br/>
+             #training<br/>
+             classifier.fit(training_images, training_target)<br/>
+             <br/>
+             #prediction<br/>
+             predict_images = digits.images[int(digits.images.shape[0]/2)+1:]<br/>
+             actual_labels = digits.target[int(digits.target.shape[0]/2)+1:]<br/>
+             predicted_labels = classifier.predict(predict_images.reshape((predict_images.shape[0], -1)))<br/>
+             <br/>
+             #classification report<br/>
+             print(metrics.classification_report(actual_labels,predicted_labels))<br/>
+          </code>
+         </p>
+         <p>We will now work with Perceptron.</p>
+         <p class="codeexample">
+          <code>
+             from sklearn import datasets, metrics<br/>
+             from sklearn.linear_model import Perceptron<br/>
+             import numpy as np<br/>
+             import matplotlib.pyplot as plot<br/>
+             <br/>
+             digits = datasets.load_digits()<br/>
+             <br/>
+             training_images = digits.images[:int(digits.images.shape[0]/2)]<br/>
+             training_images = training_images.reshape((training_images.shape[0], -1))<br/>
+             <br/>
+             training_target = digits.target[0:int(digits.target.shape[0]/2)]<br/>
+             <br/>
+             classifier = Perceptron(max_iter=1000)<br/>
+             #training<br/>
+             classifier.fit(training_images, training_target)<br/>
+             <br/>
+             #prediction<br/>
+             predict_images = digits.images[int(digits.images.shape[0]/2)+1:]<br/>
+             actual_labels = digits.target[int(digits.target.shape[0]/2)+1:]<br/>
+             predicted_labels = classifier.predict(predict_images.reshape((predict_images.shape[0], -1)))<br/>
+             <br/>
+             #classification report<br/>
+             print(metrics.classification_report(actual_labels,predicted_labels))<br/>
+          </code>
+         </p>
+         <p>Finally, we will finish the test with Multilayer Perceptron.</p>
+         <p class="codeexample">
+          <code>
+             from sklearn import datasets, metrics<br/>
+             from sklearn.neural_network import MLPClassifier<br/>
+             import numpy as np<br/>
+             import matplotlib.pyplot as plot<br/>
+             <br/>
+             digits = datasets.load_digits()<br/>
+             <br/>
+             training_images = digits.images[:int(digits.images.shape[0]/2)]<br/>
+             training_images = training_images.reshape((training_images.shape[0], -1))<br/>
+             <br/>
+             training_target = digits.target[0:int(digits.target.shape[0]/2)]<br/>
+             <br/>
+             classifier = MLPClassifier(alpha=2, max_iter=1000)<br/>
+             #training<br/>
+             classifier.fit(training_images, training_target)<br/>
+             <br/>
+             #prediction<br/>
+             predict_images = digits.images[int(digits.images.shape[0]/2)+1:]<br/>
+             actual_labels = digits.target[int(digits.target.shape[0]/2)+1:]<br/>
+             predicted_labels = classifier.predict(predict_images.reshape((predict_images.shape[0], -1)))<br/>
+             <br/>
+             #classification report<br/>
+             print(metrics.classification_report(actual_labels,predicted_labels))<br/>
+          </code>
+         </p>
+         <p>What are your observations after trying the different methods of classification? </p>
         </div>
         <h4>Exercise 3.4 <span style="color:red">&#9733;&#9733;</span></h4>
         <div class="exercise">
-          <ul>
-            <li></li>
-          </ul>
+         <p>In this exercise, we will split an image into sub-images in the following manner.</p>
+         <p class="codeexample">
+          <code>
+             import os,sys<br/>
+             from PIL import Image<br/>
+             import matplotlib.pyplot as plot<br/>
+             import numpy<br/>
+             <br/>
+             imgfile = Image.open("flower.jpg")<br/>
+             print(imgfile.size)<br/>
+             <br/>
+             figure, axes = plot.subplots(nrows=5, ncols=5, figsize=(20,25))<br/>
+             <br/>
+             xaxis = 0<br/>
+             for i in range(0, 640, 128):<br/>
+             &nbsp;&nbsp;&nbsp;&nbsp;yaxis=0<br/>
+             &nbsp;&nbsp;&nbsp;&nbsp;for j in range(0,480, 96):<br/>
+             &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;#print(i, j)<br/>
+             &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;bbox = (i, j, i+128, j+96)<br/>
+             &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;axes[xaxis, yaxis].imshow(imgfile.crop(bbox))<br/>
+             &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;yaxis = yaxis + 1<br/>
+             &nbsp;&nbsp;&nbsp;&nbsp;xaxis = xaxis + 1<br/>
+             <br/>
+             plot.show()<br/>
+          </code>
+         </p>
+         <p>
+           <img style="width:50%" src="./images/subimages.png"></img>
+         </p>
+         <p>Your next goal is to label these subimages based on the predominant colors. You can ask the user to label the subimages into colors, like blue, green, yellow, etc. For every subimage, we will have <b>only one</b> color. Then train and test your classifiers using the following methods.</p>
+         <ul>
+           <li>Support vector classifier (SVC)</li>
+           <li>Perceptron</li>
+           <li>Multilayer Perceptron</li>
+         </ul>
+         <p>Also print classification report for every classifier.</p>
         </div>
         <h4>Exercise 3.5 <span style="color:red">&#9733;&#9733;&#9733;</span></h4>
         <div class="exercise">
-          <ul>
-            <li></li>
-          </ul>
+         <h5>Project: Image recommender system: 3 practical sessions</h5>
+         <p>Recall that the goal of this project is to recommend images based on the color preferences of the user. We will build this system in three practical sessions.</p>
+         <p>During your last practical session, you collected images and obtained the predominant colors in each image. Now with your knowledge in different types of classifiers and clustering algorithms, what more information will you add for every image?</p>
+         <p>For every image, you already have the following information</p>
+         <ol>
+          <li>Predominant colors in an image</li>
+          <li>Image size</li> 
+          <li>How about asking users to tag the images? E.g., colors, cat, flower, sunflower, rose etc.</li>
+          <li>How about asking users to tag subimages? E.g. colors, cat, flower, sunflower, building etc.</li>
+          <li>...</li>
+         </ol>
+         <p>Ask the user to select some images. We may assume that those images contain the favorite colors of the user, or other favorite characteristics. For every user, you are now in a position to build user-preference profile</p>
+         <ol>
+          <li>Favorite colors</li>
+          <li>Favorite image sizes (thumbnail images, large images, medium-size images etc.)</li>
+          <li>Tags</li>
+          <li>...</li>
+         </ol>
+         <p>Are you now in a position to recommend images to a user? What's missing?</p>
         </div>
         <h4>Submission</h4>
         <ul>
