@@ -166,9 +166,40 @@
         </div>
         <h4>Exercise 4.1 <span style="color:red">&#9733;</span></h4>
         <div class="exercise">
-          <ul>
-            <li></li>
-          </ul>
+          <p>During our last <a href="./practicals3.html">practical session 3</a>, we split our data into two: training data and test data for creating models for prediction and we fed the complete training data to our classifier. However, in real life, we may have new data to train. Check the following code using perceptron and compare it with the code of exercise 3.3:</p>
+          <p class="codeexample">
+            <code>
+              from sklearn import datasets, metrics</br>
+              from sklearn.linear_model import Perceptron</br>
+              import numpy as np</br>
+              import matplotlib.pyplot as plot</br>
+              </br>
+              digits = datasets.load_digits()</br>
+              training_size = int(digits.images.shape[0]/2)</br>
+              </br>
+              training_images = digits.images[0:training_size]</br>
+              training_images = training_images.reshape((training_images.shape[0], -1))</br>
+              </br>
+              training_target = digits.target[0:training_size]</br>
+              </br>
+              classifier = Perceptron(max_iter=1000)</br>
+              #training</br>
+              for i in range(training_size):</br>
+              &nbsp;&nbsp;&nbsp;&nbsp;training_data = np.array(training_images[i])</br>
+              &nbsp;&nbsp;&nbsp;&nbsp;training_data = training_data.reshape(1, -1)</br>
+              &nbsp;&nbsp;&nbsp;&nbsp;classifier.partial_fit(training_data, [training_target[i]], classes=np.unique(digits.target))</br>
+              </br>
+              #prediction</br>
+              predict_images = digits.images[training_size+1:]</br>
+              actual_labels = digits.target[training_size+1:]</br>
+              predicted_labels = classifier.predict(predict_images.reshape((predict_images.shape[0], -1)))</br>
+              </br>
+              #classification report</br>
+              print(metrics.classification_report(actual_labels,predicted_labels))</br>
+            </code>
+          </p>
+          <p>This approach is called <a href="https://en.wikipedia.org/wiki/Online_machine_learning">online machine training</a> (or <a href="https://fr.wikipedia.org/wiki/Algorithme_d%27apprentissage_incr%C3%A9mental">algorithme d'apprentissage incrémental (fr)</a>). Did you get good precision? Or it went down?</p>
+           <p>Your next question is to modify the above program and test online training with <b>MLPClassifier</b>.</p>
         </div>
         <h4>Exercise 4.2 <span style="color:red">&#9733;</span></h4>
         <div class="exercise">
