@@ -1,9 +1,9 @@
 function drawCorners(context, id) {
   context.fillStyle =  "black";
-  context.lineWidth = 10;
+  context.lineWidth = 1;
   context.beginPath();
-  context.arc(10, 10, 10, 0, 2 * Math.PI);
-  context.arc(290, 390, 10, 0, 2 * Math.PI);
+  context.arc(10, 10, 7, 0, 2 * Math.PI);
+  context.arc(290, 390, 7, 0, 2 * Math.PI);
   context.fill();
   context.strokeStyle =  "black";
   context.fillStyle =  "black";
