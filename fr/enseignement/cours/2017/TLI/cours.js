@@ -1,8 +1,35 @@
+function drawCorners(context, id) {
+  context.fillStyle =  "black";
+  context.lineWidth = 10;
+  context.beginPath();
+  context.arc(10, 10, 10, 0, 2 * Math.PI);
+  context.arc(290, 390, 10, 0, 2 * Math.PI);
+  context.fill();
+  context.strokeStyle =  "black";
+  context.fillStyle =  "black";
+  context.font = "20px Arial";
+  context.fillText("(0, 0)", 25, 20);
+  context.fillText("(" +
+       id.width.toString() + ", " +
+       id.height + ")", 
+       id.width-120,
+       id.height-20);
+}
+
 function moncanvas1() {
   var id = document.getElementById("moncanvas1");
   var context = id.getContext("2d");
   id.style.backgroundColor="green";
 }
+
+function moncanvas2() {
+  var id = document.getElementById("moncanvas2");
+  var context = id.getContext("2d");
+  id.style.backgroundColor="green";
+  id.style.width = 500;
+  id.style.height = 500;
+}
+
 
 function cercle(nom) {
   var id = document.getElementById(nom);
@@ -12,6 +39,7 @@ function cercle(nom) {
   context.beginPath();
   context.arc(150, 150, 100, 0, 2 * Math.PI);
   context.stroke();
+  drawCorners(context, id);
 }
 
 function rectangle(nom, fill) {
@@ -27,35 +55,40 @@ function rectangle(nom, fill) {
     context.rect(10, 10, 280, 280);
     context.stroke();
   }
+  drawCorners(context, id);
 }
 
 function moncanvastexte() {
-  var id = document.getElementById("moncanvas");
-  var context = id.getContext("2d");
-  context.strokeStyle =  "#00b33c";
-  context.lineWidth = 10;
-  context.rect(10, 10, 280, 380);
-  context.stroke();
-  context.font = "20px Arial";
-  context.fillText("(0, 0)", 15, 40);
-  context.fillText("(300, 400)", 140, 370);
-  context.fillStyle =  "red";
-  context.lineWidth = 10;
-  context.beginPath();
-  context.arc(10, 10, 10, 0, 2 * Math.PI);
-  context.arc(290, 390, 10, 0, 2 * Math.PI);
-  context.fill();
+  var classes = document.getElementsByClassName("moncanvas");
+  for (i = 0; i < classes.length; i++) { 
+      var context = classes[i].getContext("2d");
+      context.strokeStyle =  "#00b33c";
+      context.lineWidth = 10;
+      context.rect(10, 10, 280, 380);
+      context.stroke();
+      context.font = "20px Arial";
+      context.fillText("(0, 0)", 15, 40);
+      context.fillText("(300, 400)", 140, 370);
+      context.fillStyle =  "red";
+      context.lineWidth = 10;
+      context.beginPath();
+      context.arc(10, 10, 10, 0, 2 * Math.PI);
+      context.arc(290, 390, 10, 0, 2 * Math.PI);
+      context.fill();
+  }
 }
 
-function ligne() {
-  var id = document.getElementById("ligne");
+function ligne(id, stroke) {
+  var id = document.getElementById(id);
   var context = id.getContext("2d");
   context.beginPath();
   context.strokeStyle =  "#00b33c";
   context.lineWidth = 10;
   context.moveTo(0,0);
   context.lineTo(300,400);
-  context.stroke();
+  if(stroke) {
+    context.stroke();
+  }
   context.fillStyle =  "red";
   context.lineWidth = 10;
   context.beginPath();
@@ -69,8 +102,8 @@ function ligne() {
   context.fillText("(300, 400)", 130, 370);
 }
 
-function ligne2() {
-  var id = document.getElementById("ligne2");
+function ligne3() {
+  var id = document.getElementById("ligne3");
   var context = id.getContext("2d");
   context.strokeStyle =  "#00b33c";
   context.lineWidth = 10;
@@ -141,6 +174,7 @@ function arc1() {
   context.fillStyle =  "black";
   context.font = "20px Arial";
   context.fillText("(200, 150)", 100, 220);
+  drawCorners(context, id);
 }
 
 function arc2() {
@@ -160,6 +194,7 @@ function arc2() {
   context.fillStyle =  "black";
   context.font = "20px Arial";
   context.fillText("(200, 150)", 100, 120);
+  drawCorners(context, id);
 }
 
 function arc3(nom, fill) {
@@ -200,6 +235,7 @@ function arc3(nom, fill) {
   context.fillText("(140, 70)", 100, 100);
   context.fillText("(200, 70)", 210, 70);
   context.fillText("(200, 270)", 210, 270);
+  drawCorners(context, id);
 }
 
 function courbequadratique(nom, bezier) {
@@ -259,6 +295,7 @@ function courbequadratique(nom, bezier) {
   else {
     context.fillText("(200, 270)", 210, 270);
   }
+  drawCorners(context, id);
 }
 
 function triangle(nom, fill) {
@@ -278,6 +315,7 @@ function triangle(nom, fill) {
   else {
     context.stroke();
   }
+  drawCorners(context, id);
 }
 
 function hexagone(nom, fill) {
@@ -300,6 +338,7 @@ function hexagone(nom, fill) {
   else {
     context.stroke();
   }
+  drawCorners(context, id);
 }
 
 function effacer(nom){
@@ -307,6 +346,7 @@ function effacer(nom){
   var context = id.getContext("2d");
   hexagone(nom, true);
   context.clearRect(90, 140, 100, 100);
+  drawCorners(context, id);
 }
 
 function bonjour(nom, fill){
@@ -320,6 +360,7 @@ function bonjour(nom, fill){
   else {
     context.strokeText("Bonjour!", 100, 100);
   }
+  drawCorners(context, id);
 }
 
 function pointeur(nom){
@@ -332,6 +373,7 @@ function pointeur(nom){
   context.beginPath();
   context.arc(100, 100, 10, 0, 2 * Math.PI);
   context.fill();
+  drawCorners(context, id);
 }
 
 function alignement(nom){
@@ -361,6 +403,7 @@ function alignement(nom){
 
   context.textAlign = "center";
   context.fillText("centre", 250, 340);
+  drawCorners(context, id);
 }
 
 function base(nom){
@@ -387,6 +430,7 @@ function base(nom){
 
   context.textBaseline = "bottom";
   context.fillText("en bas", 420, 200);
+  drawCorners(context, id);
 }
 
 function image() {
@@ -397,6 +441,7 @@ function image() {
   img.onload = function() {
     context.drawImage(img, 0, 0);
   }
+  drawCorners(context, id);
 }
 
 function imagezone() {
@@ -407,6 +452,7 @@ function imagezone() {
   img.onload = function() {
     context.drawImage(img, 0, 0, 500, 400);
   }
+  drawCorners(context, id);
 }
 
 function imagezone2() {
@@ -420,6 +466,7 @@ function imagezone2() {
     context.drawImage(img, 0, 200, 250, 200);
     context.drawImage(img, 250, 200, 250, 200);
   }
+  drawCorners(context, id);
 }
 
 function imagedecoupage() {
@@ -441,6 +488,7 @@ function imageRotate() {
     context.rotate(10*Math.PI/180);
     context.drawImage(img, 200, 0, 200, 200);
   }
+  drawCorners(context, id);
 }
 
 function imageScale() {
@@ -452,6 +500,7 @@ function imageScale() {
     context.scale(0.5, 0.5);
     context.drawImage(img, 200, 0, 200, 200);
   }
+  drawCorners(context, id);
 }
 
 function imageTranslate() {
@@ -464,6 +513,7 @@ function imageTranslate() {
     context.translate(200, 200);
     context.drawImage(img, 0, 0, 400, 400);
   }
+  drawCorners(context, id);
 }
 
 function imageTransform() {
@@ -476,6 +526,7 @@ function imageTransform() {
     context.transform(0.5, 0.5, -0.5, 0.5, 300,10);
     context.drawImage(img, 0, 0, 400, 400);
   }
+  drawCorners(context, id);
 }
 
 image();
@@ -488,8 +539,9 @@ cercle("introduction");
 rectangle("introduction", false);
 moncanvastexte();
 
-ligne();
-ligne2();
+ligne("ligne1", true);
+ligne("ligne2", false);
+ligne3();
 
 lignes1();
 lignes2();
@@ -525,3 +577,4 @@ imagezone2();
 imagedecoupage();
 
 moncanvas1();
+moncanvas2();
