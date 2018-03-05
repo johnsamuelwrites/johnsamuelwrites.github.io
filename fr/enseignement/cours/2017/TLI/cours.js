@@ -31,7 +31,7 @@ function moncanvas2() {
 }
 
 
-function cercle(nom) {
+function cercle(nom, corners=true) {
   var id = document.getElementById(nom);
   var context = id.getContext("2d");
   context.strokeStyle =  "#00b33c";
@@ -39,10 +39,12 @@ function cercle(nom) {
   context.beginPath();
   context.arc(150, 150, 100, 0, 2 * Math.PI);
   context.stroke();
-  drawCorners(context, id);
+  if(corners) {
+    drawCorners(context, id);
+  }
 }
 
-function rectangle(nom, fill) {
+function rectangle(nom, fill, corners=true) {
   var id = document.getElementById(nom);
   var context = id.getContext("2d");
   context.strokeStyle =  "#00b33c";
@@ -55,7 +57,9 @@ function rectangle(nom, fill) {
     context.rect(10, 10, 280, 280);
     context.stroke();
   }
-  drawCorners(context, id);
+  if(corners) {
+    drawCorners(context, id);
+  }
 }
 
 function moncanvastexte() {
@@ -535,8 +539,8 @@ imageScale();
 imageTranslate();
 imageTransform();
 
-cercle("introduction");
-rectangle("introduction", false);
+cercle("introduction", false);
+rectangle("introduction", false, false);
 moncanvastexte();
 
 ligne("ligne1", true);
