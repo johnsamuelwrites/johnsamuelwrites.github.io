@@ -1,3 +1,9 @@
+function moncanvas1() {
+  var id = document.getElementById("moncanvas1");
+  var context = id.getContext("2d");
+  id.style.backgroundColor="green";
+}
+
 function cercle(nom) {
   var id = document.getElementById(nom);
   var context = id.getContext("2d");
@@ -300,7 +306,7 @@ function effacer(nom){
   var id = document.getElementById(nom);
   var context = id.getContext("2d");
   hexagone(nom, true);
-  context.clearRect(90, 140, 100, 100); 
+  context.clearRect(90, 140, 100, 100);
 }
 
 function bonjour(nom, fill){
@@ -517,3 +523,5 @@ image();
 imagezone();
 imagezone2();
 imagedecoupage();
+
+moncanvas1();
