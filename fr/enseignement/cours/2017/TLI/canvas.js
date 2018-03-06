@@ -10,8 +10,8 @@ function ligne() {
   context.stroke();
 }
 
-function cirque() {
-  var id = document.getElementById("cirque");
+function cercle() {
+  var id = document.getElementById("cercle");
   var context = id.getContext("2d");
   context.strokeStyle =  "#00b33c";
   context.lineWidth = 10;
@@ -75,7 +75,7 @@ function courbebezier2() {
 
 ligne();
 arc();
-cirque();
+cercle();
 rectangle();
 courbequadratique();
 courbebezier();
