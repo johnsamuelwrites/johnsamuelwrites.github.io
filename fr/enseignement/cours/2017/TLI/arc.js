@@ -9,7 +9,7 @@ function arcanimated() {
   context.lineWidth = 10;
   context.beginPath();
   context.moveTo(10,20);
-  context.arcTo(350, y, 710, 20, 50);
+  context.arcTo(350, y, 710, 20, 150);
   context.lineTo(710, 20);
   context.stroke();
 
