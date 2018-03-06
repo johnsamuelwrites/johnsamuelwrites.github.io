@@ -4,7 +4,7 @@ function image() {
   var img = new Image();
   img.src = "800px-Detailaufnahme_Weihnachtsstern_-_groß.bmp";
   img.onload = function() {
-    context.drawImage(img, 0, 0, 400, 600);
+    context.drawImage(img, 0, 0, id.width, id.height);
   }
 }
 
@@ -15,7 +15,7 @@ function imageRotate() {
   img.src = "800px-Detailaufnahme_Weihnachtsstern_-_groß.bmp";
   img.onload = function() {
     context.rotate(10*Math.PI/180);
-    context.drawImage(img, 200, 0, 400, 600);
+    context.drawImage(img, 200, 0, id.width, id.height);
   }
 }
 
@@ -26,7 +26,7 @@ function imageScale() {
   img.src = "800px-Detailaufnahme_Weihnachtsstern_-_groß.bmp";
   img.onload = function() {
     context.scale(0.5, 0.5);
-    context.drawImage(img, 200, 0, 400, 600);
+    context.drawImage(img, 200, 0, id.width, id.height);
   }
 }
 
@@ -36,9 +36,9 @@ function imageTranslate() {
   var img = new Image();
   img.src = "800px-Detailaufnahme_Weihnachtsstern_-_groß.bmp";
   img.onload = function() {
-    context.drawImage(img, 0, 0, 400, 600);
+    context.drawImage(img, 0, 0, id.width, id.height);
     context.translate(200, 200);
-    context.drawImage(img, 0, 0, 400, 600);
+    context.drawImage(img, 0, 0, id.width, id.height);
   }
 }
 
@@ -50,7 +50,7 @@ function imageTransform() {
   img.onload = function() {
     context.drawImage(img, 0, 0, 400, 600);
     context.transform(0.5, 0.5, -0.5, 0.5, 300,10);
-    context.drawImage(img, 0, 0, 400, 600);
+    context.drawImage(img, 0, 0, id.width, id.height);
   }
 }
 

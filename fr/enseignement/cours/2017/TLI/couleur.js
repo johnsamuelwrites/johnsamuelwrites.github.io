@@ -3,13 +3,13 @@ var context = id.getContext("2d");
 var img = new Image();
 img.src = "800px-Detailaufnahme_Weihnachtsstern_-_groß.bmp";
 img.onload = function() {
-  context.drawImage(img, 200, 0, 400, 600);
+  context.drawImage(img, 0, 0, id.width, id.height);
 }
 
 function imageData(r, g, b) {
-  context.clearRect(0, 0, 400, 600)
-  context.drawImage(img, 200, 0, 400, 600);
-  var data = context.getImageData(200, 0, 400, 600);
+  context.clearRect(0, 0, id.width, id.height)
+  context.drawImage(img, 0, 0, id.width, id.height);
+  var data = context.getImageData(0, 0, id.width, id.height);
   for(i=0; i< data.data.length; i+=3)
     if(data.data[i] > r - 20  && data.data[i] < r + 20 &&
        data.data[i+1] > g - 20 && data.data[i + 1] < g + 20 &&
@@ -18,7 +18,7 @@ function imageData(r, g, b) {
       data.data[i+1]=205;
       data.data[i+2]=205;
     }
-  context.putImageData(data, 200, 0);
+  context.putImageData(data, 0, 0);
 }
 
 
