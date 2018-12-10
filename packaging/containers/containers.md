@@ -2,7 +2,7 @@
 
 ## Docker 
 
-Refer [./Dockerfile](Dockerfile)
+Refer [Dockerfile](./Dockerfile)
 
 ### Building the image
 In order to build the Docker image, run the following command
@@ -19,3 +19,7 @@ Once successfully built, run the following command
 Open [http://localhost:8080/](http://localhost:8080/).
 
 
+### Rebuilding the image
+In order to build the Docker image, run the following command
+
+`docker build --no-cache -t johnsamuel .`
