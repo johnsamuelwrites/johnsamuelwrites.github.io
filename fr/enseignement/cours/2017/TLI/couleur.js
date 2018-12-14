@@ -10,7 +10,7 @@ function imageData(r, g, b) {
   context.clearRect(0, 0, id.width, id.height)
   context.drawImage(img, 0, 0, id.width, id.height);
   var data = context.getImageData(0, 0, id.width, id.height);
-  for(i=0; i< data.data.length; i+=3)
+  for(i=0; i< data.data.length; i+=4)
     if(data.data[i] > r - 20  && data.data[i] < r + 20 &&
        data.data[i+1] > g - 20 && data.data[i + 1] < g + 20 &&
        data.data[i+2] > b - 20 && data.data[i + 1] < b + 20) {
