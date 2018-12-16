@@ -17,6 +17,9 @@
       bottom: 0;
       width:20vw;
     }
+    body :lang(fr) {
+      display:none;
+    }
     .title {
       position:relative;
       top: 15vmax;
@@ -99,13 +102,15 @@
     }
   </style>
   </head>
-  <body vocab="http://schema.org/">
+  <body vocab="http://schema.org/" onload="displayPage()">
     <div id="sidebar">
       <div class="title">
-        <h1><a href="./nature.html">Nature</a></h1>
+        <h1><a href="./nature.html" lang="en">Nature</a></h1>
+        <h1><a href="./nature.html?lang=fr" lang="fr">Nature</a></h1>
       </div>
       <div class="subtitle">
-        <h3><a href="../about.html">John Samuel</a></h3>
+        <h3><a href="../about.html" lang="en">John Samuel</a></h3>
+        <h3><a href="../../fr/apropos.html" lang="fr">John Samuel</a></h3>
       </div>
     </div>
     <div class="licence"><a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/"><img alt="Creative Commons License" style="border-width:0" src="./../../images/license.png"/></a> </div>
@@ -114,12 +119,18 @@
        <ul typeof="BreadcrumbList">
         <li property="itemListElement" typeof="ListItem">
             <a property="item" typeof="WebPage" href="../index.html">
-              <span property="name">Home</span>
+              <span property="name" lang="en">Home</span>
+            </a>
+            <a property="item" typeof="WebPage"href="../../fr/index.html">
+              <span property="name" lang="fr" >Accueil</span>
             </a>
         </li>
         <li property="itemListElement" typeof="ListItem">
-            <a property="item" typeof="WebPage" href="../travel/index.html">
-              <span property="name">Travel</span>
+            <a property="item" typeof="WebPage" lang="en" href="../travel/index.html">
+              <span property="name" lang="en" >Travel</span>
+            </a>
+            <a property="item" typeof="WebPage" lang="fr" href="../../fr/voyages/index.html">
+              <span property="name" lang="fr" >Voyages</span>
             </a>
         </li>
        </ul>
@@ -129,5 +140,45 @@
         <a href="../photography/rocks1.html"><img style="height:40%;width:40%" src="https://upload.wikimedia.org/wikipedia/commons/thumb/1/16/Rocks_in_Adr%C5%A1pach-Teplice.jpg/640px-Rocks_in_Adr%C5%A1pach-Teplice.jpg"/></a>
       </div>
     </div>
+   <script type="text/javascript">
+    function displayPage() { 
+      var pageLanguage = "en";
+      // Get the language from the URL
+      if(window.location.search.length > 0) {
+        var reg = new RegExp("lang=([^&#=]*)");
+        var value = reg.exec(window.location.search);
+        if (value != null) {
+           pageLanguage = decodeURIComponent(value[1]);
+        }
+      }
+      var languageFound = false;
+      var elements = document.querySelectorAll("[lang='" + pageLanguage + "']");
+      for (var elementCount = 0; elementCount < elements.length; elementCount++) {
+        element = elements[elementCount];
+        if(element != null) {
+          element.style['display']='inline';
+          languageFound = true;
+        }
+      }
+      if(!languageFound) {//Language specified is not present. 
+        // Hence no need to change the default page content
+        return;
+      }
+      //Hide the content of all the other languages
+      var languages = ["en"];
+      for (var count in languages) {
+          if (pageLanguage === languages[count]) {
+            continue;
+          }
+          var elements = document.querySelectorAll("[lang='"+ languages[count] +"']");
+          for (var elementCount = 0; elementCount < elements.length; elementCount++) {
+            element = elements[elementCount];
+            if(element != null && element.localName !== 'html') {
+              element.style['display']='none';
+            }
+          }
+      }
+     }
+    </script>
   </body>
 </html>
