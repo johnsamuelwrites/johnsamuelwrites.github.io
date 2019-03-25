@@ -30,6 +30,31 @@ function moncanvas2() {
   id.style.height = 500;
 }
 
+function ellipse1(nom, corners=true) {
+  var id = document.getElementById(nom);
+  var context = id.getContext("2d");
+  context.strokeStyle =  "#00b33c";
+  context.lineWidth = 10;
+  context.beginPath();
+  context.ellipse(150, 180, 100, 150, 0, 0, 2 * Math.PI);
+  context.stroke();
+  if(corners) {
+    drawCorners(context, id);
+  }
+}
+
+function ellipse2(nom, corners=true) {
+  var id = document.getElementById(nom);
+  var context = id.getContext("2d");
+  context.strokeStyle =  "#00b33c";
+  context.lineWidth = 10;
+  context.beginPath();
+  context.ellipse(150, 180, 100, 150, Math.PI/4, 0, 2 * Math.PI);
+  context.stroke();
+  if(corners) {
+    drawCorners(context, id);
+  }
+}
 
 function cercle(nom, corners=true) {
   var id = document.getElementById(nom);
@@ -558,6 +583,8 @@ courbequadratique("courbe1", false);
 courbequadratique("courbe2", true);
 
 cercle("cercle");
+ellipse1("ellipse1");
+ellipse2("ellipse2");
 rectangle("rectangle1", false);
 rectangle("rectangle2", true);
 triangle("triangle1", false);
