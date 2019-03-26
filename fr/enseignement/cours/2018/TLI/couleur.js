@@ -13,7 +13,7 @@ function imageData(r, g, b) {
   for(i=0; i< data.data.length; i+=4)
     if(data.data[i] > r - 20  && data.data[i] < r + 20 &&
        data.data[i+1] > g - 20 && data.data[i + 1] < g + 20 &&
-       data.data[i+2] > b - 20 && data.data[i + 1] < b + 20) {
+       data.data[i+2] > b - 20 && data.data[i + 2] < b + 20) {
       data.data[i]=205;
       data.data[i+1]=205;
       data.data[i+2]=205;
