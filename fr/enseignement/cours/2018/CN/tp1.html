@@ -1,0 +1,935 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8"/>
+    <meta http-equiv="Content-Language" content="en"/>
+    <link rel="shortcut icon" href="../../images/logo/favicon.png"/>
+    <title>Chimie et Numérique: John Samuel</title>
+    <style type="text/css">
+    body{
+      background-color: #FFFFFF;
+    }
+    #sidebar {
+      position: fixed;
+      background-color: #00363a;
+      top: 0;
+      left: 0;
+      bottom: 0;
+      width:25vw;
+    }
+    #sidebar .title {
+      position:relative;
+      text-align: center;
+      line-height: 5vmax;
+      font-size: 1.4vmax;
+      font-family: 'Arial';
+      margin-top: 30vh;
+    }
+    #sidebar .title a:link,
+    #sidebar .title a:visited{
+     color: #FFFFFF;
+     text-decoration:none;
+    }
+    .subtitle {
+      top: 50vh;
+      text-align: center;
+      line-height: 1.3vmax;
+      font-family: 'Arial';
+      font-size: 1.5vmax;
+      color: #FFFFFF;
+    }
+    a:link, a:visited {
+     color:#00363a;
+    }
+    .subtitle a:link,
+    .subtitle a:visited{
+     color: #FFFFFF;
+     text-decoration:none;
+    }
+    .licence {
+      position:fixed;
+      text-align: right;
+      bottom:0;
+      right:0;
+    }
+    .home {
+     position:fixed;
+     text-align: left;
+     font-family: 'Arial';
+     color: #D3D3D3;
+     z-index:100;
+     width:100%;
+     background-color:#FFFFFF;
+     top:0px;
+     margin-bottom:10px;
+     padding-bottom:10px;
+    }
+    .codeexample {
+      background-color:#eeeeee;
+    }
+    .home ul{
+      margin: 0;
+      padding: 0;
+      text-align: left;
+      list-style:none;
+    }
+    .home li{
+     position: relative;
+     float: left;
+     padding-top:15px;
+     margin-right: 1em;
+     font-family: 'Arial';
+    }
+    .home li:hover {
+      display:block;
+    }
+    .home a:link,
+    .home a:visited{
+     color: #D3D3D3;
+    }
+    .home li:hover a:link,
+    .home li:hover a:visited{
+      text-decoration:none;
+      padding:15px;
+      color:#FFFFFF;
+      background-color: #00363a;
+    }
+    .content {
+     line-height: 1.8vmax;
+     font-size: 1.2vmax;
+     font-family: 'Arial';
+     margin-top: 15vh;
+     width:90%;
+    }
+    .content h2, h3, h4{
+     color:#00363a;
+    }
+    .content a:link,
+    .content a:visited{
+     color: #00363a;
+    }
+    .content h2::before,
+    .content h3::before{
+       display: block;
+       content : " ";
+       visibility:hidden;
+       height:50px;
+       margin-top:-50px;
+       pointer-events: none;
+       background-color:#FFFFFF;
+    }
+    .content a:link,
+    .content a:visited{
+     color:#00363a;
+    }
+    .content li {
+      margin:5px;
+    }
+    .exercise {
+     margin-left:2vw;
+    }
+    .exercise p{
+     margin-left:1vw;
+    }
+    .exercise img{
+     width:100%;
+    }
+    .content a:link,
+    .content a:visited{
+     color:#00363a;
+    }
+    .home a:link,
+    .home a:visited{
+     color: #D3D3D3;
+    }
+    .page {
+      width:65vw;
+      height:100%;
+      margin-left:25vw;
+      overflow: auto;
+      padding: 0 1em;
+    }
+    img {
+     max-width:100%;
+     max-height:100%;
+    }
+    /* Using same Jupyter CSS
+     */
+    .highlight  { background: #f8f8f8; }
+    .highlight .c { color: #408080; font-style: italic } /* Comment */
+    .highlight .err { border: 1px solid #FF0000 } /* Error */
+    .highlight .k { color: #008000; font-weight: bold } /* Keyword */
+    .highlight .o { color: #666666 } /* Operator */
+    .highlight .ch { color: #408080; font-style: italic } /* Comment.Hashbang */
+    .highlight .c1 { color: #408080; font-style: italic } /* Comment.Single */
+    .highlight .cs { color: #408080; font-style: italic } /* Comment.Special */
+    .highlight .cm { color: #408080; font-style: italic } /* Comment.Multiline */
+    .highlight .nn { color: #0000FF; font-weight: bold } /* Name.Namespace */
+    .highlight .k { color: #008000; font-weight: bold } /* Keyword */
+    .highlight .s2 { color: #BA2121 } /* Literal.String.Double */
+    .highlight .s1 { color: #BA2121 } /* Literal.String.Single */
+    .highlight .kn { color: #008000; font-weight: bold } /* Keyword.Namespace */
+    .highlight .nb { color: #008000 } /* Name.Builtin */
+    .highlight .mb { color: #666666 } /* Literal.Number.Bin */
+    .highlight .mf { color: #666666 } /* Literal.Number.Float */
+    .highlight .mh { color: #666666 } /* Literal.Number.Hex */
+    .highlight .mi { color: #666666 } /* Literal.Number.Integer */
+    .highlight .mo { color: #666666 } /* Literal.Number.Oct */
+    @media (max-width: 640px), screen and (orientation: portrait) {
+      body {
+        max-width:100%;
+        max-height:100%;
+      }
+      #sidebar {
+        position: fixed;
+        background-color: #00363a;
+        top: 0;
+        left: 0;
+        bottom: 80vh;
+        width:100vw;
+      }
+      #sidebar .title {
+        text-align: center;
+        position: fixed;
+        margin-top: 6vh;
+        left:0px;
+        right:0px;
+        line-height: 3.5vmax;
+        font-size: 1.5vmax;
+        font-family: 'Arial';
+      }
+      #sidebar .subtitle {
+        text-align:center;
+        top: 5vh;
+        left:0px;
+        right:0px;
+        position: fixed;
+        margin-top: 10vh;
+        font-size: 1.5vmax;
+      }
+      #sidebar .title a:link,
+      #sidebar .title a:visited{
+        text-align:center;
+        color:#FFFFFF;
+      }
+      #sidebar .subtitle a:link,
+      #sidebar .subtitle a:visited{
+        text-align:center;
+        color:#FFFFFF;
+      }
+      .home{
+        z-index:100;
+        width:100%;
+        background-color:#00363a;
+        font-size:1.5vmax;
+      }
+      .home a:link,
+      .home a:visited{
+        text-decoration:none;
+        color:#FFFFFF;
+      }
+      .content {
+        line-height: 3.8vmax;
+        font-size: 1.8vmax;
+        font-family: 'Arial';
+        margin-top:22vh;
+      }
+      .content a:link,
+      .content a:visited{
+        color:#00363a;
+      }
+      .page {
+        top: 40vh;
+        width:95%;
+        margin-left:0vw;
+      }
+      .page img {
+        max-width:100%;
+        max-height:100%;
+        border:0;
+      }
+    }
+
+    </style>
+  </head>
+  <body vocab="http://schema.org/">
+    <div id="sidebar">
+     <div class="title">
+      <h1><a href="./index.html">Travaux Pratiques: Chimie et Numérique</a></h1>
+     </div>
+     <div class="subtitle">
+      <h3><a href="../../../../apropos.html">John Samuel</a></h3>
+     </div>
+    </div>
+    <div class="licence"><a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/"><img alt="Creative Commons License" style="border-width:0" src="./../../../../../images/license.png"/></a>
+    </div>
+    <div class="page">
+      <div class="home">
+       <ul typeof="BreadcrumbList">
+        <li property="itemListElement" typeof="ListItem">
+          <a property="item" typeof="WebPage" href="../../../../index.html">
+            <span property="name">Accueil</span>
+          </a>
+        </li>
+        <li property="itemListElement" typeof="ListItem">
+         <a property="item" typeof="WebPage" href="index.html">
+          <span property="name">Chimie et Numérique</span>
+         </a>
+        </li>
+        <li property="itemListElement" typeof="ListItem">
+         <a property="item" typeof="WebPage" href="../../../index.html">
+          <span property="name">Enseignement</span>
+         </a>
+        </li>
+       </ul>
+      </div>
+      <div class="content">
+        <h3>Objectifs</h3>
+        <ul>
+          <li>Fondamentaux de la programmation en Python</li>
+          <li>Manipulation des fichiers</li>
+          <li>Interaction avec l'utilisateur</li>
+          <li>Analyse des données (basique)</li>
+        </ul>
+        <h4>Exercices</h4>
+        <ol>
+          <li>Installation de Jupyter, affichage des messages, variables, type de données, liste, ensemble et tuples.</li>
+          <li>Expressions conditionnelles, boucles for</li>
+          <li>Tri</li>
+          <li>Dictionnaires</li>
+          <li>Fichiers, interaction avec l'utilisateur</li>
+        </ol>
+        <h3>Evaluation</h3>
+        <p>Chaque exercice a un niveau de difficulté. Les exercices faciles et de difficulté moyenne vous aident pour comprendre les fondamentaux. Il est recommandé de finir ces exercices avant de commencer les exercices difficiles. Le niveau de difficulté de l'exercice:</p>
+        <ol>
+          <li><span style="color:red">&#9733;</span>: Facile</li>
+          <li><span style="color:red">&#9733;&#9733;</span>: Moyen</li>
+          <li><span style="color:red">&#9733;&#9733;&#9733;</span>: Difficile</li>
+        </ol>
+        <h4>Exercice 1 <span style="color:red">&#9733;</span></h4>
+        <div class="exercise">
+          <h5>Installation</h5>
+          <p>Exécuter les commandes suivantes sur votre machine virtuelle</p>
+          <p>pip</p>
+          <p class="codeexample">
+            <code>
+              $ sudo apt install python-pip
+            </code>
+          </p>
+          <p>jupyter</p>
+          <p class="codeexample">
+            <code>
+              $ python3 -m pip install jupyter
+            </code>
+          </p>
+          <h5>Hello World!</h5>
+          <p class="codeexample">
+            <code>
+              $ mkdir TP1 && cd TP1
+              $ jupyter notebook
+            </code>
+          </p>
+          <p>
+            <img src="../../../../../en/teaching/courses/2017/DataMining/images/jupyter.png"></img>
+          </p>
+          <p>Cliquer sur l'onglet 'Running'.
+            <img src="../../../../../en/teaching/courses/2017/DataMining/images/jupyterrunning.png"></img>
+          </p>
+          <p>Aller à l'onglet 'Files' et cliquer sur New et choisir Python3 sous Notebook
+            <img src="../../../../../en/teaching/courses/2017/DataMining/images/jupyternotebook.png"></img>
+          </p>
+          <p>Ça ouvre un nouvel onglet</p>
+          <p class="codeexample">
+            <code>
+              <span style="color:green">print</span>(<span style="color:red">"Hello World!"</span>)
+            </code>
+            <img src="../../../../../en/teaching/courses/2017/DataMining/images/jupyterprogram.png"></img>
+          </p>
+          <p>Cliquez dans n'importe quelle cellule et appuyez 'Run'.</p>
+          <p>Par défaut, votre Notebook est nommé 'Untitled'. Vous pouvez le renommer en cliquant sur le texte 'Untitled' et en donnant un nouveau nom.</p>
+          <p>
+            <img src="../../../../../en/teaching/courses/2017/DataMining/images/jupyterrenamenotebook.png"></img>
+          </p>
+          <p>Maintenant allez à l'onglet 'Files' tab et vous pouvez voir votre Notebook. 
+            <img src="../../../../../en/teaching/courses/2017/DataMining/images/jupyternotebooks.png"></img>
+          </p>
+        </div>
+        <div class="exercise">
+          <p>1. Commentaires</p>
+          <p class="codeexample">
+            <code>
+               #Ceci est un commentaire</br>
+               <span style="color:green">print</span>("Bonjour")
+            </code>
+          </p>
+          <p>2. Variables</p>
+          <p class="codeexample">
+            <code>
+            #une variable</br>
+            message = "le monde!"</br>
+            <span style="color:green">print</span>(message)</br>
+            </code>
+          </p>
+          <p class="codeexample">
+            <code>
+              a = 10</br>
+              b = 20</br>
+              c = a + b</br>
+              <span style="color:green">print</span>(c)</br>
+            </code>
+          </p>
+          <p class="codeexample">
+            <code>
+              #nombres flottantes</br>
+              pi = 3.14</br>
+              <span style="color:green">print</span>(pi)</br>
+            </code>
+          </p>
+          <p class="codeexample">
+            <code>
+              #type de données</br>
+              message1 = "Bonjour"</br>
+              a = 12</br>
+              pi = 3.14</br>
+              <span style="color:green">print</span>(<span style="color:green">type</span>(message1))</br>
+              <span style="color:green">print</span>(<span style="color:green">type</span>(a))</br>
+              <span style="color:green">print</span>(<span style="color:green">type</span>(pi))</br>
+            </code>
+          </p>
+          <p>3. Concatenation de chaine de caractères</p>
+          <p class="codeexample">
+            <code>
+            #concatenation de chaine de caractères</br>
+            message = "le monde!"</br>
+            <span style="color:green">print</span>("Bonjour" + message)</br>
+            </code>
+          </p>
+          <p class="codeexample">
+            <code>
+              #concatenation de chaine de caractères</br>
+              message1 = "Bonjour "</br>
+              message2 = "le monde!"</br>
+              <span style="color:green">print</span>(message1 + message2)</br>
+            </code>
+          </p>
+          <p class="codeexample">
+            <code>
+              #concatenation de deux différents types de données</br>
+              message1 = "Bonjour en Python"</br>
+              a = 3</br>
+              <span style="color:green">print</span>(message1 + a)</br>
+            </code>
+          </p>
+          <p class="codeexample">
+            <code>
+              #concatenation de deux différents types de données</br>
+              message1 = "Bonjour en Python "</br>
+              a = 3</br>
+              <span style="color:green">print</span>(message1 + str(a))</br>
+            </code>
+          </p>
+          <p>4. Liste</p>
+          <p class="codeexample">
+            <code>
+              a = [10, 20, 30, 40, 50]</br>
+              <span style="color:green">print</span>(a)</br>
+            </code>
+          </p>
+          <p class="codeexample">
+            <code>
+              a = [10, 20, 30, 40, 50]</br>
+              <span style="color:green">print</span>(a[0])</br>
+              <span style="color:green">print</span>(a[1])</br>
+              <span style="color:green">print</span>(a[2])</br>
+              <span style="color:green">print</span>(a[3])</br>
+              <span style="color:green">print</span>(a[4])</br>
+            </code>
+          </p>
+          <p class="codeexample">
+            <code>
+              a = [10, 20, 30, 40, 50]</br>
+              <span style="color:green">print</span>(a[8])</br>
+            </code>
+          </p>
+          <p class="codeexample">
+            <code>
+              message1 = "Bonjour en Python "</br>
+              <span style="color:green">print</span>(message1[0])</br>
+              <span style="color:green">print</span>(message1[1])</br>
+              <span style="color:green">print</span>(message1[2])</br>
+              <span style="color:green">print</span>(message1[3])</br>
+              <span style="color:green">print</span>(message1[4])</br>
+              <span style="color:green">print</span>(message1[5])</br>
+              <span style="color:green">print</span>(message1[6])</br>
+              <span style="color:green">print</span>(message1[7])</br>
+            </code>
+          </p>
+          <p class="codeexample">
+            <code>
+              message1 = "Bonjour en Python "</br>
+              <span style="color:green">print</span>(len(message1))</br>
+            </code>
+          </p>
+          <p class="codeexample">
+            <code>
+              a = [10, 20, 30, 40, 50]</br>
+              <span style="color:green">print</span>(len(a))</br>
+            </code>
+          </p>
+          <p class="codeexample">
+            <code>
+              a = [10, 20, 30, 40, 50]</br>
+              a.append(60)</br>
+              <span style="color:green">print</span>(a)</br>
+            </code>
+          </p>
+          <p class="codeexample">
+            <code>
+              a = [10, 20, 30, 40, 50]</br>
+              a[0] = 0</br>
+              <span style="color:green">print</span>(a)</br>
+            </code>
+          </p>
+          <p class="codeexample">
+            <code>
+              a = [10, 20, 30, 40, 50]</br>
+              a[6] = 20</br>
+              <span style="color:green">print</span>(a)</br>
+            </code>
+          </p>
+          <p class="codeexample">
+            <code>
+              a = [10, 20, 30, 40, 50]</br>
+              a.insert(0, 0)</br>
+              <span style="color:green">print</span>(a)</br>
+              <span style="color:green">print</span>(len(a))</br>
+            </code>
+          </p>
+          <p class="codeexample">
+            <code>
+              a = [10, 20, 30, 40, 50]</br>
+              a.insert(6,60)</br>
+              <span style="color:green">print</span>(a)</br>
+              <span style="color:green">print</span>(len(a))</br>
+            </code>
+          </p>
+          <p>5. Tuple (une liste qui ne peut plus être modifiée.)</p>
+          <p class="codeexample">
+            <code>
+              a = (10, 20, 30, 40, 50)</br>
+              <span style="color:green">print</span>(a)</br>
+            </code>
+          </p>
+          <p class="codeexample">
+            <code>
+              a = (10, 20, 30, 40, 50)</br>
+              <span style="color:green">print</span>(a[0])</br>
+            </code>
+          </p>
+          <p class="codeexample">
+            <code>
+              a = (10, 20, 30, 40, 50)</br>
+              a[0] = 0</br>
+              <span style="color:green">print</span>(a)</br>
+            </code>
+          </p>
+          <p>6. Ensemble (set)</p>
+          <p class="codeexample">
+            <code>
+              a = {10, 20, 30, 40, 50, 10, 20, 30, 40, 50}</br>
+              <span style="color:green">print</span>(a)</br>
+            </code>
+          </p>
+          <p class="codeexample">
+            <code>
+              a = {10, 20, 30, 40, 50, 10, 20, 30, 40, 50}</br>
+              a.add(10)</br>
+              <span style="color:green">print</span>(a)</br>
+            </code>
+          </p>
+          <p class="codeexample">
+            <code>
+              a = {10, 20, 30, 40, 50, 10, 20, 30, 40, 50}</br>
+              a.add(60)</br>
+              <span style="color:green">print</span>(a)</br>
+            </code>
+          </p>
+          <p class="codeexample">
+            <code>
+              a = {10, 20, 30, 40, 50, 10, 20, 30, 40, 50}</br>
+              a.remove(40)</br>
+              <span style="color:green">print</span>(a)</br>
+            </code>
+          </p>
+          <p class="codeexample">
+            <code>
+              #set</br>
+              a = {10, 20, 30, 40, 50, 10, 20, 30, 40, 50}</br>
+              <span style="color:green">print</span>(a)</br>
+              <span style="color:green">print</span>(<span style="color:green">type</span>(a))</br>
+              </br>
+              #tuple</br>
+              b = (10, 20, 30, 40, 50, 10, 20, 30, 40, 50)</br>
+              <span style="color:green">print</span>(b)</br>
+              <span style="color:green">print</span>(<span style="color:green">type</span>(b))</br>
+              </br>
+              #liste</br>
+              c= [10, 20, 30, 40, 50, 10, 20, 30, 40, 50]</br>
+              <span style="color:green">print</span>(c)</br>
+              <span style="color:green">print</span>(<span style="color:green">type</span>(c))</br>
+            </code>
+          </p>
+        </div>
+        <h4>Exercice 2 <span style="color:red">&#9733;</span></h4>
+        <div class="exercise">
+          <p>1. Expressions conditionnelles</p>
+          <p class="codeexample">
+            <code>
+              a = 12</br>
+              if( a%2 == 0):</br>
+              &nbsp;&nbsp;<span style="color:green">print</span>(a, " est divisible par 2")</br>
+              else:</br>
+              &nbsp;&nbsp;<span style="color:green">print</span>(a, " n'est pas divisible par 2")</br>
+            </code>
+          </p>
+          <p class="codeexample">
+            <code>
+              lang = "Français"</br>
+              if (lang =="Français"):</br>
+              &nbsp;&nbsp;<span style="color:green">print</span>("Bonjour le monde!")</br>
+              else:</br>
+              &nbsp;&nbsp;<span style="color:green">print</span>("Hello World!")</br>
+            </code>
+          </p>
+          <p>2. Boucles for</p>
+          <p class="codeexample">
+            <code>
+              for i in [10, 20, 30, 40, 50, 10, 20, 30, 40, 50]:</br>
+              &nbsp;&nbsp;<span style="color:green">print</span>(i)</br>
+            </code>
+          </p>
+          <p class="codeexample">
+            <code>
+              for i in (10, 20, 30, 40, 50, 10, 20, 30, 40, 50):</br>
+              &nbsp;&nbsp;<span style="color:green">print</span>(i)</br>
+            </code>
+          </p>
+          <p class="codeexample">
+            <code>
+              for i in {10, 20, 30, 40, 50, 10, 20, 30, 40, 50}:</br>
+              &nbsp;&nbsp;<span style="color:green">print</span>(i)</br>
+            </code>
+          </p>
+          <p>2. Range</p>
+          <p class="codeexample">
+            <code>
+              for i in range(0,10):</br>
+              &nbsp;&nbsp;<span style="color:green">print</span>(i)</br>
+            </code>
+          </p>
+          <p class="codeexample">
+            <code>
+              for i in range(0,10,2):</br>
+              &nbsp;&nbsp;<span style="color:green">print</span>(i)</br>
+            </code>
+          </p>
+          <p class="codeexample">
+            <code>
+              for i in range(0,10,2):</br>
+              &nbsp;&nbsp;<span style="color:green">print</span>(i, end=' ')</br>
+            </code>
+          </p>
+          <p class="codeexample">
+            <code>
+              for i in range(10,0,-2):</br>
+               &nbsp;&nbsp;<span style="color:green">print</span>(i)</br>
+            </code>
+          </p>
+          <p class="codeexample">
+            <code>
+              for i in range(10,0):</br>
+              &nbsp;&nbsp;<span style="color:green">print</span>(i)</br>
+            </code>
+          </p>
+          <p>Corrigez le code au-dessus pour avoir une bonne réponse pour afficher les numéros en ordre croissant.</p>
+          <p class="codeexample">
+            <code>
+              for i in "Bonjour le monde!":</br>
+              &nbsp;&nbsp;<span style="color:green">print</span>(i)</br>
+            </code>
+          </p>
+          <p>Comparez la différence entre le code ci-dessous et le code au-dessus.</p>
+          <p class="codeexample">
+            <code>
+              for i in "Bonjour le monde!".split():</br>
+              &nbsp;&nbsp;<span style="color:green">print</span>(i)</br>
+            </code>
+          </p>
+          <p class="codeexample">
+            <code>
+              for i in "Bonjour,le,monde!".split():</br>
+              &nbsp;&nbsp;<span style="color:green">print</span>(i)</br>
+            </code>
+          </p>
+          <p class="codeexample">
+            <code>
+              for i in "Bonjour,le,monde!".split(","):</br>
+              &nbsp;&nbsp;<span style="color:green">print</span>(i)</br>
+            </code>
+          </p>
+          <p>Coder en Python un progamme pour avoir la réponse ci-dessous.</p>
+          <p class="codeexample">
+            <code>
+              1</br>
+              12</br>
+              123</br>
+              1234</br>
+              12345</br>
+              123456</br>
+              1234567</br>
+              12345678</br>
+            </code>
+          </p>
+        </div>
+        <h4>Exercice 3 <span style="color:red">&#9733;&#9733;</span></h4>
+        <div class="exercise">
+          <p>1. Tri</p>
+          <p class="codeexample">
+            <code>
+              num = [10, 20, 30, 40, 50, 10, 20, 30, 40, 50]</br>
+              num.sort()</br>
+              <span style="color:green">print</span>(num)</br>
+            </code>
+          </p>
+          <p>2. Tri en ordre décroissant</p>
+          <p class="codeexample">
+            <code>
+              num = [10, 20, 30, 40, 50, 10, 20, 30, 40, 50]</br>
+              num.sort(reverse=True)</br>
+              <span style="color:green">print</span>(num)</br>
+            </code>
+          </p>
+          <p>3. minimum</p>
+          <p class="codeexample">
+            <code>
+              num = [10, 20, 30, 40, 50, 10, 20, 30, 40, 50]</br>
+              <span style="color:green">print</span>(min(num))</br>
+            </code>
+          </p>
+          <p>4. maximum</p>
+          <p class="codeexample">
+            <code>
+              num = [10, 20, 30, 40, 50, 10, 20, 30, 40, 50]</br>
+              <span style="color:green">print</span>(max(num))</br>
+            </code>
+          </p>
+          <p>5. sorted()</p>
+          <p class="codeexample">
+            <code>
+              num = [70, 20, 30, 10, 50, 60, 20, 80, 70, 50]</br>
+              num = sorted(num,reverse=True)[:5]</br>
+              <span style="color:green">print</span>(num)</br>
+            </code>
+          </p>
+          <p>Modifiez le code au-dessus pour afficher les cinq plus grands nombres uniques.</p>
+          <p class="codeexample">
+            <code>
+              <span style="color:green">print</span>(sorted("Bonjour le monde!".split(), key=str.lower, reverse=True))
+            </code>
+          </p>
+        </div>
+        <h4>Exercice 4 <span style="color:red">&#9733;&#9733;</span></h4>
+        <div class="exercise">
+          <p>1. Dictionnaires</p>
+          <p class="codeexample">
+            <code>
+              a = {"contente": 12, "content": 12, "triste": 2}</br>
+              <span style="color:green">print</span>(a)</br>
+              <span style="color:green">print</span>(<span style="color:green">type</span>(a))</br>
+            </code>
+          </p>
+          <p class="codeexample">
+            <code>
+              a = {"contente": 12, "content": 12, "triste": 2}</br>
+              for cle in a:</br>
+              &nbsp;&nbsp;<span style="color:green">print</span>("la phrase ", cle, " apparait ", a[cle], " fois")</br>
+            </code>
+          </p>
+          <p class="codeexample">
+            <code>
+              a = {"contente": 12, "content": 12, "triste": 2}</br>
+              for cle,valeur in a.items():</br>
+                  <span style="color:green">print</span>("la phrase ", cle, " apparait ", valeur, " fois")</br>
+            </code>
+          </p>
+          <p class="codeexample">
+            <code>
+              a = {"contente": 12, "content": 12, "triste": 2}</br>
+              a["joie"] = 10</br>
+              <span style="color:green">print</span>(a)</br>
+            </code>
+          </p>
+          <p class="codeexample">
+            <code>
+              a = {"contente": 12, "content": 12, "triste": 2}</br>
+              del a["triste"]</br>
+              <span style="color:green">print</span>(a)</br>
+            </code>
+          </p>
+          <p class="codeexample">
+            <code>
+              mots = {"contente": 12, "content": 12, "triste": 2, "joie" : 10}
+              <span style="color:green">print</span>(sorted(mots))
+            </code>
+          </p>
+          <p class="codeexample">
+            <code>
+              mots = {"contente": 12, "content": 12, "triste": 2, "joie" : 10}</br>
+              mots_tuple = [(cle, valeur) for cle,valeur in mots.items()]</br>
+              <span style="color:green">print</span>(mots_tuple)</br>
+            </code>
+          </p>
+          <p>2. itemgetter</p>
+          <p class="codeexample">
+            <code>
+              from operator import itemgetter</br>
+              </br>
+              mots = {"contente": 12, "content": 12, "triste": 2, "joie" : 10}</br>
+              mots_tuple = [(cle, valeur) for cle,valeur in mots.items()]</br>
+              <span style="color:green">print</span>(sorted(mots_tuple, key=itemgetter(1)))</br>
+            </code>
+          </p>
+          <p>3. Interaction avec l'utilisateur</p>
+          <p class="codeexample">
+            <code>
+              nom = <span style="color:green">input</span>("Quel est votre nom?")</br>
+              <span style="color:green">print</span>(nom)</br>
+            </code>
+          </p>
+          <p class="codeexample">
+            <code>
+              age = <span style="color:green">input</span>("Quel est votre âge? ")</br>
+              <span style="color:green">print</span>(age)</br>
+              <span style="color:green">print</span>(<span style="color:green">type</span>(age))</br>
+            </code>
+          </p>
+          <p class="codeexample">
+            <code>
+              age = <span style="color:green">input</span>("Quel est votre âge? ")</br>
+              age = int(age)</br>
+              <span style="color:green">print</span>(age)</br>
+              <span style="color:green">print</span>(<span style="color:green">type</span>(age))</br>
+            </code>
+          </p>
+          <p><b>Question 1:</b> Coder en Python un programme pour demander un utilisateur les informations suivantes:</p>
+          <ul>
+             <li>Nom d'un(e) étudiant(e)</li>
+             <li>Age</li>
+             <li>Les notes dans 5 modules</li>
+          </ul>
+          <p>Une fois que vous avez eu toutes les informations, calculez les valeurs suivantes pour chaque module et affichez les résultats suivants:</p>
+          <ul>
+            <li>la moyenne de la classe</li>
+            <li>la note minimum</li>
+            <li>la note maximum</li>
+          </ul>
+        </div>
+        <h4>Exercice 5 <span style="color:red">&#9733;&#9733;&#9733;</span></h4>
+        <div class="exercise">
+          <p>1. Manipulation d'un fichier</p>
+          <p class="codeexample">
+          <p class="codeexample">
+            <code>
+              message = "Bonjour le monde"</br>
+              with open("bonjour.txt", "w") as file:</br>
+              &nbsp;&nbsp;file.write(message)</br>
+              file.close()</br>
+            </code>
+          </p>
+          <p class="codeexample">
+            <code>
+              with open("bonjour.txt", "r") as file:</br>
+              &nbsp;&nbsp;text = file.read()</br>
+              &nbsp;&nbsp;<span style="color:green">print</span>(text)</br>
+              file.close()</br>
+            </code>
+          </p>
+          <p class="codeexample">
+            <code>
+              message1 = "Bonjour le monde"</br>
+              message2 = "Programmation en Python"</br>
+              with open("bonjour.txt", "w") as file:</br>
+              &nbsp;&nbsp;file.write(message1)</br>
+              &nbsp;&nbsp;file.write(message2)</br>
+              file.close()</br>
+              </br>
+              with open("bonjour.txt", "r") as file:</br>
+              &nbsp;&nbsp;text = file.read()</br>
+              &nbsp;&nbsp;<span style="color:green">print</span>(text)</br>
+              file.close()</br>
+            </code>
+          </p>
+          <p class="codeexample">
+            <code>
+              message1 = "Bonjour le monde\n"</br>
+              message2 = "Programmation en Python"</br>
+              with open("bonjour.txt", "w") as file:</br>
+              &nbsp;&nbsp;file.write(message1)</br>
+              &nbsp;&nbsp;file.write(message2)</br>
+              file.close()</br>
+              </br>
+              with open("bonjour.txt", "r") as file:</br>
+              &nbsp;&nbsp;text = file.read()</br>
+              &nbsp;&nbsp;<span style="color:green">print</span>(text)</br>
+              file.close()</br>
+            </code>
+          </p>
+          <p>2. readline()</p>
+          <p class="codeexample">
+            <code>
+              message1 = "Bonjour le monde\n"</br>
+              message2 = "Programmation en Python"</br>
+              with open("bonjour.txt", "w") as file:</br>
+              &nbsp;&nbsp;file.write(message1)</br>
+              &nbsp;&nbsp;file.write(message2)</br>
+              file.close()</br>
+              </br>
+              with open("bonjour.txt", "r") as file:</br>
+              &nbsp;&nbsp;text = file.readline()</br>
+              &nbsp;&nbsp;<span style="color:green">print</span>(text)</br>
+              file.close()</br>
+            </code>
+          </p>
+          <p class="codeexample">
+            <code>
+              message1 = "Bonjour le monde\n"</br>
+              message2 = "Programmation en Python\n"</br>
+              with open("bonjour.txt", "w") as file:</br>
+              &nbsp;&nbsp;file.write(message1)</br>
+              &nbsp;&nbsp;file.write(message2)</br>
+              file.close()</br>
+              </br>
+              with open("bonjour.txt", "r") as file:</br>
+              &nbsp;&nbsp;for line in file:</br>
+              &nbsp;&nbsp;&nbsp;&nbsp;<span style="color:green">print</span>(line)</br>
+              file.close()</br>
+            </code>
+          </p>
+        </div>
+        <p><b>Question 2:</b> Copier ce <a href="./tp1.html">fichier HTML</a> dans votre répertoire. Coder en Python afin d'obtenir les résultats suivants:</p>
+        <ul>
+          <li>le nombre de caractères dans le texte</li>
+          <li>le nombre de lignes dans le texte</li>
+          <li>le nombre de mots dans le texte</li>
+          <li>les mots distincts dans le texte</li>
+          <li>les vingt premiers mots dans le texte</li>
+        </ul>
+       <p><b>Question 3:</b> Copier ce <a href="../../../../../en/teaching/courses/2017/DataMining/population.csv">fichier CSV</a> dans votre répertoire. Le fichier contient la population entre 1901 et 2016. Coder en Python afin d'avoir les résultats suivants:</p>
+          <ul>
+            <li>La population moyenne</li>
+            <li>Visualiser la population et sa croissance</li>
+            <li>Prévoire la population en 2050.</li>
+          </ul>
+      </div>
+  </body>
+</html>
