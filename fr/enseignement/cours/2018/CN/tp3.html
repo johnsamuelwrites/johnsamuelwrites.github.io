@@ -476,6 +476,9 @@
           </p>
           <p>Quelles sont vos observations?</p>
           <h5>2. Partitionnement de données</h5>
+          <p>Notre prochain objectif est de partionner des donnés.
+             Pour le faire, nous utiliserons la bibliothéque Scikit-learn (sklearn) et plus précisement, l'algorithme KMeans.
+          </p>
           <p class="codeexample">
             <code>
               <span style="color:green">from</span> pandas.io.json <span style="color:green">import</span> <span style="color:blue">json_normalize</span><br/>
@@ -485,22 +488,27 @@
               <span style="color:green">import</span> datetime<br/>
               <span style="color:green">from</span> sklearn.cluster <span style="color:green">import</span> KMeans<br/>
               <br/>
+              <span style="color:grey"># lecture d'un fichier JSON et création d'un DataFrame pandas</span><br/>
               data = <span style="color:blue">json.load</span>(open('valeurs.json')) <br/>
               dataframe = <span style="color:blue">json_normalize</span>(data["values"]) <br/>
               dataframe = <span style="color:blue">dataframe.astype</span>(dtype= {"humidity" : "float32", "lum" : "int32", <br/>
               &nbsp;&nbsp;"pression" : "int32", "temp" : "float32", "UV" : "int32", <br/>
               &nbsp;&nbsp;"date" : datetime.datetime}) <br/>
               <br/>
+              <span style="color:grey"># création de deux clusters</span><br/>
               clusters = KMeans(n_clusters = 2)<br/>
+              <br/>
+              <span style="color:grey"># utilisation de deux colonnes pour la création de clusters</span><br/>
               clusters.fit(<span style="color:blue">dataframe.loc</span>[:, ["temp","humidity"]])<br/>
               <br/>
+              <span style="color:grey"># visualisation de clusters/partitions</span><br/>
               <span style="color:blue">dataframe.plot</span>(x='temp', y= 'humidity', kind="scatter")<br/>
               centroids = clusters.cluster_centers_<br/>
               <span style="color:blue">plot.scatter</span>(centroids[:, 0], centroids[:, 1], marker='x', color='r')<br/>
               <span style="color:blue">plot.show</span>()<br/>
             </code>
           </p>
-          <p>Précisez chaque partition en utilisant différentes couleurs.</p>
+          <p>Vous pouvez distinguer chaque partition en utilisant une différente couleur pour chaque partition.</p>
           <p class="codeexample">
             <code>
               <span style="color:green">from</span> pandas.io.json <span style="color:green">import</span> <span style="color:blue">json_normalize</span><br/>
@@ -518,7 +526,11 @@
               <br/>
               clusters = KMeans(n_clusters = 2)<br/>
               clusters.fit(<span style="color:blue">dataframe.loc</span>[:, ["temp","humidity"]])<br/>
+              <br/>
+              <span style="color:grey"># visualisation de clusters/partitions</span><br/>
               centroids = clusters.cluster_centers_<br/>
+              <br/>
+              <span style="color:grey"># choix de couleurs pour les différentes partitions</span><br/>
               color_list = ['b', 'g', 'y']<br/>
               colors = [color_list[i] for i in clusters.labels_]<br/>
               <br/>
@@ -527,6 +539,7 @@
               <span style="color:blue">plot.show</span>()<br/>
             </code>
           </p>
+          <p>Voici le code qui créer deux partitions en utilisant les colonnes temp (tepérature) et la humidité (humidity)</p>
           <p class="codeexample">
             <code>
               <span style="color:green">from</span> pandas.io.json <span style="color:green">import</span> <span style="color:blue">json_normalize</span><br/>
@@ -558,7 +571,10 @@
         <h4>Exercice 3.3 <span style="color:red">&#9733;&#9733;</span></h4>
         <div class="exercise">
           <h5>1. Trouver des couleurs dominantes dans une image</h5>
-          <p>Copiez le fichier <a href="../../../../../en/teaching/courses/2017/DataMining/images/flower.jpg">flower.jpg</a> dans votre repertoire afin de trouver des couleurs dominantes.</p>
+          <p>Copiez le fichier <a href="../../../../../en/teaching/courses/2017/DataMining/images/flower.jpg">flower.jpg</a> dans votre repertoire afin de trouver des couleurs dominantes.
+             Voyez le code ci-dessous qui sort les couleurs prédominantes du image.
+             Nous testerons le code du 2 à 12 partitions en utilisant l'algorithme KMeans.
+          </p>
           <p class="codeexample">
             <code>
              <span style="color:green">from</span> PIL <span style="color:green">import</span> Image<br/>
@@ -602,6 +618,9 @@
             </code>
           </p>
           <h5>2. Amélioration de performance.</h5>
+          <p>Ci-dessous, nous testerons le code avec un algorithme appelé MiniBatchKMeans, qui est plus performant à comparer à KMeans.
+             MiniBatchKMeans n'utilise pas toutes les données du image pour la création des partitions, mais qu'une partie. 
+          </p>
           <p class="codeexample">
             <code>
              <span style="color:green">from</span> PIL <span style="color:green">import</span> Image<br/>
@@ -685,11 +704,11 @@
               pf = PolynomialFeatures(degree=1)<br/>
               x_poly = pf.fit_transform(x_train)<br/>
               <br/>
-              <span style="color:grey">#training</span><br/>
+              <span style="color:grey">#apprentissage</span><br/>
               lr = LinearRegression()<br/>
               lr.fit(x_poly, y_train)<br/>
               <br/>
-              <span style="color:grey">#printing coefficients</span><br/>
+              <span style="color:grey">#affichage de coefficients</span><br/>
               print(lr.intercept_, lr.coef_)<br/>
               <br/>
               <span style="color:grey">#prediction</span><br/>
@@ -697,6 +716,7 @@
               y_actual = df['population'][41:].values.reshape(-1, 1)<br/>
               y_predict = lr.predict(pf.fit_transform(x_predict))<br/>
               <br/>
+              <span style="color:grey"># visualisation de données</span><br/>
               <span style="color:blue">plot.scatter</span>(x_predict, y_actual)<br/>
               <span style="color:blue">plot.plot</span>(x_predict, y_predict, color='red', linewidth=2)<br/>
               <span style="color:blue">plot.show</span>()<br/>
@@ -719,6 +739,10 @@
               <span style="color:blue">plot.show</span>()<br/>
             </code>
           </p>
+          <p>Finalement, nous utiliserons une neuronne artificielle appelée Perceptron.
+             Notre prochain objectif est d'utiliser un perceptron pour la réconnaissance de l'écriture.
+             Mais, avant de l'utiliser, nous verrons le jeu de données: les images et l'entier associé.
+          </p>
           <p class="codeexample">
             <code>
               <span style="color:green">from</span> sklearn <span style="color:green">import</span> datasets, metrics<br/>
@@ -730,7 +754,7 @@
               print(digits.target[0])<br/>
             </code>
           </p>
-          <p>Affichage d'images:</p>
+          <p>Voici le code pour l'affichage des images.</p>
           <p class="codeexample">
             <code>
               <span style="color:green">from</span> sklearn <span style="color:green">import</span> datasets, metrics<br/>
@@ -744,7 +768,11 @@
               &nbsp;&nbsp;<span style="color:blue">plot.show</span>()<br/>
             </code>
           </p>
-          <p>Apprentissage en utilisant Perceptron</p>
+          <p>Finalement, nous testerons l'apprentissage en utilisant le perceptron.
+             Nous séparerons les images et les étiquettes associées (les entiers) en deux parties: une partie pour faire l'apprentissage et la deuxième parties pour faire les testes.
+             Il est important de noter que dans notre cas, toutes les images sont déjà étiquettées.
+             Donc, nous pouvons comparer différentes modèles d'apprentissage. 
+          </p>
           <p class="codeexample">
             <code>
               <span style="color:green">from</span> sklearn <span style="color:green">import</span> datasets, metrics<br/>
@@ -760,14 +788,14 @@
               training_target = digits.target[0:int(digits.target.shape[0]/2)]<br/>
               <br/>
               classifier = Perceptron(max_iter=1000)<br/>
-              <span style="color:grey">#training</span><br/>
+              <span style="color:grey">#apprentissage</span><br/>
               classifier.fit(training_images, training_target)<br/>
               <br/>
-              <span style="color:grey">#prediction</span><br/>
+              <span style="color:grey">#prévision</span><br/>
               predict_images = digits.images[int(digits.images.shape[0]/2)+1:]<br/>
               actual_labels = digits.target[int(digits.target.shape[0]/2)+1:]<br/>
               predicted_labels = classifier.predict(predict_images.reshape((predict_images.shape[0], -1)))<br/>
-              <span style="color:grey">#prediction</span><br/>
+              <span style="color:grey"># voir une image prévisionnée</span><br/>
               predict_image = digits.images[int(digits.images.shape[0]/2)+2]<br/>
               print("Predicted value: ", classifier.predict(predict_image.reshape(1,-1)))<br/>
               <br/>
@@ -790,15 +818,15 @@
              training_target = digits.target[0:int(digits.target.shape[0]/2)]<br/>
              <br/>
              classifier = Perceptron(max_iter=1000)<br/>
-             <span style="color:grey">#training</span><br/>
+             <span style="color:grey"># apprentissage</span><br/>
              classifier.fit(training_images, training_target)<br/>
              <br/>
-             <span style="color:grey">#prediction</span><br/>
+             <span style="color:grey">#prévision</span><br/>
              predict_images = digits.images[int(digits.images.shape[0]/2)+1:]<br/>
              actual_labels = digits.target[int(digits.target.shape[0]/2)+1:]<br/>
              predicted_labels = classifier.predict(predict_images.reshape((predict_images.shape[0], -1)))<br/>
              <br/>
-             <span style="color:grey">#classification report</span><br/>
+             <span style="color:grey"># rapport de prévision</span><br/>
              print(metrics.classification_report(actual_labels,predicted_labels))<br/>
            </code>
           </p>
