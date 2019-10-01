@@ -73,8 +73,8 @@
  - __Category__: Website
  - __Tag__: Course, Slides
 
-#11. Explore CSS options: sticky and CSS animations
- - __Description__: Test CSS paged media module for printing slides 
+#11. Explore CSS options: CSS transformation and animations
+ - __Description__: Explore CSS options like sticky positions, CSS transform and CSS animations
  - __Status__: In progress
  - __Category__: Website
  - __Tag__: Website, Page
