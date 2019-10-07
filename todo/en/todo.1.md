@@ -78,3 +78,9 @@
  - __Status__: In progress
  - __Category__: Website
  - __Tag__: Website, Page
+
+#12. C course: Add slide on multiple .h and .c files
+ - __Description__: Add slides on multiple .h and .c files. Demonstrate that only one single main() can be present  and the errorss obtained with multiple main files
+ - __Status__: In progress
+ - __Category__: Website
+ - __Tag__: Course, Slides
