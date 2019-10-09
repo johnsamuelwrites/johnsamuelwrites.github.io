@@ -81,6 +81,18 @@
 
 #12. C course: Add slide on multiple .h and .c files
  - __Description__: Add slides on multiple .h and .c files. Demonstrate that only one single main() can be present  and the errorss obtained with multiple main files
- - __Status__: In progress
+ - __Status__: Done
+ - __Category__: Website
+ - __Tag__: Course, Slides
+
+#13. C course: Add slide on variable scope
+ - __Description__: Add slides on scope of variables: global and local variables 
+ - __Status__: Done
+ - __Category__: Website
+ - __Tag__: Course, Slides
+
+#14. C course: Add slide on parameter passing 
+ - __Description__: Add slides on parmater passing by values and parameter passing by reference 
+ - __Status__: Done
  - __Category__: Website
  - __Tag__: Course, Slides
