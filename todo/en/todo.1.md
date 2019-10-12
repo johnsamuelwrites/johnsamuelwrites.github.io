@@ -38,13 +38,11 @@
  - __Category__: Website
  - __Tag__: Course, Slides
 
-#7. C course: Add slide on functions like sprintf, sscanf, readline, strtok
+#7. C course: Add slide on functions like sprintf, sscanf
  - __Description__: Add slides on the following functions
     - sprintf
     - sscanf
-    - readline
-    - strtok
- - __Status__: In progress
+ - __Status__: Done
  - __Category__: Website
  - __Tag__: Course, Slides
 
@@ -94,5 +92,13 @@
 #14. C course: Add slide on parameter passing 
  - __Description__: Add slides on parmater passing by values and parameter passing by reference 
  - __Status__: Done
+ - __Category__: Website
+ - __Tag__: Course, Slides
+
+#15. C course: Add slide on functions like readline, strtok
+ - __Description__: Add slides on the following functions
+    - readline
+    - strtok
+ - __Status__: In progress
  - __Category__: Website
  - __Tag__: Course, Slides
