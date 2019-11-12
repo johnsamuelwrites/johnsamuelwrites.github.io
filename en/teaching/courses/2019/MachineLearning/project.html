@@ -676,8 +676,50 @@ arules.loc[(arules["antecedent_len"]>1) &</br>
           </p>
         <p>Repeat the above experiment for translation of descriptions and aliases. Please note down your observations as comments in your notebook.</p>
         </div>
-        <h4>Exercise 1.5</h4>
+        <h4>Exercise 1.4</h4>
         <div class="exercise">
+          <p>Our next goal is to visualize the flow of translation. For this purpose, we install holoviews and bokeh.</p>
+          <p class="codeexample">
+            <code>
+!pip install holoviews bokeh --upgrade
+            </code>
+          </p>
+          <p>First, we create groups for different translations.</p>
+          <p class="codeexample">
+            <code>
+languageorder = []</br>
+labeldataframe = dataframe.loc[(dataframe["type"] == "label")]</br>
+groups = labeldataframe.groupby(["property"])</br>
+for k, group in groups:</br>
+&nbsp;&nbsp;  languageorder.append(list(groups.get_group((k))["language"]))</br>
+</br>
+languagepairs = []</br>
+for lo in languageorder:</br>
+&nbsp;&nbsp;  for i in range(0, len(lo)-1):</br>
+&nbsp;&nbsp;&nbsp;    languagepairs.append([lo[i], lo[i+1], 1])</br>
+</br>
+lpdataframe = pd.DataFrame(languagepairs)</br>
+lpdataframe.columns = ['source', 'target', 'count']</br>
+</br>
+groups = lpdataframe.groupby(["source","target"]).count().reset_index()</br>
+print(groups)</br>
+            </code>
+          </p>
+          <p>Next we visualize them using circular layout. Note the code below, we have only taken 500 combinations of language pairs.</p>
+          <p class="codeexample">
+            <code>
+import networkx as nx</br>
+import matplotlib.pyplot as plot</br>
+</br>
+G = nx.from_pandas_edgelist(groups[:500], 'source', 'target')</br>
+</br>
+plot.rcParams["figure.figsize"] = (15,15) </br>
+pos = nx.circular_layout(G)</br>
+nx.draw(G, pos, with_labels=True)</br>
+            </code>
+          </p>
+          <p>Copy the above code and check the flow of translations for any languages of your choice (number of languages &gt; 20).</p>
+          <p>Use Bokeh/Holoviews chord layout for visualizing the weights as well.</p>
         </div>
         <h4>Submission</h4>
         <ul>
