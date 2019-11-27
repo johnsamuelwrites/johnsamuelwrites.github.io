@@ -19,8 +19,8 @@ arc1();
 arc2();
 arc3("arc3", false);
 arc3("arc4", true);
-courbequadratique("courbe1", false);
-courbequadratique("courbe2", true);
+courbequadratiquebezier("courbe1", false);
+courbequadratiquebezier("courbe2", true);
 
 cercle("cercle");
 ellipse1("ellipse1");

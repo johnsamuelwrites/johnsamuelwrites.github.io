@@ -267,7 +267,7 @@ function arc3(nom, fill) {
   drawCorners(context, id);
 }
 
-function courbequadratique(nom, bezier) {
+function courbequadratiquebezier(nom, bezier) {
   var id = document.getElementById(nom);
   var context = id.getContext("2d");
   context.strokeStyle =  "#00b33c";
@@ -557,3 +557,4 @@ function imageTransform() {
   }
   drawCorners(context, id);
 }
+console.log("bonjour cours");
