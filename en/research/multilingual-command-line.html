@@ -94,7 +94,7 @@
       background-color: #1B80CF;
     }
     .content {
-     line-height: 1.8vmax;
+     line-height: 1.9vmax;
      font-size: 1.2vmax;
      font-family: 'Arial';
      margin-top: 15vh;
@@ -135,9 +135,22 @@
       padding: 0 1em;
       font-family: 'Arial';
     }
+    .content figure img{
+      margin-right:auto;
+      margin-left:auto;
+      width:100%;
+      height:400px;
+    }
+    .content figure {
+      margin-right:auto;
+      margin-left:auto;
+      width:100%;
+      padding: 10vh;
+    }
     .page figure{
-      margin-right:0;
-      margin-left:0;
+      margin-right:auto;
+      margin-left:auto;
+      height:400px;
       width:100%;
     }
     .page figure>figcaption{
@@ -260,17 +273,13 @@
            Up until now, the command line interface mostly had commands that are more or less English-like or have mnemonics made out of English words.
            This makes it difficult for new non-English speakers to work with the command line.
            Thus the major question is how to enable non-English speakers to work with the command line interface in their native lanugages.
-           Is there really a need to rewrite the command-line emulators so that it can support the multiple human languages?
-           This article takes a look into how to  make the best use of the current capabilities of these emulators and extend them in a transparent manner.
+           Is there really a need to rewrite the command-line emulators so that they can support multiple human languages?
+           This article takes a look into the different ways to extend them for supporting multiple languages.
           </i>
         </p>
-        <figure>
-          <img src="../../images/research/command-action.svg" alt="commands and actions"/>
-          <figcaption>Fig 1: Command to list files, directories, processes or network connections</figcaption>
-        </figure>
         <h3>Introduction</h3>
         <p>
-          A recent article on Wired<sup><a href="#coding">1</a></sup> talked about how most of the programming languages are suited for English speakers and do not support non-English speakers. 
+          A recent article on Wired<sup><a href="#coding">1</a></sup> talked about how most of the programming languages are suited for English speakers and do not help non-English speakers. 
           The keywords used in programming languages make use of the English (Latin) alphabet and are more or less derived from the English words. 
           Take for example, if you wish to define a function in a programming language like Python, you need to make use of the keyword <code>def</code> (derived from the word 'define').
           Similarly, if you want to define a class, you make use of the keyword <code>class</code>, another English word.
@@ -297,8 +306,8 @@
           <li><b>Solution 2</b>: Modify the shell (e.g., Bash) source code to allow accepting translations of existing commands, in such a manner that when a user types a command in their native language, the shell searches for this command in all the translations and if it finds one, checks whether the translation is mapped to any existing command.</li>
           <li><b>Solution 3</b>: Extend the shell (e.g., Bash) in a transparent manner, similar to the approach taken by Ubiquity<sup><a href="#mozilla-ubiquity">4</a>,<a href="#ubiquity">5</a></sup> that does not require any modification to the shell (like browser in the case of Ubiquity) nor to the individual applications.</li>
         </ol>
-        Solution 3 is explored in detail in this article.
-        As stated above, the primary inspiration of this work is Ubiquity<sup><a href="#mozilla-ubiquity">4</a>,<a href="#ubiquity">5</a></sup>, which had considered several languages for their study.
+        Ubiquity<sup><a href="#mozilla-ubiquity">4</a>,<a href="#ubiquity">5</a></sup>, for example opted for solution 3 considering several languages for their study.
+        One interesting contribution from this work was that one cannot assume a generic word order.
         In case of English, imperatives (or commands) are of the form <i>Verb + Subject + Object</i>, <i>Verb + Object</i> or just <i>Verb</i><sup><a href="#imperative">6</a>,<a href="#imperative-mood">7</a></sup>.
         Take for example, some imperative sentences from English, from the perspective of command line.
         <ul>
@@ -320,12 +329,145 @@
         </ul>
         Thus, the word order cannot be assumed, and it's important to be flexible.
         Figure 1 shows one possibility, where the verb comes first and the object(s) come at the second place.
+        <figure>
+          <img src="../../images/research/command-action.svg" alt="commands and actions"/>
+          <figcaption>Fig 1: Command to list files, directories, processes or network connections</figcaption>
+        </figure>
         Other possibility of commands is shown in Figure 2, where the object comes at the first place.
         <figure>
           <img src="../../images/research/action-command.svg" alt="commands and actions"/>
-          <figcaption>Fig 2: Command to list files, directories, processes or network connections. Object comes at first position.</figcaption>
+          <figcaption>Fig 2: Command to create, show, delete and list files. Object comes at first position.</figcaption>
+        </figure> 
+        <p>While working with the command line, taking a look at some of the commands that people normally use, we can obtain some possible objects and the actions on them as shown in Figure 3.</p>
+        <figure>
+          <img src="../../images/research/object-action-command.svg" alt="commands and actions"/>
+          <figcaption>Fig 3: Command to list files, directories, processes or network connections. Object comes at first position.</figcaption>
         </figure> 
         <h3>Development</h3>
+        <p>Let's explore a very simple way to implement this idea.
+           We want to implement commands as shown in Figure 1, i.e., the action verb comes first and the object comes in the second place.
+           For testing these commands, we want to add these commands in <i>.bashrc</i><sup><a href="#bashrc">8</a>,<a href="#bashrcfiles">9</a></sup> file in the home directory.
+           The idea is to create a new word combining action word and object. 
+           So, the next time, the user has to use these new combination of words.
+        </p>
+        <code>
+        <span style="color:brown">alias</span> listfile=<span style="color:red">"ls"</span><br/>
+        <span style="color:brown">alias</span> createfile=<span style="color:red">"touch"</span><br/>
+        <span style="color:brown">alias</span> deletefile=<span style="color:red">"rm"</span><br/>
+        <span style="color:brown">alias</span> showfile=<span style="color:red">"cat"</span><br/>
+<br/>
+        <span style="color:brown">alias</span> listdirectory=<span style="color:red">"ls"</span><br/>
+        <span style="color:brown">alias</span> createdirectory=<span style="color:red">"mkdir"</span><br/>
+        <span style="color:brown">alias</span> deletedirectory=<span style="color:red">"rmdir"</span><br/>
+        <span style="color:brown">alias</span> showdirectory=<span style="color:red">"ls"</span><br/>
+
+        </code>
+        <p>Though this approach is simple and can be used to create any number of commands.
+           The user has to remember the four action words <i>create, show, delete</i> and <i>list</i> as well as the objects <i>file</i> and <i>directory</i>.</p> 
+        <p>
+           However, some may see that the presence of big commands like <i>listdirectory, createfile</i> as not a very interesting approach since these words do not exist in the dictionary. 
+          We wish to create commands very close to human-language.
+        </p>
+        <p>
+         So, the second approach is to separate action words and objects, so that the user can run following type of commands.
+        </p>
+        <ul>
+          <li><i>create directory dir1</i></li>
+          <li><i>show directory dir1</i></li>
+          <li><i>delete directory dir1</i></li>
+          <li><i>create file file1</i></li>
+          <li><i>show file file1</i></li>
+          <li><i>...</i></li>
+        </ul>
+        <p>
+          For this purpose, we may use bash functions and aliases. 
+        </p>
+        <code>
+          <span style="color:green">function</span> deleteaction() {<br/>
+          &nbsp;&nbsp;count=$#<br/>
+          &nbsp;&nbsp;<span style="color:green">if</span> [[ $1 == <span style="color:red">"file"</span> ]]<br/>
+          &nbsp;&nbsp;<span style="color:green">then</span><br/>
+          &nbsp;&nbsp;&nbsp;&nbsp;<span style="color:green">shift</span><br/>
+          &nbsp;&nbsp;&nbsp;&nbsp;rm $@<br/>
+          &nbsp;&nbsp;<span style="color:green">elif</span> [[ $1 == <span style="color:red">"directory"</span> ]]<br/>
+          &nbsp;&nbsp;<span style="color:green">then</span><br/>
+          &nbsp;&nbsp;&nbsp;&nbsp;<span style="color:green">shift</span><br/>
+          &nbsp;&nbsp;&nbsp;&nbsp;rmdir $@<br/>
+          &nbsp;&nbsp;<span style="color:green">fi</span><br/>
+          }<br/>
+         <br/>
+         <span style="color:brown">alias</span> delete=<span style="color:red">"deleteaction"</span><br/>
+        </code>
+        <p>
+          The above code shows how <span style="color:brown">alias</span> has been used to call a function.
+          Though it shows a way to delete files and directories.
+          But what if we want to repeat this for French language?
+        </p>
+        <code>
+          <span style="color:green">function</span> supprimeraction() {<br/>
+          &nbsp;&nbsp;count=$#<br/>
+          &nbsp;&nbsp;<span style="color:green">if</span> [[ $1 == <span style="color:red">"fichier"</span> ]]<br/>
+          &nbsp;&nbsp;<span style="color:green">then</span><br/>
+          &nbsp;&nbsp;&nbsp;&nbsp;<span style="color:green">shift</span><br/>
+          &nbsp;&nbsp;&nbsp;&nbsp;rm $@<br/>
+          &nbsp;&nbsp;<span style="color:green">elif</span> [[ $1 == <span style="color:red">"répertoire"</span> ]]<br/>
+          &nbsp;&nbsp;<span style="color:green">then</span><br/>
+          &nbsp;&nbsp;&nbsp;&nbsp;<span style="color:green">shift</span><br/>
+          &nbsp;&nbsp;&nbsp;&nbsp;rmdir $@<br/>
+          &nbsp;&nbsp;<span style="color:green">fi</span><br/>
+          }<br/>
+         <br/>
+         <span style="color:brown">alias</span> supprimer=<span style="color:red">"supprimer"</span><br/>
+        </code>
+        <p>
+         As you can see that the code is similar to that in the English language and we have replaced the action words and objects by their translations in French language.
+         Now we can run the following commands in French language.
+        </p>
+        <ul>
+          <li><i>supprimer répertoire rép1</i></li>
+          <li><i>supprimer fichier f1</i></li>
+        </ul>
+        <p>
+          One may ask what's the need to write the complete word, why not just commands in the following way.
+        </p>
+        <ul>
+          <li><i>s r rép1</i></li>
+          <li><i>s f f1</i></li>
+        </ul>
+        <p>The above code can be easily modified to obtain these commands.</p>
+        <p>
+           Finally, how about the commands in Figure 2, where the object comes first. 
+           For this purpose, let's check these commands in Malayalam language, where the object comes first and the action word comes later.
+           For example, we want to have the following commands for creating and deleting directories.
+        </p>
+        <ul>
+          <li><i>ഡയറക്ടറി  സൃഷ്ടിക്കുക ഡ1</i></li>
+          <li><i>ഡയറക്ടറി  ഇല്ലാതാക്കുക  ഡ1</i></li>
+        </ul>
+        <p>To be able to run the above commands, the above code has been modified. 
+           As can be seen, all relevant operations related to directory have been grouped under a single function.
+        </p>
+        <code>
+          <span style="color:green">function</span> ഡയറക്ടറിപ്രവർത്തനങ്ങൾ() {<br/>
+          &nbsp;&nbsp;count=$#<br/>
+          &nbsp;&nbsp;<span style="color:green">if</span> [[ $1 == <span style="color:red">"സൃഷ്ടിക്കുക"</span> ]]<br/>
+          &nbsp;&nbsp;<span style="color:green">then</span><br/>
+          &nbsp;&nbsp;&nbsp;&nbsp;<span style="color:green">shift</span><br/>
+          &nbsp;&nbsp;&nbsp;&nbsp;rm $@<br/>
+          &nbsp;&nbsp;<span style="color:green">elif</span> [[ $1 == <span style="color:red">"ഇല്ലാതാക്കുക"</span> ]]<br/>
+          &nbsp;&nbsp;<span style="color:green">then</span><br/>
+          &nbsp;&nbsp;&nbsp;&nbsp;<span style="color:green">shift</span><br/>
+          &nbsp;&nbsp;&nbsp;&nbsp;rmdir $@<br/>
+          &nbsp;&nbsp;<span style="color:green">fi</span><br/>
+          }<br/>
+         <br/>
+         <span style="color:brown">alias</span> ഡയറക്ടറി=<span style="color:red">"ഡയറക്ടറിപ്രവർത്തനങ്ങൾ"</span><br/>
+        </code>
+        <p>
+          One another questions that remains answering is how to ensure that even the arguments (options) to the commands are also taken into consideration.
+          For example, if a person wants to pass -R (recursive) for recursively navigating a directory. 
+          These options may still work with the newly created aliases, but may need some modifications to the above functions.
+        </p>
         <h3>Conclusion</h3>
         <h3>References</h3>
         <p>
@@ -337,6 +479,8 @@
           <li id="ubiquity">Ubiquity: Designing a Multilingual Natural Language Interface, Michael Yoshitaka Erlewine, SIGIR Workshop on Information Access in a Multilingual World, July 23, 2009</li> 
           <li id="imperative"><a href="https://blog.esllibrary.com/2018/01/23/imperative-verbs/">Imperative Verbs</a></li>
           <li id="imperative-mood"><a href="https://en.wikipedia.org/wiki/Imperative_mood">Imperative mood</a></li>
+          <li id="bashrc"><a href="https://linux.die.net/man/1/bash">.bashrc</a></li>
+          <li id="bashrcfiles"><a href="http://www.gnu.org/software/bash/manual/html_node/Bash-Startup-Files.html">Bash Startup Files</a></li>
          </ol>
         </p>
       </div>
