@@ -102,3 +102,19 @@
  - __Status__: In progress
  - __Category__: Website
  - __Tag__: Course, Slides
+
+#16. Add last modification date and creation date on every article
+ - __Description__: Add modification and creation date on every article
+    - statically generated
+ - __Status__: In progress
+ - __Category__: Website
+ - __Tag__: Web page 
+
+#17. Add link to history of every modification of a given article 
+ - __Description__: Add the posibility to view the modification history of the article 
+    - Explore the possibility of a single page diff.html
+      - input: relative URL of the page
+      - output: page history with the possibility of visualization
+ - __Status__: In progress
+ - __Category__: Website
+ - __Tag__: Web page 
