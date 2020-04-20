@@ -19,7 +19,8 @@ def check_broken_links_file(filepath):
       source = link.get('href')
       if ( source.startswith('http') or
            source.startswith('https')):
-        request = requests.get(source)
+        headers={'User-Agent': 'Mozilla/5.0'}
+        request = requests.get(source, headers=headers)
         # Try to access the web page and check the status code
         if not request.status_code == 200:
           print(str(request.status_code) + ":  " + source)
