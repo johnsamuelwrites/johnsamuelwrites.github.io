@@ -13,9 +13,12 @@ import os
 from pygit2 import Repository, GIT_BLAME_TRACK_COPIES_SAME_FILE, GIT_SORT_TOPOLOGICAL, GIT_SORT_REVERSE
 from datetime import datetime
 import bisect
+from shutil import copy
+from os import remove
 
 directories = {}
 directories["en"] = [
+   "en",
    "en/blog",
    "en/photography",  
    "en/research",
@@ -25,10 +28,21 @@ directories["en"] = [
    "en/programming",
    "en/slides",
    "en/technology",
-   "en/travel"
+   "en/travel",
+   "en/slides/2017/Akademy/html",
+   "en/slides/2017/CapitoleduLibre/html",
+   "en/slides/2017/XLDB/html",
+   "en/slides/2018/CLEF",
+   "en/slides/2018/SWIB",
+   "en/slides/2018/UNILOG",
+   "en/slides/2018/WikimediaHackathon",
+   "en/slides/2018/WikiWorkshop",
+   "en/slides/2019/Catai",
+   "en/slides/2019/WikidataCon"
   ]
 
 directories["fr"] = [
+   "fr",
    "fr/blog",
    "fr/enseignement",
    "fr/linguistique",
@@ -40,26 +54,29 @@ directories["fr"] = [
    "fr/recherche"
 ]
 
+directories["ml"] = [
+   "ml"
+]
+
+directories["hi"] = [
+   "hi"
+]
+
+directories["pa"] = [
+   "pa"
+]
+
 exclude_files = {
-   "en/blog/index.html",
-   "en/photography/index.html",  
-   "en/research/index.html",
-   "en/teaching/index.html",
-   "en/writings/index.html",
-   "en/linguistics/index.html",
-   "en/programming/index.html",
+   "en/template.html",
    "en/slides/index.html",
    "en/technology/index.html",
    "en/travel/index.html",
    "fr/blog/index.html",
-   "fr/enseignement/index.html",
    "fr/linguistique/index.html",
    "fr/programmation/index.html",
    "fr/technologie/index.html",
    "fr/voyages/index.html",
    "fr/ecrits/index.html",
-   "fr/photographie/index.html",
-   "fr/recherche/index.html",
    "en/blog/template.html",
    "en/photography/template.html",  
    "en/research/template.html",
@@ -95,10 +112,12 @@ def get_latest_modification(filepath):
 
 def check_for_modified_articles():
   articles = {}
+  articleset = set()
   modification_time_list = []
   for language in directories:
     for directory in directories[language]:
       try:
+        filepath = None
         for filename in os.listdir(directory):
           filepath = directory+"/"+filename
           if(os.path.isfile(filepath) and filepath not in exclude_files):
@@ -107,15 +126,58 @@ def check_for_modified_articles():
                 latest = get_latest_modification(filepath)  
                 bisect.insort(modification_time_list, latest.commit_time) 
                 if latest.commit_time not in articles:
-                  articles[latest.commit_time] = [filepath]
+                  articles[latest.commit_time] = {filepath}
                 else:
-                  articles[latest.commit_time].append(filepath)
+                  articles[latest.commit_time].add(filepath)
 
       except Exception as e:
-        print("Error: " + str(e))
+        print("Error: in file: " + filepath + ": " + str(e))
+  frenchlist = "<ul>"
+  englishlist = "<ul>"
+  punjabilist = "<ul>"
+  malayalamlist = "<ul>"
+  hindilist = "<ul>"
   for time in modification_time_list[::-1]: 
     for article in articles[time]:
-      print(article, datetime.fromtimestamp(time).strftime('%d %B %Y'))
+      title = None
+      if (article in articleset):
+        continue
+      articleset.add(article)
+      with open(article,"r") as inputfile:
+        content = inputfile.read()
+        parsed_html = BeautifulSoup(content, features='html.parser')
+        for link in parsed_html.find_all('title'):
+          title = link.text.replace("John Samuel", "")
+          title = title.replace(":", "")
+          title = title.strip()
+          line = "\n<li><a href='../"+ article + "'>" + title + "</a>" + " <span>" + datetime.fromtimestamp(time).strftime('%d %B %Y') + "</span>" + "</li>"
+          if article.startswith("fr"):
+            frenchlist = frenchlist + line
+          elif article.startswith("en"):
+            englishlist = englishlist + line
+          elif article.startswith("ml"):
+            malayalamlist = malayalamlist + line
+          elif article.startswith("pa"):
+            punjabilist = punjabilist + line
+          elif article.startswith("hi"):
+            hindilist = hindilist + line
+  frenchlist = frenchlist + "\n</ul>"
+  englishlist = englishlist + "\n</ul>"
+  malayalamlist = malayalamlist + "\n</ul>"
+  hindilist = hindilist + "\n</ul>"
+  punjabilist = punjabilist + "\n</ul>"
+  with open("templates/blog.html", "r") as blogtemplate:
+    content = blogtemplate.read()
+    content = content.replace("EnglishArticleList", englishlist)
+    content = content.replace("FrenchArticleList", frenchlist)
+    content = content.replace("HindiArticleList", hindilist)
+    content = content.replace("MalayalamArticleList", malayalamlist)
+    content = content.replace("PunjabiArticleList", punjabilist)
+    with open("blog/index.html", "w") as blog:
+      blog.write(content)
+    blog.close()
+  blogtemplate.close()
+
 
 if(len(sys.argv) > 1):
  print("The program takes no input")
