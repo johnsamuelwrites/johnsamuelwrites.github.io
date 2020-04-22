@@ -17,22 +17,26 @@ def check_broken_links_file(filepath):
     parsed_html = BeautifulSoup(content, features='html.parser')
     for link in parsed_html.find_all('a'):
       source = link.get('href')
-      if ( source.startswith('http') or
-           source.startswith('https')):
-        headers={'User-Agent': 'Mozilla/5.0'}
-        request = requests.get(source, headers=headers)
-        # Try to access the web page and check the status code
-        if not request.status_code == 200:
-          print(str(request.status_code) + ":  " + source)
-      elif not source.startswith('#'):
-         dirpath = os.path.dirname(os.path.abspath(filepath))
-         if not os.path.isfile(dirpath + "/" + source):
-           print(source)
+      try:
+        if ( source.startswith('http') or
+             source.startswith('https')):
+          headers={'User-Agent': 'Mozilla/5.0'}
+          request = requests.get(source, headers=headers)
+          # Try to access the web page and check the status code
+          if not request.status_code == 200:
+            print("====== "+filepath + " ======")
+            print(str(request.status_code) + ":  " + source)
+        elif not source.startswith('#'):
+           dirpath = os.path.dirname(os.path.abspath(filepath))
+           if not os.path.isfile(dirpath + "/" + source):
+             print("====== "+filepath + " ======")
+             print(source)
+      except Exception as e:
+        print("Error: in accessing source: " + source + ", "+ str(e))
 
 
 def check_broken_links_files(filepaths):
   for filepath in filepaths:
-    print("====== "+filepath + " ======")
     check_broken_links_file(filepath)
 
 parser = argparse.ArgumentParser(description='check if links are broken')
