@@ -68,9 +68,8 @@ directories["pa"] = [
 
 exclude_files = {
    "en/template.html",
-   "en/slides/index.html",
-   "en/technology/index.html",
-   "en/travel/index.html",
+   "fr/template.html",
+   "en/slides/2017/Akademy/html/kde-wikidata.html",
    "fr/blog/index.html",
    "fr/linguistique/index.html",
    "fr/programmation/index.html",
@@ -110,6 +109,13 @@ def get_latest_modification(filepath):
       latest = commit
   return latest
 
+def replace_name(title):
+  title = title.replace("John Samuel", "")
+  title = title.replace("ജോൺ ശമൂവേൽ", "")
+  title = title.replace("ਜੌਨ ਸੈਮੂਅਲ", "")
+  title = title.replace("जॉन शमुऐल", "")
+  return title
+
 def check_for_modified_articles():
   articles = {}
   articleset = set()
@@ -119,6 +125,8 @@ def check_for_modified_articles():
       try:
         filepath = None
         for filename in os.listdir(directory):
+          if ".html" not in filename:
+            continue
           filepath = directory+"/"+filename
           if(os.path.isfile(filepath) and filepath not in exclude_files):
             with open (filepath, "r") as f:
@@ -147,7 +155,7 @@ def check_for_modified_articles():
         content = inputfile.read()
         parsed_html = BeautifulSoup(content, features='html.parser')
         for link in parsed_html.find_all('title'):
-          title = link.text.replace("John Samuel", "")
+          title = replace_name(link.text)
           title = title.replace(":", "")
           title = title.strip()
           line = "\n<li><a href='../"+ article + "'>" + title + "</a>" + " <span>" + datetime.fromtimestamp(time).strftime('%d %B %Y') + "</span>" + "</li>"
