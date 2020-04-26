@@ -38,7 +38,8 @@ directories["en"] = [
    "en/slides/2018/WikimediaHackathon",
    "en/slides/2018/WikiWorkshop",
    "en/slides/2019/Catai",
-   "en/slides/2019/WikidataCon"
+   "en/slides/2019/WikidataCon",
+   "en/slides/2020/EUvsVirus"
   ]
 
 directories["fr"] = [
