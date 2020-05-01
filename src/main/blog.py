@@ -15,6 +15,8 @@ from datetime import datetime
 import bisect
 from shutil import copy
 from os import remove
+from feedgen.feed import FeedGenerator
+from pytz import timezone
 
 directories = {}
 directories["en"] = [
@@ -146,6 +148,14 @@ def check_for_modified_articles():
   punjabilist = "<ul>"
   malayalamlist = "<ul>"
   hindilist = "<ul>"
+
+  fg = FeedGenerator()
+  fg.id("https://johnsamuel.info")
+  fg.title("John Samuel")
+  fg.description('Personal Blog of John Samuel')
+  fg.author( {'name':'John Samuel'} )
+  fg.language('en')
+  fg.link(href="https://johnsamuel.info")
   for time in modification_time_list[::-1]: 
     for article in articles[time]:
       title = None
@@ -170,6 +180,13 @@ def check_for_modified_articles():
             punjabilist = punjabilist + line
           elif article.startswith("hi"):
             hindilist = hindilist + line
+          fe = fg.add_entry()
+          fe.id("https://johnsamuel.info/" + article.strip())
+          fe.title(title.strip())
+          fe.pubDate(datetime.fromtimestamp(time, tz=timezone('Europe/Amsterdam')))
+          fe.description(title)
+          fe.link(href="https://johnsamuel.info/"+article.strip())
+
   frenchlist = frenchlist + "\n</ul>"
   englishlist = englishlist + "\n</ul>"
   malayalamlist = malayalamlist + "\n</ul>"
@@ -186,6 +203,12 @@ def check_for_modified_articles():
       blog.write(content)
     blog.close()
   blogtemplate.close()
+
+  # Writing the feed
+  atomfeed = fg.atom_str(pretty=True)
+  rssfeed  = fg.rss_str(pretty=True)
+  fg.atom_file('atom.xml')
+  fg.rss_file('rss.xml')
 
 
 if(len(sys.argv) > 1):
