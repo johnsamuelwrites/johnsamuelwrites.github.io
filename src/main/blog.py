@@ -180,7 +180,7 @@ def check_for_modified_articles():
             punjabilist = punjabilist + line
           elif article.startswith("hi"):
             hindilist = hindilist + line
-          fe = fg.add_entry()
+          fe = fg.add_entry(order='append')
           fe.id("https://johnsamuel.info/" + article.strip())
           fe.title(title.strip())
           fe.pubDate(datetime.fromtimestamp(time, tz=timezone('Europe/Amsterdam')))
