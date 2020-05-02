@@ -144,10 +144,10 @@ def check_for_modified_articles():
       except Exception as e:
         print("Error: in file: " + filepath + ": " + str(e))
   frenchlist = "<ul vocab='http://schema.org/' typeof='BreadcrumbList'>"
-  englishlist = "<ul vocab='http://schema.org/' typeof='BreadcrumbList'>>"
-  punjabilist = "<ul vocab='http://schema.org/' typeof='BreadcrumbList'>>"
-  malayalamlist = "<ul vocab='http://schema.org/' typeof='BreadcrumbList'>>"
-  hindilist = "<ul vocab='http://schema.org/' typeof='BreadcrumbList'>>"
+  englishlist = "<ul vocab='http://schema.org/' typeof='BreadcrumbList'>"
+  punjabilist = "<ul vocab='http://schema.org/' typeof='BreadcrumbList'>"
+  malayalamlist = "<ul vocab='http://schema.org/' typeof='BreadcrumbList'>"
+  hindilist = "<ul vocab='http://schema.org/' typeof='BreadcrumbList'>"
 
   fg = FeedGenerator()
   fg.id("https://johnsamuel.info")
@@ -169,7 +169,7 @@ def check_for_modified_articles():
           title = replace_name(link.text)
           title = title.replace(":", "")
           title = title.strip()
-          line = "\n<li property='itemListElement' typeof='ListItem'><a property='item' typeof='WebPage' href='../"+ article + "'>" + title + "</a>" + " <span property='name'>" + datetime.fromtimestamp(time).strftime('%d %B %Y') + "</span>" + "</li>"
+          line = "\n<li property='itemListElement' typeof='ListItem'><a property='item' typeof='WebPage' href='../"+ article + "'>" + "<span property='name'>" + title + "</span></a>" + " <span class='date' property='datePublished' content='" + datetime.fromtimestamp(time).strftime('%Y-%m-%d') + "'>" + datetime.fromtimestamp(time).strftime('%d %B %Y') + "</span>" + "</li>"
           if article.startswith("fr"):
             frenchlist = frenchlist + line
           elif article.startswith("en"):
