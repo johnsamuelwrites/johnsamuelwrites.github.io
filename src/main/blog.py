@@ -10,7 +10,7 @@
 import sys
 from bs4 import BeautifulSoup
 import os
-from pygit2 import Repository, GIT_BLAME_TRACK_COPIES_SAME_FILE, GIT_SORT_TOPOLOGICAL, GIT_SORT_REVERSE
+from git import get_first_latest_modification
 from datetime import datetime
 import bisect
 from shutil import copy
@@ -100,17 +100,6 @@ exclude_files = {
    "fr/recherche/template.html",
 }
 
-def get_latest_modification(filepath):
-  repo = Repository('.git')
-  latest = None
-  blame = repo.blame(filepath, flags=GIT_BLAME_TRACK_COPIES_SAME_FILE)
-  for b in blame:
-    commit = repo.get(b.final_commit_id)
-    if not latest:
-      latest = commit
-    elif latest.commit_time < commit.commit_time:
-      latest = commit
-  return latest
 
 def replace_name(title):
   title = title.replace("John Samuel", "")
@@ -134,20 +123,15 @@ def check_for_modified_articles():
           if(os.path.isfile(filepath) and filepath not in exclude_files):
             with open (filepath, "r") as f:
               if("NOTE: Article in Progress" not in f.read()):
-                latest = get_latest_modification(filepath)  
-                bisect.insort(modification_time_list, latest.commit_time) 
-                if latest.commit_time not in articles:
-                  articles[latest.commit_time] = {filepath}
+                first, latest = get_first_latest_modification(filepath)  
+                bisect.insort(modification_time_list, latest) 
+                if latest not in articles:
+                  articles[latest] = {filepath}
                 else:
-                  articles[latest.commit_time].add(filepath)
+                  articles[latest].add(filepath)
 
       except Exception as e:
         print("Error: in file: " + filepath + ": " + str(e))
-  frenchlist = "<ul vocab='http://schema.org/' typeof='BreadcrumbList'>"
-  englishlist = "<ul vocab='http://schema.org/' typeof='BreadcrumbList'>"
-  punjabilist = "<ul vocab='http://schema.org/' typeof='BreadcrumbList'>"
-  malayalamlist = "<ul vocab='http://schema.org/' typeof='BreadcrumbList'>"
-  hindilist = "<ul vocab='http://schema.org/' typeof='BreadcrumbList'>"
 
   fg = FeedGenerator()
   fg.id("https://johnsamuel.info")
@@ -156,6 +140,11 @@ def check_for_modified_articles():
   fg.author( {'name':'John Samuel'} )
   fg.language('en')
   fg.link(href="https://johnsamuel.info")
+  count = {}
+  articlelist = {}
+  for lang in ["en", "fr", "hi", "pa", "ml"]:
+    count[lang] = 1
+    articlelist[lang] = "<ul vocab='http://schema.org/' typeof='BreadcrumbList'>"
   for time in modification_time_list[::-1]: 
     for article in articles[time]:
       title = None
@@ -169,17 +158,13 @@ def check_for_modified_articles():
           title = replace_name(link.text)
           title = title.replace(":", "")
           title = title.strip()
-          line = "\n<li property='itemListElement' typeof='ListItem'><a property='item' typeof='WebPage' href='../"+ article + "'>" + "<span property='name'>" + title + "</span></a>" + " <span class='date' property='datePublished' content='" + datetime.fromtimestamp(time).strftime('%Y-%m-%d') + "'>" + datetime.fromtimestamp(time).strftime('%d %B %Y') + "</span>" + "</li>"
-          if article.startswith("fr"):
-            frenchlist = frenchlist + line
-          elif article.startswith("en"):
-            englishlist = englishlist + line
-          elif article.startswith("ml"):
-            malayalamlist = malayalamlist + line
-          elif article.startswith("pa"):
-            punjabilist = punjabilist + line
-          elif article.startswith("hi"):
-            hindilist = hindilist + line
+          #display modification date of article along with the title
+          line = "\n<li property='itemListElement' typeof='ListItem'><a property='item' typeof='WebPage' href='../"+ article + "'>" + "<span property='name'>" + title + "</span></a>" + " <span class='date' property='datePublished' content='" + datetime.fromtimestamp(time).strftime('%Y-%m-%d') + "'>" + datetime.fromtimestamp(time).strftime('%d %B %Y') + "</span>" 
+          for lang in ["en", "fr", "hi", "pa", "ml"]:
+            if article.startswith(lang):
+              articlelist[lang] = articlelist[lang] + line + '<meta property="position" content="' + str(count[lang]) + '"></li>'
+              count[lang] = count[lang] + 1
+              break
           fe = fg.add_entry(order='append')
           fe.id("https://johnsamuel.info/" + article.strip())
           fe.title(title.strip())
@@ -187,18 +172,15 @@ def check_for_modified_articles():
           fe.description(title)
           fe.link(href="https://johnsamuel.info/"+article.strip())
 
-  frenchlist = frenchlist + "\n</ul>"
-  englishlist = englishlist + "\n</ul>"
-  malayalamlist = malayalamlist + "\n</ul>"
-  hindilist = hindilist + "\n</ul>"
-  punjabilist = punjabilist + "\n</ul>"
+  for lang in ["en", "fr", "hi", "pa", "ml"]:
+    articlelist[lang] = articlelist[lang] + "\n</ul>"
   with open("templates/blog.html", "r") as blogtemplate:
     content = blogtemplate.read()
-    content = content.replace("EnglishArticleList", englishlist)
-    content = content.replace("FrenchArticleList", frenchlist)
-    content = content.replace("HindiArticleList", hindilist)
-    content = content.replace("MalayalamArticleList", malayalamlist)
-    content = content.replace("PunjabiArticleList", punjabilist)
+    content = content.replace("EnglishArticleList", articlelist["en"])
+    content = content.replace("FrenchArticleList", articlelist["fr"])
+    content = content.replace("HindiArticleList", articlelist["hi"])
+    content = content.replace("MalayalamArticleList", articlelist["ml"])
+    content = content.replace("PunjabiArticleList", articlelist["pa"])
     with open("blog/index.html", "w") as blog:
       blog.write(content)
     blog.close()

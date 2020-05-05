@@ -6,7 +6,7 @@ import requests
 import pprint
 import argparse
 from w3lib.html import get_base_url
-from pygit2 import Repository, GIT_BLAME_TRACK_COPIES_SAME_FILE, GIT_SORT_TOPOLOGICAL, GIT_SORT_REVERSE
+from git import get_first_latest_modification
 from bs4 import BeautifulSoup
 import re
 import json
@@ -36,23 +36,6 @@ jsonld_template = """
 }
 """
 
-def get_modification_publication(filepath):
-  repo = Repository('.git')
-  latest = None
-  first = None
-  blame = repo.blame(filepath, flags=GIT_BLAME_TRACK_COPIES_SAME_FILE)
-  for b in blame:
-    commit = repo.get(b.final_commit_id)
-    if not latest:
-      latest = commit.commit_time
-    elif latest < commit.commit_time:
-      latest = commit.commit_time
-    if not first:
-      first = commit.commit_time
-    elif first > commit.commit_time:
-      first = commit.commit_time
-  return first, latest
-
 def replace_name(title):
   title = title.replace("John Samuel", "")
   title = title.replace("ജോൺ ശമൂവേൽ", "")
@@ -74,7 +57,7 @@ def add_update_metadata(links):
         content = f.read()
         jsonld = json.loads(jsonld_template)
         # get creation, publication and modification date
-        first, latest = get_modification_publication(link)
+        first, latest = get_first_latest_modification(link)
         jsonld["dateCreated"] = str(datetime.fromtimestamp(first))
         jsonld["datePublished"] = str(datetime.fromtimestamp(first))
         jsonld["dateModified"] = str(datetime.fromtimestamp(latest))
