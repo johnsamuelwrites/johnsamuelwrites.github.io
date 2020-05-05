@@ -159,10 +159,10 @@ def check_for_modified_articles():
           title = title.replace(":", "")
           title = title.strip()
           #display modification date of article along with the title
-          line = "\n<li property='itemListElement' typeof='ListItem'><a property='item' typeof='WebPage' href='../"+ article + "'>" + "<span property='name'>" + title + "</span></a>" + " <span class='date' property='datePublished' content='" + datetime.fromtimestamp(time).strftime('%Y-%m-%d') + "'>" + datetime.fromtimestamp(time).strftime('%d %B %Y') + "</span>" 
+          line = "\n<li property='itemListElement' typeof='ListItem'><a property='item' typeof='WebPage' href='../"+ article + "'>" + "<span property='name'>" + title + "</span></a>" + " <span typeof='WebPage' class='date' property='datePublished' content='" + datetime.fromtimestamp(time).strftime('%Y-%m-%d') + "'>" + datetime.fromtimestamp(time).strftime('%d %B %Y') + "</span>" 
           for lang in ["en", "fr", "hi", "pa", "ml"]:
             if article.startswith(lang):
-              articlelist[lang] = articlelist[lang] + line + '<meta property="position" content="' + str(count[lang]) + '"></li>'
+              articlelist[lang] = articlelist[lang] + line + '<meta typeof="ListItem" property="position" content="' + str(count[lang]) + '"></li>'
               count[lang] = count[lang] + 1
               break
           fe = fg.add_entry(order='append')
