@@ -43,7 +43,7 @@ jsonld_template = """
        "name": "John Samuel",
        "logo": {
          "@type": "imageObject",
-         "url": "https://johnsamuel.info/images/writings/coconut-trees-landscape.svg",
+         "url": "https://johnsamuel.info/images/writings/coconut-trees-landscape.svg"
        }
     },
     "keywords" : ["Blog" ]
