@@ -144,7 +144,7 @@ def check_for_modified_articles():
   articlelist = {}
   for lang in ["en", "fr", "hi", "pa", "ml"]:
     count[lang] = 1
-    articlelist[lang] = "<ul vocab='http://schema.org/' typeof='BreadcrumbList'>"
+    articlelist[lang] = "<ul vocab='http://schema.org/' typeof='ItemList'>"
   for time in modification_time_list[::-1]: 
     for article in articles[time]:
       title = None
