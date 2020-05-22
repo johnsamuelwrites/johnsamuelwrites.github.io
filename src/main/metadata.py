@@ -8,7 +8,7 @@ import argparse
 from w3lib.html import get_base_url
 from git import get_first_latest_modification
 from bs4 import BeautifulSoup
-import re
+import regex
 import json
 from datetime import datetime
 from shutil import copy
@@ -91,7 +91,7 @@ def add_update_metadata(links):
         if ("application/ld+json" not in content):
           content = content.replace("</head>", scriptjsonld + "\n  </head>")
         else:
-          content = re.sub(pattern, scriptjsonld, content)
+          content = regex.sub(pattern, scriptjsonld, content)
         outputfile = open("/tmp/temp.html", "w") 
 
         outputfile.write(content)
