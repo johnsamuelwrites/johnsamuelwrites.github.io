@@ -32,6 +32,20 @@ jsonld_template = """
     "dateModified" : "",
     "dateCreated" : "",
     "url" : "",
+    "image": {
+       "@type": "imageObject",
+       "url": "https://johnsamuel.info/images/writings/coconut-trees-landscape.svg",
+       "height": "600",
+       "width": "800"
+    },
+    "publisher": {
+       "@type": "Organization",
+       "name": "John Samuel",
+       "logo": {
+         "@type": "imageObject",
+         "url": "https://johnsamuel.info/images/writings/coconut-trees-landscape.svg",
+       }
+    },
     "keywords" : ["Blog" ]
 }
 """
