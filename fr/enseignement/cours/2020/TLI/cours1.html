@@ -1,0 +1,2490 @@
+<html>
+<head>
+<meta charset="utf-8"/>
+<title>HTML5 Canvas</title>
+<style type="text/css">
+    body {
+      height: 100%;
+      width: 100%;
+      background-color: white;
+      margin: 0;
+      overflow: hidden;
+      font-family: Arial;
+    }
+    .slide {
+      height: 100%;
+      width: 100%;
+    }
+    .content {
+      height: 79%;
+      width: 95vw;
+      display: flex;
+      flex-direction: column;
+      color: #000000;
+      text-align: left;
+      padding-left: 1.5vmax;
+      padding-top: 1.5vmax;
+      overflow-x: auto;
+      font-size: 3vmin;
+      flex-wrap: wrap;
+    }
+    .content h1, h2, h3, h4 {
+      color: #1B80CF;
+    }
+    .content .topichighlight {
+      background-color: #78002E;
+      color: #FFFFFF;
+    }
+    .content .topicheading{
+      background-color: #1B80CF;
+      color: #FFFFFF;
+      vertical-align:middle;
+      border-radius:0 2vmax 2vmax 0%;
+      height:4vmax;
+      line-height:4vmax;
+      padding-left:1vmax;
+      margin:0.1vmax;
+      width:50%;
+    }
+    .content .flexcontent{
+      height: 79%;
+      width: 95vw;
+      display: flex;
+      overflow-y: auto;
+      font-size: 3vmin;
+      flex-wrap: wrap;
+    }
+    .content .gridcontent{
+      display:grid;
+      grid-template-columns: auto auto auto auto;
+      grid-column-gap:0px;
+      grid-row-gap:0px;
+      grid-gap:0px;
+    }
+    .content .topicsubheading{
+      background-color: #1B80CF;
+      color: #FFFFFF;
+      vertical-align:middle;
+      border-radius:0 1.5vmax 1.5vmax 0%;
+      height:3vmax;
+      margin:0.1vmax;
+      font-size:90%;
+      line-height:3vmax;
+      padding-left:1vmax;
+      width:40%;
+    }
+    .content table {
+      color: #000000;
+      font-size: 100%;
+      width: 100%;
+    }
+    .content a:link,
+    .content a:visited{
+      color: #1B80CF;
+      text-decoration:none;
+    }
+    .content th {
+      color: #FFFFFF;
+      background-color: #1B80CF;
+      border-radius:2vmax 2vmax 2vmax 2vmax;
+      font-size: 120%;
+      padding: 15px;
+    }
+    .content figure {
+      max-width:90%;
+      max-height:90%;
+    }
+    .content figure img{
+      max-width:50vmin;
+      max-height:50vmin;
+      vertical-align:center;
+      display:block;
+      margin-left:auto;
+      margin-right:auto;
+    }
+    .content figure figcaption {
+      max-width:90%;
+      max-height:90%;
+      margin:0.1vmax;
+      font-size:90%;
+      text-align:center;
+      padding:0.5vmax;
+      background-color: #E1F5FE;
+      border-radius:2vmax 2vmax 2vmax 2vmax;
+    }
+    .content td {
+      color: #000000;
+      width: 8%;
+      padding-left: 3vmax;
+      padding-top: 1vmax;
+      padding-bottom: 1vmax;
+      background-color: #E1F5FE;
+      border-radius:2vmax 2vmax 2vmax 2vmax;
+    }
+    .content li {
+      line-height: 4vh;
+    }
+    .header {
+      color: #ffffff;
+      background-color: #00549d;
+      height: 5vmax;
+    }
+    .header h1 {
+      text-align: center;
+      vertical-align: middle;
+      font-size: 3vmax;
+      line-height: 4vmax;
+      margin: 0;
+    }
+    .footer {
+      height: 3vmax;
+      line-height: 3vmax;
+      vertical-align: middle;
+      color: #ffffff;
+      background-color: #00549d;
+      margin: 0;
+      padding: .3vmax;
+      overflow: hidden;
+    }
+    .footer .contact {
+      float: left;
+      color: #ffffff;
+      text-align: left;
+      font-size: 3.2vmin;
+    }
+    .footer .navigation {
+      float: right;
+      text-align: right;
+      width: 8vw;
+      font-size: 3vmin;
+    }
+
+    .footer .navigation .next,.prev {
+      font-size: 3vmin;
+      color: #ffffff;
+      text-decoration: none;
+    }
+
+    .footer .navigation .next::after {
+      content: "| >";
+    }
+
+    .footer .navigation .prev::after {
+      content: "< ";
+    }
+    /* Using same Jupyter CSS
+     */
+    .highlight  { background: #f8f8f8; }
+    .highlight .c { color: #408080; font-style: italic } /* Comment */
+    .highlight .err { border: 1px solid #FF0000 } /* Error */
+    .highlight .k { color: #008000; font-weight: bold } /* Keyword */
+    .highlight .o { color: #666666 } /* Operator */
+    .highlight .ch { color: #408080; font-style: italic } /* Comment.Hashbang */
+    .highlight .c1 { color: #408080; font-style: italic } /* Comment.Single */
+    .highlight .cs { color: #408080; font-style: italic } /* Comment.Special */
+    .highlight .cm { color: #408080; font-style: italic } /* Comment.Multiline */
+    .highlight .nn { color: #0000FF; font-weight: bold } /* Name.Namespace */
+    .highlight .k { color: #008000; font-weight: bold } /* Keyword */
+    .highlight .s2 { color: #BA2121 } /* Literal.String.Double */
+    .highlight .s1 { color: #BA2121 } /* Literal.String.Single */
+    .highlight .kn { color: #008000; font-weight: bold } /* Keyword.Namespace */
+    .highlight .nb { color: #008000 } /* Name.Builtin */
+    .highlight .mb { color: #666666 } /* Literal.Number.Bin */
+    .highlight .mf { color: #666666 } /* Literal.Number.Float */
+    .highlight .mh { color: #666666 } /* Literal.Number.Hex */
+    .highlight .mi { color: #666666 } /* Literal.Number.Integer */
+    .highlight .mo { color: #666666 } /* Literal.Number.Oct */
+    @media (max-width: 640px), screen and (orientation: portrait) {
+       body {
+         max-width:100%;
+         max-height:100%;
+       }
+       .slide {
+          height: 100%;
+          width: 100%;
+       }
+       .content {
+          width: 100%;
+          height:92%;
+          display: flex;
+          flex-direction: row;
+          text-align: left;
+          padding: 1vw;
+          line-height: 3.8vmax;
+          font-size: 1.8vmax;
+          flex-wrap: wrap;
+       }
+       .content .topicheading{
+         width:90%;
+       }
+       .content h1, h2, h3, h4 {
+          width:100%;
+       }
+       .content figure img{
+          max-width:80vmin;
+          max-height:50vmin;
+       }
+       .content figure figcaption {
+           max-width:90%;
+           max-height:90%;
+       }
+    }
+
+    @media print {
+      body {
+        max-width:100%;
+        max-height:100%;
+      }
+      .content {
+        height: 76%;
+        width: 90vw;
+        display: flex;
+        flex-direction: column;
+        color: #000000;
+        text-align: left;
+        padding: 5vw;
+        font-size: 3vmin;
+        flex-wrap: wrap;
+      }
+      .content figure img{
+        max-width:80%;
+        max-height:80%;
+      }
+      .content figcaption {
+        max-width:80%;
+        max-height:80%;
+      }
+    }
+
+    </style>
+</head>
+<body>
+	<section class="slide" id="slide1">
+		<div class="header">
+		</div>
+		<div class="content">
+			<h1 style="font-size:3.5vmin">HTML5 Canvas<br/></h1>
+                        <p><b>John Samuel</b><br/>
+                          CPE Lyon<br/><br/>
+                        <b>Année</b>: 2020-2021<br/>
+                        <b>Courriel</b>: john(dot)samuel(at)cpe(dot)fr<br/><br/>
+                        <a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/"><img alt="Creative Commons License" style="border-width:0" src="../../../../../en/teaching/courses/2017/C/88x31.png" /></a></p>
+                        <p>
+                          <canvas id="introduction" width="300" height="400">
+                          </canvas>
+                        </p>
+		</div>
+		<div class="footer">
+			<div class="contact">HTML5 Canvas | John Samuel</div>
+			<div class="navigation">1
+
+                                <a class="next" href="#slide2"></a>
+			</div>
+		</div>
+	</section>
+	<section class="slide" id="slide2">
+		<div class="header">
+			<h1>HTML5 Canvas</h1>
+		</div>
+		<div class="content">
+			<h1>Objectifs</h1>
+			<ul>
+                          <li>Canvas
+			    <ul>
+                              <li>Lignes, Arcs et Courbes</li>
+                              <li>Rectangle</li>
+                              <li>Texte</li>
+                              <li>Manipulation des images</li>
+                              <li>Interaction</li>
+			    </ul>
+                          </li>
+                          <li>SVG
+			    <ul>
+                              <li>Lignes, Chemins, Arcs et Courbes</li>
+                              <li>Rectangle, Cercles et Ellipses</li>
+                              <li>Texte</li>
+			    </ul>
+                          </li>
+                          <li>Média</li>
+                        </ul>
+		</div>
+		<div class="footer">
+			<div class="contact">HTML5 Canvas | John Samuel</div>
+			<div class="navigation">2
+				<a class="prev" href="#slide1"></a>
+                                <a class="next" href="#slide3"></a>
+			</div>
+		</div>
+	</section>
+	<section class="slide" id="slide3">
+		<div class="header">
+			<h1>HTML5 Canvas</h1>
+		</div>
+		<div class="content">
+			<h1>Histoire</h1>
+			<ul>
+                           <li>Dévéloppé par Apple pour être utilisé dans WebKit en 2004</li>
+                           <li>Adopté par les navigateurs utilisant Gecko en 2005</li>
+                           <li>Adopté par Opera en 2006</li>
+                           <li>Standardisé par le groupe de travail WHATWG</li>
+                           <li>Il n'est pas reconnu par tous les vieux navigateurs</li>
+			</ul>
+		</div>
+		<div class="footer">
+			<div class="contact">HTML5 Canvas | John Samuel</div>
+			<div class="navigation">3
+				<a class="prev" href="#slide2"></a>
+                                <a class="next" href="#slide4"></a>
+			</div>
+		</div>
+	</section>
+	<section class="slide" id="slide4">
+		<div class="header">
+			<h1>Fonctionnement</h1>
+		</div>
+		<div class="content">
+                        <h3>canvas</h3>
+                        <code>
+                          &lt;<span style="color:green">body</span>&gt;<br/>...<br/>
+                          &nbsp;&lt;<span style="color:green">canvas</span> <span style="color:blue">id</span>=<span style="color:red">"moncanvas"</span> <span style="color:blue">width</span>=<span style="color:red">"300"</span> <span style="color:blue">height</span>=<span style="color:red">"400"</span>&gt;<br/>
+                          &nbsp;&lt;/<span style="color:green">canvas</span>&gt;
+                          <br/>...<br/>
+                          &lt;/<span style="color:green">body</span>&gt;<br/>
+                        </code>
+                        <p>
+                          <canvas class="moncanvas" width="300" height="400">
+                          </canvas>
+                        </p>
+		</div>
+		<div class="footer">
+			<div class="contact">HTML5 Canvas | John Samuel</div>
+			<div class="navigation">4
+				<a class="prev" href="#slide3"></a>
+                                <a class="next" href="#slide5"></a>
+			</div>
+		</div>
+	</section>
+	<section class="slide" id="slide5">
+		<div class="header">
+			<h1>Fonctionnement</h1>
+		</div>
+		<div class="content">
+                        <h3>canvas</h3>
+			<ul>
+                           <li>&lt;canvas&gt; utilise un objet de contexte JavaScript</li>
+                           <li>La taille par défaut de canvas est 300 px × 150 px</li>
+			</ul>
+                        <code>
+                          &nbsp;&lt;<span style="color:green">canvas</span> <span style="color:blue">id</span>=<span style="color:red">"moncanvas"</span> <span style="color:blue">width</span>=<span style="color:red">"300"</span> <span style="color:blue">height</span>=<span style="color:red">"400"</span>&gt;<br/>
+                          &nbsp;&lt;/<span style="color:green">canvas</span>&gt;
+                        </code>
+                        <p>
+                          <canvas class="moncanvas" width="300" height="400">
+                          </canvas>
+                        </p>
+		</div>
+		<div class="footer">
+			<div class="contact">HTML5 Canvas | John Samuel</div>
+			<div class="navigation">5
+				<a class="prev" href="#slide4"></a>
+                                <a class="next" href="#slide6"></a>
+			</div>
+		</div>
+	</section>
+	<section class="slide" id="slide6">
+		<div class="header">
+			<h1>Fonctionnement</h1>
+		</div>
+		<div class="content">
+                        <h3>canvas</h3>
+                        <code>
+                          &nbsp;&lt;<span style="color:green">canvas</span> <span style="color:blue">id</span>=<span style="color:red">"moncanvas"</span> <span style="color:blue">width</span>=<span style="color:red">"300"</span> <span style="color:blue">height</span>=<span style="color:red">"400"</span>&gt;<br/>
+                          &nbsp;&lt;/<span style="color:green">canvas</span>&gt;
+                        </code>
+                        <ul>
+                          <li><b>(0, 0)</b>: le coin supérieur gauche</li>
+                          <li><b>(300, 400)</b>: le coin inférieur droit</li>
+                        </ul>
+                        <p>
+                          <canvas class="moncanvas" width="300" height="400">
+                          </canvas>
+                        </p>
+		</div>
+		<div class="footer">
+			<div class="contact">HTML5 Canvas | John Samuel</div>
+			<div class="navigation">6
+				<a class="prev" href="#slide5"></a>
+                                <a class="next" href="#slide7"></a>
+			</div>
+		</div>
+	</section>
+
+	<section class="slide" id="slide7">
+		<div class="header">
+			<h1>Fonctionnement</h1>
+		</div>
+		<div class="content">
+                        <h3>getContext(...)</h3>
+                        <code>
+                          &lt;<span style="color:green">body</span>&gt;<br/>...<br/>
+                          &nbsp;&lt;<span style="color:green">canvas</span> <span style="color:blue">id</span>=<span style="color:red">"moncanvas"</span> <span style="color:blue">width</span>=<span style="color:red">"300"</span> <span style="color:blue">height</span>=<span style="color:red">"400"</span>&gt;<br/>
+                          &nbsp;&lt;/<span style="color:green">canvas</span>&gt;
+                          <br/>
+                          &nbsp;&lt;<span style="color:green">script</span>&gt;<br/>
+                          &nbsp;&nbsp;var <span style="color:blue">id</span> = document.getElementById(<span style="color:red">"moncanvas"</span>);<br/>
+                          &nbsp;&nbsp;var <span style="color:blue">context</span> = id.getContext(<span style="color:red">"2d"</span>);<br/>
+                          &nbsp;&lt;<span style="color:green">/script</span>&gt;<br/>...<br/>
+                          &lt;/<span style="color:green">body</span>&gt;<br/>
+                        </code>
+                        <p>
+                          <canvas class="moncanvas" width="300" height="400">
+                          </canvas>
+                        </p>
+		</div>
+		<div class="footer">
+			<div class="contact">HTML5 Canvas | John Samuel</div>
+			<div class="navigation">7
+				<a class="prev" href="#slide6"></a>
+                                <a class="next" href="#slide8"></a>
+			</div>
+		</div>
+	</section>
+	<section class="slide" id="slide8">
+		<div class="header">
+			<h1>Fonctionnement</h1>
+		</div>
+		<div class="content">
+                        <h3>canvas</h3>
+                        <p>Dans le <b>body</b> d'un fichier HTML</p>
+                        <ul>
+                          <li><b>identifiant</b>: id</li>
+                          <li><b>largeur</b>: width</li>
+                          <li><b>hauteur</b>: height</li>
+                        </ul>
+                        <code>
+                          &nbsp;&lt;<span style="color:green">canvas</span> <span style="color:blue">id</span>=<span style="color:red">"moncanvas"</span> <span style="color:blue">width</span>=<span style="color:red">"300"</span> <span style="color:blue">height</span>=<span style="color:red">"400"</span>&gt;<br/>
+                          &nbsp;&lt;/<span style="color:green">canvas</span>&gt;
+                        </code>
+                        <p>
+                          <canvas class="moncanvas" width="300" height="400">
+                          </canvas>
+                        </p>
+		</div>
+		<div class="footer">
+			<div class="contact">HTML5 Canvas | John Samuel</div>
+			<div class="navigation">8
+				<a class="prev" href="#slide7"></a>
+                                <a class="next" href="#slide9"></a>
+			</div>
+		</div>
+	</section>
+	<section class="slide" id="slide9">
+		<div class="header">
+			<h1>Fonctionnement</h1>
+		</div>
+		<div class="content">
+                        <h3>canvas</h3>
+                        <p>Dans un fichier Javascript ou dans <b>&lt;script&gt;...&lt;/script&gt;</b></p>
+                        <code>
+                          &nbsp;&lt;<span style="color:green">script</span>&gt;<br/>
+                          &nbsp;&nbsp;var <span style="color:blue">id</span> = document.getElementById(<span style="color:red">"moncanvas"</span>);<br/>
+                          &nbsp;&nbsp;var <span style="color:blue">context</span> = id.getContext(<span style="color:red">"2d"</span>);<br/>
+                          &nbsp;&lt;<span style="color:green">/script</span>&gt;
+                        </code>
+		</div>
+		<div class="footer">
+			<div class="contact">HTML5 Canvas | John Samuel</div>
+			<div class="navigation">9
+				<a class="prev" href="#slide8"></a>
+                                <a class="next" href="#slide10"></a>
+			</div>
+		</div>
+	</section>
+	<section class="slide" id="slide10">
+		<div class="header">
+			<h1>Fonctionnement</h1>
+		</div>
+		<div class="content">
+                        <h3>style.backgroundColor</h3>
+                        <p>Changer la couleur du fond</b></p>
+                        <code>
+                          &nbsp;&nbsp;<span style="color:blue">id.style.backgroundColor</span> = <span style="color:red">"green"</span>;<br/>
+                        </code>
+                        <p>
+                          <canvas id="moncanvas1" width="300" height="400">
+                          </canvas>
+                        </p>
+		</div>
+		<div class="footer">
+			<div class="contact">HTML5 Canvas | John Samuel</div>
+			<div class="navigation">10
+				<a class="prev" href="#slide9"></a>
+                                <a class="next" href="#slide11"></a>
+			</div>
+		</div>
+	</section>
+	<section class="slide" id="slide11">
+		<div class="header">
+			<h1>Fonctionnement</h1>
+		</div>
+		<div class="content">
+                        <h3>width, height</h3>
+                        <p>Changer l'hauteur et la largeur d'un canvas</p>
+                        <code>
+                          &nbsp;&nbsp;var <span style="color:blue">id</span> = document.getElementById(<span style="color:red">"moncanvas"</span>);<br/>
+                          &nbsp;&nbsp;<span style="color:blue">id.setAttribute</span>(<span style="color:red">"width"</span>, 500);</br>
+                          &nbsp;&nbsp;<span style="color:blue">id.setAttribute</span>(<span style="color:red">"height"</span>, 600);
+                        </code>
+                        <p>
+                          <canvas id="moncanvas2" width="300" height="400">
+                          </canvas>
+                        </p>
+		</div>
+		<div class="footer">
+			<div class="contact">HTML5 Canvas | John Samuel</div>
+			<div class="navigation">11
+				<a class="prev" href="#slide10"></a>
+                                <a class="next" href="#slide12"></a>
+			</div>
+		</div>
+	</section>
+	<section class="slide" id="slide12">
+		<div class="header">
+			<h1>Fonctionnement</h1>
+		</div>
+		<div class="content">
+                        <h3>3D en utilisant le contexte WebGL</h3>
+                        <code>
+                          &lt;<span style="color:green">body</span>&gt;<br/>...<br/>
+                          &nbsp;&lt;<span style="color:green">canvas</span> <span style="color:blue">id</span>=<span style="color:red">"moncanvas3D"</span> <span style="color:blue">width</span>=<span style="color:red">"300"</span> <span style="color:blue">height</span>=<span style="color:red">"400"</span>&gt;<br/>
+                          &nbsp;&lt;/<span style="color:green">canvas</span>&gt;
+                          <br/>
+                          &nbsp;&lt;<span style="color:green">script</span>&gt;<br/>
+                          &nbsp;&nbsp;var <span style="color:blue">id</span> = document.getElementById(<span style="color:red">"moncanvas3D"</span>);<br/>
+                          &nbsp;&nbsp;var <span style="color:blue">context</span> = id.getContext(<span style="color:red">"webgl"</span>);<br/>
+                          &nbsp;&lt;<span style="color:green">/script</span>&gt;<br/>...<br/>
+                          &lt;/<span style="color:green">body</span>&gt;<br/>
+                        </code>
+		</div>
+		<div class="footer">
+			<div class="contact">HTML5 Canvas | John Samuel</div>
+			<div class="navigation">12
+				<a class="prev" href="#slide11"></a>
+                                <a class="next" href="#slide13"></a>
+			</div>
+		</div>
+	</section>
+	<section class="slide" id="slide13">
+		<div class="header">
+			<h1>Ligne</h1>
+		</div>
+		<div class="content">
+                        <p>
+                          <canvas id="ligne1" width="300" height="400">
+                          </canvas>
+                        </p>
+                        <h3>lineTo(...)</h3>
+                        <code>
+                          &lt;<span style="color:green">body</span>&gt;<br/>...<br/>
+                          &nbsp;&lt;<span style="color:green">canvas</span> <span style="color:blue">id</span>=<span style="color:red">"ligne"</span> <span style="color:blue">width</span>=<span style="color:red">"300"</span> <span style="color:blue">height</span>=<span style="color:red">"400"</span>&gt;<br/>
+                          &nbsp;&lt;/<span style="color:green">canvas</span>&gt;
+                          <br/>
+                          &nbsp;&lt;<span style="color:green">script</span>&gt;<br/>
+                          &nbsp;&nbsp;var <span style="color:blue">id</span> = document.getElementById(<span style="color:red">"ligne"</span>);<br/>
+                          &nbsp;&nbsp;var <span style="color:blue">context</span> = id.getContext(<span style="color:red">"2d"</span>);<br/><br/>
+                          &nbsp;&nbsp;<span style="color:blue">context.strokeStyle</span> =  <span style="color:red">"#00b33c"</span>;<br/>
+                          &nbsp;&nbsp;<span style="color:blue">context.lineWidth</span> = 10;<br/>
+                          &nbsp;&nbsp;<span style="color:blue">context.moveTo</span>(0,0);<br/>
+                          &nbsp;&nbsp;<span style="color:blue">context.lineTo</span>(300,400);<br/>
+                          &nbsp;&nbsp;<span style="color:blue">context.stroke</span>();<br/>
+                          &nbsp;&lt;<span style="color:green">/script</span>&gt;<br/>...<br/>
+                          &lt;/<span style="color:green">body</span>&gt;<br/>
+                        </code>
+		</div>
+		<div class="footer">
+			<div class="contact">HTML5 Canvas | John Samuel</div>
+			<div class="navigation">13
+				<a class="prev" href="#slide12"></a>
+                                <a class="next" href="#slide14"></a>
+			</div>
+		</div>
+	</section>
+	<section class="slide" id="slide14">
+		<div class="header">
+			<h1>Ligne</h1>
+		</div>
+		<div class="content">
+                        <p>
+                          <canvas id="ligne2" width="300" height="400">
+                          </canvas>
+                        </p>
+                        <h3>lineTo(...)</h3>
+                        <code>
+                          &nbsp;&lt;<span style="color:green">canvas</span> <span style="color:blue">id</span>=<span style="color:red">"ligne"</span> <span style="color:blue">width</span>=<span style="color:red">"300"</span> <span style="color:blue">height</span>=<span style="color:red">"400"</span>&gt;<br/>
+                          &nbsp;&lt;/<span style="color:green">canvas</span>&gt;
+                          <br/>
+                          &nbsp;&lt;<span style="color:green">script</span>&gt;<br/>
+                          &nbsp;&nbsp;var <span style="color:blue">id</span> = document.getElementById(<span style="color:red">"ligne"</span>);<br/>
+                          &nbsp;&nbsp;var <span style="color:blue">context</span> = id.getContext(<span style="color:red">"2d"</span>);<br/><br/>
+                          &nbsp;&nbsp;<span style="color:blue">context.strokeStyle</span> =  <span style="color:red">"#00b33c"</span>;<br/>
+                          &nbsp;&nbsp;<span style="color:blue">context.lineWidth</span> = 10;<br/>
+                          &nbsp;&nbsp;<span style="color:blue">context.moveTo</span>(0,0);<br/>
+                          &nbsp;&nbsp;<span style="color:blue">context.lineTo</span>(300,400);<br/>
+                          &nbsp;&lt;<span style="color:green">/script</span>&gt;<br/>...<br/>
+                        </code>
+		</div>
+		<div class="footer">
+			<div class="contact">HTML5 Canvas | John Samuel</div>
+			<div class="navigation">14
+				<a class="prev" href="#slide13"></a>
+                                <a class="next" href="#slide15"></a>
+			</div>
+		</div>
+	</section>
+	<section class="slide" id="slide15">
+		<div class="header">
+			<h1>Ligne</h1>
+		</div>
+		<div class="content">
+                        <p>
+                          <canvas id="ligne3" width="300" height="400">
+                          </canvas>
+                        </p>
+                        <h3>lineTo(...)</h3>
+                        <code>
+                          &lt;<span style="color:green">body</span>&gt;<br/>...<br/>
+                          &nbsp;&lt;<span style="color:green">canvas</span> <span style="color:blue">id</span>=<span style="color:red">"ligne"</span> <span style="color:blue">width</span>=<span style="color:red">"300"</span> <span style="color:blue">height</span>=<span style="color:red">"400"</span>&gt;<br/>
+                          &nbsp;&lt;/<span style="color:green">canvas</span>&gt;
+                          <br/>
+                          &nbsp;&lt;<span style="color:green">script</span>&gt;<br/>
+                          &nbsp;&nbsp;var <span style="color:blue">id</span> = document.getElementById(<span style="color:red">"ligne"</span>);<br/>
+                          &nbsp;&nbsp;var <span style="color:blue">context</span> = id.getContext(<span style="color:red">"2d"</span>);<br/><br/>
+                          &nbsp;&nbsp;<span style="color:blue">context.strokeStyle</span> =  <span style="color:red">"#00b33c"</span>;<br/>
+                          &nbsp;&nbsp;<span style="color:blue">context.lineWidth</span> = 10;<br/>
+                          &nbsp;&nbsp;<span style="color:blue">context.moveTo</span>(300,0);<br/>
+                          &nbsp;&nbsp;<span style="color:blue">context.lineTo</span>(0,400);<br/>
+                          &nbsp;&nbsp;<span style="color:blue">context.stroke</span>();<br/>
+                          &nbsp;&lt;<span style="color:green">/script</span>&gt;<br/>...<br/>
+                          &lt;/<span style="color:green">body</span>&gt;<br/>
+                        </code>
+		</div>
+		<div class="footer">
+			<div class="contact">HTML5 Canvas | John Samuel</div>
+			<div class="navigation">15
+				<a class="prev" href="#slide14"></a>
+                                <a class="next" href="#slide16"></a>
+			</div>
+		</div>
+	</section>
+	<section class="slide" id="slide16">
+		<div class="header">
+			<h1>Ligne</h1>
+		</div>
+		<div class="content">
+                        <h3>beginPath()</h3>
+                        <code>
+                          &nbsp;&nbsp;<span style="color:blue">context.beginPath</span>();<br/>
+                          &nbsp;&nbsp;<span style="color:blue">context.strokeStyle</span> =  <span style="color:red">"#00b33c"</span>;<br/>
+                          &nbsp;&nbsp;<span style="color:blue">context.moveTo</span>(0,0);<br/>
+                          &nbsp;&nbsp;<span style="color:blue">context.lineTo</span>(300,400);<br/>
+                          &nbsp;&nbsp;<span style="color:blue">context.stroke</span>();<br/>
+                        </code>
+		</div>
+		<div class="footer">
+			<div class="contact">HTML5 Canvas | John Samuel</div>
+			<div class="navigation">16
+				<a class="prev" href="#slide15"></a>
+                                <a class="next" href="#slide17"></a>
+			</div>
+		</div>
+	</section>
+	<section class="slide" id="slide17">
+		<div class="header">
+			<h1>Lignes</h1>
+		</div>
+		<div class="content">
+                        <p>
+                          <canvas id="lignes1" width="300" height="400">
+                          </canvas>
+                        </p>
+                        <h3>beginPath()</h3>
+                        <code>
+                          &nbsp;&nbsp;<span style="color:blue">context.beginPath</span>();<br/>
+                          &nbsp;&nbsp;<span style="color:blue">context.strokeStyle</span> =  <span style="color:red">"#00b33c"</span>;<br/>
+                          &nbsp;&nbsp;<span style="color:blue">context.moveTo</span>(0,0);<br/>
+                          &nbsp;&nbsp;<span style="color:blue">context.lineTo</span>(300,400);<br/><br/>
+                          &nbsp;&nbsp;<span style="color:blue">context.strokeStyle</span> =  <span style="color:red">"red"</span>;<br/>
+                          &nbsp;&nbsp;<span style="color:blue">context.moveTo</span>(0,400);<br/>
+                          &nbsp;&nbsp;<span style="color:blue">context.lineTo</span>(300,0);<br/>
+                          &nbsp;&nbsp;<span style="color:blue">context.stroke</span>();<br/>
+                        </code>
+		</div>
+		<div class="footer">
+			<div class="contact">HTML5 Canvas | John Samuel</div>
+			<div class="navigation">17
+				<a class="prev" href="#slide16"></a>
+                                <a class="next" href="#slide18"></a>
+			</div>
+		</div>
+	</section>
+	<section class="slide" id="slide18">
+		<div class="header">
+			<h1>Lignes</h1>
+		</div>
+		<div class="content">
+                        <p>
+                          <canvas id="lignes2" width="300" height="400">
+                          </canvas>
+                        </p>
+                        <h3>beginPath()</h3>
+                        <code>
+                          &nbsp;&nbsp;<span style="color:blue">context.beginPath</span>();<br/>
+                          &nbsp;&nbsp;<span style="color:blue">context.strokeStyle</span> =  <span style="color:red">"#00b33c"</span>;<br/>
+                          &nbsp;&nbsp;<span style="color:blue">context.moveTo</span>(0,0);<br/>
+                          &nbsp;&nbsp;<span style="color:blue">context.lineTo</span>(300,400);<br/>
+                          &nbsp;&nbsp;<span style="color:blue">context.stroke</span>();<br/><br/>
+                          &nbsp;&nbsp;<span style="color:blue">context.beginPath</span>();<br/>
+                          &nbsp;&nbsp;<span style="color:blue">context.strokeStyle</span> =  <span style="color:red">"red"</span>;<br/>
+                          &nbsp;&nbsp;<span style="color:blue">context.moveTo</span>(0,400);<br/>
+                          &nbsp;&nbsp;<span style="color:blue">context.lineTo</span>(300,0);<br/>
+                          &nbsp;&nbsp;<span style="color:blue">context.stroke</span>();<br/>
+                        </code>
+		</div>
+		<div class="footer">
+			<div class="contact">HTML5 Canvas | John Samuel</div>
+			<div class="navigation">18
+				<a class="prev" href="#slide17"></a>
+                                <a class="next" href="#slide19"></a>
+			</div>
+		</div>
+	</section>
+
+	<section class="slide" id="slide19">
+		<div class="header">
+			<h1>Arc</h1>
+		</div>
+		<div class="content">
+                        <p>
+                          <canvas id="arc1" width="300" height="400">
+                          </canvas>
+                        </p>
+                        <h3>arc(...)</h3>
+                        <code>
+                          &nbsp;&nbsp;<span style="color:blue">context.beginPath</span>();<br/>
+                          &nbsp;&nbsp;<span style="color:blue">context.arc</span>(200, 150, 100, Math.PI, 1.5 * Math.PI);<br/>
+                          &nbsp;&nbsp;<span style="color:blue">context.stroke</span>();<br/>
+                        </code>
+		</div>
+		<div class="footer">
+			<div class="contact">HTML5 Canvas | John Samuel</div>
+			<div class="navigation">19
+				<a class="prev" href="#slide18"></a>
+                                <a class="next" href="#slide20"></a>
+			</div>
+		</div>
+	</section>
+	<section class="slide" id="slide20">
+		<div class="header">
+			<h1>Arc</h1>
+		</div>
+		<div class="content">
+                        <p>
+                          <canvas id="arc2" width="300" height="400">
+                          </canvas>
+                        </p>
+                        <h3>arc(...)</h3>
+                        <code>
+                          &nbsp;&nbsp;<span style="color:blue">context.beginPath</span>();<br/>
+                          &nbsp;&nbsp;<span style="color:blue">context.arc</span>(200, 150, 100, Math.PI, 1.5 * Math.PI, true);<br/>
+                          &nbsp;&nbsp;<span style="color:blue">context.stroke</span>();<br/>
+                        </code>
+		</div>
+		<div class="footer">
+			<div class="contact">HTML5 Canvas | John Samuel</div>
+			<div class="navigation">20
+				<a class="prev" href="#slide19"></a>
+                                <a class="next" href="#slide21"></a>
+			</div>
+		</div>
+	</section>
+	<section class="slide" id="slide21">
+		<div class="header">
+			<h1>Arc</h1>
+		</div>
+		<div class="content">
+                        <h3>arc(...)</h3>
+                        <code>
+                          &nbsp;&nbsp;<span style="color:blue">context.beginPath</span>();<br/>
+                          &nbsp;&nbsp;<span style="color:blue">context.arc</span>(x, y, rayon, angleInitial, angleFinal, antihoraire);<br/>
+                          &nbsp;&nbsp;<span style="color:blue">context.stroke</span>();<br/>
+                        </code>
+                        <div><br/>
+                         <span style="color:red">Note:</span> Les angles dans la fonction arc sont mesurés en radians.
+                        </div>
+		</div>
+		<div class="footer">
+			<div class="contact">HTML5 Canvas | John Samuel</div>
+			<div class="navigation">21
+				<a class="prev" href="#slide20"></a>
+                                <a class="next" href="#slide22"></a>
+			</div>
+		</div>
+	</section>
+	<section class="slide" id="slide22">
+		<div class="header">
+			<h1>Arc</h1>
+		</div>
+		<div class="content">
+                        <p>
+                          <canvas id="arc3" width="300" height="400">
+                          </canvas>
+                        </p>
+                        <h3>arcTo(...)</h3>
+                        <code>
+                          &nbsp;&nbsp;<span style="color:blue">context.beginPath</span>();<br/>
+                          &nbsp;&nbsp;<span style="color:blue">context.moveTo</span>(0,70);<br/>
+                          &nbsp;&nbsp;<span style="color:blue">context.lineTo</span>(140,70);<br/>
+                          &nbsp;&nbsp;<span style="color:blue">context.arcTo</span>(200, 70, 200, 270, 50);<br/>
+                          &nbsp;&nbsp;<span style="color:blue">context.lineTo</span>(200, 270);<br/>
+                          &nbsp;&nbsp;<span style="color:blue">context.stroke</span>();<br/>
+                        </code>
+		</div>
+		<div class="footer">
+			<div class="contact">HTML5 Canvas | John Samuel</div>
+			<div class="navigation">22
+				<a class="prev" href="#slide21"></a>
+                                <a class="next" href="#slide23"></a>
+			</div>
+		</div>
+	</section>
+	<section class="slide" id="slide23">
+		<div class="header">
+			<h1>Arc</h1>
+		</div>
+		<div class="content">
+                        <p>
+                          <canvas id="arc4" width="300" height="400">
+                          </canvas>
+                        </p>
+                        <h3>arcTo(...)</h3>
+                        <code>
+                          &nbsp;&nbsp;<span style="color:blue">context.beginPath</span>();<br/>
+                          &nbsp;&nbsp;<span style="color:blue">context.fillStyle</span> =  <span style="color:red">"#00b33c"</span>;<br/>
+                          &nbsp;&nbsp;<span style="color:blue">context.moveTo</span>(0,70);<br/>
+                          &nbsp;&nbsp;<span style="color:blue">context.lineTo</span>(140,70);<br/>
+                          &nbsp;&nbsp;<span style="color:blue">context.arcTo</span>(200, 70, 200, 270, 50);<br/>
+                          &nbsp;&nbsp;<span style="color:blue">context.lineTo</span>(200, 270);<br/>
+                          &nbsp;&nbsp;<span style="color:blue">context.fill</span>();<br/>
+                        </code>
+		</div>
+		<div class="footer">
+			<div class="contact">HTML5 Canvas | John Samuel</div>
+			<div class="navigation">23
+				<a class="prev" href="#slide22"></a>
+                                <a class="next" href="#slide24"></a>
+			</div>
+		</div>
+	</section>
+	<section class="slide" id="slide24">
+		<div class="header">
+			<h1>Arc</h1>
+		</div>
+		<div class="content">
+                        <canvas id="arcanimated" width="800" height="600">
+                        </canvas>
+                        <h3>arcTo(...)</h3>
+                        <code>
+                          &nbsp;&nbsp;<span style="color:blue">context.beginPath</span>();<br/>
+                          &nbsp;&nbsp;<span style="color:blue">context.arcTo</span>(x1, y1, x2, y2, rayon);<br/>
+                          &nbsp;&nbsp;<span style="color:blue">context.stroke</span>();<br/>
+                        </code>
+                        <h3>Exemple</h3>
+                        <code>
+                          &nbsp;&nbsp;<span style="color:blue">context.arcTo</span>(350, <span style="color:red">y</span>, 710, 20, 150);<br/>
+                        </code>
+		</div>
+		<div class="footer">
+			<div class="contact">HTML5 Canvas | John Samuel</div>
+			<div class="navigation">24
+				<a class="prev" href="#slide23"></a>
+                                <a class="next" href="#slide25"></a>
+			</div>
+		</div>
+	</section>
+	<section class="slide" id="slide25">
+		<div class="header">
+			<h1>Courbe</h1>
+		</div>
+		<div class="content">
+			<h3>Courbe de Bézier quadratique</h3>
+                        <h4>quadraticCurveTo(...)</h4>
+                        <code>
+                          &nbsp;&nbsp;<span style="color:blue">context.beginPath</span>();<br/>
+                          &nbsp;&nbsp;<span style="color:blue">quadraticCurveTo</span>(cp1x, cp1y, x, y);<br/>
+                          &nbsp;&nbsp;<span style="color:blue">context.stroke</span>();<br/>
+                        </code>
+		</div>
+		<div class="footer">
+			<div class="contact">HTML5 Canvas | John Samuel</div>
+			<div class="navigation">25
+				<a class="prev" href="#slide24"></a>
+                                <a class="next" href="#slide26"></a>
+			</div>
+		</div>
+	</section>
+	<section class="slide" id="slide26">
+		<div class="header">
+			<h1>Courbe</h1>
+		</div>
+		<div class="content">
+                        <p>
+                          <canvas id="courbe1" width="300" height="400">
+                          </canvas>
+                        </p>
+                        <h3>quadraticCurveTo(...)</h3>
+                        <code>
+                          &nbsp;&nbsp;<span style="color:blue">context.beginPath</span>();<br/>
+                          &nbsp;&nbsp;<span style="color:blue">context.moveTo</span>(0,70);<br/>
+                          &nbsp;&nbsp;<span style="color:blue">context.lineTo</span>(120,70);<br/>
+                          &nbsp;&nbsp;<span style="color:blue">context.quadraticCurveTo</span>(280, 120, 200, 270);<br/>
+                          &nbsp;&nbsp;<span style="color:blue">context.stroke</span>();<br/>
+                        </code>
+		</div>
+		<div class="footer">
+			<div class="contact">HTML5 Canvas | John Samuel</div>
+			<div class="navigation">26
+				<a class="prev" href="#slide25"></a>
+                                <a class="next" href="#slide27"></a>
+			</div>
+		</div>
+	</section>
+	<section class="slide" id="slide27">
+		<div class="header">
+			<h1>Courbe</h1>
+		</div>
+		<div class="content">
+                        <canvas id="courbequadratiqueanimated" width="800" height="600">
+                        </canvas>
+			<h3>Courbe de Bézier quadratique</h3>
+                        <h4>quadraticCurveTo(...)</h4>
+                        <code>
+                          &nbsp;&nbsp;<span style="color:blue">context.beginPath</span>();<br/>
+                          &nbsp;&nbsp;<span style="color:blue">quadraticCurveTo</span>(cp1x, cp1y, x, y);<br/>
+                          &nbsp;&nbsp;<span style="color:blue">context.stroke</span>();<br/>
+                        </code>
+		</div>
+		<div class="footer">
+			<div class="contact">HTML5 Canvas | John Samuel</div>
+			<div class="navigation">27
+				<a class="prev" href="#slide26"></a>
+                                <a class="next" href="#slide28"></a>
+			</div>
+		</div>
+	</section>
+	<section class="slide" id="slide28">
+		<div class="header">
+			<h1>Courbe</h1>
+		</div>
+		<div class="content">
+			<h3>Courbe de Bézier cubique</h3>
+                        <h4>bezierCurveTo(...)</h4>
+                        <code>
+                          &nbsp;&nbsp;<span style="color:blue">context.beginPath</span>();<br/>
+                          &nbsp;&nbsp;<span style="color:blue">bezierCurveTo</span>(cp1x, cp1y, cp2x, cp2y, x, y);<br/>
+                          &nbsp;&nbsp;<span style="color:blue">context.stroke</span>();<br/>
+                        </code>
+		</div>
+		<div class="footer">
+			<div class="contact">HTML5 Canvas | John Samuel</div>
+			<div class="navigation">28
+				<a class="prev" href="#slide27"></a>
+                                <a class="next" href="#slide29"></a>
+			</div>
+		</div>
+	</section>
+	<section class="slide" id="slide29">
+		<div class="header">
+			<h1>Courbe</h1>
+		</div>
+		<div class="content">
+                        <p>
+                          <canvas id="courbe2" width="300" height="400">
+                          </canvas>
+                        </p>
+                        <h3>bezierCurveTo(...)</h3>
+                        <code>
+                          &nbsp;&nbsp;<span style="color:blue">context.beginPath</span>();<br/>
+                          &nbsp;&nbsp;<span style="color:blue">context.moveTo</span>(0,70);<br/>
+                          &nbsp;&nbsp;<span style="color:blue">context.lineTo</span>(120,70);<br/>
+                          &nbsp;&nbsp;<span style="color:blue">context.bezierCurveTo</span>(280, 120, 240, 220, 150, 270);<br/>
+                          &nbsp;&nbsp;<span style="color:blue">context.stroke</span>();<br/>
+                        </code>
+		</div>
+		<div class="footer">
+			<div class="contact">HTML5 Canvas | John Samuel</div>
+			<div class="navigation">29
+				<a class="prev" href="#slide28"></a>
+                                <a class="next" href="#slide30"></a>
+			</div>
+		</div>
+	</section>
+	<section class="slide" id="slide30">
+		<div class="header">
+			<h1>Courbe</h1>
+		</div>
+		<div class="content">
+                        <canvas id="courbebezieranimated" width="800" height="600">
+                        </canvas>
+			<h3>Courbe de Bézier cubique</h3>
+                        <h4>bezierCurveTo(...)</h4>
+                        <code>
+                          &nbsp;&nbsp;<span style="color:blue">context.beginPath</span>();<br/>
+                          &nbsp;&nbsp;<span style="color:blue">bezierCurveTo</span>(cp1x, cp1y, cp2x, cp2y, x, y);<br/>
+                          &nbsp;&nbsp;<span style="color:blue">context.stroke</span>();<br/>
+                        </code>
+		</div>
+		<div class="footer">
+			<div class="contact">HTML5 Canvas | John Samuel</div>
+			<div class="navigation">30
+				<a class="prev" href="#slide29"></a>
+                                <a class="next" href="#slide31"></a>
+			</div>
+		</div>
+	</section>
+	<section class="slide" id="slide31">
+		<div class="header">
+			<h1>Cercle</h1>
+		</div>
+		<div class="content">
+                        <p>
+                          <canvas id="cercle" width="300" height="400">
+                          </canvas>
+                        </p>
+                        <h3>Cercle en utilisant arc(...)</h3>
+                        <code>
+                          &nbsp;&nbsp;<span style="color:blue">context.beginPath</span>();<br/>
+                          &nbsp;&nbsp;<span style="color:blue">context.arc</span>(150, 150, 100, 0, 2 * Math.PI);<br/>
+                          &nbsp;&nbsp;<span style="color:blue">context.stroke</span>();<br/>
+                        </code>
+		</div>
+		<div class="footer">
+			<div class="contact">HTML5 Canvas | John Samuel</div>
+			<div class="navigation">31
+				<a class="prev" href="#slide30"></a>
+                                <a class="next" href="#slide32"></a>
+			</div>
+		</div>
+	</section>
+	<section class="slide" id="slide32">
+		<div class="header">
+			<h1>Ellipse</h1>
+		</div>
+		<div class="content">
+                        <p>
+                          <canvas id="ellipse1" width="300" height="400">
+                          </canvas>
+                        </p>
+                        <h3>ellipse(...)</h3>
+                        <code>
+                          &nbsp;&nbsp;<span style="color:blue">context.beginPath</span>();<br/>
+                          &nbsp;&nbsp;<span style="color:blue">context.ellipse</span>(x, y, radiusX, radiusY, rotation, startAngle, endAngle [, anticlockwise]);<br/>
+                          &nbsp;&nbsp;<span style="color:blue">context.stroke</span>();<br/>
+                        </code>
+		</div>
+		<div class="footer">
+			<div class="contact">HTML5 Canvas | John Samuel</div>
+			<div class="navigation">32
+				<a class="prev" href="#slide31"></a>
+                                <a class="next" href="#slide33"></a>
+			</div>
+		</div>
+	</section>
+	<section class="slide" id="slide33">
+		<div class="header">
+			<h1>Ellipse</h1>
+		</div>
+		<div class="content">
+                        <p>
+                          <canvas id="ellipse2" width="300" height="400">
+                          </canvas>
+                        </p>
+                        <h3>ellipse(...)</h3>
+                        <code>
+                          &nbsp;&nbsp;<span style="color:blue">context.beginPath</span>();<br/>
+                          &nbsp;&nbsp;<span style="color:blue">context.ellipse</span>(150, 180, 100, 150, Math.PI/4, 0, 2 * Math.PI);<br/>
+                          &nbsp;&nbsp;<span style="color:blue">context.stroke</span>();<br/>
+                        </code>
+		</div>
+		<div class="footer">
+			<div class="contact">HTML5 Canvas | John Samuel</div>
+			<div class="navigation">33
+				<a class="prev" href="#slide32"></a>
+                                <a class="next" href="#slide34"></a>
+			</div>
+		</div>
+	</section>
+	<section class="slide" id="slide34">
+		<div class="header">
+			<h1>Rectangle</h1>
+		</div>
+		<div class="content">
+                        <p>
+                          <canvas id="rectangle1" width="300" height="400">
+                          </canvas>
+                        </p>
+                        <h3>rect(...)</h3>
+                        <code>
+                          &nbsp;&nbsp;<span style="color:blue">context.lineWidth</span> = 10;<br/>
+                          &nbsp;&nbsp;<span style="color:blue">context.rect</span>(10, 10, 280, 280);<br/>
+                          &nbsp;&nbsp;<span style="color:blue">context.stroke</span>();<br/>
+                        </code>
+		</div>
+		<div class="footer">
+			<div class="contact">HTML5 Canvas | John Samuel</div>
+			<div class="navigation">34
+				<a class="prev" href="#slide33"></a>
+                                <a class="next" href="#slide35"></a>
+			</div>
+		</div>
+	</section>
+	<section class="slide" id="slide35">
+		<div class="header">
+			<h1>Rectangle</h1>
+		</div>
+		<div class="content">
+                        <h3>rect(...)</h3>
+                        <code>
+                          &nbsp;&nbsp;<span style="color:blue">context.strokeStyle</span> =  <span style="color:red">"#00b33c"</span>;<br/>
+                          &nbsp;&nbsp;<span style="color:blue">context.rect</span>(x, y, largeur, hauteur);<br/>
+                          &nbsp;&nbsp;<span style="color:blue">context.stroke</span>();<br/>
+                        </code>
+                        <code><br/>
+                          &nbsp;&nbsp;<span style="color:blue">context.strokeStyle</span> =  <span style="color:red">"#00b33c"</span>;<br/>
+                          &nbsp;&nbsp;<span style="color:blue">context.strokeRect</span>(x, y, largeur, hauteur);<br/>
+                        </code>
+                        <code><br/>
+                          &nbsp;&nbsp;<span style="color:blue">context.fillStyle</span> =  <span style="color:red">"#00b33c"</span>;<br/>
+                          &nbsp;&nbsp;<span style="color:blue">context.fillRect</span>(x, y, largeur, hauteur);<br/>
+                        </code>
+		</div>
+		<div class="footer">
+			<div class="contact">HTML5 Canvas | John Samuel</div>
+			<div class="navigation">35
+				<a class="prev" href="#slide34"></a>
+                                <a class="next" href="#slide36"></a>
+			</div>
+		</div>
+	</section>
+	<section class="slide" id="slide36">
+		<div class="header">
+			<h1>Rectangle</h1>
+		</div>
+		<div class="content">
+                        <p>
+                          <canvas id="rectangle2" width="300" height="400">
+                          </canvas>
+                        </p>
+                        <h3>fillRect(...)</h3>
+                        <code>
+                          &nbsp;&nbsp;<span style="color:blue">context.fillStyle</span> =  <span style="color:red">"#00b33c"</span>;<br/>
+                          &nbsp;&nbsp;<span style="color:blue">context.fillRect</span>(10, 10, 280, 280);<br/>
+                        </code>
+		</div>
+		<div class="footer">
+			<div class="contact">HTML5 Canvas | John Samuel</div>
+			<div class="navigation">36
+				<a class="prev" href="#slide35"></a>
+                                <a class="next" href="#slide37"></a>
+			</div>
+		</div>
+	</section>
+	<section class="slide" id="slide37">
+		<div class="header">
+			<h1>Polygone</h1>
+		</div>
+		<div class="content">
+                        <p>
+                          <canvas id="triangle1" width="300" height="400">
+                          </canvas>
+                        </p>
+                        <h3>Polygone en utilisant lineTo()</h3>
+                        <code>
+                          &nbsp;&nbsp;<span style="color:blue">context.beginPath</span>();<br/>
+                          &nbsp;&nbsp;<span style="color:blue">context.strokeStyle</span> =  <span style="color:red">"#00b33c"</span>;<br/>
+                          &nbsp;&nbsp;<span style="color:blue">context.moveTo</span>(10, 10);<br/>
+                          &nbsp;&nbsp;<span style="color:blue">context.lineTo</span>(150, 380);<br/>
+                          &nbsp;&nbsp;<span style="color:blue">context.lineTo</span>(280, 10);<br/>
+                          &nbsp;&nbsp;<span style="color:blue">context.closePath</span>();<br/>
+                          &nbsp;&nbsp;<span style="color:blue">context.stroke</span>();<br/>
+                        </code>
+		</div>
+		<div class="footer">
+			<div class="contact">HTML5 Canvas | John Samuel</div>
+			<div class="navigation">37
+				<a class="prev" href="#slide36"></a>
+                                <a class="next" href="#slide38"></a>
+			</div>
+		</div>
+	</section>
+	<section class="slide" id="slide38">
+		<div class="header">
+			<h1>Polygone</h1>
+		</div>
+		<div class="content">
+                        <p>
+                          <canvas id="triangle2" width="300" height="400">
+                          </canvas>
+                        </p>
+                        <h3>Polygone en utilisant lineTo()</h3>
+                        <code>
+                          &nbsp;&nbsp;<span style="color:blue">context.beginPath</span>();<br/>
+                          &nbsp;&nbsp;<span style="color:blue">context.fillStyle</span> =  <span style="color:red">"#00b33c"</span>;<br/>
+                          &nbsp;&nbsp;<span style="color:blue">context.moveTo</span>(10, 10);<br/>
+                          &nbsp;&nbsp;<span style="color:blue">context.lineTo</span>(150, 380);<br/>
+                          &nbsp;&nbsp;<span style="color:blue">context.lineTo</span>(280, 10);<br/>
+                          &nbsp;&nbsp;<span style="color:blue">context.closePath</span>();<br/>
+                          &nbsp;&nbsp;<span style="color:blue">context.fill</span>();<br/>
+                        </code>
+		</div>
+		<div class="footer">
+			<div class="contact">HTML5 Canvas | John Samuel</div>
+			<div class="navigation">38
+				<a class="prev" href="#slide37"></a>
+                                <a class="next" href="#slide39"></a>
+			</div>
+		</div>
+	</section>
+	<section class="slide" id="slide39">
+		<div class="header">
+			<h1>Polygone</h1>
+		</div>
+		<div class="content">
+                        <p>
+                          <canvas id="hexagone1" width="300" height="400">
+                          </canvas>
+                        </p>
+                        <h3>Polygone en utilisant lineTo()</h3>
+                        <code>
+                          &nbsp;&nbsp;<span style="color:blue">context.beginPath</span>();<br/>
+                          &nbsp;&nbsp;<span style="color:blue">context.strokeStyle</span> =  <span style="color:red">"#00b33c"</span>;<br/>
+                          &nbsp;&nbsp;<span style="color:blue">context.moveTo</span>(10, 200);<br/>
+                          &nbsp;&nbsp;<span style="color:blue">context.lineTo</span>(80, 10);<br/>
+                          &nbsp;&nbsp;<span style="color:blue">context.lineTo</span>(200, 10);<br/>
+                          &nbsp;&nbsp;<span style="color:blue">context.lineTo</span>(270, 200);<br/>
+                          &nbsp;&nbsp;<span style="color:blue">context.lineTo</span>(200, 380);<br/>
+                          &nbsp;&nbsp;<span style="color:blue">context.lineTo</span>(80, 380);<br/>
+                          &nbsp;&nbsp;<span style="color:blue">context.closePath</span>();<br/>
+                          &nbsp;&nbsp;<span style="color:blue">context.stroke</span>();<br/>
+                        </code>
+		</div>
+		<div class="footer">
+			<div class="contact">HTML5 Canvas | John Samuel</div>
+			<div class="navigation">39
+				<a class="prev" href="#slide38"></a>
+                                <a class="next" href="#slide40"></a>
+			</div>
+		</div>
+	</section>
+	<section class="slide" id="slide40">
+		<div class="header">
+			<h1>Polygone</h1>
+		</div>
+		<div class="content">
+                        <p>
+                          <canvas id="hexagone2" width="300" height="400">
+                          </canvas>
+                        </p>
+                        <h3>Polygone en utilisant lineTo()</h3>
+                        <code>
+                          &nbsp;&nbsp;<span style="color:blue">context.beginPath</span>();<br/>
+                          &nbsp;&nbsp;<span style="color:blue">context.fillStyle</span> =  <span style="color:red">"#00b33c"</span>;<br/>
+                          &nbsp;&nbsp;<span style="color:blue">context.moveTo</span>(10, 200);<br/>
+                          &nbsp;&nbsp;<span style="color:blue">context.lineTo</span>(80, 10);<br/>
+                          &nbsp;&nbsp;<span style="color:blue">context.lineTo</span>(200, 10);<br/>
+                          &nbsp;&nbsp;<span style="color:blue">context.lineTo</span>(270, 200);<br/>
+                          &nbsp;&nbsp;<span style="color:blue">context.lineTo</span>(200, 380);<br/>
+                          &nbsp;&nbsp;<span style="color:blue">context.lineTo</span>(80, 380);<br/>
+                          &nbsp;&nbsp;<span style="color:blue">context.lineTo</span>(80, 380);<br/>
+                          &nbsp;&nbsp;<span style="color:blue">context.closePath</span>();<br/>
+                          &nbsp;&nbsp;<span style="color:blue">context.fill</span>();<br/>
+                        </code>
+		</div>
+		<div class="footer">
+			<div class="contact">HTML5 Canvas | John Samuel</div>
+			<div class="navigation">40
+				<a class="prev" href="#slide39"></a>
+                                <a class="next" href="#slide41"></a>
+			</div>
+		</div>
+	</section>
+	<section class="slide" id="slide41">
+		<div class="header">
+			<h1>Effacer une zone</h1>
+		</div>
+		<div class="content">
+                        <p>
+                          <canvas id="clearrect" width="300" height="400">
+                          </canvas>
+                        </p>
+                        <h3>clearRect()</h3>
+                        <code>
+                          &nbsp;&nbsp;<span style="color:blue">context.clearRect</span>(90, 140, 100, 100);<br/>
+                        </code>
+		</div>
+		<div class="footer">
+			<div class="contact">HTML5 Canvas | John Samuel</div>
+			<div class="navigation">41
+				<a class="prev" href="#slide40"></a>
+                                <a class="next" href="#slide42"></a>
+			</div>
+		</div>
+	</section>
+	<section class="slide" id="slide42">
+		<div class="header">
+			<h1>Texte</h1>
+		</div>
+		<div class="content">
+                        <p>
+                          <canvas id="texte1" width="300" height="400">
+                          </canvas>
+                        </p>
+                        <h3>strokeText()</h3>
+                        <code>
+                          &nbsp;&nbsp;<span style="color:blue">context.font</span> =  <span style="color:red">"40px Arial"</span>;<br/>
+                          &nbsp;&nbsp;<span style="color:blue">context.strokeText</span>("Bonjour!", 100, 100);<br/>
+                        </code>
+		</div>
+		<div class="footer">
+			<div class="contact">HTML5 Canvas | John Samuel</div>
+			<div class="navigation">42
+				<a class="prev" href="#slide41"></a>
+                                <a class="next" href="#slide43"></a>
+			</div>
+		</div>
+	</section>
+	<section class="slide" id="slide43">
+		<div class="header">
+			<h1>Texte</h1>
+		</div>
+		<div class="content">
+                        <p>
+                          <canvas id="texte2" width="300" height="400">
+                          </canvas>
+                        </p>
+                        <h3>fillText()</h3>
+                        <code>
+                          &nbsp;&nbsp;<span style="color:blue">context.font</span> =  <span style="color:red">"40px Arial"</span>;<br/>
+                          &nbsp;&nbsp;<span style="color:blue">context.fillText</span>("Bonjour!", 100, 100);<br/>
+                        </code>
+		</div>
+		<div class="footer">
+			<div class="contact">HTML5 Canvas | John Samuel</div>
+			<div class="navigation">43
+				<a class="prev" href="#slide42"></a>
+                                <a class="next" href="#slide44"></a>
+			</div>
+		</div>
+	</section>
+	<section class="slide" id="slide44">
+		<div class="header">
+			<h1>Texte</h1>
+		</div>
+		<div class="content">
+                        <p>
+                          <canvas id="pointeur" width="300" height="400">
+                          </canvas>
+                        </p>
+                        <h3>strokeText()</h3>
+                        <code>
+                          &nbsp;&nbsp;<span style="color:blue">context.font</span> =  <span style="color:red">"40px Arial"</span>;<br/>
+                          &nbsp;&nbsp;<span style="color:blue">context.strokeText</span>("Bonjour!", 100, 100);<br/>
+                        </code>
+		</div>
+		<div class="footer">
+			<div class="contact">HTML5 Canvas | John Samuel</div>
+			<div class="navigation">44
+				<a class="prev" href="#slide43"></a>
+                                <a class="next" href="#slide45"></a>
+			</div>
+		</div>
+	</section>
+	<section class="slide" id="slide45">
+		<div class="header">
+			<h1>L'alignement du texte</h1>
+		</div>
+		<div class="content">
+                        <p>
+                          <canvas id="alignement" width="500" height="400">
+                          </canvas>
+                        </p>
+                        <h3>textAlign()</h3>
+                        <code>
+                <span style="color:blue">context.font</span> = <span style="color:red">"30px Arial"</span>;<br/>
+                <span style="color:blue">context.textAlign</span> = <span style="color:red">"start"</span>;<br/>
+                <span style="color:blue">context.fillText</span>(<span style="color:red">"début"</span>, 250, 20);<br/>
+                <br/>
+                <span style="color:blue">context.textAlign</span> = <span style="color:red">"end"</span>;<br/>
+                <span style="color:blue">context.fillText</span>(<span style="color:red">"fin1 fin2 fin3 fin4 fin5 fin6"</span>, 250, 100);<br/>
+                <br/>
+                <span style="color:blue">context.textAlign</span> = <span style="color:red">"left"</span>;<br/>
+                <span style="color:blue">context.fillText</span>(<span style="color:red">"gauche1 gauche2 gauche3 gauche4"</span>, 250, 180);<br/>
+                <br/>
+                <span style="color:blue">context.textAlign</span> = <span style="color:red">"right"</span>;<br/>
+                <span style="color:blue">context.fillText</span>(<span style="color:red">"droite1 droite2 droite3 droite4"</span>, 250, 260);<br/>
+                <br/>
+                <span style="color:blue">context.textAlign</span> = <span style="color:red">"center"</span>;<br/>
+                <span style="color:blue">context.fillText</span>(<span style="color:red">"centre"</span>, 250, 340);<br/>
+                        </code>
+		</div>
+		<div class="footer">
+			<div class="contact">HTML5 Canvas | John Samuel</div>
+			<div class="navigation">45
+				<a class="prev" href="#slide44"></a>
+                                <a class="next" href="#slide46"></a>
+			</div>
+		</div>
+	</section>
+	<section class="slide" id="slide46">
+		<div class="header">
+			<h1>L'alignement de base</h1>
+		</div>
+		<div class="content">
+                        <p>
+                          <canvas id="alignementbase" width="500" height="400">
+                          </canvas>
+                        </p>
+                        <h3>textBaseline()</h3>
+                        <code>
+                              <span style="color:blue">context.font</span> = <span style="color:red">"20px Arial"</span>;<br/>
+                              <span style="color:blue">context.textBaseline</span> = <span style="color:red">"top"</span>;<br/>
+                              <span style="color:blue">context.fillText</span>(<span style="color:red">"haut"</span>, 0, 200);<br/>
+                            <br/>
+                              <span style="color:blue">context.textBaseline</span> = <span style="color:red">"middle"</span>;<br/>
+                              <span style="color:blue">context.fillText</span>(<span style="color:red">"moyen"</span>, 150, 200);<br/>
+                            <br/>
+                              <span style="color:blue">context.textBaseline</span> = <span style="color:red">"alphabetic"</span>;<br/>
+                              <span style="color:blue">context.fillText</span>(<span style="color:red">"alphabetique"</span>, 250, 200);<br/>
+                            <br/>
+                              <span style="color:blue">context.textBaseline</span> = <span style="color:red">"bottom"</span>;<br/>
+                              <span style="color:blue">context.fillText</span>(<span style="color:red">"en bas"</span>, 420, 200);<br/>
+
+                        </code>
+		</div>
+		<div class="footer">
+			<div class="contact">HTML5 Canvas | John Samuel</div>
+			<div class="navigation">46
+				<a class="prev" href="#slide45"></a>
+                                <a class="next" href="#slide47"></a>
+			</div>
+		</div>
+	</section>
+	<section class="slide" id="slide47">
+		<div class="header">
+			<h1>Images</h1>
+		</div>
+		<div class="content">
+                        <h3>drawImage()</h3>
+                        <code>
+                          <span style="color:blue">context.drawImage</span>(image, dx, dy);<br/>
+                          <span style="color:blue">context.drawImage</span>(image, dx, dy, dLargeur, dHauteur);<br/>
+                          <span style="color:blue">context.drawImage</span>(image, sx, sy, sLargeur, sHauteur, dx, dy, dLargeur, dHauteur);<br/>
+                        </code>
+                        <img width="500px" src="canvasdrawimage.svg"/>
+		</div>
+		<div class="footer">
+			<div class="contact">HTML5 Canvas | John Samuel</div>
+			<div class="navigation">47
+				<a class="prev" href="#slide46"></a>
+                                <a class="next" href="#slide48"></a>
+			</div>
+		</div>
+	</section>
+
+	<section class="slide" id="slide48">
+		<div class="header">
+			<h1>Images</h1>
+		</div>
+		<div class="content">
+                        <p>
+                          <canvas id="image" width="500" height="400">
+                          </canvas>
+                        </p>
+                        <h3>drawImage()</h3>
+                        <code>
+                          &nbsp;var <span style="color:blue">img</span> = <span style="color:green">new</span> Image();<br/>
+                          &nbsp;<span style="color:blue">img.src</span> = <span style="color:red">"img.png"</span>;<br/>
+                          &nbsp;<span style="color:blue">img.onload</span> = <span style="color:green">function</span>() {<br/>
+                          &nbsp;&nbsp;<span style="color:blue">context.drawImage</span>(img, 0, 0);<br/>
+                          }<br/>
+                        </code>
+		</div>
+		<div class="footer">
+			<div class="contact">HTML5 Canvas | John Samuel</div>
+			<div class="navigation">48
+				<a class="prev" href="#slide47"></a>
+                                <a class="next" href="#slide49"></a>
+			</div>
+		</div>
+	</section>
+	<section class="slide" id="slide49">
+		<div class="header">
+			<h1>Images: Mise à l'échelle</h1>
+		</div>
+		<div class="content">
+                        <p>
+                          <canvas id="imagezone" width="500" height="400">
+                          </canvas>
+                        </p>
+                        <h3>drawImage()</h3>
+                        <code>
+                          &nbsp;var <span style="color:blue">img</span> = <span style="color:green">new</span> Image();<br/>
+                          &nbsp;<span style="color:blue">img.src</span> = <span style="color:red">"img.png"</span>;<br/>
+                          &nbsp;<span style="color:blue">img.onload</span> = <span style="color:green">function</span>() {<br/>
+                          &nbsp;&nbsp;<span style="color:blue">context.drawImage</span>(img, 0, 0, 500, 400);<br/>
+                          }<br/>
+                  </code>
+		</div>
+		<div class="footer">
+			<div class="contact">HTML5 Canvas | John Samuel</div>
+			<div class="navigation">49
+				<a class="prev" href="#slide48"></a>
+                                <a class="next" href="#slide50"></a>
+			</div>
+		</div>
+	</section>
+	<section class="slide" id="slide50">
+		<div class="header">
+			<h1>Images: Mise à l'échelle</h1>
+		</div>
+		<div class="content">
+                        <p>
+                          <canvas id="imagezone2" width="500" height="400">
+                          </canvas>
+                        </p>
+                        <h3>drawImage(...)</h3>
+                        <code>
+                          &nbsp;var <span style="color:blue">img</span> = <span style="color:green">new</span> Image();<br/>
+                          &nbsp;<span style="color:blue">img.src</span> = <span style="color:red">"img.png"</span>;<br/>
+                          &nbsp;<span style="color:blue">img.onload</span> = <span style="color:green">function</span>() {<br/>
+                          &nbsp;&nbsp;<span style="color:blue">context.drawImage</span>(img, 0, 0, 250, 200);<br/>
+                          &nbsp;&nbsp;<span style="color:blue">context.drawImage</span>(img, 250, 0, 250, 200);<br/>
+                          &nbsp;&nbsp;<span style="color:blue">context.drawImage</span>(img, 0, 200, 250, 200);<br/>
+                          &nbsp;&nbsp;<span style="color:blue">context.drawImage</span>(img, 250, 200, 250, 200);<br/>
+                          }<br/>
+                  </code>
+		</div>
+		<div class="footer">
+			<div class="contact">HTML5 Canvas | John Samuel</div>
+			<div class="navigation">50
+				<a class="prev" href="#slide49"></a>
+                                <a class="next" href="#slide51"></a>
+			</div>
+		</div>
+	</section>
+	<section class="slide" id="slide51">
+		<div class="header">
+			<h1>Images: Découpage</h1>
+		</div>
+		<div class="content">
+                        <p>
+                          <canvas id="imagedecoupage" width="500" height="400">
+                          </canvas>
+                        </p>
+                        <h3>drawImage(...)</h3>
+                        <code>
+                          &nbsp;var <span style="color:blue">img</span> = <span style="color:green">new</span> Image();<br/>
+                          &nbsp;<span style="color:blue">img.src</span> = <span style="color:red">"img.png"</span>;<br/>
+                          &nbsp;<span style="color:blue">img.onload</span> = <span style="color:green">function</span>() {<br/>
+                          &nbsp;&nbsp;<span style="color:blue">context.drawImage</span>(img, 100, 100, 500, 400, 250, 250, 150, 150);<br/>
+                          }<br/>
+                        </code>
+		</div>
+		<div class="footer">
+			<div class="contact">HTML5 Canvas | John Samuel</div>
+			<div class="navigation">51
+				<a class="prev" href="#slide50"></a>
+                                <a class="next" href="#slide52"></a>
+			</div>
+		</div>
+	</section>
+	<section class="slide" id="slide52">
+		<div class="header">
+			<h1>Images: Rotation</h1>
+		</div>
+		<div class="content">
+                        <p>
+                          <canvas id="imageRotate" width="500" height="400">
+                          </canvas>
+                        </p>
+                        <h3>rotate(...)</h3>
+                        <code>
+                          &nbsp;var <span style="color:blue">img</span> = <span style="color:green">new</span> Image();<br/>
+                          &nbsp;<span style="color:blue">img.src</span> = <span style="color:red">"img.png"</span>;<br/>
+                          &nbsp;<span style="color:blue">img.onload</span> = <span style="color:green">function</span>() {<br/>
+                          &nbsp;&nbsp;<span style="color:blue">context.rotate</span>(10*Math.PI/180);<br/>
+                          &nbsp;&nbsp;<span style="color:blue">context.drawImage</span>(img, 200, 0, 200, 200);<br/>
+                          }<br/>
+                        </code>
+		</div>
+		<div class="footer">
+			<div class="contact">HTML5 Canvas | John Samuel</div>
+			<div class="navigation">52
+				<a class="prev" href="#slide51"></a>
+                                <a class="next" href="#slide53"></a>
+			</div>
+		</div>
+	</section>
+	<section class="slide" id="slide53">
+		<div class="header">
+			<h1>Images: Mise à l'échelle</h1>
+		</div>
+		<div class="content">
+                        <p>
+                          <canvas id="imageScale" width="500" height="400">
+                          </canvas>
+                        </p>
+                        <h3>scale(...)</h3>
+                        <code>
+                          &nbsp;var <span style="color:blue">img</span> = <span style="color:green">new</span> Image();<br/>
+                          &nbsp;<span style="color:blue">img.src</span> = <span style="color:red">"img.png"</span>;<br/>
+                          &nbsp;<span style="color:blue">img.onload</span> = <span style="color:green">function</span>() {<br/>
+                          &nbsp;&nbsp;<span style="color:blue">context.scale</span>(0.5, 0.5);<br/>
+                          &nbsp;&nbsp;<span style="color:blue">context.drawImage</span>(img, 200, 0, 200, 200);<br/>
+                          }<br/>
+                        </code>
+		</div>
+		<div class="footer">
+			<div class="contact">HTML5 Canvas | John Samuel</div>
+			<div class="navigation">53
+				<a class="prev" href="#slide52"></a>
+                                <a class="next" href="#slide54"></a>
+			</div>
+		</div>
+	</section>
+	<section class="slide" id="slide54">
+		<div class="header">
+			<h1>Image: Déplacement</h1>
+		</div>
+		<div class="content">
+                        <p>
+                          <canvas id="imageTranslate" width="500" height="400">
+                          </canvas>
+                        </p>
+                        <h3>translate(...)</h3>
+                        <code>
+                          &nbsp;var <span style="color:blue">img</span> = <span style="color:green">new</span> Image();<br/>
+                          &nbsp;<span style="color:blue">img.src</span> = <span style="color:red">"img.png"</span>;<br/>
+                          &nbsp;<span style="color:blue">img.onload</span> = <span style="color:green">function</span>() {<br/>
+                          &nbsp;&nbsp;<span style="color:blue">context.drawImage</span>(img, 0, 0, 200, 200);<br/>
+                          &nbsp;&nbsp;<span style="color:blue">context.translate</span>(200, 200);<br/>
+                          &nbsp;&nbsp;<span style="color:blue">context.drawImage</span>(img, 0, 0, 400, 400);<br/>
+                          }<br/>
+                        </code>
+		</div>
+		<div class="footer">
+			<div class="contact">HTML5 Canvas | John Samuel</div>
+			<div class="navigation">54
+				<a class="prev" href="#slide53"></a>
+                                <a class="next" href="#slide55"></a>
+			</div>
+		</div>
+	</section>
+	<section class="slide" id="slide55">
+		<div class="header">
+			<h1>Images: Transformation</h1>
+		</div>
+		<div class="content">
+                        <p>
+                          <canvas id="imageTransform" width="500" height="400">
+                          </canvas>
+                        </p>
+                        <h3>transform(...)</h3>
+                        <code>
+                          &nbsp;var <span style="color:blue">img</span> = <span style="color:green">new</span> Image();<br/>
+                          &nbsp;<span style="color:blue">img.src</span> = <span style="color:red">"img.png"</span>;<br/>
+                          &nbsp;<span style="color:blue">img.onload</span> = <span style="color:green">function</span>() {<br/>
+                          &nbsp;&nbsp;<span style="color:blue">context.drawImage</span>(img, 0, 0, 200, 200);<br/>
+                          &nbsp;&nbsp;<span style="color:blue">context.transform</span>(0.5, 0.5, -0.5, 0.5, 300,10);<br/>
+                          &nbsp;&nbsp;<span style="color:blue">context.drawImage</span>(img, 0, 0, 400, 400);<br/>
+                          }<br/>
+                        </code>
+		</div>
+		<div class="footer">
+			<div class="contact">HTML5 Canvas | John Samuel</div>
+			<div class="navigation">55
+				<a class="prev" href="#slide54"></a>
+                                <a class="next" href="#slide56"></a>
+			</div>
+		</div>
+	</section>
+	<section class="slide" id="slide56">
+		<div class="header">
+			<h1>Interaction: Clavier</h1>
+		</div>
+		<div class="content">
+                  <h3>keyCode</h3>
+                  <code>
+		&nbsp;<span style="color:blue">document.onkeydown</span> = function(event) {<br/>
+		&nbsp;&nbsp;event = event || window.event;<br/>
+		&nbsp;&nbsp;event.preventDefault();<br/>
+<br/>
+		&nbsp;&nbsp;if (<span style="color:blue">event.keyCode</span> == <span style="color:red">'37'</span>) {<br/>
+		&nbsp;&nbsp;&nbsp;// gauche<br/>
+                &nbsp;&nbsp;}<br/>
+		&nbsp;&nbsp;else if (<span style="color:blue">event.keyCode</span> == <span style="color:red">'38'</span>) {<br/>
+		&nbsp;&nbsp;&nbsp;// haut<br/>
+                &nbsp;&nbsp;}<br/>
+		&nbsp;&nbsp;else if (<span style="color:blue">event.keyCode</span> == <span style="color:red">'39'</span>) {<br/>
+		&nbsp;&nbsp;&nbsp;// droite<br/>
+                &nbsp;&nbsp;}<br/>
+		&nbsp;&nbsp;else if (<span style="color:blue">event.keyCode</span> == <span style="color:red">'40'</span>) {<br/>
+		&nbsp;&nbsp;&nbsp;// bas<br/>
+                &nbsp;&nbsp;}<br/>
+                &nbsp;}
+                  </code>
+		</div>
+		<div class="footer">
+			<div class="contact">HTML5 Canvas | John Samuel</div>
+			<div class="navigation">56
+				<a class="prev" href="#slide55"></a>
+                                <a class="next" href="#slide57"></a>
+			</div>
+		</div>
+	</section>
+	<section class="slide" id="slide57">
+		<div class="header">
+			<h1>Interaction: Clavier</h1>
+		</div>
+		<div class="content">
+                  <h3>key</h3>
+                  <code>
+		&nbsp;<span style="color:blue">document.onkeydown</span> = function(event) {<br/>
+		&nbsp;&nbsp;event = event || window.event;<br/>
+		&nbsp;&nbsp;event.preventDefault();<br/>
+<br/>
+		&nbsp;&nbsp;if (<span style="color:blue">event.key</span> === <span style="color:red">"ArrowLeft"</span>) {<br/>
+		&nbsp;&nbsp;&nbsp;// gauche<br/>
+                &nbsp;&nbsp;}<br/>
+		&nbsp;&nbsp;else if (<span style="color:blue">event.key</span> === <span style="color:red">"ArrowUp"</span>) {<br/>
+		&nbsp;&nbsp;&nbsp;// haut<br/>
+                &nbsp;&nbsp;}<br/>
+		&nbsp;&nbsp;else if (<span style="color:blue">event.key</span> === <span style="color:red">"ArrowRight"</span>) {<br/>
+		&nbsp;&nbsp;&nbsp;// droite<br/>
+                &nbsp;&nbsp;}<br/>
+		&nbsp;&nbsp;else if (<span style="color:blue">event.key</span> === <span style="color:red">"ArrowDown"</span>) {<br/>
+		&nbsp;&nbsp;&nbsp;// bas<br/>
+                &nbsp;&nbsp;}<br/>
+                &nbsp;}
+                  </code>
+		</div>
+		<div class="footer">
+			<div class="contact">HTML5 Canvas | John Samuel</div>
+			<div class="navigation">57
+				<a class="prev" href="#slide56"></a>
+                                <a class="next" href="#slide58"></a>
+			</div>
+		</div>
+	</section>
+	<section class="slide" id="slide58">
+		<div class="header">
+			<h1>Interaction: Souris</h1>
+		</div>
+		<div class="content">
+                  <h3>pageX, pageY, offsetLeft, offsetTop</h3>
+                  <code>
+                    &nbsp;<span style="color:blue">document.getElementById</span>(<span style="color:red">"moncanvas"</span>).onmousedown  = <span style="color:green">function</span>(event) {<br/>
+                    &nbsp;&nbsp;event = event || window.event;<br/>
+                    &nbsp;&nbsp;event.preventDefault();<br/>
+                        <br/>
+                    &nbsp;&nbsp;var <span style="color:blue">posX</span> = event.pageX - canvas.offsetLeft;<br/>
+                    &nbsp;&nbsp;var <span style="color:blue">posY</span> = event.pageY - canvas.offsetTop;<br/>
+                   }<br/>
+                  </code>
+		</div>
+		<div class="footer">
+			<div class="contact">HTML5 Canvas | John Samuel</div>
+			<div class="navigation">58
+				<a class="prev" href="#slide57"></a>
+                                <a class="next" href="#slide59"></a>
+			</div>
+		</div>
+	</section>
+	<section class="slide" id="slide59">
+		<div class="header">
+			<h1>Interaction: Souris</h1>
+		</div>
+		<div class="content">
+                  <h3>pageX, pageY, offsetLeft, offsetTop</h3>
+                  <code>
+                    &nbsp;<span style="color:blue">document.getElementById</span>(<span style="color:red">"moncanvas"</span>).onmousedown  = <span style="color:green">function</span>(event) {<br/>
+                    &nbsp;&nbsp;event = event || window.event;<br/>
+                    &nbsp;&nbsp;event.preventDefault();<br/>
+                        <br/>
+                    &nbsp;&nbsp;var <span style="color:blue">posX</span> = event.clientX - canvas.getBoundingClientRect().x;<br/>
+                    &nbsp;&nbsp;var <span style="color:blue">posY</span> = event.clientY - canvas.getBoundingClientRect().y;<br/>
+                   }<br/>
+                  </code>
+		</div>
+		<div class="footer">
+			<div class="contact">HTML5 Canvas | John Samuel</div>
+			<div class="navigation">59
+				<a class="prev" href="#slide58"></a>
+                                <a class="next" href="#slide60"></a>
+			</div>
+		</div>
+	</section>
+	<section class="slide" id="slide60">
+		<div class="header">
+			<h1>Interaction: Souris</h1>
+		</div>
+		<div class="content">
+                  <h3>onmouseup</h3>
+                  <code>
+		    <span style="color:blue">document.body.onmouseup</span> = <span style="color:green">function</span>(event) {<br/>
+	            &nbsp;&nbsp;event = event || window.event;<br/>
+	            &nbsp;&nbsp;event.preventDefault();<br/>
+                    }<br/>
+                  </code>
+		</div>
+		<div class="footer">
+			<div class="contact">HTML5 Canvas | John Samuel</div>
+			<div class="navigation">60
+				<a class="prev" href="#slide59"></a>
+                                <a class="next" href="#slide61"></a>
+			</div>
+		</div>
+	</section>
+	<section class="slide" id="slide61">
+		<div class="header">
+			<h1>HTML5 Canvas et SVG</h1>
+		</div>
+		<div class="content">
+                  <table>
+                    <tr>
+                     <th>SVG</th>
+                     <th>Canvas</th>
+                    </tr>
+                    <tr>
+                     <td>Pour les images vectorielles</td>
+                     <td>Pour les images matricielles</td>
+                    </tr>
+                    <tr>
+                     <td>XML</td>
+                     <td>Javascript</td>
+                    </tr>
+                    <tr>
+                     <td>Manipulation facile des événements du DOM</td>
+                     <td>Correspondence des coordonnées du pointeur et d'image</td>
+                    </tr>
+                  </table>
+		</div>
+		<div class="footer">
+			<div class="contact">HTML5 Canvas | John Samuel</div>
+			<div class="navigation">61
+				<a class="prev" href="#slide60"></a>
+                                <a class="next" href="#slide62"></a>
+			</div>
+		</div>
+	</section>
+	<section class="slide" id="slide62">
+		<div class="header">
+			<h1>SVG</h1>
+		</div>
+		<div class="content">
+                  <h3>svg</h3>
+                  <pre>
+                  &lt;svg width="200" height="200"
+                     xmlns="http://www.w3.org/2000/svg"&gt;
+                  ...
+                  &lt;/svg&gt;
+                  </pre>
+		</div>
+		<div class="footer">
+			<div class="contact">HTML5 Canvas | John Samuel</div>
+			<div class="navigation">62
+				<a class="prev" href="#slide61"></a>
+                                <a class="next" href="#slide63"></a>
+			</div>
+		</div>
+	</section>
+	<section class="slide" id="slide63">
+		<div class="header">
+			<h1>SVG: Rectangle</h1>
+		</div>
+		<div class="content">
+                  <svg width="200" height="200"
+                     xmlns="http://www.w3.org/2000/svg">
+                     <rect height=200 width=200 fill="green">
+                  </svg>
+                  <h3>rect</h3>
+
+                  <pre>
+                  &lt;svg width="200" height="200"
+                     xmlns="http://www.w3.org/2000/svg"&gt;
+                     &lt;rect height=200 width=200 fill="green"&gt;
+                  &lt;/svg&gt;
+                  </pre>
+		</div>
+		<div class="footer">
+			<div class="contact">HTML5 Canvas | John Samuel</div>
+			<div class="navigation">63
+				<a class="prev" href="#slide62"></a>
+                                <a class="next" href="#slide64"></a>
+			</div>
+		</div>
+	</section>
+	<section class="slide" id="slide64">
+		<div class="header">
+			<h1>SVG: Cercle</h1>
+		</div>
+		<div class="content">
+                  <svg width="200" height="200"
+                     xmlns="http://www.w3.org/2000/svg">
+                     <circle cx=100 cy=100 r=50 fill="red">
+                  </svg>
+                  <h3>circle</h3>
+
+                  <pre>
+                  &lt;svg width="200" height="200"
+                     xmlns="http://www.w3.org/2000/svg"&gt;
+                     &lt;circle cx=100 cy=100 r=50 fill="red"&gt;
+                  &lt;/svg&gt;
+                  </pre>
+		</div>
+		<div class="footer">
+			<div class="contact">HTML5 Canvas | John Samuel</div>
+			<div class="navigation">64
+				<a class="prev" href="#slide63"></a>
+                                <a class="next" href="#slide65"></a>
+			</div>
+		</div>
+	</section>
+	<section class="slide" id="slide65">
+		<div class="header">
+			<h1>SVG: Ellipse</h1>
+		</div>
+		<div class="content">
+                  <svg width="200" height="200"
+                     xmlns="http://www.w3.org/2000/svg">
+                     <ellipse cx=100 cy=100 rx=80 ry=40 fill="red">
+                  </svg>
+                  <h3>ellipse</h3>
+
+                  <pre>
+                  &lt;svg width="200" height="200"
+                     xmlns="http://www.w3.org/2000/svg"&gt;
+                     &lt;ellipse cx=100 cy=100 rx=80 ry=40 fill="red"&gt;
+                  &lt;/svg&gt;
+                  </pre>
+		</div>
+		<div class="footer">
+			<div class="contact">HTML5 Canvas | John Samuel</div>
+			<div class="navigation">65
+				<a class="prev" href="#slide64"></a>
+                                <a class="next" href="#slide66"></a>
+			</div>
+		</div>
+	</section>
+	<section class="slide" id="slide66">
+		<div class="header">
+			<h1>SVG: Lignes</h1>
+		</div>
+		<div class="content">
+                  <svg width="200" height="200"
+                     xmlns="http://www.w3.org/2000/svg">
+                     <line x1=0 y1=0 x2=200 y2=200 stroke="red" stroke-width=10>
+                  </svg>
+                  <h3>line</h3>
+
+                  <pre>
+                  &lt;svg width="200" height="200"
+                     xmlns="http://www.w3.org/2000/svg"&gt;
+                     &lt;line x1=0 y1=0 x2=200 y2=200 stroke="red" stroke-width=10&gt;
+                  &lt;/svg&gt;
+                  </pre>
+		</div>
+		<div class="footer">
+			<div class="contact">HTML5 Canvas | John Samuel</div>
+			<div class="navigation">66
+				<a class="prev" href="#slide65"></a>
+                                <a class="next" href="#slide67"></a>
+			</div>
+		</div>
+	</section>
+	<section class="slide" id="slide67">
+		<div class="header">
+			<h1>SVG: Polylignes</h1>
+		</div>
+		<div class="content">
+                  <svg width="200" height="200"
+                     xmlns="http://www.w3.org/2000/svg">
+                     <polyline points="0 0 180 180 0 180"
+                       fill="none"
+                       stroke="red" stroke-width=10 />
+                  </svg>
+                  <h3>polyline</h3>
+
+
+                  <pre>
+                  &lt;svg width="200" height="200"
+                     xmlns="http://www.w3.org/2000/svg"&gt;
+                     &lt;polyline points="30 30 180 180 30 180"
+                       fill="none"
+                       stroke="red" stroke-width=10 /&gt;
+                  &lt;/svg&gt;
+                  </pre>
+		</div>
+		<div class="footer">
+			<div class="contact">HTML5 Canvas | John Samuel</div>
+			<div class="navigation">67
+				<a class="prev" href="#slide66"></a>
+                                <a class="next" href="#slide68"></a>
+			</div>
+		</div>
+	</section>
+	<section class="slide" id="slide68">
+		<div class="header">
+			<h1>SVG: Polygon</h1>
+		</div>
+		<div class="content">
+                  <svg width="200" height="200"
+                     xmlns="http://www.w3.org/2000/svg">
+                     <polygon points="30 30 180 180 30 180"
+                       fill="none"
+                       stroke="red" stroke-width=10 />
+                  </svg>
+                  <h3>polygon</h3>
+
+                  <pre>
+                  &lt;svg width="200" height="200"
+                     xmlns="http://www.w3.org/2000/svg"&gt;
+                     &lt;polygon points="30 30 180 180 30 180"
+                       fill="none"
+                       stroke="red" stroke-width=10 /&gt;
+                  &lt;/svg&gt;
+                  </pre>
+		</div>
+		<div class="footer">
+			<div class="contact">HTML5 Canvas | John Samuel</div>
+			<div class="navigation">68
+				<a class="prev" href="#slide67"></a>
+                                <a class="next" href="#slide69"></a>
+			</div>
+		</div>
+	</section>
+	<section class="slide" id="slide69">
+		<div class="header">
+			<h1>SVG: Chemin</h1>
+		</div>
+		<div class="content">
+                  <svg width="200" height="200"
+                     xmlns="http://www.w3.org/2000/svg">
+                     <path d="M30 30 L 180 180 L 30 180"
+                       fill="none"
+                       stroke="red" stroke-width=10 />
+                  </svg>
+                  <h3>path</h3>
+
+                  <pre>
+                  &lt;svg width="200" height="200"
+                     xmlns="http://www.w3.org/2000/svg"&gt;
+                     &lt;path d="M30 30 L 180 180 L 30 180"
+                       fill="none"
+                       stroke="red" stroke-width=10 /&gt;
+                  &lt;/svg&gt;
+                  </pre>
+		</div>
+		<div class="footer">
+			<div class="contact">HTML5 Canvas | John Samuel</div>
+			<div class="navigation">69
+				<a class="prev" href="#slide68"></a>
+                                <a class="next" href="#slide70"></a>
+			</div>
+		</div>
+	</section>
+	<section class="slide" id="slide70">
+		<div class="header">
+			<h1>SVG: Chemin</h1>
+		</div>
+		<div class="content">
+                  <svg width="200" height="200"
+                     xmlns="http://www.w3.org/2000/svg">
+                     <path d="M30 30 L 180 180 L 30 180"
+                       fill="none"
+                       stroke="red" stroke-width=10 />
+                  </svg>
+                  <h3>path</h3>
+
+                  <pre>
+                  &lt;svg width="200" height="200"
+                     xmlns="http://www.w3.org/2000/svg"&gt;
+                     &lt;path d="M30 30 L 180 180 L 30 180"
+                       fill="none"
+                       stroke="red" stroke-width=10 /&gt;
+                  &lt;/svg&gt;
+                  </pre>
+                  <ul>
+                    <li>M: Move to</li>
+                    <li>L: Line to</li>
+                    <li>H: Horizontal line to</li>
+                    <li>V: Vertical line to</li>
+                  </ul>
+		</div>
+		<div class="footer">
+			<div class="contact">HTML5 Canvas | John Samuel</div>
+			<div class="navigation">70
+				<a class="prev" href="#slide69"></a>
+                                <a class="next" href="#slide71"></a>
+			</div>
+		</div>
+	</section>
+	<section class="slide" id="slide71">
+		<div class="header">
+			<h1>SVG: Textes</h1>
+		</div>
+		<div class="content">
+                  <svg width="200" height="200"
+                     xmlns="http://www.w3.org/2000/svg">
+                     <text x="40" y="40" stroke="red" fill="red">Bonjour</text>
+                  </svg>
+                  <h3>text</h3>
+
+                  <pre>
+                  &lt;svg width="200" height="200"
+                     xmlns="http://www.w3.org/2000/svg"&gt;
+                     &lt;text x="40" y="40"
+                           stroke="red" fill="red"&gt;
+                           Bonjour&lt;/text&gt;
+                  &lt;/svg&gt;
+                  </pre>
+		</div>
+		<div class="footer">
+			<div class="contact">HTML5 Canvas | John Samuel</div>
+			<div class="navigation">71
+				<a class="prev" href="#slide70"></a>
+                                <a class="next" href="#slide72"></a>
+			</div>
+		</div>
+	</section>
+	<section class="slide" id="slide72">
+		<div class="header">
+			<h1>SVG: Textes et Chemin</h1>
+		</div>
+		<div class="content">
+                  <svg width="200" height="200"
+                     xmlns="http://www.w3.org/2000/svg">
+                     <path d="M30 30 L 180 180 L 30 180"
+                       fill="transparent"
+                       id="tpath"
+                       stroke-width=10 />
+                     <text stroke="red" fill="red">
+                       <textPath xmlns:xlink="http://www.w3.org/1999/xlink"
+                                 xlink:href="#tpath">
+                          Bonjour le Monde! Canvas
+                       </textPath>
+                     </text>
+                  </svg>
+                  <h3>textPath</h3>
+
+                  <pre>
+                  &lt;svg width="200" height="200"
+                     xmlns="http://www.w3.org/2000/svg"&gt;
+                     &lt;path d="M30 30 L 180 180 L 30 180"
+                       fill="transparent"
+                       id="tpath"
+                       stroke-width=10 /&gt;
+                     &lt;text stroke="red" fill="red"&gt;
+                       &lt;textPath xmlns:xlink="http://www.w3.org/1999/xlink"
+                                 xlink:href="#tpath"&gt;
+                          Bonjour le Monde! Canvas
+                       &lt;/textPath&gt;
+                     &lt;/text&gt;
+                  &lt;/svg&gt;
+                  </pre>
+		</div>
+		<div class="footer">
+			<div class="contact">HTML5 Canvas | John Samuel</div>
+			<div class="navigation">72
+				<a class="prev" href="#slide71"></a>
+                                <a class="next" href="#slide73"></a>
+			</div>
+		</div>
+	</section>
+	<section class="slide" id="slide73">
+		<div class="header">
+			<h1>Média</h1>
+		</div>
+		<div class="content">
+                  <h3>iframe</h3>
+                  <iframe id="mainpage"
+                    title="main page"
+                    width="500"
+                    height="400"
+                    src="./index.html">
+                  </iframe>
+		</div>
+		<div class="footer">
+			<div class="contact">HTML5 Canvas | John Samuel</div>
+			<div class="navigation">73
+				<a class="prev" href="#slide72"></a>
+                                <a class="next" href="#slide74"></a>
+			</div>
+		</div>
+	</section>
+	<section class="slide" id="slide74">
+		<div class="header">
+			<h1>Média</h1>
+		</div>
+		<div class="content">
+                  <h3>iframe</h3>
+                  <code>
+                    &lt;<span style="color:green">iframe</span> id=<span style="color:red">"accueil"</span></br>
+                    &nbsp;&nbsp;title=<span style="color:red">"accueil"</span></br>
+                    &nbsp;&nbsp;width=<span style="color:red">"500"</span></br>
+                    &nbsp;&nbsp;height=<span style="color:red">"400"</span></br>
+                    &nbsp;&nbsp;src=<span style="color:red">"./index.html"</span>&gt;</br>
+                    &lt;/<span style="color:green">iframe</span>&gt;</br>
+                  </code>
+		</div>
+		<div class="footer">
+			<div class="contact">HTML5 Canvas | John Samuel</div>
+			<div class="navigation">74
+				<a class="prev" href="#slide73"></a>
+                                <a class="next" href="#slide75"></a>
+			</div>
+		</div>
+	</section>
+	<section class="slide" id="slide75">
+		<div class="header">
+			<h1>Média</h1>
+		</div>
+		<div class="content">
+                  <h3>iframe</h3>
+                 <iframe id="openstreetmap" width="425" height="350" frameborder="0" scrolling="no" marginheight="0" marginwidth="0" src="https://www.openstreetmap.org/export/embed.html?bbox=4.7606849670410165%2C45.708696659903026%2C4.975776672363282%2C45.800443408584&amp;layer=mapnik" style="border: 1px solid black"></iframe><br/><small><a href="https://www.openstreetmap.org/#map=13/45.7546/4.8682">View Larger Map</a></small>
+		</div>
+		<div class="footer">
+			<div class="contact">HTML5 Canvas | John Samuel</div>
+			<div class="navigation">75
+				<a class="prev" href="#slide74"></a>
+                                <a class="next" href="#slide76"></a>
+			</div>
+		</div>
+	</section>
+	<section class="slide" id="slide76">
+		<div class="header">
+			<h1>Média</h1>
+		</div>
+		<div class="content">
+                  <h3>iframe</h3>
+                  <iframe id="mainpage"
+                    title="main page"
+                    width="500"
+                    height="400"
+                    src="https://commons.wikimedia.org/wiki/Flowers">
+                  </iframe>
+		</div>
+		<div class="footer">
+			<div class="contact">HTML5 Canvas | John Samuel</div>
+			<div class="navigation">76
+				<a class="prev" href="#slide75"></a>
+                                <a class="next" href="#slide77"></a>
+			</div>
+		</div>
+	</section>
+	<section class="slide" id="slide77">
+		<div class="header">
+			<h1>Média</h1>
+		</div>
+		<div class="content">
+                  <h3>video</h3>
+                    <video controls width="250">
+
+                        <source src="https://upload.wikimedia.org/wikipedia/commons/a/ab/Tui_feeding_from_flax_flowers_Wellington.ogv"
+                                type="video/ogg">
+                                Désolé, votre navigateur ne prend pas en charge les vidéos intégrées.
+                    </video>
+		</div>
+		<div class="footer">
+			<div class="contact">HTML5 Canvas | John Samuel</div>
+			<div class="navigation">77
+				<a class="prev" href="#slide76"></a>
+                                <a class="next" href="#slide78"></a>
+			</div>
+		</div>
+	</section>
+	<section class="slide" id="slide78">
+		<div class="header">
+			<h1>Média</h1>
+		</div>
+		<div class="content">
+                  <h3>video</h3>
+                  <code>
+                   &lt;<span style="color:green">video</span> controls width=<span style="color:red">"250"</span>&gt;</br>
+                    &nbsp;&nbsp;&lt;<span style="color:green">source</span> src=<span style="color:red">"...ogv"</span></br>
+                    &nbsp;&nbsp;&nbsp;        type=<span style="color:red">"video/ogg"</span>&gt;</br>
+                    &nbsp;&nbsp;&lt;<span style="color:green">source</span> src=<span style="color:red">"...mp4"</span></br>
+                    &nbsp;&nbsp;&nbsp;        type=<span style="color:red">"video/mp4"</span>&gt;</br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Désolé, votre navigateur ne prend pas en charge les vidéos intégrées.</br>
+                   &lt;/<span style="color:green">video</span>&gt;</br>
+                  </code>
+		</div>
+		<div class="footer">
+			<div class="contact">HTML5 Canvas | John Samuel</div>
+			<div class="navigation">78
+				<a class="prev" href="#slide77"></a>
+                                <a class="next" href="#slide79"></a>
+			</div>
+		</div>
+	</section>
+	<section class="slide" id="slide79">
+		<div class="header">
+			<h1>Média</h1>
+		</div>
+		<div class="content">
+                  <h3>audio</h3>
+                    <audio
+                            controls
+                            src="https://upload.wikimedia.org/wikipedia/commons/9/98/Schumann_Prophet_Bird_from_Waldszenen.wav">
+                                Your browser does not support the
+                                <code>audio</code> element.
+                        </audio>
+		</div>
+		<div class="footer">
+			<div class="contact">HTML5 Canvas | John Samuel</div>
+			<div class="navigation">79
+				<a class="prev" href="#slide78"></a>
+                                <a class="next" href="#slide80"></a>
+			</div>
+		</div>
+	</section>
+	<section class="slide" id="slide80">
+		<div class="header">
+			<h1>Média</h1>
+		</div>
+		<div class="content">
+                  <h3>audio</h3>
+                  <code>
+                    &lt;<span style="color:green">audio</span></br>
+                       &nbsp;&nbsp;&nbsp;controls</br>
+                       &nbsp;&nbsp;&nbsp;src=<span style="color:red">".wav"</span>&gt;</br>
+                       &nbsp;&nbsp;&nbsp;&nbsp;Votre navigateur ne supporte pas l'élément audio.</br>
+                        &lt;/<span style="color:green">audio</span>&gt;</br>
+                  </code>
+		</div>
+		<div class="footer">
+			<div class="contact">HTML5 Canvas | John Samuel</div>
+			<div class="navigation">80
+				<a class="prev" href="#slide79"></a>
+                                <a class="next" href="#slide81"></a>
+			</div>
+		</div>
+	</section>
+	<section class="slide" id="slide81">
+		<div class="header">
+			<h1>HTML5 Canvas</h1>
+		</div>
+		<div class="content">
+			<h1>Références</h1>
+			<ul>
+				<li><a href="https://developer.mozilla.org/fr/docs/Tutoriel_canvas">https://developer.mozilla.org/fr/docs/Tutoriel_canvas</a></li>
+				<li><a href="https://developer.mozilla.org/fr/docs/Web/API/CanvasRenderingContext2D/drawImage">https://developer.mozilla.org/fr/docs/Web/API/CanvasRenderingContext2D/drawImage</a></li>
+				<li><a href="https://developer.mozilla.org/fr/docs/Web/API/CanvasRenderingContext2D">https://developer.mozilla.org/fr/docs/Web/API/CanvasRenderingContext2D</a></li>
+				<li><a href="https://fr.wikipedia.org/wiki/Canvas_(HTML)">https://fr.wikipedia.org/wiki/Canvas_(HTML)</a></li>
+				<li><a href="https://developer.mozilla.org/fr/docs/Web/SVG/Tutoriel">https://developer.mozilla.org/fr/docs/Web/SVG/Tutoriel</a></li>
+				<li><a href="https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/key">https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/key</a></li>
+				<li><a href="https://developer.mozilla.org/fr/docs/Web/API/CanvasRenderingContext2D/textAlign">https://developer.mozilla.org/fr/docs/Web/API/CanvasRenderingContext2D/textAlign</a></li>
+				<li><a href="https://developer.mozilla.org/fr/docs/Web/API/CanvasRenderingContext2D/textBaseline">https://developer.mozilla.org/fr/docs/Web/API/CanvasRenderingContext2D/textBaseline</a></li>
+				<li><a href="https://developer.mozilla.org/fr/docs/Web/API/CanvasRenderingContext2D/transform">https://developer.mozilla.org/fr/docs/Web/API/CanvasRenderingContext2D/transform</a></li>
+				<li><a href="https://developer.mozilla.org/fr/docs/Web/API/CanvasRenderingContext2D/scale">https://developer.mozilla.org/fr/docs/Web/API/CanvasRenderingContext2D/scale</a></li>
+			</ul>
+		</div>
+		<div class="footer">
+			<div class="contact">HTML5 Canvas | John Samuel</div>
+			<div class="navigation">81
+				<a class="prev" href="#slide80"></a>
+                                <a class="next" href="#slide82"></a>
+			</div>
+		</div>
+	</section>
+	<section class="slide" id="slide82">
+		<div class="header">
+			<h1>HTML5 Canvas</h1>
+		</div>
+		<div class="content">
+			<h1>Références</h1>
+			<ul>
+				<li><a href="https://developer.mozilla.org/fr/docs/Web/HTML/Element/iframe">https://developer.mozilla.org/fr/docs/Web/HTML/Element/iframe</a></li>
+			</ul>
+			<h1>Crédits d'images</h1>
+			<ul>
+				<li><a href="https://commons.wikimedia.org/wiki/Main_Page">Wikimedia Commons</a></li>
+			</ul>
+		</div>
+		<div class="footer">
+			<div class="contact">HTML5 Canvas | John Samuel</div>
+			<div class="navigation">82
+				<a class="prev" href="#slide81"></a>
+                                <a class="next" href="#slide83"></a>
+			</div>
+		</div>
+	</section>
+
+
+	<script>
+		function changeCurrentURLSlideNumber(isIncrement) {
+			url = window.location.href;
+			position = url.indexOf("#slide");
+			if (position != -1) { // Not on the first page
+				slideIdString = url.substr(position + 6);
+				if (!Number.isNaN(slideIdString)) {
+					slideId = parseInt(slideIdString);
+					if (isIncrement) {
+                                               if (slideId  < 82) {
+						slideId = slideId + 1;
+                                               }
+					} else {
+						if (slideId > 1) {
+							slideId = slideId - 1;
+						}
+					}
+                                        /* regexp */
+					url = url.replace(/#slide\d+/g, "#slide" + slideId);
+					window.location.href = url;
+				}
+			} else {
+				window.location.href = url + "#slide2";
+			}
+		}
+		document.onkeydown = function(event) {
+			event = event || window.event;
+			event.preventDefault(); /* This will ensure the default behavior of
+													        page scroll behaviour (up, down, right, left)*/
+
+                        /*Codes de la touche sur le clavier: 37, 38, 39, 40*/
+			if (event.key === "ArrowLeft") {
+				// left
+				changeCurrentURLSlideNumber(false);
+			} else if (event.key === "ArrowUp") {
+				// up
+				changeCurrentURLSlideNumber(false);
+			} else if (event.key === "ArrowRight") {
+				// right
+				changeCurrentURLSlideNumber(true);
+			} else if (event.key === "ArrowDown") {
+				// down
+				changeCurrentURLSlideNumber(true);
+			}
+		}
+		document.body.onmouseup = function(event) {
+			event = event || window.event;
+			event.preventDefault();
+			changeCurrentURLSlideNumber(true);
+		}
+	</script>
+        <script src="cours.js"></script>
+        <script src="curve.js"></script>
+        <script src="beziercurve.js"></script>
+        <script src="arc.js"></script>
+        <script src="cours3.js"></script>
+</body>
+</html>
