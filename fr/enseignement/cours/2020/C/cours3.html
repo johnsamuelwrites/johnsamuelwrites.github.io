@@ -2559,13 +2559,21 @@ tableau.c:15:13: error: type of formal parameter 1 is incomplete</br>
 	</section>
 	<section class="slide" id="slide79">
 		<div class="header">
-			<h1>La chaine de compilation</h1>
+			<h1>Préprocesseur</h1>
 		</div>
 		<div class="content">
-                  <h3 class="topicsubheading">Préprocesseur</h3>
-                  <code>
-                  $ gcc -E bonjour.c
-                  </code>
+                        <h3 class="topicsubheading">1. Préprocesseur</h3>
+			<h3>cercle.c</h3>
+			<code><span style="color:purple">#ifndef</span> PI</br>
+			<span style="color:purple">#define</span> PI 3.14159</br>
+			<span style="color:purple">#endif</span></br></br>
+
+			<span style="color:green">float</span> <span style="color:blue">area</span>(
+			<span style="color:green">float</span> <span style="color:blue">radius</span>) { <br>
+			&nbsp;<span style="color:green">return</span>(PI * <span style="color:blue">radius</span>
+						* <span style="color:blue">radius</span>);<br>
+			}<br>
+                        </code>
 		</div>
 		<div class="footer">
 			<div class="contact">Programmation en C | John Samuel</div>
@@ -2580,12 +2588,20 @@ tableau.c:15:13: error: type of formal parameter 1 is incomplete</br>
 			<h1>La chaine de compilation</h1>
 		</div>
 		<div class="content">
-                  <h3 class="topicsubheading">Langage intermédiaire</h3>
+                  <h3 class="topicsubheading">1. Préprocesseur</h3>
                   <code>
-                  $ gcc -v bonjour.c # les étapes importantes</br>
-                  $ gcc -save-temps -v bonjour.c # les fichiers *.i, *.s</br>
-                  $ gcc -fdump-tree-all bonjour.c</br>
-                  $ gcc -fdump-rtl-all bonjour.c</br>
+                  $ gcc -E cercle.c
+		  # 1 "cercle.c"</br>
+# 1 "<built-in>"</br>
+# 1 "<command-line>"</br>
+# 31 "<command-line>"</br>
+# 1 "/usr/include/stdc-predef.h" 1 3 4</br>
+# 32 "<command-line>" 2</br>
+# 1 "cercle.c"</br>
+</br>
+float area(float radius) {</br>
+  return(3.14 * radius * radius);</br>
+}</br>
                   </code>
 		</div>
 		<div class="footer">
@@ -2601,16 +2617,13 @@ tableau.c:15:13: error: type of formal parameter 1 is incomplete</br>
 			<h1>La chaine de compilation</h1>
 		</div>
 		<div class="content">
-                  <h3 class="topicsubheading">Optimisation de code</h3>
+                  <h3 class="topicsubheading">2. Langage intermédiaire</h3>
                   <code>
-                  $ gcc -O2 bonjour.c</br>
-                  $ gcc -O3 bonjour.c</br>
+                  $ gcc -v bonjour.c # les étapes importantes</br>
+                  $ gcc -save-temps -v bonjour.c # les fichiers *.i, *.s</br>
+                  $ gcc -fdump-tree-all bonjour.c</br>
+                  $ gcc -fdump-rtl-all bonjour.c</br>
                   </code>
-                   <p>
-		     <span style="color:red">Remarque:</span> Autres optimisations: -O1  -O2  -O3  -Os -Ofast -Og
-			</p>
-                   </p>
-
 		</div>
 		<div class="footer">
 			<div class="contact">Programmation en C | John Samuel</div>
@@ -2625,10 +2638,21 @@ tableau.c:15:13: error: type of formal parameter 1 is incomplete</br>
 			<h1>La chaine de compilation</h1>
 		</div>
 		<div class="content">
-                  <h3 class="topicsubheading">Génération de code natif</h3>
+                  <h3 class="topicsubheading">2. Langage intermédiaire</h3>
                   <code>
-                  $ gcc -S bonjour.c</br>
-                  $ cat bonjour.s
+                  $ gcc -fdump-tree-all -c cercle.c</br>
+		  $ cat cercle.c.005t.gimple</br>
+area (float radius)</br>
+{</br>
+  float D.1914;</br>
+</br>
+  _1 = (double) radius;</br>
+  _2 = _1 * 3.140000000000000124344978758017532527446746826171875e+0;</br>
+  _3 = (double) radius;</br>
+  _4 = _2 * _3;</br>
+  D.1914 = (float) _4;</br>
+  return D.1914;</br>
+}</br>
                   </code>
 		</div>
 		<div class="footer">
@@ -2644,7 +2668,50 @@ tableau.c:15:13: error: type of formal parameter 1 is incomplete</br>
 			<h1>La chaine de compilation</h1>
 		</div>
 		<div class="content">
-                  <h3 class="topicsubheading">Optimisation de code</h3>
+                  <h3 class="topicsubheading">3. Optimisation de code</h3>
+                  <code>
+                  $ gcc -O2 bonjour.c</br>
+                  $ gcc -O3 bonjour.c</br>
+                  </code>
+                   <p>
+		     <span style="color:red">Remarque:</span> Autres optimisations: -O1  -O2  -O3  -Os -Ofast -Og
+			</p>
+                   </p>
+
+		</div>
+		<div class="footer">
+			<div class="contact">Programmation en C | John Samuel</div>
+			<div class="navigation">83
+				<a class="prev" href="#slide82"></a>
+                                <a class="next" href="#slide84"></a>
+			</div>
+		</div>
+	</section>
+	<section class="slide" id="slide84">
+		<div class="header">
+			<h1>La chaine de compilation</h1>
+		</div>
+		<div class="content">
+                  <h3 class="topicsubheading">4. Génération de code natif</h3>
+                  <code>
+                  $ gcc -S bonjour.c</br>
+                  $ cat bonjour.s
+                  </code>
+		</div>
+		<div class="footer">
+			<div class="contact">Programmation en C | John Samuel</div>
+			<div class="navigation">84
+				<a class="prev" href="#slide83"></a>
+                                <a class="next" href="#slide85"></a>
+			</div>
+		</div>
+	</section>
+	<section class="slide" id="slide85">
+		<div class="header">
+			<h1>La chaine de compilation</h1>
+		</div>
+		<div class="content">
+                  <h3 class="topicsubheading">4. Génération de code natif et l'optimisation de code</h3>
                   <code>
                   <span style="color: green">int</span> <span style="color:blue">main</span>() {</br>
                   &nbsp;&nbsp;<span style="color: green">int</span> <span style="color: blue">num</span> = 2 + 3;</br>
@@ -2675,18 +2742,18 @@ tableau.c:15:13: error: type of formal parameter 1 is incomplete</br>
 		</div>
 		<div class="footer">
 			<div class="contact">Programmation en C | John Samuel</div>
-			<div class="navigation">83
-				<a class="prev" href="#slide82"></a>
-                                <a class="next" href="#slide84"></a>
+			<div class="navigation">85
+				<a class="prev" href="#slide84"></a>
+                                <a class="next" href="#slide86"></a>
 			</div>
 		</div>
 	</section>
-	<section class="slide" id="slide84">
+	<section class="slide" id="slide86">
 		<div class="header">
 			<h1>La chaine de compilation</h1>
 		</div>
 		<div class="content">
-                  <h3 class="topicsubheading">Optimisation de code</h3>
+                  <h3 class="topicsubheading">4. Génération de code natif et l'optimisation de code</h3>
                   <code>
                   <span style="color: green">int</span> <span style="color:blue">main</span>() {</br>
                   &nbsp;&nbsp;<span style="color: green">int</span> <span style="color: blue">num</span> = 2 + 3;</br>
@@ -2709,49 +2776,6 @@ tableau.c:15:13: error: type of formal parameter 1 is incomplete</br>
 		</div>
 		<div class="footer">
 			<div class="contact">Programmation en C | John Samuel</div>
-			<div class="navigation">84
-				<a class="prev" href="#slide83"></a>
-                                <a class="next" href="#slide85"></a>
-			</div>
-		</div>
-	</section>
-	<section class="slide" id="slide85">
-		<div class="header">
-			<h1>La chaine de compilation</h1>
-		</div>
-		<div class="content">
-                  <h3 class="topicsubheading">Génération de code</h3>
-                  <h4>sur une machine d'architecture 64 bits</h4>
-                  <code>
-                  $ gcc bonjour.c</br>
-                  $ file a.out </br>
-                  &nbsp;a.out: ELF 64-bit LSB shared object, x86-64</br>
-                  </code>
-		</div>
-		<div class="footer">
-			<div class="contact">Programmation en C | John Samuel</div>
-			<div class="navigation">85
-				<a class="prev" href="#slide84"></a>
-                                <a class="next" href="#slide86"></a>
-			</div>
-		</div>
-	</section>
-	<section class="slide" id="slide86">
-		<div class="header">
-			<h1>La chaine de compilation</h1>
-		</div>
-		<div class="content">
-                  <h3 class="topicsubheading">Génération de code</h3>
-                  <h4>sur une machine d'architecture 64 bits</h4>
-                  <code>
-                  $ gcc -march=i686 -m32 bonjour.c</br>
-                  $ gcc -S -march=i686 -m32 bonjour.c</br>
-                  $ file ./a.out </br>
-                  &nbsp;./a.out: ELF 32-bit LSB shared object, Intel 80386</br>
-                  </code>
-		</div>
-		<div class="footer">
-			<div class="contact">Programmation en C | John Samuel</div>
 			<div class="navigation">86
 				<a class="prev" href="#slide85"></a>
                                 <a class="next" href="#slide87"></a>
@@ -2763,12 +2787,13 @@ tableau.c:15:13: error: type of formal parameter 1 is incomplete</br>
 			<h1>La chaine de compilation</h1>
 		</div>
 		<div class="content">
-                <h3 class="topicsubheading">Code objet</h3>
-                <code>
-                $ gcc -c client.c </br>
-                $ gcc -c color.c </br>
-                $ gcc -o color color.o client.o </br>
-                </code>
+                  <h3 class="topicsubheading">4. Génération de code</h3>
+                  <h4>sur une machine d'architecture 64 bits</h4>
+                  <code>
+                  $ gcc bonjour.c</br>
+                  $ file a.out </br>
+                  &nbsp;a.out: ELF 64-bit LSB shared object, x86-64</br>
+                  </code>
 		</div>
 		<div class="footer">
 			<div class="contact">Programmation en C | John Samuel</div>
@@ -2783,7 +2808,49 @@ tableau.c:15:13: error: type of formal parameter 1 is incomplete</br>
 			<h1>La chaine de compilation</h1>
 		</div>
 		<div class="content">
-                <h3>Code objet (Modifications et recompilation)</h3>
+                  <h3 class="topicsubheading">4. Génération de code</h3>
+                  <h4>sur une machine d'architecture 64 bits</h4>
+                  <code>
+                  $ gcc -march=i686 -m32 bonjour.c</br>
+                  $ gcc -S -march=i686 -m32 bonjour.c</br>
+                  $ file ./a.out </br>
+                  &nbsp;./a.out: ELF 32-bit LSB shared object, Intel 80386</br>
+                  </code>
+		</div>
+		<div class="footer">
+			<div class="contact">Programmation en C | John Samuel</div>
+			<div class="navigation">88
+				<a class="prev" href="#slide87"></a>
+                                <a class="next" href="#slide89"></a>
+			</div>
+		</div>
+	</section>
+	<section class="slide" id="slide89">
+		<div class="header">
+			<h1>La chaine de compilation</h1>
+		</div>
+		<div class="content">
+                <h3 class="topicsubheading">5. Code objet</h3>
+                <code>
+                $ gcc -c client.c </br>
+                $ gcc -c color.c </br>
+                $ gcc -o color color.o client.o </br>
+                </code>
+		</div>
+		<div class="footer">
+			<div class="contact">Programmation en C | John Samuel</div>
+			<div class="navigation">89
+				<a class="prev" href="#slide88"></a>
+                                <a class="next" href="#slide90"></a>
+			</div>
+		</div>
+	</section>
+	<section class="slide" id="slide90">
+		<div class="header">
+			<h1>La chaine de compilation</h1>
+		</div>
+		<div class="content">
+                <h3>5. Code objet (Modifications et recompilation)</h3>
                 <code>
                 $ gcc -c client.c </br>
                 $ gcc -c color.c </br>
@@ -2798,13 +2865,74 @@ tableau.c:15:13: error: type of formal parameter 1 is incomplete</br>
 		</div>
 		<div class="footer">
 			<div class="contact">Programmation en C | John Samuel</div>
-			<div class="navigation">88
-				<a class="prev" href="#slide87"></a>
-                                <a class="next" href="#slide89"></a>
+			<div class="navigation">90
+				<a class="prev" href="#slide89"></a>
+                                <a class="next" href="#slide91"></a>
 			</div>
 		</div>
 	</section>
-	<section class="slide" id="slide89">
+	<section class="slide" id="slide91">
+		<div class="header">
+			<h1>La chaine de compilation</h1>
+		</div>
+		<div class="content">
+                <h3 class="topicsubheading">Makefile</h3>
+                <code>
+                    <span style="color: green">client</span>: client.c color.c</br>
+		    <span style="color: red">&lt;TAB&gt;</span>gcc -o client client.c color.c </br>
+                </code>
+		</div>
+		<div class="footer">
+			<div class="contact">Programmation en C | John Samuel</div>
+			<div class="navigation">91
+				<a class="prev" href="#slide90"></a>
+                                <a class="next" href="#slide92"></a>
+			</div>
+		</div>
+	</section>
+	<section class="slide" id="slide92">
+		<div class="header">
+			<h1>La chaine de compilation</h1>
+		</div>
+		<div class="content">
+                <h3 class="topicsubheading">Makefile</h3>
+                <code>
+                    $ make</br>
+		    gcc -o client client.c color.c </br>
+                </code>
+		</div>
+		<div class="footer">
+			<div class="contact">Programmation en C | John Samuel</div>
+			<div class="navigation">92
+				<a class="prev" href="#slide91"></a>
+                                <a class="next" href="#slide93"></a>
+			</div>
+		</div>
+	</section>
+	<section class="slide" id="slide93">
+		<div class="header">
+			<h1>La chaine de compilation</h1>
+		</div>
+		<div class="content">
+                <h3 class="topicsubheading">Makefile</h3>
+                <code>
+                    <span style="color: green">client</span>: client.o color.o</br>
+		    &nbsp;gcc -o client client.o color.o </br></br>
+                    <span style="color: green">client.o</span>: client.c client.h</br>
+		    &nbsp;gcc -c client.c</br></br>
+                    <span style="color: green">color.o</span>: color.c color.h</br>
+		    &nbsp;gcc -c color.c</br></br>
+                </code>
+		</div>
+		<div class="footer">
+			<div class="contact">Programmation en C | John Samuel</div>
+			<div class="navigation">93
+				<a class="prev" href="#slide92"></a>
+                                <a class="next" href="#slide94"></a>
+			</div>
+		</div>
+	</section>
+	<section class="slide" id="slide94">
 		<div class="header">
 			<h1>La chaine de compilation</h1>
 		</div>
@@ -2826,13 +2954,13 @@ tableau.c:15:13: error: type of formal parameter 1 is incomplete</br>
 		</div>
 		<div class="footer">
 			<div class="contact">Programmation en C | John Samuel</div>
-			<div class="navigation">89
-				<a class="prev" href="#slide88"></a>
-                                <a class="next" href="#slide90"></a>
+			<div class="navigation">94
+				<a class="prev" href="#slide93"></a>
+                                <a class="next" href="#slide95"></a>
 			</div>
 		</div>
 	</section>
-	<section class="slide" id="slide90">
+	<section class="slide" id="slide95">
 		<div class="header">
 			<h1>La chaine de compilation</h1>
 		</div>
@@ -2853,13 +2981,13 @@ tableau.c:15:13: error: type of formal parameter 1 is incomplete</br>
 		</div>
 		<div class="footer">
 			<div class="contact">Programmation en C | John Samuel</div>
-			<div class="navigation">90
-				<a class="prev" href="#slide89"></a>
-                                <a class="next" href="#slide91"></a>
+			<div class="navigation">95
+				<a class="prev" href="#slide94"></a>
+                                <a class="next" href="#slide96"></a>
 			</div>
 		</div>
 	</section>
-	<section class="slide" id="slide91">
+	<section class="slide" id="slide96">
 		<div class="header">
 			<h1>La chaine de compilation</h1>
 		</div>
@@ -2876,13 +3004,13 @@ tableau.c:15:13: error: type of formal parameter 1 is incomplete</br>
 		</div>
 		<div class="footer">
 			<div class="contact">Programmation en C | John Samuel</div>
-			<div class="navigation">91
-				<a class="prev" href="#slide90"></a>
-                                <a class="next" href="#slide92"></a>
+			<div class="navigation">96
+				<a class="prev" href="#slide95"></a>
+                                <a class="next" href="#slide97"></a>
 			</div>
 		</div>
 	</section>
-	<section class="slide" id="slide92">
+	<section class="slide" id="slide97">
 		<div class="header">
 			<h1>Références</h1>
 		</div>
@@ -2901,8 +3029,8 @@ tableau.c:15:13: error: type of formal parameter 1 is incomplete</br>
 		</div>
 		<div class="footer">
 			<div class="contact">Programmation en C | John Samuel</div>
-			<div class="navigation">92
-				<a class="prev" href="#slide91"></a>
+			<div class="navigation">97
+				<a class="prev" href="#slide96"></a>
 			</div>
 		</div>
 	</section>
@@ -2916,7 +3044,7 @@ tableau.c:15:13: error: type of formal parameter 1 is incomplete</br>
 				if (!Number.isNaN(slideIdString)) {
 					slideId = parseInt(slideIdString);
 					if (isIncrement) {
-                                               if (slideId  < 74) {
+                                               if (slideId  < 97) {
 						slideId = slideId + 1;
                                                }
 					} else {
