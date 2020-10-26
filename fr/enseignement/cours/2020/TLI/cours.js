@@ -558,3 +558,21 @@ function imageTransform() {
   drawCorners(context, id);
 }
 console.log("bonjour cours");
+
+function path2dcercle(nom, stroke=false, corners=true) {
+  var id = document.getElementById(nom);
+  var context = id.getContext("2d");
+  var cercle = new Path2D();
+  cercle.arc(150, 150, 100, 0, 2 * Math.PI);
+  context.fillStyle = "#00b33c";
+ 
+  if (stroke) {
+    context.stroke(cercle);
+  }
+  else {
+    context.fill(cercle);
+  }
+  if(corners) {
+    drawCorners(context, id);
+  }
+}

@@ -49,3 +49,5 @@ imagedecoupage();
 
 moncanvas1();
 moncanvas2();
+path2dcercle("path2dstroke", true, true);
+path2dcercle("path2dfill", false, true);
