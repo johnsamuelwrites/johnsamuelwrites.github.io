@@ -11,6 +11,8 @@ moncanvastexte();
 ligne("ligne1", true);
 ligne("ligne2", false);
 ligne3();
+ligne4("lignes4", false);
+ligne4("lignes5", true);
 
 lignes1();
 lignes2();
@@ -29,6 +31,10 @@ rectangle("rectangle1", false);
 rectangle("rectangle2", true);
 triangle("triangle1", false);
 triangle("triangle2", true);
+fillStyleRectangle("fillStyleRectangle");
+fillStyleRectangleTransparence("fillStyleRectangleTransparence");
+fillStyleRectangleGradient("fillStyleRectangleGradient");
+fillStyleRectangleRadialGradient("fillStyleRectangleRadialGradient");
 
 hexagone("hexagone1", false);
 hexagone("hexagone2", true);

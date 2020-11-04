@@ -576,3 +576,67 @@ function path2dcercle(nom, stroke=false, corners=true) {
     drawCorners(context, id);
   }
 }
+
+function ligne4(id, moveTo) {
+  var id = document.getElementById(id);
+  var context = id.getContext("2d");
+  context.beginPath();
+  context.strokeStyle =  "#00b33c";
+  context.lineWidth = 10;
+  context.moveTo(0,0);
+  context.lineTo(250,400);
+  if (moveTo) {
+    context.moveTo(150,150);
+  }
+  context.arc(100,150, 50, 0, 2*Math.PI);
+  context.stroke();
+}
+
+function fillStyleRectangle(id) {
+  var id = document.getElementById(id);
+  var context = id.getContext("2d");
+  context.fillStyle =  "green";
+  context.fillRect(10, 10, 140,140);
+  context.fillStyle =  "#00b33c";
+  context.fillRect(150, 10, 140,140);
+  context.fillStyle =  "rgb(100,255,100)";
+  context.fillRect(10, 150, 140, 140);
+  context.fillStyle =  "rgba(100,255,100,0.4)";
+  context.fillRect(150, 150, 140, 140);
+}
+
+function fillStyleRectangleTransparence(id) {
+  var id = document.getElementById(id);
+  var context = id.getContext("2d");
+  context.fillStyle =  "red";
+  context.arc(150,150, 50, 0, 2*Math.PI);
+  context.fill();
+  context.fillStyle =  "rgba(100,255,100,1)";
+  context.fillRect(10, 10, 140,140);
+  context.fillStyle =  "rgba(100,255,100,0.7)";
+  context.fillRect(150, 10, 140,140);
+  context.fillStyle =  "rgba(100,255,100,0.5)";
+  context.fillRect(10, 150, 140, 140);
+  context.fillStyle =  "rgba(100,255,100,0.3)";
+  context.fillRect(150, 150, 140, 140);
+}
+function fillStyleRectangleGradient(id) {
+  var id = document.getElementById(id);
+  var context = id.getContext("2d");
+  var lingradient = context.createLinearGradient(10, 10, 10, 340);
+  lingradient.addColorStop(0, 'blue');
+  lingradient.addColorStop(0.5, '#ff0000');
+  lingradient.addColorStop(1, '#ffffff');
+  context.fillStyle = lingradient; 
+  context.fillRect(10, 10, 240,340);
+}
+function fillStyleRectangleRadialGradient(id) {
+  var id = document.getElementById(id);
+  var context = id.getContext("2d");
+  var radialgradient = context.createRadialGradient(140, 140, 10, 140, 140, 100);
+  radialgradient.addColorStop(0, 'blue');
+  radialgradient.addColorStop(0.5, 'green');
+  radialgradient.addColorStop(1, '#fff');
+  context.fillStyle = radialgradient; 
+  context.fillRect(10, 10, 240,340);
+}
