@@ -1,3 +1,27 @@
+# v0.8
+===============================================================================
+
+* Course material for 2020-2021 (first semester)
+  * Artificial Intelligence and Machine Learning
+  * Systems programming: Python
+  * Exercises in C Programming
+  * Exercises in Algorithms and C Programming 
+  * Updated slides on HTML Canvas and Big Data
+* Slides on DebConf 2020 and meeting
+
+# v0.7
+===============================================================================
+
+* Course material for 2019-2020
+* Links to pages on other languages
+
+# v0.6
+===============================================================================
+
+* Course material for 2018-2019
+* Mobile friendly version
+
+
 # v0.5
 ===============================================================================
 
