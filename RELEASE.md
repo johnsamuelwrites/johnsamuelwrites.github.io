@@ -1,3 +1,15 @@
+# v0.9
+===============================================================================
+
+* Course material for 2020-2021 (second semester)
+  * Massive data processing
+* Slides for Wiki Workshop 2021, ContribuLing 2021,...
+* Update CV
+  * Conference and journal proceedings, posters
+  * Project mentorship
+  * Conferences attended
+* Update blog, books read,...
+
 # v0.8
 ===============================================================================
 
