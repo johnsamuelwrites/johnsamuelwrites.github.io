@@ -1,5 +1,10 @@
+#
+# SPDX-FileCopyrightText: 2020 John Samuel <johnsamuelwrites@gmail.com>
+#
+# SPDX-License-Identifier: GPL-3.0-or-later
+#
+
 # Generate an upto date list of articles in reverse chronological order 
-# Author: John Samuel
 
 '''
   This program does not take any input from the command line

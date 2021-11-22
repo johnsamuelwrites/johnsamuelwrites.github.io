@@ -1,5 +1,9 @@
-# Change the style of one or more HTML files 
-# Author: John Samuel
+#
+# SPDX-FileCopyrightText: 2020 John Samuel <johnsamuelwrites@gmail.com>
+#
+# SPDX-License-Identifier: GPL-3.0-or-later
+#
+# Change the style of one or more HTML files
 
 '''
   This will take one or more input HTML files and a single CSS file.

@@ -1,5 +1,10 @@
+#
+# SPDX-FileCopyrightText: 2020 John Samuel <johnsamuelwrites@gmail.com>
+#
+# SPDX-License-Identifier: GPL-3.0-or-later
+#
+
 # Check the presence of broken links in one or more HTML files 
-# Author: John Samuel
 
 '''
   This will take one or more input HTML files.

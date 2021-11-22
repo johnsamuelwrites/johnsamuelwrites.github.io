@@ -1,5 +1,9 @@
+#
+# SPDX-FileCopyrightText: 2020 John Samuel <johnsamuelwrites@gmail.com>
+#
+# SPDX-License-Identifier: GPL-3.0-or-later
+#
 # Add, update and extract metadata (RDFa, JSON-LD, microdata) of a web page
-# Author: John Samuel
 
 import extruct
 import requests
