@@ -6,8 +6,6 @@
 
 from pygit2 import Repository, GIT_BLAME_TRACK_COPIES_SAME_FILE, GIT_SORT_TOPOLOGICAL, GIT_SORT_REVERSE
 
-"""
-'author', 'commit_time', 'commit_time_offset', 'committer', 'filemode', 'gpg_signature', 'hex', 'id', 'message', 'message_encoding', 'name', 'oid', 'parent_ids', 'parents', 'peel', 'raw_message', 'raw_name', 'read_raw', 'short_id', 'tree', 'tree_id', 'type', 'type_str'"""
 
 def get_first_latest_modification(filepath):
   repo = Repository('.git')

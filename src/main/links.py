@@ -4,7 +4,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 #
 
-# Check the presence of broken links in one or more HTML files 
+# Check the presence of broken links in one or more HTML files
 
 '''
   This will take one or more input HTML files.
@@ -16,33 +16,35 @@ from bs4 import BeautifulSoup
 import os
 import requests
 
+
 def check_broken_links_file(filepath):
-  with open(filepath,"r") as inputfile:
-    content = inputfile.read()
-    parsed_html = BeautifulSoup(content, features='html.parser')
-    for link in parsed_html.find_all('a'):
-      source = link.get('href')
-      try:
-        if ( source.startswith('http') or
-             source.startswith('https')):
-          headers={'User-Agent': 'Mozilla/5.0'}
-          request = requests.get(source, headers=headers)
-          # Try to access the web page and check the status code
-          if not request.status_code == 200:
-            print("====== "+filepath + " ======")
-            print(str(request.status_code) + ":  " + source)
-        elif not source.startswith('#'):
-           dirpath = os.path.dirname(os.path.abspath(filepath))
-           if not os.path.isfile(dirpath + "/" + source):
-             print("====== "+filepath + " ======")
-             print(source)
-      except Exception as e:
-        print("Error: in accessing source: " + source + ", "+ str(e))
+    with open(filepath, "r") as inputfile:
+        content = inputfile.read()
+        parsed_html = BeautifulSoup(content, features='html.parser')
+        for link in parsed_html.find_all('a'):
+            source = link.get('href')
+            try:
+                if (source.startswith('http') or
+                        source.startswith('https')):
+                    headers = {'User-Agent': 'Mozilla/5.0'}
+                    request = requests.get(source, headers=headers)
+                    # Try to access the web page and check the status code
+                    if not request.status_code == 200:
+                        print("====== "+filepath + " ======")
+                        print(str(request.status_code) + ":  " + source)
+                elif not source.startswith('#'):
+                    dirpath = os.path.dirname(os.path.abspath(filepath))
+                    if not os.path.isfile(dirpath + "/" + source):
+                        print("====== "+filepath + " ======")
+                        print(source)
+            except Exception as e:
+                print("Error: in accessing source: " + source + ", " + str(e))
 
 
 def check_broken_links_files(filepaths):
-  for filepath in filepaths:
-    check_broken_links_file(filepath)
+    for filepath in filepaths:
+        check_broken_links_file(filepath)
+
 
 parser = argparse.ArgumentParser(description='check if links are broken')
 parser.add_argument('files', metavar='F', type=str, nargs='+',
@@ -52,8 +54,7 @@ args = parser.parse_args()
 
 # style file and HTML file
 if(len(args.files) < 1):
-  parser.print_usage()
-  exit(1)
+    parser.print_usage()
+    exit(1)
 
 check_broken_links_files(args.files)
-
