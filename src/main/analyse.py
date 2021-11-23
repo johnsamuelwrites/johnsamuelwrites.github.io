@@ -83,14 +83,22 @@ class HTMLTextAnalysis:
 
 class WordEmbedding:
     @staticmethod
-    def get_word2vec_model_from_sentences(sentences):
-        model = Word2Vec(sentences=sentences, vector_size=100,
-                         window=5, min_count=1, workers=4)
+    def get_word2vec_model_from_sentences(sentences, skipgram=False):
+        """By default, this approach uses CBOW model
+        """
+        model = None
+        if skipgram:
+            model = Word2Vec(sentences=sentences, vector_size=100,
+                             window=2, min_count=1, workers=4, sg=1)
+        else:
+            model = Word2Vec(sentences=sentences, vector_size=100,
+                             window=2, min_count=1, workers=4)
         return model
 
     @staticmethod
-    def get_word2vec_model_from_HTMLfile(article):
+    def get_word2vec_model_from_HTMLfile(article, skipgram=False):
         sentences = HTMLTextAnalysis.get_sentences_with_tokens(
             article, False, True, True)
-        model = WordEmbedding.get_word2vec_model_from_sentences(sentences)
+        model = WordEmbedding.get_word2vec_model_from_sentences(
+            sentences, skipgram)
         return model
