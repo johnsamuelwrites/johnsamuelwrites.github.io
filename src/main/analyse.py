@@ -15,6 +15,94 @@ from collections import Counter
 #import nltk
 # nltk.download('stopwords')
 
+class WebsiteAnalysis:
+    directories = {}
+    directories["en"] = [
+       "en",
+        "en/blog",
+        "en/photography",
+        "en/research",
+        "en/teaching",
+        "en/writings",
+        "en/linguistics",
+        "en/programming",
+        "en/slides",
+        "en/technology",
+        "en/travel",
+        "en/slides/2017/Akademy/html",
+        "en/slides/2017/CapitoleduLibre/html",
+        "en/slides/2017/XLDB/html",
+        "en/slides/2018/CLEF",
+        "en/slides/2018/SWIB",
+        "en/slides/2018/UNILOG",
+        "en/slides/2018/WikimediaHackathon",
+        "en/slides/2018/WikiWorkshop",
+        "en/slides/2019/Catai",
+        "en/slides/2019/WikidataCon",
+        "en/slides/2020/DebConf",
+        "en/slides/2020/DublinCoreMeeting",
+        "en/slides/2020/EUvsVirus",
+        "en/slides/2021/ContribuLing",
+        "en/slides/2021/DCMIVirtual",
+        "en/slides/2021/OpenSym",
+        "en/slides/2021/WikidataCon",
+        "en/slides/2021/WikiWorkshop"
+    ]
+    
+    directories["fr"] = [
+        "fr",
+        "fr/blog",
+        "fr/enseignement",
+        "fr/linguistique",
+        "fr/programmation",
+        "fr/technologie",
+        "fr/voyages",
+        "fr/ecrits",
+        "fr/photographie",
+        "fr/recherche"
+    ]
+    
+    directories["ml"] = [
+        "ml"
+    ]
+    
+    directories["hi"] = [
+        "hi"
+    ]
+    
+    directories["pa"] = [
+        "pa"
+    ]
+    exclude_files = {
+        "en/template.html",
+        "fr/template.html",
+        "en/slides/2017/Akademy/html/kde-wikidata.html",
+        "fr/blog/index.html",
+        "fr/linguistique/index.html",
+        "fr/programmation/index.html",
+        "fr/technologie/index.html",
+        "fr/voyages/index.html",
+        "fr/ecrits/index.html",
+        "en/blog/template.html",
+        "en/photography/template.html",
+        "en/research/template.html",
+        "en/teaching/template.html",
+        "en/writings/template.html",
+        "en/linguistics/template.html",
+        "en/programming/template.html",
+        "en/slides/template.html",
+        "en/technology/template.html",
+        "en/travel/template.html",
+        "fr/blog/template.html",
+        "fr/enseignement/template.html",
+        "fr/linguistique/template.html",
+        "fr/programmation/template.html",
+        "fr/technologie/template.html",
+        "fr/voyages/template.html",
+        "fr/ecrits/template.html",
+        "fr/photographie/template.html",
+        "fr/recherche/template.html",
+    }
 
 class HTMLTextAnalysis:
     @staticmethod
