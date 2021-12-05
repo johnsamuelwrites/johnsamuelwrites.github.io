@@ -15,10 +15,11 @@ from collections import Counter
 #import nltk
 # nltk.download('stopwords')
 
+
 class WebsiteAnalysis:
     directories = {}
     directories["en"] = [
-       "en",
+        "en",
         "en/blog",
         "en/photography",
         "en/research",
@@ -84,7 +85,7 @@ class WebsiteAnalysis:
         "en/slides/2021/WikidataCon",
         "en/slides/2021/WikiWorkshop"
     ]
-    
+
     directories["fr"] = [
         "fr",
         "fr/blog",
@@ -136,15 +137,15 @@ class WebsiteAnalysis:
         "fr/enseignement/cours/2021/TDM",
         "fr/enseignement/cours/2021/TLI",
     ]
-    
+
     directories["ml"] = [
         "ml"
     ]
-    
+
     directories["hi"] = [
         "hi"
     ]
-    
+
     directories["pa"] = [
         "pa"
     ]
@@ -184,6 +185,7 @@ class WebsiteAnalysis:
 
     def get_excluded_files():
         return WebsiteAnalysis.exclude_files
+
 
 class HTMLTextAnalysis:
     @staticmethod

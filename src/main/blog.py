@@ -23,6 +23,9 @@ from os import remove
 from feedgen.feed import FeedGenerator
 from pytz import timezone
 from analyse import WebsiteAnalysis
+import pandas
+import numpy as np
+
 
 def replace_name(title):
     title = title.replace("John Samuel", "")
@@ -33,11 +36,8 @@ def replace_name(title):
 
 
 def check_for_modified_articles():
-    articles = {}
-    article_and_creation_time = {}
+    article_metadata = []
     articleset = set()
-    modification_time_list = []
-    creation_time_list = []
     directories = WebsiteAnalysis.get_directories()
     for language in directories:
         for directory in directories[language]:
@@ -52,16 +52,15 @@ def check_for_modified_articles():
                             if("NOTE: Article in Progress" not in f.read()):
                                 first, latest = get_first_latest_modification(
                                     filepath)
-                                bisect.insort(modification_time_list, latest)
-                                bisect.insort(creation_time_list, first)
-                                article_and_creation_time[filepath] = first
-                                if latest not in articles:
-                                    articles[latest] = {filepath}
-                                else:
-                                    articles[latest].add(filepath)
+                                article_metadata.append(
+                                    [filepath, first, latest])
 
             except Exception as e:
                 print("Error: in file: " + filepath + ": " + str(e))
+
+    df = pandas.DataFrame(article_metadata, columns=[
+                          "filepath", "first", "latest"])
+    df = df.sort_values(["latest", "first"], ascending=[False, False])
 
     fg = FeedGenerator()
     fg.id("https://johnsamuel.info")
@@ -75,34 +74,36 @@ def check_for_modified_articles():
     for lang in ["en", "fr", "hi", "pa", "ml"]:
         count[lang] = 1
         articlelist[lang] = "<ul vocab='http://schema.org/' typeof='ItemList'>"
-    for time in modification_time_list[::-1]:
-        for article in articles[time]:
-            title = None
-            if (article in articleset):
-                continue
-            articleset.add(article)
-            with open(article, "r") as inputfile:
-                creation_time = article_and_creation_time[article]
-                content = inputfile.read()
-                parsed_html = BeautifulSoup(content, features='html.parser')
-                for link in parsed_html.find_all('title'):
-                    title = replace_name(link.text)
-                    title = title.replace(":", "")
-                    title = title.strip()
-                    # display modification date of article along with the title
-                    for lang in ["en", "fr", "hi", "pa", "ml"]:
-                        if article.startswith(lang):
-                            articlelist[lang] = articlelist[lang] + "\n<li property='itemListElement' typeof='ListItem'>" + '<meta typeof="ListItem" property="position" content="' + str(
-                                count[lang]) + '"/>' + "<a property='item' typeof='WebPage' href='../" + article + "'>" + "<span property='name'>" + title + "</span></a>" + " <span class='date'>(" + datetime.fromtimestamp(creation_time).strftime('%d %B %Y') + ";</span>" + " <span class='date'>" + datetime.fromtimestamp(time).strftime('%d %B %Y') + ")</span></li>"
-                            count[lang] = count[lang] + 1
-                            break
-                    fe = fg.add_entry(order='append')
-                    fe.id("https://johnsamuel.info/" + article.strip())
-                    fe.title(title.strip())
-                    fe.pubDate(datetime.fromtimestamp(
-                        time, tz=timezone('Europe/Amsterdam')))
-                    fe.description(title)
-                    fe.link(href="https://johnsamuel.info/"+article.strip())
+    for index, row in df.iterrows():
+        article = row["filepath"]
+
+        title = None
+        if (article in articleset):
+            continue
+        articleset.add(article)
+        with open(article, "r") as inputfile:
+            creation_time = row["first"]
+            time = row["latest"]
+            content = inputfile.read()
+            parsed_html = BeautifulSoup(content, features='html.parser')
+            for link in parsed_html.find_all('title'):
+                title = replace_name(link.text)
+                title = title.replace(":", "")
+                title = title.strip()
+                # display modification date of article along with the title
+                for lang in ["en", "fr", "hi", "pa", "ml"]:
+                    if article.startswith(lang):
+                        articlelist[lang] = articlelist[lang] + "\n<li property='itemListElement' typeof='ListItem'>" + '<meta typeof="ListItem" property="position" content="' + str(
+                            count[lang]) + '"/>' + "<a property='item' typeof='WebPage' href='../" + article + "'>" + "<span property='name'>" + title + "</span></a>" + " <span class='date'>(" + datetime.fromtimestamp(creation_time).strftime('%d %B %Y') + ";</span>" + " <span class='date'>" + datetime.fromtimestamp(time).strftime('%d %B %Y') + ")</span></li>"
+                        count[lang] = count[lang] + 1
+                        break
+                fe = fg.add_entry(order='append')
+                fe.id("https://johnsamuel.info/" + article.strip())
+                fe.title(title.strip())
+                fe.pubDate(datetime.fromtimestamp(
+                    time, tz=timezone('Europe/Amsterdam')))
+                fe.description(title)
+                fe.link(href="https://johnsamuel.info/"+article.strip())
 
     for lang in ["en", "fr", "hi", "pa", "ml"]:
         articlelist[lang] = articlelist[lang] + "\n</ul>"
