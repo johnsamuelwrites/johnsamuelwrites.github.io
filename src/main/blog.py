@@ -34,8 +34,10 @@ def replace_name(title):
 
 def check_for_modified_articles():
     articles = {}
+    article_and_creation_time = {}
     articleset = set()
     modification_time_list = []
+    creation_time_list = []
     directories = WebsiteAnalysis.get_directories()
     for language in directories:
         for directory in directories[language]:
@@ -51,6 +53,8 @@ def check_for_modified_articles():
                                 first, latest = get_first_latest_modification(
                                     filepath)
                                 bisect.insort(modification_time_list, latest)
+                                bisect.insort(creation_time_list, first)
+                                article_and_creation_time[filepath] = first
                                 if latest not in articles:
                                     articles[latest] = {filepath}
                                 else:
@@ -78,6 +82,7 @@ def check_for_modified_articles():
                 continue
             articleset.add(article)
             with open(article, "r") as inputfile:
+                creation_time = article_and_creation_time[article]
                 content = inputfile.read()
                 parsed_html = BeautifulSoup(content, features='html.parser')
                 for link in parsed_html.find_all('title'):
@@ -88,7 +93,7 @@ def check_for_modified_articles():
                     for lang in ["en", "fr", "hi", "pa", "ml"]:
                         if article.startswith(lang):
                             articlelist[lang] = articlelist[lang] + "\n<li property='itemListElement' typeof='ListItem'>" + '<meta typeof="ListItem" property="position" content="' + str(
-                                count[lang]) + '"/>' + "<a property='item' typeof='WebPage' href='../" + article + "'>" + "<span property='name'>" + title + "</span></a>" + " <span class='date'>" + datetime.fromtimestamp(time).strftime('%d %B %Y') + "</span></li>"
+                                count[lang]) + '"/>' + "<a property='item' typeof='WebPage' href='../" + article + "'>" + "<span property='name'>" + title + "</span></a>" + " <span class='date'>(" + datetime.fromtimestamp(creation_time).strftime('%d %B %Y') + ";</span>" + " <span class='date'>" + datetime.fromtimestamp(time).strftime('%d %B %Y') + ")</span></li>"
                             count[lang] = count[lang] + 1
                             break
                     fe = fg.add_entry(order='append')
