@@ -103,6 +103,42 @@ class WebsiteAnalysis:
         "fr/photographie/template.html",
         "fr/recherche/template.html",
     }
+    exclude_files = {
+        "en/template.html",
+        "fr/template.html",
+        "en/slides/2017/Akademy/html/kde-wikidata.html",
+        "fr/blog/index.html",
+        "fr/linguistique/index.html",
+        "fr/programmation/index.html",
+        "fr/technologie/index.html",
+        "fr/voyages/index.html",
+        "fr/ecrits/index.html",
+        "en/blog/template.html",
+        "en/photography/template.html",
+        "en/research/template.html",
+        "en/teaching/template.html",
+        "en/writings/template.html",
+        "en/linguistics/template.html",
+        "en/programming/template.html",
+        "en/slides/template.html",
+        "en/technology/template.html",
+        "en/travel/template.html",
+        "fr/blog/template.html",
+        "fr/enseignement/template.html",
+        "fr/linguistique/template.html",
+        "fr/programmation/template.html",
+        "fr/technologie/template.html",
+        "fr/voyages/template.html",
+        "fr/ecrits/template.html",
+        "fr/photographie/template.html",
+        "fr/recherche/template.html",
+    }
+
+    def get_directories():
+        return WebsiteAnalysis.directories
+
+    def get_excluded_files():
+        return WebsiteAnalysis.exclude_files
 
 class HTMLTextAnalysis:
     @staticmethod

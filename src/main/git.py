@@ -14,7 +14,6 @@ def get_first_latest_modification(filepath):
   blame = repo.blame(filepath, flags=GIT_BLAME_TRACK_COPIES_SAME_FILE)
   for b in blame:
     commit = repo.get(b.final_commit_id)
-    print(dir(commit))
     if not latest:
       latest = commit.commit_time
     elif latest < commit.commit_time:

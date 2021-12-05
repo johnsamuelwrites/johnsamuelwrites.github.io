@@ -22,89 +22,7 @@ from shutil import copy
 from os import remove
 from feedgen.feed import FeedGenerator
 from pytz import timezone
-
-directories = {}
-directories["en"] = [
-    "en",
-    "en/blog",
-    "en/photography",
-    "en/research",
-    "en/teaching",
-    "en/writings",
-    "en/linguistics",
-    "en/programming",
-    "en/slides",
-    "en/technology",
-    "en/travel",
-    "en/slides/2017/Akademy/html",
-    "en/slides/2017/CapitoleduLibre/html",
-    "en/slides/2017/XLDB/html",
-    "en/slides/2018/CLEF",
-    "en/slides/2018/SWIB",
-    "en/slides/2018/UNILOG",
-    "en/slides/2018/WikimediaHackathon",
-    "en/slides/2018/WikiWorkshop",
-    "en/slides/2019/Catai",
-    "en/slides/2019/WikidataCon",
-    "en/slides/2020/EUvsVirus"
-]
-
-directories["fr"] = [
-    "fr",
-    "fr/blog",
-    "fr/enseignement",
-    "fr/linguistique",
-    "fr/programmation",
-    "fr/technologie",
-    "fr/voyages",
-    "fr/ecrits",
-    "fr/photographie",
-    "fr/recherche"
-]
-
-directories["ml"] = [
-    "ml"
-]
-
-directories["hi"] = [
-    "hi"
-]
-
-directories["pa"] = [
-    "pa"
-]
-
-exclude_files = {
-    "en/template.html",
-    "fr/template.html",
-    "en/slides/2017/Akademy/html/kde-wikidata.html",
-    "fr/blog/index.html",
-    "fr/linguistique/index.html",
-    "fr/programmation/index.html",
-    "fr/technologie/index.html",
-    "fr/voyages/index.html",
-    "fr/ecrits/index.html",
-    "en/blog/template.html",
-    "en/photography/template.html",
-    "en/research/template.html",
-    "en/teaching/template.html",
-    "en/writings/template.html",
-    "en/linguistics/template.html",
-    "en/programming/template.html",
-    "en/slides/template.html",
-    "en/technology/template.html",
-    "en/travel/template.html",
-    "fr/blog/template.html",
-    "fr/enseignement/template.html",
-    "fr/linguistique/template.html",
-    "fr/programmation/template.html",
-    "fr/technologie/template.html",
-    "fr/voyages/template.html",
-    "fr/ecrits/template.html",
-    "fr/photographie/template.html",
-    "fr/recherche/template.html",
-}
-
+from analyse import WebsiteAnalysis
 
 def replace_name(title):
     title = title.replace("John Samuel", "")
@@ -118,6 +36,7 @@ def check_for_modified_articles():
     articles = {}
     articleset = set()
     modification_time_list = []
+    directories = WebsiteAnalysis.get_directories()
     for language in directories:
         for directory in directories[language]:
             try:
@@ -126,7 +45,7 @@ def check_for_modified_articles():
                     if ".html" not in filename:
                         continue
                     filepath = directory+"/"+filename
-                    if(os.path.isfile(filepath) and filepath not in exclude_files):
+                    if(os.path.isfile(filepath) and filepath not in WebsiteAnalysis.get_excluded_files()):
                         with open(filepath, "r") as f:
                             if("NOTE: Article in Progress" not in f.read()):
                                 first, latest = get_first_latest_modification(
