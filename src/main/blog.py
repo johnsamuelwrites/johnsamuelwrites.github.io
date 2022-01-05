@@ -28,10 +28,10 @@ import numpy as np
 
 
 def replace_name(title):
-    title = title.replace("John Samuel", "")
-    title = title.replace("ജോൺ ശമൂവേൽ", "")
-    title = title.replace("ਜੌਨ ਸੈਮੂਅਲ", "")
-    title = title.replace("जॉन शमुऐल", "")
+    title = title.replace(": John Samuel", "")
+    title = title.replace(": ജോൺ ശമൂവേൽ", "")
+    title = title.replace(": ਜੌਨ ਸੈਮੂਅਲ", "")
+    title = title.replace(": जॉन शमुऐल", "")
     return title
 
 
@@ -88,7 +88,6 @@ def check_for_modified_articles():
             parsed_html = BeautifulSoup(content, features='html.parser')
             for link in parsed_html.find_all('title'):
                 title = replace_name(link.text)
-                title = title.replace(":", "")
                 title = title.strip()
                 # display modification date of article along with the title
                 for lang in ["en", "fr", "hi", "pa", "ml"]:
