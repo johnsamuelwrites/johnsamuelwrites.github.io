@@ -1,6 +1,6 @@
 John Samuel
 ===========
-Content and evolution of official website of John Samuel.
+Content and evolution of the official website of John Samuel.
 
 ## Documentation
 * [Wiki](documentation/wiki/en/johnsamuel.md  "Wiki")
