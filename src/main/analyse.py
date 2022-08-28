@@ -69,6 +69,9 @@ class WebsiteAnalysis:
         "en/teaching/courses/2021/MachineLearning",
         "en/teaching/courses/2021/MDP",
         "en/teaching/courses/2021/SysProg",
+        "en/teaching/courses/2022/Algorithms",
+        "en/teaching/courses/2022/SysProg",
+        "en/teaching/courses/2022/C",
         "en/slides/2017/Akademy/html",
         "en/slides/2017/CapitoleduLibre/html",
         "en/slides/2017/XLDB/html",
@@ -139,6 +142,9 @@ class WebsiteAnalysis:
         "fr/enseignement/cours/2021/ProgSys",
         "fr/enseignement/cours/2021/TDM",
         "fr/enseignement/cours/2021/TLI",
+        "fr/enseignement/cours/2022/Algorithmes",
+        "fr/enseignement/cours/2022/ProgSys",
+        "fr/enseignement/cours/2022/C",
     ]
 
     directories["ml"] = [
