@@ -12,7 +12,7 @@ from nltk.util import ngrams
 from collections import Counter
 
 # Download the stopwords
-#import nltk
+# import nltk
 # nltk.download('stopwords')
 
 
@@ -89,7 +89,7 @@ class WebsiteAnalysis:
         "en/slides/2021/DCMIVirtual",
         "en/slides/2021/OpenSym",
         "en/slides/2021/WikidataCon",
-        "en/slides/2021/WikiWorkshop"
+        "en/slides/2021/WikiWorkshop",
     ]
 
     directories["fr"] = [
@@ -147,17 +147,11 @@ class WebsiteAnalysis:
         "fr/enseignement/cours/2022/C",
     ]
 
-    directories["ml"] = [
-        "ml"
-    ]
+    directories["ml"] = ["ml"]
 
-    directories["hi"] = [
-        "hi"
-    ]
+    directories["hi"] = ["hi"]
 
-    directories["pa"] = [
-        "pa"
-    ]
+    directories["pa"] = ["pa"]
     exclude_files = {
         "en/template.html",
         "fr/template.html",
@@ -198,12 +192,14 @@ class WebsiteAnalysis:
 
 class HTMLTextAnalysis:
     @staticmethod
-    def get_sentences_with_tokens(filepath, lowercase=True, remove_punctuation=False, remove_stopwords=False):
+    def get_sentences_with_tokens(
+        filepath, lowercase=True, remove_punctuation=False, remove_stopwords=False
+    ):
         sentences = []
-        stopwords_set = set(stopwords.words('english'))
+        stopwords_set = set(stopwords.words("english"))
         with open(filepath, "r") as inputfile:
             content = inputfile.read()
-            parsed_html = BeautifulSoup(content, features='html.parser')
+            parsed_html = BeautifulSoup(content, features="html.parser")
 
             text = parsed_html.body.get_text()
             for sentence in sent_tokenize(text):
@@ -221,12 +217,14 @@ class HTMLTextAnalysis:
         return sentences
 
     @staticmethod
-    def get_tokens(filepath, lowercase=True, remove_punctuation=False, remove_stopwords=False):
+    def get_tokens(
+        filepath, lowercase=True, remove_punctuation=False, remove_stopwords=False
+    ):
         tokens = []
-        stopwords_set = set(stopwords.words('english'))
+        stopwords_set = set(stopwords.words("english"))
         with open(filepath, "r") as inputfile:
             content = inputfile.read()
-            parsed_html = BeautifulSoup(content, features='html.parser')
+            parsed_html = BeautifulSoup(content, features="html.parser")
 
             text = parsed_html.body.get_text()
             for sentence in sent_tokenize(text):
@@ -242,43 +240,51 @@ class HTMLTextAnalysis:
         return tokens
 
     @staticmethod
-    def get_distinct_tokens(filepath, lowercase=True, remove_punctuation=False, remove_stopwords=False):
+    def get_distinct_tokens(
+        filepath, lowercase=True, remove_punctuation=False, remove_stopwords=False
+    ):
         tokens = HTMLTextAnalysis.get_tokens(filepath, lowercase)
         distinct_tokens = list(set(tokens))
-        return(distinct_tokens)
+        return distinct_tokens
 
     @staticmethod
     def get_ngrams(article, n=2):
         tokens = HTMLTextAnalysis.get_tokens(article, False, True, True)
         ngrams_list = ngrams(tokens, n)
-        return (ngrams_list)
+        return ngrams_list
 
     @staticmethod
     def get_ngrams_frequency(article, n=2):
         tokens = HTMLTextAnalysis.get_tokens(article, False, True, True)
         ngrams_list = ngrams(tokens, n)
         frequency = Counter(ngrams_list)
-        return (frequency)
+        return frequency
 
 
 class WordEmbedding:
     @staticmethod
     def get_word2vec_model_from_sentences(sentences, skipgram=False):
-        """By default, this approach uses CBOW model
-        """
+        """By default, this approach uses CBOW model"""
         model = None
         if skipgram:
-            model = Word2Vec(sentences=sentences, vector_size=100,
-                             window=2, min_count=1, workers=4, sg=1)
+            model = Word2Vec(
+                sentences=sentences,
+                vector_size=100,
+                window=2,
+                min_count=1,
+                workers=4,
+                sg=1,
+            )
         else:
-            model = Word2Vec(sentences=sentences, vector_size=100,
-                             window=2, min_count=1, workers=4)
+            model = Word2Vec(
+                sentences=sentences, vector_size=100, window=2, min_count=1, workers=4
+            )
         return model
 
     @staticmethod
     def get_word2vec_model_from_HTMLfile(article, skipgram=False):
         sentences = HTMLTextAnalysis.get_sentences_with_tokens(
-            article, False, True, True)
-        model = WordEmbedding.get_word2vec_model_from_sentences(
-            sentences, skipgram)
+            article, False, True, True
+        )
+        model = WordEmbedding.get_word2vec_model_from_sentences(sentences, skipgram)
         return model

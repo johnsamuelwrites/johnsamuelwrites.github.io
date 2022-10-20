@@ -17,14 +17,10 @@ def enumerate_slides(filename):
     count = 1
 
     # Setting up regular expressions
-    regex1 = re.compile(r'<section class="slide" id="slide[0-9]*">.*$',
-                        re.IGNORECASE)
-    regex2 = re.compile(r'<div class="navigation">[0-9]*',
-                        re.IGNORECASE)
-    regex3 = re.compile(r'<a class="prev" href="#slide[0-9]*">',
-                        re.IGNORECASE)
-    regex4 = re.compile(r'<a class="next" href="#slide[0-9]*">',
-                        re.IGNORECASE)
+    regex1 = re.compile(r'<section class="slide" id="slide[0-9]*">.*$', re.IGNORECASE)
+    regex2 = re.compile(r'<div class="navigation">[0-9]*', re.IGNORECASE)
+    regex3 = re.compile(r'<a class="prev" href="#slide[0-9]*">', re.IGNORECASE)
+    regex4 = re.compile(r'<a class="next" href="#slide[0-9]*">', re.IGNORECASE)
     with open(filename, "r") as inputfile:
         for line in inputfile:
             # stripping the new line character (to later add it)
@@ -38,30 +34,32 @@ def enumerate_slides(filename):
 
             # Setting up regular expressions
             innersectionline1 = regex1.sub(
-                '<section class="slide" id="slide%d">' % count, line)
-            innersectionline2 = regex2.sub(
-                '<div class="navigation">%d' % count, line)
+                '<section class="slide" id="slide%d">' % count, line
+            )
+            innersectionline2 = regex2.sub('<div class="navigation">%d' % count, line)
             innersectionline3 = regex3.sub(
-                '<a class="prev" href="#slide%d">' % (count-1), line)
+                '<a class="prev" href="#slide%d">' % (count - 1), line
+            )
             newsectionline = regex4.sub(
-                '<a class="next" href="#slide%d">' % (count+1), line)
+                '<a class="next" href="#slide%d">' % (count + 1), line
+            )
 
-            if (line != newsectionline):
+            if line != newsectionline:
                 line = newsectionline
                 # incrementing section number
                 count = count + 1
-            elif (line != innersectionline1):
+            elif line != innersectionline1:
                 line = innersectionline1
-            elif (line != innersectionline2):
+            elif line != innersectionline2:
                 line = innersectionline2
-            elif (line != innersectionline3):
+            elif line != innersectionline3:
                 line = innersectionline3
             else:
                 # No change, but section number need to be incremented
-                if ('<a class="next" href="#slide' in line):
+                if '<a class="next" href="#slide' in line:
                     count = count + 1
 
-            outputfile.write(line+"\n")
+            outputfile.write(line + "\n")
     outputfile.close()
     inputfile.close()
 
@@ -76,9 +74,8 @@ def modify_files(files):
         enumerate_slides(filename)
 
 
-parser = argparse.ArgumentParser(description='Numbering the slides')
-parser.add_argument('files', metavar='F', type=str, nargs='+',
-                    help='HTML file')
+parser = argparse.ArgumentParser(description="Numbering the slides")
+parser.add_argument("files", metavar="F", type=str, nargs="+", help="HTML file")
 
 args = parser.parse_args()
 modify_files(args.files)

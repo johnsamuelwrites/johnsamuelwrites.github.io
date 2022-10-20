@@ -68,11 +68,11 @@ def add_update_metadata(links):
     # Setting up regular expression for json-ld script
     pattern = r'<script type="application\/ld\+json">(\n|.)*script>'
 
-    headpattern = r'<head.*>(\n|.)*<\/head>'
+    headpattern = r"<head.*>(\n|.)*<\/head>"
 
     for link in links:
         # only with files
-        if (not link.startswith("http")):
+        if not link.startswith("http"):
             with open(link, "r") as f:
                 content = f.read()
                 jsonld = json.loads(jsonld_template)
@@ -83,8 +83,8 @@ def add_update_metadata(links):
                 jsonld["dateModified"] = str(datetime.fromtimestamp(latest))
 
                 # get title
-                parsed_html = BeautifulSoup(content, features='html.parser')
-                for titletag in parsed_html.find_all('title'):
+                parsed_html = BeautifulSoup(content, features="html.parser")
+                for titletag in parsed_html.find_all("title"):
                     title = replace_name(titletag.text)
                     title = title.replace(":", "")
                     title = title.strip()
@@ -93,11 +93,13 @@ def add_update_metadata(links):
                 # Care must be taken to ensure the link exists
                 jsonld["url"] = "https://johnsamuel.info/" + link
                 jsonld["headline"] = title
-                scriptjsonld = '<script type="application/ld+json">\n      ' + \
-                    json.dumps(jsonld) + "\n    </script>"
-                if ("application/ld+json" not in content):
-                    content = content.replace(
-                        "</head>", scriptjsonld + "\n  </head>")
+                scriptjsonld = (
+                    '<script type="application/ld+json">\n      '
+                    + json.dumps(jsonld)
+                    + "\n    </script>"
+                )
+                if "application/ld+json" not in content:
+                    content = content.replace("</head>", scriptjsonld + "\n  </head>")
                 else:
                     content = regex.sub(pattern, scriptjsonld, content)
                 outputfile = open("/tmp/temp.html", "w")
@@ -118,7 +120,7 @@ def extract_metadata(links):
         print("=======" + link + "========")
         pp = pprint.PrettyPrinter(indent=2)
         data = None
-        if (link.startswith("http")):
+        if link.startswith("http"):
             r = requests.get(link)
             base_url = get_base_url(r.text, r.url)
             data = extruct.extract(r.text, base_url=base_url)
@@ -129,21 +131,23 @@ def extract_metadata(links):
 
 
 parser = argparse.ArgumentParser(
-    description='set or extract metadata form a URL or a file')
-subparsers = parser.add_subparsers(
-    help='sub-command help', dest='subparser_name')
+    description="set or extract metadata form a URL or a file"
+)
+subparsers = parser.add_subparsers(help="sub-command help", dest="subparser_name")
 
 
 # create the parser for the "extract" command
-parser_extract = subparsers.add_parser('extract', help='extract metadata')
-parser_extract.add_argument('link', metavar='link', type=str, nargs='+',
-                            help='link or paths of html file')
+parser_extract = subparsers.add_parser("extract", help="extract metadata")
+parser_extract.add_argument(
+    "link", metavar="link", type=str, nargs="+", help="link or paths of html file"
+)
 parser_extract.set_defaults(func=extract_metadata)
 
 # create the parser for the "add" command
-parser_add = subparsers.add_parser('add', help='add metadata')
-parser_add.add_argument('link', metavar='link', type=str, nargs='+',
-                        help='link or paths of html file')
+parser_add = subparsers.add_parser("add", help="add metadata")
+parser_add.add_argument(
+    "link", metavar="link", type=str, nargs="+", help="link or paths of html file"
+)
 parser_add.set_defaults(func=add_update_metadata)
 
 args = parser.parse_args()

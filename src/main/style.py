@@ -5,11 +5,11 @@
 #
 # Change the style of one or more HTML files
 
-'''
+"""
   This will take one or more input HTML files and a single CSS file.
   Content between <style> and </style> will be replaced by the contents 
   of the CSS file
-'''
+"""
 
 import argparse
 from shutil import copy
@@ -21,7 +21,7 @@ def change_style(filename, stylefilepath):
     outputfile = open("/tmp/temp.html", "w")
 
     # Setting up regular expression for style
-    pattern = r'<style.*>(\n|.)*style>'
+    pattern = r"<style.*>(\n|.)*style>"
 
     content = ""
     style = ""
@@ -44,21 +44,22 @@ def change_style(filename, stylefilepath):
 
 
 def modify_files(files):
-    inputfiles = files[:len(files)-1]
-    stylefile = files[len(files)-1]
+    inputfiles = files[: len(files) - 1]
+    stylefile = files[len(files) - 1]
     for filename in inputfiles:
         print(filename, stylefile)
         change_style(filename, stylefile)
 
 
-parser = argparse.ArgumentParser(description='change style of HTML file')
-parser.add_argument('files', metavar='F', type=str, nargs='+',
-                    help='HTML CSS style filse')
+parser = argparse.ArgumentParser(description="change style of HTML file")
+parser.add_argument(
+    "files", metavar="F", type=str, nargs="+", help="HTML CSS style filse"
+)
 
 args = parser.parse_args()
 
 # style file and HTML file
-if(len(args.files) < 2):
+if len(args.files) < 2:
     parser.print_usage()
     exit(1)
 modify_files(args.files)

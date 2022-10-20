@@ -4,11 +4,16 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 #
 
-from pygit2 import Repository, GIT_BLAME_TRACK_COPIES_SAME_FILE, GIT_SORT_TOPOLOGICAL, GIT_SORT_REVERSE
+from pygit2 import (
+    Repository,
+    GIT_BLAME_TRACK_COPIES_SAME_FILE,
+    GIT_SORT_TOPOLOGICAL,
+    GIT_SORT_REVERSE,
+)
 
 
 def get_first_latest_modification(filepath):
-    repo = Repository('.git')
+    repo = Repository(".git")
     latest = None
     first = None
     blame = repo.blame(filepath, flags=GIT_BLAME_TRACK_COPIES_SAME_FILE)
@@ -27,14 +32,22 @@ def get_first_latest_modification(filepath):
 
 
 def get_modification_list(filepath):
-    repo = Repository('.git')
+    repo = Repository(".git")
     latest = None
     first = None
     blame = repo.blame(filepath, flags=GIT_BLAME_TRACK_COPIES_SAME_FILE)
     modifications = list()
     for b in blame:
         commit = repo.get(b.final_commit_id)
-        modifications.append((commit.author.name, commit.id, commit.short_id,
-                             commit.commit_time, commit.commit_time_offset, commit.message))
+        modifications.append(
+            (
+                commit.author.name,
+                commit.id,
+                commit.short_id,
+                commit.commit_time,
+                commit.commit_time_offset,
+                commit.message,
+            )
+        )
 
     return modifications

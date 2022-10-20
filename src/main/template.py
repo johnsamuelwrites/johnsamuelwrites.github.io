@@ -6,11 +6,11 @@
 
 # Change the section of one or more HTML files
 
-'''
+"""
   This will take one or more input HTML files and a single CSS file.
   Content between <template> and </template> will be replaced by the contents 
   of the CSS file
-'''
+"""
 
 import argparse
 from shutil import copy
@@ -88,26 +88,27 @@ def add_content(filename, templatefilepath):
 
 
 def modify_files(files):
-    inputfiles = files[:len(files)-1]
-    templatefile = files[len(files)-1]
+    inputfiles = files[: len(files) - 1]
+    templatefile = files[len(files) - 1]
     for filename in inputfiles:
         print(filename, templatefile)
-        patterns = [r'<div class="licence">(\n|.)*?</div>',
-                    r'<div class="separator" id="top">(\n|.)*?</div>',
-                    r'<div class="separator" id="bottom">(\n|.)*?</div>']
+        patterns = [
+            r'<div class="licence">(\n|.)*?</div>',
+            r'<div class="separator" id="top">(\n|.)*?</div>',
+            r'<div class="separator" id="bottom">(\n|.)*?</div>',
+        ]
         add_content(filename, templatefile)
         remove_content(filename, patterns)
         modify_content(filename)
 
 
-parser = argparse.ArgumentParser(description='change section of HTML file')
-parser.add_argument('files', metavar='F', type=str, nargs='+',
-                    help='HTML header file')
+parser = argparse.ArgumentParser(description="change section of HTML file")
+parser.add_argument("files", metavar="F", type=str, nargs="+", help="HTML header file")
 
 args = parser.parse_args()
 
 # template file and HTML file
-if(len(args.files) < 2):
+if len(args.files) < 2:
     parser.print_usage()
     exit(1)
 modify_files(args.files)
