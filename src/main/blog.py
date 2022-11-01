@@ -87,20 +87,21 @@ class Blog:
 
     @staticmethod
     def generate_feed_in_multiple_languages(dataframe, feed_count=10):
-        for lang in WebsiteAnalysis.get_languages(): 
+        for lang in WebsiteAnalysis.get_languages():
             lang_df = dataframe[dataframe["language"] == lang]
             lang_df = lang_df.sort_values(["latest"], ascending=False).head(feed_count)
             Blog.generate_feed_from_dataframe(lang_df, feed_count, "" + lang + "/")
 
     @staticmethod
-    def generate_feed(feed_count=10):
-        df = WebsiteAnalysis.get_articles_list_dataframe()
+    def generate_feed(df, feed_count=10):
         Blog.generate_main_feed(df, feed_count)
         Blog.generate_feed_in_multiple_languages(df, feed_count)
 
     @staticmethod
-    def generate_complete_list_of_articles():
-        df = WebsiteAnalysis.get_articles_list_dataframe()
+    def generate_complete_list_of_articles(df):
+        df = df.sort_values(
+            ["latest", "first", "filepath"], ascending=[False, False, True]
+        )
         articleset = set()
         count = {}
         articlelist = {}
@@ -117,7 +118,7 @@ class Blog:
             with open(article, "r") as inputfile:
                 creation_time = row["first"]
                 time = row["latest"]
-                contehnt = inputfile.read()
+                content = inputfile.read()
                 parsed_html = BeautifulSoup(content, features="html.parser")
                 for link in parsed_html.find_all("title"):
                     title = Blog.replace_name(link.text)
@@ -162,6 +163,28 @@ class Blog:
                 blog.write(content)
             blog.close()
         blogtemplate.close()
+        language_blog_list = {
+            "EnglishArticleList": "en/blog.html",
+            "FrenchArticleList": "fr/blog.html",
+            "MalayalamArticleList": "ml/ബ്ലോഗ്.html",
+            "HindiArticleList": "hi/ब्लॉग.html",
+            "PunjabiArticleList": "pa/ਬਲਾਗ.html",
+        }
+        for language_article_list, blog_filepath in language_blog_list.items():
+            language = blog_filepath[:2]
+            with open("templates/blog/" + language + ".html", "r") as blogtemplate:
+                content = blogtemplate.read()
+                content = content.replace(language_article_list, articlelist[language])
+                with open(blog_filepath, "w") as blog:
+                    blog.write(content)
+                blog.close()
+            blogtemplate.close()
+
+    @staticmethod
+    def generate_feed_and_complete_article_list():
+        df = WebsiteAnalysis.get_articles_list_dataframe()
+        Blog.generate_complete_list_of_articles(df)
+        Blog.generate_feed(df, 20)
 
 
 if len(sys.argv) > 1:
@@ -169,4 +192,4 @@ if len(sys.argv) > 1:
     exit(1)
 
 # Generate the feed of last 10 articles
-Blog.generate_feed(20)
+Blog.generate_feed_and_complete_article_list()
