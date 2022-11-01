@@ -38,9 +38,7 @@ class Blog:
         return title
 
     @staticmethod
-    def generate_feed(feed_count=10):
-        df = WebsiteAnalysis.get_articles_list_dataframe()
-        df = df.sort_values(["latest"], ascending=False).head(feed_count)
+    def generate_feed_from_dataframe(feed_df, feed_count=10, directory=""):
         articleset = set()
         fg = FeedGenerator()
         fg.id("https://johnsamuel.info")
@@ -50,9 +48,9 @@ class Blog:
         fg.language("en")
         fg.link(href="https://johnsamuel.info")
         count = {}
-        for lang in ["en", "fr", "hi", "pa", "ml"]:
+        for lang in WebsiteAnalysis.get_languages():
             count[lang] = 1
-        for index, row in df.iterrows():
+        for index, row in feed_df.iterrows():
             article = row["filepath"]
 
             title = None
@@ -79,15 +77,34 @@ class Blog:
         # Writing the feed
         atomfeed = fg.atom_str(pretty=True)
         rssfeed = fg.rss_str(pretty=True)
-        fg.atom_file("atom.xml")
-        fg.rss_file("rss.xml")
+        fg.atom_file(directory + "atom.xml")
+        fg.rss_file(directory + "rss.xml")
 
+    @staticmethod
+    def generate_main_feed(dataframe, feed_count=10):
+        df = dataframe.sort_values(["latest"], ascending=False).head(feed_count)
+        Blog.generate_feed_from_dataframe(df, feed_count)
+
+    @staticmethod
+    def generate_feed_in_multiple_languages(dataframe, feed_count=10):
+        for lang in WebsiteAnalysis.get_languages(): 
+            lang_df = dataframe[dataframe["language"] == lang]
+            lang_df = lang_df.sort_values(["latest"], ascending=False).head(feed_count)
+            Blog.generate_feed_from_dataframe(lang_df, feed_count, "" + lang + "/")
+
+    @staticmethod
+    def generate_feed(feed_count=10):
+        df = WebsiteAnalysis.get_articles_list_dataframe()
+        Blog.generate_main_feed(df, feed_count)
+        Blog.generate_feed_in_multiple_languages(df, feed_count)
+
+    @staticmethod
     def generate_complete_list_of_articles():
         df = WebsiteAnalysis.get_articles_list_dataframe()
         articleset = set()
         count = {}
         articlelist = {}
-        for lang in ["en", "fr", "hi", "pa", "ml"]:
+        for lang in WebsiteAnalysis.get_languages():
             count[lang] = 1
             articlelist[lang] = "<ul vocab='http://schema.org/' typeof='ItemList'>"
         for index, row in df.iterrows():
@@ -106,7 +123,7 @@ class Blog:
                     title = Blog.replace_name(link.text)
                     title = title.strip()
                     # display modification date of article along with the title
-                    for lang in ["en", "fr", "hi", "pa", "ml"]:
+                    for lang in WebsiteAnalysis.get_languages():
                         if article.startswith(lang):
                             articlelist[lang] = (
                                 articlelist[lang]
@@ -132,7 +149,7 @@ class Blog:
                             count[lang] = count[lang] + 1
                             break
 
-        for lang in ["en", "fr", "hi", "pa", "ml"]:
+        for lang in WebsiteAnalysis.get_languages():
             articlelist[lang] = articlelist[lang] + "\n</ul>"
         with open("templates/blog.html", "r") as blogtemplate:
             content = blogtemplate.read()

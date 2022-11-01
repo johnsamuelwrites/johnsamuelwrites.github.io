@@ -198,10 +198,13 @@ class WebsiteAnalysis:
     def get_directories():
         return WebsiteAnalysis.directories
 
+    def get_languages():
+        return ["en", "fr", "hi", "pa", "ml"]
+
     def get_excluded_files():
         return WebsiteAnalysis.exclude_files
 
-    def get_articles_list_dataframe(main_directory="./"):
+    def get_articles_list_dataframe(main_directory=""):
         article_metadata = []
         directories = WebsiteAnalysis.get_directories()
         for language in directories:
@@ -223,13 +226,20 @@ class WebsiteAnalysis:
                                         filepath, main_directory
                                     )
                                     article_metadata.append(
-                                        [main_directory + filepath, first, latest]
+                                        [
+                                            main_directory + filepath,
+                                            language,
+                                            first,
+                                            latest,
+                                        ]
                                     )
 
                 except Exception as e:
                     print("Error: in file: " + filepath + ": " + str(e))
 
-        df = pandas.DataFrame(article_metadata, columns=["filepath", "first", "latest"])
+        df = pandas.DataFrame(
+            article_metadata, columns=["filepath", "language", "first", "latest"]
+        )
         df = df.sort_values(["latest", "first"], ascending=[False, False])
         return df
 
