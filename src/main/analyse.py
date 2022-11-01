@@ -10,6 +10,9 @@ from gensim.models import Word2Vec, Phrases
 from nltk.corpus import stopwords
 from nltk.util import ngrams
 from collections import Counter
+from git import get_first_latest_modification
+import os
+import pandas
 
 # Download the stopwords
 # import nltk
@@ -69,9 +72,13 @@ class WebsiteAnalysis:
         "en/teaching/courses/2021/MachineLearning",
         "en/teaching/courses/2021/MDP",
         "en/teaching/courses/2021/SysProg",
+        "en/teaching/courses/2022/AI-DeepLearning",
         "en/teaching/courses/2022/Algorithms",
-        "en/teaching/courses/2022/SysProg",
         "en/teaching/courses/2022/C",
+        "en/teaching/courses/2022/DataMining",
+        "en/teaching/courses/2022/InternetTechnologyLanguage",
+        "en/teaching/courses/2022/MachineLearning",
+        "en/teaching/courses/2022/SysProg",
         "en/slides/2017/Akademy/html",
         "en/slides/2017/CapitoleduLibre/html",
         "en/slides/2017/XLDB/html",
@@ -90,6 +97,7 @@ class WebsiteAnalysis:
         "en/slides/2021/OpenSym",
         "en/slides/2021/WikidataCon",
         "en/slides/2021/WikiWorkshop",
+        "en/slides/2022/QueeringWikipedia",
     ]
 
     directories["fr"] = [
@@ -143,8 +151,12 @@ class WebsiteAnalysis:
         "fr/enseignement/cours/2021/TDM",
         "fr/enseignement/cours/2021/TLI",
         "fr/enseignement/cours/2022/Algorithmes",
-        "fr/enseignement/cours/2022/ProgSys",
         "fr/enseignement/cours/2022/C",
+        "fr/enseignement/cours/2022/DataMining",
+        "fr/enseignement/cours/2022/IA-DeepLearning",
+        "fr/enseignement/cours/2022/MachineLearning",
+        "fr/enseignement/cours/2022/ProgSys",
+        "fr/enseignement/cours/2022/TLI",
     ]
 
     directories["ml"] = ["ml"]
@@ -188,6 +200,38 @@ class WebsiteAnalysis:
 
     def get_excluded_files():
         return WebsiteAnalysis.exclude_files
+
+    def get_articles_list_dataframe(main_directory="./"):
+        article_metadata = []
+        directories = WebsiteAnalysis.get_directories()
+        for language in directories:
+            for directory in directories[language]:
+                try:
+                    filepath = None
+                    for filename in os.listdir(main_directory + directory):
+                        if ".html" not in filename:
+                            continue
+                        filepath = directory + "/" + filename
+                        complete_filepath = main_directory + directory + "/" + filename
+                        if (
+                            os.path.isfile(complete_filepath)
+                            and filepath not in WebsiteAnalysis.get_excluded_files()
+                        ):
+                            with open(complete_filepath, "r") as f:
+                                if "NOTE: Article in Progress" not in f.read():
+                                    first, latest = get_first_latest_modification(
+                                        filepath, main_directory
+                                    )
+                                    article_metadata.append(
+                                        [main_directory + filepath, first, latest]
+                                    )
+
+                except Exception as e:
+                    print("Error: in file: " + filepath + ": " + str(e))
+
+        df = pandas.DataFrame(article_metadata, columns=["filepath", "first", "latest"])
+        df = df.sort_values(["latest", "first"], ascending=[False, False])
+        return df
 
 
 class HTMLTextAnalysis:

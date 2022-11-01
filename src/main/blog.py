@@ -28,124 +28,128 @@ import pandas
 import numpy as np
 
 
-def replace_name(title):
-    title = title.replace(": John Samuel", "")
-    title = title.replace(": ജോൺ ശമൂവേൽ", "")
-    title = title.replace(": ਜੌਨ ਸੈਮੂਅਲ", "")
-    title = title.replace(": जॉन शमुऐल", "")
-    return title
+class Blog:
+    @staticmethod
+    def replace_name(title):
+        title = title.replace(": John Samuel", "")
+        title = title.replace(": ജോൺ ശമൂവേൽ", "")
+        title = title.replace(": ਜੌਨ ਸੈਮੂਅਲ", "")
+        title = title.replace(": जॉन शमुऐल", "")
+        return title
 
+    @staticmethod
+    def generate_feed(feed_count=10):
+        df = WebsiteAnalysis.get_articles_list_dataframe()
+        df = df.sort_values(["latest"], ascending=False).head(feed_count)
+        articleset = set()
+        fg = FeedGenerator()
+        fg.id("https://johnsamuel.info")
+        fg.title("John Samuel")
+        fg.description("Personal Blog of John Samuel")
+        fg.author({"name": "John Samuel"})
+        fg.language("en")
+        fg.link(href="https://johnsamuel.info")
+        count = {}
+        for lang in ["en", "fr", "hi", "pa", "ml"]:
+            count[lang] = 1
+        for index, row in df.iterrows():
+            article = row["filepath"]
 
-def check_for_modified_articles():
-    article_metadata = []
-    articleset = set()
-    directories = WebsiteAnalysis.get_directories()
-    for language in directories:
-        for directory in directories[language]:
-            try:
-                filepath = None
-                for filename in os.listdir(directory):
-                    if ".html" not in filename:
-                        continue
-                    filepath = directory + "/" + filename
-                    if (
-                        os.path.isfile(filepath)
-                        and filepath not in WebsiteAnalysis.get_excluded_files()
-                    ):
-                        with open(filepath, "r") as f:
-                            if "NOTE: Article in Progress" not in f.read():
-                                first, latest = get_first_latest_modification(filepath)
-                                article_metadata.append([filepath, first, latest])
+            title = None
+            if article in articleset:
+                continue
+            articleset.add(article)
+            with open(article, "r") as inputfile:
+                creation_time = row["first"]
+                time = row["latest"]
+                content = inputfile.read()
+                parsed_html = BeautifulSoup(content, features="html.parser")
+                for link in parsed_html.find_all("title"):
+                    title = Blog.replace_name(link.text)
+                    title = title.strip()
+                    fe = fg.add_entry(order="append")
+                    fe.id("https://johnsamuel.info/" + article.strip())
+                    fe.title(title.strip())
+                    fe.pubDate(
+                        datetime.fromtimestamp(time, tz=timezone("Europe/Amsterdam"))
+                    )
+                    fe.description(title)
+                    fe.link(href="https://johnsamuel.info/" + article.strip())
 
-            except Exception as e:
-                print("Error: in file: " + filepath + ": " + str(e))
+        # Writing the feed
+        atomfeed = fg.atom_str(pretty=True)
+        rssfeed = fg.rss_str(pretty=True)
+        fg.atom_file("atom.xml")
+        fg.rss_file("rss.xml")
 
-    df = pandas.DataFrame(article_metadata, columns=["filepath", "first", "latest"])
-    df = df.sort_values(["latest", "first"], ascending=[False, False])
+    def generate_complete_list_of_articles():
+        df = WebsiteAnalysis.get_articles_list_dataframe()
+        articleset = set()
+        count = {}
+        articlelist = {}
+        for lang in ["en", "fr", "hi", "pa", "ml"]:
+            count[lang] = 1
+            articlelist[lang] = "<ul vocab='http://schema.org/' typeof='ItemList'>"
+        for index, row in df.iterrows():
+            article = row["filepath"]
 
-    fg = FeedGenerator()
-    fg.id("https://johnsamuel.info")
-    fg.title("John Samuel")
-    fg.description("Personal Blog of John Samuel")
-    fg.author({"name": "John Samuel"})
-    fg.language("en")
-    fg.link(href="https://johnsamuel.info")
-    count = {}
-    articlelist = {}
-    for lang in ["en", "fr", "hi", "pa", "ml"]:
-        count[lang] = 1
-        articlelist[lang] = "<ul vocab='http://schema.org/' typeof='ItemList'>"
-    for index, row in df.iterrows():
-        article = row["filepath"]
+            title = None
+            if article in articleset:
+                continue
+            articleset.add(article)
+            with open(article, "r") as inputfile:
+                creation_time = row["first"]
+                time = row["latest"]
+                contehnt = inputfile.read()
+                parsed_html = BeautifulSoup(content, features="html.parser")
+                for link in parsed_html.find_all("title"):
+                    title = Blog.replace_name(link.text)
+                    title = title.strip()
+                    # display modification date of article along with the title
+                    for lang in ["en", "fr", "hi", "pa", "ml"]:
+                        if article.startswith(lang):
+                            articlelist[lang] = (
+                                articlelist[lang]
+                                + "\n<li property='itemListElement' typeof='ListItem'>"
+                                + '<meta typeof="ListItem" property="position" content="'
+                                + str(count[lang])
+                                + '"/>'
+                                + "<a property='item' typeof='WebPage' href='../"
+                                + article
+                                + "'>"
+                                + "<span property='name'>"
+                                + title
+                                + "</span></a>"
+                                + " <span class='date'>("
+                                + datetime.fromtimestamp(creation_time).strftime(
+                                    "%d %B %Y"
+                                )
+                                + ";</span>"
+                                + " <span class='date'>"
+                                + datetime.fromtimestamp(time).strftime("%d %B %Y")
+                                + ")</span></li>"
+                            )
+                            count[lang] = count[lang] + 1
+                            break
 
-        title = None
-        if article in articleset:
-            continue
-        articleset.add(article)
-        with open(article, "r") as inputfile:
-            creation_time = row["first"]
-            time = row["latest"]
-            content = inputfile.read()
-            parsed_html = BeautifulSoup(content, features="html.parser")
-            for link in parsed_html.find_all("title"):
-                title = replace_name(link.text)
-                title = title.strip()
-                # display modification date of article along with the title
-                for lang in ["en", "fr", "hi", "pa", "ml"]:
-                    if article.startswith(lang):
-                        articlelist[lang] = (
-                            articlelist[lang]
-                            + "\n<li property='itemListElement' typeof='ListItem'>"
-                            + '<meta typeof="ListItem" property="position" content="'
-                            + str(count[lang])
-                            + '"/>'
-                            + "<a property='item' typeof='WebPage' href='../"
-                            + article
-                            + "'>"
-                            + "<span property='name'>"
-                            + title
-                            + "</span></a>"
-                            + " <span class='date'>("
-                            + datetime.fromtimestamp(creation_time).strftime("%d %B %Y")
-                            + ";</span>"
-                            + " <span class='date'>"
-                            + datetime.fromtimestamp(time).strftime("%d %B %Y")
-                            + ")</span></li>"
-                        )
-                        count[lang] = count[lang] + 1
-                        break
-                fe = fg.add_entry(order="append")
-                fe.id("https://johnsamuel.info/" + article.strip())
-                fe.title(title.strip())
-                fe.pubDate(
-                    datetime.fromtimestamp(time, tz=timezone("Europe/Amsterdam"))
-                )
-                fe.description(title)
-                fe.link(href="https://johnsamuel.info/" + article.strip())
-
-    for lang in ["en", "fr", "hi", "pa", "ml"]:
-        articlelist[lang] = articlelist[lang] + "\n</ul>"
-    with open("templates/blog.html", "r") as blogtemplate:
-        content = blogtemplate.read()
-        content = content.replace("EnglishArticleList", articlelist["en"])
-        content = content.replace("FrenchArticleList", articlelist["fr"])
-        content = content.replace("HindiArticleList", articlelist["hi"])
-        content = content.replace("MalayalamArticleList", articlelist["ml"])
-        content = content.replace("PunjabiArticleList", articlelist["pa"])
-        with open("blog/index.html", "w") as blog:
-            blog.write(content)
-        blog.close()
-    blogtemplate.close()
-
-    # Writing the feed
-    atomfeed = fg.atom_str(pretty=True)
-    rssfeed = fg.rss_str(pretty=True)
-    fg.atom_file("atom.xml")
-    fg.rss_file("rss.xml")
+        for lang in ["en", "fr", "hi", "pa", "ml"]:
+            articlelist[lang] = articlelist[lang] + "\n</ul>"
+        with open("templates/blog.html", "r") as blogtemplate:
+            content = blogtemplate.read()
+            content = content.replace("EnglishArticleList", articlelist["en"])
+            content = content.replace("FrenchArticleList", articlelist["fr"])
+            content = content.replace("HindiArticleList", articlelist["hi"])
+            content = content.replace("MalayalamArticleList", articlelist["ml"])
+            content = content.replace("PunjabiArticleList", articlelist["pa"])
+            with open("blog/index.html", "w") as blog:
+                blog.write(content)
+            blog.close()
+        blogtemplate.close()
 
 
 if len(sys.argv) > 1:
     print("The program takes no input")
     exit(1)
 
-check_for_modified_articles()
+# Generate the feed of last 10 articles
+Blog.generate_feed(20)

@@ -12,8 +12,8 @@ from pygit2 import (
 )
 
 
-def get_first_latest_modification(filepath):
-    repo = Repository(".git")
+def get_first_latest_modification(filepath, main_directory="./"):
+    repo = Repository(main_directory + ".git")
     latest = None
     first = None
     blame = repo.blame(filepath, flags=GIT_BLAME_TRACK_COPIES_SAME_FILE)
@@ -31,8 +31,8 @@ def get_first_latest_modification(filepath):
     return first, latest
 
 
-def get_modification_list(filepath):
-    repo = Repository(".git")
+def get_modification_list(filepath, main_directory="./"):
+    repo = Repository(main_directory + ".git")
     latest = None
     first = None
     blame = repo.blame(filepath, flags=GIT_BLAME_TRACK_COPIES_SAME_FILE)
