@@ -23,7 +23,7 @@ from shutil import copy
 from os import remove
 from feedgen.feed import FeedGenerator
 from pytz import timezone
-from analyse import WebsiteAnalysis
+from analyse import HTMLTextAnalysis, WebsiteAnalysis
 import pandas
 import numpy as np
 
@@ -181,10 +181,50 @@ class Blog:
             blogtemplate.close()
 
     @staticmethod
+    def publish_report(article_list_df):
+        token_filepath_set = set()
+        for index, row in article_list_df.iterrows():
+            tokens = HTMLTextAnalysis.get_tokens(row["filepath"], lowercase=True, remove_punctuation=True, remove_stopwords=True)
+            for token in tokens:
+                token_filepath_set.add((token[0], token, row["language"], row["filepath"]))
+        tf = pandas.DataFrame(
+                    token_filepath_set, columns=["first_char", "token", "language", "filepath"]
+        )
+        lang_articles = tf[["language", "filepath"]]
+        lang_articles = lang_articles.drop_duplicates()
+        lang_articles.groupby(["language"]).count()
+        
+        lang_articles_count = lang_articles.groupby(["language"]).count()
+        lang_articles_count = lang_articles_count.reset_index()
+        
+        lang_words = tf[["language", "token"]]
+        lang_words = lang_words.drop_duplicates()
+        lang_words_count = lang_words.groupby(["language"]).count()
+        lang_words_count = lang_words_count.reset_index()
+        
+        languages ={"en": "English", "fr": "French", "ml": "Malayalam", "pa": "Punjabi", "hi": "Hindi"}
+        with open("templates/report.html", "r") as blogtemplate:
+            content = blogtemplate.read()
+            for code, name in languages.items():
+                content = content.replace(name + "Articles", str(lang_articles_count[lang_articles_count["language"] == code]["filepath"].values[0]))
+            for code, name in languages.items():
+                content = content.replace(name + "Words", str(lang_words_count[lang_words_count["language"] == code]["token"].values[0]))
+            with open("blog/report.html", "w") as blog:
+                blog.write(content)
+            blog.close()
+
+        blogtemplate.close()
+
+        #Writing the report to the CSV file
+        tf = tf.sort_values(["first_char", "token"])
+        tf.to_csv("blog/report.csv", index=False)
+
+    @staticmethod
     def generate_feed_and_complete_article_list():
         df = WebsiteAnalysis.get_articles_list_dataframe()
         Blog.generate_complete_list_of_articles(df)
         Blog.generate_feed(df, 20)
+        Blog.publish_report(df)
 
 
 if len(sys.argv) > 1:
