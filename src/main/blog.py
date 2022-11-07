@@ -77,8 +77,9 @@ class Blog:
         # Writing the feed
         atomfeed = fg.atom_str(pretty=True)
         rssfeed = fg.rss_str(pretty=True)
-        fg.atom_file(directory + "atom.xml")
-        fg.rss_file(directory + "rss.xml")
+        
+        fg.atom_file(directory + "atom.xml", pretty=True)
+        fg.rss_file(directory + "rss.xml", pretty=True)
 
     @staticmethod
     def generate_main_feed(dataframe, feed_count=10):
@@ -215,8 +216,8 @@ class Blog:
 
         blogtemplate.close()
 
-        #Writing the report to the CSV file
-        tf = tf.sort_values(["first_char", "token"])
+        # Writing the report to the CSV file
+        tf = tf.sort_values(["language", "first_char", "token", "filepath"])
         tf.to_csv("blog/report.csv", index=False)
 
     @staticmethod
