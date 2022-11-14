@@ -36,6 +36,7 @@ class WebsiteAnalysis:
         "en/research/art",
         "en/research/color",
         "en/research/3d",
+        "en/research/games",
         "en/teaching/courses/2017/ArchitectureInformationSystems",
         "en/teaching/courses/2017/BigData",
         "en/teaching/courses/2017/C",
