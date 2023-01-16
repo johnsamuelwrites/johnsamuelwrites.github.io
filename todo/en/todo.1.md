@@ -23,13 +23,13 @@
  - __Category__: Website
  - __Tag__: Website, Page, Course, Slides
 
-#5. C course: Add slides on truth table for binary logical operators 
+# 5. C course: Add slides on truth table for binary logical operators 
  - __Description__: A table that shows all the possible combinations
  - __Status__: In progress
  - __Category__: Website
  - __Tag__: Course, Slides
 
-#6. C course: Add slide on comparison of while, do..while with break, continue
+# 6. C course: Add slide on comparison of while, do..while with break, continue
  - __Description__: Slides comparing while, do..while, for and break/continue
     - do..while, while, for
     - do..while, while, for with break
@@ -38,7 +38,7 @@
  - __Category__: Website
  - __Tag__: Course, Slides
 
-#7. C course: Add slide on functions like sprintf, sscanf
+# 7. C course: Add slide on functions like sprintf, sscanf
  - __Description__: Add slides on the following functions
     - sprintf
     - sscanf
@@ -46,7 +46,7 @@
  - __Category__: Website
  - __Tag__: Course, Slides
 
-#8. Algo course: Add slide on data structures
+# 8. Algo course: Add slide on data structures
  - __Description__: Add slides on the following data structures
     - list: single and doubly linked list
     - queue
@@ -57,7 +57,7 @@
  - __Category__: Website
  - __Tag__: Course, Slides
 
-#9. Algo course: Add slide on algorithms
+# 9. Algo course: Add slide on algorithms
  - __Description__: Add slides on the following algorithmes
     - search: binary search
     - sort: quick sort
@@ -65,37 +65,37 @@
  - __Category__: Website
  - __Tag__: Course, Slides
 
-#10. C course: Add slide on gcc errors
+# 10. C course: Add slide on gcc errors
  - __Description__: Add slides on the common errors like varibale undefined, preferably linked to slides on compilation chain
  - __Status__: In progress
  - __Category__: Website
  - __Tag__: Course, Slides
 
-#11. Explore CSS options: CSS transformation and animations
+# 11. Explore CSS options: CSS transformation and animations
  - __Description__: Explore CSS options like sticky positions, CSS transform and CSS animations
  - __Status__: In progress
  - __Category__: Website
  - __Tag__: Website, Page
 
-#12. C course: Add slide on multiple .h and .c files
+# 12. C course: Add slide on multiple .h and .c files
  - __Description__: Add slides on multiple .h and .c files. Demonstrate that only one single main() can be present  and the errorss obtained with multiple main files
  - __Status__: Done
  - __Category__: Website
  - __Tag__: Course, Slides
 
-#13. C course: Add slide on variable scope
+# 13. C course: Add slide on variable scope
  - __Description__: Add slides on scope of variables: global and local variables 
  - __Status__: Done
  - __Category__: Website
  - __Tag__: Course, Slides
 
-#14. C course: Add slide on parameter passing 
+# 14. C course: Add slide on parameter passing 
  - __Description__: Add slides on parmater passing by values and parameter passing by reference 
  - __Status__: Done
  - __Category__: Website
  - __Tag__: Course, Slides
 
-#15. C course: Add slide on functions like readline, strtok
+# 15. C course: Add slide on functions like readline, strtok
  - __Description__: Add slides on the following functions
     - readline
     - strtok
@@ -103,14 +103,14 @@
  - __Category__: Website
  - __Tag__: Course, Slides
 
-#16. Add last modification date and creation date on every article
+# 16. Add last modification date and creation date on every article
  - __Description__: Add modification and creation date on every article
     - statically generated
  - __Status__: In progress
  - __Category__: Website
  - __Tag__: Web page 
 
-#17. Add link to history of every modification of a given article 
+# 17. Add link to history of every modification of a given article 
  - __Description__: Add the posibility to view the modification history of the article 
     - Explore the possibility of a single page diff.html
       - input: relative URL of the page
