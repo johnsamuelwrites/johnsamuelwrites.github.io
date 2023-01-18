@@ -1,3 +1,3 @@
 ```dataview
-TABLE file.name AS "File", Title, file.mtime as Modification FROM "discussion/en"
+TABLE file.name AS "File", Title, file.mtime as Modification FROM "discussion/en" where Tag= "Daily"
 ```
