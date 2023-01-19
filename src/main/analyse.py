@@ -151,6 +151,7 @@ class WebsiteAnalysis:
         "fr/enseignement/cours/2021/ProgSys",
         "fr/enseignement/cours/2021/TDM",
         "fr/enseignement/cours/2021/TLI",
+        "fr/enseignement/cours/2021/DP",
         "fr/enseignement/cours/2022/Algorithmes",
         "fr/enseignement/cours/2022/C",
         "fr/enseignement/cours/2022/DataMining",
@@ -158,6 +159,8 @@ class WebsiteAnalysis:
         "fr/enseignement/cours/2022/MachineLearning",
         "fr/enseignement/cours/2022/ProgSys",
         "fr/enseignement/cours/2022/TLI",
+        "fr/enseignement/cours/2022/CN",
+        "fr/enseignement/cours/2022/DP",
     ]
 
     directories["ml"] = ["ml"]
