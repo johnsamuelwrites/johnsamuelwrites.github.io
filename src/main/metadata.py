@@ -80,6 +80,11 @@ def get_title(html_content):
     return title
 
 
+def get_title_from_link(link):
+    content = get_article_content(link)
+    return get_title(content)
+
+
 def add_update_metadata(links):
 
     # Setting up regular expression for json-ld script
