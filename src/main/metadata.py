@@ -63,6 +63,23 @@ def replace_name(title):
     return title
 
 
+def get_article_content(link):
+    with open(link, "r") as f:
+        content = f.read()
+    f.close()
+    return content
+
+
+def get_title(html_content):
+    parsed_html = BeautifulSoup(html_content, features="html.parser")
+    title = ""
+    for titletag in parsed_html.find_all("title"):
+        title = replace_name(titletag.text)
+        title = title.replace(":", "")
+        title = title.strip()
+    return title
+
+
 def add_update_metadata(links):
 
     # Setting up regular expression for json-ld script
@@ -73,46 +90,40 @@ def add_update_metadata(links):
     for link in links:
         # only with files
         if not link.startswith("http"):
-            with open(link, "r") as f:
-                content = f.read()
-                jsonld = json.loads(jsonld_template)
-                # get creation, publication and modification date
-                first, latest = get_first_latest_modification(link)
-                jsonld["dateCreated"] = str(datetime.fromtimestamp(first))
-                jsonld["datePublished"] = str(datetime.fromtimestamp(first))
-                jsonld["dateModified"] = str(datetime.fromtimestamp(latest))
+            content = get_article_content(link)
+            jsonld = json.loads(jsonld_template)
+            # get creation, publication and modification date
+            first, latest = get_first_latest_modification(link)
+            jsonld["dateCreated"] = str(datetime.fromtimestamp(first))
+            jsonld["datePublished"] = str(datetime.fromtimestamp(first))
+            jsonld["dateModified"] = str(datetime.fromtimestamp(latest))
 
-                # get title
-                parsed_html = BeautifulSoup(content, features="html.parser")
-                for titletag in parsed_html.find_all("title"):
-                    title = replace_name(titletag.text)
-                    title = title.replace(":", "")
-                    title = title.strip()
-                jsonld["name"] = title
-                jsonld["description"] = "Article by John Samuel"
-                # Care must be taken to ensure the link exists
-                jsonld["url"] = "https://johnsamuel.info/" + link
-                jsonld["headline"] = title
-                scriptjsonld = (
-                    '<script type="application/ld+json">\n      '
-                    + json.dumps(jsonld)
-                    + "\n    </script>"
-                )
-                if "application/ld+json" not in content:
-                    content = content.replace("</head>", scriptjsonld + "\n  </head>")
-                else:
-                    content = regex.sub(pattern, scriptjsonld, content)
-                outputfile = open("/tmp/temp.html", "w")
+            # get title
+            title = get_title(content)
+            jsonld["name"] = title
+            jsonld["description"] = "Article by John Samuel"
+            # Care must be taken to ensure the link exists
+            jsonld["url"] = "https://johnsamuel.info/" + link
+            jsonld["headline"] = title
+            scriptjsonld = (
+                '<script type="application/ld+json">\n      '
+                + json.dumps(jsonld)
+                + "\n    </script>"
+            )
+            if "application/ld+json" not in content:
+                content = content.replace("</head>", scriptjsonld + "\n  </head>")
+            else:
+                content = regex.sub(pattern, scriptjsonld, content)
+            outputfile = open("/tmp/temp.html", "w")
 
-                outputfile.write(content)
+            outputfile.write(content)
 
-                f.close()
-                outputfile.close()
+            outputfile.close()
 
-                # Replacing the old file
-                remove(link)
-                copy("/tmp/temp.html", link)
-                remove("/tmp/temp.html")
+            # Replacing the old file
+            remove(link)
+            copy("/tmp/temp.html", link)
+            remove("/tmp/temp.html")
 
 
 def extract_metadata(links):
@@ -130,27 +141,27 @@ def extract_metadata(links):
         pp.pprint(data)
 
 
-parser = argparse.ArgumentParser(
-    description="set or extract metadata form a URL or a file"
-)
-subparsers = parser.add_subparsers(help="sub-command help", dest="subparser_name")
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(
+        description="set or extract metadata form a URL or a file"
+    )
+    subparsers = parser.add_subparsers(help="sub-command help", dest="subparser_name")
 
+    # create the parser for the "extract" command
+    parser_extract = subparsers.add_parser("extract", help="extract metadata")
+    parser_extract.add_argument(
+        "link", metavar="link", type=str, nargs="+", help="link or paths of html file"
+    )
+    parser_extract.set_defaults(func=extract_metadata)
 
-# create the parser for the "extract" command
-parser_extract = subparsers.add_parser("extract", help="extract metadata")
-parser_extract.add_argument(
-    "link", metavar="link", type=str, nargs="+", help="link or paths of html file"
-)
-parser_extract.set_defaults(func=extract_metadata)
+    # create the parser for the "add" command
+    parser_add = subparsers.add_parser("add", help="add metadata")
+    parser_add.add_argument(
+        "link", metavar="link", type=str, nargs="+", help="link or paths of html file"
+    )
+    parser_add.set_defaults(func=add_update_metadata)
 
-# create the parser for the "add" command
-parser_add = subparsers.add_parser("add", help="add metadata")
-parser_add.add_argument(
-    "link", metavar="link", type=str, nargs="+", help="link or paths of html file"
-)
-parser_add.set_defaults(func=add_update_metadata)
-
-args = parser.parse_args()
-# args.subparser_name contains the name of the subcommand
-# since we have link as a parameter for both the command
-args.func(args.link)
+    args = parser.parse_args()
+    # args.subparser_name contains the name of the subcommand
+    # since we have link as a parameter for both the command
+    args.func(args.link)
