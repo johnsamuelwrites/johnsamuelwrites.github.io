@@ -76,9 +76,12 @@ class WebsiteAnalysis:
         "en/teaching/courses/2022/AI-DeepLearning",
         "en/teaching/courses/2022/Algorithms",
         "en/teaching/courses/2022/C",
+        "en/teaching/courses/2022/CN",
         "en/teaching/courses/2022/DataMining",
+        "en/teaching/courses/2022/DP",
         "en/teaching/courses/2022/InternetTechnologyLanguage",
         "en/teaching/courses/2022/MachineLearning",
+        "en/teaching/courses/2022/MDP",
         "en/teaching/courses/2022/SysProg",
         "en/slides/2017/Akademy/html",
         "en/slides/2017/CapitoleduLibre/html",
@@ -99,6 +102,7 @@ class WebsiteAnalysis:
         "en/slides/2021/WikidataCon",
         "en/slides/2021/WikiWorkshop",
         "en/slides/2022/QueeringWikipedia",
+        "en/slides/2023/SASSQueer/",
     ]
 
     directories["fr"] = [
@@ -154,13 +158,14 @@ class WebsiteAnalysis:
         "fr/enseignement/cours/2021/DP",
         "fr/enseignement/cours/2022/Algorithmes",
         "fr/enseignement/cours/2022/C",
+        "fr/enseignement/cours/2022/CN",
         "fr/enseignement/cours/2022/DataMining",
+        "fr/enseignement/cours/2022/DP",
         "fr/enseignement/cours/2022/IA-DeepLearning",
         "fr/enseignement/cours/2022/MachineLearning",
         "fr/enseignement/cours/2022/ProgSys",
+        "fr/enseignement/cours/2022/TDM",
         "fr/enseignement/cours/2022/TLI",
-        "fr/enseignement/cours/2022/CN",
-        "fr/enseignement/cours/2022/DP",
     ]
 
     directories["ml"] = ["ml"]
