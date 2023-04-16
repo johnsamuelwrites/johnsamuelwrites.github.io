@@ -168,11 +168,14 @@ class WebsiteAnalysis:
         "fr/enseignement/cours/2022/TLI",
     ]
 
-    directories["ml"] = ["ml"]
+    directories["ml"] = ["ml",
+    "ml/രചനകൾ"]
 
-    directories["hi"] = ["hi"]
+    directories["hi"] = ["hi",
+    "hi/रचनायें"]
 
-    directories["pa"] = ["pa"]
+    directories["pa"] = ["pa",
+    "pa/ਲਿਖਤਾਂ"]
     exclude_files = {
         "en/template.html",
         "fr/template.html",
