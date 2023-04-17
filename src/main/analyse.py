@@ -168,14 +168,32 @@ class WebsiteAnalysis:
         "fr/enseignement/cours/2022/TLI",
     ]
 
-    directories["ml"] = ["ml",
-    "ml/രചനകൾ"]
+    directories["ml"] = [
+        "ml",
+        "ml/അദ്ധ്യാപനം",
+        "ml/ഗവേഷണം",
+        "ml/ഭാഷാശാസ്ത്രം",
+        "ml/യാത്രകൾ",
+        "ml/രചനകൾ",
+    ]
 
-    directories["hi"] = ["hi",
-    "hi/रचनायें"]
+    directories["hi"] = [
+        "hi",
+        "hi/अध्यापन",
+        "hi/अनुसंधान",
+        "hi/भाषाविज्ञान",
+        "hi/यात्रा",
+        "hi/रचनायें",
+    ]
 
-    directories["pa"] = ["pa",
-    "pa/ਲਿਖਤਾਂ"]
+    directories["pa"] = [
+        "pa",
+        "pa/ਅਧਿਆਪਨ",
+        "pa/ਖੋਜ",
+        "pa/ਭਾਸ਼ਾ ਵਿਗਿਆਨ",
+        "pa/ਯਾਤਰਾ",
+        "pa/ਲਿਖਤਾਂ",
+    ]
     exclude_files = {
         "en/template.html",
         "fr/template.html",

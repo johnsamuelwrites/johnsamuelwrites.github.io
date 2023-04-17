@@ -77,7 +77,7 @@ class Blog:
         # Writing the feed
         atomfeed = fg.atom_str(pretty=True)
         rssfeed = fg.rss_str(pretty=True)
-        
+
         fg.atom_file(directory + "atom.xml", pretty=True)
         fg.rss_file(directory + "rss.xml", pretty=True)
 
@@ -185,31 +185,58 @@ class Blog:
     def publish_report(article_list_df):
         token_filepath_set = set()
         for index, row in article_list_df.iterrows():
-            tokens = HTMLTextAnalysis.get_tokens(row["filepath"], lowercase=True, remove_punctuation=True, remove_stopwords=True)
+            tokens = HTMLTextAnalysis.get_tokens(
+                row["filepath"],
+                lowercase=True,
+                remove_punctuation=True,
+                remove_stopwords=True,
+            )
             for token in tokens:
-                token_filepath_set.add((token[0], token, row["language"], row["filepath"]))
+                token_filepath_set.add(
+                    (token[0], token, row["language"], row["filepath"])
+                )
         tf = pandas.DataFrame(
-                    token_filepath_set, columns=["first_char", "token", "language", "filepath"]
+            token_filepath_set, columns=["first_char", "token", "language", "filepath"]
         )
         lang_articles = tf[["language", "filepath"]]
         lang_articles = lang_articles.drop_duplicates()
         lang_articles.groupby(["language"]).count()
-        
+
         lang_articles_count = lang_articles.groupby(["language"]).count()
         lang_articles_count = lang_articles_count.reset_index()
-        
+
         lang_words = tf[["language", "token"]]
         lang_words = lang_words.drop_duplicates()
         lang_words_count = lang_words.groupby(["language"]).count()
         lang_words_count = lang_words_count.reset_index()
-        
-        languages ={"en": "English", "fr": "French", "ml": "Malayalam", "pa": "Punjabi", "hi": "Hindi"}
+
+        languages = {
+            "en": "English",
+            "fr": "French",
+            "ml": "Malayalam",
+            "pa": "Punjabi",
+            "hi": "Hindi",
+        }
         with open("templates/report.html", "r") as blogtemplate:
             content = blogtemplate.read()
             for code, name in languages.items():
-                content = content.replace(name + "Articles", str(lang_articles_count[lang_articles_count["language"] == code]["filepath"].values[0]))
+                content = content.replace(
+                    name + "Articles",
+                    str(
+                        lang_articles_count[lang_articles_count["language"] == code][
+                            "filepath"
+                        ].values[0]
+                    ),
+                )
             for code, name in languages.items():
-                content = content.replace(name + "Words", str(lang_words_count[lang_words_count["language"] == code]["token"].values[0]))
+                content = content.replace(
+                    name + "Words",
+                    str(
+                        lang_words_count[lang_words_count["language"] == code][
+                            "token"
+                        ].values[0]
+                    ),
+                )
             with open("blog/report.html", "w") as blog:
                 blog.write(content)
             blog.close()
