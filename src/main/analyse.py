@@ -103,6 +103,7 @@ class WebsiteAnalysis:
         "en/slides/2021/WikiWorkshop",
         "en/slides/2022/QueeringWikipedia",
         "en/slides/2023/SASSQueer",
+        "en/slides/2023/QueeringWikipedia",
     ]
 
     directories["fr"] = [
