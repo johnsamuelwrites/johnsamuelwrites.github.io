@@ -10,4 +10,8 @@ Comments:
 Creator: John Samuel
 ---
 
+
+# References
+- [The fascinating world of Voronoi diagrams](https://towardsdatascience.com/the-fascinating-world-of-voronoi-diagrams-da8fc700fa1b)
+
 #todo #Art #Website #Drawing
