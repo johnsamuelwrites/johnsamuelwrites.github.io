@@ -1,3 +1,31 @@
+# v1.0
+===============================================================================
+
+* Course material for 2021-2023 (updated)
+  * C Programming
+  * Algorithms
+  * Data Mining
+  * Data Science
+  * Python
+  * AI and Deep learning
+  * Data Mining and Machine Learning
+  * Massive data processing
+  * Summer School - Data Science for Chemists
+* Slides for (invited) talks
+* Update CV
+  * Conference and journal proceedings, posters
+  * Current and past PhD students
+  * Project mentorship
+  * Conferences attended
+  * Add interviews
+* Update disclaimers, about 
+* Update books read, movies, series watched, museums visites
+* Update writings : blog posts, poems, technical articles, linguistics-related
+* Update CSS and interlanguage links between articles
+* Add travel photography
+* Add drawings
+
+
 # v0.9
 ===============================================================================
 
