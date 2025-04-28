@@ -1,3 +1,77 @@
+# v1.1
+===============================================================================
+
+* Course material for 2023-2025 (updated)
+* Add 
+  * article on explaining Iohannes
+  * BDA 2024 demonstration paper
+  * compilation steps
+  * context of building mlscores
+  * course content, references, examples and images
+  * Data Reuse days talk on mlscores
+  * DOI of the articles
+  * FOSDEM 2025 talk and video
+  * GenAI images for course modules
+  * HTML version of FOSDEM 2025 slides
+  * ICMTS paper
+  * image of Latin version - Iohannes
+  * initial content on compilation (PLP)
+  * initial content on data structures (PLP)
+  * initial content on key properties (PLP)
+  * initial pages
+  * initials drawing
+  * initial slides for 2024-25
+  * introductory slides
+  * invited talk on Dynamic Data Integration
+  * link to HTML slides
+  * link to interview on AI in Chut!
+  * link to quotes
+  * Masters student
+  * missing courses
+  * missing files/directory
+  * new modules and split exisiting ones
+  * new topics and rearrange slides
+  * panel talk on Global Pride History at Missouri Historical Society
+  * Round Table meeting on AI
+  * slides of Campus du Libre
+  * Summer School course
+* Correct 
+  * article type
+  * errors
+  * HTML tags
+* Create supplmentary subjects
+* Indent files
+* Precise evaluation
+* Precise Symbolic AI
+* Precise TPs
+* Rearrange slides and separate introduction
+* Remove
+  * image
+  * scanf/fgets
+* Replace course icons with GenAI image icons
+* Split into two sections - past/current
+* Split slides to two pages
+* Update 
+  * About: add Mastodon
+  * analyses
+  * archives
+  * blog and analyses
+  * books read
+  * conference proceedings
+  * conferences participated
+  * conferences reviewed
+  * course content, icons, slides on lambda expressions, introductory slides, slides with code examples, slides with Python interpretation
+  * films, series and documentaries watched
+  * image with Latin version name
+  * journals reviewed
+  * list of personal projects
+  * masters students
+  * museums and galleries visited
+  * music heard
+  * quotes from Simon Veil and Antoni Gaudí
+  * reference list
+  * RELEASE notes
+
 # v1.0
 ===============================================================================
 
