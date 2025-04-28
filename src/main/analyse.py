@@ -119,8 +119,11 @@ class WebsiteAnalysis:
         "en/slides/2021/WikidataCon",
         "en/slides/2021/WikiWorkshop",
         "en/slides/2022/QueeringWikipedia",
+        "en/slides/2023/CollectifArchivesLGBTQI+",
         "en/slides/2023/SASSQueer",
         "en/slides/2023/QueeringWikipedia",
+        "en/slides/2024/CampusduLibre",
+        "en/slides/2025/FOSDEM",
     ]
 
     directories["fr"] = [
