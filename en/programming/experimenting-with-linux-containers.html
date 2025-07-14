@@ -1,307 +1,470 @@
 <!DOCTYPE html>
 <html lang="en">
 
-<head>
-    <meta charset="utf-8" />
-    <meta http-equiv="Content-Language" content="en" />
-    <link rel="shortcut icon" href="../../images/logo/favicon.png" />
-    <title>Experimenting with Linux Containers: John Samuel</title>
-    <style type="text/css">
-        body {
-            background-color: #FFFFFF;
-        }
-        
-        #sidebar {
-            position: fixed;
-            background-color: #009AA6;
-            top: 0;
-            left: 0;
-            bottom: 0;
-            width: 30vw;
-        }
-        
-        #sidebar .title {
-            position: relative;
-            text-align: center;
-            line-height: 5vmax;
-            font-size: 1.4vmax;
-            font-family: 'Arial';
-            margin-top: 30vh;
-        }
-        
-        #sidebar .title a:link,
-        #sidebar .title a:visited {
-            color: #FFFFFF;
-            text-decoration: none;
-        }
-        
-        .subtitle {
-            top: 50vh;
-            text-align: center;
-            line-height: 1.3vmax;
-            font-family: 'Arial';
-            font-size: 1.2vmax;
-            color: #FFFFFF;
-        }
-        
-        .subtitle a:link,
-        .subtitle a:visited {
-            color: #FFFFFF;
-            text-decoration: none;
-        }
-        
-        .licence {
-            position: fixed;
-            text-align: right;
-            bottom: 0;
-            right: 0;
-        }
-        
-        .home {
-            position: fixed;
-            text-align: left;
-            font-family: 'Arial';
-            color: #D3D3D3;
-            z-index: 100;
-            width: 100%;
-            background-color: #FFFFFF;
-            top: 0px;
-            margin-bottom: 10px;
-            padding-bottom: 10px;
-        }
-        
-        .home a:link,
-        .home a:visited {
-            text-decoration: none;
-            color: #D3D3D3;
-        }
-        
-        .home ul {
-            margin: 0;
-            padding: 0;
-            text-align: left;
-            list-style: none;
-        }
-        
-        .home li {
-            position: relative;
-            float: left;
-            padding-top: 15px;
-            margin-right: 1em;
-            font-family: 'Arial';
-        }
-        
-        .home li:hover {
-            display: block;
-        }
-        
-        .home li:hover a:link,
-        .home li:hover a:visited {
-            text-decoration: none;
-            padding: 15px;
-            color: #FFFFFF;
-            background-color: #009AA6;
-        }
-        
-        .content {
-            line-height: 1.8vmax;
-            font-size: 1.2vmax;
-            font-family: 'Arial';
-            margin-top: 15vh;
-            width: 90%;
-        }
-        
-        .content h2,
-        h3,
-        h4 {
-            color: #009AA6;
-        }
-        
-        .content a:link,
-        .content a:visited {
-            color: #009AA6;
-        }
-        
-        .content h3 {
-            color: #009AA6;
-        }
-        
-        .content h2::before,
-        .content h3::before {
-            display: block;
-            content: " ";
-            visibility: hidden;
-            height: 50px;
-            margin-top: -50px;
-            pointer-events: none;
-            background-color: #FFFFFF;
-        }
-        
-        .content a:link,
-        .content a:visited {
-            color: #009AA6;
-        }
-        
-        .home a:link,
-        .home a:visited {
-            color: #D3D3D3;
-        }
-        
-        .page {
-            width: 65vw;
-            height: 100%;
-            margin-left: 30vw;
-            overflow: hidden;
-            padding: 0 1em;
-            font-family: 'Arial';
-        }
-        
-        .page img {
-            max-width: 100%;
-            max-height: 100%;
-        }
-        
-        @media (max-width: 640px),
-        screen and (orientation: portrait) {
+    <head>
+        <meta charset="utf-8" />
+        <meta http-equiv="Content-Language" content="en" />
+        <link rel="shortcut icon" href="../../images/logo/favicon.png" />
+        <title>Experimenting with Linux Containers: John Samuel</title>
+        <style type="text/css">
             body {
-                max-width: 100%;
-                max-height: 100%;
+                background-color: #FFFFFF;
             }
+
             #sidebar {
                 position: fixed;
                 background-color: #009AA6;
                 top: 0;
                 left: 0;
-                bottom: 80vh;
-                width: 100vw;
+                bottom: 0;
+                width: 30vw;
             }
+
             #sidebar .title {
+                position: relative;
                 text-align: center;
-                position: fixed;
-                margin-top: 6vh;
-                left: 0px;
-                right: 0px;
-                line-height: 3.5vmax;
-                font-size: 1.5vmax;
+                line-height: 5vmax;
+                font-size: 1.4vmax;
                 font-family: 'Arial';
+                margin-top: 30vh;
             }
-            #sidebar .subtitle {
-                text-align: center;
-                top: 5vh;
-                left: 0px;
-                right: 0px;
-                position: fixed;
-                margin-top: 10vh;
-                font-size: 1.5vmax;
-            }
+
             #sidebar .title a:link,
             #sidebar .title a:visited {
+                color: #FFFFFF;
+                text-decoration: none;
+            }
+
+            .subtitle {
+                top: 50vh;
                 text-align: center;
+                line-height: 1.3vmax;
+                font-family: 'Arial';
+                font-size: 1.2vmax;
                 color: #FFFFFF;
             }
-            #sidebar .subtitle a:link,
-            #sidebar .subtitle a:visited {
-                text-align: center;
+
+            .subtitle a:link,
+            .subtitle a:visited {
                 color: #FFFFFF;
+                text-decoration: none;
             }
+
+            .licence {
+                position: fixed;
+                text-align: right;
+                bottom: 0;
+                right: 0;
+            }
+
             .home {
+                position: fixed;
+                text-align: left;
+                font-family: 'Arial';
+                color: #D3D3D3;
                 z-index: 100;
                 width: 100%;
-                background-color: #009AA6;
-                font-size: 1.5vmax;
+                background-color: #FFFFFF;
+                top: 0px;
+                margin-bottom: 10px;
+                padding-bottom: 10px;
             }
+
             .home a:link,
             .home a:visited {
                 text-decoration: none;
-                color: #FFFFFF;
+                color: #D3D3D3;
             }
-            .content {
-                line-height: 3.8vmax;
-                font-size: 1.8vmax;
+
+            .home ul {
+                margin: 0;
+                padding: 0;
+                text-align: left;
+                list-style: none;
+            }
+
+            .home li {
+                position: relative;
+                float: left;
+                padding-top: 15px;
+                margin-right: 1em;
                 font-family: 'Arial';
-                margin-top: 22vh;
             }
+
+            .home li:hover {
+                display: block;
+            }
+
+            .home li:hover a:link,
+            .home li:hover a:visited {
+                text-decoration: none;
+                padding: 15px;
+                color: #FFFFFF;
+                background-color: #009AA6;
+            }
+
+            .content {
+                line-height: 1.8vmax;
+                font-size: 1.2vmax;
+                font-family: 'Arial';
+                margin-top: 15vh;
+                width: 90%;
+            }
+
+            .content h2,
+            h3,
+            h4 {
+                color: #009AA6;
+            }
+
             .content a:link,
             .content a:visited {
                 color: #009AA6;
             }
-            .page {
-                top: 40vh;
-                width: 95%;
-                margin-left: 0vw;
+
+            .content h3 {
+                color: #009AA6;
             }
+
+            .content h2::before,
+            .content h3::before {
+                display: block;
+                content: " ";
+                visibility: hidden;
+                height: 50px;
+                margin-top: -50px;
+                pointer-events: none;
+                background-color: #FFFFFF;
+            }
+
+            .content a:link,
+            .content a:visited {
+                color: #009AA6;
+            }
+
+            .home a:link,
+            .home a:visited {
+                color: #D3D3D3;
+            }
+
+            .page {
+                width: 65vw;
+                height: 100%;
+                margin-left: 30vw;
+                overflow: hidden;
+                padding: 0 1em;
+                font-family: 'Arial';
+            }
+
             .page img {
                 max-width: 100%;
                 max-height: 100%;
-                border: 0;
             }
-        }
-    </style>
-</head>
 
-<body vocab="http://schema.org/">
-    <div id="sidebar">
-        <div class="title">
-            <h1><a href="./experimenting-with-linux-containers.html">Experimenting with Linux Containers</a></h1>
+            @media (max-width: 640px),
+            screen and (orientation: portrait) {
+                body {
+                    max-width: 100%;
+                    max-height: 100%;
+                }
+
+                #sidebar {
+                    position: fixed;
+                    background-color: #009AA6;
+                    top: 0;
+                    left: 0;
+                    bottom: 80vh;
+                    width: 100vw;
+                }
+
+                #sidebar .title {
+                    text-align: center;
+                    position: fixed;
+                    margin-top: 6vh;
+                    left: 0px;
+                    right: 0px;
+                    line-height: 3.5vmax;
+                    font-size: 1.5vmax;
+                    font-family: 'Arial';
+                }
+
+                #sidebar .subtitle {
+                    text-align: center;
+                    top: 5vh;
+                    left: 0px;
+                    right: 0px;
+                    position: fixed;
+                    margin-top: 10vh;
+                    font-size: 1.5vmax;
+                }
+
+                #sidebar .title a:link,
+                #sidebar .title a:visited {
+                    text-align: center;
+                    color: #FFFFFF;
+                }
+
+                #sidebar .subtitle a:link,
+                #sidebar .subtitle a:visited {
+                    text-align: center;
+                    color: #FFFFFF;
+                }
+
+                .home {
+                    z-index: 100;
+                    width: 100%;
+                    background-color: #009AA6;
+                    font-size: 1.5vmax;
+                }
+
+                .home a:link,
+                .home a:visited {
+                    text-decoration: none;
+                    color: #FFFFFF;
+                }
+
+                .content {
+                    line-height: 3.8vmax;
+                    font-size: 1.8vmax;
+                    font-family: 'Arial';
+                    margin-top: 22vh;
+                }
+
+                .content a:link,
+                .content a:visited {
+                    color: #009AA6;
+                }
+
+                .page {
+                    top: 40vh;
+                    width: 95%;
+                    margin-left: 0vw;
+                }
+
+                .page img {
+                    max-width: 100%;
+                    max-height: 100%;
+                    border: 0;
+                }
+            }
+        </style>
+    </head>
+
+    <body vocab="http://schema.org/">
+        <div id="sidebar">
+            <div class="title">
+                <h1><a href="./experimenting-with-linux-containers.html">Experimenting with Linux Containers</a></h1>
+            </div>
+            <div class="subtitle">
+                <h3><a href="../about.html">John Samuel</a></h3>
+            </div>
         </div>
-        <div class="subtitle">
-            <h3><a href="../about.html">John Samuel</a></h3>
-        </div>
-    </div>
-    <div class="page">
-        <div class="home">
-            <ul typeof="BreadcrumbList">
-                <li property="itemListElement" typeof="ListItem">
-                    <a property="item" typeof="WebPage" href="../index.html">
-                        <span property="name">Home</span>
-                    </a>
-                </li>
-                <li property="itemListElement" typeof="ListItem">
-                    <a property="item" typeof="WebPage" href="../programming/index.html">
-                        <span property="name">Programming</span>
-                    </a>
-                </li>
-                <li property="itemListElement" typeof="ListItem">
-                    <a property="item" typeof="WebPage" href="../research/research.html">
-                        <span property="name">Research</span>
-                    </a>
-                </li>
-            </ul>
-        </div>
-        <div class="content">
-            <p style="color:red;text-align:center">NOTE: Article in Progress</p>
-            <p>Introduction</p>
-            <p>Current available technologies: LXC, Docker, OpenVZ, Open Containers, rkt</p>
-            <p>other related container technology: application container (apc)</p>
-            <p>Experiments: testing libraries and application without installing them on your base machine</p>
-            <p>development</p>
-            <p>testing: testing old versions of applications, recreating the image from an end-user perspective</p>
-            <p>production and deployment</p>
-            <h3>Docker Containers</h3>
-            <p>Docker containers: simpler way to use linux containers?</p>
-            <p>lightweight</p>
-            <p>different base images like alpine, archlinux, busybox, centos, crux, debian, fedora, mageia, opensuse, ubuntu</p>
-            <p>away with installing and removing different test packages for different experiments</p>
-            <p>experimentation with different distributions and their package managers</p>
-            <p>package dependencies</p>
-            <p>older versions of applications, especially browsers</p>
-            <p>sharing settings</p>
-            <p>sequential execution of commands?</p>
-            <p>multi-profile (production, dev, staging?)</p>
-            <p>easier way to run applications especially web applications</p>
-            <p>orchestration, kubernetes</p>
-            <h3>References</h3>
-            <p>
+        <div class="page">
+            <div class="home">
+                <ul typeof="BreadcrumbList">
+                    <li property="itemListElement" typeof="ListItem">
+                        <a property="item" typeof="WebPage" href="../index.html">
+                            <span property="name">Home</span>
+                        </a>
+                    </li>
+                    <li property="itemListElement" typeof="ListItem">
+                        <a property="item" typeof="WebPage" href="../programming/index.html">
+                            <span property="name">Programming</span>
+                        </a>
+                    </li>
+                    <li property="itemListElement" typeof="ListItem">
+                        <a property="item" typeof="WebPage" href="../research/research.html">
+                            <span property="name">Research</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+            <div class="content">
+                <h2>Introduction</h2>
+                <p>
+                    Linux containers are a form of lightweight virtualization that enable you to run multiple isolated
+                    user-space instances—called containers—on a single Linux host. Unlike traditional virtual machines,
+                    containers share the host operating system kernel, which makes them highly efficient in terms of
+                    resource usage. This efficiency has positioned containers as a foundational technology for modern
+                    application deployment, testing, and development, providing a consistent environment across
+                    different systems.
+                </p>
+                <p>
+                    Today, a variety of container technologies are available, including LXC (Linux Containers), Docker,
+                    OpenVZ, Open Container Initiative (OCI) tools, rkt, Podman, and Singularity. Each offers unique
+                    features and use cases, but they all build upon the core concept of operating system-level
+                    virtualization.
+                </p>
+
+                <h2>Understanding Linux Containers</h2>
+                <p>
+                    Linux containers (often abbreviated as LXC) are a set of tools, templates, libraries, and language
+                    bindings that provide operating system-level virtualization. This allows multiple isolated Linux
+                    environments to run on a single host, each with its own user space, processes, and network
+                    interfaces, but all sharing the same kernel.
+                </p>
+                <ul>
+                    <li><strong>Lightweight:</strong> Containers use fewer resources than virtual machines since they do
+                        not require a separate guest operating system.</li>
+                    <li><strong>Isolation:</strong> Each container operates in its own isolated environment, ensuring
+                        that processes and files do not interfere with those in other containers.</li>
+                    <li><strong>Consistency:</strong> Containers provide a predictable and reproducible environment,
+                        making them ideal for development, testing, and deployment.</li>
+                    <li><strong>Flexibility:</strong> Developers and system administrators can create, deploy, and
+                        manage applications more efficiently.</li>
+                </ul>
+                <p>
+                    <strong>Popular Container Technologies:</strong>
+                </p>
+                <ul>
+                    <li><strong>LXC:</strong> Provides low-level container management and is often used for system
+                        containers.</li>
+                    <li><strong>Docker:</strong> Focuses on application containers and offers a comprehensive ecosystem
+                        for building, shipping, and running applications.</li>
+                    <li><strong>Podman:</strong> A daemonless container engine compatible with Docker images and
+                        commands.</li>
+                    <li><strong>OpenVZ:</strong> Specializes in container-based virtualization for Linux.</li>
+                    <li><strong>rkt (Rocket):</strong> Designed for application containers, emphasizing security and
+                        composability.</li>
+                    <li><strong>Singularity:</strong> Tailored for high-performance computing and scientific workloads.
+                    </li>
+                </ul>
+
+                <h2>Practical Applications and Experimentation</h2>
+                <h3>Development and Testing</h3>
+                <p>
+                    Containers are invaluable for developers seeking isolated environments for testing libraries and
+                    applications without polluting their base system. They make it easy to:
+                </p>
+                <ul>
+                    <li>Test different versions of applications, including legacy software and browsers.</li>
+                    <li>Experiment with various Linux distributions and their package managers (e.g., Alpine, Arch
+                        Linux, Debian, Fedora, Ubuntu).</li>
+                    <li>Recreate production-like environments for end-user perspective testing.</li>
+                    <li>Manage package dependencies cleanly and avoid conflicts.</li>
+                </ul>
+
+                <h3>Deployment and Production</h3>
+                <p>
+                    In production, containers streamline the deployment process by encapsulating applications and their
+                    dependencies. This ensures consistent behavior across different environments, from development to
+                    staging to production.
+                </p>
+                <ul>
+                    <li><strong>Portability:</strong> Containers can run on any system with a compatible container
+                        runtime.</li>
+                    <li><strong>Scalability:</strong> Orchestration tools like Kubernetes automate the deployment,
+                        scaling, and management of containerized applications.</li>
+                    <li><strong>Multi-profile Support:</strong> Easily create separate configurations for development,
+                        staging, and production environments.</li>
+                </ul>
+
+                <h2>Docker: Simplifying Containerization</h2>
+                <p>
+                    Docker has become the de facto standard for application containers, offering a user-friendly
+                    platform to build, distribute, and run containers. It abstracts much of the complexity of LXC and
+                    provides a rich ecosystem of tools and images.
+                </p>
+                <ul>
+                    <li><strong>Ease of Use:</strong> Docker simplifies container management with a straightforward CLI
+                        and comprehensive documentation.</li>
+                    <li><strong>Base Images:</strong> Wide selection of official and community-maintained images (e.g.,
+                        Alpine, Ubuntu, CentOS, BusyBox).</li>
+                    <li><strong>Layered Architecture:</strong> Efficient storage and distribution of images through
+                        layered filesystems.</li>
+                    <li><strong>Experimentation:</strong> Quickly spin up containers for testing, development, or
+                        running different distributions.</li>
+                    <li><strong>Configuration Management:</strong> Use Dockerfiles to automate the sequential execution
+                        of commands and define multi-stage builds.</li>
+                    <li><strong>Profiles:</strong> Support for multiple environments (development, staging, production)
+                        through environment variables and configuration files.</li>
+                    <li><strong>Orchestration:</strong> Integrates seamlessly with orchestration platforms like
+                        Kubernetes and Docker Swarm for managing large-scale deployments.</li>
+                </ul>
+
+                <h2>Personal Experiments with Containers</h2>
+                <h3>Testing Libraries and Applications Without Host Installation</h3>
+                <p>
+                    One of the most practical uses of containers in my workflow has been the ability to test new
+                    libraries and applications without installing them directly on my base machine. By spinning up a
+                    fresh container, I can:
+                </p>
+                <ul>
+                    <li>Install and evaluate new software in isolation.</li>
+                    <li>Avoid cluttering my main system with dependencies or conflicting versions.</li>
+                    <li>Quickly discard the container if the experiment is no longer needed, keeping my development
+                        environment clean.</li>
+                </ul>
+
+                <h3>Isolated Environments for Development</h3>
+                <p>
+                    During development, containers have allowed me to create fully isolated environments tailored for
+                    specific projects. This has enabled me to:
+                </p>
+                <ul>
+                    <li>Maintain separate environments for different programming languages or frameworks.</li>
+                    <li>Ensure that each project has access to the exact dependencies it needs, with no risk of version
+                        conflicts.</li>
+                    <li>Easily share development environments with collaborators by distributing container images or
+                        Dockerfiles.</li>
+                </ul>
+
+                <h3>Testing Old Versions and User Perspective</h3>
+                <p>
+                    Containers have proven invaluable for testing older versions of applications, especially when
+                    reproducing bugs reported by users on legacy setups. My typical workflow includes:
+                </p>
+                <ul>
+                    <li>Pulling or building container images with older versions of operating systems or browsers.</li>
+                    <li>Recreating the exact environment an end user might have, ensuring accurate bug reproduction and
+                        troubleshooting.</li>
+                    <li>Automating the recreation of these environments using Dockerfiles for repeatable testing.</li>
+                </ul>
+
+                <h3>Production and Deployment</h3>
+                <p>
+                    In production scenarios, I use containers to package applications along with all their dependencies,
+                    ensuring consistency across environments. Key benefits I've observed include:
+                </p>
+                <ul>
+                    <li>Simplified deployment pipelines, as the same container image can be used in development,
+                        staging, and production.</li>
+                    <li>Easier rollbacks and updates by managing container versions.</li>
+                    <li>Integration with orchestration tools like Kubernetes for scaling and managing services
+                        efficiently.</li>
+                </ul>
+
+                <h3>Docker as a Central Tool</h3>
+                <p>
+                    Docker has been central to these experiments, providing:
+                </p>
+                <ul>
+                    <li>A vast library of base images for different distributions and use cases.</li>
+                    <li>Tools for building, running, and managing containers with minimal overhead.</li>
+                    <li>The ability to script and automate environment setup using Dockerfiles, making it easy to
+                        reproduce experiments and share results.</li>
+                </ul>
+
+                <h2>Additional Insights</h2>
+                <ul>
+                    <li><strong>Security:</strong> Containers provide process and file system isolation, but share the
+                        kernel, so kernel vulnerabilities can affect all containers. Best practices include running
+                        containers with least privilege and keeping the host system updated.</li>
+                    <li><strong>Networking:</strong> Containers can be networked together using virtual bridges and
+                        overlays, supporting complex application architectures.</li>
+                    <li><strong>Sharing and Reproducibility:</strong> Container images can be shared via registries
+                        (e.g., Docker Hub), enabling reproducible builds and deployments.</li>
+                </ul>
+
+                <h2>References</h2>
                 <ol>
-                    <li id="linux-container"><a href="https://en.wikipedia.org/wiki/Linux_container">LXC</a></li>
-                    <li id="docker"><a href="https://www.docker.com/">Docker</a></li>
-                    <li id="docker-documentation"><a href="https://docs.docker.com/">Docker Documentation</a></li>
-                    <li id="docker-videos"><a href="https://opensource.com/business/15/5/must-watch-docker-videos">5 videos to help you learn about Docker</a></li>
-                    <li id="">...</li>
+                    <li><a href="https://en.wikipedia.org/wiki/OS-level_virtualization">OS-level
+                            virtualization</a></li>
+                    <li><a href="https://www.docker.com/">Docker Official Website</a></li>
+                    <li><a href="https://docs.docker.com/">Docker Documentation</a></li>
                 </ol>
-            </p>
+            </div>
         </div>
-    </div>
-</body>
+    </body>
 
 </html>
