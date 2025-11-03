@@ -1,0 +1,764 @@
+<!DOCTYPE html>
+<html lang="en">
+
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Perceptron Learning Animation</title>
+        <style>
+            * {
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
+            }
+
+            body {
+                font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                min-height: 100vh;
+                padding: 20px;
+            }
+
+            .container {
+                background: white;
+                border-radius: 20px;
+                box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+                padding: 30px;
+                max-width: 1400px;
+                width: 100%;
+            }
+
+            h1 {
+                text-align: center;
+                color: #333;
+                margin-bottom: 10px;
+                font-size: 2em;
+            }
+
+            .subtitle {
+                text-align: center;
+                color: #666;
+                margin-bottom: 20px;
+                font-size: 0.9em;
+            }
+
+            .content {
+                display: grid;
+                grid-template-columns: 2fr 1fr;
+                gap: 30px;
+            }
+
+            .top-section {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 20px;
+                margin-bottom: 20px;
+            }
+
+            .network-diagram {
+                background: #f8f9fa;
+                border-radius: 10px;
+                padding: 20px;
+            }
+
+            .network-diagram h3 {
+                color: #333;
+                margin-bottom: 15px;
+                font-size: 1.1em;
+                text-align: center;
+            }
+
+            .visualization {
+                background: #f8f9fa;
+                border-radius: 10px;
+                padding: 20px;
+            }
+
+            svg {
+                border: 2px solid #ddd;
+                border-radius: 8px;
+                background: white;
+            }
+
+            .controls {
+                display: flex;
+                flex-direction: column;
+                gap: 20px;
+            }
+
+            .info-panel {
+                background: #f8f9fa;
+                border-radius: 10px;
+                padding: 20px;
+            }
+
+            .info-panel h3 {
+                color: #333;
+                margin-bottom: 15px;
+                font-size: 1.2em;
+                border-bottom: 2px solid #667eea;
+                padding-bottom: 10px;
+            }
+
+            .weights {
+                background: white;
+                padding: 15px;
+                border-radius: 8px;
+                margin-bottom: 15px;
+            }
+
+            .weight-item {
+                display: flex;
+                justify-content: space-between;
+                margin: 8px 0;
+                font-family: 'Courier New', monospace;
+            }
+
+            .weight-label {
+                color: #666;
+                font-weight: bold;
+            }
+
+            .weight-value {
+                color: #667eea;
+                font-weight: bold;
+            }
+
+            .stats {
+                background: white;
+                padding: 15px;
+                border-radius: 8px;
+                margin-bottom: 15px;
+            }
+
+            .stat-item {
+                display: flex;
+                justify-content: space-between;
+                margin: 8px 0;
+            }
+
+            .equation {
+                background: white;
+                padding: 15px;
+                border-radius: 8px;
+                font-family: 'Courier New', monospace;
+                font-size: 0.9em;
+                text-align: center;
+                color: #333;
+                margin-bottom: 15px;
+            }
+
+            .buttons {
+                display: flex;
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            button {
+                padding: 12px 24px;
+                border: none;
+                border-radius: 8px;
+                font-size: 1em;
+                cursor: pointer;
+                transition: all 0.3s;
+                font-weight: bold;
+            }
+
+            .btn-primary {
+                background: #667eea;
+                color: white;
+            }
+
+            .btn-primary:hover {
+                background: #5568d3;
+                transform: translateY(-2px);
+                box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+            }
+
+            .btn-secondary {
+                background: #48bb78;
+                color: white;
+            }
+
+            .btn-secondary:hover {
+                background: #38a169;
+                transform: translateY(-2px);
+                box-shadow: 0 4px 12px rgba(72, 187, 120, 0.4);
+            }
+
+            .btn-danger {
+                background: #f56565;
+                color: white;
+            }
+
+            .btn-danger:hover {
+                background: #e53e3e;
+                transform: translateY(-2px);
+                box-shadow: 0 4px 12px rgba(245, 101, 101, 0.4);
+            }
+
+            .speed-control {
+                background: white;
+                padding: 15px;
+                border-radius: 8px;
+            }
+
+            .speed-control label {
+                display: block;
+                margin-bottom: 8px;
+                color: #666;
+                font-weight: bold;
+            }
+
+            input[type="range"] {
+                width: 100%;
+                margin-top: 5px;
+            }
+
+            .legend {
+                display: flex;
+                gap: 20px;
+                justify-content: center;
+                margin-top: 15px;
+                flex-wrap: wrap;
+            }
+
+            .legend-item {
+                display: flex;
+                align-items: center;
+                gap: 8px;
+                font-size: 0.9em;
+            }
+
+            .legend-circle {
+                width: 16px;
+                height: 16px;
+                border-radius: 50%;
+                border: 2px solid #333;
+            }
+
+            .status {
+                background: white;
+                padding: 12px;
+                border-radius: 8px;
+                text-align: center;
+                font-weight: bold;
+                color: #667eea;
+            }
+        </style>
+    </head>
+
+    <body>
+        <div class="container">
+            <h1>🧠 Algorithme d’Apprentissage du Perceptron</h1>
+            <p class="subtitle">Visualisation interactive d’un classificateur linéaire binaire apprenant une frontière
+                de décision</p>
+
+            <div class="content">
+                <div>
+                    <div class="top-section">
+                        <div class="network-diagram">
+                            <h3>Architecture du Perceptron</h3>
+                            <svg id="network" width="340" height="280"></svg>
+                        </div>
+
+                        <div class="info-panel">
+                            <h3>Poids Actuels</h3>
+
+                            <div class="weights">
+                                <div class="weight-item">
+                                    <span class="weight-label">Poids w₁ :</span>
+                                    <span class="weight-value" id="w1">0.00</span>
+                                </div>
+                                <div class="weight-item">
+                                    <span class="weight-label">Poids w₂ :</span>
+                                    <span class="weight-value" id="w2">0.00</span>
+                                </div>
+                                <div class="weight-item">
+                                    <span class="weight-label">Biais b :</span>
+                                    <span class="weight-value" id="bias">0.00</span>
+                                </div>
+                            </div>
+
+                            <div class="equation">
+                                y = sign(w₁x₁ + w₂x₂ + b)
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="visualization">
+                        <svg id="canvas" width="700" height="380"></svg>
+                        <div class="legend">
+                            <div class="legend-item">
+                                <div class="legend-circle" style="background: #4299e1;"></div>
+                                <span>Classe 0 (Bleu)</span>
+                            </div>
+                            <div class="legend-item">
+                                <div class="legend-circle" style="background: #f56565;"></div>
+                                <span>Classe 1 (Rouge)</span>
+                            </div>
+                            <div class="legend-item">
+                                <div style="width: 20px; height: 3px; background: #48bb78;"></div>
+                                <span>Frontière de Décision</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="controls">
+                    <div class="info-panel">
+                        <h3>Statistiques d’Entraînement</h3>
+
+                        <div class="stats">
+                            <div class="stat-item">
+                                <span>Époque :</span>
+                                <span id="epoch">0</span>
+                            </div>
+                            <div class="stat-item">
+                                <span>Erreurs :</span>
+                                <span id="errors">0</span>
+                            </div>
+                            <div class="stat-item">
+                                <span>Précision :</span>
+                                <span id="accuracy">0%</span>
+                            </div>
+                        </div>
+
+                        <div class="status" id="status">Prêt à s’entraîner</div>
+                    </div>
+
+                    <div class="buttons">
+                        <button class="btn-primary" onclick="startTraining()">▶ Démarrer l’Entraînement</button>
+                        <button class="btn-secondary" onclick="stepTraining()">⏭ Étape Unique</button>
+                        <button class="btn-danger" onclick="reset()">↻ Réinitialiser</button>
+                    </div>
+
+                    <div class="speed-control">
+                        <label for="speed">Vitesse d’Animation</label>
+                        <input type="range" id="speed" min="100" max="2000" value="800" step="100">
+                        <div style="text-align: center; margin-top: 5px; color: #666;">
+                            <span id="speedLabel">Normale</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <script>
+            const canvas = document.getElementById('canvas');
+            const network = document.getElementById('network');
+            const WIDTH = 700;
+            const HEIGHT = 380;
+            const MARGIN = 40;
+
+            // Perceptron state
+            let weights = [0, 0];
+            let bias = 0;
+            let learningRate = 0.1;
+            let epoch = 0;
+            let isTraining = false;
+            let trainingInterval = null;
+
+            // Generate sample data
+            let dataPoints = [];
+
+            function drawNetworkDiagram() {
+                network.innerHTML = '';
+
+                const netWidth = 340;
+                const netHeight = 280;
+
+                // Input layer positions
+                const input1 = { x: 80, y: 80, label: 'x₁' };
+                const input2 = { x: 80, y: 200, label: 'x₂' };
+                const biasNode = { x: 80, y: 140, label: '1' };
+
+                // Output layer position
+                const output = { x: 260, y: 140, label: 'y' };
+
+                // Draw connections with weights
+                function drawConnection(from, to, weight, label) {
+                    // Calculate line thickness based on weight magnitude
+                    const thickness = Math.min(Math.abs(weight) * 3 + 1, 8);
+                    const color = weight >= 0 ? '#48bb78' : '#f56565';
+                    const opacity = Math.min(Math.abs(weight) * 0.5 + 0.3, 1);
+
+                    // Draw line
+                    const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+                    line.setAttribute('x1', from.x + 25);
+                    line.setAttribute('y1', from.y);
+                    line.setAttribute('x2', to.x - 30);
+                    line.setAttribute('y2', to.y);
+                    line.setAttribute('stroke', color);
+                    line.setAttribute('stroke-width', thickness);
+                    line.setAttribute('opacity', opacity);
+                    network.appendChild(line);
+
+                    // Draw weight label
+                    const midX = (from.x + to.x) / 2;
+                    const midY = (from.y + to.y) / 2;
+
+                    // Background for text
+                    const textBg = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+                    textBg.setAttribute('x', midX - 25);
+                    textBg.setAttribute('y', midY - 12);
+                    textBg.setAttribute('width', 50);
+                    textBg.setAttribute('height', 20);
+                    textBg.setAttribute('fill', 'white');
+                    textBg.setAttribute('rx', '4');
+                    textBg.setAttribute('stroke', color);
+                    textBg.setAttribute('stroke-width', '1');
+                    network.appendChild(textBg);
+
+                    const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+                    text.setAttribute('x', midX);
+                    text.setAttribute('y', midY + 4);
+                    text.setAttribute('text-anchor', 'middle');
+                    text.setAttribute('fill', color);
+                    text.setAttribute('font-size', '11');
+                    text.setAttribute('font-weight', 'bold');
+                    text.setAttribute('font-family', 'Courier New, monospace');
+                    text.textContent = weight.toFixed(2);
+                    network.appendChild(text);
+
+                    // Draw label
+                    const labelText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+                    labelText.setAttribute('x', midX);
+                    labelText.setAttribute('y', midY - 18);
+                    labelText.setAttribute('text-anchor', 'middle');
+                    labelText.setAttribute('fill', '#666');
+                    labelText.setAttribute('font-size', '10');
+                    labelText.textContent = label;
+                    network.appendChild(labelText);
+                }
+
+                // Draw nodes
+                function drawNode(node, color = '#667eea') {
+                    const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+                    circle.setAttribute('cx', node.x);
+                    circle.setAttribute('cy', node.y);
+                    circle.setAttribute('r', '25');
+                    circle.setAttribute('fill', color);
+                    circle.setAttribute('stroke', '#333');
+                    circle.setAttribute('stroke-width', '3');
+                    network.appendChild(circle);
+
+                    const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+                    text.setAttribute('x', node.x);
+                    text.setAttribute('y', node.y + 6);
+                    text.setAttribute('text-anchor', 'middle');
+                    text.setAttribute('fill', 'white');
+                    text.setAttribute('font-size', '18');
+                    text.setAttribute('font-weight', 'bold');
+                    text.textContent = node.label;
+                    network.appendChild(text);
+                }
+
+                // Draw connections first (so they're behind nodes)
+                drawConnection(input1, output, weights[0], 'w₁');
+                drawConnection(input2, output, weights[1], 'w₂');
+                drawConnection(biasNode, output, bias, 'b');
+
+                // Draw nodes
+                drawNode(input1, '#4299e1');
+                drawNode(input2, '#4299e1');
+                drawNode(biasNode, '#9f7aea');
+                drawNode(output, '#48bb78');
+
+                // Draw layer labels
+                const inputLabel = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+                inputLabel.setAttribute('x', 80);
+                inputLabel.setAttribute('y', 250);
+                inputLabel.setAttribute('text-anchor', 'middle');
+                inputLabel.setAttribute('fill', '#666');
+                inputLabel.setAttribute('font-size', '12');
+                inputLabel.setAttribute('font-weight', 'bold');
+                inputLabel.textContent = 'Input Layer';
+                network.appendChild(inputLabel);
+
+                const outputLabel = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+                outputLabel.setAttribute('x', 260);
+                outputLabel.setAttribute('y', 250);
+                outputLabel.setAttribute('text-anchor', 'middle');
+                outputLabel.setAttribute('fill', '#666');
+                outputLabel.setAttribute('font-size', '12');
+                outputLabel.setAttribute('font-weight', 'bold');
+                outputLabel.textContent = 'Output';
+                network.appendChild(outputLabel);
+
+                // Add activation function label
+                const activationLabel = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+                activationLabel.setAttribute('x', 260);
+                activationLabel.setAttribute('y', 190);
+                activationLabel.setAttribute('text-anchor', 'middle');
+                activationLabel.setAttribute('fill', '#666');
+                activationLabel.setAttribute('font-size', '10');
+                activationLabel.setAttribute('font-style', 'italic');
+                activationLabel.textContent = 'sign(Σ)';
+                network.appendChild(activationLabel);
+            }
+
+            function generateData() {
+                dataPoints = [];
+                // Generate linearly separable data
+                for (let i = 0; i < 20; i++) {
+                    let x1 = Math.random() * 6 - 3;
+                    let x2 = Math.random() * 6 - 3;
+                    // Decision boundary: x2 > 0.5*x1 + 0.5
+                    let label = x2 > 0.5 * x1 + 0.5 ? 1 : 0;
+                    dataPoints.push({ x1, x2, label });
+                }
+            }
+
+            function scaleX(x) {
+                return MARGIN + ((x + 3) / 6) * (WIDTH - 2 * MARGIN);
+            }
+
+            function scaleY(y) {
+                return HEIGHT - MARGIN - ((y + 3) / 6) * (HEIGHT - 2 * MARGIN);
+            }
+
+            function drawAxes() {
+                // Clear canvas
+                canvas.innerHTML = '';
+
+                // X axis
+                const xAxis = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+                xAxis.setAttribute('x1', MARGIN);
+                xAxis.setAttribute('y1', scaleY(0));
+                xAxis.setAttribute('x2', WIDTH - MARGIN);
+                xAxis.setAttribute('y2', scaleY(0));
+                xAxis.setAttribute('stroke', '#ccc');
+                xAxis.setAttribute('stroke-width', '2');
+                canvas.appendChild(xAxis);
+
+                // Y axis
+                const yAxis = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+                yAxis.setAttribute('x1', scaleX(0));
+                yAxis.setAttribute('y1', MARGIN);
+                yAxis.setAttribute('x2', scaleX(0));
+                yAxis.setAttribute('y2', HEIGHT - MARGIN);
+                yAxis.setAttribute('stroke', '#ccc');
+                yAxis.setAttribute('stroke-width', '2');
+                canvas.appendChild(yAxis);
+
+                // Labels
+                const xLabel = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+                xLabel.setAttribute('x', WIDTH - MARGIN + 10);
+                xLabel.setAttribute('y', scaleY(0) + 5);
+                xLabel.setAttribute('fill', '#666');
+                xLabel.setAttribute('font-size', '14');
+                xLabel.textContent = 'x₁';
+                canvas.appendChild(xLabel);
+
+                const yLabel = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+                yLabel.setAttribute('x', scaleX(0) - 10);
+                yLabel.setAttribute('y', MARGIN - 10);
+                yLabel.setAttribute('fill', '#666');
+                yLabel.setAttribute('font-size', '14');
+                yLabel.textContent = 'x₂';
+                canvas.appendChild(yLabel);
+            }
+
+            function drawPoints() {
+                dataPoints.forEach((point, idx) => {
+                    const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+                    circle.setAttribute('cx', scaleX(point.x1));
+                    circle.setAttribute('cy', scaleY(point.x2));
+                    circle.setAttribute('r', '8');
+                    circle.setAttribute('fill', point.label === 1 ? '#f56565' : '#4299e1');
+                    circle.setAttribute('stroke', '#333');
+                    circle.setAttribute('stroke-width', '2');
+                    circle.setAttribute('id', `point-${idx}`);
+                    canvas.appendChild(circle);
+                });
+            }
+
+            function drawDecisionBoundary() {
+                // Remove old boundary
+                const oldBoundary = document.getElementById('boundary');
+                if (oldBoundary) oldBoundary.remove();
+
+                if (weights[1] === 0) return;
+
+                // Decision boundary: w1*x1 + w2*x2 + b = 0
+                // x2 = (-w1*x1 - b) / w2
+                let x1_start = -3;
+                let x1_end = 3;
+                let x2_start = (-weights[0] * x1_start - bias) / weights[1];
+                let x2_end = (-weights[0] * x1_end - bias) / weights[1];
+
+                const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+                line.setAttribute('id', 'boundary');
+                line.setAttribute('x1', scaleX(x1_start));
+                line.setAttribute('y1', scaleY(x2_start));
+                line.setAttribute('x2', scaleX(x1_end));
+                line.setAttribute('y2', scaleY(x2_end));
+                line.setAttribute('stroke', '#48bb78');
+                line.setAttribute('stroke-width', '3');
+                line.setAttribute('stroke-dasharray', '5,5');
+                canvas.appendChild(line);
+            }
+
+            function predict(x1, x2) {
+                const sum = weights[0] * x1 + weights[1] * x2 + bias;
+                return sum >= 0 ? 1 : 0;
+            }
+
+            function highlightPoint(idx, isCorrect) {
+                const point = document.getElementById(`point-${idx}`);
+                if (point) {
+                    point.setAttribute('r', '12');
+                    point.setAttribute('stroke', isCorrect ? '#48bb78' : '#f6ad55');
+                    point.setAttribute('stroke-width', '4');
+
+                    setTimeout(() => {
+                        point.setAttribute('r', '8');
+                        point.setAttribute('stroke', '#333');
+                        point.setAttribute('stroke-width', '2');
+                    }, 300);
+                }
+            }
+
+            function trainStep() {
+                let errors = 0;
+                let madeUpdate = false;
+
+                dataPoints.forEach((point, idx) => {
+                    const prediction = predict(point.x1, point.x2);
+                    const error = point.label - prediction;
+
+                    if (error !== 0) {
+                        errors++;
+                        if (!madeUpdate) {
+                            // Update weights
+                            weights[0] += learningRate * error * point.x1;
+                            weights[1] += learningRate * error * point.x2;
+                            bias += learningRate * error;
+
+                            highlightPoint(idx, false);
+                            madeUpdate = true;
+                        }
+                    } else {
+                        highlightPoint(idx, true);
+                    }
+                });
+
+                epoch++;
+                updateDisplay();
+                drawDecisionBoundary();
+
+                // Check convergence
+                if (errors === 0) {
+                    stopTraining();
+                    document.getElementById('status').textContent = '✓ Convergé !';
+                    document.getElementById('status').style.color = '#48bb78';
+                }
+
+                return errors;
+            }
+
+            function updateDisplay() {
+                document.getElementById('w1').textContent = weights[0].toFixed(3);
+                document.getElementById('w2').textContent = weights[1].toFixed(3);
+                document.getElementById('bias').textContent = bias.toFixed(3);
+                document.getElementById('epoch').textContent = epoch;
+
+                // Calculate accuracy
+                let correct = 0;
+                dataPoints.forEach(point => {
+                    if (predict(point.x1, point.x2) === point.label) correct++;
+                });
+                const accuracy = (correct / dataPoints.length * 100).toFixed(1);
+                document.getElementById('accuracy').textContent = accuracy + '%';
+
+                const errors = dataPoints.length - correct;
+                document.getElementById('errors').textContent = errors;
+
+                // Redraw network diagram with updated weights
+                drawNetworkDiagram();
+            }
+
+            function startTraining() {
+                if (isTraining) {
+                    stopTraining();
+                    return;
+                }
+
+                isTraining = true;
+                document.querySelector('.btn-primary').textContent = '⏸ Mettre en pause l’entraînement';
+                document.getElementById('status').textContent = 'Entraînement en cours...';
+                document.getElementById('status').style.color = '#667eea';
+
+                const speed = parseInt(document.getElementById('speed').value);
+                trainingInterval = setInterval(() => {
+                    trainStep();
+                }, 2100 - speed);
+            }
+
+            function stopTraining() {
+                isTraining = false;
+                document.querySelector('.btn-primary').textContent = '▶ Démarrer l’Entraînement';
+                if (trainingInterval) {
+                    clearInterval(trainingInterval);
+                    trainingInterval = null;
+                }
+            }
+
+            function stepTraining() {
+                stopTraining();
+                trainStep();
+                document.getElementById('status').textContent = 'Étape terminée';
+            }
+
+            function reset() {
+                stopTraining();
+                weights = [Math.random() * 0.2 - 0.1, Math.random() * 0.2 - 0.1];
+                bias = Math.random() * 0.2 - 0.1;
+                epoch = 0;
+                generateData();
+                drawAxes();
+                drawPoints();
+                drawDecisionBoundary();
+                updateDisplay();
+                document.getElementById('status').textContent = 'Prêt à s’entraîner';
+                document.getElementById('status').style.color = '#667eea';
+            }
+
+            // Speed control
+            document.getElementById('speed').addEventListener('input', (e) => {
+                const speed = parseInt(e.target.value);
+                const labels = {
+                    100: 'Très rapide',
+                    600: 'Rapide',
+                    800: 'Normale',
+                    1200: 'Lente',
+                    2000: 'Très lente'
+                };
+
+                let label = 'Normale';
+                for (let val in labels) {
+                    if (Math.abs(speed - val) < 250) {
+                        label = labels[val];
+                        break;
+                    }
+                }
+
+                document.getElementById('speedLabel').textContent = label;
+
+                if (isTraining) {
+                    stopTraining();
+                    startTraining();
+                }
+            });
+
+            // Initialize
+            reset();
+        </script>
+    </body>
+
+</html>
