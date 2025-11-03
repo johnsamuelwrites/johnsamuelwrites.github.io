@@ -1,0 +1,1051 @@
+<!DOCTYPE html>
+<html lang="en">
+
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Gradient Descent Methods Visualization</title>
+        <style>
+            * {
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
+            }
+
+            body {
+                font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                min-height: 100vh;
+                padding: 20px;
+                overflow-x: hidden;
+            }
+
+            .container {
+                background: white;
+                border-radius: 20px;
+                padding: 30px;
+                box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+                max-width: 1400px;
+                width: 100%;
+            }
+
+            h1 {
+                text-align: center;
+                color: #333;
+                margin-bottom: 10px;
+                font-size: 2em;
+            }
+
+            .subtitle {
+                text-align: center;
+                color: #666;
+                margin-bottom: 20px;
+                font-size: 0.9em;
+            }
+
+            .mode-selector {
+                display: flex;
+                justify-content: center;
+                gap: 10px;
+                margin-bottom: 20px;
+                flex-wrap: wrap;
+            }
+
+            .mode-btn {
+                padding: 12px 24px;
+                font-size: 16px;
+                border: 2px solid #667eea;
+                border-radius: 8px;
+                cursor: pointer;
+                transition: all 0.3s ease;
+                font-weight: 600;
+                background: white;
+                color: #667eea;
+            }
+
+            .mode-btn:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            }
+
+            .mode-btn.active {
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                color: white;
+            }
+
+            .controls {
+                display: flex;
+                justify-content: center;
+                gap: 15px;
+                margin-bottom: 20px;
+                flex-wrap: wrap;
+            }
+
+            button {
+                padding: 12px 24px;
+                font-size: 16px;
+                border: none;
+                border-radius: 8px;
+                cursor: pointer;
+                transition: all 0.3s ease;
+                font-weight: 600;
+                box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            }
+
+            .btn-primary {
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                color: white;
+            }
+
+            .btn-primary:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+            }
+
+            .btn-secondary {
+                background: #f0f0f0;
+                color: #333;
+            }
+
+            .btn-secondary:hover {
+                background: #e0e0e0;
+            }
+
+            #network-canvas {
+                width: 100%;
+                height: 500px;
+                border: 2px solid #e0e0e0;
+                border-radius: 12px;
+                background: #fafafa;
+            }
+
+            .info-panel {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+                gap: 15px;
+                margin-top: 20px;
+            }
+
+            .info-card {
+                background: linear-gradient(135deg, #667eea15 0%, #764ba215 100%);
+                padding: 15px;
+                border-radius: 10px;
+                border-left: 4px solid #667eea;
+            }
+
+            .info-card h3 {
+                color: #667eea;
+                font-size: 0.9em;
+                margin-bottom: 8px;
+                text-transform: uppercase;
+                letter-spacing: 1px;
+            }
+
+            .info-card p {
+                color: #333;
+                font-size: 1.1em;
+                font-weight: 600;
+            }
+
+            .samples-display {
+                background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+                border: 2px solid #f59e0b;
+                border-radius: 10px;
+                padding: 15px;
+                margin-top: 15px;
+            }
+
+            .samples-display h3 {
+                color: #92400e;
+                margin-bottom: 10px;
+                font-size: 1em;
+                text-align: center;
+            }
+
+            .samples-grid {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+                gap: 10px;
+            }
+
+            .sample-box {
+                background: white;
+                padding: 10px;
+                border-radius: 6px;
+                border: 2px solid #d97706;
+                font-size: 0.85em;
+            }
+
+            .sample-box.active {
+                background: #fbbf24;
+                border-color: #92400e;
+                font-weight: bold;
+            }
+
+            .sample-box.in-batch {
+                background: #fed7aa;
+                border-color: #ea580c;
+            }
+
+            .explanation-box {
+                background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+                border: 2px solid #3b82f6;
+                border-radius: 10px;
+                padding: 15px;
+                margin-top: 15px;
+            }
+
+            .explanation-box h3 {
+                color: #1e40af;
+                margin-bottom: 10px;
+                font-size: 1.1em;
+            }
+
+            .explanation-box ul {
+                margin-left: 20px;
+                color: #1e3a8a;
+            }
+
+            .explanation-box li {
+                margin-bottom: 8px;
+                line-height: 1.5;
+            }
+
+            .legend {
+                display: flex;
+                justify-content: center;
+                gap: 30px;
+                margin-top: 15px;
+                flex-wrap: wrap;
+            }
+
+            .legend-item {
+                display: flex;
+                align-items: center;
+                gap: 8px;
+                font-size: 0.9em;
+                color: #666;
+            }
+
+            .legend-color {
+                width: 20px;
+                height: 20px;
+                border-radius: 4px;
+            }
+
+            @media (max-width: 768px) {
+                h1 {
+                    font-size: 1.5em;
+                }
+
+                #network-canvas {
+                    height: 400px;
+                }
+            }
+        </style>
+    </head>
+
+    <body>
+        <div class="container">
+            <h1>🧠 Gradient Descent Methods Visualization</h1>
+            <p class="subtitle">Compare SGD, BGD, and Mini-batch GD with 4 samples and 2 batches</p>
+
+            <div class="mode-selector">
+                <button class="mode-btn active" onclick="setMode('sgd')">📊 SGD (Stochastic)</button>
+                <button class="mode-btn" onclick="setMode('bgd')">📈 BGD (Batch)</button>
+                <button class="mode-btn" onclick="setMode('minibatch')">📉 Mini-batch GD</button>
+            </div>
+
+            <div class="controls">
+                <button class="btn-primary" onclick="trainOneEpoch()">🔄 Train 1 Epoch</button>
+                <button class="btn-secondary" onclick="resetNetwork()">↻ Reset</button>
+                <button class="btn-secondary" onclick="toggleSpeed()">⚡ Speed: <span
+                        id="speed-label">Normal</span></button>
+                <button class="btn-secondary" onclick="toggleWeights()">👁 Weights: <span
+                        id="weights-label">Hidden</span></button>
+            </div>
+
+            <svg id="network-canvas" viewBox="0 0 1200 500"></svg>
+
+            <div class="samples-display">
+                <h3>📦 Training Samples (4 total, 2 batches of 2 samples each)</h3>
+                <div class="samples-grid">
+                    <div class="sample-box" id="sample-0">
+                        <strong>Sample 1</strong><br>
+                        Input: [0.2, 0.8, 0.5, 0.3]<br>
+                        Target: [0.9, 0.1]
+                    </div>
+                    <div class="sample-box" id="sample-1">
+                        <strong>Sample 2</strong><br>
+                        Input: [0.7, 0.3, 0.6, 0.4]<br>
+                        Target: [0.2, 0.8]
+                    </div>
+                    <div class="sample-box" id="sample-2">
+                        <strong>Sample 3</strong><br>
+                        Input: [0.4, 0.6, 0.2, 0.7]<br>
+                        Target: [0.8, 0.2]
+                    </div>
+                    <div class="sample-box" id="sample-3">
+                        <strong>Sample 4</strong><br>
+                        Input: [0.9, 0.1, 0.8, 0.2]<br>
+                        Target: [0.3, 0.7]
+                    </div>
+                </div>
+                <div style="margin-top: 10px; text-align: center; color: #92400e; font-size: 0.9em;">
+                    <strong>Batch 1:</strong> Samples 1-2 | <strong>Batch 2:</strong> Samples 3-4
+                </div>
+            </div>
+
+            <div class="info-panel">
+                <div class="info-card">
+                    <h3>Current Mode</h3>
+                    <p id="current-mode">SGD</p>
+                </div>
+                <div class="info-card">
+                    <h3>Epoch</h3>
+                    <p id="epoch-count">0</p>
+                </div>
+                <div class="info-card">
+                    <h3>Weight Updates/Epoch</h3>
+                    <p id="updates-per-epoch">4</p>
+                </div>
+                <div class="info-card">
+                    <h3>Current Sample/Batch</h3>
+                    <p id="current-sample">-</p>
+                </div>
+                <div class="info-card">
+                    <h3>Loss</h3>
+                    <p id="loss-value">--</p>
+                </div>
+                <div class="info-card">
+                    <h3>Progress</h3>
+                    <p id="progress">Ready</p>
+                </div>
+            </div>
+
+            <div class="explanation-box" id="explanation">
+                <h3>📚 Stochastic Gradient Descent (SGD)</h3>
+                <ul>
+                    <li><strong>Weight Updates:</strong> 4 per epoch (one after each sample)</li>
+                    <li><strong>Process:</strong> For each sample → Forward pass → Backward pass → Update weights
+                        immediately</li>
+                    <li><strong>Pros:</strong> Fast updates, can escape local minima, good for large datasets</li>
+                    <li><strong>Cons:</strong> Noisy gradient estimates, unstable convergence</li>
+                </ul>
+            </div>
+
+            <div class="legend">
+                <div class="legend-item">
+                    <div class="legend-color" style="background: #fbbf24;"></div>
+                    <span>Active Sample</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background: #fed7aa;"></div>
+                    <span>In Current Batch</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background: #4ade80;"></div>
+                    <span>Strong Activation</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background: #a855f7;"></div>
+                    <span>Gradient Flow</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background: #fbbf24; border: 2px solid #f59e0b;"></div>
+                    <span>Weight Update</span>
+                </div>
+            </div>
+        </div>
+
+        <script>
+            const svg = document.getElementById('network-canvas');
+            const layers = [4, 6, 4, 2]; // Network architecture
+            const layerNames = ['Input', 'Hidden 1', 'Hidden 2', 'Output'];
+            let animationSpeed = 1;
+            let isAnimating = false;
+            let showWeights = false;
+            let epochCount = 0;
+            let learningRate = 0.01;
+            let currentMode = 'sgd'; // 'sgd', 'bgd', 'minibatch'
+
+            // Training samples (4 samples, 2 batches)
+            const samples = [
+                { input: [0.2, 0.8, 0.5, 0.3], target: [0.9, 0.1] },
+                { input: [0.7, 0.3, 0.6, 0.4], target: [0.2, 0.8] },
+                { input: [0.4, 0.6, 0.2, 0.7], target: [0.8, 0.2] },
+                { input: [0.9, 0.1, 0.8, 0.2], target: [0.3, 0.7] }
+            ];
+
+            const batches = [
+                [0, 1], // Batch 1: samples 0 and 1
+                [2, 3]  // Batch 2: samples 2 and 3
+            ];
+
+            // Network structure
+            let neurons = [];
+            let connections = [];
+            let gradients = [];
+            let accumulatedGradients = []; // For batch and mini-batch
+
+            function initializeNetwork() {
+                svg.innerHTML = '';
+                neurons = [];
+                connections = [];
+                gradients = [];
+
+                const width = 1200;
+                const height = 500;
+                const layerSpacing = width / (layers.length + 1);
+                const padding = 60;
+
+                // Create neurons
+                layers.forEach((neuronCount, layerIndex) => {
+                    const x = layerSpacing * (layerIndex + 1);
+                    const neuronSpacing = (height - 2 * padding) / (neuronCount + 1);
+
+                    for (let i = 0; i < neuronCount; i++) {
+                        const y = padding + neuronSpacing * (i + 1);
+                        neurons.push({
+                            x,
+                            y,
+                            layer: layerIndex,
+                            activation: 0,
+                            gradient: 0,
+                            element: null
+                        });
+                    }
+                });
+
+                // Create connections
+                let neuronIndex = 0;
+                for (let layer = 0; layer < layers.length - 1; layer++) {
+                    const currentLayerSize = layers[layer];
+                    const nextLayerSize = layers[layer + 1];
+                    const currentLayerStart = neuronIndex;
+                    const nextLayerStart = neuronIndex + currentLayerSize;
+
+                    for (let i = 0; i < currentLayerSize; i++) {
+                        for (let j = 0; j < nextLayerSize; j++) {
+                            const from = currentLayerStart + i;
+                            const to = nextLayerStart + j;
+                            const weight = (Math.random() * 2 - 1) * 0.5;
+
+                            connections.push({
+                                from,
+                                to,
+                                weight,
+                                gradient: 0,
+                                element: null,
+                                weightText: null
+                            });
+                        }
+                    }
+                    neuronIndex += currentLayerSize;
+                }
+
+                // Initialize accumulated gradients
+                accumulatedGradients = connections.map(() => 0);
+
+                drawNetwork();
+            }
+
+            function drawNetwork() {
+                // Draw connections
+                connections.forEach(conn => {
+                    const fromNeuron = neurons[conn.from];
+                    const toNeuron = neurons[conn.to];
+
+                    const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+                    line.setAttribute('x1', fromNeuron.x);
+                    line.setAttribute('y1', fromNeuron.y);
+                    line.setAttribute('x2', toNeuron.x);
+                    line.setAttribute('y2', toNeuron.y);
+                    line.setAttribute('stroke', '#e0e0e0');
+                    line.setAttribute('stroke-width', '1');
+                    line.setAttribute('opacity', '0.3');
+                    svg.appendChild(line);
+                    conn.element = line;
+
+                    // Weight text
+                    const midX = (fromNeuron.x + toNeuron.x) / 2;
+                    const midY = (fromNeuron.y + toNeuron.y) / 2;
+                    const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+                    text.setAttribute('x', midX);
+                    text.setAttribute('y', midY);
+                    text.setAttribute('text-anchor', 'middle');
+                    text.setAttribute('font-size', '8');
+                    text.setAttribute('fill', '#666');
+                    text.setAttribute('opacity', '0');
+                    text.textContent = conn.weight.toFixed(2);
+                    svg.appendChild(text);
+                    conn.weightText = text;
+                });
+
+                // Draw neurons
+                neurons.forEach((neuron) => {
+                    const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+                    circle.setAttribute('cx', neuron.x);
+                    circle.setAttribute('cy', neuron.y);
+                    circle.setAttribute('r', '15');
+                    circle.setAttribute('fill', '#94a3b8');
+                    circle.setAttribute('stroke', '#64748b');
+                    circle.setAttribute('stroke-width', '2');
+                    svg.appendChild(circle);
+                    neuron.element = circle;
+                });
+
+                // Add layer labels
+                layers.forEach((_, layerIndex) => {
+                    const x = (1200 / (layers.length + 1)) * (layerIndex + 1);
+                    const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+                    text.setAttribute('x', x);
+                    text.setAttribute('y', 30);
+                    text.setAttribute('text-anchor', 'middle');
+                    text.setAttribute('font-size', '14');
+                    text.setAttribute('font-weight', 'bold');
+                    text.setAttribute('fill', '#667eea');
+                    text.textContent = layerNames[layerIndex];
+                    svg.appendChild(text);
+                });
+            }
+
+            function setMode(mode) {
+                currentMode = mode;
+                document.querySelectorAll('.mode-btn').forEach(btn => btn.classList.remove('active'));
+                event.target.classList.add('active');
+
+                const modeNames = { 'sgd': 'SGD', 'bgd': 'Batch GD', 'minibatch': 'Mini-batch GD' };
+                const updatesPerEpoch = { 'sgd': 4, 'bgd': 1, 'minibatch': 2 };
+
+                document.getElementById('current-mode').textContent = modeNames[mode];
+                document.getElementById('updates-per-epoch').textContent = updatesPerEpoch[mode];
+
+                // Update explanation
+                const explanations = {
+                    'sgd': {
+                        title: '📚 Stochastic Gradient Descent (SGD)',
+                        points: [
+                            '<strong>Weight Updates:</strong> 4 per epoch (one after each sample)',
+                            '<strong>Process:</strong> For each sample → Forward pass → Backward pass → Update weights immediately',
+                            '<strong>Pros:</strong> Fast updates, can escape local minima, good for large datasets',
+                            '<strong>Cons:</strong> Noisy gradient estimates, unstable convergence'
+                        ]
+                    },
+                    'bgd': {
+                        title: '📈 Batch Gradient Descent (BGD)',
+                        points: [
+                            '<strong>Weight Updates:</strong> 1 per epoch (after processing all 4 samples)',
+                            '<strong>Process:</strong> Process all samples → Accumulate gradients → Average → Update weights once',
+                            '<strong>Pros:</strong> Stable convergence, smooth gradient estimates',
+                            '<strong>Cons:</strong> Slow for large datasets, may get stuck in local minima'
+                        ]
+                    },
+                    'minibatch': {
+                        title: '📉 Mini-batch Gradient Descent',
+                        points: [
+                            '<strong>Weight Updates:</strong> 2 per epoch (one per batch of 2 samples)',
+                            '<strong>Process:</strong> For each batch → Process samples → Accumulate gradients → Average → Update weights',
+                            '<strong>Pros:</strong> Balance between SGD and BGD, efficient, stable',
+                            '<strong>Cons:</strong> Requires tuning batch size'
+                        ]
+                    }
+                };
+
+                const exp = explanations[mode];
+                document.getElementById('explanation').innerHTML = `
+                <h3>${exp.title}</h3>
+                <ul>${exp.points.map(p => `<li>${p}</li>`).join('')}</ul>
+            `;
+            }
+
+            async function trainOneEpoch() {
+                if (isAnimating) return;
+                isAnimating = true;
+                epochCount++;
+                document.getElementById('epoch-count').textContent = epochCount;
+
+                clearSampleHighlights();
+
+                if (currentMode === 'sgd') {
+                    await trainSGD();
+                } else if (currentMode === 'bgd') {
+                    await trainBGD();
+                } else if (currentMode === 'minibatch') {
+                    await trainMiniBatch();
+                }
+
+                clearSampleHighlights();
+                document.getElementById('current-sample').textContent = '-';
+                document.getElementById('progress').textContent = 'Epoch Complete!';
+                isAnimating = false;
+            }
+
+            async function trainSGD() {
+                document.getElementById('progress').textContent = 'SGD Training...';
+
+                for (let i = 0; i < samples.length; i++) {
+                    highlightSample(i);
+                    document.getElementById('current-sample').textContent = `Sample ${i + 1}`;
+
+                    // Forward pass with this sample
+                    await forwardPass(samples[i].input);
+                    await sleep(300 / animationSpeed);
+
+                    // Calculate and display loss
+                    const loss = calculateLoss(samples[i].target);
+                    document.getElementById('loss-value').textContent = loss.toFixed(4);
+                    await sleep(200 / animationSpeed);
+
+                    // Backward pass
+                    await backwardPass(samples[i].target);
+                    await sleep(300 / animationSpeed);
+
+                    // Update weights immediately
+                    await updateWeights(1); // Update with gradient as-is
+                    await sleep(300 / animationSpeed);
+
+                    clearSampleHighlights();
+                }
+            }
+
+            async function trainBGD() {
+                document.getElementById('progress').textContent = 'BGD Training...';
+
+                // Reset accumulated gradients
+                accumulatedGradients = connections.map(() => 0);
+                let totalLoss = 0;
+
+                // Process all samples and accumulate gradients
+                for (let i = 0; i < samples.length; i++) {
+                    highlightSample(i);
+                    document.getElementById('current-sample').textContent = `Sample ${i + 1}/4 (accumulating)`;
+
+                    // Forward pass
+                    await forwardPass(samples[i].input);
+                    await sleep(200 / animationSpeed);
+
+                    // Calculate loss
+                    const loss = calculateLoss(samples[i].target);
+                    totalLoss += loss;
+                    await sleep(200 / animationSpeed);
+
+                    // Backward pass (accumulate gradients)
+                    await backwardPass(samples[i].target);
+
+                    // Accumulate gradients
+                    connections.forEach((conn, idx) => {
+                        accumulatedGradients[idx] += conn.gradient;
+                    });
+
+                    await sleep(200 / animationSpeed);
+                    clearSampleHighlights();
+                }
+
+                // Display average loss
+                document.getElementById('loss-value').textContent = (totalLoss / samples.length).toFixed(4);
+                document.getElementById('current-sample').textContent = 'All samples processed';
+                await sleep(300 / animationSpeed);
+
+                // Update weights once with averaged gradients
+                document.getElementById('progress').textContent = 'Updating weights (averaged)...';
+                await updateWeights(samples.length); // Divide by number of samples
+            }
+
+            async function trainMiniBatch() {
+                document.getElementById('progress').textContent = 'Mini-batch GD Training...';
+
+                for (let batchIdx = 0; batchIdx < batches.length; batchIdx++) {
+                    const batch = batches[batchIdx];
+                    accumulatedGradients = connections.map(() => 0);
+                    let batchLoss = 0;
+
+                    document.getElementById('current-sample').textContent = `Batch ${batchIdx + 1}/2`;
+
+                    // Mark batch samples
+                    batch.forEach(sampleIdx => {
+                        document.getElementById(`sample-${sampleIdx}`).classList.add('in-batch');
+                    });
+                    await sleep(200 / animationSpeed);
+
+                    // Process each sample in the batch
+                    for (let sampleIdx of batch) {
+                        highlightSample(sampleIdx);
+
+                        // Forward pass
+                        await forwardPass(samples[sampleIdx].input);
+                        await sleep(200 / animationSpeed);
+
+                        // Calculate loss
+                        const loss = calculateLoss(samples[sampleIdx].target);
+                        batchLoss += loss;
+                        await sleep(200 / animationSpeed);
+
+                        // Backward pass
+                        await backwardPass(samples[sampleIdx].target);
+
+                        // Accumulate gradients
+                        connections.forEach((conn, idx) => {
+                            accumulatedGradients[idx] += conn.gradient;
+                        });
+
+                        await sleep(200 / animationSpeed);
+                        clearSampleHighlight(sampleIdx);
+                    }
+
+                    // Display average batch loss
+                    document.getElementById('loss-value').textContent = (batchLoss / batch.length).toFixed(4);
+                    await sleep(300 / animationSpeed);
+
+                    // Update weights with averaged batch gradients
+                    document.getElementById('progress').textContent = `Updating weights (Batch ${batchIdx + 1})...`;
+                    await updateWeights(batch.length); // Divide by batch size
+
+                    // Clear batch highlight
+                    batch.forEach(sampleIdx => {
+                        document.getElementById(`sample-${sampleIdx}`).classList.remove('in-batch');
+                    });
+
+                    await sleep(300 / animationSpeed);
+                }
+            }
+
+            function highlightSample(index) {
+                clearSampleHighlights();
+                document.getElementById(`sample-${index}`).classList.add('active');
+            }
+
+            function clearSampleHighlight(index) {
+                document.getElementById(`sample-${index}`).classList.remove('active');
+            }
+
+            function clearSampleHighlights() {
+                for (let i = 0; i < samples.length; i++) {
+                    document.getElementById(`sample-${i}`).classList.remove('active');
+                    document.getElementById(`sample-${i}`).classList.remove('in-batch');
+                }
+            }
+
+            async function forwardPass(inputData) {
+                // Reset activations
+                neurons.forEach(n => n.activation = 0);
+
+                // Set input layer
+                for (let i = 0; i < inputData.length; i++) {
+                    neurons[i].activation = inputData[i];
+                    await animateNeuron(neurons[i], false);
+                }
+
+                // Propagate through layers
+                let currentNeuronIndex = 0;
+                for (let layerIndex = 0; layerIndex < layers.length - 1; layerIndex++) {
+                    await propagateToNextLayer(layerIndex);
+                    currentNeuronIndex += layers[layerIndex];
+                    await sleep(200 / animationSpeed);
+                }
+            }
+
+            async function backwardPass(targetOutput) {
+                // Calculate output layer gradients
+                const outputLayerStart = neurons.length - layers[layers.length - 1];
+                for (let i = 0; i < layers[layers.length - 1]; i++) {
+                    const neuron = neurons[outputLayerStart + i];
+                    neuron.gradient = neuron.activation - targetOutput[i];
+                }
+
+                // Animate backward through layers
+                for (let layerIndex = layers.length - 1; layerIndex >= 0; layerIndex--) {
+                    const layerSize = layers[layerIndex];
+                    const layerStart = layers.slice(0, layerIndex).reduce((a, b) => a + b, 0);
+
+                    for (let i = 0; i < layerSize; i++) {
+                        await animateNeuron(neurons[layerStart + i], true);
+                    }
+
+                    if (layerIndex > 0) {
+                        await propagateGradientsBackward(layerIndex);
+                    }
+                    await sleep(150 / animationSpeed);
+                }
+
+                // Calculate connection gradients
+                connections.forEach(conn => {
+                    const fromActivation = neurons[conn.from].activation;
+                    const toGradient = neurons[conn.to].gradient;
+                    conn.gradient = fromActivation * toGradient;
+                });
+            }
+
+            function calculateLoss(target) {
+                const outputLayerStart = neurons.length - layers[layers.length - 1];
+                let loss = 0;
+                for (let i = 0; i < layers[layers.length - 1]; i++) {
+                    const diff = neurons[outputLayerStart + i].activation - target[i];
+                    loss += diff * diff;
+                }
+                return loss / 2;
+            }
+
+            async function updateWeights(divisor) {
+                const wasVisible = showWeights;
+                if (!showWeights) toggleWeights();
+
+                for (let idx = 0; idx < connections.length; idx++) {
+                    const conn = connections[idx];
+                    const line = conn.element;
+                    const text = conn.weightText;
+
+                    // Calculate weight update
+                    let gradientToUse;
+                    if (currentMode === 'sgd') {
+                        gradientToUse = conn.gradient;
+                    } else {
+                        gradientToUse = accumulatedGradients[idx] / divisor;
+                    }
+
+                    const oldWeight = conn.weight;
+                    const weightUpdate = -learningRate * gradientToUse;
+                    const newWeight = oldWeight + weightUpdate;
+
+                    // Highlight connection
+                    line.setAttribute('stroke', '#fbbf24');
+                    line.setAttribute('stroke-width', '4');
+                    line.setAttribute('opacity', '1');
+
+                    text.setAttribute('font-size', '10');
+                    text.setAttribute('font-weight', 'bold');
+                    text.setAttribute('fill', '#ef4444');
+                    text.textContent = oldWeight.toFixed(3);
+
+                    await sleep(30 / animationSpeed);
+
+                    // Show update
+                    text.setAttribute('fill', '#10b981');
+                    text.textContent = oldWeight.toFixed(3) + '→' + newWeight.toFixed(3);
+
+                    await sleep(80 / animationSpeed);
+
+                    // Update weight
+                    conn.weight = newWeight;
+
+                    const finalColor = getWeightColor(conn.weight);
+                    line.setAttribute('stroke', finalColor);
+                    line.setAttribute('stroke-width', '2');
+                    line.setAttribute('opacity', '0.7');
+
+                    text.setAttribute('fill', finalColor);
+                    text.setAttribute('font-size', '8');
+                    text.setAttribute('font-weight', 'normal');
+                    text.textContent = conn.weight.toFixed(2);
+
+                    await sleep(20 / animationSpeed);
+
+                    line.setAttribute('stroke-width', '1');
+                    line.setAttribute('opacity', '0.6');
+                }
+
+                if (!wasVisible) toggleWeights();
+            }
+
+            async function propagateToNextLayer(layerIndex) {
+                const currentLayerStart = layers.slice(0, layerIndex).reduce((a, b) => a + b, 0);
+                const nextLayerStart = currentLayerStart + layers[layerIndex];
+                const nextLayerSize = layers[layerIndex + 1];
+
+                for (let i = 0; i < nextLayerSize; i++) {
+                    neurons[nextLayerStart + i].activation = 0;
+                }
+
+                const relevantConnections = connections.filter(conn =>
+                    conn.from >= currentLayerStart && conn.from < nextLayerStart
+                );
+
+                for (let neuronIdx = 0; neuronIdx < nextLayerSize; neuronIdx++) {
+                    const targetNeuron = nextLayerStart + neuronIdx;
+                    const incomingConnections = relevantConnections.filter(conn => conn.to === targetNeuron);
+
+                    await Promise.all(incomingConnections.map(conn => {
+                        neurons[conn.to].activation += neurons[conn.from].activation * conn.weight;
+                        return animateConnection(conn);
+                    }));
+
+                    neurons[targetNeuron].activation = 1 / (1 + Math.exp(-neurons[targetNeuron].activation));
+                    await animateNeuron(neurons[targetNeuron], false);
+                    await sleep(80 / animationSpeed);
+                }
+            }
+
+            async function propagateGradientsBackward(layerIndex) {
+                const currentLayerStart = layers.slice(0, layerIndex).reduce((a, b) => a + b, 0);
+                const prevLayerStart = layers.slice(0, layerIndex - 1).reduce((a, b) => a + b, 0);
+                const prevLayerSize = layers[layerIndex - 1];
+
+                for (let i = 0; i < prevLayerSize; i++) {
+                    neurons[prevLayerStart + i].gradient = 0;
+                }
+
+                const incomingConnections = connections.filter(conn =>
+                    conn.to >= currentLayerStart && conn.to < currentLayerStart + layers[layerIndex] &&
+                    conn.from >= prevLayerStart && conn.from < prevLayerStart + prevLayerSize
+                );
+
+                for (let neuronIdx = 0; neuronIdx < prevLayerSize; neuronIdx++) {
+                    const sourceNeuron = prevLayerStart + neuronIdx;
+                    const outgoingConnections = incomingConnections.filter(conn => conn.from === sourceNeuron);
+
+                    await Promise.all(outgoingConnections.map(conn => {
+                        neurons[conn.from].gradient += neurons[conn.to].gradient * conn.weight;
+                        return animateConnectionBackward(conn);
+                    }));
+
+                    await sleep(80 / animationSpeed);
+                }
+            }
+
+            function animateNeuron(neuron, isBackward) {
+                return new Promise(resolve => {
+                    const circle = neuron.element;
+                    const color = isBackward ? getGradientColor(neuron.gradient) : getActivationColor(neuron.activation);
+
+                    circle.setAttribute('fill', color);
+                    const originalR = 15;
+                    let scale = 1;
+                    let growing = true;
+                    let frames = 0;
+                    const maxFrames = 10;
+
+                    const animate = () => {
+                        if (frames >= maxFrames) {
+                            circle.setAttribute('r', originalR);
+                            resolve();
+                            return;
+                        }
+
+                        if (growing) {
+                            scale += 0.04;
+                            if (scale >= 1.3) growing = false;
+                        } else {
+                            scale -= 0.04;
+                        }
+
+                        circle.setAttribute('r', originalR * scale);
+                        frames++;
+                        requestAnimationFrame(animate);
+                    };
+                    animate();
+                });
+            }
+
+            function animateConnection(conn) {
+                return new Promise(resolve => {
+                    const line = conn.element;
+                    const color = getWeightColor(conn.weight);
+
+                    line.setAttribute('stroke', color);
+                    line.setAttribute('stroke-width', '2.5');
+                    line.setAttribute('opacity', '0.8');
+
+                    setTimeout(() => {
+                        line.setAttribute('stroke', '#e0e0e0');
+                        line.setAttribute('stroke-width', '1');
+                        line.setAttribute('opacity', '0.3');
+                        resolve();
+                    }, 60 / animationSpeed);
+                });
+            }
+
+            function animateConnectionBackward(conn) {
+                return new Promise(resolve => {
+                    const line = conn.element;
+
+                    line.setAttribute('stroke', '#a855f7');
+                    line.setAttribute('stroke-width', '2.5');
+                    line.setAttribute('opacity', '0.9');
+
+                    setTimeout(() => {
+                        line.setAttribute('stroke', '#e0e0e0');
+                        line.setAttribute('stroke-width', '1');
+                        line.setAttribute('opacity', '0.3');
+                        resolve();
+                    }, 60 / animationSpeed);
+                });
+            }
+
+            function getActivationColor(activation) {
+                if (activation > 0.7) return '#4ade80';
+                if (activation > 0.4) return '#fbbf24';
+                if (activation > 0.1) return '#fb923c';
+                return '#94a3b8';
+            }
+
+            function getWeightColor(weight) {
+                const absWeight = Math.abs(weight);
+                if (weight > 0) {
+                    if (absWeight > 0.5) return '#ef4444';
+                    if (absWeight > 0.2) return '#f87171';
+                    return '#fca5a5';
+                } else {
+                    if (absWeight > 0.5) return '#3b82f6';
+                    if (absWeight > 0.2) return '#60a5fa';
+                    return '#93c5fd';
+                }
+            }
+
+            function getGradientColor(gradient) {
+                const absGrad = Math.abs(gradient);
+                if (absGrad > 0.5) return '#a855f7';
+                if (absGrad > 0.2) return '#c084fc';
+                return '#e9d5ff';
+            }
+
+            function sleep(ms) {
+                return new Promise(resolve => setTimeout(resolve, ms));
+            }
+
+            function resetNetwork() {
+                isAnimating = false;
+                epochCount = 0;
+                initializeNetwork();
+                clearSampleHighlights();
+                document.getElementById('epoch-count').textContent = '0';
+                document.getElementById('loss-value').textContent = '--';
+                document.getElementById('current-sample').textContent = '-';
+                document.getElementById('progress').textContent = 'Ready';
+            }
+
+            function toggleSpeed() {
+                animationSpeed = animationSpeed === 1 ? 2 : animationSpeed === 2 ? 0.5 : 1;
+                const label = animationSpeed === 2 ? 'Fast' : animationSpeed === 0.5 ? 'Slow' : 'Normal';
+                document.getElementById('speed-label').textContent = label;
+            }
+
+            function toggleWeights() {
+                showWeights = !showWeights;
+                connections.forEach(conn => {
+                    const text = conn.weightText;
+                    const line = conn.element;
+
+                    text.setAttribute('opacity', showWeights ? '1' : '0');
+                    if (showWeights) {
+                        text.textContent = conn.weight.toFixed(2);
+                        const color = getWeightColor(conn.weight);
+                        text.setAttribute('fill', color);
+                        line.setAttribute('stroke', color);
+                        line.setAttribute('opacity', '0.6');
+                    } else {
+                        line.setAttribute('stroke', '#e0e0e0');
+                        line.setAttribute('opacity', '0.3');
+                    }
+                });
+                document.getElementById('weights-label').textContent = showWeights ? 'Visible' : 'Hidden';
+            }
+
+            // Initialize
+            initializeNetwork();
+        </script>
+    </body>
+
+</html>
