@@ -1,0 +1,1040 @@
+<!DOCTYPE html>
+<html lang="en">
+
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>MLP Visualization - Batch vs Stochastic Learning</title>
+        <style>
+            * {
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
+            }
+
+            body {
+                font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                min-height: 100vh;
+                padding: 20px;
+            }
+
+            .container {
+                background: white;
+                border-radius: 20px;
+                padding: 30px;
+                box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+                width: 95vw;
+                max-width: 1400px;
+            }
+
+            h1 {
+                text-align: center;
+                color: #333;
+                margin-bottom: 10px;
+                font-size: 28px;
+            }
+
+            .subtitle {
+                text-align: center;
+                color: #666;
+                margin-bottom: 20px;
+                font-size: 14px;
+            }
+
+            .learning-mode-selector {
+                background: #e3f2fd;
+                padding: 20px;
+                border-radius: 10px;
+                margin-bottom: 20px;
+                border: 2px solid #2196F3;
+            }
+
+            .learning-mode-selector h3 {
+                color: #1976d2;
+                margin-bottom: 15px;
+                font-size: 18px;
+            }
+
+            .mode-options {
+                display: flex;
+                gap: 20px;
+                flex-wrap: wrap;
+            }
+
+            .mode-option {
+                flex: 1;
+                min-width: 250px;
+                background: white;
+                padding: 15px;
+                border-radius: 8px;
+                cursor: pointer;
+                border: 3px solid transparent;
+                transition: all 0.3s;
+            }
+
+            .mode-option:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            }
+
+            .mode-option.selected {
+                border-color: #2196F3;
+                background: #f0f7ff;
+            }
+
+            .mode-option input[type="radio"] {
+                margin-right: 10px;
+            }
+
+            .mode-option h4 {
+                color: #333;
+                margin-bottom: 8px;
+                font-size: 16px;
+            }
+
+            .mode-option p {
+                color: #666;
+                font-size: 13px;
+                line-height: 1.5;
+            }
+
+            .controls {
+                display: flex;
+                justify-content: center;
+                gap: 15px;
+                margin-bottom: 20px;
+                flex-wrap: wrap;
+            }
+
+            button {
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                color: white;
+                border: none;
+                padding: 12px 30px;
+                border-radius: 25px;
+                cursor: pointer;
+                font-size: 16px;
+                font-weight: 600;
+                transition: transform 0.2s, box-shadow 0.2s;
+                box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+            }
+
+            button:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+            }
+
+            button:disabled {
+                background: #ccc;
+                cursor: not-allowed;
+                box-shadow: none;
+            }
+
+            #networkCanvas {
+                display: block;
+                margin: 0 auto;
+                background: #f8f9fa;
+                border-radius: 10px;
+                border: 2px solid #e0e0e0;
+            }
+
+            .current-step {
+                background: #fff3cd;
+                border: 2px solid #ffc107;
+                padding: 15px;
+                border-radius: 10px;
+                margin-bottom: 15px;
+                text-align: center;
+            }
+
+            .current-step h3 {
+                color: #856404;
+                font-size: 16px;
+                margin-bottom: 5px;
+            }
+
+            .current-step p {
+                color: #856404;
+                font-size: 14px;
+                margin: 0;
+            }
+
+            .formula-display {
+                background: #e3f2fd;
+                padding: 10px;
+                border-radius: 5px;
+                margin-top: 5px;
+                font-family: 'Courier New', monospace;
+                font-size: 13px;
+                color: #0d47a1;
+            }
+
+            .error-accumulator {
+                background: #ffe0e0;
+                border: 2px solid #f44336;
+                padding: 15px;
+                border-radius: 10px;
+                margin-bottom: 15px;
+            }
+
+            .error-accumulator h3 {
+                color: #c62828;
+                font-size: 16px;
+                margin-bottom: 10px;
+            }
+
+            .error-samples {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+                gap: 10px;
+            }
+
+            .error-sample {
+                background: white;
+                padding: 10px;
+                border-radius: 5px;
+                font-size: 13px;
+            }
+
+            .error-sample.processed {
+                background: #c8e6c9;
+                border: 2px solid #4caf50;
+            }
+
+            .error-sample .sample-label {
+                font-weight: bold;
+                color: #333;
+                margin-bottom: 5px;
+            }
+
+            .error-sample .sample-loss {
+                color: #f44336;
+                font-family: monospace;
+            }
+
+            .stats-panel {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+                gap: 15px;
+                margin-top: 15px;
+            }
+
+            .stat-box {
+                background: #fff;
+                padding: 15px;
+                border-radius: 8px;
+                border: 2px solid #e0e0e0;
+                text-align: center;
+            }
+
+            .stat-label {
+                font-size: 12px;
+                color: #666;
+                margin-bottom: 5px;
+                text-transform: uppercase;
+                letter-spacing: 1px;
+            }
+
+            .stat-value {
+                font-size: 24px;
+                font-weight: bold;
+                color: #667eea;
+            }
+
+            .legend {
+                display: flex;
+                justify-content: center;
+                gap: 30px;
+                margin-top: 15px;
+                flex-wrap: wrap;
+            }
+
+            .legend-item {
+                display: flex;
+                align-items: center;
+                gap: 8px;
+                font-size: 13px;
+                color: #555;
+            }
+
+            .legend-color {
+                width: 20px;
+                height: 20px;
+                border-radius: 50%;
+                border: 2px solid #333;
+            }
+
+            .info-panel {
+                margin-top: 20px;
+                padding: 20px;
+                background: #f0f4ff;
+                border-radius: 10px;
+                border-left: 4px solid #667eea;
+            }
+
+            .info-panel h3 {
+                color: #333;
+                margin-bottom: 10px;
+                font-size: 18px;
+            }
+
+            .info-panel p {
+                color: #555;
+                line-height: 1.8;
+                font-size: 14px;
+                margin-bottom: 10px;
+            }
+
+            .info-panel strong {
+                color: #667eea;
+            }
+
+            .speed-control {
+                display: flex;
+                align-items: center;
+                gap: 10px;
+                font-size: 14px;
+                color: #555;
+            }
+
+            .weight-tooltip {
+                position: absolute;
+                background: rgba(0, 0, 0, 0.9);
+                color: white;
+                padding: 8px 12px;
+                border-radius: 6px;
+                font-size: 12px;
+                pointer-events: none;
+                z-index: 1000;
+                display: none;
+                white-space: nowrap;
+            }
+        </style>
+    </head>
+
+    <body>
+        <div class="weight-tooltip" id="tooltip"></div>
+
+        <div class="container">
+            <h1>🧠 MLP Learning: Batch vs Stochastic Gradient Descent</h1>
+            <p class="subtitle">Understanding how errors are handled during training</p>
+
+            <div class="learning-mode-selector">
+                <h3>📚 Select Learning Mode:</h3>
+                <div class="mode-options">
+                    <label class="mode-option selected" id="modeStochastic">
+                        <input type="radio" name="learningMode" value="stochastic" checked
+                            onchange="selectMode('stochastic')">
+                        <h4>🎯 Stochastic Gradient Descent (SGD)</h4>
+                        <p><strong>Update after EACH sample</strong><br>
+                            • Faster, more frequent updates<br>
+                            • Weights change after every training example<br>
+                            • Noisy but can escape local minima<br>
+                            • Current loss shown per sample</p>
+                    </label>
+                    <label class="mode-option" id="modeBatch">
+                        <input type="radio" name="learningMode" value="batch" onchange="selectMode('batch')">
+                        <h4>📦 Batch Gradient Descent</h4>
+                        <p><strong>Update ONCE per epoch</strong><br>
+                            • Accumulate gradients from all samples<br>
+                            • Weights update after seeing all data<br>
+                            • Stable, consistent gradient direction<br>
+                            • Average loss across all samples</p>
+                    </label>
+                </div>
+            </div>
+
+            <div class="current-step" id="stepIndicator">
+                <h3 id="stepTitle">Ready to Start</h3>
+                <p id="stepDescription">Select a learning mode and click "Train Network"</p>
+                <div class="formula-display" id="formulaDisplay" style="display: none;"></div>
+            </div>
+
+            <div class="error-accumulator" id="errorAccumulator" style="display: none;">
+                <h3>📊 Error Tracking for Current Epoch</h3>
+                <div class="error-samples" id="errorSamples"></div>
+                <div style="margin-top: 10px; font-size: 14px; color: #c62828;">
+                    <strong>Total Accumulated Loss:</strong> <span id="totalLoss">0.0000</span>
+                </div>
+            </div>
+
+            <div class="controls">
+                <button id="trainBtn" onclick="startTraining()">🎓 Train Network (1 Epoch)</button>
+                <button id="forwardBtn" onclick="startForwardProp()">▶️ Forward Pass Only</button>
+                <button id="resetBtn" onclick="resetNetwork()">🔄 Reset Network</button>
+                <button id="randomBtn" onclick="randomizeWeights()">🎲 Randomize Weights</button>
+                <div class="speed-control">
+                    <label for="speedSlider">Speed:</label>
+                    <input type="range" id="speedSlider" min="0.3" max="2" step="0.1" value="1">
+                    <span id="speedValue">1.0x</span>
+                </div>
+            </div>
+
+            <div class="stats-panel">
+                <div class="stat-box">
+                    <div class="stat-label">Learning Mode</div>
+                    <div class="stat-value" id="modeValue" style="font-size: 16px;">SGD</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-label">Current Phase</div>
+                    <div class="stat-value" id="phaseValue" style="font-size: 16px;">Ready</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-label">Average Loss</div>
+                    <div class="stat-value" id="lossValue">0.0000</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-label">Epochs Completed</div>
+                    <div class="stat-value" id="epochValue">0</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-label">Weight Updates</div>
+                    <div class="stat-value" id="updateValue">0</div>
+                </div>
+            </div>
+
+            <canvas id="networkCanvas" width="1300" height="500"></canvas>
+
+            <div class="legend">
+                <div class="legend-item">
+                    <div class="legend-color" style="background: #4CAF50;"></div>
+                    <span>Input Layer</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background: #2196F3;"></div>
+                    <span>Hidden Layer</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background: #FF9800;"></div>
+                    <span>Output Layer</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background: rgba(255, 50, 50, 0.8);"></div>
+                    <span>Forward Signal</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background: rgba(255, 215, 0, 0.8);"></div>
+                    <span>Backward Gradient</span>
+                </div>
+            </div>
+
+            <div class="info-panel">
+                <h3>📚 Understanding Error Handling in One Epoch:</h3>
+
+                <p><strong>Stochastic Gradient Descent (SGD):</strong></p>
+                <p>• Process Sample 1 → Calculate error → Update weights immediately<br>
+                    • Process Sample 2 → Calculate error → Update weights immediately<br>
+                    • Process Sample 3 → Calculate error → Update weights immediately<br>
+                    • Process Sample 4 → Calculate error → Update weights immediately<br>
+                    <strong>Result:</strong> 4 weight updates per epoch. Each sample immediately influences the network.
+                </p>
+
+                <p><strong>Batch Gradient Descent:</strong></p>
+                <p>• Process Sample 1 → Calculate error → Store gradients<br>
+                    • Process Sample 2 → Calculate error → Accumulate gradients<br>
+                    • Process Sample 3 → Calculate error → Accumulate gradients<br>
+                    • Process Sample 4 → Calculate error → Accumulate gradients<br>
+                    • Average all gradients → Update weights ONCE<br>
+                    <strong>Result:</strong> 1 weight update per epoch. All samples influence the update equally.
+                </p>
+
+                <p><strong>Key Difference:</strong> In SGD, weights change after each sample, so later samples see
+                    different weights than earlier ones. In Batch GD, all samples see the same weights, and we update
+                    based on the average gradient.</p>
+
+                <p><strong>Average Loss Calculation:</strong> For both methods, we report the average loss across all
+                    samples in the epoch: <code>Avg Loss = (Loss₁ + Loss₂ + Loss₃ + Loss₄) / 4</code></p>
+            </div>
+        </div>
+
+        <script>
+            const canvas = document.getElementById('networkCanvas');
+            const ctx = canvas.getContext('2d');
+            const tooltip = document.getElementById('tooltip');
+
+            // Network architecture
+            const layers = [3, 4, 2];
+            const layerColors = ['#4CAF50', '#2196F3', '#FF9800'];
+
+            // State
+            let neurons = [];
+            let connections = [];
+            let animating = false;
+            let animationSpeed = 1;
+            let learningRate = 0.5;
+            let epochCount = 0;
+            let currentLoss = 0;
+            let learningMode = 'stochastic'; // 'stochastic' or 'batch'
+            let totalWeightUpdates = 0;
+
+            // Training data
+            const trainingData = [
+                { input: [0.2, 0.3, 0.1], target: [0.8, 0.2] },
+                { input: [0.8, 0.7, 0.9], target: [0.2, 0.8] },
+                { input: [0.1, 0.8, 0.2], target: [0.7, 0.3] },
+                { input: [0.9, 0.2, 0.8], target: [0.3, 0.7] }
+            ];
+
+            function selectMode(mode) {
+                if (animating) return;
+
+                learningMode = mode;
+                document.getElementById('modeStochastic').classList.toggle('selected', mode === 'stochastic');
+                document.getElementById('modeBatch').classList.toggle('selected', mode === 'batch');
+                document.getElementById('modeValue').textContent = mode === 'stochastic' ? 'SGD' : 'Batch';
+            }
+
+            function initNetwork() {
+                neurons = [];
+                connections = [];
+
+                const layerSpacing = canvas.width / (layers.length + 1);
+
+                layers.forEach((count, layerIndex) => {
+                    const layer = [];
+                    const neuronSpacing = canvas.height / (count + 1);
+
+                    for (let i = 0; i < count; i++) {
+                        layer.push({
+                            x: layerSpacing * (layerIndex + 1),
+                            y: neuronSpacing * (i + 1),
+                            radius: 25,
+                            activation: 0,
+                            delta: 0,
+                            accumulatedDelta: 0, // For batch mode
+                            color: layerColors[layerIndex],
+                            layer: layerIndex,
+                            index: i,
+                            computing: false,
+                            weightedSum: 0
+                        });
+                    }
+                    neurons.push(layer);
+                });
+
+                for (let l = 0; l < neurons.length - 1; l++) {
+                    for (let i = 0; i < neurons[l].length; i++) {
+                        for (let j = 0; j < neurons[l + 1].length; j++) {
+                            connections.push({
+                                from: neurons[l][i],
+                                to: neurons[l + 1][j],
+                                weight: (Math.random() * 2 - 1) * 0.5,
+                                signal: 0,
+                                backSignal: 0,
+                                accumulatedGradient: 0, // For batch mode
+                                active: false
+                            });
+                        }
+                    }
+                }
+
+                updateStats();
+            }
+
+            function updateStats() {
+                document.getElementById('epochValue').textContent = epochCount;
+                document.getElementById('lossValue').textContent = currentLoss.toFixed(4);
+                document.getElementById('updateValue').textContent = totalWeightUpdates;
+            }
+
+            function updateStepIndicator(title, description, formula = null) {
+                document.getElementById('stepTitle').textContent = title;
+                document.getElementById('stepDescription').textContent = description;
+
+                const formulaDisplay = document.getElementById('formulaDisplay');
+                if (formula) {
+                    formulaDisplay.textContent = formula;
+                    formulaDisplay.style.display = 'block';
+                } else {
+                    formulaDisplay.style.display = 'none';
+                }
+            }
+
+            function updateErrorAccumulator(sampleIndex, loss, isProcessed) {
+                const accumulator = document.getElementById('errorAccumulator');
+                const samplesDiv = document.getElementById('errorSamples');
+
+                accumulator.style.display = 'block';
+
+                let sampleDiv = document.getElementById(`error-sample-${sampleIndex}`);
+                if (!sampleDiv) {
+                    sampleDiv = document.createElement('div');
+                    sampleDiv.id = `error-sample-${sampleIndex}`;
+                    sampleDiv.className = 'error-sample';
+                    samplesDiv.appendChild(sampleDiv);
+                }
+
+                sampleDiv.innerHTML = `
+                <div class="sample-label">Sample ${sampleIndex + 1}</div>
+                <div class="sample-loss">Loss: ${loss.toFixed(4)}</div>
+            `;
+
+                if (isProcessed) {
+                    sampleDiv.classList.add('processed');
+                }
+            }
+
+            function clearErrorAccumulator() {
+                document.getElementById('errorSamples').innerHTML = '';
+                document.getElementById('totalLoss').textContent = '0.0000';
+            }
+
+            function drawNetwork() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+                // Draw connections
+                connections.forEach(conn => {
+                    const weightMag = Math.abs(conn.weight);
+                    const alpha = Math.min(weightMag / 2, 0.8);
+                    let width = Math.max(1, Math.min(weightMag * 2.5, 6));
+
+                    if (conn.active) width = 8;
+
+                    ctx.beginPath();
+                    ctx.moveTo(conn.from.x, conn.from.y);
+                    ctx.lineTo(conn.to.x, conn.to.y);
+
+                    if (conn.active) {
+                        ctx.strokeStyle = 'rgba(255, 215, 0, 0.9)';
+                    } else {
+                        ctx.strokeStyle = conn.weight > 0
+                            ? `rgba(33, 150, 243, ${alpha})`
+                            : `rgba(244, 67, 54, ${alpha})`;
+                    }
+                    ctx.lineWidth = width;
+                    ctx.stroke();
+
+                    // Signals
+                    if (conn.signal > 0 && conn.signal <= 1) {
+                        const t = conn.signal;
+                        const x = conn.from.x + (conn.to.x - conn.from.x) * t;
+                        const y = conn.from.y + (conn.to.y - conn.from.y) * t;
+
+                        ctx.beginPath();
+                        ctx.arc(x, y, 10, 0, Math.PI * 2);
+                        ctx.fillStyle = 'rgba(255, 50, 50, 0.9)';
+                        ctx.fill();
+                    }
+
+                    if (conn.backSignal > 0 && conn.backSignal <= 1) {
+                        const t = 1 - conn.backSignal;
+                        const x = conn.from.x + (conn.to.x - conn.from.x) * t;
+                        const y = conn.from.y + (conn.to.y - conn.from.y) * t;
+
+                        ctx.beginPath();
+                        ctx.arc(x, y, 10, 0, Math.PI * 2);
+                        ctx.fillStyle = 'rgba(255, 215, 0, 0.9)';
+                        ctx.fill();
+                    }
+                });
+
+                // Draw neurons
+                neurons.forEach((layer, layerIndex) => {
+                    layer.forEach(neuron => {
+                        if (neuron.computing) {
+                            ctx.beginPath();
+                            ctx.arc(neuron.x, neuron.y, neuron.radius * 1.5, 0, Math.PI * 2);
+                            ctx.fillStyle = 'rgba(255, 215, 0, 0.3)';
+                            ctx.fill();
+                        }
+
+                        ctx.beginPath();
+                        ctx.arc(neuron.x, neuron.y, neuron.radius, 0, Math.PI * 2);
+                        ctx.fillStyle = neuron.color;
+                        ctx.fill();
+
+                        if (neuron.activation > 0.1) {
+                            const brightness = Math.min(neuron.activation, 1);
+                            const gradient = ctx.createRadialGradient(
+                                neuron.x, neuron.y, neuron.radius * 0.3,
+                                neuron.x, neuron.y, neuron.radius * 1.3
+                            );
+                            gradient.addColorStop(0, `rgba(255, 255, 255, ${brightness * 0.9})`);
+                            gradient.addColorStop(1, 'rgba(255, 255, 255, 0)');
+
+                            ctx.beginPath();
+                            ctx.arc(neuron.x, neuron.y, neuron.radius * 1.3, 0, Math.PI * 2);
+                            ctx.fillStyle = gradient;
+                            ctx.fill();
+                        }
+
+                        ctx.beginPath();
+                        ctx.arc(neuron.x, neuron.y, neuron.radius, 0, Math.PI * 2);
+                        ctx.strokeStyle = neuron.computing ? '#FFD700' : '#333';
+                        ctx.lineWidth = neuron.computing ? 3 : 2;
+                        ctx.stroke();
+
+                        ctx.fillStyle = neuron.activation > 0.5 ? '#fff' : '#000';
+                        ctx.font = 'bold 12px Arial';
+                        ctx.textAlign = 'center';
+                        ctx.textBaseline = 'middle';
+
+                        if (neuron.activation > 0) {
+                            ctx.fillText(neuron.activation.toFixed(2), neuron.x, neuron.y);
+                        }
+                    });
+
+                    const firstNeuron = layer[0];
+                    const layerNames = ['Input', 'Hidden', 'Output'];
+                    ctx.fillStyle = '#333';
+                    ctx.font = 'bold 16px Arial';
+                    ctx.textAlign = 'center';
+                    ctx.fillText(layerNames[layerIndex], firstNeuron.x, 35);
+                });
+            }
+
+            function sigmoid(x) {
+                return 1 / (1 + Math.exp(-x));
+            }
+
+            function sigmoidDerivative(activation) {
+                return activation * (1 - activation);
+            }
+
+            async function forwardPropagate(input, animate = true) {
+                neurons[0].forEach((neuron, i) => {
+                    neuron.activation = input[i] || 0;
+                });
+
+                if (animate) {
+                    drawNetwork();
+                    await sleep(500 / animationSpeed);
+                }
+
+                for (let l = 0; l < neurons.length - 1; l++) {
+                    const fromLayer = neurons[l];
+                    const toLayer = neurons[l + 1];
+                    const layerConnections = connections.filter(
+                        c => c.from.layer === l && c.to.layer === l + 1
+                    );
+
+                    if (animate) {
+                        const steps = 30;
+                        for (let step = 0; step <= steps; step++) {
+                            layerConnections.forEach(conn => conn.signal = step / steps);
+                            drawNetwork();
+                            await sleep(10 / animationSpeed);
+                        }
+                        layerConnections.forEach(conn => conn.signal = 0);
+                    }
+
+                    toLayer.forEach(toNeuron => {
+                        let sum = 0;
+                        fromLayer.forEach(fromNeuron => {
+                            const conn = layerConnections.find(
+                                c => c.from === fromNeuron && c.to === toNeuron
+                            );
+                            if (conn) {
+                                sum += fromNeuron.activation * conn.weight;
+                            }
+                        });
+                        toNeuron.activation = sigmoid(sum);
+                    });
+
+                    if (animate) {
+                        drawNetwork();
+                        await sleep(300 / animationSpeed);
+                    }
+                }
+
+                return neurons[neurons.length - 1].map(n => n.activation);
+            }
+
+            async function backPropagate(target, animate = true, updateWeights = true) {
+                const outputLayer = neurons[neurons.length - 1];
+
+                outputLayer.forEach((neuron, i) => {
+                    const error = target[i] - neuron.activation;
+                    neuron.delta = error * sigmoidDerivative(neuron.activation);
+                });
+
+                if (animate) {
+                    drawNetwork();
+                    await sleep(500 / animationSpeed);
+                }
+
+                for (let l = neurons.length - 2; l >= 0; l--) {
+                    const currentLayer = neurons[l];
+                    const nextLayer = neurons[l + 1];
+                    const layerConnections = connections.filter(
+                        c => c.from.layer === l && c.to.layer === l + 1
+                    );
+
+                    if (animate) {
+                        const steps = 30;
+                        for (let step = 0; step <= steps; step++) {
+                            layerConnections.forEach(conn => conn.backSignal = step / steps);
+                            drawNetwork();
+                            await sleep(10 / animationSpeed);
+                        }
+                        layerConnections.forEach(conn => conn.backSignal = 0);
+                    }
+
+                    for (let i = 0; i < currentLayer.length; i++) {
+                        const neuron = currentLayer[i];
+                        let errorSum = 0;
+
+                        for (let j = 0; j < nextLayer.length; j++) {
+                            const nextNeuron = nextLayer[j];
+                            const conn = layerConnections.find(
+                                c => c.from === neuron && c.to === nextNeuron
+                            );
+
+                            if (conn) {
+                                errorSum += nextNeuron.delta * conn.weight;
+
+                                const gradient = neuron.activation * nextNeuron.delta;
+
+                                if (updateWeights) {
+                                    // SGD: update immediately
+                                    conn.weight += learningRate * gradient;
+                                } else {
+                                    // Batch: accumulate gradient
+                                    conn.accumulatedGradient += gradient;
+                                }
+                            }
+                        }
+
+                        neuron.delta = errorSum * sigmoidDerivative(neuron.activation);
+                    }
+
+                    if (animate) {
+                        drawNetwork();
+                        await sleep(200 / animationSpeed);
+                    }
+                }
+
+                if (updateWeights) {
+                    totalWeightUpdates++;
+                    updateStats();
+                }
+            }
+
+            function applyBatchUpdate() {
+                // Apply accumulated gradients (divided by number of samples)
+                const numSamples = trainingData.length;
+                connections.forEach(conn => {
+                    conn.weight += learningRate * (conn.accumulatedGradient / numSamples);
+                    conn.accumulatedGradient = 0;
+                });
+                totalWeightUpdates++;
+                updateStats();
+            }
+
+            function calculateLoss(output, target) {
+                let loss = 0;
+                for (let i = 0; i < output.length; i++) {
+                    loss += Math.pow(target[i] - output[i], 2);
+                }
+                return loss / output.length;
+            }
+
+            async function startForwardProp() {
+                if (animating) return;
+
+                animating = true;
+                document.getElementById('trainBtn').disabled = true;
+                document.getElementById('forwardBtn').disabled = true;
+
+                updateStepIndicator('▶️ Forward Propagation Only', 'Showing how input flows through the network');
+
+                const sample = trainingData[0];
+                await forwardPropagate(sample.input, true);
+
+                const output = neurons[neurons.length - 1].map(n => n.activation);
+                currentLoss = calculateLoss(output, sample.target);
+                updateStats();
+
+                updateStepIndicator(
+                    '✅ Forward Pass Complete',
+                    `Output: [${output.map(v => v.toFixed(3)).join(', ')}] | Loss: ${currentLoss.toFixed(4)}`
+                );
+
+                animating = false;
+                document.getElementById('trainBtn').disabled = false;
+                document.getElementById('forwardBtn').disabled = false;
+            }
+
+            async function startTraining() {
+                if (animating) return;
+
+                animating = true;
+                document.getElementById('trainBtn').disabled = true;
+                document.getElementById('forwardBtn').disabled = true;
+                clearErrorAccumulator();
+
+                let totalLoss = 0;
+
+                if (learningMode === 'stochastic') {
+                    updateStepIndicator(
+                        '🎯 Stochastic Gradient Descent',
+                        'Updating weights after EACH sample'
+                    );
+
+                    for (let i = 0; i < trainingData.length; i++) {
+                        const sample = trainingData[i];
+
+                        document.getElementById('phaseValue').textContent = `SGD ${i + 1}/4`;
+
+                        updateStepIndicator(
+                            `📤 Sample ${i + 1}: Forward Pass`,
+                            `Processing: [${sample.input.map(v => v.toFixed(2)).join(', ')}]`
+                        );
+
+                        await forwardPropagate(sample.input, true);
+
+                        const output = neurons[neurons.length - 1].map(n => n.activation);
+                        const loss = calculateLoss(output, sample.target);
+                        totalLoss += loss;
+
+                        updateErrorAccumulator(i, loss, false);
+                        document.getElementById('totalLoss').textContent = totalLoss.toFixed(4);
+
+                        await sleep(500 / animationSpeed);
+
+                        updateStepIndicator(
+                            `📥 Sample ${i + 1}: Backprop + Update`,
+                            `Updating weights immediately (SGD)`,
+                            `Weight update #${totalWeightUpdates + 1}`
+                        );
+
+                        await backPropagate(sample.target, true, true); // true = update weights
+
+                        updateErrorAccumulator(i, loss, true);
+
+                        await sleep(700 / animationSpeed);
+                    }
+
+                } else {
+                    // Batch mode
+                    updateStepIndicator(
+                        '📦 Batch Gradient Descent',
+                        'Accumulating gradients from ALL samples'
+                    );
+
+                    for (let i = 0; i < trainingData.length; i++) {
+                        const sample = trainingData[i];
+
+                        document.getElementById('phaseValue').textContent = `Batch ${i + 1}/4`;
+
+                        updateStepIndicator(
+                            `📤 Sample ${i + 1}: Forward Pass`,
+                            `Processing: [${sample.input.map(v => v.toFixed(2)).join(', ')}]`
+                        );
+
+                        await forwardPropagate(sample.input, true);
+
+                        const output = neurons[neurons.length - 1].map(n => n.activation);
+                        const loss = calculateLoss(output, sample.target);
+                        totalLoss += loss;
+
+                        updateErrorAccumulator(i, loss, false);
+                        document.getElementById('totalLoss').textContent = totalLoss.toFixed(4);
+
+                        await sleep(500 / animationSpeed);
+
+                        updateStepIndicator(
+                            `📥 Sample ${i + 1}: Backprop (Accumulate)`,
+                            `Storing gradients, NOT updating yet`,
+                            `Gradient accumulated for sample ${i + 1}`
+                        );
+
+                        await backPropagate(sample.target, true, false); // false = don't update yet
+
+                        updateErrorAccumulator(i, loss, true);
+
+                        await sleep(700 / animationSpeed);
+                    }
+
+                    // Now apply the batch update
+                    updateStepIndicator(
+                        '⚡ Applying Batch Update',
+                        'Updating ALL weights with averaged gradients',
+                        `Single weight update using average of ${trainingData.length} samples`
+                    );
+
+                    await sleep(1000 / animationSpeed);
+                    applyBatchUpdate();
+                    await sleep(1000 / animationSpeed);
+                }
+
+                currentLoss = totalLoss / trainingData.length;
+                epochCount++;
+                updateStats();
+
+                updateStepIndicator(
+                    '🎉 Epoch Complete!',
+                    `Mode: ${learningMode === 'stochastic' ? 'SGD (4 updates)' : 'Batch (1 update)'} | Avg Loss: ${currentLoss.toFixed(4)}`,
+                    `Total weight updates so far: ${totalWeightUpdates}`
+                );
+
+                document.getElementById('phaseValue').textContent = 'Done';
+
+                animating = false;
+                document.getElementById('trainBtn').disabled = false;
+                document.getElementById('forwardBtn').disabled = false;
+            }
+
+            function sleep(ms) {
+                return new Promise(resolve => setTimeout(resolve, ms));
+            }
+
+            function resetNetwork() {
+                if (animating) return;
+
+                neurons.forEach(layer => {
+                    layer.forEach(n => {
+                        n.activation = 0;
+                        n.delta = 0;
+                        n.accumulatedDelta = 0;
+                        n.computing = false;
+                        n.weightedSum = 0;
+                    });
+                });
+
+                connections.forEach(c => {
+                    c.signal = 0;
+                    c.backSignal = 0;
+                    c.accumulatedGradient = 0;
+                    c.active = false;
+                });
+
+                epochCount = 0;
+                currentLoss = 0;
+                totalWeightUpdates = 0;
+
+                clearErrorAccumulator();
+                document.getElementById('errorAccumulator').style.display = 'none';
+                updateStats();
+                updateStepIndicator('Ready to Start', 'Select a learning mode and click "Train Network"');
+                document.getElementById('phaseValue').textContent = 'Ready';
+
+                drawNetwork();
+            }
+
+            function randomizeWeights() {
+                if (animating) return;
+
+                connections.forEach(conn => {
+                    conn.weight = (Math.random() * 2 - 1) * 0.5;
+                });
+
+                resetNetwork();
+                updateStepIndicator('Weights Randomized', 'Network reset with new random weights');
+            }
+
+            document.getElementById('speedSlider').addEventListener('input', (e) => {
+                animationSpeed = parseFloat(e.target.value);
+                document.getElementById('speedValue').textContent = animationSpeed.toFixed(1) + 'x';
+            });
+
+            initNetwork();
+            drawNetwork();
+        </script>
+    </body>
+
+</html>
