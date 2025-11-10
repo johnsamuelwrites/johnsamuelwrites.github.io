@@ -2,342 +2,738 @@
 <html lang="en">
 
     <head>
-        <meta charset="utf-8" />
-        <meta http-equiv="Content-Language" content="en" />
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <link rel="shortcut icon" href="../../images/logo/favicon.png" />
         <title>Universe: John Samuel</title>
-        <style type="text/css">
-            body {
-                background-color: #252525;
-            }
-
-            #sidebar {
-                position: fixed;
-                background-color: #e57255;
-                top: 0;
-                left: 0;
-                bottom: 0;
-                width: 25vw;
-            }
-
-            #sidebar .title {
-                position: relative;
-                text-align: center;
-                line-height: 7vh;
-                font-size: 1.6vmax;
-                font-family: 'Arial';
-                margin-top: 40vh;
-            }
-
-            #sidebar .title a:link,
-            #sidebar .title a:visited {
-                color: #FFFFFF;
-                text-decoration: none;
-            }
-
-            #sidebar .subtitle {
-                top: 50vh;
-                text-align: center;
-                line-height: 1.3vmax;
-                font-family: 'Arial';
-                font-size: 1.5vmax;
-                color: #FFFFFF;
-            }
-
-            .subtitle a:link,
-            .subtitle a:visited {
-                color: #FFFFFF;
-                text-decoration: none;
-            }
-
-            .licence {
-                position: fixed;
-                text-align: right;
-                bottom: 0;
-                right: 0;
-            }
-
-            .home {
-                position: fixed;
-                text-align: left;
-                font-family: 'Arial';
-                color: #D3D3D3;
-                z-index: 100;
-                width: 100%;
-                background-color: #252525;
-                top: 0px;
-                margin-bottom: 10px;
-            }
-
-            .home a:link,
-            .home a:visited {
-                text-decoration: none;
-                color: #D3D3D3;
-            }
-
-            .home ul {
+        <style>
+            * {
                 margin: 0;
                 padding: 0;
-                text-align: left;
-                list-style: none;
+                box-sizing: border-box;
             }
 
-            .home li {
+            :root {
+                --deep-space: #0a0e27;
+                --nebula-purple: #4a1c5c;
+                --cosmic-blue: #1e3a8a;
+                --starlight: #e8f4ff;
+                --solar-gold: #ffd700;
+                --galaxy-pink: #ff6ec7;
+                --aurora-cyan: #00d9ff;
+                --meteor-orange: #ff8c42;
+            }
+
+            body {
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+                background: linear-gradient(135deg, var(--deep-space) 0%, var(--nebula-purple) 50%, var(--cosmic-blue) 100%);
+                color: var(--starlight);
+                line-height: 1.8;
+                overflow-x: hidden;
                 position: relative;
-                float: left;
-                padding-top: 15px;
-                margin-right: 1em;
-                font-family: 'Arial';
+                min-height: 100vh;
             }
 
-            .home li:hover {
-                display: block;
-            }
-
-            .home li:hover a:link,
-            .home li:hover a:visited {
-                text-decoration: none;
-                padding: 15px;
-                color: #FFFFFF;
-                background-color: #e57255;
-            }
-
-            .content {
-                line-height: 1.6vmax;
-                font-size: 1.1vmax;
-                font-family: 'Arial';
-                margin-top: 15vh;
-                width: 90%;
-                color: #e1e1e3;
-            }
-
-            .content h2,
-            h3,
-            h4 {
-                color: #e57255;
-            }
-
-            .content a:link,
-            .content a:visited {
-                color: #e57255;
-            }
-
-            .content h2::before,
-            .content h3::before {
-                display: block;
-                content: " ";
-                visibility: hidden;
-                height: 50px;
-                margin-top: -50px;
+            /* Animated starfield background */
+            body::before {
+                content: '';
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background-image:
+                    radial-gradient(2px 2px at 20% 30%, white, transparent),
+                    radial-gradient(2px 2px at 60% 70%, white, transparent),
+                    radial-gradient(1px 1px at 50% 50%, white, transparent),
+                    radial-gradient(1px 1px at 80% 10%, white, transparent),
+                    radial-gradient(2px 2px at 90% 60%, white, transparent),
+                    radial-gradient(1px 1px at 33% 80%, white, transparent),
+                    radial-gradient(1px 1px at 15% 90%, white, transparent);
+                background-size: 200% 200%;
+                background-position: 0% 0%;
+                animation: starfield 120s linear infinite;
+                opacity: 0.6;
                 pointer-events: none;
-                background-color: #FFFFFF;
+                z-index: 0;
             }
 
-            .content #topics li {
+            @keyframes starfield {
+
+                0%,
+                100% {
+                    background-position: 0% 0%;
+                }
+
+                50% {
+                    background-position: 100% 100%;
+                }
+            }
+
+            /* Navigation */
+            nav {
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                background: rgba(10, 14, 39, 0.8);
+                -webkit-backdrop-filter: blur(20px);
+                backdrop-filter: blur(20px);
+                padding: 1rem 3rem;
+                z-index: 1000;
+                border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+                box-shadow: 0 4px 30px rgba(0, 217, 255, 0.1);
+            }
+
+            nav ul {
                 list-style: none;
-                padding: 2rem;
-                font-size: 1.6rem;
-                line-height: 2.2rem;
                 display: flex;
-                flex-wrap: wrap;
+                gap: 2rem;
                 align-items: center;
-                padding-bottom: 5rem;
             }
 
-            .content #topics li>a {
+            nav li {
+                font-size: 1rem;
+                font-weight: 500;
+            }
+
+            nav a {
+                color: var(--starlight);
                 text-decoration: none;
-                font-size: 3.8rem;
-                line-height: 4rem;
-                padding: 0 1rem 1rem 0;
-                border-bottom-width: 1px;
-                border-bottom-style: solid;
+                padding: 0.5rem 1rem;
+                border-radius: 8px;
+                transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+                position: relative;
             }
 
-            .content li>span {
+            nav a::after {
+                content: '';
+                position: absolute;
+                bottom: 0;
+                left: 50%;
+                width: 0;
+                height: 2px;
+                background: linear-gradient(90deg, var(--aurora-cyan), var(--galaxy-pink));
+                transform: translateX(-50%);
+                transition: width 0.3s ease;
+            }
+
+            nav a:hover {
+                color: var(--aurora-cyan);
+                background: rgba(0, 217, 255, 0.1);
+            }
+
+            nav a:hover::after {
+                width: 80%;
+            }
+
+            /* Hero Section */
+            .hero {
+                padding: 8rem 3rem 6rem;
+                text-align: center;
+                position: relative;
+                z-index: 1;
+            }
+
+            .hero h1 {
+                font-size: 5rem;
+                font-weight: 800;
+                letter-spacing: -0.03em;
+                margin-bottom: 2rem;
+                background: linear-gradient(135deg, var(--starlight), var(--aurora-cyan), var(--galaxy-pink));
+                -webkit-background-clip: text;
+                background-clip: text;
+                -webkit-text-fill-color: transparent;
+                animation: titleGlow 4s ease-in-out infinite;
+            }
+
+            @keyframes titleGlow {
+
+                0%,
+                100% {
+                    filter: drop-shadow(0 0 20px rgba(0, 217, 255, 0.3));
+                }
+
+                50% {
+                    filter: drop-shadow(0 0 40px rgba(255, 110, 199, 0.5));
+                }
+            }
+
+            .hero-svg {
+                margin: 3rem auto;
+                max-width: 500px;
+            }
+
+            .hero-description {
+                max-width: 900px;
+                margin: 3rem auto 0;
+                font-size: 1.2rem;
+                line-height: 2;
+                padding: 2.5rem;
+                background: rgba(30, 58, 138, 0.2);
+                border: 1px solid rgba(0, 217, 255, 0.3);
+                border-radius: 20px;
+                -webkit-backdrop-filter: blur(10px);
+                backdrop-filter: blur(10px);
+                box-shadow: 0 8px 32px rgba(0, 217, 255, 0.15);
+            }
+
+            .hero-description sup a {
+                color: var(--solar-gold);
+                text-decoration: none;
+                font-weight: 600;
+                transition: color 0.3s ease;
+            }
+
+            .hero-description sup a:hover {
+                color: var(--aurora-cyan);
+            }
+
+            /* Main Content */
+            main {
+                max-width: 1400px;
+                margin: 0 auto;
+                padding: 4rem 3rem;
+                position: relative;
+                z-index: 1;
+            }
+
+            .section-title {
+                font-size: 2.5rem;
+                font-weight: 700;
+                margin-bottom: 3rem;
+                text-align: center;
+                position: relative;
+                display: inline-block;
+                left: 50%;
+                transform: translateX(-50%);
+            }
+
+            .section-title::before {
+                content: '✦';
+                position: absolute;
+                left: -3rem;
+                color: var(--galaxy-pink);
+                animation: twinkle 3s ease-in-out infinite;
+            }
+
+            .section-title::after {
+                content: '✦';
+                position: absolute;
+                right: -3rem;
+                color: var(--aurora-cyan);
+                animation: twinkle 3s ease-in-out infinite 1.5s;
+            }
+
+            @keyframes twinkle {
+
+                0%,
+                100% {
+                    opacity: 0.3;
+                    transform: scale(1);
+                }
+
+                50% {
+                    opacity: 1;
+                    transform: scale(1.2);
+                }
+            }
+
+            /* Topics Grid */
+            .topics-grid {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+                gap: 2rem;
+                margin-top: 3rem;
+            }
+
+            .topic-card {
+                background: linear-gradient(135deg, rgba(30, 58, 138, 0.3) 0%, rgba(74, 28, 92, 0.3) 100%);
+                border: 1px solid rgba(255, 255, 255, 0.1);
+                border-radius: 24px;
+                padding: 2.5rem;
+                position: relative;
+                overflow: hidden;
+                transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+                -webkit-backdrop-filter: blur(10px);
+                backdrop-filter: blur(10px);
+                display: block;
+                text-decoration: none;
+                color: var(--starlight);
+            }
+
+            .topic-card::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background: radial-gradient(circle at 50% 50%, rgba(0, 217, 255, 0.1) 0%, transparent 70%);
+                opacity: 0;
+                transition: opacity 0.4s ease;
+            }
+
+            .topic-card:hover::before {
+                opacity: 1;
+            }
+
+            .topic-card:hover {
+                transform: translateY(-15px) scale(1.02);
+                border-color: var(--aurora-cyan);
+                box-shadow:
+                    0 20px 60px rgba(0, 217, 255, 0.3),
+                    0 0 40px rgba(255, 110, 199, 0.2),
+                    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+            }
+
+            .topic-icon {
+                width: 90px;
+                height: 90px;
+                margin: 0 auto 1.5rem;
+                background: linear-gradient(135deg, var(--nebula-purple), var(--cosmic-blue));
+                border-radius: 50% 40% 50% 40%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 2.5rem;
+                animation: morphIcon 6s ease-in-out infinite;
+                transition: all 0.4s ease;
+                box-shadow: 0 8px 24px rgba(0, 217, 255, 0.3);
+            }
+
+            .topic-card:hover .topic-icon {
+                transform: scale(1.15) rotate(10deg);
+                box-shadow: 0 12px 36px rgba(255, 110, 199, 0.5);
+            }
+
+            @keyframes morphIcon {
+
+                0%,
+                100% {
+                    border-radius: 50% 40% 50% 40%;
+                }
+
+                33% {
+                    border-radius: 40% 50% 40% 50%;
+                }
+
+                66% {
+                    border-radius: 50% 50% 40% 40%;
+                }
+            }
+
+            .topic-card h3 {
                 font-size: 1.6rem;
-                line-height: 2.2rem;
+                font-weight: 700;
+                margin-bottom: 1rem;
+                letter-spacing: -0.01em;
+                color: var(--starlight);
             }
 
-            .content a:link,
-            .content a:visited {
-                color: #e57255;
+            .topic-card:hover h3 {
+                color: var(--aurora-cyan);
             }
 
-            .page {
-                width: 75vw;
-                height: 100%;
-                margin-left: 25vw;
-                overflow: auto;
-                padding: 0 1em;
+            .topic-card p {
+                font-size: 1.05rem;
+                line-height: 1.7;
+                color: rgba(232, 244, 255, 0.85);
+                margin-top: 0.8rem;
             }
 
-            .page img {
-                max-width: 100%;
-                max-height: 100%;
+            .topic-card:hover p {
+                color: var(--starlight);
             }
 
-            @media (max-width: 640px),
-            screen and (orientation: portrait) {
-                body {
-                    max-width: 100%;
-                    max-height: 100%;
+            /* Featured Card */
+            .topic-card.featured {
+                grid-column: span 2;
+                background: linear-gradient(135deg, rgba(74, 28, 92, 0.4) 0%, rgba(30, 58, 138, 0.4) 100%);
+                border: 2px solid rgba(255, 110, 199, 0.3);
+            }
+
+            .topic-card.featured::after {
+                content: '⭐ Featured';
+                position: absolute;
+                top: 1.5rem;
+                right: 1.5rem;
+                background: linear-gradient(135deg, var(--galaxy-pink), var(--meteor-orange));
+                color: white;
+                padding: 0.4rem 1rem;
+                border-radius: 20px;
+                font-size: 0.85rem;
+                font-weight: 600;
+                letter-spacing: 0.05em;
+                text-transform: uppercase;
+            }
+
+            /* References Section */
+            .references {
+                margin-top: 6rem;
+                padding: 3rem;
+                background: rgba(10, 14, 39, 0.5);
+                border-radius: 24px;
+                border: 1px solid rgba(255, 255, 255, 0.1);
+                -webkit-backdrop-filter: blur(10px);
+                backdrop-filter: blur(10px);
+            }
+
+            .references h3 {
+                font-size: 2rem;
+                margin-bottom: 2rem;
+                color: var(--aurora-cyan);
+            }
+
+            .references ol {
+                list-style-position: inside;
+                padding-left: 1rem;
+            }
+
+            .references li {
+                margin-bottom: 1rem;
+                line-height: 1.8;
+                color: rgba(232, 244, 255, 0.9);
+            }
+
+            .references a {
+                color: var(--galaxy-pink);
+                text-decoration: none;
+                transition: all 0.3s ease;
+                border-bottom: 1px solid transparent;
+            }
+
+            .references a:hover {
+                color: var(--aurora-cyan);
+                border-bottom-color: var(--aurora-cyan);
+            }
+
+            /* Footer */
+            footer {
+                margin-top: 6rem;
+                padding: 3rem;
+                text-align: center;
+                border-top: 1px solid rgba(255, 255, 255, 0.1);
+                position: relative;
+                z-index: 1;
+            }
+
+            .language-selector {
+                display: flex;
+                gap: 1rem;
+                justify-content: center;
+                margin-bottom: 2rem;
+            }
+
+            .language-selector a {
+                color: var(--starlight);
+                text-decoration: none;
+                padding: 0.6rem 1.5rem;
+                border: 1px solid rgba(255, 255, 255, 0.2);
+                border-radius: 12px;
+                transition: all 0.3s ease;
+                font-weight: 500;
+            }
+
+            .language-selector a:hover {
+                background: rgba(0, 217, 255, 0.2);
+                border-color: var(--aurora-cyan);
+                color: var(--aurora-cyan);
+                transform: translateY(-2px);
+            }
+
+            .copyright {
+                color: rgba(232, 244, 255, 0.7);
+                font-size: 0.95rem;
+            }
+
+            .copyright a {
+                color: var(--galaxy-pink);
+                text-decoration: none;
+                transition: color 0.3s ease;
+            }
+
+            .copyright a:hover {
+                color: var(--aurora-cyan);
+            }
+
+            /* Responsive Design */
+            @media (max-width: 768px) {
+                nav {
+                    padding: 1rem 1.5rem;
                 }
 
-                #sidebar {
-                    position: fixed;
-                    background-color: #e57255;
-                    top: 0;
-                    left: 0;
-                    bottom: 80vh;
-                    width: 100vw;
+                nav ul {
+                    gap: 1rem;
+                    flex-wrap: wrap;
                 }
 
-                #sidebar .title {
-                    text-align: center;
-                    position: fixed;
-                    margin-top: 6vh;
-                    left: 0px;
-                    right: 0px;
-                    line-height: 7vh;
-                    font-size: 2vmax;
-                    font-family: 'Arial';
+                .hero {
+                    padding: 6rem 1.5rem 4rem;
                 }
 
-                #sidebar .subtitle {
-                    text-align: center;
-                    top: 5vh;
-                    left: 0px;
-                    right: 0px;
-                    position: fixed;
-                    margin-top: 10vh;
-                    font-size: 1.5vmax;
+                .hero h1 {
+                    font-size: 2.5rem;
                 }
 
-                #sidebar .title a:link,
-                #sidebar .title a:visited {
-                    text-align: center;
-                    color: #FFFFFF;
+                .hero-description {
+                    font-size: 1rem;
+                    padding: 1.5rem;
                 }
 
-                #sidebar .subtitle a:link,
-                #sidebar .subtitle a:visited {
-                    text-align: center;
-                    color: #FFFFFF;
+                main {
+                    padding: 2rem 1.5rem;
                 }
 
-                .home {
-                    z-index: 100;
-                    width: 100%;
-                    background-color: #e57255;
-                    font-size: 1.5vmax;
+                .section-title {
+                    font-size: 1.8rem;
                 }
 
-                .home a:link,
-                .home a:visited {
-                    text-decoration: none;
-                    color: #FFFFFF;
+                .section-title::before,
+                .section-title::after {
+                    display: none;
                 }
 
-                .content {
-                    line-height: 3.8vmax;
-                    font-size: 1.8vmax;
-                    font-family: 'Arial';
-                    margin-top: 22vh;
+                .topics-grid {
+                    grid-template-columns: 1fr;
+                    gap: 1.5rem;
                 }
 
-                .content a:link,
-                .content a:visited {
-                    color: #e57255;
+                .topic-card.featured {
+                    grid-column: span 1;
                 }
 
-                .page {
-                    top: 40vh;
-                    width: 95%;
-                    margin-left: 0vw;
+                .references {
+                    padding: 2rem 1.5rem;
                 }
+            }
 
-                .page img {
-                    max-width: 100%;
-                    max-height: 100%;
-                    border: 0;
+            @media (max-width: 1200px) and (min-width: 769px) {
+                .topic-card.featured {
+                    grid-column: span 1;
                 }
             }
         </style>
     </head>
 
-    <body vocab="http://schema.org/">
-        <div class="page">
-            <div class="home">
-                <ul typeof="BreadcrumbList">
-                    <li property="itemListElement" typeof="ListItem">
-                        <a property="item" typeof="WebPage" href="../index.html">
-                            <span property="name">Home</span>
-                        </a>
-                    </li>
-                    <li property="itemListElement" typeof="ListItem">
-                        <a property="item" typeof="WebPage" href="../research/research.html">
-                            <span property="name">Research</span>
-                        </a>
-                    </li>
-                </ul>
+    <body>
+        <nav>
+            <ul>
+                <li><a href="../about.html">John Samuel</a></li>
+                <li><a href="../index.html">Home</a></li>
+                <li><a href="../research/research.html">Research</a></li>
+                <li><a href="./universe.html">Universe</a></li>
+            </ul>
+        </nav>
 
-            </div>
-            <div id="sidebar">
-                <div class="title">
-                    <h1><a href="./universe.html">Universe</a></h1>
-                </div>
-                <div class="subtitle">
-                    <h3><a href="../about.html">John Samuel</a></h3>
-                </div>
-            </div>
+        <div class="hero">
+            <h1>Universe</h1>
 
-            <div class="content">
+            <svg class="hero-svg" viewBox="0 0 500 400" xmlns="http://www.w3.org/2000/svg">
+                <!-- Background nebula clouds -->
+                <ellipse cx="250" cy="200" rx="150" ry="100" fill="#4a1c5c" opacity="0.3">
+                    <animate attributeName="opacity" values="0.3;0.5;0.3" dur="6s" repeatCount="indefinite" />
+                </ellipse>
+                <ellipse cx="300" cy="180" rx="120" ry="80" fill="#1e3a8a" opacity="0.2">
+                    <animate attributeName="opacity" values="0.2;0.4;0.2" dur="5s" repeatCount="indefinite" />
+                </ellipse>
+
+                <!-- Central star/sun -->
+                <circle cx="250" cy="200" r="35" fill="#ffd700">
+                    <animate attributeName="r" values="35;38;35" dur="3s" repeatCount="indefinite" />
+                </circle>
+                <circle cx="250" cy="200" r="40" fill="#ffd700" opacity="0.3">
+                    <animate attributeName="r" values="40;50;40" dur="3s" repeatCount="indefinite" />
+                    <animate attributeName="opacity" values="0.3;0.1;0.3" dur="3s" repeatCount="indefinite" />
+                </circle>
+
+                <!-- Planet orbits -->
+                <circle cx="250" cy="200" r="80" fill="none" stroke="#00d9ff" stroke-width="0.5" opacity="0.3" />
+                <circle cx="250" cy="200" r="130" fill="none" stroke="#ff6ec7" stroke-width="0.5" opacity="0.3" />
+                <circle cx="250" cy="200" r="180" fill="none" stroke="#ff8c42" stroke-width="0.5" opacity="0.3" />
+
+                <!-- Inner planet (Mercury-like) -->
+                <g>
+                    <circle cx="250" cy="200" r="6" fill="#00d9ff">
+                        <animateTransform attributeName="transform" type="rotate" from="0 250 200" to="360 250 200"
+                            dur="4s" repeatCount="indefinite" />
+                    </circle>
+                    <circle cx="330" cy="200" r="6" fill="#00d9ff">
+                        <animateTransform attributeName="transform" type="rotate" from="0 250 200" to="360 250 200"
+                            dur="4s" repeatCount="indefinite" />
+                    </circle>
+                </g>
+
+                <!-- Middle planet (Earth-like) -->
+                <g>
+                    <circle cx="250" cy="200" r="10" fill="#1e90ff">
+                        <animateTransform attributeName="transform" type="rotate" from="45 250 200" to="405 250 200"
+                            dur="8s" repeatCount="indefinite" />
+                    </circle>
+                    <circle cx="380" cy="200" r="10" fill="#1e90ff">
+                        <animateTransform attributeName="transform" type="rotate" from="45 250 200" to="405 250 200"
+                            dur="8s" repeatCount="indefinite" />
+                    </circle>
+                </g>
+
+                <!-- Outer planet (Jupiter-like) -->
+                <g>
+                    <circle cx="250" cy="200" r="14" fill="#ff6ec7">
+                        <animateTransform attributeName="transform" type="rotate" from="90 250 200" to="450 250 200"
+                            dur="12s" repeatCount="indefinite" />
+                    </circle>
+                    <circle cx="430" cy="200" r="14" fill="#ff6ec7">
+                        <animateTransform attributeName="transform" type="rotate" from="90 250 200" to="450 250 200"
+                            dur="12s" repeatCount="indefinite" />
+                    </circle>
+                </g>
+
+                <!-- Distant stars -->
+                <circle cx="80" cy="50" r="2" fill="white" opacity="0.8">
+                    <animate attributeName="opacity" values="0.8;0.3;0.8" dur="3s" repeatCount="indefinite" />
+                </circle>
+                <circle cx="420" cy="70" r="2" fill="white" opacity="0.7">
+                    <animate attributeName="opacity" values="0.7;0.3;0.7" dur="4s" repeatCount="indefinite" />
+                </circle>
+                <circle cx="100" cy="340" r="2" fill="white" opacity="0.9">
+                    <animate attributeName="opacity" values="0.9;0.4;0.9" dur="2.5s" repeatCount="indefinite" />
+                </circle>
+                <circle cx="400" cy="320" r="2" fill="white" opacity="0.6">
+                    <animate attributeName="opacity" values="0.6;0.3;0.6" dur="3.5s" repeatCount="indefinite" />
+                </circle>
+
+                <!-- Shooting stars/meteors -->
+                <line x1="50" y1="100" x2="90" y2="140" stroke="#ff8c42" stroke-width="2" opacity="0">
+                    <animate attributeName="opacity" values="0;1;0" dur="2s" repeatCount="indefinite" begin="0s" />
+                    <animateTransform attributeName="transform" type="translate" from="0 0" to="150 150" dur="2s"
+                        repeatCount="indefinite" begin="0s" />
+                </line>
+                <line x1="400" y1="50" x2="440" y2="90" stroke="#00d9ff" stroke-width="2" opacity="0">
+                    <animate attributeName="opacity" values="0;1;0" dur="3s" repeatCount="indefinite" begin="1s" />
+                    <animateTransform attributeName="transform" type="translate" from="0 0" to="100 100" dur="3s"
+                        repeatCount="indefinite" begin="1s" />
+                </line>
+            </svg>
+
+            <div class="hero-description">
                 <p>Is the universe<sup><a href="#universe">1</a></sup> a simulation? Are we inhabiting a simulated
                     environment? Could future beings, equipped with advanced computing technologies, create conscious
                     entities within a simulated realm to investigate the possibility of our existence within a
-                    simulation<sup><a href="#simulation">2</a>,<a href="#computersimulation">3</a></sup>?
-                    Moreover, what if we were to utilize a synthetic universe<sup><a href="#synthetic">4</a>,<a
+                    simulation<sup><a href="#simulation">2</a>,<a href="#computersimulation">3</a></sup>? Moreover, what
+                    if we were to utilize a synthetic universe<sup><a href="#synthetic">4</a>,<a
                             href="#syntheticuniverse">5</a></sup> as a tool to unravel the seemingly flawless
-                    laws<sup><a href="perfection">6</a></sup> governing nature and physics?
-                    Developing such a simulation would demand a profound comprehension of the wonders of the natural
-                    world,
-                    a pursuit that is currently underway and documented here.
-                </p>
-                <ul id="topics">
-                    <li><a href="complexity-simplicity.html">Complexity Emerging from Simplicity</a></li>
-                    <li><a href="space-communities.html">Space communities, villages, and towns</a></li>
-                    <li><a href="./dimension.html">Dimension</a></li>
-                    <li><a href="./time-dimension.html">Time dimension</a></li>
-                    <li><a href="geometry.html">Geometry</a></li>
-                    <li><a href="music.html">Music</a></li>
-                    <li><a href="nature.html">Nature</a></li>
-                    <li><a href="architecture.html">Architecture</a></li>
-                    <li><a href="biology.html">Biology</a></li>
-                    <li><a href="games.html">Games</a></li>
-                </ul>
-                <h3>References</h3>
-                <p>
-                <ol>
-                    <li id="universe"><a href="https://en.wikipedia.org/wiki/Universe">Universe</a></li>
-                    <li id="simulation"><a href="https://en.wikipedia.org/wiki/Simulation_hypothesis">Simulation
-                            hypothesis</a></li>
-                    <li id="computersimulation"><a
-                            href="https://www.scientificamerican.com/article/do-we-live-in-a-simulation-chances-are-about-50-50/">Do
-                            We Live in a Simulation? Chances Are about 50–50</a></li>
-                    <li id="synthetic"><a
-                            href="https://news.uchicago.edu/story/synthetic-universes-how-simulations-will-help-search-dark-energy">Synthetic
-                            universes: How simulations will help search for dark energy</a></li>
-                    <li id="syntheticuniverse"><a href="https://www.youtube.com/watch?v=Y6KAaD3pyec">Scientists create
-                            synthetic universe</a></li>
-                    <li id="perfection"><a href="https://www.youtube.com/watch?v=lR9r7_MweK8">Why Is The Universe
-                            Perfect?</a></li>
-                </ol>
-                </p>
+                    laws<sup><a href="#perfection">6</a></sup> governing nature and physics? Developing such a
+                    simulation would demand a profound comprehension of the wonders of the natural world, a pursuit that
+                    is currently underway and documented here.</p>
+            </div>
+        </div>
+
+        <main>
+            <h2 class="section-title">Explore the Cosmos</h2>
+
+            <div class="topics-grid">
+                <a href="complexity-simplicity.html" class="topic-card featured">
+                    <div class="topic-icon">🌌</div>
+                    <h3>Complexity Emerging from Simplicity</h3>
+                    <p>Intricate cosmic structures arising from fundamental physical laws, mirroring the
+                        universe's evolution from primordial simplicity to breathtaking complexity.</p>
+                </a>
+
+                <a href="space-communities.html" class="topic-card">
+                    <div class="topic-icon">🚀</div>
+                    <h3>Space Communities, Villages, and Towns</h3>
+                    <p>The future of human habitation beyond Earth, from orbital stations to Martian colonies
+                        and interstellar settlements.</p>
+                </a>
+
+                <a href="./dimension.html" class="topic-card">
+                    <div class="topic-icon">📐</div>
+                    <h3>Dimension</h3>
+                    <p>The fabric of spacetime, from familiar 3D space to theoretical higher dimensions that
+                        may shape our universe's hidden structure.</p>
+                </a>
+
+                <a href="./time-dimension.html" class="topic-card">
+                    <div class="topic-icon">⏰</div>
+                    <h3>Time Dimension</h3>
+                    <p>The mysteries of time as the fourth dimension, examining its flow, relativity, and role
+                        in the cosmic tapestry.</p>
+                </a>
+
+                <a href="geometry.html" class="topic-card">
+                    <div class="topic-icon">🔷</div>
+                    <h3>Geometry</h3>
+                    <p>The mathematical shapes and structures that define the universe, from quantum geometry to
+                        the curvature of spacetime itself.</p>
+                </a>
+
+                <a href="music.html" class="topic-card">
+                    <div class="topic-icon">🎵</div>
+                    <h3>Music</h3>
+                    <p>The universal language of harmony, rhythm, and vibration that connects mathematical
+                        patterns to cosmic resonances.</p>
+                </a>
+
+                <a href="nature.html" class="topic-card">
+                    <div class="topic-icon">🌿</div>
+                    <h3>Nature</h3>
+                    <p>The intricate patterns and processes of the natural world, reflecting universal
+                        principles at every scale.</p>
+                </a>
+
+                <a href="architecture.html" class="topic-card">
+                    <div class="topic-icon">🏛️</div>
+                    <h3>Architecture</h3>
+                    <p>Structures embodying physical laws and mathematical principles, from ancient temples to
+                        futuristic megastructures.</p>
+                </a>
+
+                <a href="biology.html" class="topic-card">
+                    <div class="topic-icon">🧬</div>
+                    <h3>Biology</h3>
+                    <p>Life's molecular machinery and evolutionary algorithms, nature's computational
+                        approach to complexity.</p>
+                </a>
+
+                <a href="games.html" class="topic-card">
+                    <div class="topic-icon">🎮</div>
+                    <h3>Games</h3>
+                    <p>Simulated realities and rule-based systems that mirror the deterministic yet emergent
+                        nature of our universe.</p>
+                </a>
             </div>
 
-            <br />
+            <div class="references">
+                <h3>References</h3>
+                <ol>
+                    <li id="universe"><a href="https://en.wikipedia.org/wiki/Universe" target="_blank"
+                            rel="noopener">Universe</a></li>
+                    <li id="simulation"><a href="https://en.wikipedia.org/wiki/Simulation_hypothesis" target="_blank"
+                            rel="noopener">Simulation hypothesis</a></li>
+                    <li id="computersimulation"><a
+                            href="https://www.scientificamerican.com/article/do-we-live-in-a-simulation-chances-are-about-50-50/"
+                            target="_blank" rel="noopener">Do We Live in a Simulation? Chances Are about 50–50</a></li>
+                    <li id="synthetic"><a
+                            href="https://news.uchicago.edu/story/synthetic-universes-how-simulations-will-help-search-dark-energy"
+                            target="_blank" rel="noopener">Synthetic universes: How simulations will help search for
+                            dark energy</a></li>
+                    <li id="syntheticuniverse"><a href="https://www.youtube.com/watch?v=Y6KAaD3pyec" target="_blank"
+                            rel="noopener">Scientists create synthetic universe</a></li>
+                    <li id="perfection"><a href="https://www.youtube.com/watch?v=lR9r7_MweK8" target="_blank"
+                            rel="noopener">Why Is The Universe Perfect?</a></li>
+                </ol>
+            </div>
+        </main>
 
-        </div>
+        <footer>
+            <div class="language-selector">
+                <a href="./universe.html">English</a>
+                <a href="./universe-fr.html">Français</a>
+            </div>
+            <div class="copyright">
+                <p>&copy; 2025 <a href="../about.html">John Samuel</a>. All content under Creative Commons License.</p>
+            </div>
+        </footer>
     </body>
 
 </html>

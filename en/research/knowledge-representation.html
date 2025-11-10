@@ -5,364 +5,676 @@
         <meta charset="utf-8" />
         <title>Knowledge Representation: John Samuel</title>
         <link rel="shortcut icon" href="../../images/logo/favicon.png" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <style type="text/css">
+            * {
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
+            }
+
+            :root {
+                --bg-primary: #fafbfd;
+                --bg-secondary: #f5f7fa;
+                --accent-primary: #5b7cff;
+                --accent-secondary: #8b5cf6;
+                --accent-tertiary: #06b6d4;
+                --text-primary: #1e293b;
+                --text-secondary: #475569;
+                --text-light: #64748b;
+                --card-bg: #ffffff;
+                --nav-bg: rgba(250, 251, 253, 0.85);
+                --shadow-sm: 0 2px 8px rgba(91, 124, 255, 0.08);
+                --shadow-md: 0 8px 24px rgba(91, 124, 255, 0.12);
+                --shadow-lg: 0 16px 48px rgba(91, 124, 255, 0.18);
+            }
+
             body {
-                background-color: #252525;
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+                background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
+                color: var(--text-primary);
+                line-height: 1.7;
+                overflow-x: hidden;
             }
 
-            #sidebar {
-                position: fixed;
-                background-color: #51cf66;
-                top: 0;
-                left: 0;
-                bottom: 0;
-                width: 25vw;
-            }
-
-            #sidebar .title {
-                position: relative;
-                text-align: center;
-                line-height: 8.5vh;
-                font-size: 1.6vmax;
-                font-family: 'Arial';
-                margin-top: 40vh;
-            }
-
-            #sidebar .title a:link,
-            #sidebar .title a:visited {
-                color: #252525;
-                text-decoration: none;
-            }
-
-            #sidebar .subtitle {
-                top: 50vh;
-                text-align: center;
-                line-height: 1.3vmax;
-                font-family: 'Arial';
-                font-size: 1.5vmax;
-                color: #252525;
-            }
-
-            .subtitle a:link,
-            .subtitle a:visited {
-                color: #252525;
-                text-decoration: none;
-            }
-
-            .licence {
-                position: fixed;
-                text-align: right;
-                bottom: 0;
-                right: 0;
-            }
-
+            /* Fixed Navigation */
             .home {
                 position: fixed;
-                text-align: left;
-                font-family: 'Arial';
-                color: #D3D3D3;
-                z-index: 100;
-                width: 100%;
-                background-color: #252525;
-                top: 0px;
-                margin-bottom: 10px;
-            }
-
-            .home a:link,
-            .home a:visited {
-                text-decoration: none;
-                color: #D3D3D3;
+                top: 0;
+                left: 0;
+                right: 0;
+                background: var(--nav-bg);
+                backdrop-filter: blur(12px);
+                -webkit-backdrop-filter: blur(12px);
+                z-index: 1000;
+                padding: 1rem 2rem;
+                box-shadow: var(--shadow-sm);
+                border-bottom: 1px solid rgba(91, 124, 255, 0.1);
             }
 
             .home ul {
-                margin: 0;
-                padding: 0;
-                text-align: left;
                 list-style: none;
+                display: flex;
+                gap: 0.5rem;
+                flex-wrap: wrap;
+                align-items: center;
             }
 
             .home li {
+                font-size: 0.95rem;
+                font-weight: 500;
+            }
+
+            .home li:not(:last-child)::after {
+                content: '→';
+                margin-left: 0.5rem;
+                color: var(--text-light);
+            }
+
+            .home a {
+                color: var(--text-secondary);
+                text-decoration: none;
+                padding: 0.5rem 1rem;
+                border-radius: 8px;
+                transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            }
+
+            .home a:hover {
+                color: var(--accent-primary);
+                background: rgba(91, 124, 255, 0.08);
+                transform: translateY(-1px);
+            }
+
+            /* Hero Section */
+            .hero {
+                margin-top: 5rem;
+                padding: 4rem 2rem 3rem;
+                text-align: center;
                 position: relative;
-                float: left;
-                padding-top: 15px;
-                margin-right: 1em;
-                font-family: 'Arial';
             }
 
-            .home li:hover {
-                display: block;
+            .hero h1 {
+                font-size: 4.5rem;
+                font-weight: 800;
+                letter-spacing: -0.03em;
+                color: var(--text-primary);
+                margin-bottom: 1rem;
+                line-height: 1.1;
             }
 
-            .home li:hover a:link,
-            .home li:hover a:visited {
+            .hero h3 {
+                font-size: 1.5rem;
+                font-weight: 500;
+                color: var(--accent-primary);
+                margin-bottom: 3rem;
+            }
+
+            .hero h3 a {
+                color: inherit;
                 text-decoration: none;
-                padding: 15px;
-                color: #252525;
-                background-color: #51cf66;
+                transition: all 0.3s ease;
             }
 
+            .hero h3 a:hover {
+                color: var(--accent-secondary);
+            }
+
+            /* SVG Container */
+            .svg-container {
+                margin: 3rem auto;
+                max-width: 500px;
+            }
+
+            /* Intro Text */
+            .intro {
+                max-width: 900px;
+                margin: 0 auto 4rem;
+                padding: 2.5rem;
+                background: var(--card-bg);
+                border-radius: 24px;
+                box-shadow: var(--shadow-md);
+                border: 1px solid rgba(91, 124, 255, 0.1);
+            }
+
+            .intro p {
+                font-size: 1.15rem;
+                line-height: 1.8;
+                color: var(--text-secondary);
+                margin-bottom: 1.5rem;
+            }
+
+            .intro p:last-child {
+                margin-bottom: 0;
+            }
+
+            /* Content Container */
             .content {
-                line-height: 1.6vmax;
-                font-size: 1.1vmax;
-                font-family: 'Arial';
-                margin-top: 15vh;
-                width: 90%;
-                color: #e1e1e3;
+                max-width: 1400px;
+                margin: 0 auto;
+                padding: 0 2rem 4rem;
             }
 
-            .content h2,
-            h3,
-            h4 {
-                color: #51cf66;
+            /* Section Title */
+            .section-title {
+                font-size: 2.5rem;
+                font-weight: 700;
+                color: var(--text-primary);
+                margin: 4rem 0 2.5rem;
+                text-align: center;
+                position: relative;
+                display: inline-block;
+                width: 100%;
             }
 
-            .content a:link,
-            .content a:visited {
-                color: #51cf66;
+            .section-title::after {
+                content: '';
+                position: absolute;
+                bottom: -12px;
+                left: 50%;
+                transform: translateX(-50%);
+                width: 80px;
+                height: 4px;
+                background: linear-gradient(90deg, var(--accent-primary), var(--accent-secondary));
+                border-radius: 2px;
             }
 
-            .content h2::before,
-            .content h3::before {
+            /* Bento Grid */
+            .topics-grid {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
+                gap: 2rem;
+                margin-bottom: 4rem;
+            }
+
+            .topic-card {
                 display: block;
-                content: " ";
-                visibility: hidden;
-                height: 50px;
-                margin-top: -50px;
-                pointer-events: none;
-                background-color: #252525;
-            }
-
-            .content #topics li {
-                list-style: none;
-                padding: 2rem;
-                font-size: 1.6rem;
-                line-height: 2.2rem;
-                display: flex;
-                flex-wrap: wrap;
-                align-items: center;
-                padding-bottom: 5rem;
-            }
-
-            .content #topics li>a {
+                background: var(--card-bg);
+                border-radius: 24px;
+                padding: 2.5rem;
+                box-shadow: var(--shadow-sm);
+                border: 1px solid rgba(91, 124, 255, 0.08);
+                transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+                position: relative;
+                overflow: hidden;
                 text-decoration: none;
-                font-size: 3.8rem;
-                line-height: 4rem;
-                padding: 0 1rem 1rem 0;
-                border-bottom-width: 1px;
-                border-bottom-style: solid;
+                color: inherit;
             }
 
-            .content li>span {
+            .topic-card::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background:
+                    radial-gradient(circle at 20% 30%, rgba(91, 124, 255, 0.03) 0%, transparent 50%),
+                    radial-gradient(circle at 80% 70%, rgba(139, 92, 246, 0.03) 0%, transparent 50%);
+                opacity: 0;
+                transition: opacity 0.4s ease;
+            }
+
+            .topic-card:hover::before {
+                opacity: 1;
+            }
+
+            .topic-card:hover {
+                transform: translateY(-12px) scale(1.02);
+                box-shadow: var(--shadow-lg);
+                border-color: rgba(91, 124, 255, 0.2);
+            }
+
+            .topic-icon {
+                width: 90px;
+                height: 90px;
+                background: linear-gradient(135deg, rgba(91, 124, 255, 0.1), rgba(139, 92, 246, 0.1));
+                border-radius: 50% 40% 45% 55%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                margin-bottom: 1.5rem;
+                font-size: 2.5rem;
+                transition: all 0.4s ease;
+                animation: morph 6s ease-in-out infinite;
+            }
+
+            .topic-card:hover .topic-icon {
+                transform: scale(1.15) rotate(10deg);
+                background: linear-gradient(135deg, rgba(91, 124, 255, 0.2), rgba(139, 92, 246, 0.2));
+            }
+
+            @keyframes morph {
+
+                0%,
+                100% {
+                    border-radius: 50% 40% 45% 55%;
+                }
+
+                25% {
+                    border-radius: 40% 50% 55% 45%;
+                }
+
+                50% {
+                    border-radius: 45% 55% 40% 50%;
+                }
+
+                75% {
+                    border-radius: 55% 45% 50% 40%;
+                }
+            }
+
+            .topic-card h3 {
                 font-size: 1.6rem;
-                line-height: 2.2rem;
+                font-weight: 700;
+                color: var(--text-primary);
+                margin-bottom: 0.75rem;
+                letter-spacing: -0.02em;
+                line-height: 1.3;
             }
 
-            .content a:link,
-            .content a:visited {
-                color: #51cf66;
+            .topic-card p {
+                font-size: 1.05rem;
+                line-height: 1.7;
+                color: var(--text-secondary);
             }
 
-            .page {
-                width: 75vw;
-                height: 100%;
-                margin-left: 25vw;
-                overflow: auto;
-                padding: 0 1em;
+            /* Featured Card */
+            .featured {
+                grid-column: span 2;
+                background: linear-gradient(135deg, rgba(91, 124, 255, 0.05), rgba(139, 92, 246, 0.05));
             }
 
-            .page img {
-                max-width: 100%;
-                max-height: 100%;
+            .featured .topic-icon {
+                width: 110px;
+                height: 110px;
+                font-size: 3rem;
             }
 
-            @media (max-width: 640px),
-            screen and (orientation: portrait) {
-                body {
-                    max-width: 100%;
-                    max-height: 100%;
+            .featured h3 {
+                font-size: 1.9rem;
+            }
+
+            .featured-badge {
+                display: inline-block;
+                background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+                color: white;
+                padding: 0.35rem 1rem;
+                border-radius: 20px;
+                font-size: 0.85rem;
+                font-weight: 600;
+                margin-bottom: 1rem;
+                letter-spacing: 0.02em;
+            }
+
+            /* References Section */
+            .references {
+                background: var(--card-bg);
+                border-radius: 24px;
+                padding: 2.5rem;
+                box-shadow: var(--shadow-md);
+                border: 1px solid rgba(91, 124, 255, 0.1);
+                margin-top: 3rem;
+            }
+
+            .references h3 {
+                font-size: 2rem;
+                font-weight: 700;
+                color: var(--text-primary);
+                margin-bottom: 1.5rem;
+            }
+
+            .references ol {
+                padding-left: 1.5rem;
+            }
+
+            .references li {
+                font-size: 1.05rem;
+                line-height: 1.8;
+                color: var(--text-secondary);
+                margin-bottom: 0.75rem;
+            }
+
+            .references a {
+                color: var(--accent-primary);
+                text-decoration: none;
+                transition: all 0.3s ease;
+                border-bottom: 1px solid transparent;
+            }
+
+            .references a:hover {
+                color: var(--accent-secondary);
+                border-bottom-color: var(--accent-secondary);
+            }
+
+            /* Footer */
+            footer {
+                text-align: center;
+                padding: 3rem 2rem;
+                color: var(--text-light);
+                font-size: 0.95rem;
+            }
+
+            /* Responsive Design */
+            @media (max-width: 1200px) {
+                .featured {
+                    grid-column: span 1;
+                }
+            }
+
+            @media (max-width: 768px) {
+                .hero h1 {
+                    font-size: 2.75rem;
                 }
 
-                #sidebar {
-                    position: fixed;
-                    background-color: #51cf66;
-                    top: 0;
-                    left: 0;
-                    bottom: 80vh;
-                    width: 100vw;
+                .hero h3 {
+                    font-size: 1.2rem;
                 }
 
-                #sidebar .title {
-                    text-align: center;
-                    position: fixed;
-                    margin-top: 6vh;
-                    left: 0px;
-                    right: 0px;
-                    line-height: 7vh;
-                    font-size: 2vmax;
-                    font-family: 'Arial';
+                .section-title {
+                    font-size: 1.8rem;
                 }
 
-                #sidebar .subtitle {
-                    text-align: center;
-                    top: 5vh;
-                    left: 0px;
-                    right: 0px;
-                    position: fixed;
-                    margin-top: 10vh;
-                    font-size: 1.5vmax;
+                .topics-grid {
+                    grid-template-columns: 1fr;
+                    gap: 1.5rem;
                 }
 
-                #sidebar .title a:link,
-                #sidebar .title a:visited {
-                    text-align: center;
-                    color: #252525;
+                .featured {
+                    grid-column: span 1;
                 }
 
-                #sidebar .subtitle a:link,
-                #sidebar .subtitle a:visited {
-                    text-align: center;
-                    color: #252525;
+                .intro {
+                    padding: 2rem;
+                }
+
+                .intro p {
+                    font-size: 1.05rem;
+                }
+
+                .topic-card {
+                    padding: 2rem;
                 }
 
                 .home {
-                    z-index: 100;
-                    width: 100%;
-                    background-color: #51cf66;
-                    font-size: 1.5vmax;
+                    padding: 1rem;
                 }
 
-                .home a:link,
-                .home a:visited {
-                    text-decoration: none;
-                    color: #252525;
+                .home ul {
+                    font-size: 0.85rem;
+                }
+            }
+
+            @media (max-width: 480px) {
+                .hero h1 {
+                    font-size: 2.25rem;
                 }
 
-                .content {
-                    line-height: 3.8vmax;
-                    font-size: 1.8vmax;
-                    font-family: 'Arial';
-                    margin-top: 22vh;
-                }
-
-                .content a:link,
-                .content a:visited {
-                    color: #51cf66;
-                }
-
-                .page {
-                    top: 40vh;
-                    width: 95%;
-                    margin-left: 0vw;
-                }
-
-                .page img {
-                    max-width: 100%;
-                    max-height: 100%;
-                    border: 0;
+                .topic-card h3 {
+                    font-size: 1.4rem;
                 }
             }
         </style>
     </head>
 
     <body vocab="http://schema.org/">
-        <div class="page">
-            <div class="home">
-                <ul typeof="BreadcrumbList">
-                    <li property="itemListElement" typeof="ListItem">
-                        <a property="item" typeof="WebPage" href="../index.html">
-                            <span property="name">Home</span>
-                        </a>
-                    </li>
-                    <li property="itemListElement" typeof="ListItem">
-                        <a property="item" typeof="WebPage" href="../research/research.html">
-                            <span property="name">Research</span>
-                        </a>
-                    </li>
-                </ul>
+        <nav class="home">
+            <ul typeof="BreadcrumbList">
+                <li property="itemListElement" typeof="ListItem">
+                    <a property="item" typeof="WebPage" href="../about.html">
+                        <span property="name">John Samuel</span>
+                    </a>
+                </li>
+                <li property="itemListElement" typeof="ListItem">
+                    <a property="item" typeof="WebPage" href="../index.html">
+                        <span property="name">Home</span>
+                    </a>
+                </li>
+                <li property="itemListElement" typeof="ListItem">
+                    <a property="item" typeof="WebPage" href="../research/research.html">
+                        <span property="name">Research</span>
+                    </a>
+                </li>
+                <li property="itemListElement" typeof="ListItem">
+                    <a property="item" typeof="WebPage" href="./knowledge-representation.html">
+                        <span property="name">Knowledge Representation</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
 
+        <header class="hero">
+            <h1>Knowledge Representation</h1>
+            <h3><a href="../about.html">John Samuel</a></h3>
+
+            <div class="svg-container">
+                <svg viewBox="0 0 500 400" xmlns="http://www.w3.org/2000/svg">
+                    <!-- Background nodes -->
+                    <circle cx="100" cy="80" r="18" fill="rgba(91, 124, 255, 0.15)" opacity="0.6">
+                        <animate attributeName="opacity" values="0.6;0.9;0.6" dur="4s" repeatCount="indefinite" />
+                    </circle>
+                    <circle cx="400" cy="100" r="16" fill="rgba(139, 92, 246, 0.15)" opacity="0.5">
+                        <animate attributeName="opacity" values="0.5;0.85;0.5" dur="5s" repeatCount="indefinite" />
+                    </circle>
+                    <circle cx="80" cy="320" r="20" fill="rgba(6, 182, 212, 0.15)" opacity="0.55">
+                        <animate attributeName="opacity" values="0.55;0.9;0.55" dur="4.5s" repeatCount="indefinite" />
+                    </circle>
+                    <circle cx="420" cy="340" r="17" fill="rgba(91, 124, 255, 0.15)" opacity="0.6">
+                        <animate attributeName="opacity" values="0.6;0.85;0.6" dur="5.5s" repeatCount="indefinite" />
+                    </circle>
+
+                    <!-- Connection lines -->
+                    <line x1="150" y1="200" x2="250" y2="150" stroke="rgba(91, 124, 255, 0.2)" stroke-width="2">
+                        <animate attributeName="stroke-opacity" values="0.2;0.5;0.2" dur="3s"
+                            repeatCount="indefinite" />
+                    </line>
+                    <line x1="250" y1="150" x2="350" y2="200" stroke="rgba(139, 92, 246, 0.2)" stroke-width="2">
+                        <animate attributeName="stroke-opacity" values="0.2;0.5;0.2" dur="3.5s" repeatCount="indefinite"
+                            begin="0.5s" />
+                    </line>
+                    <line x1="150" y1="200" x2="200" y2="280" stroke="rgba(6, 182, 212, 0.2)" stroke-width="2">
+                        <animate attributeName="stroke-opacity" values="0.2;0.5;0.2" dur="4s" repeatCount="indefinite"
+                            begin="1s" />
+                    </line>
+                    <line x1="200" y1="280" x2="300" y2="280" stroke="rgba(91, 124, 255, 0.2)" stroke-width="2">
+                        <animate attributeName="stroke-opacity" values="0.2;0.5;0.2" dur="3.5s" repeatCount="indefinite"
+                            begin="1.5s" />
+                    </line>
+                    <line x1="300" y1="280" x2="350" y2="200" stroke="rgba(139, 92, 246, 0.2)" stroke-width="2">
+                        <animate attributeName="stroke-opacity" values="0.2;0.5;0.2" dur="4s" repeatCount="indefinite"
+                            begin="2s" />
+                    </line>
+
+                    <!-- Central knowledge graph structure -->
+                    <!-- Node 1: Top -->
+                    <circle cx="250" cy="150" r="35" fill="#ffffff" stroke="url(#grad1)" stroke-width="3">
+                        <animateTransform attributeName="transform" attributeType="XML" type="translate"
+                            values="0,0; 0,-8; 0,0" dur="4s" repeatCount="indefinite" />
+                    </circle>
+                    <text x="250" y="157" text-anchor="middle" fill="#5b7cff" font-size="28" font-weight="700">KG</text>
+
+                    <!-- Node 2: Left -->
+                    <circle cx="150" cy="200" r="32" fill="#ffffff" stroke="url(#grad2)" stroke-width="3">
+                        <animateTransform attributeName="transform" attributeType="XML" type="translate"
+                            values="0,0; -6,4; 0,0" dur="5s" repeatCount="indefinite" />
+                    </circle>
+                    <text x="150" y="207" text-anchor="middle" fill="#8b5cf6" font-size="24"
+                        font-weight="600">RDF</text>
+
+                    <!-- Node 3: Right -->
+                    <circle cx="350" cy="200" r="32" fill="#ffffff" stroke="url(#grad3)" stroke-width="3">
+                        <animateTransform attributeName="transform" attributeType="XML" type="translate"
+                            values="0,0; 6,4; 0,0" dur="4.5s" repeatCount="indefinite" />
+                    </circle>
+                    <text x="350" y="207" text-anchor="middle" fill="#06b6d4" font-size="24"
+                        font-weight="600">OWL</text>
+
+                    <!-- Node 4: Bottom Left -->
+                    <circle cx="200" cy="280" r="28" fill="#ffffff" stroke="url(#grad4)" stroke-width="2.5">
+                        <animateTransform attributeName="transform" attributeType="XML" type="translate"
+                            values="0,0; -5,6; 0,0" dur="5.5s" repeatCount="indefinite" />
+                    </circle>
+                    <text x="200" y="287" text-anchor="middle" fill="#5b7cff" font-size="20" font-weight="600">DL</text>
+
+                    <!-- Node 5: Bottom Right -->
+                    <circle cx="300" cy="280" r="28" fill="#ffffff" stroke="url(#grad5)" stroke-width="2.5">
+                        <animateTransform attributeName="transform" attributeType="XML" type="translate"
+                            values="0,0; 5,6; 0,0" dur="6s" repeatCount="indefinite" />
+                    </circle>
+                    <text x="300" y="287" text-anchor="middle" fill="#8b5cf6" font-size="20"
+                        font-weight="600">ShEx</text>
+
+                    <!-- Data particles floating -->
+                    <circle cx="180" cy="120" r="4" fill="#5b7cff" opacity="0.7">
+                        <animateTransform attributeName="transform" attributeType="XML" type="translate"
+                            values="0,0; 20,-20; 0,0" dur="6s" repeatCount="indefinite" />
+                        <animate attributeName="opacity" values="0.7;0.3;0.7" dur="6s" repeatCount="indefinite" />
+                    </circle>
+                    <circle cx="320" cy="130" r="4" fill="#8b5cf6" opacity="0.7">
+                        <animateTransform attributeName="transform" attributeType="XML" type="translate"
+                            values="0,0; -15,-25; 0,0" dur="7s" repeatCount="indefinite" />
+                        <animate attributeName="opacity" values="0.7;0.3;0.7" dur="7s" repeatCount="indefinite" />
+                    </circle>
+                    <circle cx="250" cy="240" r="4" fill="#06b6d4" opacity="0.7">
+                        <animateTransform attributeName="transform" attributeType="XML" type="translate"
+                            values="0,0; 0,30; 0,0" dur="5s" repeatCount="indefinite" />
+                        <animate attributeName="opacity" values="0.7;0.3;0.7" dur="5s" repeatCount="indefinite" />
+                    </circle>
+
+                    <!-- Gradients -->
+                    <defs>
+                        <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" style="stop-color:#5b7cff;stop-opacity:1" />
+                            <stop offset="100%" style="stop-color:#8b5cf6;stop-opacity:1" />
+                        </linearGradient>
+                        <linearGradient id="grad2" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" style="stop-color:#8b5cf6;stop-opacity:1" />
+                            <stop offset="100%" style="stop-color:#06b6d4;stop-opacity:1" />
+                        </linearGradient>
+                        <linearGradient id="grad3" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" style="stop-color:#06b6d4;stop-opacity:1" />
+                            <stop offset="100%" style="stop-color:#5b7cff;stop-opacity:1" />
+                        </linearGradient>
+                        <linearGradient id="grad4" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" style="stop-color:#5b7cff;stop-opacity:0.8" />
+                            <stop offset="100%" style="stop-color:#8b5cf6;stop-opacity:0.8" />
+                        </linearGradient>
+                        <linearGradient id="grad5" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" style="stop-color:#8b5cf6;stop-opacity:0.8" />
+                            <stop offset="100%" style="stop-color:#06b6d4;stop-opacity:0.8" />
+                        </linearGradient>
+                    </defs>
+                </svg>
             </div>
-            <div id="sidebar">
-                <div class="title">
-                    <h1><a href="./knowledge-representation.html">Knowledge Representation</a></h1>
-                </div>
-                <div class="subtitle">
-                    <h3><a href="../about.html">John Samuel</a></h3>
-                </div>
+        </header>
+
+        <div class="intro">
+            <p>
+                Knowledge Representation (KR) techniques play a pivotal role in computer science and information systems
+                beyond traditional reasoning applications. These techniques have found new and diverse applications
+                within
+                software applications, expanding their utility in various domains. Semantic web technologies, such as
+                Resource Description Framework (RDF) and Web Ontology Language (OWL), are at the forefront of this
+                evolution. They enable the representation of data and knowledge on the web in a structured and
+                semantically
+                meaningful way. RDF, for instance, is used to create relationships between resources, making it possible
+                to
+                discover and retrieve information efficiently. OWL, on the other hand, provides a rich vocabulary for
+                defining ontologies, allowing for more sophisticated knowledge modeling.
+            </p>
+            <p>
+                Descriptive logic is another crucial component of KR, offering a formal language for expressing complex
+                knowledge structures and relationships. It provides a foundation for representing knowledge in a logical
+                and
+                computationally tractable manner, which is essential for various applications, including information
+                retrieval and intelligent systems.
+            </p>
+            <p>
+                Graph structures are instrumental in knowledge representation as they allow for the visualization and
+                manipulation of complex relationships within data. Graph databases and knowledge graphs have gained
+                popularity in recent years due to their ability to capture and represent interconnected knowledge in a
+                flexible and intuitive way.
+            </p>
+            <p>
+                Reasoning, a fundamental aspect of KR, is not limited to traditional AI reasoning tasks but is also
+                applied
+                in information retrieval and decision support systems. Data validation, which ensures the accuracy and
+                integrity of data, is another important use of KR techniques, particularly in database management and
+                data-centric applications. Furthermore, language models, like the ones based on deep learning, are
+                increasingly employed for knowledge representation, enabling systems to understand and generate
+                human-like
+                text based on large-scale textual data.
+            </p>
+            <p>
+                In summary, KR techniques have evolved beyond mere reasoning and have become integral components of
+                software
+                applications across various domains. They enable structured representation, efficient information
+                retrieval,
+                logical modeling, and validation of data, making them invaluable in modern computer science and
+                information
+                systems.
+            </p>
+        </div>
+
+        <main class="content">
+            <h2 class="section-title">Research Topics</h2>
+
+            <div class="topics-grid">
+                <a href="semantic-web.html" class="topic-card">
+                    <div class="topic-icon">🌐</div>
+                    <h3>Semantic Web</h3>
+                    <p>Exploring semantic web technologies and their applications in modern information systems.</p>
+                </a>
+
+                <a href="../programming/embedding-rdfa.html" class="topic-card">
+                    <div class="topic-icon">📋</div>
+                    <h3>Embedding RDFa on Web Pages</h3>
+                    <p>Techniques and best practices for embedding structured data using RDFa markup.</p>
+                </a>
+
+                <a href="../programming/linkeddata-integration.html" class="topic-card">
+                    <div class="topic-icon">🔗</div>
+                    <h3>Integrating Linked Data</h3>
+                    <p>Methods for integrating and consuming linked data across distributed systems.</p>
+                </a>
+
+                <a href="../programming/vocabulary-personal-website.html" class="topic-card">
+                    <div class="topic-icon">📖</div>
+                    <h3>Identifying Linked Open Vocabularies</h3>
+                    <p>Discovering and utilizing appropriate vocabularies for personal web projects.</p>
+                </a>
+
+                <a href="shex-wikidata.html" class="topic-card">
+                    <div class="topic-icon">✓</div>
+                    <h3>Shape Expressions (ShEx) for Wikidata</h3>
+                    <p>Using ShEx to validate and constrain knowledge graph structures in Wikidata.</p>
+                </a>
+
+                <a href="next-gen-citation.html" class="topic-card featured">
+                    <span class="featured-badge">Featured Research</span>
+                    <div class="topic-icon">📚</div>
+                    <h3>Next-Generation Citations</h3>
+                    <p>New ways to cite sources and represent the citation metadata. Exploring innovative approaches to
+                        academic citations that capture richer semantic relationships and provenance information in the
+                        age
+                        of digital scholarship.</p>
+                </a>
             </div>
 
-            <div class="content">
-                <p>
-                    Knowledge Representation (KR) techniques play a pivotal role in computer science and information
-                    systems
-                    beyond traditional reasoning applications. These techniques have found new and diverse applications
-                    within software applications, expanding their utility in various domains. Semantic web technologies,
-                    such as Resource Description Framework (RDF) and Web Ontology Language (OWL), are at the forefront
-                    of
-                    this evolution. They enable the representation of data and knowledge on the web in a structured and
-                    semantically meaningful way. RDF, for instance, is used to create relationships between resources,
-                    making it possible to discover and retrieve information efficiently. OWL, on the other hand,
-                    provides a
-                    rich vocabulary for defining ontologies, allowing for more sophisticated knowledge modeling.
-                </p>
-                <p>
-                    Descriptive logic is another crucial component of KR, offering a formal language for expressing
-                    complex
-                    knowledge structures and relationships. It provides a foundation for representing knowledge in a
-                    logical
-                    and computationally tractable manner, which is essential for various applications, including
-                    information
-                    retrieval and intelligent systems.
-                </p>
-                <p>
-                    Graph structures are instrumental in knowledge representation as they allow for the visualization
-                    and
-                    manipulation of complex relationships within data. Graph databases and knowledge graphs have gained
-                    popularity in recent years due to their ability to capture and represent interconnected knowledge in
-                    a
-                    flexible and intuitive way.
-                </p>
-                <p>
-                    Reasoning, a fundamental aspect of KR, is not limited to traditional AI reasoning tasks but is also
-                    applied in information retrieval and decision support systems. Data validation, which ensures the
-                    accuracy and integrity of data, is another important use of KR techniques, particularly in database
-                    management and data-centric applications. Furthermore, language models, like the ones based on deep
-                    learning, are increasingly employed for knowledge representation, enabling systems to understand and
-                    generate human-like text based on large-scale textual data.
-                </p>
-                <p>
-
-                    In summary, KR techniques have evolved beyond mere reasoning and have become integral components of
-                    software applications across various domains. They enable structured representation, efficient
-                    information retrieval, logical modeling, and validation of data, making them invaluable in modern
-                    computer science and information systems.
-                </p>
-                <ul id="topics">
-                    <li><a href="semantic-web.html">Semantic Web</a></li>
-                    <li><a href="../programming/embedding-rdfa.html">Embedding RDFa on Web Pages</a></li>
-                    <li><a href="../programming/linkeddata-integration.html">Integrating Linked Data</a></li>
-                    <li><a href="../programming/vocabulary-personal-website.html">Identifying Linked Open
-                            Vocabularies</a></li>
-                    <li><a href="shex-wikidata.html">Shape Expressions (ShEx) for Wikidata</a></li>
-                    <li><a href="next-gen-citation.html">Next-Generation Citations</a> <span>New ways to cite sources
-                            and represent the citation metadata. </span></li>
-                </ul>
+            <section class="references">
                 <h3>References</h3>
-                <p>
                 <ol>
-                    <li id="knowledge-representation"><a
-                            href="https://en.wikipedia.org/wiki/Knowledge_representation_and_reasoning">Knowledge
+                    <li><a href="https://en.wikipedia.org/wiki/Knowledge_representation_and_reasoning">Knowledge
                             representation and reasoning</a></li>
-                    <li id="knowledge-graphs"><a
+                    <li><a
                             href="https://www.linkedin.com/pulse/knowledge-graphs-end-user-products-from-cyc-ai-part-daniel-kornev/">Knowledge
                             Graphs in End-User Products: From Cyc to AI Assistants - Part I</a></li>
-                    <li id="">...</li>
                 </ol>
-                </p>
-            </div>
+            </section>
+        </main>
 
-            <br />
-
-        </div>
+        <footer>
+            <p>&copy; 2025 John Samuel.</p>
+        </footer>
     </body>
 
 </html>
