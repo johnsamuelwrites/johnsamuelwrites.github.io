@@ -3,438 +3,834 @@
 
     <head>
         <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <meta http-equiv="Content-Language" content="en" />
         <link rel="shortcut icon" href="../../images/logo/favicon.png" />
         <title>Evolving Story Format: John Samuel</title>
         <style type="text/css">
-            body {
-                background-color: #FFFFFF;
+            /* ===================================
+           DESIGN TOKENS & CSS VARIABLES
+           =================================== */
+            :root {
+                /* Base Colors - Evolution Theme */
+                --color-base-bg: #faf9fc;
+                --color-base-surface: #ffffff;
+                --color-base-text: #2c2c2c;
+                --color-base-text-muted: #5a5a5a;
+
+                /* Theme Accents - Purple/Violet for evolution and transformation */
+                --color-accent-1: #7b68ee;
+                --color-accent-2: #6a4fd4;
+                --color-accent-3: #9d8dff;
+                --color-accent-light: #f0edff;
+                --color-accent-pale: #f8f7ff;
+
+                /* Functional Colors */
+                --color-shadow: rgba(123, 104, 238, 0.12);
+                --color-border: rgba(123, 104, 238, 0.15);
+                --color-hover: rgba(123, 104, 238, 0.08);
+
+                /* Gradients */
+                --gradient-primary: linear-gradient(135deg, var(--color-accent-1), var(--color-accent-2));
+                --gradient-subtle: linear-gradient(180deg, var(--color-base-bg), var(--color-accent-pale));
+                --gradient-vibrant: linear-gradient(135deg, #7b68ee 0%, #9d8dff 50%, #b8a9ff 100%);
+
+                /* Spacing Scale */
+                --space-xs: 0.25rem;
+                --space-sm: 0.5rem;
+                --space-md: 1rem;
+                --space-lg: 1.5rem;
+                --space-xl: 2rem;
+                --space-2xl: 3rem;
+                --space-3xl: 4rem;
+                --space-4xl: 6rem;
+
+                /* Border Radius */
+                --radius-sm: 4px;
+                --radius-md: 8px;
+                --radius-lg: 12px;
+                --radius-xl: 16px;
+                --radius-2xl: 24px;
+                --radius-full: 9999px;
+
+                /* Shadows */
+                --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.04), 0 1px 3px rgba(0, 0, 0, 0.06);
+                --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.05), 0 2px 4px rgba(0, 0, 0, 0.06);
+                --shadow-lg: 0 10px 24px rgba(0, 0, 0, 0.08), 0 4px 8px rgba(0, 0, 0, 0.06);
+                --shadow-theme: 0 10px 30px var(--color-shadow), 0 4px 10px rgba(0, 0, 0, 0.06);
+
+                /* Typography */
+                --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+                --text-xs: clamp(0.75rem, 0.7rem + 0.25vw, 0.875rem);
+                --text-sm: clamp(0.875rem, 0.8rem + 0.35vw, 1rem);
+                --text-base: clamp(1rem, 0.95rem + 0.25vw, 1.125rem);
+                --text-lg: clamp(1.125rem, 1.05rem + 0.35vw, 1.25rem);
+                --text-xl: clamp(1.25rem, 1.15rem + 0.5vw, 1.5rem);
+                --text-2xl: clamp(1.5rem, 1.3rem + 1vw, 2rem);
+                --text-3xl: clamp(2rem, 1.6rem + 2vw, 2.5rem);
+                --text-4xl: clamp(2.5rem, 2rem + 2.5vw, 3.5rem);
+
+                --weight-normal: 400;
+                --weight-medium: 500;
+                --weight-semibold: 600;
+                --weight-bold: 700;
+
+                --leading-relaxed: 1.75;
+                --leading-normal: 1.5;
             }
 
-            #sidebar {
-                position: fixed;
-                background-color: #D8580E;
-                top: 0;
-                left: 0;
-                bottom: 0;
-                width: 30vw;
-            }
-
-            #sidebar .title {
-                position: relative;
-                text-align: center;
-                line-height: 5vmax;
-                font-size: 1.4vmax;
-                font-family: 'Arial';
-                margin-top: 30vh;
-            }
-
-            #sidebar .title a:link,
-            #sidebar .title a:visited {
-                color: #FFFFFF;
-                text-decoration: none;
-            }
-
-            .subtitle {
-                top: 50vh;
-                text-align: center;
-                line-height: 1.3vmax;
-                font-family: 'Arial';
-                font-size: 1.5vmax;
-                color: #FFFFFF;
-            }
-
-            .subtitle a:link,
-            .subtitle a:visited {
-                color: #FFFFFF;
-                text-decoration: none;
-            }
-
-            .licence {
-                position: fixed;
-                text-align: right;
-                bottom: 0;
-                right: 0;
-            }
-
-            .home {
-                position: fixed;
-                text-align: left;
-                font-family: 'Arial';
-                color: #D3D3D3;
-                z-index: 100;
-                width: 100%;
-                background-color: #FFFFFF;
-                top: 0px;
-                margin-bottom: 10px;
-                padding-bottom: 10px;
-            }
-
-            .home a:link,
-            .home a:visited {
-                text-decoration: none;
-                color: #D3D3D3;
-            }
-
-            .home ul {
+            /* ===================================
+           RESET & BASE STYLES
+           =================================== */
+            * {
                 margin: 0;
                 padding: 0;
-                text-align: left;
+                box-sizing: border-box;
+            }
+
+            html {
+                scroll-behavior: smooth;
+                scroll-padding-top: 80px;
+            }
+
+            body {
+                font-family: var(--font-sans);
+                font-size: var(--text-base);
+                line-height: var(--leading-relaxed);
+                color: var(--color-base-text);
+                background: var(--color-base-bg);
+                -webkit-font-smoothing: antialiased;
+                -moz-osx-font-smoothing: grayscale;
+            }
+
+            /* ===================================
+           NAVIGATION
+           =================================== */
+            .navbar {
+                position: fixed;
+                top: 0;
+                width: 100%;
+                z-index: 1000;
+                background: rgba(255, 255, 255, 0.9);
+                -webkit-backdrop-filter: blur(12px) saturate(180%);
+                backdrop-filter: blur(12px) saturate(180%);
+                border-bottom: 1px solid var(--color-border);
+                box-shadow: var(--shadow-sm);
+                transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            }
+
+            .navbar ul {
                 list-style: none;
+                display: flex;
+                align-items: center;
+                gap: var(--space-md);
+                padding: var(--space-md) var(--space-xl);
+                max-width: 1400px;
+                margin: 0 auto;
             }
 
-            .home li {
+            .navbar li {
                 position: relative;
-                float: left;
-                padding-top: 15px;
-                margin-right: 1em;
-                font-family: 'Arial';
             }
 
-            .home li:hover {
-                display: block;
-            }
-
-            .home li:hover a:link,
-            .home li:hover a:visited {
+            .navbar a {
                 text-decoration: none;
-                padding: 15px;
-                color: #FFFFFF;
-                background-color: #D8580E;
+                color: var(--color-base-text-muted);
+                font-weight: var(--weight-normal);
+                transition: color 0.3s ease;
+                padding: var(--space-sm) var(--space-md);
+                border-radius: var(--radius-sm);
             }
 
-            .content {
-                line-height: 1.8vmax;
-                font-size: 1.2vmax;
-                font-family: 'Arial';
-                margin-top: 15vh;
-                width: 90%;
+            .navbar-brand a {
+                font-weight: var(--weight-bold);
+                color: var(--color-accent-1);
+                background: var(--gradient-primary);
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                background-clip: text;
             }
 
-            .content h2,
-            h3,
-            h4 {
-                color: #D8580E;
+            .navbar a:hover {
+                color: var(--color-accent-1);
+                background: var(--color-hover);
             }
 
-            .content a:link,
-            .content a:visited {
-                color: #D8580E;
+            .navbar li:not(:last-child)::after {
+                content: '›';
+                position: absolute;
+                right: -0.5rem;
+                color: var(--color-base-text-muted);
+                opacity: 0.4;
             }
 
-            .content h3 {
-                color: #D8580E;
+            /* ===================================
+           HERO SECTION
+           =================================== */
+            .hero {
+                min-height: 70vh;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                padding: var(--space-4xl) var(--space-xl);
+                margin-top: 60px;
+                background: var(--gradient-subtle);
+                position: relative;
+                overflow: hidden;
             }
 
-            .content h2::before,
-            .content h3::before {
-                display: block;
-                content: " ";
-                visibility: hidden;
-                height: 50px;
-                margin-top: -50px;
+            .hero::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background:
+                    radial-gradient(circle at 20% 30%, rgba(123, 104, 238, 0.08) 0%, transparent 50%),
+                    radial-gradient(circle at 80% 70%, rgba(157, 141, 255, 0.06) 0%, transparent 50%);
                 pointer-events: none;
-                background-color: #FFFFFF;
             }
 
-            .content p {
+            .hero-svg {
+                width: 350px;
+                height: 350px;
+                margin-bottom: var(--space-2xl);
+                filter: drop-shadow(0 10px 20px rgba(123, 104, 238, 0.15));
+                position: relative;
+                z-index: 1;
+            }
+
+            .hero-title {
+                font-size: var(--text-4xl);
+                font-weight: var(--weight-bold);
+                color: var(--color-accent-2);
+                text-align: center;
+                margin-bottom: var(--space-md);
+                letter-spacing: -0.02em;
+                position: relative;
+                z-index: 1;
+            }
+
+            .hero-subtitle {
+                font-size: var(--text-xl);
+                font-weight: var(--weight-medium);
+                color: var(--color-base-text-muted);
+                text-align: center;
+                position: relative;
+                z-index: 1;
+            }
+
+            .hero-subtitle a {
+                color: var(--color-accent-1);
+                text-decoration: none;
+                transition: color 0.3s ease;
+            }
+
+            .hero-subtitle a:hover {
+                color: var(--color-accent-2);
+            }
+
+            /* ===================================
+           CONTENT SECTION
+           =================================== */
+            .content-wrapper {
+                max-width: 900px;
+                margin: 0 auto;
+                padding: var(--space-4xl) var(--space-xl);
+            }
+
+            .evolution-card {
+                background: var(--color-base-surface);
+                border-radius: var(--radius-xl);
+                padding: var(--space-3xl);
+                box-shadow: var(--shadow-theme);
+                position: relative;
+                overflow: hidden;
+                margin-bottom: var(--space-2xl);
+                transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            }
+
+            .evolution-card::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                height: 4px;
+                background: var(--gradient-vibrant);
+                background-size: 200% 200%;
+                animation: gradientShift 8s ease infinite;
+            }
+
+            .evolution-card p {
+                margin-bottom: var(--space-xl);
+                line-height: var(--leading-relaxed);
+                color: var(--color-base-text);
                 text-align: justify;
                 text-justify: inter-word;
             }
 
-            .content a:link,
-            .content a:visited {
-                color: #D8580E;
+            .evolution-card p:last-of-type {
+                margin-bottom: 0;
             }
 
-            .home a:link,
-            .home a:visited {
-                color: #D3D3D3;
+            .evolution-card em {
+                font-style: italic;
+                color: var(--color-base-text-muted);
             }
 
-            .page {
-                width: 65vw;
-                height: 100%;
-                margin-left: 30vw;
-                overflow: hidden;
-                padding: 0 1em;
-                font-family: 'Arial';
+            .evolution-card strong,
+            .evolution-card b {
+                color: var(--color-accent-1);
+                font-weight: var(--weight-bold);
             }
 
-            .page img {
-                max-width: 100%;
-                max-height: 100%;
+            .evolution-card a {
+                color: var(--color-accent-1);
+                text-decoration: none;
+                font-weight: var(--weight-medium);
+                transition: color 0.3s ease;
+                border-bottom: 1px solid transparent;
             }
 
-            @media (max-width: 640px),
-            screen and (orientation: portrait) {
-                body {
-                    max-width: 100%;
-                    max-height: 100%;
+            .evolution-card a:hover {
+                color: var(--color-accent-2);
+                border-bottom-color: var(--color-accent-2);
+            }
+
+            .evolution-card sup {
+                font-size: 0.75em;
+                margin-left: 0.1em;
+            }
+
+            .evolution-card h3 {
+                font-size: var(--text-2xl);
+                font-weight: var(--weight-bold);
+                color: var(--color-accent-1);
+                margin-top: var(--space-3xl);
+                margin-bottom: var(--space-lg);
+                position: relative;
+                padding-bottom: var(--space-sm);
+            }
+
+            .evolution-card h3::after {
+                content: '';
+                position: absolute;
+                bottom: 0;
+                left: 0;
+                width: 60px;
+                height: 3px;
+                background: var(--gradient-primary);
+                border-radius: var(--radius-full);
+            }
+
+            .evolution-card ol {
+                list-style: none;
+                counter-reset: reference-counter;
+                padding-left: 0;
+            }
+
+            .evolution-card ol li {
+                counter-increment: reference-counter;
+                margin-bottom: var(--space-md);
+                padding-left: var(--space-xl);
+                position: relative;
+                line-height: var(--leading-normal);
+            }
+
+            .evolution-card ol li::before {
+                content: counter(reference-counter);
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 28px;
+                height: 28px;
+                background: var(--gradient-primary);
+                color: white;
+                border-radius: 50%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: var(--text-sm);
+                font-weight: var(--weight-bold);
+            }
+
+            /* ===================================
+           DECORATIVE ELEMENTS
+           =================================== */
+            .version-badge {
+                position: absolute;
+                top: 20px;
+                right: 20px;
+                background: var(--gradient-primary);
+                color: white;
+                padding: var(--space-xs) var(--space-md);
+                border-radius: var(--radius-full);
+                font-size: var(--text-xs);
+                font-weight: var(--weight-semibold);
+                opacity: 0.15;
+                pointer-events: none;
+            }
+
+            /* ===================================
+           ANIMATIONS
+           =================================== */
+            @keyframes gradientShift {
+                0% {
+                    background-position: 0% 50%;
                 }
 
-                #sidebar {
-                    position: fixed;
-                    background-color: #D8580E;
-                    top: 0;
-                    left: 0;
-                    bottom: 80vh;
-                    width: 100vw;
+                50% {
+                    background-position: 100% 50%;
                 }
 
-                #sidebar .title {
-                    text-align: center;
-                    position: fixed;
-                    margin-top: 6vh;
-                    left: 0px;
-                    right: 0px;
-                    line-height: 3.5vmax;
-                    font-size: 1.5vmax;
-                    font-family: 'Arial';
+                100% {
+                    background-position: 0% 50%;
+                }
+            }
+
+            @keyframes float {
+
+                0%,
+                100% {
+                    transform: translateY(0px) rotate(0deg);
                 }
 
-                #sidebar .subtitle {
-                    text-align: center;
-                    top: 5vh;
-                    left: 0px;
-                    right: 0px;
-                    position: fixed;
-                    margin-top: 10vh;
-                    font-size: 1.5vmax;
+                50% {
+                    transform: translateY(-20px) rotate(3deg);
+                }
+            }
+
+            @keyframes floatReverse {
+
+                0%,
+                100% {
+                    transform: translateY(0px) rotate(0deg);
                 }
 
-                #sidebar .title a:link,
-                #sidebar .title a:visited {
-                    text-align: center;
-                    color: #FFFFFF;
+                50% {
+                    transform: translateY(-15px) rotate(-3deg);
+                }
+            }
+
+            @keyframes pulse {
+
+                0%,
+                100% {
+                    opacity: 1;
+                    transform: scale(1);
                 }
 
-                #sidebar .subtitle a:link,
-                #sidebar .subtitle a:visited {
-                    text-align: center;
-                    color: #FFFFFF;
+                50% {
+                    opacity: 0.7;
+                    transform: scale(1.05);
+                }
+            }
+
+            @keyframes morph {
+
+                0%,
+                100% {
+                    border-radius: 63% 37% 54% 46% / 45% 62% 38% 55%;
                 }
 
-                .home {
-                    z-index: 100;
-                    width: 100%;
-                    background-color: #D8580E;
-                    font-size: 1.5vmax;
+                50% {
+                    border-radius: 37% 63% 46% 54% / 62% 45% 55% 38%;
+                }
+            }
+
+            @keyframes rotate {
+                from {
+                    transform: rotate(0deg);
                 }
 
-                .home a:link,
-                .home a:visited {
-                    text-decoration: none;
-                    color: #FFFFFF;
+                to {
+                    transform: rotate(360deg);
+                }
+            }
+
+            @keyframes fadeInUp {
+                from {
+                    opacity: 0;
+                    transform: translateY(30px);
                 }
 
-                .content {
-                    line-height: 3.8vmax;
-                    font-size: 1.8vmax;
-                    font-family: 'Arial';
-                    margin-top: 22vh;
+                to {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            }
+
+            .evolution-card {
+                animation: fadeInUp 0.8s ease-out;
+            }
+
+            /* SVG Animations */
+            .svg-document {
+                animation: float 6s ease-in-out infinite;
+                transform-origin: center;
+            }
+
+            .svg-version-circle {
+                animation: pulse 4s ease-in-out infinite;
+            }
+
+            .svg-arrow {
+                animation: floatReverse 5s ease-in-out infinite;
+            }
+
+            .svg-blob {
+                animation: morph 8s ease-in-out infinite;
+            }
+
+            .svg-commit-node {
+                animation: pulse 3s ease-in-out infinite;
+            }
+
+            /* ===================================
+           ACCESSIBILITY
+           =================================== */
+            :focus-visible {
+                outline: 3px solid var(--color-accent-1);
+                outline-offset: 2px;
+                border-radius: var(--radius-sm);
+            }
+
+            .skip-link {
+                position: absolute;
+                top: -40px;
+                left: 0;
+                background: var(--color-accent-1);
+                color: white;
+                padding: var(--space-sm) var(--space-md);
+                text-decoration: none;
+                border-radius: var(--radius-sm);
+                z-index: 10000;
+            }
+
+            .skip-link:focus {
+                top: 0;
+            }
+
+            @media (prefers-reduced-motion: reduce) {
+
+                *,
+                *::before,
+                *::after {
+                    animation-duration: 0.01ms !important;
+                    animation-iteration-count: 1 !important;
+                    transition-duration: 0.01ms !important;
+                }
+            }
+
+            /* ===================================
+           RESPONSIVE DESIGN
+           =================================== */
+            @media (max-width: 768px) {
+                .hero {
+                    min-height: 60vh;
+                    padding: var(--space-3xl) var(--space-md);
                 }
 
-                .content a:link,
-                .content a:visited {
-                    color: #D8580E;
+                .hero-svg {
+                    width: 250px;
+                    height: 250px;
                 }
 
-                .page {
-                    top: 40vh;
-                    width: 95%;
-                    margin-left: 0vw;
+                .navbar ul {
+                    padding: var(--space-sm) var(--space-md);
+                    gap: var(--space-sm);
                 }
 
-                .page img {
-                    max-width: 100%;
-                    max-height: 100%;
-                    border: 0;
+                .navbar a {
+                    padding: var(--space-xs) var(--space-sm);
+                    font-size: var(--text-sm);
+                }
+
+                .evolution-card {
+                    padding: var(--space-xl);
+                }
+
+                .content-wrapper {
+                    padding: var(--space-2xl) var(--space-md);
+                }
+            }
+
+            @media (max-width: 480px) {
+                .navbar li:not(:last-child)::after {
+                    display: none;
+                }
+
+                .evolution-card p {
+                    text-align: left;
                 }
             }
         </style>
     </head>
 
     <body vocab="http://schema.org/">
-        <div id="sidebar">
-            <div id="sidebar">
-                <div class="title">
-                    <h1><a href="./evolving-story-format.html">Evolving Story Format</a></h1>
-                </div>
-                <div class="subtitle">
-                    <h3><a href="../about.html">John Samuel</a></h3>
-                </div>
-            </div>
-        </div>
+        <a href="#main-content" class="skip-link">Skip to main content</a>
 
-        <div class="page">
-            <div class="home">
-                <ul typeof="BreadcrumbList">
-                    <li property="itemListElement" typeof="ListItem">
-                        <a property="item" typeof="WebPage" href="../index.html">
-                            <span property="name">Home</span>
-                        </a>
-                    </li>
-                    <li property="itemListElement" typeof="ListItem">
-                        <a property="item" typeof="WebPage" href="../writings/index.html">
-                            <span property="name">Writings</span>
-                        </a>
-                    </li>
-                </ul>
+        <!-- Navigation -->
+        <nav class="navbar" aria-label="Main navigation">
+            <ul typeof="BreadcrumbList">
+                <li property="itemListElement" typeof="ListItem">
+                    <a property="item" typeof="WebPage" href="../index.html">
+                        <span property="name">Home</span>
+                    </a>
+                </li>
+                <li property="itemListElement" typeof="ListItem" class="navbar-brand">
+                    <a property="item" typeof="WebPage" href="../about.html">
+                        <span property="name">John Samuel</span>
+                    </a>
+                </li>
+                <li property="itemListElement" typeof="ListItem">
+                    <a property="item" typeof="WebPage" href="../writings/index.html">
+                        <span property="name">Writings</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
 
-            </div>
-            <div class="content">
-                <p>
-                    <i>
-                        Some stories evolve and do not usually end with 'and they lived happily ever after'.
-                        Real life is much more challenging, new twists come now and then, like in plays, where when we
-                        are expecting nothing of a big surprise, new characters enter the scene and leave most of us
-                        wondering what's next.
-                        Some writers abruptly end their stories, leaving their readers to imagine the rest.
-                        Still others write many novels, leaving the doors open for future writers.
-                        Pens, papers and printing presses played and still play a significant role in literature.
-                        However, we now have one additional media: the internet.
-                        Mirroring what we do in the physical world to the virtual world is one possible direction.
-                        But exploiting the many potentials of internet is another way to advance literature.
-                        Here, I would like to describe what I call the <b>evolving story format</b> to explore
-                        continuous writing on any subject: writing, updating and keeping track of the evolution.
-                    </i>
-                </p>
-                <p>
-                    Not a single domain has remained stagnant all these years. When almost everybody thought that there
+        <!-- Hero Section -->
+        <header class="hero">
+            <svg class="hero-svg" viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                <!-- Background gradient -->
+                <defs>
+                    <linearGradient id="purpleGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" style="stop-color:#7b68ee;stop-opacity:1" />
+                        <stop offset="100%" style="stop-color:#9d8dff;stop-opacity:1" />
+                    </linearGradient>
+                    <linearGradient id="bgGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" style="stop-color:#f8f7ff;stop-opacity:1" />
+                        <stop offset="100%" style="stop-color:#f0edff;stop-opacity:1" />
+                    </linearGradient>
+                    <filter id="softGlow">
+                        <feGaussianBlur stdDeviation="3" result="blur" />
+                        <feFlood flood-color="#7b68ee" flood-opacity="0.4" />
+                        <feComposite in2="blur" operator="in" />
+                        <feMerge>
+                            <feMergeNode />
+                            <feMergeNode in="SourceGraphic" />
+                        </feMerge>
+                    </filter>
+                </defs>
+
+                <!-- Background blob (morphing) -->
+                <ellipse class="svg-blob" cx="200" cy="200" rx="160" ry="180" fill="url(#bgGradient)" opacity="0.6" />
+
+                <!-- Git-inspired version tree -->
+                <!-- Version nodes (commits) -->
+                <g filter="url(#softGlow)">
+                    <!-- Version 1 (bottom) -->
+                    <circle class="svg-commit-node" cx="80" cy="320" r="12" fill="url(#purpleGradient)" />
+                    <text x="80" y="345" text-anchor="middle" font-size="10" fill="#7b68ee" font-weight="bold">v1</text>
+
+                    <!-- Version 2 -->
+                    <circle class="svg-commit-node" cx="140" cy="260" r="12" fill="url(#purpleGradient)"
+                        style="animation-delay: 0.3s;" />
+                    <text x="140" y="285" text-anchor="middle" font-size="10" fill="#7b68ee"
+                        font-weight="bold">v2</text>
+
+                    <!-- Version 3 -->
+                    <circle class="svg-commit-node" cx="200" cy="200" r="12" fill="url(#purpleGradient)"
+                        style="animation-delay: 0.6s;" />
+                    <text x="200" y="225" text-anchor="middle" font-size="10" fill="#7b68ee"
+                        font-weight="bold">v3</text>
+
+                    <!-- Version 4 -->
+                    <circle class="svg-commit-node" cx="260" cy="140" r="12" fill="url(#purpleGradient)"
+                        style="animation-delay: 0.9s;" />
+                    <text x="260" y="165" text-anchor="middle" font-size="10" fill="#7b68ee"
+                        font-weight="bold">v4</text>
+
+                    <!-- Version 5 (top, current) -->
+                    <circle class="svg-commit-node" cx="320" cy="80" r="15" fill="url(#purpleGradient)"
+                        style="animation-delay: 1.2s;" />
+                    <text x="320" y="110" text-anchor="middle" font-size="10" fill="#7b68ee"
+                        font-weight="bold">v5</text>
+                </g>
+
+                <!-- Connection lines between versions -->
+                <line x1="80" y1="320" x2="140" y2="260" stroke="#7b68ee" stroke-width="3" opacity="0.4" />
+                <line x1="140" y1="260" x2="200" y2="200" stroke="#7b68ee" stroke-width="3" opacity="0.4" />
+                <line x1="200" y1="200" x2="260" y2="140" stroke="#7b68ee" stroke-width="3" opacity="0.4" />
+                <line x1="260" y1="140" x2="320" y2="80" stroke="#7b68ee" stroke-width="3" opacity="0.4" />
+
+                <!-- Document pages (evolution) -->
+                <g class="svg-document">
+                    <!-- Page 1 (back) -->
+                    <rect x="150" y="280" width="70" height="90" rx="4" fill="#fff" stroke="#9d8dff" stroke-width="2"
+                        opacity="0.6" transform="rotate(-5 185 325)" />
+
+                    <!-- Page 2 (middle) -->
+                    <rect x="155" y="275" width="70" height="90" rx="4" fill="#fff" stroke="#7b68ee" stroke-width="2"
+                        opacity="0.8" transform="rotate(2 190 320)" />
+
+                    <!-- Page 3 (front) -->
+                    <rect x="160" y="270" width="70" height="90" rx="4" fill="#fff" stroke="#7b68ee"
+                        stroke-width="2.5" />
+                    <!-- Lines on front page -->
+                    <line x1="170" y1="285" x2="215" y2="285" stroke="#7b68ee" stroke-width="1.5" opacity="0.3" />
+                    <line x1="170" y1="295" x2="220" y2="295" stroke="#7b68ee" stroke-width="1.5" opacity="0.3" />
+                    <line x1="170" y1="305" x2="210" y2="305" stroke="#7b68ee" stroke-width="1.5" opacity="0.3" />
+                    <line x1="170" y1="315" x2="218" y2="315" stroke="#7b68ee" stroke-width="1.5" opacity="0.3" />
+                </g>
+
+                <!-- Evolution arrows -->
+                <g class="svg-arrow">
+                    <path d="M 100 340 Q 110 330, 120 320" stroke="#9d8dff" stroke-width="3" fill="none" opacity="0.5"
+                        stroke-linecap="round" />
+                    <polygon points="120,320 115,325 118,318" fill="#9d8dff" opacity="0.5" />
+                </g>
+
+                <!-- Circular version indicator -->
+                <g class="svg-version-circle">
+                    <circle cx="320" cy="260" r="30" fill="none" stroke="#7b68ee" stroke-width="2" opacity="0.3"
+                        stroke-dasharray="5,5" />
+                    <circle cx="320" cy="260" r="22" fill="none" stroke="#9d8dff" stroke-width="1.5" opacity="0.4"
+                        stroke-dasharray="3,3" />
+                </g>
+
+                <!-- Decorative dots -->
+                <circle cx="60" cy="150" r="3" fill="#7b68ee" opacity="0.3" />
+                <circle cx="340" cy="320" r="3" fill="#9d8dff" opacity="0.3" />
+                <circle cx="350" cy="180" r="2.5" fill="#7b68ee" opacity="0.3" />
+                <circle cx="50" cy="250" r="2.5" fill="#9d8dff" opacity="0.3" />
+            </svg>
+
+            <h1 class="hero-title">Evolving Story Format</h1>
+            <h2 class="hero-subtitle">
+                <a href="../about.html">John Samuel</a>
+            </h2>
+        </header>
+
+        <!-- Main Content -->
+        <main id="main-content" class="content-wrapper">
+            <article class="evolution-card">
+                <span class="version-badge">v∞</span>
+
+                <p><em>Some stories evolve and do not usually end with 'and they lived happily ever after'. Real life is
+                        much more challenging, new twists come now and then, like in plays, where when we are expecting
+                        nothing of a big surprise, new characters enter the scene and leave most of us wondering what's
+                        next. Some writers abruptly end their stories, leaving their readers to imagine the rest. Still
+                        others write many novels, leaving the doors open for future writers. Pens, papers and printing
+                        presses played and still play a significant role in literature. However, we now have one
+                        additional media: the internet. Mirroring what we do in the physical world to the virtual world
+                        is one possible direction. But exploiting the many potentials of internet is another way to
+                        advance literature. Here, I would like to describe what I call the <strong>evolving story
+                            format</strong> to explore continuous writing on any subject: writing, updating and keeping
+                        track of the evolution.</em></p>
+
+                <p>Not a single domain has remained stagnant all these years. When almost everybody thought that there
                     will not be any novelty coming up in a particular domain, all of a sudden, someone somewhere comes
-                    up with a new hypothesis and the domain is back in picture.
-                    No domain can just be confined to a few books.
-                </p>
+                    up with a new hypothesis and the domain is back in picture. No domain can just be confined to a few
+                    books.</p>
+
                 <p>Last several years have seen a shift from paper notebooks and books to internet. It is nevertheless
                     important to note that physical books have not lost their charm. Internet has provided a new medium
-                    for dissemination of information in novel
-                    ways. In the beginning, we saw internet equivalents of every physical objects we know in the virtual
-                    world. We continued to use the same terminology of tangible objects of the physical world to refer
-                    to their non-tangible equivalents on
-                    the internet. We now have (virtual) articles, newspapers, journals, books on the internet and are
-                    very much successful in mimicing their physical world counterparts. Thus, our transition from
-                    physical world to virtual world has been pretty
-                    smooth. But physical world objects have their limitations: once an author has published a book and
-                    expressed opinions based on the facts known at the time of writing or publishing, it is difficult to
-                    change them based on newly known facts.
-                    We do see corrigendum, erratum in (physical) newspaper articles in extreme cases, but we are unsure
-                    whether the readers read them.
-                </p>
-                <p>
-                    A traditional approach of publishing on the internet is to write a blog post and publish it
+                    for dissemination of information in novel ways. In the beginning, we saw internet equivalents of
+                    every physical objects we know in the virtual world. We continued to use the same terminology of
+                    tangible objects of the physical world to refer to their non-tangible equivalents on the internet.
+                    We now have (virtual) articles, newspapers, journals, books on the internet and are very much
+                    successful in mimicing their physical world counterparts. Thus, our transition from physical world
+                    to virtual world has been pretty smooth. But physical world objects have their limitations: once an
+                    author has published a book and expressed opinions based on the facts known at the time of writing
+                    or publishing, it is difficult to change them based on newly known facts. We do see corrigendum,
+                    erratum in (physical) newspaper articles in extreme cases, but we are unsure whether the readers
+                    read them.</p>
+
+                <p>A traditional approach of publishing on the internet is to write a blog post and publish it
                     immediately or on a given date. Any new development to the story already published requires writing
-                    a blog article and add hyperlinks to the previous article to
-                    give the readers the context. Though linking articles helps the user to find the previous article
-                    easily (compare it to the case where the reader has to check a newspaper of some days ago), it still
-                    requires the reader to refer to multiple
-                    articles. Here I would like to pose the question: virtual publishing has a lot more possibilities
-                    compared to physical world publishing, but do we need to limit ourselves by mimicking everything
-                    exactly according to the physical world
-                    equivalent?
-                </p>
-                <p>
-                    Long story format<sup><a href="#longform">1</a></sup> explores the idea of continuous publishing on
-                    a story or a subject. It encourages the author to update a story by adding content in the form of
-                    new sentences, paragraphs, sections,
-                    images etc. on any new development either to the top or the bottom of the article. Is addition to
-                    the top portion of the page better? Readers come to the story page and look at the top. They do not
-                    need to scroll down to the end of the
-                    page to get the latest update. But what about first time readers? Do they need to follow the story
-                    in reverse chronological order without getting the complete context of the story? That brings us to
-                    an important question: is chronological
-                    presentation a feasible option all the time? I think it is a very difficult decision to make and is
-                    objective.
-                </p>
-                <p>
-                    Updates at top or bottom portion of the page may work well for chronological stories. However, some
+                    a blog article and add hyperlinks to the previous article to give the readers the context. Though
+                    linking articles helps the user to find the previous article easily (compare it to the case where
+                    the reader has to check a newspaper of some days ago), it still requires the reader to refer to
+                    multiple articles. Here I would like to pose the question: virtual publishing has a lot more
+                    possibilities compared to physical world publishing, but do we need to limit ourselves by mimicking
+                    everything exactly according to the physical world equivalent?</p>
+
+                <p>Long story format<sup><a href="#longform">1</a></sup> explores the idea of continuous publishing on a
+                    story or a subject. It encourages the author to update a story by adding content in the form of new
+                    sentences, paragraphs, sections, images etc. on any new development either to the top or the bottom
+                    of the article. Is addition to the top portion of the page better? Readers come to the story page
+                    and look at the top. They do not need to scroll down to the end of the page to get the latest
+                    update. But what about first time readers? Do they need to follow the story in reverse chronological
+                    order without getting the complete context of the story? That brings us to an important question: is
+                    chronological presentation a feasible option all the time? I think it is a very difficult decision
+                    to make and is objective.</p>
+
+                <p>Updates at top or bottom portion of the page may work well for chronological stories. However, some
                     facts do change thanks to new and ongoing research works. This requires rewriting of some older
-                    sections of the article since what was once true is no
-                    longer the case. How can an article reflect that? This is where <b>evolving story format</b> comes
-                    in picture. Evolving story format lets the author update an article anywhere: top, bottom, middle,
-                    after second paragraph,
-                    after third line of the fourth paragraph etc. The format also lets the author rewrite any line,
-                    correct typos or ammend grammar mistakes.
-                    <b>But</b> how do the readers track these changes? How could they refer to a fact at a given time?
-                </p>
-                <p>
-                    Version control systems have been used in software development for quite some time. They track every
+                    sections of the article since what was once true is no longer the case. How can an article reflect
+                    that? This is where <strong>evolving story format</strong> comes in picture. Evolving story format
+                    lets the author update an article anywhere: top, bottom, middle, after second paragraph, after third
+                    line of the fourth paragraph etc. The format also lets the author rewrite any line, correct typos or
+                    ammend grammar mistakes. <strong>But</strong> how do the readers track these changes? How could they
+                    refer to a fact at a given time?</p>
+
+                <p>Version control systems have been used in software development for quite some time. They track every
                     change that a user has made since the beginning of a project. Whenever a developer decides to save
-                    and record a given state of the project, they saves
-                    the work and the term used for this 'saving' in software development is <b>commit</b>. Every time
-                    they makes a commit, the state of the work is saved along with the time details. Anybody can view
-                    what has changed between
-                    two states (or commits or even two different times). This is exactly the idea behind <b>evolving
-                        story format</b>.
-                </p>
-                <p>
-                    Let us take an analogy from the real-life. Imagine writing an article on a piece of paper. Once the
+                    and record a given state of the project, they saves the work and the term used for this 'saving' in
+                    software development is <strong>commit</strong>. Every time they makes a commit, the state of the
+                    work is saved along with the time details. Anybody can view what has changed between two states (or
+                    commits or even two different times). This is exactly the idea behind <strong>evolving story
+                        format</strong>.</p>
+
+                <p>Let us take an analogy from the real-life. Imagine writing an article on a piece of paper. Once the
                     first draft version is completed, the author may choose to publish it as it is. However, in some
-                    cases, this draft version may be reread and corrections
-                    (including correction of grammatical errors, typos) as well as rephrasing of the sentences, if
-                    required are done. This may take several rounds and even mean several draft paper versions are
-                    written before the final article is ready. Nevertheless,
-                    what is lost in this process is the story of changes, the story of how changes have been made to a
-                    given article. Some people do keep record of all manuscript changes, whereas others only keep the
-                    final version. Evolving story format aims
-                    to mimic this experience online. Every time an author decides to save, they makes a commit. Thus any
-                    interested person may have a complete story of the evolution of a given article.
-                </p>
-                <p><b>Storytelling</b> is an art, so is the story of storytelling. An author may wish to show the story
-                    of the making of the article in their own style, deciding when or when not to commit their changes.
-                    They may show the first and the final
-                    version of the article, whereas another may wish to share every small change. The evolving story
-                    format does not put any limit to the number of commits. But this may not necessarily depend on the
-                    author alone. Our ideas and opinions evolve.
-                    Some of them happen when new information comes and when our old assumptions are no longer true.
-                    There can also be rapid advancements on a single topic based on new and rapidly changing scientific
-                    discoveries and facts.
-                </p>
-                <p>
-                    What else could evolve in a story? It's not just textual content of the story itself that could
+                    cases, this draft version may be reread and corrections (including correction of grammatical errors,
+                    typos) as well as rephrasing of the sentences, if required are done. This may take several rounds
+                    and even mean several draft paper versions are written before the final article is ready.
+                    Nevertheless, what is lost in this process is the story of changes, the story of how changes have
+                    been made to a given article. Some people do keep record of all manuscript changes, whereas others
+                    only keep the final version. Evolving story format aims to mimic this experience online. Every time
+                    an author decides to save, they makes a commit. Thus any interested person may have a complete story
+                    of the evolution of a given article.</p>
+
+                <p><strong>Storytelling</strong> is an art, so is the story of storytelling. An author may wish to show
+                    the story of the making of the article in their own style, deciding when or when not to commit their
+                    changes. They may show the first and the final version of the article, whereas another may wish to
+                    share every small change. The evolving story format does not put any limit to the number of commits.
+                    But this may not necessarily depend on the author alone. Our ideas and opinions evolve. Some of them
+                    happen when new information comes and when our old assumptions are no longer true. There can also be
+                    rapid advancements on a single topic based on new and rapidly changing scientific discoveries and
+                    facts.</p>
+
+                <p>What else could evolve in a story? It's not just textual content of the story itself that could
                     evolve, but also the manner in which a story is presented online: styles, fonts, colors, background
-                    chosen by the storyteller(s) etc. The choice of images,
-                    their addition or removal, the change in titles, the addition or modification of sections, the way
-                    new articles arising from some sections of an old article are created, all of these constitute the
-                    story of evolution.
-                </p>
-                <p>
-                    But if you are wondering whether this is feasible, you need not look far, but just check Wikipedia
+                    chosen by the storyteller(s) etc. The choice of images, their addition or removal, the change in
+                    titles, the addition or modification of sections, the way new articles arising from some sections of
+                    an old article are created, all of these constitute the story of evolution.</p>
+
+                <p>But if you are wondering whether this is feasible, you need not look far, but just check Wikipedia
                     and see how one can see the evolution of any Wikipedia article. Wikipedia is collaborative knowledge
-                    repository or encyclopedia, where readers are usually
-                    shown the latest version of a given article, agreed upon by the contributors of the article.
-                    However, one can also check its previous versions. Wikipedia articles tell the story of evolution as
-                    well as collaboration.</p>
-                </p>
-                <p>
-                    I would like to finish this topic, by detailing how I am trying to achieve this evolving story
-                    format on my blog. Undoubtedly, there is a difference between Wikipedia and my personal website,
-                    where Wikipedia is a collaborative project involving multiple
-                    persons, this website is a personal one involving just me, the author. What am I sharing on this
-                    website? My personal reading list, personal understanding of diverse topics, opinions, teaching
-                    supports and materials. It has been quite
+                    repository or encyclopedia, where readers are usually shown the latest version of a given article,
+                    agreed upon by the contributors of the article. However, one can also check its previous versions.
+                    Wikipedia articles tell the story of evolution as well as collaboration.</p>
+
+                <p>I would like to finish this topic, by detailing how I am trying to achieve this evolving story format
+                    on my blog. Undoubtedly, there is a difference between Wikipedia and my personal website, where
+                    Wikipedia is a collaborative project involving multiple persons, this website is a personal one
+                    involving just me, the author. What am I sharing on this website? My personal reading list, personal
+                    understanding of diverse topics, opinions, teaching supports and materials. It has been quite
                     sometime that I am working on this site. Anybody going through the commit history of my blog can see
                     my learning and recalling process, my approach of collecting and refinement of thoughts on various
-                    topics. Some of my articles are dumpyards
-                    of my initial thoughts, with no phrases, but rather seemingly random words. However, some of my
-                    articles have started maturing. I use one page for each topic of my interest. SVG (XML-like) formats
-                    are used to illustrate for two reasons:
-                    these are (semi)-human readable texts, and they are easier to be tracked across different versions.
+                    topics. Some of my articles are dumpyards of my initial thoughts, with no phrases, but rather
+                    seemingly random words. However, some of my articles have started maturing. I use one page for each
+                    topic of my interest. SVG (XML-like) formats are used to illustrate for two reasons: these are
+                    (semi)-human readable texts, and they are easier to be tracked across different versions.</p>
+
+                <p>I frequently <strong>commit</strong> my changes. Frequent commiting with good commit notes is an
+                    interesting way to understand my own thought process at different instants of time. They also serve
+                    as the evidence of the evolution of my thoughts on a given topic. The major advantage is that I am
+                    able to write more frequently and at the same time improve my writing style<sup><a
+                            href="#frequentediting">5</a></sup>. I believe that personal blogs tracked by version
+                    control tell a story of an individual and the progress and the evolution of their ideas and opinions
+                    based on new facts and obsolescence of old ones. I do wish that all websites follow this approach.
                 </p>
-                <p>
-                    I frequently <b>commit</b> my changes. Frequent commiting with good commit notes is an interesting
-                    way
-                    to understand my own thought process at different instants of time. They also serve as the evidence
-                    of
-                    the evolution of my thoughts on a
-                    given topic. The major advantage is that I am able to write more frequently and at the same time
-                    improve
-                    my writing style<sup><a href="#frequentediting">5</a></sup>. I believe that personal blogs tracked
-                    by
-                    version control tell a story of
-                    an individual and the progress and the evolution of their ideas and opinions based on new facts and
-                    obsolescence of old ones. I do wish that all websites follow this approach.
-                </p>
+
                 <h3>References</h3>
                 <ol>
                     <li id="longform"><a href="https://en.wikipedia.org/wiki/Long-form_journalism">Long-form
@@ -451,8 +847,8 @@
                             href="https://www.nytimes.com/2020/04/07/smarter-living/how-to-edit-your-own-writing.html">How
                             to Edit Your Own Writing</a></li>
                 </ol>
-            </div>
-        </div>
+            </article>
+        </main>
     </body>
 
 </html>

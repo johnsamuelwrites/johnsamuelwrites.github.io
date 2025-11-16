@@ -3,327 +3,758 @@
 
     <head>
         <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <meta http-equiv="Content-Language" content="en" />
         <link rel="shortcut icon" href="../../images/logo/favicon.png" />
         <title>Blogging: John Samuel</title>
         <style type="text/css">
-            body {
-                background-color: #FFFFFF;
+            /* ===================================
+           DESIGN TOKENS & CSS VARIABLES
+           =================================== */
+            :root {
+                /* Base Colors - Creative Writing Theme */
+                --color-base-bg: #faf9f7;
+                --color-base-surface: #ffffff;
+                --color-base-text: #2c2c2c;
+                --color-base-text-muted: #5a5a5a;
+
+                /* Theme Accents - Vibrant orange for creativity and energy */
+                --color-accent-1: #D8580E;
+                --color-accent-2: #b94808;
+                --color-accent-3: #ff7733;
+                --color-accent-light: #fff3eb;
+                --color-accent-pale: #fff8f3;
+
+                /* Functional Colors */
+                --color-shadow: rgba(216, 88, 14, 0.12);
+                --color-border: rgba(216, 88, 14, 0.15);
+                --color-hover: rgba(216, 88, 14, 0.08);
+
+                /* Gradients */
+                --gradient-primary: linear-gradient(135deg, var(--color-accent-1), var(--color-accent-2));
+                --gradient-subtle: linear-gradient(180deg, var(--color-base-bg), var(--color-accent-pale));
+                --gradient-vibrant: linear-gradient(135deg, #D8580E 0%, #ff7733 50%, #ffaa66 100%);
+
+                /* Spacing Scale */
+                --space-xs: 0.25rem;
+                --space-sm: 0.5rem;
+                --space-md: 1rem;
+                --space-lg: 1.5rem;
+                --space-xl: 2rem;
+                --space-2xl: 3rem;
+                --space-3xl: 4rem;
+                --space-4xl: 6rem;
+
+                /* Border Radius */
+                --radius-sm: 4px;
+                --radius-md: 8px;
+                --radius-lg: 12px;
+                --radius-xl: 16px;
+                --radius-2xl: 24px;
+                --radius-full: 9999px;
+
+                /* Shadows */
+                --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.04), 0 1px 3px rgba(0, 0, 0, 0.06);
+                --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.05), 0 2px 4px rgba(0, 0, 0, 0.06);
+                --shadow-lg: 0 10px 24px rgba(0, 0, 0, 0.08), 0 4px 8px rgba(0, 0, 0, 0.06);
+                --shadow-theme: 0 10px 30px var(--color-shadow), 0 4px 10px rgba(0, 0, 0, 0.06);
+
+                /* Typography */
+                --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+                --text-xs: clamp(0.75rem, 0.7rem + 0.25vw, 0.875rem);
+                --text-sm: clamp(0.875rem, 0.8rem + 0.35vw, 1rem);
+                --text-base: clamp(1rem, 0.95rem + 0.25vw, 1.125rem);
+                --text-lg: clamp(1.125rem, 1.05rem + 0.35vw, 1.25rem);
+                --text-xl: clamp(1.25rem, 1.15rem + 0.5vw, 1.5rem);
+                --text-2xl: clamp(1.5rem, 1.3rem + 1vw, 2rem);
+                --text-3xl: clamp(2rem, 1.6rem + 2vw, 2.5rem);
+                --text-4xl: clamp(2.5rem, 2rem + 2.5vw, 3.5rem);
+
+                --weight-normal: 400;
+                --weight-medium: 500;
+                --weight-semibold: 600;
+                --weight-bold: 700;
+
+                --leading-relaxed: 1.75;
+                --leading-normal: 1.5;
             }
 
-            #sidebar {
-                position: fixed;
-                background-color: #D8580E;
-                top: 0;
-                left: 0;
-                bottom: 0;
-                width: 30vw;
-            }
-
-            #sidebar .title {
-                position: relative;
-                text-align: center;
-                line-height: 5vmax;
-                font-size: 1.4vmax;
-                font-family: 'Arial';
-                margin-top: 30vh;
-            }
-
-            #sidebar .title a:link,
-            #sidebar .title a:visited {
-                color: #FFFFFF;
-                text-decoration: none;
-            }
-
-            .subtitle {
-                top: 50vh;
-                text-align: center;
-                line-height: 1.3vmax;
-                font-family: 'Arial';
-                font-size: 1.5vmax;
-                color: #FFFFFF;
-            }
-
-            .subtitle a:link,
-            .subtitle a:visited {
-                color: #FFFFFF;
-                text-decoration: none;
-            }
-
-            .licence {
-                position: fixed;
-                text-align: right;
-                bottom: 0;
-                right: 0;
-            }
-
-            .home {
-                position: fixed;
-                text-align: left;
-                font-family: 'Arial';
-                color: #D3D3D3;
-                z-index: 100;
-                width: 100%;
-                background-color: #FFFFFF;
-                top: 0px;
-                margin-bottom: 10px;
-                padding-bottom: 10px;
-            }
-
-            .home a:link,
-            .home a:visited {
-                text-decoration: none;
-                color: #D3D3D3;
-            }
-
-            .home ul {
+            /* ===================================
+           RESET & BASE STYLES
+           =================================== */
+            * {
                 margin: 0;
                 padding: 0;
-                text-align: left;
+                box-sizing: border-box;
+            }
+
+            html {
+                scroll-behavior: smooth;
+                scroll-padding-top: 80px;
+            }
+
+            body {
+                font-family: var(--font-sans);
+                font-size: var(--text-base);
+                line-height: var(--leading-relaxed);
+                color: var(--color-base-text);
+                background: var(--color-base-bg);
+                -webkit-font-smoothing: antialiased;
+                -moz-osx-font-smoothing: grayscale;
+            }
+
+            /* ===================================
+           NAVIGATION
+           =================================== */
+            .navbar {
+                position: fixed;
+                top: 0;
+                width: 100%;
+                z-index: 1000;
+                background: rgba(255, 255, 255, 0.9);
+                -webkit-backdrop-filter: blur(12px) saturate(180%);
+                backdrop-filter: blur(12px) saturate(180%);
+                border-bottom: 1px solid var(--color-border);
+                box-shadow: var(--shadow-sm);
+                transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            }
+
+            .navbar ul {
                 list-style: none;
+                display: flex;
+                align-items: center;
+                gap: var(--space-md);
+                padding: var(--space-md) var(--space-xl);
+                max-width: 1400px;
+                margin: 0 auto;
             }
 
-            .home li {
+            .navbar li {
                 position: relative;
-                float: left;
-                padding-top: 15px;
-                margin-right: 1em;
-                font-family: 'Arial';
             }
 
-            .home li:hover {
-                display: block;
-            }
-
-            .home li:hover a:link,
-            .home li:hover a:visited {
+            .navbar a {
                 text-decoration: none;
-                padding: 15px;
-                color: #FFFFFF;
-                background-color: #D8580E;
+                color: var(--color-base-text-muted);
+                font-weight: var(--weight-normal);
+                transition: color 0.3s ease;
+                padding: var(--space-sm) var(--space-md);
+                border-radius: var(--radius-sm);
             }
 
-            .content {
-                line-height: 1.8vmax;
-                font-size: 1.2vmax;
-                font-family: 'Arial';
-                margin-top: 15vh;
-                width: 90%;
+            .navbar-brand a {
+                font-weight: var(--weight-bold);
+                color: var(--color-accent-1);
+                background: var(--gradient-primary);
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                background-clip: text;
             }
 
-            .content h2,
-            h3,
-            h4 {
-                color: #D8580E;
+            .navbar a:hover {
+                color: var(--color-accent-1);
+                background: var(--color-hover);
             }
 
-            .content a:link,
-            .content a:visited {
-                color: #D8580E;
+            .navbar li:not(:last-child)::after {
+                content: '›';
+                position: absolute;
+                right: -0.5rem;
+                color: var(--color-base-text-muted);
+                opacity: 0.4;
             }
 
-            .content h3 {
-                color: #D8580E;
+            /* ===================================
+           HERO SECTION
+           =================================== */
+            .hero {
+                min-height: 70vh;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                padding: var(--space-4xl) var(--space-xl);
+                margin-top: 60px;
+                background: var(--gradient-subtle);
+                position: relative;
+                overflow: hidden;
             }
 
-            .content h2::before,
-            .content h3::before {
-                display: block;
-                content: " ";
-                visibility: hidden;
-                height: 50px;
-                margin-top: -50px;
+            .hero::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background:
+                    radial-gradient(circle at 20% 30%, rgba(216, 88, 14, 0.08) 0%, transparent 50%),
+                    radial-gradient(circle at 80% 70%, rgba(255, 119, 51, 0.06) 0%, transparent 50%);
                 pointer-events: none;
-                background-color: #FFFFFF;
             }
 
-            .content p {
+            .hero-svg {
+                width: 350px;
+                height: 350px;
+                margin-bottom: var(--space-2xl);
+                filter: drop-shadow(0 10px 20px rgba(216, 88, 14, 0.15));
+                position: relative;
+                z-index: 1;
+            }
+
+            .hero-title {
+                font-size: var(--text-4xl);
+                font-weight: var(--weight-bold);
+                color: var(--color-accent-2);
+                text-align: center;
+                margin-bottom: var(--space-md);
+                letter-spacing: -0.02em;
+                position: relative;
+                z-index: 1;
+            }
+
+            .hero-subtitle {
+                font-size: var(--text-xl);
+                font-weight: var(--weight-medium);
+                color: var(--color-base-text-muted);
+                text-align: center;
+                position: relative;
+                z-index: 1;
+            }
+
+            .hero-subtitle a {
+                color: var(--color-accent-1);
+                text-decoration: none;
+                transition: color 0.3s ease;
+            }
+
+            .hero-subtitle a:hover {
+                color: var(--color-accent-2);
+            }
+
+            /* ===================================
+           CONTENT SECTION
+           =================================== */
+            .content-wrapper {
+                max-width: 900px;
+                margin: 0 auto;
+                padding: var(--space-4xl) var(--space-xl);
+            }
+
+            .writing-card {
+                background: var(--color-base-surface);
+                border-radius: var(--radius-xl);
+                padding: var(--space-3xl);
+                box-shadow: var(--shadow-theme);
+                position: relative;
+                overflow: hidden;
+                margin-bottom: var(--space-2xl);
+                transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            }
+
+            .writing-card::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                height: 4px;
+                background: var(--gradient-vibrant);
+                background-size: 200% 200%;
+                animation: gradientShift 8s ease infinite;
+            }
+
+            .writing-card:hover {
+                transform: translateY(-8px);
+                box-shadow: 0 20px 40px rgba(216, 88, 14, 0.18), 0 8px 16px rgba(0, 0, 0, 0.08);
+            }
+
+            .writing-card p {
+                margin-bottom: var(--space-xl);
+                line-height: var(--leading-relaxed);
+                color: var(--color-base-text);
                 text-align: justify;
                 text-justify: inter-word;
             }
 
-            .content a:link,
-            .content a:visited {
-                color: #D8580E;
+            .writing-card p:last-of-type {
+                margin-bottom: 0;
             }
 
-            .home a:link,
-            .home a:visited {
-                color: #D3D3D3;
+            .writing-card strong {
+                color: var(--color-accent-1);
+                font-weight: var(--weight-bold);
             }
 
-            .page {
-                width: 65vw;
-                height: 100%;
-                margin-left: 30vw;
-                overflow: hidden;
-                padding: 0 1em;
-                font-family: 'Arial';
+            .writing-card a {
+                color: var(--color-accent-1);
+                text-decoration: none;
+                font-weight: var(--weight-medium);
+                transition: color 0.3s ease;
+                border-bottom: 1px solid transparent;
             }
 
-            .page img {
-                max-width: 100%;
-                max-height: 100%;
+            .writing-card a:hover {
+                color: var(--color-accent-2);
+                border-bottom-color: var(--color-accent-2);
             }
 
-            @media (max-width: 640px),
-            screen and (orientation: portrait) {
-                body {
-                    max-width: 100%;
-                    max-height: 100%;
+            .writing-card sup {
+                font-size: 0.75em;
+                margin-left: 0.1em;
+            }
+
+            .references-section {
+                background: var(--color-accent-pale);
+                border-radius: var(--radius-lg);
+                padding: var(--space-xl);
+                margin-top: var(--space-2xl);
+            }
+
+            .references-section h3 {
+                font-size: var(--text-2xl);
+                font-weight: var(--weight-bold);
+                color: var(--color-accent-1);
+                margin-bottom: var(--space-lg);
+                position: relative;
+                padding-bottom: var(--space-sm);
+            }
+
+            .references-section h3::after {
+                content: '';
+                position: absolute;
+                bottom: 0;
+                left: 0;
+                width: 60px;
+                height: 3px;
+                background: var(--gradient-primary);
+                border-radius: var(--radius-full);
+            }
+
+            .references-section ol {
+                list-style: none;
+                counter-reset: reference-counter;
+                padding-left: 0;
+            }
+
+            .references-section ol li {
+                counter-increment: reference-counter;
+                margin-bottom: var(--space-md);
+                padding-left: var(--space-xl);
+                position: relative;
+                line-height: var(--leading-normal);
+            }
+
+            .references-section ol li::before {
+                content: counter(reference-counter);
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 28px;
+                height: 28px;
+                background: var(--gradient-primary);
+                color: white;
+                border-radius: 50%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: var(--text-sm);
+                font-weight: var(--weight-bold);
+            }
+
+            /* ===================================
+           DECORATIVE ELEMENTS
+           =================================== */
+            .quote-decoration {
+                position: absolute;
+                top: 20px;
+                right: 20px;
+                font-size: 80px;
+                color: var(--color-accent-1);
+                opacity: 0.05;
+                font-family: Georgia, serif;
+                line-height: 1;
+                pointer-events: none;
+            }
+
+            /* ===================================
+           ANIMATIONS
+           =================================== */
+            @keyframes gradientShift {
+                0% {
+                    background-position: 0% 50%;
                 }
 
-                #sidebar {
-                    position: fixed;
-                    background-color: #D8580E;
-                    top: 0;
-                    left: 0;
-                    bottom: 80vh;
-                    width: 100vw;
+                50% {
+                    background-position: 100% 50%;
                 }
 
-                #sidebar .title {
-                    text-align: center;
-                    position: fixed;
-                    margin-top: 6vh;
-                    left: 0px;
-                    right: 0px;
-                    line-height: 3.5vmax;
-                    font-size: 1.5vmax;
-                    font-family: 'Arial';
+                100% {
+                    background-position: 0% 50%;
+                }
+            }
+
+            @keyframes float {
+
+                0%,
+                100% {
+                    transform: translateY(0px) rotate(0deg);
                 }
 
-                #sidebar .subtitle {
-                    text-align: center;
-                    top: 5vh;
-                    left: 0px;
-                    right: 0px;
-                    position: fixed;
-                    margin-top: 10vh;
-                    font-size: 1.5vmax;
+                50% {
+                    transform: translateY(-20px) rotate(3deg);
+                }
+            }
+
+            @keyframes floatReverse {
+
+                0%,
+                100% {
+                    transform: translateY(0px) rotate(0deg);
                 }
 
-                #sidebar .title a:link,
-                #sidebar .title a:visited {
-                    text-align: center;
-                    color: #FFFFFF;
+                50% {
+                    transform: translateY(-15px) rotate(-3deg);
+                }
+            }
+
+            @keyframes pulse {
+
+                0%,
+                100% {
+                    opacity: 1;
                 }
 
-                #sidebar .subtitle a:link,
-                #sidebar .subtitle a:visited {
-                    text-align: center;
-                    color: #FFFFFF;
+                50% {
+                    opacity: 0.6;
+                }
+            }
+
+            @keyframes flow {
+                0% {
+                    transform: translateX(-20px) translateY(0px);
+                    opacity: 0;
                 }
 
-                .home {
-                    z-index: 100;
-                    width: 100%;
-                    background-color: #D8580E;
-                    font-size: 1.5vmax;
+                50% {
+                    opacity: 1;
                 }
 
-                .home a:link,
-                .home a:visited {
-                    text-decoration: none;
-                    color: #FFFFFF;
+                100% {
+                    transform: translateX(20px) translateY(-10px);
+                    opacity: 0;
+                }
+            }
+
+            @keyframes write {
+                0% {
+                    stroke-dashoffset: 1000;
                 }
 
-                .content {
-                    line-height: 3.8vmax;
-                    font-size: 1.8vmax;
-                    font-family: 'Arial';
-                    margin-top: 22vh;
+                100% {
+                    stroke-dashoffset: 0;
+                }
+            }
+
+            @keyframes fadeInUp {
+                from {
+                    opacity: 0;
+                    transform: translateY(30px);
                 }
 
-                .content a:link,
-                .content a:visited {
-                    color: #D8580E;
+                to {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            }
+
+            .writing-card {
+                animation: fadeInUp 0.8s ease-out;
+            }
+
+            /* SVG Animations */
+            .svg-pen {
+                animation: float 5s ease-in-out infinite;
+                transform-origin: center;
+            }
+
+            .svg-notebook {
+                animation: floatReverse 6s ease-in-out infinite;
+                transform-origin: center;
+            }
+
+            .svg-idea-flow {
+                animation: flow 4s ease-in-out infinite;
+            }
+
+            .svg-bulb {
+                animation: pulse 3s ease-in-out infinite;
+            }
+
+            .svg-writing-line {
+                stroke-dasharray: 1000;
+                stroke-dashoffset: 1000;
+                animation: write 3s ease-in-out infinite;
+            }
+
+            /* ===================================
+           ACCESSIBILITY
+           =================================== */
+            :focus-visible {
+                outline: 3px solid var(--color-accent-1);
+                outline-offset: 2px;
+                border-radius: var(--radius-sm);
+            }
+
+            .skip-link {
+                position: absolute;
+                top: -40px;
+                left: 0;
+                background: var(--color-accent-1);
+                color: white;
+                padding: var(--space-sm) var(--space-md);
+                text-decoration: none;
+                border-radius: var(--radius-sm);
+                z-index: 10000;
+            }
+
+            .skip-link:focus {
+                top: 0;
+            }
+
+            @media (prefers-reduced-motion: reduce) {
+
+                *,
+                *::before,
+                *::after {
+                    animation-duration: 0.01ms !important;
+                    animation-iteration-count: 1 !important;
+                    transition-duration: 0.01ms !important;
+                }
+            }
+
+            /* ===================================
+           RESPONSIVE DESIGN
+           =================================== */
+            @media (max-width: 768px) {
+                .hero {
+                    min-height: 60vh;
+                    padding: var(--space-3xl) var(--space-md);
                 }
 
-                .page {
-                    top: 40vh;
-                    width: 95%;
-                    margin-left: 0vw;
+                .hero-svg {
+                    width: 250px;
+                    height: 250px;
                 }
 
-                .page img {
-                    max-width: 100%;
-                    max-height: 100%;
-                    border: 0;
+                .navbar ul {
+                    padding: var(--space-sm) var(--space-md);
+                    gap: var(--space-sm);
+                }
+
+                .navbar a {
+                    padding: var(--space-xs) var(--space-sm);
+                    font-size: var(--text-sm);
+                }
+
+                .writing-card {
+                    padding: var(--space-xl);
+                }
+
+                .content-wrapper {
+                    padding: var(--space-2xl) var(--space-md);
+                }
+
+                .references-section {
+                    padding: var(--space-lg);
+                }
+            }
+
+            @media (max-width: 480px) {
+                .navbar li:not(:last-child)::after {
+                    display: none;
+                }
+
+                .writing-card p {
+                    text-align: left;
                 }
             }
         </style>
     </head>
 
     <body vocab="http://schema.org/">
-        <div class="page">
-            <div class="home">
-                <ul typeof="BreadcrumbList">
-                    <li property="itemListElement" typeof="ListItem">
-                        <a property="item" typeof="WebPage" href="../index.html">
-                            <span property="name">Home</span>
-                        </a>
-                    </li>
-                    <li property="itemListElement" typeof="ListItem">
-                        <a property="item" typeof="WebPage" href="../writings/index.html">
-                            <span property="name">Writings</span>
-                        </a>
-                    </li>
-                </ul>
+        <a href="#main-content" class="skip-link">Skip to main content</a>
 
-            </div>
-            <div id="sidebar">
-                <div class="title">
-                    <h1><a href="./blogging.html">Blogging</a></h1>
-                </div>
-                <div class="subtitle">
-                    <h3><a href="../about.html">John Samuel</a></h3>
-                </div>
-            </div>
+        <!-- Navigation -->
+        <nav class="navbar" aria-label="Main navigation">
+            <ul typeof="BreadcrumbList">
+                <li property="itemListElement" typeof="ListItem">
+                    <a property="item" typeof="WebPage" href="../index.html">
+                        <span property="name">Home</span>
+                    </a>
+                </li>
+                <li property="itemListElement" typeof="ListItem" class="navbar-brand">
+                    <a property="item" typeof="WebPage" href="../about.html">
+                        <span property="name">John Samuel</span>
+                    </a>
+                </li>
+                <li property="itemListElement" typeof="ListItem">
+                    <a property="item" typeof="WebPage" href="../writings/index.html">
+                        <span property="name">Writings</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
 
-            <div class="content">
-                <p>I <b>love to write</b>.
-                </p>
-                <p>
-                    I usually jot down my thoughts while traveling and reading books. These are two of the best moments
+        <!-- Hero Section -->
+        <header class="hero">
+            <svg class="hero-svg" viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                <!-- Background gradient circle -->
+                <defs>
+                    <linearGradient id="bgGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" style="stop-color:#fff8f3;stop-opacity:1" />
+                        <stop offset="100%" style="stop-color:#fff3eb;stop-opacity:1" />
+                    </linearGradient>
+                    <linearGradient id="orangeGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" style="stop-color:#D8580E;stop-opacity:1" />
+                        <stop offset="100%" style="stop-color:#ff7733;stop-opacity:1" />
+                    </linearGradient>
+                    <linearGradient id="paperGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+                        <stop offset="0%" style="stop-color:#ffffff;stop-opacity:1" />
+                        <stop offset="100%" style="stop-color:#f9f9f9;stop-opacity:1" />
+                    </linearGradient>
+                    <filter id="softGlow">
+                        <feGaussianBlur stdDeviation="3" result="blur" />
+                        <feFlood flood-color="#D8580E" flood-opacity="0.4" />
+                        <feComposite in2="blur" operator="in" />
+                        <feMerge>
+                            <feMergeNode />
+                            <feMergeNode in="SourceGraphic" />
+                        </feMerge>
+                    </filter>
+                </defs>
+
+                <!-- Background -->
+                <circle cx="200" cy="200" r="180" fill="url(#bgGradient)" opacity="0.6" />
+
+                <!-- Idea flow particles (top) -->
+                <g class="svg-idea-flow">
+                    <circle cx="80" cy="100" r="4" fill="#D8580E" opacity="0.4" />
+                    <circle cx="100" cy="90" r="3" fill="#ff7733" opacity="0.4" />
+                    <circle cx="120" cy="95" r="3.5" fill="#D8580E" opacity="0.4" />
+                </g>
+
+                <g class="svg-idea-flow" style="animation-delay: 0.5s;">
+                    <circle cx="280" cy="110" r="3.5" fill="#ff7733" opacity="0.4" />
+                    <circle cx="300" cy="105" r="4" fill="#D8580E" opacity="0.4" />
+                    <circle cx="320" cy="100" r="3" fill="#ff7733" opacity="0.4" />
+                </g>
+
+                <!-- Light bulb (idea symbol) -->
+                <g class="svg-bulb" filter="url(#softGlow)">
+                    <!-- Bulb -->
+                    <ellipse cx="200" cy="90" rx="25" ry="30" fill="url(#orangeGradient)" opacity="0.8" />
+                    <circle cx="200" cy="90" r="18" fill="#fff" opacity="0.5" />
+                    <!-- Base -->
+                    <rect x="192" y="115" width="16" height="8" rx="2" fill="#D8580E" />
+                    <rect x="194" y="123" width="12" height="6" rx="1" fill="#b94808" />
+                    <!-- Light rays -->
+                    <line x1="200" y1="60" x2="200" y2="45" stroke="#ffaa66" stroke-width="2" opacity="0.6" />
+                    <line x1="170" y1="75" x2="160" y2="65" stroke="#ffaa66" stroke-width="2" opacity="0.6" />
+                    <line x1="230" y1="75" x2="240" y2="65" stroke="#ffaa66" stroke-width="2" opacity="0.6" />
+                </g>
+
+                <!-- Notebook -->
+                <g class="svg-notebook">
+                    <!-- Notebook cover -->
+                    <rect x="80" y="180" width="100" height="140" rx="5" fill="url(#paperGradient)" stroke="#D8580E"
+                        stroke-width="3" />
+                    <!-- Spiral binding -->
+                    <circle cx="95" cy="195" r="3" fill="none" stroke="#D8580E" stroke-width="1.5" />
+                    <circle cx="95" cy="210" r="3" fill="none" stroke="#D8580E" stroke-width="1.5" />
+                    <circle cx="95" y="225" r="3" fill="none" stroke="#D8580E" stroke-width="1.5" />
+                    <circle cx="95" cy="240" r="3" fill="none" stroke="#D8580E" stroke-width="1.5" />
+                    <circle cx="95" cy="255" r="3" fill="none" stroke="#D8580E" stroke-width="1.5" />
+                    <!-- Lines on page -->
+                    <line x1="110" y1="200" x2="160" y2="200" stroke="#D8580E" stroke-width="1" opacity="0.3" />
+                    <line x1="110" y1="215" x2="165" y2="215" stroke="#D8580E" stroke-width="1" opacity="0.3" />
+                    <line x1="110" y1="230" x2="155" y2="230" stroke="#D8580E" stroke-width="1" opacity="0.3" />
+                    <line x1="110" y1="245" x2="170" y2="245" stroke="#D8580E" stroke-width="1" opacity="0.3" />
+                </g>
+
+                <!-- Pen/Pencil -->
+                <g class="svg-pen" filter="url(#softGlow)">
+                    <!-- Pen body -->
+                    <rect x="220" y="230" width="100" height="12" rx="6" fill="url(#orangeGradient)"
+                        transform="rotate(-30 270 236)" />
+                    <!-- Pen tip -->
+                    <polygon points="220,230 215,236 220,242" fill="#b94808" transform="rotate(-30 270 236)" />
+                    <!-- Pen clip -->
+                    <ellipse cx="280" cy="220" rx="3" ry="8" fill="#fff" opacity="0.6"
+                        transform="rotate(-30 270 236)" />
+                </g>
+
+                <!-- Writing lines (animated) -->
+                <path class="svg-writing-line" d="M 100 340 Q 150 335, 200 340 T 300 340" stroke="#D8580E"
+                    stroke-width="2" fill="none" opacity="0.5" />
+                <path class="svg-writing-line" d="M 90 360 Q 140 355, 190 360 T 290 360" stroke="#ff7733"
+                    stroke-width="2" fill="none" opacity="0.4" style="animation-delay: 0.5s;" />
+
+                <!-- Decorative dots -->
+                <circle cx="60" cy="150" r="3" fill="#D8580E" opacity="0.3" />
+                <circle cx="340" cy="280" r="3" fill="#ff7733" opacity="0.3" />
+                <circle cx="350" cy="180" r="2.5" fill="#D8580E" opacity="0.3" />
+                <circle cx="50" cy="300" r="2.5" fill="#ff7733" opacity="0.3" />
+            </svg>
+
+            <h1 class="hero-title">Blogging</h1>
+            <h2 class="hero-subtitle">
+                <a href="../about.html">John Samuel</a>
+            </h2>
+        </header>
+
+        <!-- Main Content -->
+        <main id="main-content" class="content-wrapper">
+            <article class="writing-card">
+                <span class="quote-decoration">"</span>
+
+                <p>I <strong>love to write</strong>.</p>
+
+                <p>I usually jot down my thoughts while traveling and reading books. These are two of the best moments
                     when new ideas flow. Staring out of the windows of tram or bus, sometimes into the void and
-                    sometimes at the busy streets, trees and buildings gives birth
-                    to a flood of ideas which need to be mixed, refined and baked. Reading opens door to a fresh outlook
-                    on various subjects.
-                </p>
-                <p>
-                    I follow evolving story format<sup><a href="#evolving">1</a></sup> where I add new thoughts on a
+                    sometimes at the busy streets, trees and buildings gives birth to a flood of ideas which need to be
+                    mixed, refined and baked. Reading opens door to a fresh outlook on various subjects.</p>
+
+                <p>I follow evolving story format<sup><a href="#evolving">1</a></sup> where I add new thoughts on a
                     topic, delete or alter a post as and when possible. I save my thought process as well as its
-                    associated evolution as small, simple phrases
-                    on this blog. Weekends and late evenings are the moments when I take up writing seriously especially
-                    to complete the posts.
-                </p>
+                    associated evolution as small, simple phrases on this blog. Weekends and late evenings are the
+                    moments when I take up writing seriously especially to complete the posts.</p>
+
                 <p>Earlier, I used my notebooks and computer to jot down my thoughts. The result of which was that I had
                     an accumulation of notes and ideas, unpublished anywhere on the internet. Now with the
-                    aforementioned approach, every new idea or thought
-                    results in a small update on the webpage of the corresponding topic or the emergence of a new
-                    article.
-                </p>
-                <p>
-                    The posts are incomplete since they miss complete sentences and there is no specific flow of ideas.
-                    But these <b>published incomplete posts</b> motivate me to focus and work on the respective subject
-                    as time progresses. They are easily
-                    accessible anywhere, anytime unlike my notebooks. Also it's much easier for me to analyse and
-                    elaborate them than when it required of me to write complete sentences every time.
-                </p>
-                <p>I also find this approach quite useful to deal with <b>writer's block</b><sup><a
+                    aforementioned approach, every new idea or thought results in a small update on the webpage of the
+                    corresponding topic or the emergence of a new article.</p>
+
+                <p>The posts are incomplete since they miss complete sentences and there is no specific flow of ideas.
+                    But these <strong>published incomplete posts</strong> motivate me to focus and work on the
+                    respective subject as time progresses. They are easily accessible anywhere, anytime unlike my
+                    notebooks. Also it's much easier for me to analyse and elaborate them than when it required of me to
+                    write complete sentences every time.</p>
+
+                <p>I also find this approach quite useful to deal with <strong>writer's block</strong><sup><a
                             href="#writers-block">2</a></sup>. There is no blank page; in fact there are many phrases
-                    that need elaboration and rephrasing and many partial pages that need
-                    completion.
-                </p>
-                <h3>References</h3>
-                <ol>
-                    <li id="evolving"><a href="evolving-story-format.html">Evolving Story Format</a></li>
-                    <li id="writers-block"><a href="https://en.wikipedia.org/wiki/Writer's_block">Writer's Block</a>
-                    </li>
-                </ol>
-            </div>
-        </div>
+                    that need elaboration and rephrasing and many partial pages that need completion.</p>
+
+                <div class="references-section">
+                    <h3>References</h3>
+                    <ol>
+                        <li id="evolving"><a href="evolving-story-format.html">Evolving Story Format</a></li>
+                        <li id="writers-block"><a href="https://en.wikipedia.org/wiki/Writer's_block">Writer's Block</a>
+                        </li>
+                    </ol>
+                </div>
+            </article>
+        </main>
     </body>
 
 </html>

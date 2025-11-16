@@ -3,328 +3,762 @@
 
     <head>
         <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <meta http-equiv="Content-Language" content="en" />
         <link rel="shortcut icon" href="../../images/logo/favicon.png" />
         <title>Blogging in 2023: John Samuel</title>
         <style type="text/css">
-            body {
-                background-color: #FFFFFF;
+            /* ===================================
+           DESIGN TOKENS & CSS VARIABLES
+           =================================== */
+            :root {
+                /* Base Colors - Digital Renaissance Theme */
+                --color-base-bg: #f7fbfc;
+                --color-base-surface: #ffffff;
+                --color-base-text: #2c2c2c;
+                --color-base-text-muted: #5a5a5a;
+
+                /* Theme Accents - Teal/Cyan for digital era and human-AI intersection */
+                --color-accent-1: #0891b2;
+                --color-accent-2: #0e7490;
+                --color-accent-3: #06b6d4;
+                --color-accent-light: #ecfeff;
+                --color-accent-pale: #f0fdff;
+
+                /* Functional Colors */
+                --color-shadow: rgba(8, 145, 178, 0.12);
+                --color-border: rgba(8, 145, 178, 0.15);
+                --color-hover: rgba(8, 145, 178, 0.08);
+
+                /* Gradients */
+                --gradient-primary: linear-gradient(135deg, var(--color-accent-1), var(--color-accent-2));
+                --gradient-subtle: linear-gradient(180deg, var(--color-base-bg), var(--color-accent-pale));
+                --gradient-vibrant: linear-gradient(135deg, #0891b2 0%, #06b6d4 50%, #22d3ee 100%);
+
+                /* Spacing Scale */
+                --space-xs: 0.25rem;
+                --space-sm: 0.5rem;
+                --space-md: 1rem;
+                --space-lg: 1.5rem;
+                --space-xl: 2rem;
+                --space-2xl: 3rem;
+                --space-3xl: 4rem;
+                --space-4xl: 6rem;
+
+                /* Border Radius */
+                --radius-sm: 4px;
+                --radius-md: 8px;
+                --radius-lg: 12px;
+                --radius-xl: 16px;
+                --radius-2xl: 24px;
+                --radius-full: 9999px;
+
+                /* Shadows */
+                --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.04), 0 1px 3px rgba(0, 0, 0, 0.06);
+                --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.05), 0 2px 4px rgba(0, 0, 0, 0.06);
+                --shadow-lg: 0 10px 24px rgba(0, 0, 0, 0.08), 0 4px 8px rgba(0, 0, 0, 0.06);
+                --shadow-theme: 0 10px 30px var(--color-shadow), 0 4px 10px rgba(0, 0, 0, 0.06);
+
+                /* Typography */
+                --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+                --text-xs: clamp(0.75rem, 0.7rem + 0.25vw, 0.875rem);
+                --text-sm: clamp(0.875rem, 0.8rem + 0.35vw, 1rem);
+                --text-base: clamp(1rem, 0.95rem + 0.25vw, 1.125rem);
+                --text-lg: clamp(1.125rem, 1.05rem + 0.35vw, 1.25rem);
+                --text-xl: clamp(1.25rem, 1.15rem + 0.5vw, 1.5rem);
+                --text-2xl: clamp(1.5rem, 1.3rem + 1vw, 2rem);
+                --text-3xl: clamp(2rem, 1.6rem + 2vw, 2.5rem);
+                --text-4xl: clamp(2.5rem, 2rem + 2.5vw, 3.5rem);
+
+                --weight-normal: 400;
+                --weight-medium: 500;
+                --weight-semibold: 600;
+                --weight-bold: 700;
+
+                --leading-relaxed: 1.75;
+                --leading-normal: 1.5;
             }
 
-            #sidebar {
-                position: fixed;
-                background-color: #D8580E;
-                top: 0;
-                left: 0;
-                bottom: 0;
-                width: 30vw;
-            }
-
-            #sidebar .title {
-                position: relative;
-                text-align: center;
-                line-height: 5vmax;
-                font-size: 1.4vmax;
-                font-family: 'Arial';
-                margin-top: 30vh;
-            }
-
-            #sidebar .title a:link,
-            #sidebar .title a:visited {
-                color: #FFFFFF;
-                text-decoration: none;
-            }
-
-            .subtitle {
-                top: 50vh;
-                text-align: center;
-                line-height: 1.3vmax;
-                font-family: 'Arial';
-                font-size: 1.5vmax;
-                color: #FFFFFF;
-            }
-
-            .subtitle a:link,
-            .subtitle a:visited {
-                color: #FFFFFF;
-                text-decoration: none;
-            }
-
-            .licence {
-                position: fixed;
-                text-align: right;
-                bottom: 0;
-                right: 0;
-            }
-
-            .home {
-                position: fixed;
-                text-align: left;
-                font-family: 'Arial';
-                color: #D3D3D3;
-                z-index: 100;
-                width: 100%;
-                background-color: #FFFFFF;
-                top: 0px;
-                margin-bottom: 10px;
-                padding-bottom: 10px;
-            }
-
-            .home a:link,
-            .home a:visited {
-                text-decoration: none;
-                color: #D3D3D3;
-            }
-
-            .home ul {
+            /* ===================================
+           RESET & BASE STYLES
+           =================================== */
+            * {
                 margin: 0;
                 padding: 0;
-                text-align: left;
+                box-sizing: border-box;
+            }
+
+            html {
+                scroll-behavior: smooth;
+                scroll-padding-top: 80px;
+            }
+
+            body {
+                font-family: var(--font-sans);
+                font-size: var(--text-base);
+                line-height: var(--leading-relaxed);
+                color: var(--color-base-text);
+                background: var(--color-base-bg);
+                -webkit-font-smoothing: antialiased;
+                -moz-osx-font-smoothing: grayscale;
+            }
+
+            /* ===================================
+           NAVIGATION
+           =================================== */
+            .navbar {
+                position: fixed;
+                top: 0;
+                width: 100%;
+                z-index: 1000;
+                background: rgba(255, 255, 255, 0.9);
+                -webkit-backdrop-filter: blur(12px) saturate(180%);
+                backdrop-filter: blur(12px) saturate(180%);
+                border-bottom: 1px solid var(--color-border);
+                box-shadow: var(--shadow-sm);
+                transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            }
+
+            .navbar ul {
                 list-style: none;
+                display: flex;
+                align-items: center;
+                gap: var(--space-md);
+                padding: var(--space-md) var(--space-xl);
+                max-width: 1400px;
+                margin: 0 auto;
             }
 
-            .home li {
+            .navbar li {
                 position: relative;
-                float: left;
-                padding-top: 15px;
-                margin-right: 1em;
-                font-family: 'Arial';
             }
 
-            .home li:hover {
-                display: block;
-            }
-
-            .home li:hover a:link,
-            .home li:hover a:visited {
+            .navbar a {
                 text-decoration: none;
-                padding: 15px;
-                color: #FFFFFF;
-                background-color: #D8580E;
+                color: var(--color-base-text-muted);
+                font-weight: var(--weight-normal);
+                transition: color 0.3s ease;
+                padding: var(--space-sm) var(--space-md);
+                border-radius: var(--radius-sm);
             }
 
-            .content {
-                line-height: 1.8vmax;
-                font-size: 1.2vmax;
-                font-family: 'Arial';
-                margin-top: 15vh;
-                width: 90%;
+            .navbar-brand a {
+                font-weight: var(--weight-bold);
+                color: var(--color-accent-1);
+                background: var(--gradient-primary);
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                background-clip: text;
             }
 
-            .content h2,
-            h3,
-            h4 {
-                color: #D8580E;
+            .navbar a:hover {
+                color: var(--color-accent-1);
+                background: var(--color-hover);
             }
 
-            .content a:link,
-            .content a:visited {
-                color: #D8580E;
+            .navbar li:not(:last-child)::after {
+                content: '›';
+                position: absolute;
+                right: -0.5rem;
+                color: var(--color-base-text-muted);
+                opacity: 0.4;
             }
 
-            .content h3 {
-                color: #D8580E;
+            /* ===================================
+           HERO SECTION
+           =================================== */
+            .hero {
+                min-height: 70vh;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                padding: var(--space-4xl) var(--space-xl);
+                margin-top: 60px;
+                background: var(--gradient-subtle);
+                position: relative;
+                overflow: hidden;
             }
 
-            .content h2::before,
-            .content h3::before {
-                display: block;
-                content: " ";
-                visibility: hidden;
-                height: 50px;
-                margin-top: -50px;
+            .hero::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background:
+                    radial-gradient(circle at 20% 30%, rgba(8, 145, 178, 0.08) 0%, transparent 50%),
+                    radial-gradient(circle at 80% 70%, rgba(6, 182, 212, 0.06) 0%, transparent 50%);
                 pointer-events: none;
-                background-color: #FFFFFF;
             }
 
-            .content p {
+            .hero-svg {
+                width: 350px;
+                height: 350px;
+                margin-bottom: var(--space-2xl);
+                filter: drop-shadow(0 10px 20px rgba(8, 145, 178, 0.15));
+                position: relative;
+                z-index: 1;
+            }
+
+            .hero-title {
+                font-size: var(--text-4xl);
+                font-weight: var(--weight-bold);
+                color: var(--color-accent-2);
+                text-align: center;
+                margin-bottom: var(--space-md);
+                letter-spacing: -0.02em;
+                position: relative;
+                z-index: 1;
+            }
+
+            .hero-subtitle {
+                font-size: var(--text-xl);
+                font-weight: var(--weight-medium);
+                color: var(--color-base-text-muted);
+                text-align: center;
+                position: relative;
+                z-index: 1;
+            }
+
+            .hero-subtitle a {
+                color: var(--color-accent-1);
+                text-decoration: none;
+                transition: color 0.3s ease;
+            }
+
+            .hero-subtitle a:hover {
+                color: var(--color-accent-2);
+            }
+
+            /* ===================================
+           CONTENT SECTION
+           =================================== */
+            .content-wrapper {
+                max-width: 900px;
+                margin: 0 auto;
+                padding: var(--space-4xl) var(--space-xl);
+            }
+
+            .blog-card {
+                background: var(--color-base-surface);
+                border-radius: var(--radius-xl);
+                padding: var(--space-3xl);
+                box-shadow: var(--shadow-theme);
+                position: relative;
+                overflow: hidden;
+                margin-bottom: var(--space-2xl);
+                transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            }
+
+            .blog-card::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                height: 4px;
+                background: var(--gradient-vibrant);
+                background-size: 200% 200%;
+                animation: gradientShift 8s ease infinite;
+            }
+
+            .blog-card p {
+                margin-bottom: var(--space-xl);
+                line-height: var(--leading-relaxed);
+                color: var(--color-base-text);
                 text-align: justify;
                 text-justify: inter-word;
             }
 
-            .content a:link,
-            .content a:visited {
-                color: #D8580E;
+            .blog-card p:last-of-type {
+                margin-bottom: 0;
             }
 
-            .home a:link,
-            .home a:visited {
-                color: #D3D3D3;
+            .blog-card strong,
+            .blog-card b {
+                color: var(--color-accent-1);
+                font-weight: var(--weight-bold);
             }
 
-            .page {
-                width: 65vw;
-                height: 100%;
-                margin-left: 30vw;
-                overflow: hidden;
-                padding: 0 1em;
-                font-family: 'Arial';
+            .blog-card a {
+                color: var(--color-accent-1);
+                text-decoration: none;
+                font-weight: var(--weight-medium);
+                transition: color 0.3s ease;
+                border-bottom: 1px solid transparent;
             }
 
-            .page img {
-                max-width: 100%;
-                max-height: 100%;
+            .blog-card a:hover {
+                color: var(--color-accent-2);
+                border-bottom-color: var(--color-accent-2);
             }
 
-            @media (max-width: 640px),
-            screen and (orientation: portrait) {
-                body {
-                    max-width: 100%;
-                    max-height: 100%;
+            .blog-card sup {
+                font-size: 0.75em;
+                margin-left: 0.1em;
+            }
+
+            .blog-card h3 {
+                font-size: var(--text-2xl);
+                font-weight: var(--weight-bold);
+                color: var(--color-accent-1);
+                margin-top: var(--space-3xl);
+                margin-bottom: var(--space-lg);
+                position: relative;
+                padding-bottom: var(--space-sm);
+            }
+
+            .blog-card h3::after {
+                content: '';
+                position: absolute;
+                bottom: 0;
+                left: 0;
+                width: 60px;
+                height: 3px;
+                background: var(--gradient-primary);
+                border-radius: var(--radius-full);
+            }
+
+            .blog-card ol {
+                list-style: none;
+                counter-reset: reference-counter;
+                padding-left: 0;
+            }
+
+            .blog-card ol li {
+                counter-increment: reference-counter;
+                margin-bottom: var(--space-md);
+                padding-left: var(--space-xl);
+                position: relative;
+                line-height: var(--leading-normal);
+            }
+
+            .blog-card ol li::before {
+                content: counter(reference-counter);
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 28px;
+                height: 28px;
+                background: var(--gradient-primary);
+                color: white;
+                border-radius: 50%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: var(--text-sm);
+                font-weight: var(--weight-bold);
+            }
+
+            /* ===================================
+           DECORATIVE ELEMENTS
+           =================================== */
+            .year-badge {
+                position: absolute;
+                top: 20px;
+                right: 20px;
+                background: var(--gradient-primary);
+                color: white;
+                padding: var(--space-xs) var(--space-md);
+                border-radius: var(--radius-full);
+                font-size: var(--text-sm);
+                font-weight: var(--weight-bold);
+                opacity: 0.15;
+                pointer-events: none;
+            }
+
+            /* ===================================
+           ANIMATIONS
+           =================================== */
+            @keyframes gradientShift {
+                0% {
+                    background-position: 0% 50%;
                 }
 
-                #sidebar {
-                    position: fixed;
-                    background-color: #D8580E;
-                    top: 0;
-                    left: 0;
-                    bottom: 80vh;
-                    width: 100vw;
+                50% {
+                    background-position: 100% 50%;
                 }
 
-                #sidebar .title {
-                    text-align: center;
-                    position: fixed;
-                    margin-top: 6vh;
-                    left: 0px;
-                    right: 0px;
-                    line-height: 3.5vmax;
-                    font-size: 1.5vmax;
-                    font-family: 'Arial';
+                100% {
+                    background-position: 0% 50%;
+                }
+            }
+
+            @keyframes float {
+
+                0%,
+                100% {
+                    transform: translateY(0px) rotate(0deg);
                 }
 
-                #sidebar .subtitle {
-                    text-align: center;
-                    top: 5vh;
-                    left: 0px;
-                    right: 0px;
-                    position: fixed;
-                    margin-top: 10vh;
-                    font-size: 1.5vmax;
+                50% {
+                    transform: translateY(-20px) rotate(3deg);
+                }
+            }
+
+            @keyframes floatReverse {
+
+                0%,
+                100% {
+                    transform: translateY(0px) rotate(0deg);
                 }
 
-                #sidebar .title a:link,
-                #sidebar .title a:visited {
-                    text-align: center;
-                    color: #FFFFFF;
+                50% {
+                    transform: translateY(-15px) rotate(-3deg);
+                }
+            }
+
+            @keyframes pulse {
+
+                0%,
+                100% {
+                    opacity: 1;
+                    transform: scale(1);
                 }
 
-                #sidebar .subtitle a:link,
-                #sidebar .subtitle a:visited {
-                    text-align: center;
-                    color: #FFFFFF;
+                50% {
+                    opacity: 0.7;
+                    transform: scale(1.05);
+                }
+            }
+
+            @keyframes digitalFlow {
+                0% {
+                    transform: translateX(0px);
+                    opacity: 0.3;
                 }
 
-                .home {
-                    z-index: 100;
-                    width: 100%;
-                    background-color: #D8580E;
-                    font-size: 1.5vmax;
+                50% {
+                    opacity: 0.8;
                 }
 
-                .home a:link,
-                .home a:visited {
-                    text-decoration: none;
-                    color: #FFFFFF;
+                100% {
+                    transform: translateX(400px);
+                    opacity: 0.3;
+                }
+            }
+
+            @keyframes typewriter {
+                0% {
+                    stroke-dashoffset: 1000;
                 }
 
-                .content {
-                    line-height: 3.8vmax;
-                    font-size: 1.8vmax;
-                    font-family: 'Arial';
-                    margin-top: 22vh;
+                100% {
+                    stroke-dashoffset: 0;
+                }
+            }
+
+            @keyframes fadeInUp {
+                from {
+                    opacity: 0;
+                    transform: translateY(30px);
                 }
 
-                .content a:link,
-                .content a:visited {
-                    color: #D8580E;
+                to {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            }
+
+            .blog-card {
+                animation: fadeInUp 0.8s ease-out;
+            }
+
+            /* SVG Animations */
+            .svg-blog-icon {
+                animation: float 6s ease-in-out infinite;
+                transform-origin: center;
+            }
+
+            .svg-ai-node {
+                animation: pulse 4s ease-in-out infinite;
+            }
+
+            .svg-human-node {
+                animation: pulse 3.5s ease-in-out infinite;
+            }
+
+            .svg-digital-stream {
+                animation: digitalFlow 8s linear infinite;
+            }
+
+            .svg-web {
+                animation: floatReverse 7s ease-in-out infinite;
+            }
+
+            /* ===================================
+           ACCESSIBILITY
+           =================================== */
+            :focus-visible {
+                outline: 3px solid var(--color-accent-1);
+                outline-offset: 2px;
+                border-radius: var(--radius-sm);
+            }
+
+            .skip-link {
+                position: absolute;
+                top: -40px;
+                left: 0;
+                background: var(--color-accent-1);
+                color: white;
+                padding: var(--space-sm) var(--space-md);
+                text-decoration: none;
+                border-radius: var(--radius-sm);
+                z-index: 10000;
+            }
+
+            .skip-link:focus {
+                top: 0;
+            }
+
+            @media (prefers-reduced-motion: reduce) {
+
+                *,
+                *::before,
+                *::after {
+                    animation-duration: 0.01ms !important;
+                    animation-iteration-count: 1 !important;
+                    transition-duration: 0.01ms !important;
+                }
+            }
+
+            /* ===================================
+           RESPONSIVE DESIGN
+           =================================== */
+            @media (max-width: 768px) {
+                .hero {
+                    min-height: 60vh;
+                    padding: var(--space-3xl) var(--space-md);
                 }
 
-                .page {
-                    top: 40vh;
-                    width: 95%;
-                    margin-left: 0vw;
+                .hero-svg {
+                    width: 250px;
+                    height: 250px;
                 }
 
-                .page img {
-                    max-width: 100%;
-                    max-height: 100%;
-                    border: 0;
+                .navbar ul {
+                    padding: var(--space-sm) var(--space-md);
+                    gap: var(--space-sm);
+                }
+
+                .navbar a {
+                    padding: var(--space-xs) var(--space-sm);
+                    font-size: var(--text-sm);
+                }
+
+                .blog-card {
+                    padding: var(--space-xl);
+                }
+
+                .content-wrapper {
+                    padding: var(--space-2xl) var(--space-md);
+                }
+            }
+
+            @media (max-width: 480px) {
+                .navbar li:not(:last-child)::after {
+                    display: none;
+                }
+
+                .blog-card p {
+                    text-align: left;
                 }
             }
         </style>
     </head>
 
     <body vocab="http://schema.org/">
-        <div class="page">
-            <div class="home">
-                <ul typeof="BreadcrumbList">
-                    <li property="itemListElement" typeof="ListItem">
-                        <a property="item" typeof="WebPage" href="../index.html">
-                            <span property="name">Home</span>
-                        </a>
-                    </li>
-                    <li property="itemListElement" typeof="ListItem">
-                        <a property="item" typeof="WebPage" href="../writings/index.html">
-                            <span property="name">Writings</span>
-                        </a>
-                    </li>
-                </ul>
+        <a href="#main-content" class="skip-link">Skip to main content</a>
 
-            </div>
-            <div id="sidebar">
-                <div class="title">
-                    <h1><a href="./blogging.html">Blogging in 2023</a></h1>
-                </div>
-                <div class="subtitle">
-                    <h3><a href="../about.html">John Samuel</a></h3>
-                </div>
-            </div>
+        <!-- Navigation -->
+        <nav class="navbar" aria-label="Main navigation">
+            <ul typeof="BreadcrumbList">
+                <li property="itemListElement" typeof="ListItem">
+                    <a property="item" typeof="WebPage" href="../index.html">
+                        <span property="name">Home</span>
+                    </a>
+                </li>
+                <li property="itemListElement" typeof="ListItem" class="navbar-brand">
+                    <a property="item" typeof="WebPage" href="../about.html">
+                        <span property="name">John Samuel</span>
+                    </a>
+                </li>
+                <li property="itemListElement" typeof="ListItem">
+                    <a property="item" typeof="WebPage" href="../writings/index.html">
+                        <span property="name">Writings</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
 
-            <div class="content">
+        <!-- Hero Section -->
+        <header class="hero">
+            <svg class="hero-svg" viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                <!-- Background gradient -->
+                <defs>
+                    <linearGradient id="tealGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" style="stop-color:#0891b2;stop-opacity:1" />
+                        <stop offset="100%" style="stop-color:#06b6d4;stop-opacity:1" />
+                    </linearGradient>
+                    <linearGradient id="bgGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" style="stop-color:#f0fdff;stop-opacity:1" />
+                        <stop offset="100%" style="stop-color:#ecfeff;stop-opacity:1" />
+                    </linearGradient>
+                    <filter id="softGlow">
+                        <feGaussianBlur stdDeviation="3" result="blur" />
+                        <feFlood flood-color="#0891b2" flood-opacity="0.4" />
+                        <feComposite in2="blur" operator="in" />
+                        <feMerge>
+                            <feMergeNode />
+                            <feMergeNode in="SourceGraphic" />
+                        </feMerge>
+                    </filter>
+                </defs>
+
+                <!-- Background -->
+                <circle cx="200" cy="200" r="180" fill="url(#bgGradient)" opacity="0.6" />
+
+                <!-- Web/Network representing interconnected blogosphere -->
+                <g class="svg-web">
+                    <!-- Network nodes -->
+                    <circle cx="120" cy="120" r="8" fill="url(#tealGradient)" opacity="0.6" />
+                    <circle cx="280" cy="120" r="8" fill="url(#tealGradient)" opacity="0.6" />
+                    <circle cx="120" cy="280" r="8" fill="url(#tealGradient)" opacity="0.6" />
+                    <circle cx="280" cy="280" r="8" fill="url(#tealGradient)" opacity="0.6" />
+                    <circle cx="200" cy="100" r="8" fill="url(#tealGradient)" opacity="0.6" />
+
+                    <!-- Network connections -->
+                    <line x1="120" y1="120" x2="280" y2="120" stroke="#0891b2" stroke-width="1.5" opacity="0.3" />
+                    <line x1="120" y1="280" x2="280" y2="280" stroke="#0891b2" stroke-width="1.5" opacity="0.3" />
+                    <line x1="120" y1="120" x2="120" y2="280" stroke="#0891b2" stroke-width="1.5" opacity="0.3" />
+                    <line x1="280" y1="120" x2="280" y2="280" stroke="#0891b2" stroke-width="1.5" opacity="0.3" />
+                    <line x1="120" y1="120" x2="280" y2="280" stroke="#0891b2" stroke-width="1.5" opacity="0.3" />
+                    <line x1="280" y1="120" x2="120" y2="280" stroke="#0891b2" stroke-width="1.5" opacity="0.3" />
+                    <line x1="200" y1="100" x2="120" y2="120" stroke="#0891b2" stroke-width="1.5" opacity="0.3" />
+                    <line x1="200" y1="100" x2="280" y2="120" stroke="#0891b2" stroke-width="1.5" opacity="0.3" />
+                </g>
+
+                <!-- Digital data streams -->
+                <g class="svg-digital-stream">
+                    <circle cx="50" cy="200" r="3" fill="#06b6d4" opacity="0.6" />
+                    <circle cx="80" cy="205" r="2.5" fill="#0891b2" opacity="0.6" />
+                    <circle cx="110" cy="195" r="3" fill="#06b6d4" opacity="0.6" />
+                </g>
+                <g class="svg-digital-stream" style="animation-delay: 2s;">
+                    <circle cx="50" cy="240" r="2.5" fill="#0891b2" opacity="0.6" />
+                    <circle cx="80" cy="235" r="3" fill="#06b6d4" opacity="0.6" />
+                    <circle cx="110" cy="245" r="2.5" fill="#0891b2" opacity="0.6" />
+                </g>
+
+                <!-- Central blog icon (document with pencil) -->
+                <g class="svg-blog-icon" filter="url(#softGlow)">
+                    <!-- Document/Blog post -->
+                    <rect x="160" y="180" width="80" height="100" rx="6" fill="#fff" stroke="url(#tealGradient)"
+                        stroke-width="3" />
+                    <!-- Text lines on document -->
+                    <line x1="175" y1="200" x2="225" y2="200" stroke="#0891b2" stroke-width="2" opacity="0.4" />
+                    <line x1="175" y1="215" x2="220" y2="215" stroke="#0891b2" stroke-width="2" opacity="0.4" />
+                    <line x1="175" y1="230" x2="225" y2="230" stroke="#0891b2" stroke-width="2" opacity="0.4" />
+                    <line x1="175" y1="245" x2="218" y2="245" stroke="#0891b2" stroke-width="2" opacity="0.4" />
+
+                    <!-- Pencil/Pen -->
+                    <rect x="210" y="250" width="50" height="10" rx="5" fill="url(#tealGradient)"
+                        transform="rotate(-45 235 255)" />
+                    <polygon points="210,250 205,255 210,260" fill="#0e7490" transform="rotate(-45 235 255)" />
+                </g>
+
+                <!-- Human node (left) representing human blogger -->
+                <g class="svg-human-node">
+                    <circle cx="80" cy="320" r="20" fill="url(#tealGradient)" opacity="0.7" />
+                    <!-- Person icon -->
+                    <circle cx="80" cy="315" r="5" fill="#fff" />
+                    <path d="M 70 330 Q 80 325, 90 330" stroke="#fff" stroke-width="2.5" fill="none"
+                        stroke-linecap="round" />
+                    <text x="80" y="355" text-anchor="middle" font-size="10" fill="#0891b2"
+                        font-weight="bold">Human</text>
+                </g>
+
+                <!-- AI node (right) representing AI era -->
+                <g class="svg-ai-node">
+                    <circle cx="320" cy="320" r="20" fill="url(#tealGradient)" opacity="0.7" />
+                    <!-- CPU/Chip icon -->
+                    <rect x="312" y="312" width="16" height="16" rx="2" fill="#fff" />
+                    <rect x="316" y="316" width="8" height="8" fill="#0891b2" />
+                    <!-- Connection lines -->
+                    <line x1="308" y1="320" x2="304" y2="320" stroke="#fff" stroke-width="1.5" />
+                    <line x1="332" y1="320" x2="336" y2="320" stroke="#fff" stroke-width="1.5" />
+                    <text x="320" y="355" text-anchor="middle" font-size="10" fill="#0891b2"
+                        font-weight="bold">AI</text>
+                </g>
+
+                <!-- Connection between human and AI -->
+                <line x1="100" y1="320" x2="300" y2="320" stroke="#0891b2" stroke-width="2" opacity="0.4"
+                    stroke-dasharray="5,5" />
+
+                <!-- Year badge -->
+                <g>
+                    <rect x="180" y="80" width="40" height="25" rx="12" fill="url(#tealGradient)" opacity="0.8" />
+                    <text x="200" y="97" text-anchor="middle" font-size="14" fill="#fff" font-weight="bold">2023</text>
+                </g>
+
+                <!-- Decorative dots -->
+                <circle cx="60" cy="150" r="3" fill="#0891b2" opacity="0.3" />
+                <circle cx="340" cy="150" r="3" fill="#06b6d4" opacity="0.3" />
+                <circle cx="350" cy="260" r="2.5" fill="#0891b2" opacity="0.3" />
+                <circle cx="50" cy="260" r="2.5" fill="#06b6d4" opacity="0.3" />
+            </svg>
+
+            <h1 class="hero-title">Blogging in 2023</h1>
+            <h2 class="hero-subtitle">
+                <a href="../about.html">John Samuel</a>
+            </h2>
+        </header>
+
+        <!-- Main Content -->
+        <main id="main-content" class="content-wrapper">
+            <article class="blog-card">
+                <span class="year-badge">2023</span>
+
                 <p>I have been blogging here for quite a while, though very intermittently. Seeing a major technological
                     site and multiple bloggers writing about bringing back personal blogging<sup><a
                             href="#blogging">1</a></sup> made me wonder why many people had chosen microblogging for a
                     while and shifted their writing to threads of micro-posts. It is often believed that writers usually
                     follow the places where their readers were. I must confess that despite maintaining this blog for
-                    several years, I have been more active on some microblogging sites than on my blog.
-                </p>
-                <p>
-                    Growing up at the beginning of the web 2.0 world, I am very nostalgic about blogging. I feel that
-                    those
-                    were great times. Writers and bloggers maintained their blogs and shared their thoughts about
-                    anything
-                    from food to technology, music to photography. Somehow, the centralized platforms brought bloggers
-                    and
-                    readers together on the same platform, taking away with them the free nature of the web and creating
-                    walled gardens, forcing many readers to create accounts on these platforms, sometimes disgruntled.
-                </p>
-                <p>
-                    <b>Bring back Blogging</b> sounds nostalgic to many of us who loved writing on the web and sharing
-                    our viewpoints online, some ten to fifteen years ago. Those memories still linger in our minds. It
-                    is not that most of us had completely stopped blogging. However, some of us had started shifting our
-                    attention to microblogging, and eventually forgotten our blogs. 2023 calls us back to our blogs.
-                </p>
-                <p>
-                    There are several posts I still need to write or rather complete. I follow evolving story format. I
+                    several years, I have been more active on some microblogging sites than on my blog.</p>
+
+                <p>Growing up at the beginning of the web 2.0 world, I am very nostalgic about blogging. I feel that
+                    those were great times. Writers and bloggers maintained their blogs and shared their thoughts about
+                    anything from food to technology, music to photography. Somehow, the centralized platforms brought
+                    bloggers and readers together on the same platform, taking away with them the free nature of the web
+                    and creating walled gardens, forcing many readers to create accounts on these platforms, sometimes
+                    disgruntled.</p>
+
+                <p><strong>Bring back Blogging</strong> sounds nostalgic to many of us who loved writing on the web and
+                    sharing our viewpoints online, some ten to fifteen years ago. Those memories still linger in our
+                    minds. It is not that most of us had completely stopped blogging. However, some of us had started
+                    shifting our attention to microblogging, and eventually forgotten our blogs. 2023 calls us back to
+                    our blogs.</p>
+
+                <p>There are several posts I still need to write or rather complete. I follow evolving story format. I
                     ensure that I jot down my thoughts whenever they come to my mind for later elaborate writing.
-                    Sometimes, I do wonder whether I suffer from writer’s block<sup><a
+                    Sometimes, I do wonder whether I suffer from writer's block<sup><a
                             href="#writers-block">2</a></sup>. I guess that I developed this format to help me elaborate
-                    my thoughts whenever possible, not constraining myself from writer’s block (anymore).
-                </p>
-                <p>
-                    However, 2022 ended with some major surprises. With the arrival of large language models, notably
+                    my thoughts whenever possible, not constraining myself from writer's block (anymore).</p>
+
+                <p>However, 2022 ended with some major surprises. With the arrival of large language models, notably
                     ChatGPT, I guess that some of us are going through some sort of existential crisis and wondering
-                    what it means to write in this age when blog posts could be written by the so-called “artificial
-                    intelligence” tools. Not a day goes by without coming across a blog post or a micro-post about the
+                    what it means to write in this age when blog posts could be written by the so-called "artificial
+                    intelligence" tools. Not a day goes by without coming across a blog post or a micro-post about the
                     impacts and benefits of such tools on our society. Yet, I have not made up my mind. I am wondering
                     what it means to be a human, to be creative, and to share our viewpoints in this forthcoming era. I
                     am wondering about the day when these tools are also connected to the web and have access to
                     real-time information. Will they write blog posts? What will be the role of humans? Will we read
                     these posts or ignore them? More questions haunt me. I am still looking for answers. But, in the
                     meantime, I finished writing my first post without using these aforementioned tools and sharing it
-                    online.
-                </p>
+                    online.</p>
+
                 <h3>References</h3>
                 <ol>
                     <li id="blogging"><a href="https://www.theverge.com/23513418/bring-back-personal-blogging">Bring
@@ -332,8 +766,8 @@
                     <li id="writers-block"><a href="https://en.wikipedia.org/wiki/Writer's_block">Writer's Block</a>
                     </li>
                 </ol>
-            </div>
-        </div>
+            </article>
+        </main>
     </body>
 
 </html>
