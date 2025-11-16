@@ -3,379 +3,720 @@
 
     <head>
         <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <meta http-equiv="Content-Language" content="en" />
         <link rel="shortcut icon" href="../../images/logo/favicon.png" />
         <title>To My Grandfather: John Samuel</title>
         <style type="text/css">
-            body {
-                background-color: #FFFFFF;
+            /* ===================================
+           DESIGN TOKENS & CSS VARIABLES
+           =================================== */
+            :root {
+                /* Base Colors - Warm Memorial Theme */
+                --color-base-bg: #faf9f7;
+                --color-base-surface: #ffffff;
+                --color-base-text: #2c2c2c;
+                --color-base-text-muted: #5a5a5a;
+
+                /* Theme Accents - Sage green honoring original, with warm earth tones */
+                --color-accent-1: #6b8e6f;
+                --color-accent-2: #4a6b4f;
+                --color-accent-3: #b89968;
+                --color-accent-light: #e8ede9;
+                --color-accent-pale: #f5f8f5;
+
+                /* Functional Colors */
+                --color-shadow: rgba(107, 142, 111, 0.12);
+                --color-border: rgba(107, 142, 111, 0.15);
+                --color-hover: rgba(107, 142, 111, 0.08);
+
+                /* Gradients */
+                --gradient-primary: linear-gradient(135deg, var(--color-accent-1), var(--color-accent-2));
+                --gradient-subtle: linear-gradient(180deg, var(--color-base-bg), var(--color-accent-pale));
+                --gradient-warm: linear-gradient(135deg, #6b8e6f 0%, #8fa77f 50%, #b89968 100%);
+
+                /* Spacing Scale */
+                --space-xs: 0.25rem;
+                --space-sm: 0.5rem;
+                --space-md: 1rem;
+                --space-lg: 1.5rem;
+                --space-xl: 2rem;
+                --space-2xl: 3rem;
+                --space-3xl: 4rem;
+                --space-4xl: 6rem;
+
+                /* Border Radius */
+                --radius-sm: 4px;
+                --radius-md: 8px;
+                --radius-lg: 12px;
+                --radius-xl: 16px;
+                --radius-2xl: 24px;
+                --radius-full: 9999px;
+
+                /* Shadows */
+                --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.04), 0 1px 3px rgba(0, 0, 0, 0.06);
+                --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.05), 0 2px 4px rgba(0, 0, 0, 0.06);
+                --shadow-lg: 0 10px 24px rgba(0, 0, 0, 0.08), 0 4px 8px rgba(0, 0, 0, 0.06);
+                --shadow-theme: 0 10px 30px var(--color-shadow), 0 4px 10px rgba(0, 0, 0, 0.06);
+
+                /* Typography */
+                --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+                --text-xs: clamp(0.75rem, 0.7rem + 0.25vw, 0.875rem);
+                --text-sm: clamp(0.875rem, 0.8rem + 0.35vw, 1rem);
+                --text-base: clamp(1rem, 0.95rem + 0.25vw, 1.125rem);
+                --text-lg: clamp(1.125rem, 1.05rem + 0.35vw, 1.25rem);
+                --text-xl: clamp(1.25rem, 1.15rem + 0.5vw, 1.5rem);
+                --text-2xl: clamp(1.5rem, 1.3rem + 1vw, 2rem);
+                --text-3xl: clamp(2rem, 1.6rem + 2vw, 2.5rem);
+                --text-4xl: clamp(2.5rem, 2rem + 2.5vw, 3.5rem);
+
+                --weight-normal: 400;
+                --weight-medium: 500;
+                --weight-semibold: 600;
+                --weight-bold: 700;
+
+                --leading-relaxed: 1.75;
+                --leading-normal: 1.5;
             }
 
-            #sidebar {
-                position: fixed;
-                background-color: #3c7546;
-                top: 0;
-                left: 0;
-                bottom: 0;
-                width: 30vw;
-            }
-
-            #sidebar .title {
-                position: relative;
-                text-align: center;
-                line-height: 5vmax;
-                font-size: 1.4vmax;
-                font-family: 'Arial';
-                margin-top: 30vh;
-            }
-
-            #sidebar .title a:link,
-            #sidebar .title a:visited {
-                color: #FFFFFF;
-                text-decoration: none;
-            }
-
-            .subtitle {
-                top: 50vh;
-                text-align: center;
-                line-height: 1.3vmax;
-                font-family: 'Arial';
-                font-size: 1.5vmax;
-                color: #FFFFFF;
-            }
-
-            .subtitle a:link,
-            .subtitle a:visited {
-                color: #FFFFFF;
-                text-decoration: none;
-            }
-
-            .licence {
-                position: fixed;
-                text-align: right;
-                bottom: 0;
-                right: 0;
-            }
-
-            .home {
-                position: fixed;
-                text-align: left;
-                font-family: 'Arial';
-                color: #D3D3D3;
-                z-index: 100;
-                width: 100%;
-                background-color: #FFFFFF;
-                top: 0px;
-                margin-bottom: 10px;
-                padding-bottom: 10px;
-            }
-
-            .home a:link,
-            .home a:visited {
-                text-decoration: none;
-                color: #D3D3D3;
-            }
-
-            .home ul {
+            /* ===================================
+           RESET & BASE STYLES
+           =================================== */
+            * {
                 margin: 0;
                 padding: 0;
-                text-align: left;
-                list-style: none;
+                box-sizing: border-box;
             }
 
-            .home li {
+            html {
+                scroll-behavior: smooth;
+                scroll-padding-top: 80px;
+            }
+
+            body {
+                font-family: var(--font-sans);
+                font-size: var(--text-base);
+                line-height: var(--leading-relaxed);
+                color: var(--color-base-text);
+                background: var(--color-base-bg);
+                -webkit-font-smoothing: antialiased;
+                -moz-osx-font-smoothing: grayscale;
+            }
+
+            /* ===================================
+           NAVIGATION
+           =================================== */
+            .navbar {
+                position: fixed;
+                top: 0;
+                width: 100%;
+                z-index: 1000;
+                background: rgba(255, 255, 255, 0.9);
+                -webkit-backdrop-filter: blur(12px) saturate(180%);
+                backdrop-filter: blur(12px) saturate(180%);
+                border-bottom: 1px solid var(--color-border);
+                box-shadow: var(--shadow-sm);
+                transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            }
+
+            .navbar ul {
+                list-style: none;
+                display: flex;
+                align-items: center;
+                gap: var(--space-md);
+                padding: var(--space-md) var(--space-xl);
+                max-width: 1400px;
+                margin: 0 auto;
+            }
+
+            .navbar li {
                 position: relative;
-                float: left;
-                padding-top: 15px;
-                margin-right: 1em;
-                font-family: 'Arial';
             }
 
-            .home li:hover {
-                display: block;
-            }
-
-            .home li:hover a:link,
-            .home li:hover a:visited {
+            .navbar a {
                 text-decoration: none;
-                padding: 15px;
-                color: #FFFFFF;
-                background-color: #3c7546;
+                color: var(--color-base-text-muted);
+                font-weight: var(--weight-normal);
+                transition: color 0.3s ease;
+                padding: var(--space-sm) var(--space-md);
+                border-radius: var(--radius-sm);
             }
 
-            .content {
-                line-height: 1.8vmax;
-                font-size: 1.2vmax;
-                font-family: 'Arial';
-                margin-top: 15vh;
-                width: 90%;
+            .navbar-brand a {
+                font-weight: var(--weight-bold);
+                color: var(--color-accent-1);
+                background: var(--gradient-primary);
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                background-clip: text;
             }
 
-            #langlist {
-                padding-left: 0;
-                border-radius: 1.2em;
-                background-color: #3c7546;
-                display: inline-block;
+            .navbar a:hover {
+                color: var(--color-accent-1);
+                background: var(--color-hover);
             }
 
-            #langlist li {
-                list-style: none;
-                display: inline-block;
-                padding: 0.5em;
-                margin-left: 0.3em;
-                margin-right: 0.3em;
-                font-family: 'Arial';
+            .navbar li:not(:last-child)::after {
+                content: '›';
+                position: absolute;
+                right: -0.5rem;
+                color: var(--color-base-text-muted);
+                opacity: 0.4;
             }
 
-            #langlist a {
-                text-decoration: none;
-                color: #FFFFFF;
-            }
-
-            #langlist .highlight {
-                border-radius: 1em;
-                padding-top: 0.3em;
-                padding-bottom: 0.3em;
-                background-color: #FFFFFF;
-            }
-
-            #langlist .highlight a {
-                color: #3c7546;
-            }
-
-            .content h2,
-            h3,
-            h4 {
-                color: #3c7546;
-            }
-
-            .content a:link,
-            .content a:visited {
-                color: #3c7546;
-            }
-
-            .content h3 {
-                color: #3c7546;
-            }
-
-            .content h2::before,
-            .content h3::before {
-                display: block;
-                content: " ";
-                visibility: hidden;
-                height: 50px;
-                margin-top: -50px;
-                pointer-events: none;
-                background-color: #FFFFFF;
-            }
-
-            .content a:link,
-            .content a:visited {
-                color: #3c7546;
-            }
-
-            .home a:link,
-            .home a:visited {
-                color: #D3D3D3;
-            }
-
-            .page {
-                width: 65vw;
-                height: 100%;
-                margin-left: 30vw;
+            /* ===================================
+           HERO SECTION
+           =================================== */
+            .hero {
+                min-height: 70vh;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                padding: var(--space-4xl) var(--space-xl);
+                margin-top: 60px;
+                background: var(--gradient-subtle);
+                position: relative;
                 overflow: hidden;
-                padding: 0 1em;
-                font-family: 'Arial';
             }
 
-            .page img {
+            .hero::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background:
+                    radial-gradient(circle at 20% 30%, rgba(107, 142, 111, 0.08) 0%, transparent 50%),
+                    radial-gradient(circle at 80% 70%, rgba(184, 153, 104, 0.06) 0%, transparent 50%);
+                pointer-events: none;
+            }
+
+            .hero-svg {
+                width: 350px;
+                height: 350px;
+                margin-bottom: var(--space-2xl);
+                filter: drop-shadow(0 10px 20px rgba(107, 142, 111, 0.15));
+                position: relative;
+                z-index: 1;
+            }
+
+            .hero-title {
+                font-size: var(--text-4xl);
+                font-weight: var(--weight-bold);
+                color: var(--color-accent-2);
+                text-align: center;
+                margin-bottom: var(--space-md);
+                letter-spacing: -0.02em;
+                position: relative;
+                z-index: 1;
+            }
+
+            .hero-subtitle {
+                font-size: var(--text-xl);
+                font-weight: var(--weight-medium);
+                color: var(--color-base-text-muted);
+                text-align: center;
+                position: relative;
+                z-index: 1;
+            }
+
+            .hero-subtitle a {
+                color: var(--color-accent-1);
+                text-decoration: none;
+                transition: color 0.3s ease;
+            }
+
+            .hero-subtitle a:hover {
+                color: var(--color-accent-2);
+            }
+
+            /* ===================================
+           CONTENT SECTION
+           =================================== */
+            .content-wrapper {
+                max-width: 900px;
+                margin: 0 auto;
+                padding: var(--space-4xl) var(--space-xl);
+            }
+
+            .memorial-card {
+                background: var(--color-base-surface);
+                border-radius: var(--radius-xl);
+                padding: var(--space-3xl);
+                box-shadow: var(--shadow-theme);
+                position: relative;
+                overflow: hidden;
+                margin-bottom: var(--space-2xl);
+            }
+
+            .memorial-card::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                height: 4px;
+                background: var(--gradient-warm);
+                background-size: 200% 200%;
+                animation: gradientShift 8s ease infinite;
+            }
+
+            .memorial-card p {
+                margin-bottom: var(--space-xl);
+                line-height: var(--leading-relaxed);
+                color: var(--color-base-text);
+            }
+
+            .memorial-card p:last-child {
+                margin-bottom: 0;
+            }
+
+            .illustration-container {
+                text-align: center;
+                margin: var(--space-3xl) 0;
+                padding: var(--space-2xl);
+                background: var(--color-accent-pale);
+                border-radius: var(--radius-lg);
+            }
+
+            .illustration-container img {
                 max-width: 100%;
-                max-height: 100%;
+                height: auto;
+                border-radius: var(--radius-md);
+                box-shadow: var(--shadow-md);
             }
 
-            @media (max-width: 640px),
-            screen and (orientation: portrait) {
-                body {
-                    max-width: 100%;
-                    max-height: 100%;
+            /* ===================================
+           FOOTER
+           =================================== */
+            .footer {
+                background: var(--color-base-surface);
+                padding: var(--space-3xl) var(--space-xl);
+                border-top: 1px solid var(--color-border);
+                margin-top: var(--space-4xl);
+            }
+
+            .footer-content {
+                max-width: 1400px;
+                margin: 0 auto;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                gap: var(--space-xl);
+            }
+
+            .language-selector {
+                display: flex;
+                flex-wrap: wrap;
+                gap: var(--space-sm);
+                justify-content: center;
+                align-items: center;
+            }
+
+            .language-label {
+                font-size: var(--text-sm);
+                font-weight: var(--weight-medium);
+                color: var(--color-base-text-muted);
+                margin-right: var(--space-sm);
+            }
+
+            .language-button {
+                padding: var(--space-sm) var(--space-lg);
+                border-radius: var(--radius-full);
+                background: transparent;
+                border: 1px solid var(--color-border);
+                text-decoration: none;
+                color: var(--color-base-text-muted);
+                font-size: var(--text-sm);
+                font-weight: var(--weight-medium);
+                transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+                display: inline-block;
+            }
+
+            .language-button:hover {
+                background: var(--gradient-primary);
+                color: white;
+                border-color: transparent;
+                transform: translateY(-2px);
+                box-shadow: var(--shadow-md);
+            }
+
+            .language-button.active {
+                background: var(--gradient-primary);
+                color: white;
+                border-color: transparent;
+            }
+
+            .footer-divider {
+                width: 100%;
+                height: 1px;
+                background: linear-gradient(90deg,
+                        transparent 0%,
+                        var(--color-border) 50%,
+                        transparent 100%);
+            }
+
+            /* ===================================
+           ANIMATIONS
+           =================================== */
+            @keyframes gradientShift {
+                0% {
+                    background-position: 0% 50%;
                 }
 
-                #sidebar {
-                    position: fixed;
-                    background-color: #3c7546;
-                    top: 0;
-                    left: 0;
-                    bottom: 80vh;
-                    width: 100vw;
+                50% {
+                    background-position: 100% 50%;
                 }
 
-                #sidebar .title {
-                    text-align: center;
-                    position: fixed;
-                    margin-top: 6vh;
-                    left: 0px;
-                    right: 0px;
-                    line-height: 3.5vmax;
-                    font-size: 1.5vmax;
-                    font-family: 'Arial';
+                100% {
+                    background-position: 0% 50%;
+                }
+            }
+
+            @keyframes float {
+
+                0%,
+                100% {
+                    transform: translateY(0px) rotate(0deg);
                 }
 
-                #sidebar .subtitle {
-                    text-align: center;
-                    top: 5vh;
-                    left: 0px;
-                    right: 0px;
-                    position: fixed;
-                    margin-top: 10vh;
-                    font-size: 1.5vmax;
+                50% {
+                    transform: translateY(-20px) rotate(3deg);
+                }
+            }
+
+            @keyframes floatReverse {
+
+                0%,
+                100% {
+                    transform: translateY(0px) rotate(0deg);
                 }
 
-                #sidebar .title a:link,
-                #sidebar .title a:visited {
-                    text-align: center;
-                    color: #FFFFFF;
+                50% {
+                    transform: translateY(-15px) rotate(-2deg);
+                }
+            }
+
+            @keyframes pulse {
+
+                0%,
+                100% {
+                    opacity: 1;
                 }
 
-                #sidebar .subtitle a:link,
-                #sidebar .subtitle a:visited {
-                    text-align: center;
-                    color: #FFFFFF;
+                50% {
+                    opacity: 0.7;
+                }
+            }
+
+            @keyframes fadeInUp {
+                from {
+                    opacity: 0;
+                    transform: translateY(30px);
                 }
 
-                .home {
-                    z-index: 100;
-                    width: 100%;
-                    background-color: #3c7546;
-                    font-size: 1.5vmax;
+                to {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            }
+
+            .memorial-card {
+                animation: fadeInUp 0.8s ease-out;
+            }
+
+            /* SVG Animations */
+            .svg-chair {
+                animation: float 6s ease-in-out infinite;
+                transform-origin: center;
+            }
+
+            .svg-stick {
+                animation: floatReverse 5s ease-in-out infinite;
+                transform-origin: center;
+            }
+
+            .svg-newspaper {
+                animation: pulse 4s ease-in-out infinite;
+            }
+
+            .svg-heart {
+                animation: pulse 3s ease-in-out infinite;
+            }
+
+            .svg-memories {
+                animation: float 7s ease-in-out infinite;
+                transform-origin: center;
+            }
+
+            /* ===================================
+           ACCESSIBILITY
+           =================================== */
+            :focus-visible {
+                outline: 3px solid var(--color-accent-1);
+                outline-offset: 2px;
+                border-radius: var(--radius-sm);
+            }
+
+            .skip-link {
+                position: absolute;
+                top: -40px;
+                left: 0;
+                background: var(--color-accent-1);
+                color: white;
+                padding: var(--space-sm) var(--space-md);
+                text-decoration: none;
+                border-radius: var(--radius-sm);
+                z-index: 10000;
+            }
+
+            .skip-link:focus {
+                top: 0;
+            }
+
+            @media (prefers-reduced-motion: reduce) {
+
+                *,
+                *::before,
+                *::after {
+                    animation-duration: 0.01ms !important;
+                    animation-iteration-count: 1 !important;
+                    transition-duration: 0.01ms !important;
+                }
+            }
+
+            /* ===================================
+           RESPONSIVE DESIGN
+           =================================== */
+            @media (max-width: 768px) {
+                .hero {
+                    min-height: 60vh;
+                    padding: var(--space-3xl) var(--space-md);
                 }
 
-                .home a:link,
-                .home a:visited {
-                    text-decoration: none;
-                    color: #FFFFFF;
+                .hero-svg {
+                    width: 250px;
+                    height: 250px;
                 }
 
-                .content {
-                    line-height: 3.8vmax;
-                    font-size: 1.8vmax;
-                    font-family: 'Arial';
-                    margin-top: 22vh;
+                .navbar ul {
+                    padding: var(--space-sm) var(--space-md);
+                    gap: var(--space-sm);
                 }
 
-                .content a:link,
-                .content a:visited {
-                    color: #3c7546;
+                .navbar a {
+                    padding: var(--space-xs) var(--space-sm);
+                    font-size: var(--text-sm);
                 }
 
-                .page {
-                    top: 40vh;
-                    width: 95%;
-                    margin-left: 0vw;
+                .memorial-card {
+                    padding: var(--space-xl);
                 }
 
-                .page img {
-                    max-width: 100%;
-                    max-height: 100%;
-                    border: 0;
+                .content-wrapper {
+                    padding: var(--space-2xl) var(--space-md);
+                }
+
+                .language-selector {
+                    flex-direction: column;
+                }
+
+                .language-label {
+                    margin-right: 0;
+                    margin-bottom: var(--space-sm);
+                }
+            }
+
+            @media (max-width: 480px) {
+                .navbar li:not(:last-child)::after {
+                    display: none;
                 }
             }
         </style>
     </head>
 
     <body vocab="http://schema.org/">
-        <div class="page">
-            <div class="home">
-                <ul typeof="BreadcrumbList">
-                    <li property="itemListElement" typeof="ListItem">
-                        <a property="item" typeof="WebPage" href="../index.html">
-                            <span property="name">Home</span>
-                        </a>
-                    </li>
-                    <li property="itemListElement" typeof="ListItem">
-                        <a property="item" typeof="WebPage" href="../writings/index.html">
-                            <span property="name">Writings</span>
-                        </a>
-                    </li>
-                </ul>
+        <a href="#main-content" class="skip-link">Skip to main content</a>
 
-            </div>
-            <div id="sidebar">
-                <div class="title">
-                    <h1><a href="./grandfather.html">To My Grandfather</a></h1>
-                </div>
-                <div class="subtitle">
-                    <h3><a href="../about.html">John Samuel</a></h3>
-                </div>
-            </div>
+        <!-- Navigation -->
+        <nav class="navbar" aria-label="Main navigation">
+            <ul typeof="BreadcrumbList">
+                <li property="itemListElement" typeof="ListItem">
+                    <a property="item" typeof="WebPage" href="../index.html">
+                        <span property="name">Home</span>
+                    </a>
+                </li>
+                <li property="itemListElement" typeof="ListItem" class="navbar-brand">
+                    <a property="item" typeof="WebPage" href="../about.html">
+                        <span property="name">John Samuel</span>
+                    </a>
+                </li>
+                <li property="itemListElement" typeof="ListItem">
+                    <a property="item" typeof="WebPage" href="../writings/index.html">
+                        <span property="name">Writings</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
 
-            <div class="content">
-                <section>
-                    <ul id="langlist">
-                        <li class="highlight" id="enpage" rel="hasPart" resource="#enpage">
-                            <span lang="en"><a href="../../en/writings/grandfather.html" class="langlink" property="url"
-                                    typeof="WebPage"><span property="inLanguage">English</span></a>
-                            </span>
-                        </li>
-                        <li id="frpage" rel="hasPart" resource="#frpage">
-                            <span lang="fr"><a class="langlink" href="../../fr/ecrits/grand-père.html" property="url"
-                                    typeof="WebPage"><span property="inLanguage">Fran&#xE7;ais</span></a>
-                            </span>
-                        </li>
-                        <li id="mlpage" rel="hasPart" resource="#mlpage">
-                            <span lang="ml"><a class="langlink" href="../../ml/രചനകൾ/എന്റെ പ്രിയപ്പെട്ട അപ്പച്ചൻ.html"
-                                    property="url" typeof="WebPage"><span property="inLanguage">മലയാളം</span></a>
-                            </span>
-                        </li>
-                        <li id="papage" rel="hasPart" resource="#papage">
-                            <span lang="pa"><a class="langlink" href="../../pa/ਲਿਖਤਾਂ/ਮੇਰੇ ਦਾਦਾ ਜੀ.html" property="url"
-                                    typeof="WebPage"><span property="inLanguage">ਪੰਜਾਬੀ</span></a>
-                            </span>
-                        </li>
-                        <li id="hipage" rel="hasPart" resource="#hipage">
-                            <span lang="hi"><a class="langlink" href="../../hi/रचनायें/नाना जी.html" property="url"
-                                    typeof="WebPage"><span property="inLanguage">हिन्दी</span></a>
-                            </span>
-                        </li>
-                    </ul>
-                </section>
+        <!-- Hero Section -->
+        <header class="hero">
+            <svg class="hero-svg" viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                <!-- Background circle with gradient -->
+                <defs>
+                    <linearGradient id="bgGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" style="stop-color:#e8ede9;stop-opacity:1" />
+                        <stop offset="100%" style="stop-color:#f5f8f5;stop-opacity:1" />
+                    </linearGradient>
+                    <linearGradient id="chairGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" style="stop-color:#6b8e6f;stop-opacity:1" />
+                        <stop offset="100%" style="stop-color:#4a6b4f;stop-opacity:1" />
+                    </linearGradient>
+                    <linearGradient id="stickGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+                        <stop offset="0%" style="stop-color:#b89968;stop-opacity:1" />
+                        <stop offset="100%" style="stop-color:#8f7048;stop-opacity:1" />
+                    </linearGradient>
+                    <filter id="softGlow">
+                        <feGaussianBlur stdDeviation="2" result="blur" />
+                        <feFlood flood-color="#6b8e6f" flood-opacity="0.3" />
+                        <feComposite in2="blur" operator="in" />
+                        <feMerge>
+                            <feMergeNode />
+                            <feMergeNode in="SourceGraphic" />
+                        </feMerge>
+                    </filter>
+                </defs>
+
+                <!-- Background -->
+                <circle cx="200" cy="200" r="180" fill="url(#bgGradient)" opacity="0.5" />
+
+                <!-- Memory clouds (floating) -->
+                <g class="svg-memories">
+                    <ellipse cx="100" cy="80" rx="35" ry="25" fill="#6b8e6f" opacity="0.1" />
+                    <ellipse cx="300" cy="100" rx="40" ry="28" fill="#6b8e6f" opacity="0.1" />
+                    <ellipse cx="320" cy="280" rx="38" ry="26" fill="#b89968" opacity="0.1" />
+                </g>
+                <!-- Chair (symbol of grandfather's presence) -->
+                <g class="svg-chair" filter="url(#softGlow)">
+                    <!-- Backrest panel -->
+                    <rect x="150" y="150" width="100" height="45" rx="8" fill="url(#chairGradient)" />
+
+                    <!-- Backrest supports (connected to seat) -->
+                    <rect x="155" y="195" width="15" height="60" rx="5" fill="url(#chairGradient)" />
+                    <rect x="235" y="195" width="15" height="60" rx="5" fill="url(#chairGradient)" />
+
+                    <!-- Seat (wider and deeper) -->
+                    <rect x="140" y="250" width="120" height="18" rx="6" fill="url(#chairGradient)" />
+
+                    <!-- Front legs -->
+                    <rect x="155" y="268" width="12" height="65" rx="6" fill="url(#chairGradient)" />
+                    <rect x="233" y="268" width="12" height="65" rx="6" fill="url(#chairGradient)" />
+
+                    <!-- Back legs (slight backward angle for realism) -->
+                    <rect transform="rotate(-4 160 255)" x="160" y="255" width="10" height="70" rx="5"
+                        fill="url(#chairGradient)" opacity="0.9" />
+                    <rect transform="rotate(4 230 255)" x="230" y="255" width="10" height="70" rx="5"
+                        fill="url(#chairGradient)" opacity="0.9" />
+                </g>
+
+                <!-- Walking stick (symbol of grandmother) -->
+                <g class="svg-stick">
+
+                    <!-- Straight shaft -->
+                    <line x1="285" y1="235" x2="285" y2="320" stroke="url(#stickGradient)" stroke-width="8"
+                        stroke-linecap="round" />
+
+                    <!-- Top cap -->
+                    <ellipse cx="285" cy="235" rx="10" ry="6" fill="url(#stickGradient)" />
+
+                    <!-- Rubber tip -->
+                    <ellipse cx="285" cy="320" rx="7" ry="4" fill="url(#stickGradient)" />
+                </g>
+
+
+                <!-- Newspaper (symbol of shared moments) -->
+                <g class="svg-newspaper">
+                    <rect x="80" y="250" width="50" height="65" rx="3" fill="#fff" stroke="#6b8e6f" stroke-width="2"
+                        opacity="0.9" />
+                    <line x1="85" y1="260" x2="120" y2="260" stroke="#6b8e6f" stroke-width="2" opacity="0.5" />
+                    <line x1="85" y1="270" x2="125" y2="270" stroke="#6b8e6f" stroke-width="1.5" opacity="0.4" />
+                    <line x1="85" y1="278" x2="120" y2="278" stroke="#6b8e6f" stroke-width="1.5" opacity="0.4" />
+                    <line x1="85" y1="286" x2="125" y2="286" stroke="#6b8e6f" stroke-width="1.5" opacity="0.4" />
+                </g>
+
+                <!-- Heart (symbol of love and gratitude) -->
+                <g class="svg-heart">
+                    <path d="M 200 340 
+                         C 190 330, 170 320, 160 330
+                         C 150 340, 155 355, 165 365
+                         L 200 395
+                         L 235 365
+                         C 245 355, 250 340, 240 330
+                         C 230 320, 210 330, 200 340 Z" fill="#b89968" opacity="0.3" />
+                </g>
+
+                <!-- Decorative dots -->
+                <circle cx="90" cy="120" r="3" fill="#6b8e6f" opacity="0.3" />
+                <circle cx="310" cy="320" r="3" fill="#b89968" opacity="0.3" />
+                <circle cx="120" cy="340" r="2.5" fill="#6b8e6f" opacity="0.3" />
+                <circle cx="340" cy="150" r="2.5" fill="#b89968" opacity="0.3" />
+            </svg>
+
+            <h1 class="hero-title">To My Grandfather</h1>
+            <h2 class="hero-subtitle">
+                <a href="../about.html">John Samuel</a>
+            </h2>
+        </header>
+
+        <!-- Main Content -->
+        <main id="main-content" class="content-wrapper">
+            <article class="memorial-card">
                 <p>Every time I try writing this, I wonder to whom it is directed. Is it to you? You, who are no longer
                     among us? Is it to me? I, who wanted to complete and read it at the right time? Is it to others?
-                    Others,
-                    who may or may not know about you.
-                    Or is it an eulogy? A standing eulogy, an eulogy that I couldn't make. I do not know the answer yet.
-                </p>
+                    Others, who may or may not know about you. Or is it an eulogy? A standing eulogy, an eulogy that I
+                    couldn't make. I do not know the answer yet.</p>
+
                 <p>Whenever I think about you, the vacant chair and the stick of grandmother comes to my mind. I picture
                     myself sitting opposite to the chair and staring at it. I try to recall the numerous discussions
-                    that I
-                    had with you. You waking up early
-                    in the morning, coming out of the house with your glass of hot tea and searching for the newspaper
-                    to
-                    finally sit on your chair and start reading. But before you start your reading, you pass me some
-                    sheets
-                    of the newspaper. I take them,
-                    admiring at your curiosity (even at 'this age') and continue reading mine. I wait till your first
-                    session of reading is over and look forward to your opinions on the news of the day, both local and
-                    international. I do wonder, even to this
-                    day whether I inherited the curious nature from you.</p>
-                <p>
+                    that I had with you. You waking up early in the morning, coming out of the house with your glass of
+                    hot tea and searching for the newspaper to finally sit on your chair and start reading. But before
+                    you start your reading, you pass me some sheets of the newspaper. I take them, admiring at your
+                    curiosity (even at 'this age') and continue reading mine. I wait till your first session of reading
+                    is over and look forward to your opinions on the news of the day, both local and international. I do
+                    wonder, even to this day whether I inherited the curious nature from you.</p>
+
+                <div class="illustration-container">
                     <img src="../../images/writings/grandpa-chair-grandma-stick.svg"
-                        alt="Grandpa's chair Grandma's stick" />
-                </p>
+                        alt="Illustration showing grandpa's empty chair beside grandma's walking stick, symbols of cherished memories and enduring presence" />
+                </div>
+
                 <p>I am always thankful for your support, love and care, ever since childhood, for all the times that
-                    you
-                    motivated me and for all that attention. I had always looked forward to come and see you until the
-                    time
-                    when I could no longer do so, to
-                    talk to you and to listen to all your little anecdotes. But I am especially grateful to you for your
-                    encouragement for studies. You were one of the few persons in my life who understood me and
-                    encouraged
-                    me to move forward after every
-                    little achievement in life.</p>
+                    you motivated me and for all that attention. I had always looked forward to come and see you until
+                    the time when I could no longer do so, to talk to you and to listen to all your little anecdotes.
+                    But I am especially grateful to you for your encouragement for studies. You were one of the few
+                    persons in my life who understood me and encouraged me to move forward after every little
+                    achievement in life.</p>
+            </article>
+        </main>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <div class="footer-content">
+                <div class="language-selector">
+                    <span class="language-label">Available in:</span>
+                    <a href="../../en/writings/grandfather.html" class="language-button active" lang="en">English</a>
+                    <a href="../../fr/ecrits/grand-père.html" class="language-button" lang="fr">Français</a>
+                    <a href="../../ml/രചനകൾ/എന്റെ പ്രിയപ്പെട്ട അപ്പച്ചൻ.html" class="language-button"
+                        lang="ml">മലയാളം</a>
+                    <a href="../../pa/ਲਿਖਤਾਂ/ਮੇਰੇ ਦਾਦਾ ਜੀ.html" class="language-button" lang="pa">ਪੰਜਾਬੀ</a>
+                    <a href="../../hi/रचनायें/नाना जी.html" class="language-button" lang="hi">हिन्दी</a>
+                </div>
+
+                <div class="footer-divider"></div>
             </div>
-
-            <br />
-
-        </div>
+        </footer>
     </body>
 
 </html>
