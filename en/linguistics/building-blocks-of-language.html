@@ -2,442 +2,836 @@
 <html lang="en">
 
     <head>
-        <meta charset="utf-8" />
-        <meta http-equiv="Content-Language" content="en" />
-        <link rel="shortcut icon" href="../../images/logo/favicon.png" />
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta http-equiv="Content-Language" content="en">
+        <link rel="shortcut icon" href="../../images/logo/favicon.png">
         <title>Basic Building Blocks of a Language: John Samuel</title>
-        <style type="text/css">
-            body {
-                background-color: #FFFFFF;
+        <style>
+            /* ===== CSS Custom Properties (Design Tokens) ===== */
+            :root {
+                /* Base Colors - Linguistics/Language Theme */
+                --color-base-bg: #faf9f7;
+                --color-base-surface: #ffffff;
+                --color-base-text: #1a202c;
+                --color-base-text-muted: #4a5568;
+
+                /* Theme Accents - Language/Communication Colors */
+                --color-accent-1: #6a5acd;
+                /* Slate blue - for words */
+                --color-accent-2: #4169e1;
+                /* Royal blue - for structure */
+                --color-accent-3: #9370db;
+                /* Medium purple - for syntax */
+                --color-accent-light: #f0ebff;
+
+                /* Functional Colors */
+                --color-shadow: rgba(106, 90, 205, 0.12);
+                --color-border: rgba(106, 90, 205, 0.15);
+                --color-hover: rgba(106, 90, 205, 0.08);
+
+                /* Gradients */
+                --gradient-primary: linear-gradient(135deg, var(--color-accent-1) 0%, var(--color-accent-2) 50%, var(--color-accent-3) 100%);
+                --gradient-subtle: linear-gradient(180deg, var(--color-base-bg), var(--color-accent-light));
+
+                /* Spacing Scale */
+                --space-xs: 0.25rem;
+                --space-sm: 0.5rem;
+                --space-md: 1rem;
+                --space-lg: 1.5rem;
+                --space-xl: 2rem;
+                --space-2xl: 3rem;
+                --space-3xl: 4rem;
+                --space-4xl: 6rem;
+
+                /* Border Radius */
+                --radius-sm: 4px;
+                --radius-md: 8px;
+                --radius-lg: 12px;
+                --radius-xl: 16px;
+                --radius-2xl: 24px;
+                --radius-organic: 63% 37% 54% 46% / 45% 62% 38% 55%;
+
+                /* Shadows */
+                --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.04), 0 1px 3px rgba(0, 0, 0, 0.06);
+                --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.05), 0 2px 4px rgba(0, 0, 0, 0.06);
+                --shadow-lg: 0 10px 24px rgba(0, 0, 0, 0.08), 0 4px 8px rgba(0, 0, 0, 0.06);
+                --shadow-theme: 0 10px 30px var(--color-shadow), 0 4px 10px rgba(0, 0, 0, 0.06);
+
+                /* Typography */
+                --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+                --text-xs: clamp(0.75rem, 0.7rem + 0.25vw, 0.875rem);
+                --text-sm: clamp(0.875rem, 0.8rem + 0.35vw, 1rem);
+                --text-base: clamp(1rem, 0.95rem + 0.25vw, 1.125rem);
+                --text-lg: clamp(1.125rem, 1.05rem + 0.35vw, 1.25rem);
+                --text-xl: clamp(1.25rem, 1.15rem + 0.5vw, 1.5rem);
+                --text-2xl: clamp(1.5rem, 1.3rem + 1vw, 2rem);
+                --text-3xl: clamp(2rem, 1.6rem + 2vw, 2.5rem);
+                --text-4xl: clamp(2.5rem, 2rem + 2.5vw, 3.5rem);
+
+                /* Font Weights */
+                --weight-normal: 400;
+                --weight-medium: 500;
+                --weight-semibold: 600;
+                --weight-bold: 700;
             }
 
-            #sidebar {
-                position: fixed;
-                background-color: #8E44AD;
-                top: 0;
-                left: 0;
-                bottom: 0;
-                width: 30vw;
-            }
-
-            #sidebar .title {
-                position: relative;
-                text-align: center;
-                line-height: 5vmax;
-                font-size: 1.6vmax;
-                font-family: 'Arial';
-                margin-top: 30vh;
-            }
-
-            #sidebar .title a:link,
-            #sidebar .title a:visited {
-                color: #FFFFFF;
-                text-decoration: none;
-            }
-
-            .subtitle {
-                top: 50vh;
-                text-align: center;
-                line-height: 1.3vmax;
-                font-family: 'Arial';
-                font-size: 1.5vmax;
-                color: #FFFFFF;
-            }
-
-            .subtitle a:link,
-            .subtitle a:visited {
-                color: #FFFFFF;
-                text-decoration: none;
-            }
-
-            .licence {
-                position: fixed;
-                text-align: right;
-                bottom: 0;
-                right: 0;
-            }
-
-            .home {
-                position: fixed;
-                text-align: left;
-                font-family: 'Arial';
-                color: #D3D3D3;
-                z-index: 100;
-                width: 100%;
-                background-color: #FFFFFF;
-                top: 0px;
-                margin-bottom: 10px;
-            }
-
-            .home a:link,
-            .home a:visited {
-                text-decoration: none;
-                color: #D3D3D3;
-            }
-
-            .home ul {
+            /* ===== Reset & Base Styles ===== */
+            * {
                 margin: 0;
                 padding: 0;
-                text-align: left;
-                list-style: none;
+                box-sizing: border-box;
             }
 
-            .home li {
-                position: relative;
-                float: left;
-                padding-top: 15px;
-                margin-right: 1em;
-                font-family: 'Arial';
+            html {
+                scroll-behavior: smooth;
+                scroll-padding-top: 80px;
             }
 
-            .home li:hover {
-                display: block;
+            body {
+                font-family: var(--font-sans);
+                font-size: var(--text-base);
+                line-height: 1.7;
+                color: var(--color-base-text);
+                background: var(--gradient-subtle);
+                background-attachment: fixed;
+                letter-spacing: -0.005em;
+                overflow-x: hidden;
             }
 
-            .home li:hover a:link,
-            .home li:hover a:visited {
+            /* ===== Skip Link for Accessibility ===== */
+            .skip-link {
+                position: absolute;
+                top: -100px;
+                left: 0;
+                background: var(--color-accent-1);
+                color: white;
+                padding: var(--space-md);
                 text-decoration: none;
-                padding: 15px;
-                color: #FFFFFF;
-                background-color: #8E44AD;
+                z-index: 1000;
             }
 
-            .content {
-                line-height: 1.8vmax;
-                font-size: 1.2vmax;
-                font-family: 'Arial';
-                margin-top: 15vh;
-                width: 90%;
+            .skip-link:focus {
+                top: 0;
             }
 
-            .content h2,
-            h3,
-            h4 {
-                color: #8E44AD;
-            }
-
-            .content a:link,
-            .content a:visited {
-                color: #8E44AD;
-            }
-
-            .content h3 {
-                color: #8E44AD;
-            }
-
-            .content h2::before,
-            .content h3::before {
-                display: block;
-                content: " ";
-                visibility: hidden;
-                height: 50px;
-                margin-top: -50px;
-                pointer-events: none;
-                background-color: #FFFFFF;
-            }
-
-            .content a:link,
-            .content a:visited {
-                color: #8E44AD;
-            }
-
-            .home a:link,
-            .home a:visited {
-                color: #D3D3D3;
-            }
-
-            .page {
-                width: 65vw;
+            /* ===== Animated Background Pattern ===== */
+            body::before {
+                content: '';
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
                 height: 100%;
-                margin-left: 30vw;
-                overflow: hidden;
-                padding: 0 1em;
-                font-family: 'Arial';
+                background-image:
+                    radial-gradient(circle at 20% 30%, rgba(106, 90, 205, 0.03) 0%, transparent 50%),
+                    radial-gradient(circle at 80% 70%, rgba(65, 105, 225, 0.03) 0%, transparent 50%);
+                pointer-events: none;
+                z-index: -1;
             }
 
-            .page img {
-                max-width: 100%;
-                max-height: 100%;
+            /* ===== Navigation Bar ===== */
+            .navbar {
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                background: rgba(255, 255, 255, 0.9);
+                -webkit-backdrop-filter: blur(12px) saturate(180%);
+                backdrop-filter: blur(12px) saturate(180%);
+                border-bottom: 1px solid var(--color-border);
+                box-shadow: var(--shadow-sm);
+                z-index: 100;
+                padding: var(--space-md) var(--space-xl);
             }
 
-            @media (max-width: 640px),
-            screen and (orientation: portrait) {
-                body {
-                    max-width: 100%;
-                    max-height: 100%;
+            .navbar ul {
+                list-style: none;
+                display: flex;
+                gap: var(--space-lg);
+                align-items: center;
+                flex-wrap: wrap;
+            }
+
+            .navbar li {
+                font-size: var(--text-sm);
+            }
+
+            .navbar a {
+                text-decoration: none;
+                color: var(--color-base-text-muted);
+                transition: color 0.3s ease;
+                position: relative;
+                padding: var(--space-xs) var(--space-sm);
+            }
+
+            .navbar a:hover,
+            .navbar a:focus {
+                color: var(--color-accent-1);
+            }
+
+            .navbar .site-name {
+                font-weight: var(--weight-semibold);
+                color: var(--color-accent-1);
+                font-size: var(--text-lg);
+            }
+
+            /* ===== Main Container ===== */
+            .container {
+                max-width: 1200px;
+                margin: 0 auto;
+                padding: 0 var(--space-xl);
+            }
+
+            /* ===== Hero Section ===== */
+            .hero {
+                margin-top: 80px;
+                padding: var(--space-4xl) 0;
+                text-align: center;
+                position: relative;
+            }
+
+            .hero h1 {
+                font-size: var(--text-4xl);
+                font-weight: var(--weight-bold);
+                color: var(--color-accent-1);
+                letter-spacing: -0.03em;
+                margin-bottom: var(--space-lg);
+                line-height: 1.2;
+                animation: fadeInUp 0.8s ease-out;
+            }
+
+            .hero .subtitle {
+                font-size: var(--text-xl);
+                color: var(--color-base-text-muted);
+                margin-bottom: var(--space-2xl);
+                animation: fadeInUp 0.8s ease-out 0.2s both;
+            }
+
+            .hero .subtitle a {
+                color: var(--color-accent-2);
+                text-decoration: none;
+                font-weight: var(--weight-medium);
+            }
+
+            /* ===== SVG Illustration ===== */
+            .illustration {
+                max-width: 600px;
+                margin: var(--space-3xl) auto;
+                animation: fadeIn 1s ease-out 0.4s both;
+            }
+
+            /* ===== Content Sections ===== */
+            .content-section {
+                margin: var(--space-4xl) 0;
+                animation: fadeInUp 0.8s ease-out;
+            }
+
+            .intro-text {
+                background: rgba(255, 255, 255, 0.7);
+                -webkit-backdrop-filter: blur(12px) saturate(180%);
+                backdrop-filter: blur(12px) saturate(180%);
+                border: 1px solid rgba(106, 90, 205, 0.2);
+                border-radius: var(--radius-xl);
+                padding: var(--space-2xl);
+                margin: var(--space-3xl) 0;
+                box-shadow: var(--shadow-theme);
+                font-style: italic;
+                color: var(--color-base-text-muted);
+                line-height: 1.8;
+            }
+
+            .content-block {
+                background: var(--color-base-surface);
+                border-radius: var(--radius-xl);
+                padding: var(--space-2xl);
+                margin: var(--space-2xl) 0;
+                box-shadow: var(--shadow-md);
+                border: 1px solid var(--color-border);
+                transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            }
+
+            .content-block:hover {
+                transform: translateY(-8px);
+                box-shadow: var(--shadow-theme);
+            }
+
+            .content-block h2 {
+                font-size: var(--text-2xl);
+                color: var(--color-accent-1);
+                margin-bottom: var(--space-lg);
+                font-weight: var(--weight-bold);
+                letter-spacing: -0.02em;
+                position: relative;
+                padding-bottom: var(--space-md);
+            }
+
+            .content-block h2::after {
+                content: '';
+                position: absolute;
+                bottom: 0;
+                left: 0;
+                width: 60px;
+                height: 3px;
+                background: var(--gradient-primary);
+                border-radius: var(--radius-sm);
+            }
+
+            .content-block h3 {
+                font-size: var(--text-xl);
+                color: var(--color-accent-2);
+                margin: var(--space-xl) 0 var(--space-md);
+                font-weight: var(--weight-semibold);
+                letter-spacing: -0.01em;
+            }
+
+            .content-block p {
+                margin-bottom: var(--space-lg);
+                line-height: 1.8;
+            }
+
+            .content-block a {
+                color: var(--color-accent-2);
+                text-decoration: none;
+                font-weight: var(--weight-medium);
+                transition: color 0.3s ease;
+            }
+
+            .content-block a:hover,
+            .content-block a:focus {
+                color: var(--color-accent-1);
+                text-decoration: underline;
+            }
+
+            /* ===== References Section ===== */
+            .references {
+                background: var(--color-accent-light);
+                border-radius: var(--radius-xl);
+                padding: var(--space-2xl);
+                margin: var(--space-3xl) 0;
+            }
+
+            .references h3 {
+                font-size: var(--text-xl);
+                color: var(--color-accent-1);
+                margin-bottom: var(--space-lg);
+                font-weight: var(--weight-bold);
+            }
+
+            .references ol {
+                list-style-position: inside;
+                margin-left: var(--space-md);
+            }
+
+            .references li {
+                margin-bottom: var(--space-md);
+                line-height: 1.6;
+            }
+
+            .references a {
+                color: var(--color-accent-2);
+                text-decoration: none;
+                transition: color 0.3s ease;
+            }
+
+            .references a:hover,
+            .references a:focus {
+                color: var(--color-accent-1);
+                text-decoration: underline;
+            }
+
+            /* ===== Footer ===== */
+            .footer {
+                background: rgba(255, 255, 255, 0.7);
+                -webkit-backdrop-filter: blur(12px) saturate(180%);
+                backdrop-filter: blur(12px) saturate(180%);
+                border-top: 1px solid var(--color-border);
+                padding: var(--space-3xl) 0;
+                margin-top: var(--space-4xl);
+            }
+
+            .footer-content {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                flex-wrap: wrap;
+                gap: var(--space-xl);
+            }
+
+            .footer .license {
+                display: flex;
+                align-items: center;
+            }
+
+            .footer .license img {
+                height: 31px;
+                width: auto;
+            }
+
+            /* ===== Animations ===== */
+            @keyframes fadeIn {
+                from {
+                    opacity: 0;
                 }
 
-                #sidebar {
-                    position: fixed;
-                    background-color: #8E44AD;
-                    top: 0;
-                    left: 0;
-                    bottom: 80vh;
-                    width: 100vw;
+                to {
+                    opacity: 1;
+                }
+            }
+
+            @keyframes fadeInUp {
+                from {
+                    opacity: 0;
+                    transform: translateY(30px);
                 }
 
-                #sidebar .title {
+                to {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            }
+
+            @keyframes float {
+
+                0%,
+                100% {
+                    transform: translateY(0px);
+                }
+
+                50% {
+                    transform: translateY(-20px);
+                }
+            }
+
+            @keyframes rotateWord {
+                from {
+                    transform: rotate(0deg);
+                }
+
+                to {
+                    transform: rotate(360deg);
+                }
+            }
+
+            @keyframes pulse {
+
+                0%,
+                100% {
+                    opacity: 1;
+                }
+
+                50% {
+                    opacity: 0.5;
+                }
+            }
+
+            @keyframes morphShape {
+
+                0%,
+                100% {
+                    border-radius: 63% 37% 54% 46% / 45% 62% 38% 55%;
+                }
+
+                50% {
+                    border-radius: 37% 63% 46% 54% / 62% 45% 55% 38%;
+                }
+            }
+
+            /* ===== Reduced Motion Support ===== */
+            @media (prefers-reduced-motion: reduce) {
+
+                *,
+                *::before,
+                *::after {
+                    animation-duration: 0.01ms !important;
+                    animation-iteration-count: 1 !important;
+                    transition-duration: 0.01ms !important;
+                }
+            }
+
+            /* ===== Responsive Design ===== */
+            @media (max-width: 768px) {
+                .navbar {
+                    padding: var(--space-md);
+                }
+
+                .navbar ul {
+                    gap: var(--space-md);
+                }
+
+                .hero {
+                    padding: var(--space-2xl) 0;
+                }
+
+                .content-block {
+                    padding: var(--space-lg);
+                }
+
+                .footer-content {
+                    flex-direction: column;
                     text-align: center;
-                    position: fixed;
-                    margin-top: 6vh;
-                    left: 0px;
-                    right: 0px;
-                    line-height: 3.5vmax;
-                    font-size: 1.5vmax;
-                    font-family: 'Arial';
                 }
+            }
 
-                #sidebar .subtitle {
-                    text-align: center;
-                    top: 5vh;
-                    left: 0px;
-                    right: 0px;
-                    position: fixed;
-                    margin-top: 10vh;
-                    font-size: 1.5vmax;
-                }
-
-                #sidebar .title a:link,
-                #sidebar .title a:visited {
-                    text-align: center;
-                    color: #FFFFFF;
-                }
-
-                #sidebar .subtitle a:link,
-                #sidebar .subtitle a:visited {
-                    text-align: center;
-                    color: #FFFFFF;
-                }
-
-                .home {
-                    z-index: 100;
-                    width: 100%;
-                    background-color: #8E44AD;
-                    font-size: 1.5vmax;
-                }
-
-                .home a:link,
-                .home a:visited {
-                    text-decoration: none;
-                    color: #FFFFFF;
-                }
-
-                .content {
-                    line-height: 3.8vmax;
-                    font-size: 1.8vmax;
-                    font-family: 'Arial';
-                    margin-top: 22vh;
-                }
-
-                .content a:link,
-                .content a:visited {
-                    color: #8E44AD;
-                }
-
-                .page {
-                    top: 40vh;
-                    width: 95%;
-                    margin-left: 0vw;
-                }
-
-                .page img {
-                    max-width: 100%;
-                    max-height: 100%;
-                    border: 0;
-                }
+            /* ===== Focus Styles for Accessibility ===== */
+            a:focus,
+            button:focus {
+                outline: 2px solid var(--color-accent-1);
+                outline-offset: 2px;
             }
         </style>
-        <script type="application/ld+json">
-        {
-            "@context": "http://schema.org",
-            "@type": "BlogPosting",
-            "mainEntityOfPage": {
-                "@type": "WebPage",
-                "@id": "https://johnsamuel.info"
-            },
-            "articleSection": "blog",
-            "name": "Basic Building Blocks of a Language",
-            "headline": "Basic Building Blocks of a Language",
-            "description": "Article by John Samuel",
-            "inLanguage": "en",
-            "author": "John Samuel",
-            "datePublished": "2014-07-26 15:26:00",
-            "dateModified": "2020-08-29 13:22:36",
-            "dateCreated": "2014-07-26 15:26:00",
-            "url": "https://johnsamuel.info/en/linguistics/building-blocks-of-language.html",
-            "image": {
-                "@type": "imageObject",
-                "url": "https://johnsamuel.info/images/writings/coconut-trees-landscape.svg",
-                "height": "600",
-                "width": "800"
-            },
-            "publisher": {
-                "@type": "Organization",
-                "name": "John Samuel",
-                "logo": {
-                    "@type": "imageObject",
-                    "url": "https://johnsamuel.info/images/writings/coconut-trees-landscape.svg"
-                }
-            },
-            "keywords": ["Blog"]
-        }
-    </script>
     </head>
 
     <body vocab="http://schema.org/">
-        <div id="sidebar">
-            <div class="title">
-                <h1><a href="./index.html">Basic Building Blocks of a Language</a></h1>
-            </div>
-            <div class="subtitle">
-                <h3><a href="../about.html">John Samuel</a></h3>
-            </div>
-        </div>
-        <div class="licence">
-            <a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/"><img alt="Creative Commons License"
-                    style="border-width:0" src="./../../images/license.png" /></a>
-        </div>
-        <div class="page">
-            <div class="home">
-                <ul typeof="BreadcrumbList">
-                    <li property="itemListElement" typeof="ListItem">
-                        <a property="item" typeof="WebPage" href="../index.html">
-                            <span property="name">Home</span>
-                        </a>
-                    </li>
-                    <li property="itemListElement" typeof="ListItem">
-                        <a property="item" typeof="WebPage" href="../linguistics/index.html">
-                            <span property="name">Linguistics</span>
-                        </a>
-                    </li>
-                </ul>
-            </div>
-            <div class="content">
+        <!-- Skip to main content link for screen readers -->
+        <a href="#main-content" class="skip-link">Skip to main content</a>
+
+        <!-- Navigation Bar -->
+        <nav class="navbar" role="navigation" aria-label="Main navigation">
+            <ul typeof="BreadcrumbList">
+                <li property="itemListElement" typeof="ListItem">
+                    <a href="../index.html" property="item" typeof="WebPage" class="site-name">
+                        <span property="name">John Samuel</span>
+                    </a>
+                </li>
+                <li property="itemListElement" typeof="ListItem">
+                    <a href="../index.html" property="item" typeof="WebPage">
+                        <span property="name">Home</span>
+                    </a>
+                </li>
+                <li property="itemListElement" typeof="ListItem">
+                    <a href="../linguistics/index.html" property="item" typeof="WebPage">
+                        <span property="name">Linguistics</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+
+        <!-- Main Content -->
+        <main id="main-content" class="container">
+            <!-- Hero Section -->
+            <section class="hero">
+                <h1>Basic Building Blocks of a Language</h1>
+                <p class="subtitle">by <a href="../about.html">John Samuel</a></p>
+
+                <!-- SVG Illustration: Language Building Blocks -->
+                <div class="illustration">
+                    <svg viewBox="0 0 600 400" xmlns="http://www.w3.org/2000/svg" role="img" aria-hidden="true">
+                        <defs>
+                            <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" style="stop-color:#6a5acd;stop-opacity:1" />
+                                <stop offset="100%" style="stop-color:#4169e1;stop-opacity:1" />
+                            </linearGradient>
+                            <linearGradient id="grad2" x1="0%" y1="0%" x2="100%" y2="0%">
+                                <stop offset="0%" style="stop-color:#9370db;stop-opacity:1" />
+                                <stop offset="100%" style="stop-color:#6a5acd;stop-opacity:1" />
+                            </linearGradient>
+                            <filter id="glow">
+                                <feGaussianBlur stdDeviation="4" result="coloredBlur" />
+                                <feMerge>
+                                    <feMergeNode in="coloredBlur" />
+                                    <feMergeNode in="SourceGraphic" />
+                                </feMerge>
+                            </filter>
+                        </defs>
+
+                        <!-- Central concept: Language structure -->
+                        <circle cx="300" cy="200" r="80" fill="url(#grad1)" opacity="0.2" filter="url(#glow)">
+                            <animate attributeName="r" values="80;90;80" dur="4s" repeatCount="indefinite" />
+                        </circle>
+
+                        <!-- Word blocks floating around -->
+                        <g style="animation: float 6s ease-in-out infinite;">
+                            <rect x="120" y="80" width="80" height="60" rx="8" fill="url(#grad1)" opacity="0.8" />
+                            <text x="160" y="115" font-family="Arial, sans-serif" font-size="14" fill="white"
+                                text-anchor="middle" font-weight="bold">WORD</text>
+                        </g>
+
+                        <g style="animation: float 5s ease-in-out infinite 1s;">
+                            <rect x="400" y="100" width="80" height="60" rx="8" fill="url(#grad2)" opacity="0.8" />
+                            <text x="440" y="135" font-family="Arial, sans-serif" font-size="14" fill="white"
+                                text-anchor="middle" font-weight="bold">NOUN</text>
+                        </g>
+
+                        <g style="animation: float 5.5s ease-in-out infinite 0.5s;">
+                            <rect x="100" y="260" width="80" height="60" rx="8" fill="url(#grad1)" opacity="0.8" />
+                            <text x="140" y="295" font-family="Arial, sans-serif" font-size="14" fill="white"
+                                text-anchor="middle" font-weight="bold">VERB</text>
+                        </g>
+
+                        <g style="animation: float 6.5s ease-in-out infinite 1.5s;">
+                            <rect x="420" y="270" width="80" height="60" rx="8" fill="url(#grad2)" opacity="0.8" />
+                            <text x="460" y="305" font-family="Arial, sans-serif" font-size="12" fill="white"
+                                text-anchor="middle" font-weight="bold">SYNTAX</text>
+                        </g>
+
+                        <!-- Connecting lines representing language structure -->
+                        <line x1="200" y1="110" x2="260" y2="170" stroke="#6a5acd" stroke-width="2" opacity="0.4">
+                            <animate attributeName="opacity" values="0.2;0.6;0.2" dur="3s" repeatCount="indefinite" />
+                        </line>
+                        <line x1="400" y1="130" x2="340" y2="180" stroke="#4169e1" stroke-width="2" opacity="0.4">
+                            <animate attributeName="opacity" values="0.2;0.6;0.2" dur="3.5s" repeatCount="indefinite" />
+                        </line>
+                        <line x1="180" y1="290" x2="250" y2="230" stroke="#6a5acd" stroke-width="2" opacity="0.4">
+                            <animate attributeName="opacity" values="0.2;0.6;0.2" dur="4s" repeatCount="indefinite" />
+                        </line>
+                        <line x1="420" y1="300" x2="350" y2="240" stroke="#9370db" stroke-width="2" opacity="0.4">
+                            <animate attributeName="opacity" values="0.2;0.6;0.2" dur="3.2s" repeatCount="indefinite" />
+                        </line>
+
+                        <!-- Central text -->
+                        <text x="300" y="195" font-family="Arial, sans-serif" font-size="18" fill="#6a5acd"
+                            text-anchor="middle" font-weight="bold">LANGUAGE</text>
+                        <text x="300" y="215" font-family="Arial, sans-serif" font-size="14" fill="#4169e1"
+                            text-anchor="middle">Structure</text>
+
+                        <!-- Small morphing shapes representing evolution -->
+                        <ellipse cx="250" cy="350" rx="30" ry="20" fill="#9370db" opacity="0.3">
+                            <animate attributeName="rx" values="30;35;30" dur="5s" repeatCount="indefinite" />
+                            <animate attributeName="ry" values="20;25;20" dur="5s" repeatCount="indefinite" />
+                        </ellipse>
+                        <ellipse cx="350" cy="350" rx="25" ry="20" fill="#6a5acd" opacity="0.3">
+                            <animate attributeName="rx" values="25;30;25" dur="4.5s" repeatCount="indefinite" />
+                            <animate attributeName="ry" values="20;24;20" dur="4.5s" repeatCount="indefinite" />
+                        </ellipse>
+                    </svg>
+                </div>
+            </section>
+
+            <!-- Introduction Quote -->
+            <div class="intro-text">
                 <p>
-                    <i>
-                        What are the fundamental words of any language?
-                        When can we say that we know a language, and can communicate our feelings, thoughts, and ideas?
-                        Branches of science like physics and chemistry have their own evolving standard models and any
-                        newcomer to the field starts learning by understanding the key features of this model.
-                        Is a similar approach in language learning feasible?
-                        Is it possible for humans to be polyglot easily?
-                        Can we reduce the language learning to some standard models?
-                    </i>
+                    What are the fundamental words of any language?
+                    When can we say that we know a language, and can communicate our feelings, thoughts, and ideas?
+                    Branches of science like physics and chemistry have their own evolving standard models and any
+                    newcomer to the field starts learning by understanding the key features of this model.
+                    Is a similar approach in language learning feasible?
+                    Is it possible for humans to be polyglot easily?
+                    Can we reduce the language learning to some standard models?
                 </p>
-                <p>When can we say we have <i>learned</i> a language? What exactly does it mean to learn a language? Is
-                    it just the capability to speak? Is it the capability to write in the language using any one of the
-                    scripts? Is it the ability to comprehend
-                    a conversation among persons? How about gestures? Are gestures part of the language learning? Or is
-                    it a combination of all of the above put together? Taking the languages with a very high number of
-                    speakers and considering the number
-                    of new words that are being added to the dictionary every year (or every few years) with some former
-                    or ancient words going to extinction, when can we say that we have become fluent in a language? Does
-                    being fluent correspond to knowing
-                    all the words and their meanings? Does it mean the capability to use the shortest possible word or
-                    phrase available for expressing one's emotions or state of mind or the surroundings?</p>
-                <p>
-                    What do we mean by <i>knowing</i> a language? Is it the ability to comprehend and communicate, both
-                    orally and through writing? But is not the context of the person important as well? Knowing a
-                    language for daily usage is quite different
-                    from knowing a language in a scientific context. It is totally different from the literature
-                    context. It may mean understanding various similes and metaphors, which may differ from region to
-                    region.</p>
-                <p>Is it possible to talk about the <i>fundamental words</i>, the basic building blocks of a language?
-                    In any context, there must be an existence of certain basic words, the words that are enough to
-                    communicate the various processes, thoughts,
-                    and emotions for living and working in that context.</p>
-                <p>Recalling my school days, I sometimes feel that the science classes like physics, chemistry stayed
-                    simple, because we had some standard model to explain the fundamental nature of objects surrounding
-                    us. There were some basic elements, based
-                    on which new molecules, compounds are made. Even though these models evolved and are still evolving,
-                    there has been this quest for understanding the underlying model of nature. Yet in my quest for
-                    learning new languages. I am unable to
-                    find such a model for languages.</p>
-                <p>Why do we require such a model? In my opinion, it will make language learning easier. Though we say
-                    that languages are significantly different from each other, I am interested in finding common
-                    features among them, that I would like to call
-                    the basic building blocks. The obvious question may be why do we need to make language learning
-                    easy? In my case, it is to be able to easily learn a new language. Why do we need to learn new
-                    languages? One reason is to preserve our endangered
-                    languages
-                    <sup><a href="#endangerment">4</a></sup>. There is an increasing need to protect the endangered
-                    languages because languages can become extinct like the natural species if they do not have any more
-                    speakers. Languages played an important
-                    role in the evolution of human culture. They are living testimonies for understanding how some
-                    popular languages reached the current point, i.e., how many words were borrowed from other languages
-                    or to be more precise, for understanding
-                    the etymology of different words.
-                </p>
-                <h3>Language Learning</h3>
-                <p>Which words should we learn first? What are those universally necessary words? For some reason, I do
-                    feel that pronouns are very important. Pronouns like I, you, they, etc. Then comes the state of
-                    being or emotions. One may also need to talk
-                    about possessions, like the objects of daily need. These may include food, drinks, and other
-                    household items. However, this list is quite varying, depending both on the place and the context,
-                    as discussed above. We do not have homogeneous
-                    food or drinking habits across the world.
-                </p>
-                <p>One may even wonder what could have been the first words of the primitive people, our ancestors of
-                    long ago. Did they start from the five senses, i.e., talking about the hotness or coldness of a
-                    place, the strange smell, the sounds of some
-                    ferocious animals or the weird taste of food? Did they start talking about the objects around them?
-                </p>
-                <p>Yet there are some people who study how children learn. What are their first words? We have come
-                    across situations where parents compete to hear their role from the mouths of their children. They
-                    tend to hear words <i>mama</i>, <i>papa</i>,
-                    <i>ma</i>, <i>pa</i>, when they hear their children first speak. But most of the time, they have the
-                    illusion of hearing something they just wished to hear. As adults, do we need to approach language
-                    learning as though we were children?
-                </p>
-                <h3>Standard model</h3>
-                <p>Is it possible to approach language learning with a standard model, i.e., a model that works across
-                    languages? Such a model must consider all the languages and dialects of the world, and not just the
-                    popular languages. It must also take into
-                    account the words, the grammatical rules, the phrases, similes, and metaphors. Will such a model
-                    give us a set of basic words, present in all the languages. Will this model help in building a
-                    dictionary using only the basic words, i.e.,
-                    the meaning of all the words can be explained with these basic words, without any circular
-                    references.</p>
-                <p>Like the standard model in Physics and Chemistry, the standard model of language can cover all the
-                    language features. Most of us have gone through the parts of speech during language learning. Parts
-                    of speech<sup><a href="#part-speech">1</a></sup> like preposition, nouns, verbs, adverbs, adjectives
-                    may be considered as one of the building blocks of language, unless a more simplifying block is
-                    defined. </p>
-                <p>There are several current and former attempts to generalize all languages. One such example is the
-                    Swadesh List<sup><a href="#swadesh-list">2</a></sup>, which contains a very limited number of words
-                    (usually around 200 words) that are used
-                    to study the similarities among different languages. </p>
-                <h3>Constructed Languages</h3>
-                <p>Finally, it is also interesting to see the concept of constructed languages (conlangs)<sup><a
-                            href="#constructed-language">3</a></sup>, i.e., a group of persons may come together to
-                    start a new language. They decide to create the script, the
-                    grammatical rules, and the basic words for their new language. However, it is important to note that
-                    unknowingly they may have the bias of using the rules of their native languages or the languages
-                    they may know. They try to create words
-                    and phrases for all those expressions that they may say in the languages they know in this new
-                    language. Creating a conlang is interesting to understand about language and communication. It may
-                    be interesting to see which words are added
-                    to the dictionary of conlang. This may help in our studies to identify the basic words of languages.
-                    However, conlangs need speakers. A limited number of speakers may mean a very limited number of
-                    words, useful for very few contexts.</p>
-                <h3>Conclusion</h3>
-                <p>Identifying the basic building blocks of a language is a challenging task. Most of us have come
-                    across the special features of our native languages like tense, parts of speech, etc. But some of
-                    these may not be present in other languages or
-                    they may have additional features. Therefore, any standard model for languages must not be limited
-                    to certain popular languages and must consider the diverse linguistic spectrum of the world.
-                </p>
-                <h3>References</h3>
-                <ol>
-                    <li id="part-speech"><a href="https://en.wikipedia.org/wiki/Part_of_speech">Part of speech</a></li>
-                    <li id="swadesh-list"><a href="https://en.wikipedia.org/wiki/Swadesh_list">Swadesh list</a></li>
-                    <li id="constructed-language"><a
-                            href="https://en.wikipedia.org/wiki/Constructed_language">Constructed language</a></li>
-                    <li id="endangerment"><a href="https://www.ethnologue.com/guides/how-many-languages-endangered">How
-                            many languages are endangered?</a></li>
-                </ol>
             </div>
-        </div>
+
+            <!-- Main Content Sections -->
+            <article class="content-section">
+                <div class="content-block">
+                    <p>When can we say we have <em>learned</em> a language? What exactly does it mean to learn a
+                        language? Is
+                        it just the capability to speak? Is it the capability to write in the language using any one of
+                        the
+                        scripts? Is it the ability to comprehend
+                        a conversation among persons? How about gestures? Are gestures part of the language learning? Or
+                        is
+                        it a combination of all of the above put together? Taking the languages with a very high number
+                        of
+                        speakers and considering the number
+                        of new words that are being added to the dictionary every year (or every few years) with some
+                        former
+                        or ancient words going to extinction, when can we say that we have become fluent in a language?
+                        Does
+                        being fluent correspond to knowing
+                        all the words and their meanings? Does it mean the capability to use the shortest possible word
+                        or
+                        phrase available for expressing one's emotions or state of mind or the surroundings?</p>
+                    <p>
+                        What do we mean by <em>knowing</em> a language? Is it the ability to comprehend and communicate,
+                        both
+                        orally and through writing? But is not the context of the person important as well? Knowing a
+                        language for daily usage is quite different
+                        from knowing a language in a scientific context. It is totally different from the literature
+                        context. It may mean understanding various similes and metaphors, which may differ from region
+                        to
+                        region.</p>
+                    <p>Is it possible to talk about the <em>fundamental words</em>, the basic building blocks of a
+                        language?
+                        In any context, there must be an existence of certain basic words, the words that are enough to
+                        communicate the various processes, thoughts,
+                        and emotions for living and working in that context.</p>
+                    <p>Recalling my school days, I sometimes feel that the science classes like physics, chemistry
+                        stayed
+                        simple, because we had some standard model to explain the fundamental nature of objects
+                        surrounding
+                        us. There were some basic elements, based
+                        on which new molecules, compounds are made. Even though these models evolved and are still
+                        evolving,
+                        there has been this quest for understanding the underlying model of nature. Yet in my quest for
+                        learning new languages. I am unable to
+                        find such a model for languages.</p>
+                    <p>Why do we require such a model? In my opinion, it will make language learning easier. Though we
+                        say
+                        that languages are significantly different from each other, I am interested in finding common
+                        features among them, that I would like to call
+                        the basic building blocks. The obvious question may be why do we need to make language learning
+                        easy? In my case, it is to be able to easily learn a new language. Why do we need to learn new
+                        languages? One reason is to preserve our endangered
+                        languages
+                        <sup><a href="#endangerment">4</a></sup>. There is an increasing need to protect the endangered
+                        languages because languages can become extinct like the natural species if they do not have any
+                        more
+                        speakers. Languages played an important
+                        role in the evolution of human culture. They are living testimonies for understanding how some
+                        popular languages reached the current point, i.e., how many words were borrowed from other
+                        languages
+                        or to be more precise, for understanding
+                        the etymology of different words.
+                    </p>
+                </div>
+
+                <div class="content-block">
+                    <h3>Language Learning</h3>
+                    <p>Which words should we learn first? What are those universally necessary words? For some reason, I
+                        do
+                        feel that pronouns are very important. Pronouns like I, you, they, etc. Then comes the state of
+                        being or emotions. One may also need to talk
+                        about possessions, like the objects of daily need. These may include food, drinks, and other
+                        household items. However, this list is quite varying, depending both on the place and the
+                        context,
+                        as discussed above. We do not have homogeneous
+                        food or drinking habits across the world.
+                    </p>
+                    <p>One may even wonder what could have been the first words of the primitive people, our ancestors
+                        of
+                        long ago. Did they start from the five senses, i.e., talking about the hotness or coldness of a
+                        place, the strange smell, the sounds of some
+                        ferocious animals or the weird taste of food? Did they start talking about the objects around
+                        them?
+                    </p>
+                    <p>Yet there are some people who study how children learn. What are their first words? We have come
+                        across situations where parents compete to hear their role from the mouths of their children.
+                        They
+                        tend to hear words <em>mama</em>, <em>papa</em>,
+                        <em>ma</em>, <em>pa</em>, when they hear their children first speak. But most of the time, they
+                        have the
+                        illusion of hearing something they just wished to hear. As adults, do we need to approach
+                        language
+                        learning as though we were children?
+                    </p>
+                </div>
+
+                <div class="content-block">
+                    <h3>Standard Model</h3>
+                    <p>Is it possible to approach language learning with a standard model, i.e., a model that works
+                        across
+                        languages? Such a model must consider all the languages and dialects of the world, and not just
+                        the
+                        popular languages. It must also take into
+                        account the words, the grammatical rules, the phrases, similes, and metaphors. Will such a model
+                        give us a set of basic words, present in all the languages. Will this model help in building a
+                        dictionary using only the basic words, i.e.,
+                        the meaning of all the words can be explained with these basic words, without any circular
+                        references.</p>
+                    <p>Like the standard model in Physics and Chemistry, the standard model of language can cover all
+                        the
+                        language features. Most of us have gone through the parts of speech during language learning.
+                        Parts
+                        of speech<sup><a href="#part-speech">1</a></sup> like preposition, nouns, verbs, adverbs,
+                        adjectives
+                        may be considered as one of the building blocks of language, unless a more simplifying block is
+                        defined. </p>
+                    <p>There are several current and former attempts to generalize all languages. One such example is
+                        the
+                        Swadesh List<sup><a href="#swadesh-list">2</a></sup>, which contains a very limited number of
+                        words
+                        (usually around 200 words) that are used
+                        to study the similarities among different languages. </p>
+                </div>
+
+                <div class="content-block">
+                    <h3>Constructed Languages</h3>
+                    <p>Finally, it is also interesting to see the concept of constructed languages (conlangs)<sup><a
+                                href="#constructed-language">3</a></sup>, i.e., a group of persons may come together to
+                        start a new language. They decide to create the script, the
+                        grammatical rules, and the basic words for their new language. However, it is important to note
+                        that
+                        unknowingly they may have the bias of using the rules of their native languages or the languages
+                        they may know. They try to create words
+                        and phrases for all those expressions that they may say in the languages they know in this new
+                        language. Creating a conlang is interesting to understand about language and communication. It
+                        may
+                        be interesting to see which words are added
+                        to the dictionary of conlang. This may help in our studies to identify the basic words of
+                        languages.
+                        However, conlangs need speakers. A limited number of speakers may mean a very limited number of
+                        words, useful for very few contexts.</p>
+                </div>
+
+                <div class="content-block">
+                    <h3>Conclusion</h3>
+                    <p>Identifying the basic building blocks of a language is a challenging task. Most of us have come
+                        across the special features of our native languages like tense, parts of speech, etc. But some
+                        of
+                        these may not be present in other languages or
+                        they may have additional features. Therefore, any standard model for languages must not be
+                        limited
+                        to certain popular languages and must consider the diverse linguistic spectrum of the world.
+                    </p>
+                </div>
+
+                <!-- References Section -->
+                <div class="references">
+                    <h3>References</h3>
+                    <ol>
+                        <li id="part-speech"><a href="https://en.wikipedia.org/wiki/Part_of_speech">Part of speech</a>
+                        </li>
+                        <li id="swadesh-list"><a href="https://en.wikipedia.org/wiki/Swadesh_list">Swadesh list</a></li>
+                        <li id="constructed-language"><a
+                                href="https://en.wikipedia.org/wiki/Constructed_language">Constructed language</a></li>
+                        <li id="endangerment"><a
+                                href="https://www.ethnologue.com/guides/how-many-languages-endangered">How many
+                                languages are endangered?</a></li>
+                    </ol>
+                </div>
+            </article>
+        </main>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <div class="container">
+                <div class="footer-content">
+                    <div class="license">
+                        <a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/">
+                            <img alt="Creative Commons License" src="./../../images/license.png">
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </footer>
+
+        <!-- Structured Data -->
+        <script type="application/ld+json">
+    {
+        "@context": "http://schema.org",
+        "@type": "BlogPosting",
+        "mainEntityOfPage": {
+            "@type": "WebPage",
+            "@id": "https://johnsamuel.info"
+        },
+        "articleSection": "blog",
+        "name": "Basic Building Blocks of a Language",
+        "headline": "Basic Building Blocks of a Language",
+        "description": "Article by John Samuel",
+        "inLanguage": "en",
+        "author": "John Samuel",
+        "datePublished": "2014-07-26 15:26:00",
+        "dateModified": "2020-08-29 13:22:36",
+        "dateCreated": "2014-07-26 15:26:00",
+        "url": "https://johnsamuel.info/en/linguistics/building-blocks-of-language.html",
+        "image": {
+            "@type": "imageObject",
+            "url": "https://johnsamuel.info/images/writings/coconut-trees-landscape.svg",
+            "height": "600",
+            "width": "800"
+        },
+        "publisher": {
+            "@type": "Organization",
+            "name": "John Samuel",
+            "logo": {
+                "@type": "imageObject",
+                "url": "https://johnsamuel.info/images/writings/coconut-trees-landscape.svg"
+            }
+        },
+        "keywords": ["Blog"]
+    }
+    </script>
     </body>
 
 </html>
