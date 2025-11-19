@@ -3,261 +3,746 @@
 
     <head>
         <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <meta http-equiv="Content-Language" content="en" />
         <link rel="shortcut icon" href="../../images/logo/favicon.png" />
         <title>Data Structures: John Samuel</title>
         <style type="text/css">
-            body {
-                background-color: #FFFFFF;
+            /* ==================== Design Tokens ==================== */
+            :root {
+                /* Color Palette - Data Science Theme */
+                --color-base-bg: #f5f8fa;
+                --color-base-surface: #ffffff;
+                --color-base-text: #1a202c;
+                --color-base-text-muted: #4a5568;
+
+                /* Data Science Accent Colors */
+                --color-accent-1: #4a90e2;
+                --color-accent-2: #2d5f8d;
+                --color-accent-3: #7b68ee;
+                --color-accent-light: #e3f2fd;
+                --color-accent-data: #00bcd4;
+
+                /* Functional Colors */
+                --color-shadow: rgba(74, 144, 226, 0.12);
+                --color-border: rgba(74, 144, 226, 0.15);
+                --color-hover: rgba(74, 144, 226, 0.08);
+
+                /* Gradients */
+                --gradient-primary: linear-gradient(135deg, var(--color-accent-1) 0%, var(--color-accent-2) 50%, var(--color-accent-3) 100%);
+                --gradient-subtle: linear-gradient(180deg, var(--color-base-bg), var(--color-accent-light));
+                --gradient-hero: linear-gradient(135deg, #4a90e2 0%, #7b68ee 50%, #00bcd4 100%);
+
+                /* Typography */
+                --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+                --font-mono: 'SF Mono', Monaco, 'Cascadia Code', 'Consolas', 'Courier New', monospace;
+
+                /* Fluid Typography Scale */
+                --text-xs: clamp(0.75rem, 0.7rem + 0.25vw, 0.875rem);
+                --text-sm: clamp(0.875rem, 0.8rem + 0.35vw, 1rem);
+                --text-base: clamp(1rem, 0.95rem + 0.25vw, 1.125rem);
+                --text-lg: clamp(1.125rem, 1.05rem + 0.35vw, 1.25rem);
+                --text-xl: clamp(1.25rem, 1.15rem + 0.5vw, 1.5rem);
+                --text-2xl: clamp(1.5rem, 1.3rem + 1vw, 2rem);
+                --text-3xl: clamp(2rem, 1.6rem + 2vw, 2.5rem);
+                --text-4xl: clamp(2.5rem, 2rem + 2.5vw, 3.5rem);
+
+                /* Spacing Scale */
+                --space-xs: 0.25rem;
+                --space-sm: 0.5rem;
+                --space-md: 1rem;
+                --space-lg: 1.5rem;
+                --space-xl: 2rem;
+                --space-2xl: 3rem;
+                --space-3xl: 4rem;
+                --space-4xl: 6rem;
+
+                /* Border Radius */
+                --radius-sm: 4px;
+                --radius-md: 8px;
+                --radius-lg: 12px;
+                --radius-xl: 16px;
+                --radius-2xl: 24px;
+                --radius-full: 9999px;
+                --radius-organic: 63% 37% 54% 46% / 45% 62% 38% 55%;
+
+                /* Shadows */
+                --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.04), 0 1px 3px rgba(0, 0, 0, 0.06);
+                --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.05), 0 2px 4px rgba(0, 0, 0, 0.06);
+                --shadow-lg: 0 10px 24px rgba(0, 0, 0, 0.08), 0 4px 8px rgba(0, 0, 0, 0.06);
+                --shadow-xl: 0 20px 40px rgba(0, 0, 0, 0.12), 0 8px 16px rgba(0, 0, 0, 0.08);
+                --shadow-theme: 0 10px 30px var(--color-shadow), 0 4px 10px rgba(0, 0, 0, 0.06);
+
+                /* Font Weights */
+                --weight-normal: 400;
+                --weight-medium: 500;
+                --weight-semibold: 600;
+                --weight-bold: 700;
             }
 
-            #sidebar {
-                position: fixed;
-                background-color: #1B80CF;
-                top: 0;
-                left: 0;
-                bottom: 0;
-                width: 30vw;
-            }
-
-            #sidebar .title {
-                position: relative;
-                text-align: center;
-                line-height: 4vmax;
-                font-size: 1.4vmax;
-                font-family: 'Arial';
-                margin-top: 25vh;
-            }
-
-            #sidebar .title a:link,
-            #sidebar .title a:visited {
-                color: #FFFFFF;
-                text-decoration: none;
-            }
-
-            .subtitle {
-                top: 50vh;
-                text-align: center;
-                line-height: 1.3vmax;
-                font-family: 'Arial';
-                font-size: 1.5vmax;
-                color: #FFFFFF;
-            }
-
-            .subtitle a:link,
-            .subtitle a:visited {
-                color: #FFFFFF;
-                text-decoration: none;
-            }
-
-            .licence {
-                position: fixed;
-                text-align: right;
-                bottom: 0;
-                right: 0;
-            }
-
-            .home {
-                position: fixed;
-                text-align: left;
-                font-family: 'Arial';
-                color: #D3D3D3;
-                z-index: 100;
-                width: 100%;
-                background-color: #FFFFFF;
-                top: 0px;
-                margin-bottom: 10px;
-                padding-bottom: 10px;
-            }
-
-            .home a:link,
-            .home a:visited {
-                text-decoration: none;
-                color: #D3D3D3;
-            }
-
-            .home ul {
+            /* ==================== Reset & Base ==================== */
+            * {
                 margin: 0;
                 padding: 0;
+                box-sizing: border-box;
+            }
+
+            html {
+                scroll-behavior: smooth;
+                scroll-padding-top: 80px;
+            }
+
+            body {
+                font-family: var(--font-sans);
+                font-size: var(--text-base);
+                line-height: 1.6;
+                color: var(--color-base-text);
+                background: var(--color-base-bg);
+                overflow-x: hidden;
+            }
+
+            /* ==================== Animated Background ==================== */
+            body::before {
+                content: '';
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background:
+                    radial-gradient(circle at 20% 30%, rgba(74, 144, 226, 0.05) 0%, transparent 50%),
+                    radial-gradient(circle at 80% 70%, rgba(123, 104, 238, 0.05) 0%, transparent 50%),
+                    radial-gradient(circle at 50% 50%, rgba(0, 188, 212, 0.03) 0%, transparent 50%);
+                z-index: -1;
+                animation: backgroundPulse 15s ease-in-out infinite;
+            }
+
+            @keyframes backgroundPulse {
+
+                0%,
+                100% {
+                    opacity: 0.6;
+                }
+
+                50% {
+                    opacity: 1;
+                }
+            }
+
+            /* Data Grid Pattern Overlay */
+            body::after {
+                content: '';
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background-image:
+                    linear-gradient(rgba(74, 144, 226, 0.03) 1px, transparent 1px),
+                    linear-gradient(90deg, rgba(74, 144, 226, 0.03) 1px, transparent 1px);
+                background-size: 50px 50px;
+                z-index: -1;
+                pointer-events: none;
+            }
+
+            /* ==================== Navigation ==================== */
+            .nav-container {
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                z-index: 1000;
+                background: rgba(255, 255, 255, 0.85);
+                -webkit-backdrop-filter: blur(12px) saturate(180%);
+                backdrop-filter: blur(12px) saturate(180%);
+                border-bottom: 1px solid var(--color-border);
+                box-shadow: var(--shadow-md);
+            }
+
+            .nav-wrapper {
+                max-width: 1400px;
+                margin: 0 auto;
+                padding: var(--space-md) var(--space-xl);
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+            }
+
+            .site-name {
+                font-size: var(--text-xl);
+                font-weight: var(--weight-bold);
+                background: var(--gradient-primary);
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                background-clip: text;
+                text-decoration: none;
+                position: relative;
+            }
+
+            .site-name::after {
+                content: '';
+                position: absolute;
+                bottom: -4px;
+                left: 0;
+                width: 0;
+                height: 3px;
+                background: var(--gradient-primary);
+                transition: width 0.3s ease;
+            }
+
+            .site-name:hover::after {
+                width: 100%;
+            }
+
+            .breadcrumb {
+                display: flex;
+                list-style: none;
+                gap: var(--space-sm);
+                align-items: center;
+            }
+
+            .breadcrumb li {
+                display: flex;
+                align-items: center;
+                font-size: var(--text-sm);
+            }
+
+            .breadcrumb li::after {
+                content: '→';
+                margin-left: var(--space-sm);
+                color: var(--color-accent-1);
+                font-weight: var(--weight-bold);
+            }
+
+            .breadcrumb li:last-child::after {
+                content: '';
+            }
+
+            .breadcrumb a {
+                color: var(--color-base-text-muted);
+                text-decoration: none;
+                padding: var(--space-xs) var(--space-sm);
+                border-radius: var(--radius-sm);
+                transition: all 0.3s ease;
+            }
+
+            .breadcrumb a:hover {
+                color: var(--color-accent-1);
+                background: var(--color-hover);
+            }
+
+            /* ==================== Hero Section ==================== */
+            .hero-section {
+                margin-top: 80px;
+                padding: var(--space-4xl) var(--space-xl) var(--space-3xl);
+                position: relative;
+                overflow: hidden;
+            }
+
+            .hero-container {
+                max-width: 1400px;
+                margin: 0 auto;
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: var(--space-3xl);
+                align-items: center;
+            }
+
+            .hero-content h1 {
+                font-size: var(--text-4xl);
+                font-weight: var(--weight-bold);
+                line-height: 1.2;
+                letter-spacing: -0.02em;
+                margin-bottom: var(--space-lg);
+                background: var(--gradient-primary);
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                background-clip: text;
+            }
+
+            .hero-subtitle {
+                font-size: var(--text-xl);
+                color: var(--color-base-text-muted);
+                margin-bottom: var(--space-xl);
+                line-height: 1.6;
+            }
+
+            .series-badge {
+                display: inline-flex;
+                align-items: center;
+                gap: var(--space-sm);
+                padding: var(--space-sm) var(--space-lg);
+                background: linear-gradient(135deg, rgba(74, 144, 226, 0.1), rgba(123, 104, 238, 0.1));
+                border: 1px solid var(--color-border);
+                border-radius: var(--radius-full);
+                font-size: var(--text-sm);
+                font-weight: var(--weight-medium);
+                color: var(--color-accent-2);
+                animation: fadeInUp 0.6s ease-out;
+            }
+
+            .series-badge::before {
+                content: '✦';
+                font-size: 1.2em;
+                color: var(--color-accent-1);
+            }
+
+            /* ==================== SVG Illustration ==================== */
+            .hero-visual {
+                position: relative;
+                height: 400px;
+            }
+
+            .svg-container {
+                position: absolute;
+                width: 100%;
+                height: 100%;
+            }
+
+            /* ==================== Main Content ==================== */
+            .main-content {
+                max-width: 1400px;
+                margin: 0 auto;
+                padding: var(--space-3xl) var(--space-xl);
+            }
+
+            .content-section {
+                margin-bottom: var(--space-4xl);
+                animation: fadeInUp 0.8s ease-out;
+            }
+
+            .content-section h2 {
+                font-size: var(--text-3xl);
+                font-weight: var(--weight-bold);
+                color: var(--color-accent-2);
+                margin-bottom: var(--space-xl);
+                letter-spacing: -0.02em;
+                position: relative;
+                padding-bottom: var(--space-md);
+            }
+
+            .content-section h2::after {
+                content: '';
+                position: absolute;
+                bottom: 0;
+                left: 0;
+                width: 60px;
+                height: 4px;
+                background: var(--gradient-primary);
+                border-radius: var(--radius-full);
+            }
+
+            .content-section h3 {
+                font-size: var(--text-2xl);
+                font-weight: var(--weight-semibold);
+                color: var(--color-accent-1);
+                margin-top: var(--space-2xl);
+                margin-bottom: var(--space-lg);
+                letter-spacing: -0.01em;
+            }
+
+            .content-section p {
+                margin-bottom: var(--space-lg);
+                line-height: 1.8;
+                color: var(--color-base-text);
+            }
+
+            .content-section ul,
+            .content-section ol {
+                margin-bottom: var(--space-xl);
+                padding-left: var(--space-xl);
+            }
+
+            .content-section li {
+                margin-bottom: var(--space-md);
+                line-height: 1.7;
+            }
+
+            .content-section li strong {
+                color: var(--color-accent-2);
+                font-weight: var(--weight-semibold);
+            }
+
+            .content-section a {
+                color: var(--color-accent-1);
+                text-decoration: none;
+                border-bottom: 2px solid transparent;
+                transition: border-color 0.3s ease;
+            }
+
+            .content-section a:hover {
+                border-bottom-color: var(--color-accent-1);
+            }
+
+            /* ==================== Data Science Alert Box ==================== */
+            .series-info {
+                background: linear-gradient(135deg, rgba(74, 144, 226, 0.08), rgba(123, 104, 238, 0.08));
+                border-left: 4px solid var(--color-accent-1);
+                padding: var(--space-xl);
+                border-radius: var(--radius-lg);
+                margin-bottom: var(--space-2xl);
+                box-shadow: var(--shadow-md);
+            }
+
+            .series-info strong {
+                color: var(--color-accent-2);
+                font-weight: var(--weight-semibold);
+            }
+
+            .series-info a {
+                color: var(--color-accent-1);
+                font-weight: var(--weight-semibold);
+                text-decoration: none;
+                border-bottom: 2px solid var(--color-accent-1);
+            }
+
+            /* ==================== Complexity Table ==================== */
+            .complexity-table-wrapper {
+                overflow-x: auto;
+                margin: var(--space-xl) 0;
+                border-radius: var(--radius-lg);
+                box-shadow: var(--shadow-md);
+            }
+
+            .complexity-table {
+                width: 100%;
+                border-collapse: separate;
+                border-spacing: 0;
+                background: white;
+                font-size: var(--text-sm);
+            }
+
+            .complexity-table thead {
+                background: var(--gradient-primary);
+            }
+
+            .complexity-table th {
+                padding: var(--space-lg);
                 text-align: left;
+                font-weight: var(--weight-semibold);
+                color: white;
+                border-bottom: 2px solid rgba(255, 255, 255, 0.3);
+            }
+
+            .complexity-table th:first-child {
+                border-top-left-radius: var(--radius-lg);
+            }
+
+            .complexity-table th:last-child {
+                border-top-right-radius: var(--radius-lg);
+            }
+
+            .complexity-table td {
+                padding: var(--space-lg);
+                border-bottom: 1px solid var(--color-border);
+                color: var(--color-base-text);
+            }
+
+            .complexity-table tbody tr {
+                transition: background-color 0.2s ease;
+            }
+
+            .complexity-table tbody tr:hover {
+                background-color: var(--color-hover);
+            }
+
+            .complexity-table tbody tr:last-child td {
+                border-bottom: none;
+            }
+
+            .complexity-table tbody tr:last-child td:first-child {
+                border-bottom-left-radius: var(--radius-lg);
+            }
+
+            .complexity-table tbody tr:last-child td:last-child {
+                border-bottom-right-radius: var(--radius-lg);
+            }
+
+            .complexity-table code {
+                font-family: var(--font-mono);
+                background: rgba(74, 144, 226, 0.1);
+                padding: var(--space-xs) var(--space-sm);
+                border-radius: var(--radius-sm);
+                font-size: 0.9em;
+                color: var(--color-accent-2);
+            }
+
+            /* ==================== Footer ==================== */
+            .footer {
+                background: linear-gradient(135deg, var(--color-accent-2), var(--color-accent-3));
+                color: white;
+                padding: var(--space-3xl) var(--space-xl) var(--space-xl);
+                margin-top: var(--space-4xl);
+            }
+
+            .footer-container {
+                max-width: 1400px;
+                margin: 0 auto;
+            }
+
+            .footer-content {
+                display: grid;
+                grid-template-columns: 2fr 1fr;
+                gap: var(--space-3xl);
+                margin-bottom: var(--space-2xl);
+            }
+
+            .footer-about h3 {
+                font-size: var(--text-xl);
+                margin-bottom: var(--space-md);
+                font-weight: var(--weight-semibold);
+            }
+
+            .footer-about p {
+                line-height: 1.7;
+                opacity: 0.9;
+            }
+
+            .footer-links h3 {
+                font-size: var(--text-xl);
+                margin-bottom: var(--space-md);
+                font-weight: var(--weight-semibold);
+            }
+
+            .footer-links ul {
                 list-style: none;
             }
 
-            .home li {
-                position: relative;
-                float: left;
-                padding-top: 15px;
-                margin-right: 1em;
-                font-family: 'Arial';
+            .footer-links li {
+                margin-bottom: var(--space-sm);
             }
 
-            .home li:hover {
-                display: block;
-            }
-
-            .home a:link,
-            .home a:visited {
-                color: #D3D3D3;
-            }
-
-            .home li:hover a:link,
-            .home li:hover a:visited {
+            .footer-links a {
+                color: white;
                 text-decoration: none;
-                padding: 15px;
-                color: #FFFFFF;
-                background-color: #1B80CF;
+                opacity: 0.9;
+                transition: opacity 0.3s ease;
             }
 
-            .content {
-                line-height: 1.8vmax;
-                font-size: 1.2vmax;
-                font-family: 'Arial';
-                margin-top: 15vh;
-                width: 90%;
+            .footer-links a:hover {
+                opacity: 1;
+                text-decoration: underline;
             }
 
-            .content h2,
-            h3,
-            h4 {
-                color: #1B80CF;
+            .footer-bottom {
+                border-top: 1px solid rgba(255, 255, 255, 0.2);
+                padding-top: var(--space-xl);
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                flex-wrap: wrap;
+                gap: var(--space-lg);
             }
 
-            .content a:link,
-            .content a:visited {
-                color: #1B80CF;
+            .language-selector {
+                display: flex;
+                gap: var(--space-md);
+                flex-wrap: wrap;
             }
 
-            .content h3 {
-                color: #1B80CF;
+            .language-selector span {
+                opacity: 0.7;
+                font-size: var(--text-sm);
             }
 
-            .content h2::before,
-            .content h3::before {
-                display: block;
-                content: " ";
-                visibility: hidden;
-                height: 50px;
-                margin-top: -50px;
-                pointer-events: none;
-                background-color: #FFFFFF;
+            .language-links a {
+                padding: var(--space-xs) var(--space-md);
+                border-radius: var(--radius-full);
+                background: var(--color-accent-glass);
+                color: var(--color-accent-1);
+                font-size: var(--text-sm);
+                font-weight: var(--weight-medium);
+                transition: all 0.3s ease;
+                border: 1px solid var(--color-border);
             }
 
-            .content a:link,
-            .content a:visited {
-                color: #1B80CF;
+            .language-links a:hover {
+                background: var(--color-accent-1);
+                color: white;
+                transform: translateY(-2px);
+                box-shadow: var(--shadow-md);
             }
 
-            .content li {
-                margin: 5px;
+            .copyright {
+                font-size: var(--text-sm);
+                opacity: 0.8;
             }
 
-            .page {
-                width: 65vw;
-                height: 100%;
-                margin-left: 30vw;
-                overflow: hidden;
-                padding: 0 1em;
-                font-family: 'Arial';
+            /* ==================== Animations ==================== */
+            @keyframes fadeInUp {
+                from {
+                    opacity: 0;
+                    transform: translateY(30px);
+                }
+
+                to {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
             }
 
-            .page img {
-                max-width: 100%;
-                max-height: 100%;
+            @keyframes float {
+
+                0%,
+                100% {
+                    transform: translateY(0px);
+                }
+
+                50% {
+                    transform: translateY(-20px);
+                }
             }
 
-            @media (max-width: 640px),
-            screen and (orientation: portrait) {
+            @keyframes pulse {
+
+                0%,
+                100% {
+                    opacity: 0.6;
+                }
+
+                50% {
+                    opacity: 1;
+                }
+            }
+
+            @keyframes rotate {
+                from {
+                    transform: rotate(0deg);
+                }
+
+                to {
+                    transform: rotate(360deg);
+                }
+            }
+
+            @keyframes dashOffset {
+                to {
+                    stroke-dashoffset: 0;
+                }
+            }
+
+            /* SVG Animations */
+            .svg-node {
+                animation: pulse 4s ease-in-out infinite;
+            }
+
+            .svg-connection {
+                stroke-dasharray: 1000;
+                stroke-dashoffset: 1000;
+                animation: dashOffset 3s ease-out forwards;
+            }
+
+            .svg-data-flow {
+                animation: float 5s ease-in-out infinite;
+            }
+
+            .svg-processor {
+                animation: rotate 20s linear infinite;
+            }
+
+            /* ==================== Responsive Design ==================== */
+            @media (max-width: 1024px) {
+                .hero-container {
+                    grid-template-columns: 1fr;
+                }
+
+                .hero-visual {
+                    height: 300px;
+                }
+
+                .footer-content {
+                    grid-template-columns: 1fr;
+                }
+            }
+
+            @media (max-width: 768px) {
+                .nav-wrapper {
+                    flex-direction: column;
+                    gap: var(--space-md);
+                    align-items: flex-start;
+                }
+
+                .hero-section {
+                    padding: var(--space-2xl) var(--space-lg);
+                }
+
+                .hero-content h1 {
+                    font-size: var(--text-3xl);
+                }
+
+                .main-content {
+                    padding: var(--space-2xl) var(--space-lg);
+                }
+
+                .content-section {
+                    margin-bottom: var(--space-2xl);
+                }
+
+                .footer {
+                    padding: var(--space-2xl) var(--space-lg) var(--space-lg);
+                }
+
+                .footer-bottom {
+                    flex-direction: column;
+                    align-items: flex-start;
+                }
+            }
+
+            @media (max-width: 640px) {
+                .breadcrumb {
+                    flex-wrap: wrap;
+                }
+
+                .complexity-table {
+                    font-size: var(--text-xs);
+                }
+
+                .complexity-table th,
+                .complexity-table td {
+                    padding: var(--space-sm);
+                }
+            }
+
+            /* ==================== Reduced Motion ==================== */
+            @media (prefers-reduced-motion: reduce) {
+                * {
+                    animation-duration: 0.01ms !important;
+                    animation-iteration-count: 1 !important;
+                    transition-duration: 0.01ms !important;
+                }
+
+                html {
+                    scroll-behavior: auto;
+                }
+            }
+
+            /* ==================== Print Styles ==================== */
+            @media print {
+
+                .nav-container,
+                .footer,
+                .hero-visual {
+                    display: none;
+                }
+
                 body {
-                    max-width: 100%;
-                    max-height: 100%;
+                    background: white;
                 }
 
-                #sidebar {
-                    position: fixed;
-                    background-color: #1B80CF;
-                    top: 0;
-                    left: 0;
-                    bottom: 80vh;
-                    width: 100vw;
-                }
-
-                #sidebar .title {
-                    text-align: center;
-                    position: fixed;
-                    margin-top: 6vh;
-                    left: 0px;
-                    right: 0px;
-                    line-height: 3.5vmax;
-                    font-size: 1.5vmax;
-                    font-family: 'Arial';
-                }
-
-                #sidebar .subtitle {
-                    text-align: center;
-                    top: 5vh;
-                    left: 0px;
-                    right: 0px;
-                    position: fixed;
-                    margin-top: 10vh;
-                    font-size: 1.5vmax;
-                }
-
-                #sidebar .title a:link,
-                #sidebar .title a:visited {
-                    text-align: center;
-                    color: #FFFFFF;
-                }
-
-                #sidebar .subtitle a:link,
-                #sidebar .subtitle a:visited {
-                    text-align: center;
-                    color: #FFFFFF;
-                }
-
-                .home {
-                    z-index: 100;
-                    width: 100%;
-                    background-color: #1B80CF;
-                    font-size: 1.5vmax;
-                }
-
-                .home a:link,
-                .home a:visited {
-                    text-decoration: none;
-                    color: #FFFFFF;
-                }
-
-                .content {
-                    line-height: 3.8vmax;
-                    font-size: 1.8vmax;
-                    font-family: 'Arial';
-                    margin-top: 22vh;
-                }
-
-                .content a:link,
-                .content a:visited {
-                    color: #1B80CF;
-                }
-
-                .page {
-                    top: 40vh;
-                    width: 95%;
-                    margin-left: 0vw;
-                }
-
-                .page img {
-                    max-width: 100%;
-                    max-height: 100%;
-                    border: 0;
+                .content-section {
+                    page-break-inside: avoid;
                 }
             }
         </style>
     </head>
 
     <body vocab="http://schema.org/">
-        <div class="page">
-            <div class="home">
-                <ul typeof="BreadcrumbList">
+
+        <!-- Navigation -->
+        <nav class="nav-container" role="navigation" aria-label="Main navigation">
+            <div class="nav-wrapper">
+                <a href="../about.html" class="site-name">John Samuel</a>
+                <ul class="breadcrumb" typeof="BreadcrumbList">
                     <li property="itemListElement" typeof="ListItem">
                         <a property="item" typeof="WebPage" href="../index.html">
                             <span property="name">Home</span>
@@ -269,106 +754,207 @@
                         </a>
                     </li>
                 </ul>
-
             </div>
-            <div id="sidebar">
-                <div class="title">
-                    <h1><a href="./data-structures.html">Data Structures</a></h1>
+        </nav>
+
+        <!-- Hero Section -->
+        <section class="hero-section">
+            <div class="hero-container">
+                <div class="hero-content">
+                    <div class="series-badge">
+                        Part of Data Science Series
+                    </div>
+                    <h1>Data Structures</h1>
+                    <p class="hero-subtitle">Foundations and Evolution of Data Structures</p>
                 </div>
-                <div class="subtitle">
-                    <h3><a href="../about.html">John Samuel</a></h3>
+                <div class="hero-visual">
+                    <svg class="svg-container" viewBox="0 0 600 400" xmlns="http://www.w3.org/2000/svg"
+                        aria-hidden="true">
+                        <!-- Background gradient -->
+                        <defs>
+                            <linearGradient id="gradientBg" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" style="stop-color:#4a90e2;stop-opacity:0.1" />
+                                <stop offset="50%" style="stop-color:#7b68ee;stop-opacity:0.1" />
+                                <stop offset="100%" style="stop-color:#00bcd4;stop-opacity:0.1" />
+                            </linearGradient>
+                            <linearGradient id="nodeGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" style="stop-color:#4a90e2;stop-opacity:1" />
+                                <stop offset="100%" style="stop-color:#7b68ee;stop-opacity:1" />
+                            </linearGradient>
+                            <filter id="glow">
+                                <feGaussianBlur stdDeviation="4" result="coloredBlur" />
+                                <feMerge>
+                                    <feMergeNode in="coloredBlur" />
+                                    <feMergeNode in="SourceGraphic" />
+                                </feMerge>
+                            </filter>
+                        </defs>
+
+                        <!-- Background circle -->
+                        <circle cx="300" cy="200" r="180" fill="url(#gradientBg)" opacity="0.3" class="svg-processor" />
+
+                        <!-- Data structure network connections -->
+                        <path d="M 150 100 Q 300 150 450 100" stroke="#4a90e2" stroke-width="2" fill="none"
+                            opacity="0.4" class="svg-connection" />
+                        <path d="M 150 200 L 450 200" stroke="#7b68ee" stroke-width="2" fill="none" opacity="0.4"
+                            class="svg-connection" />
+                        <path d="M 150 300 Q 300 250 450 300" stroke="#00bcd4" stroke-width="2" fill="none"
+                            opacity="0.4" class="svg-connection" />
+
+                        <!-- Central processor node -->
+                        <circle cx="300" cy="200" r="40" fill="url(#nodeGradient)" filter="url(#glow)"
+                            class="svg-node" />
+                        <text x="300" y="205" text-anchor="middle" fill="white" font-size="14"
+                            font-weight="bold">DS</text>
+
+                        <!-- Tree structure (left) -->
+                        <g class="svg-data-flow">
+                            <circle cx="150" cy="100" r="25" fill="#4a90e2" opacity="0.8" />
+                            <circle cx="120" cy="150" r="18" fill="#4a90e2" opacity="0.6" />
+                            <circle cx="180" cy="150" r="18" fill="#4a90e2" opacity="0.6" />
+                            <line x1="150" y1="125" x2="120" y2="132" stroke="#4a90e2" stroke-width="2" opacity="0.5" />
+                            <line x1="150" y1="125" x2="180" y2="132" stroke="#4a90e2" stroke-width="2" opacity="0.5" />
+                        </g>
+
+                        <!-- Array structure (center-left) -->
+                        <g class="svg-data-flow" style="animation-delay: 0.5s">
+                            <rect x="125" y="185" width="50" height="30" fill="#7b68ee" opacity="0.8" rx="4" />
+                            <rect x="125" y="220" width="50" height="30" fill="#7b68ee" opacity="0.6" rx="4" />
+                        </g>
+
+                        <!-- Graph structure (bottom-left) -->
+                        <g class="svg-data-flow" style="animation-delay: 1s">
+                            <circle cx="130" cy="280" r="20" fill="#00bcd4" opacity="0.8" />
+                            <circle cx="170" cy="320" r="20" fill="#00bcd4" opacity="0.8" />
+                            <line x1="145" y1="290" x2="160" y2="310" stroke="#00bcd4" stroke-width="2" opacity="0.6" />
+                        </g>
+
+                        <!-- Hash structure (right) -->
+                        <g class="svg-data-flow" style="animation-delay: 1.5s">
+                            <circle cx="450" cy="100" r="25" fill="#4a90e2" opacity="0.8" />
+                            <rect x="425" y="135" width="50" height="20" fill="#4a90e2" opacity="0.6" rx="4" />
+                            <rect x="425" y="160" width="50" height="20" fill="#4a90e2" opacity="0.4" rx="4" />
+                        </g>
+
+                        <!-- List structure (center-right) -->
+                        <g class="svg-data-flow" style="animation-delay: 2s">
+                            <rect x="425" y="185" width="30" height="30" fill="#7b68ee" opacity="0.8" rx="4" />
+                            <path d="M 455 200 L 465 200 M 462 197 L 468 200 L 462 203" stroke="#7b68ee"
+                                stroke-width="2" fill="none" opacity="0.6" />
+                            <rect x="470" y="185" width="30" height="30" fill="#7b68ee" opacity="0.6" rx="4" />
+                        </g>
+
+                        <!-- Trie structure (bottom-right) -->
+                        <g class="svg-data-flow" style="animation-delay: 2.5s">
+                            <circle cx="450" cy="300" r="22" fill="#00bcd4" opacity="0.8" />
+                            <circle cx="425" cy="340" r="16" fill="#00bcd4" opacity="0.6" />
+                            <circle cx="475" cy="340" r="16" fill="#00bcd4" opacity="0.6" />
+                            <line x1="445" y1="315" x2="432" y2="330" stroke="#00bcd4" stroke-width="2" opacity="0.5" />
+                            <line x1="455" y1="315" x2="468" y2="330" stroke="#00bcd4" stroke-width="2" opacity="0.5" />
+                        </g>
+
+                        <!-- Data flow particles -->
+                        <circle cx="200" cy="150" r="3" fill="#4a90e2" opacity="0.6">
+                            <animate attributeName="cx" values="200;250;300" dur="3s" repeatCount="indefinite" />
+                            <animate attributeName="opacity" values="0.6;1;0.6" dur="3s" repeatCount="indefinite" />
+                        </circle>
+                        <circle cx="350" cy="200" r="3" fill="#7b68ee" opacity="0.6">
+                            <animate attributeName="cx" values="350;400;450" dur="3s" repeatCount="indefinite" />
+                            <animate attributeName="opacity" values="0.6;1;0.6" dur="3s" repeatCount="indefinite" />
+                        </circle>
+                        <circle cx="200" cy="280" r="3" fill="#00bcd4" opacity="0.6">
+                            <animate attributeName="cx" values="200;250;300" dur="3s" repeatCount="indefinite" />
+                            <animate attributeName="cy" values="280;260;240" dur="3s" repeatCount="indefinite" />
+                            <animate attributeName="opacity" values="0.6;1;0.6" dur="3s" repeatCount="indefinite" />
+                        </circle>
+                    </svg>
                 </div>
             </div>
+        </section>
 
-            <div class="content">
-
-                <header>
-                    <h2>Foundations and Evolution of Data Structures</h2>
-                    <div
-                        style="background-color: #f0f8ff; border-left: 4px solid #1e90ff; padding: 1em; margin-bottom: 1.5em;">
+        <!-- Main Content -->
+        <main id="main-content" class="main-content">
+            <article>
+                <section class="content-section">
+                    <div class="series-info">
                         <strong>This article is part of a series on <a href="./data-science.html">Data
                                 Science</a>.</strong>
                     </div>
-                </header>
-                <main>
-                    <section>
-                        <h3>1. Introduction</h3>
-                        <p>Data structures are fundamental constructs in computer science, enabling efficient
-                            data storage, access, manipulation, and organization. As computing needs evolve, so
-                            do the characteristics of data structures—from simple lists and trees to
-                            energy-efficient and disk-optimized models. This article provides a high-level yet
-                            rigorous overview of classical and next-generation data structures, categorized by
-                            operational patterns, access methods, and memory models.</p>
-                    </section>
 
-                    <section>
-                        <h3>2. Access Models: Sequential vs Parallel</h3>
-                        <p>Sequential access refers to reading or writing data in a specific linear order, as
-                            seen in arrays or linked lists. In contrast, parallel access enables concurrent
-                            read/write operations on data structures, essential in distributed systems or
-                            GPU-accelerated environments. Data structures such as concurrent hash maps, parallel
-                            tries, and read-optimized trees (e.g., B+ Trees) support scalable parallel access
-                            patterns.</p>
-                    </section>
+                    <h2>1. Introduction</h2>
+                    <p>Data structures are fundamental constructs in computer science, enabling efficient data storage,
+                        access, manipulation, and organization. As computing needs evolve, so do the characteristics of
+                        data structures—from simple lists and trees to energy-efficient and disk-optimized models. This
+                        article provides a high-level yet rigorous overview of classical and next-generation data
+                        structures, categorized by operational patterns, access methods, and memory models.</p>
+                </section>
 
-                    <section>
-                        <h3>3. Operations: CRUD, Traversal, Search, and Filtering</h3>
-                        <p>Operations on data structures are commonly categorized as:</p>
-                        <ul>
-                            <li><strong>Create</strong>: Construct new elements or structures (e.g., initialize
-                                an array or insert into a list).</li>
-                            <li><strong>Read (Access)</strong>: Retrieve elements efficiently (e.g., hash
-                                lookup, tree search).</li>
-                            <li><strong>Update</strong>: Modify existing data (e.g., rebalancing a tree,
-                                updating a hashmap entry).</li>
-                            <li><strong>Delete</strong>: Remove data, often requiring structural adjustments.
-                            </li>
-                            <li><strong>Traversal</strong>: Iterate over all elements (e.g., DFS on graphs,
-                                in-order tree traversal).</li>
-                            <li><strong>Filtering</strong>: Efficiently test for membership or properties, as in
-                                Bloom filters.</li>
-                        </ul>
-                    </section>
+                <section class="content-section">
+                    <h3>2. Access Models: Sequential vs Parallel</h3>
+                    <p>Sequential access refers to reading or writing data in a specific linear order, as seen in arrays
+                        or linked lists. In contrast, parallel access enables concurrent read/write operations on data
+                        structures, essential in distributed systems or GPU-accelerated environments. Data structures
+                        such as concurrent hash maps, parallel tries, and read-optimized trees (e.g., B+ Trees) support
+                        scalable parallel access patterns.</p>
+                </section>
 
-                    <section>
-                        <h3>4. Classical Data Structures</h3>
-                        <ul>
-                            <li><strong>Arrays</strong>: Contiguous memory structures offering O(1) access time.
-                                Limitation: fixed size.</li>
-                            <li><strong>Lists</strong>: Dynamic linear structures—singly or doubly linked—with
-                                O(n) access but efficient insertions and deletions.</li>
-                            <li><strong>Trees</strong>: Hierarchical structures used for sorting, searching, and
-                                organizing data (e.g., binary search trees, AVL trees).</li>
-                            <li><strong>Graphs</strong>: Collections of nodes and edges modeling complex
-                                relationships (e.g., social networks, road maps).</li>
-                            <li><strong>Hash Maps</strong>: Key-value stores using hash functions, providing
-                                expected O(1) lookup and update time.</li>
-                        </ul>
-                    </section>
+                <section class="content-section">
+                    <h3>3. Operations: CRUD, Traversal, Search, and Filtering</h3>
+                    <p>Operations on data structures are commonly categorized as:</p>
+                    <ul>
+                        <li><strong>Create</strong>: Construct new elements or structures (e.g., initialize an array or
+                            insert into a list).</li>
+                        <li><strong>Read (Access)</strong>: Retrieve elements efficiently (e.g., hash lookup, tree
+                            search).</li>
+                        <li><strong>Update</strong>: Modify existing data (e.g., rebalancing a tree, updating a hashmap
+                            entry).</li>
+                        <li><strong>Delete</strong>: Remove data, often requiring structural adjustments.</li>
+                        <li><strong>Traversal</strong>: Iterate over all elements (e.g., DFS on graphs, in-order tree
+                            traversal).</li>
+                        <li><strong>Filtering</strong>: Efficiently test for membership or properties, as in Bloom
+                            filters.</li>
+                    </ul>
+                </section>
 
-                    <section>
-                        <h3>5. Specialized and Compressed Structures</h3>
-                        <ul>
-                            <li><strong>Tries</strong>: Prefix trees used for efficient string storage and
-                                retrieval (e.g., dictionaries, autocomplete systems).</li>
-                            <li><strong>Bloom Filters</strong>: Probabilistic data structures that allow fast
-                                membership checks with a configurable false positive rate.</li>
-                            <li><strong>B Trees and B+ Trees</strong>: Balanced tree structures optimized for
-                                disk-based storage systems. B+ Trees store keys in internal nodes and values in
-                                leaves, enabling efficient range queries.</li>
-                            <li><strong>Lyndon Words</strong>: Strings that are lexicographically minimal among
-                                all their rotations. Used in algorithms for text compression and suffix
-                                automata.</li>
-                            <li><strong>Compressed Structures</strong>: Include succinct trees, wavelet trees,
-                                and run-length encoded bitmaps, which store data in nearly optimal space while
-                                allowing efficient queries.</li>
-                        </ul>
-                    </section>
+                <section class="content-section">
+                    <h3>4. Classical Data Structures</h3>
+                    <ul>
+                        <li><strong>Arrays</strong>: Contiguous memory structures offering O(1) access time. Limitation:
+                            fixed size.</li>
+                        <li><strong>Lists</strong>: Dynamic linear structures—singly or doubly linked—with O(n) access
+                            but efficient insertions and deletions.</li>
+                        <li><strong>Trees</strong>: Hierarchical structures used for sorting, searching, and organizing
+                            data (e.g., binary search trees, AVL trees).</li>
+                        <li><strong>Graphs</strong>: Collections of nodes and edges modeling complex relationships
+                            (e.g., social networks, road maps).</li>
+                        <li><strong>Hash Maps</strong>: Key-value stores using hash functions, providing expected O(1)
+                            lookup and update time.</li>
+                    </ul>
+                </section>
 
-                    <section>
-                        <h3>6. Time and Space Complexity Analysis</h3>
-                        <p>Each data structure is associated with complexity trade-offs:</p>
-                        <table border="1" cellpadding="6">
+                <section class="content-section">
+                    <h3>5. Specialized and Compressed Structures</h3>
+                    <ul>
+                        <li><strong>Tries</strong>: Prefix trees used for efficient string storage and retrieval (e.g.,
+                            dictionaries, autocomplete systems).</li>
+                        <li><strong>Bloom Filters</strong>: Probabilistic data structures that allow fast membership
+                            checks with a configurable false positive rate.</li>
+                        <li><strong>B Trees and B+ Trees</strong>: Balanced tree structures optimized for disk-based
+                            storage systems. B+ Trees store keys in internal nodes and values in leaves, enabling
+                            efficient range queries.</li>
+                        <li><strong>Lyndon Words</strong>: Strings that are lexicographically minimal among all their
+                            rotations. Used in algorithms for text compression and suffix automata.</li>
+                        <li><strong>Compressed Structures</strong>: Include succinct trees, wavelet trees, and
+                            run-length encoded bitmaps, which store data in nearly optimal space while allowing
+                            efficient queries.</li>
+                    </ul>
+                </section>
+
+                <section class="content-section">
+                    <h3>6. Time and Space Complexity Analysis</h3>
+                    <p>Each data structure is associated with complexity trade-offs:</p>
+                    <div class="complexity-table-wrapper">
+                        <table class="complexity-table">
                             <thead>
                                 <tr>
                                     <th>Structure</th>
@@ -381,108 +967,134 @@
                             <tbody>
                                 <tr>
                                     <td>Array</td>
-                                    <td>O(1)</td>
-                                    <td>O(n)</td>
-                                    <td>O(n)</td>
-                                    <td>O(n)</td>
+                                    <td><code>O(1)</code></td>
+                                    <td><code>O(n)</code></td>
+                                    <td><code>O(n)</code></td>
+                                    <td><code>O(n)</code></td>
                                 </tr>
                                 <tr>
                                     <td>Linked List</td>
-                                    <td>O(n)</td>
-                                    <td>O(1)</td>
-                                    <td>O(1)</td>
-                                    <td>O(n)</td>
+                                    <td><code>O(n)</code></td>
+                                    <td><code>O(1)</code></td>
+                                    <td><code>O(1)</code></td>
+                                    <td><code>O(n)</code></td>
                                 </tr>
                                 <tr>
                                     <td>Hash Map</td>
-                                    <td>O(1) average</td>
-                                    <td>O(1) average</td>
-                                    <td>O(1) average</td>
-                                    <td>O(n)</td>
+                                    <td><code>O(1)</code> average</td>
+                                    <td><code>O(1)</code> average</td>
+                                    <td><code>O(1)</code> average</td>
+                                    <td><code>O(n)</code></td>
                                 </tr>
                                 <tr>
                                     <td>B Tree</td>
-                                    <td>O(log n)</td>
-                                    <td>O(log n)</td>
-                                    <td>O(log n)</td>
-                                    <td>O(n)</td>
+                                    <td><code>O(log n)</code></td>
+                                    <td><code>O(log n)</code></td>
+                                    <td><code>O(log n)</code></td>
+                                    <td><code>O(n)</code></td>
                                 </tr>
                                 <tr>
                                     <td>Trie</td>
-                                    <td>O(k) where k = key length</td>
-                                    <td>O(k)</td>
-                                    <td>O(k)</td>
-                                    <td>O(n·k)</td>
+                                    <td><code>O(k)</code> where k = key length</td>
+                                    <td><code>O(k)</code></td>
+                                    <td><code>O(k)</code></td>
+                                    <td><code>O(n·k)</code></td>
                                 </tr>
                             </tbody>
                         </table>
-                    </section>
+                    </div>
+                </section>
 
-                    <section>
-                        <h3>7. Memory Models: In-Memory vs Disk-Based</h3>
-                        <p><strong>In-memory data structures</strong> reside entirely in RAM and provide
-                            low-latency access, ideal for fast applications such as caching, machine learning
-                            inference, or user-facing APIs.</p>
-                        <p><strong>Disk-based data structures</strong> are optimized for storage efficiency and
-                            block-based I/O, making them crucial in databases, file systems, and persistent
-                            key-value stores. B Trees, LSM Trees, and SSTables are common examples.</p>
-                    </section>
+                <section class="content-section">
+                    <h3>7. Memory Models: In-Memory vs Disk-Based</h3>
+                    <p><strong>In-memory data structures</strong> reside entirely in RAM and provide low-latency access,
+                        ideal for fast applications such as caching, machine learning inference, or user-facing APIs.
+                    </p>
+                    <p><strong>Disk-based data structures</strong> are optimized for storage efficiency and block-based
+                        I/O, making them crucial in databases, file systems, and persistent key-value stores. B Trees,
+                        LSM Trees, and SSTables are common examples.</p>
+                </section>
 
-                    <section>
-                        <h3>8. Next-Generation Data Structures and Energy Considerations</h3>
-                        <p>Modern applications in big data, mobile computing, and AI demand not only fast and
-                            scalable data structures but also energy-efficient ones. Several innovations address
-                            this:</p>
+                <section class="content-section">
+                    <h3>8. Next-Generation Data Structures and Energy Considerations</h3>
+                    <p>Modern applications in big data, mobile computing, and AI demand not only fast and scalable data
+                        structures but also energy-efficient ones. Several innovations address this:</p>
+                    <ul>
+                        <li><strong>Succinct Data Structures</strong>: These use close to the information-theoretic
+                            minimum space (e.g., <a href="https://en.wikipedia.org/wiki/Succinct_data_structure">bitwise
+                                wavelet trees</a>), reducing cache pressure and energy use.</li>
+                        <li><strong>Immutable Data Structures</strong>: Favored in functional programming and concurrent
+                            systems for low-overhead updates with structural sharing, reducing unnecessary memory
+                            writes.</li>
+                        <li><strong>Energy-aware caching strategies</strong>: Coupled with data structures like
+                            energy-efficient tries, these aim to reduce power consumption on embedded and mobile
+                            devices.</li>
+                        <li><strong>AI-optimized Indexes</strong>: Learned indexes (e.g., by Kraska et al., 2018) model
+                            key distributions using machine learning to reduce lookup overhead and memory footprint.
+                        </li>
+                    </ul>
+                </section>
+
+                <section class="content-section">
+                    <h3>9. Conclusion</h3>
+                    <p>Understanding data structures from both a theoretical and applied perspective is essential in
+                        modern computing. The choice of structure—whether classical or next-generation—depends on the
+                        operational needs, memory constraints, and energy consumption profiles of the application. As
+                        computing paradigms evolve, so will the sophistication and specialization of data structures
+                        used across disciplines.</p>
+                </section>
+
+                <section class="content-section">
+                    <h3>10. References</h3>
+                    <ol>
+                        <li><a href="https://en.wikipedia.org/wiki/Data_structure">Data structure - Wikipedia</a></li>
+                        <li><a href="https://en.wikipedia.org/wiki/Trie">Trie - Wikipedia</a></li>
+                        <li><a href="https://en.wikipedia.org/wiki/B-tree">B-tree - Wikipedia</a></li>
+                        <li><a href="https://en.wikipedia.org/wiki/B%2B_tree">B+ tree - Wikipedia</a></li>
+                        <li><a href="https://en.wikipedia.org/wiki/Lyndon_word">Lyndon word - Wikipedia</a></li>
+                        <li><a href="https://en.wikipedia.org/wiki/Bloom_filter">Bloom filter - Wikipedia</a></li>
+                        <li><a href="https://arxiv.org/abs/1712.01208">The Case for Learned Index Structures - Kraska et
+                                al., 2018</a></li>
+                        <li><a href="crud-analysis.html">CRUD Analysis (Internal Link)</a></li>
+                        <li>Richard Johnson, Efficient String Processing with Trie Structures</li>
+                    </ol>
+                </section>
+            </article>
+        </main>
+
+        <!-- Footer -->
+        <footer class="footer" role="contentinfo">
+            <div class="footer-container">
+                <div class="footer-content">
+                    <div class="footer-about">
+                        <h3>About This Series</h3>
+                        <p>This article is part of an ongoing series exploring the foundations and frontiers of Data
+                            Science, covering topics from fundamental data structures to advanced machine learning
+                            techniques and urban informatics applications.</p>
+                    </div>
+                    <div class="footer-links">
+                        <h3>Quick Links</h3>
                         <ul>
-                            <li><strong>Succinct Data Structures</strong>: These use close to the
-                                information-theoretic minimum space (e.g., <a
-                                    href="https://en.wikipedia.org/wiki/Succinct_data_structure">bitwise wavelet
-                                    trees</a>), reducing cache pressure and energy use.</li>
-                            <li><strong>Immutable Data Structures</strong>: Favored in functional programming
-                                and concurrent systems for low-overhead updates with structural sharing,
-                                reducing unnecessary memory writes.</li>
-                            <li><strong>Energy-aware caching strategies</strong>: Coupled with data structures
-                                like energy-efficient tries, these aim to reduce power consumption on embedded
-                                and mobile devices.</li>
-                            <li><strong>AI-optimized Indexes</strong>: Learned indexes (e.g., by Kraska et al.,
-                                2018) model key distributions using machine learning to reduce lookup overhead
-                                and memory footprint.</li>
+                            <li><a href="../index.html">Home</a></li>
+                            <li><a href="../research/research.html">Research</a></li>
+                            <li><a href="./data-science.html">Data Science Series</a></li>
+                            <li><a href="../about.html">About John Samuel</a></li>
                         </ul>
-                    </section>
-
-                    <section>
-                        <h3>9. Conclusion</h3>
-                        <p>Understanding data structures from both a theoretical and applied perspective is
-                            essential in modern computing. The choice of structure—whether classical or
-                            next-generation—depends on the operational needs, memory constraints, and energy
-                            consumption profiles of the application. As computing paradigms evolve, so will the
-                            sophistication and specialization of data structures used across disciplines.</p>
-                    </section>
-
-                    <section>
-                        <h3>10. References</h3>
-                        <ol>
-                            <li><a href="https://en.wikipedia.org/wiki/Data_structure"">Data
-                                    structure - Wikipedia</a></li>
-                            <li><a href=" https://en.wikipedia.org/wiki/Trie"">Trie -
-                                    Wikipedia</a></li>
-                            <li><a href="https://en.wikipedia.org/wiki/B-tree"">B-tree -
-                                    Wikipedia</a></li>
-                            <li><a href=" https://en.wikipedia.org/wiki/B%2B_tree"">B+ tree -
-                                    Wikipedia</a></li>
-                            <li><a href="https://en.wikipedia.org/wiki/Lyndon_word"">Lyndon word
-                                    - Wikipedia</a></li>
-                            <li><a href=" https://en.wikipedia.org/wiki/Bloom_filter"">Bloom
-                                    filter - Wikipedia</a></li>
-                            <li><a href="https://arxiv.org/abs/1712.01208"">The Case for Learned
-                                    Index Structures - Kraska et al., 2018</a></li>
-                            <li><a href=" crud-analysis.html">CRUD Analysis (Internal Link)</a></li>
-                            <li>Richard Johnson, Efficient String Processing with Trie Structures</li>
-                        </ol>
-                    </section>
-                </main>
+                    </div>
+                </div>
+                <div class="footer-bottom">
+                    <div class="language-selector">
+                        <span>Languages:</span>
+                        <div class="language-links">
+                            <a href="./data-structures.html" lang="en">English</a>
+                        </div>
+                    </div>
+                    <div class="copyright">
+                        © 2025 John Samuel. All rights reserved.
+                    </div>
+                </div>
             </div>
-        </div>
+        </footer>
     </body>
 
 </html>

@@ -2,520 +2,1020 @@
 <html lang="en">
 
     <head>
-        <meta charset="utf-8" />
-        <meta http-equiv="Content-Language" content="en" />
-        <link rel="shortcut icon" href="../../images/logo/favicon.png" />
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta http-equiv="Content-Language" content="en">
+        <link rel="shortcut icon" href="../../images/logo/favicon.png">
         <title>Data Science and Transparency: John Samuel</title>
-        <style type="text/css">
-            body {
-                background-color: #FFFFFF;
+        <style>
+            /* ===== CSS Custom Properties (Design Tokens) ===== */
+            :root {
+                /* Base Colors - Light Theme for Clarity */
+                --color-base-bg: #f5f8fa;
+                --color-base-surface: #ffffff;
+                --color-base-text: #1a2332;
+                --color-base-text-muted: #4a5a6a;
+
+                /* Transparency Theme - Crystal Blue & Clear Accents */
+                --color-accent-1: #4a9eff;
+                --color-accent-2: #2d7dd2;
+                --color-accent-3: #7db8ff;
+                --color-accent-light: #e8f4ff;
+                --color-accent-glass: rgba(74, 158, 255, 0.1);
+
+                /* Functional Colors */
+                --color-shadow: rgba(74, 158, 255, 0.12);
+                --color-border: rgba(74, 158, 255, 0.15);
+                --color-hover: rgba(74, 158, 255, 0.08);
+
+                /* Gradients */
+                --gradient-primary: linear-gradient(135deg, var(--color-accent-1), var(--color-accent-2));
+                --gradient-hero: linear-gradient(135deg, #4a9eff 0%, #7db8ff 50%, #2d7dd2 100%);
+                --gradient-subtle: linear-gradient(180deg, var(--color-base-bg), var(--color-accent-light));
+
+                /* Spacing Scale */
+                --space-xs: 0.25rem;
+                --space-sm: 0.5rem;
+                --space-md: 1rem;
+                --space-lg: 1.5rem;
+                --space-xl: 2rem;
+                --space-2xl: 3rem;
+                --space-3xl: 4rem;
+                --space-4xl: 6rem;
+
+                /* Border Radius */
+                --radius-sm: 4px;
+                --radius-md: 8px;
+                --radius-lg: 12px;
+                --radius-xl: 16px;
+                --radius-2xl: 24px;
+                --radius-full: 9999px;
+                --radius-organic: 63% 37% 54% 46% / 45% 62% 38% 55%;
+
+                /* Shadows */
+                --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.04), 0 1px 3px rgba(0, 0, 0, 0.06);
+                --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.05), 0 2px 4px rgba(0, 0, 0, 0.06);
+                --shadow-lg: 0 10px 24px rgba(0, 0, 0, 0.08), 0 4px 8px rgba(0, 0, 0, 0.06);
+                --shadow-xl: 0 20px 40px rgba(0, 0, 0, 0.12), 0 8px 16px rgba(0, 0, 0, 0.08);
+                --shadow-theme: 0 10px 30px var(--color-shadow), 0 4px 10px rgba(0, 0, 0, 0.06);
+
+                /* Typography */
+                --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+                --text-xs: clamp(0.75rem, 0.7rem + 0.25vw, 0.875rem);
+                --text-sm: clamp(0.875rem, 0.8rem + 0.35vw, 1rem);
+                --text-base: clamp(1rem, 0.95rem + 0.25vw, 1.125rem);
+                --text-lg: clamp(1.125rem, 1.05rem + 0.35vw, 1.25rem);
+                --text-xl: clamp(1.25rem, 1.15rem + 0.5vw, 1.5rem);
+                --text-2xl: clamp(1.5rem, 1.3rem + 1vw, 2rem);
+                --text-3xl: clamp(2rem, 1.6rem + 2vw, 2.5rem);
+                --text-4xl: clamp(2.5rem, 2rem + 2.5vw, 3.5rem);
+
+                --weight-normal: 400;
+                --weight-medium: 500;
+                --weight-semibold: 600;
+                --weight-bold: 700;
+
+                --leading-tight: 1.25;
+                --leading-snug: 1.375;
+                --leading-normal: 1.5;
+                --leading-relaxed: 1.625;
             }
 
-            #sidebar {
-                position: fixed;
-                background-color: #1B80CF;
-                top: 0;
-                left: 0;
-                bottom: 0;
-                width: 30vw;
-            }
-
-            #sidebar .title {
-                position: relative;
-                text-align: center;
-                line-height: 4vmax;
-                font-size: 1.4vmax;
-                font-family: 'Arial';
-                margin-top: 25vh;
-            }
-
-            #sidebar .title a:link,
-            #sidebar .title a:visited {
-                color: #FFFFFF;
-                text-decoration: none;
-            }
-
-            .subtitle {
-                top: 50vh;
-                text-align: center;
-                line-height: 1.3vmax;
-                font-family: 'Arial';
-                font-size: 1.5vmax;
-                color: #FFFFFF;
-            }
-
-            .subtitle a:link,
-            .subtitle a:visited {
-                color: #FFFFFF;
-                text-decoration: none;
-            }
-
-            .licence {
-                position: fixed;
-                text-align: right;
-                bottom: 0;
-                right: 0;
-            }
-
-            .home {
-                position: fixed;
-                text-align: left;
-                font-family: 'Arial';
-                color: #D3D3D3;
-                z-index: 100;
-                width: 100%;
-                background-color: #FFFFFF;
-                top: 0px;
-                margin-bottom: 10px;
-                padding-bottom: 10px;
-            }
-
-            .home a:link,
-            .home a:visited {
-                text-decoration: none;
-                color: #D3D3D3;
-            }
-
-            .home ul {
+            /* ===== Reset & Base Styles ===== */
+            *,
+            *::before,
+            *::after {
+                box-sizing: border-box;
                 margin: 0;
                 padding: 0;
-                text-align: left;
-                list-style: none;
             }
 
-            .home li {
-                position: relative;
-                float: left;
-                padding-top: 15px;
-                margin-right: 1em;
-                font-family: 'Arial';
+            html {
+                scroll-behavior: smooth;
+                scroll-padding-top: 80px;
             }
 
-            .home li:hover {
-                display: block;
+            body {
+                font-family: var(--font-sans);
+                font-size: var(--text-base);
+                line-height: var(--leading-relaxed);
+                color: var(--color-base-text);
+                background: var(--color-base-bg);
+                overflow-x: hidden;
+                -webkit-font-smoothing: antialiased;
+                -moz-osx-font-smoothing: grayscale;
             }
 
-            .home a:link,
-            .home a:visited {
-                color: #D3D3D3;
-            }
-
-            .home li:hover a:link,
-            .home li:hover a:visited {
-                text-decoration: none;
-                padding: 15px;
-                color: #FFFFFF;
-                background-color: #1B80CF;
-            }
-
-            .content {
-                line-height: 1.8vmax;
-                font-size: 1.2vmax;
-                font-family: 'Arial';
-                margin-top: 15vh;
-                width: 90%;
-            }
-
-            .content h2,
-            h3,
-            h4 {
-                color: #1B80CF;
-            }
-
-            .content a:link,
-            .content a:visited {
-                color: #1B80CF;
-            }
-
-            .content h3 {
-                color: #1B80CF;
-            }
-
-            .content h2::before,
-            .content h3::before {
-                display: block;
-                content: " ";
-                visibility: hidden;
-                height: 50px;
-                margin-top: -50px;
-                pointer-events: none;
-                background-color: #FFFFFF;
-            }
-
-            .content a:link,
-            .content a:visited {
-                color: #1B80CF;
-            }
-
-            .content li {
-                margin: 5px;
-            }
-
-            .page {
-                width: 65vw;
+            /* ===== Animated Background Pattern ===== */
+            body::before {
+                content: '';
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
                 height: 100%;
-                margin-left: 30vw;
+                background:
+                    radial-gradient(circle at 20% 50%, rgba(74, 158, 255, 0.03) 0%, transparent 50%),
+                    radial-gradient(circle at 80% 80%, rgba(125, 184, 255, 0.04) 0%, transparent 50%),
+                    radial-gradient(circle at 40% 20%, rgba(45, 125, 210, 0.02) 0%, transparent 50%);
+                pointer-events: none;
+                z-index: -1;
+                animation: patternShift 20s ease-in-out infinite;
+            }
+
+            @keyframes patternShift {
+
+                0%,
+                100% {
+                    opacity: 1;
+                }
+
+                50% {
+                    opacity: 0.7;
+                }
+            }
+
+            /* ===== Navigation ===== */
+            nav {
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                z-index: 1000;
+                background: rgba(255, 255, 255, 0.85);
+                -webkit-backdrop-filter: blur(12px) saturate(180%);
+                backdrop-filter: blur(12px) saturate(180%);
+                border-bottom: 1px solid var(--color-border);
+                box-shadow: var(--shadow-sm);
+            }
+
+            .nav-container {
+                max-width: 1400px;
+                margin: 0 auto;
+                padding: var(--space-md) var(--space-xl);
+                display: flex;
+                align-items: center;
+                gap: var(--space-lg);
+            }
+
+            .nav-brand {
+                font-size: var(--text-lg);
+                font-weight: var(--weight-bold);
+                color: var(--color-accent-1);
+                text-decoration: none;
+                letter-spacing: -0.01em;
+                padding: var(--space-sm) var(--space-md);
+                border-radius: var(--radius-md);
+                background: var(--gradient-primary);
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                background-clip: text;
+                transition: all 0.3s ease;
+            }
+
+            .nav-brand:hover {
+                transform: scale(1.05);
+            }
+
+            .breadcrumb {
+                display: flex;
+                list-style: none;
+                gap: var(--space-sm);
+                align-items: center;
+                flex-wrap: wrap;
+            }
+
+            .breadcrumb li {
+                display: flex;
+                align-items: center;
+                gap: var(--space-sm);
+            }
+
+            .breadcrumb li::after {
+                content: '→';
+                color: var(--color-base-text-muted);
+                font-size: var(--text-sm);
+            }
+
+            .breadcrumb li:last-child::after {
+                content: '';
+            }
+
+            .breadcrumb a {
+                color: var(--color-base-text-muted);
+                text-decoration: none;
+                font-size: var(--text-sm);
+                padding: var(--space-xs) var(--space-sm);
+                border-radius: var(--radius-sm);
+                transition: all 0.3s ease;
+            }
+
+            .breadcrumb a:hover {
+                color: var(--color-accent-1);
+                background: var(--color-hover);
+            }
+
+            /* ===== Hero Section ===== */
+            .hero {
+                margin-top: 80px;
+                padding: var(--space-4xl) var(--space-xl) var(--space-3xl);
+                background: var(--gradient-hero);
+                background-size: 200% 200%;
+                animation: gradientShift 10s ease infinite;
+                position: relative;
                 overflow: hidden;
-                padding: 0 1em;
-                font-family: 'Arial';
             }
 
-            .page img {
-                max-width: 100%;
-                max-height: 100%;
+            @keyframes gradientShift {
+
+                0%,
+                100% {
+                    background-position: 0% 50%;
+                }
+
+                50% {
+                    background-position: 100% 50%;
+                }
             }
 
-            @media (max-width: 640px),
-            screen and (orientation: portrait) {
-                body {
-                    max-width: 100%;
-                    max-height: 100%;
+            .hero::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background: url('data:image/svg+xml,<svg width="60" height="60" xmlns="http://www.w3.org/2000/svg"><circle cx="30" cy="30" r="1" fill="%23ffffff" opacity="0.1"/></svg>');
+                animation: patternMove 30s linear infinite;
+            }
+
+            @keyframes patternMove {
+                0% {
+                    transform: translate(0, 0);
                 }
 
-                #sidebar {
-                    position: fixed;
-                    background-color: #1B80CF;
-                    top: 0;
-                    left: 0;
-                    bottom: 80vh;
-                    width: 100vw;
+                100% {
+                    transform: translate(60px, 60px);
+                }
+            }
+
+            .hero-content {
+                max-width: 1200px;
+                margin: 0 auto;
+                text-align: center;
+                position: relative;
+                z-index: 1;
+            }
+
+            .hero h1 {
+                font-size: var(--text-4xl);
+                font-weight: var(--weight-bold);
+                color: white;
+                margin-bottom: var(--space-lg);
+                letter-spacing: -0.03em;
+                line-height: var(--leading-tight);
+                text-shadow: 0 2px 20px rgba(0, 0, 0, 0.15);
+            }
+
+            .hero-subtitle {
+                font-size: var(--text-xl);
+                color: rgba(255, 255, 255, 0.95);
+                font-weight: var(--weight-medium);
+                margin-bottom: var(--space-sm);
+            }
+
+            .hero-description {
+                font-size: var(--text-lg);
+                color: rgba(255, 255, 255, 0.85);
+                max-width: 800px;
+                margin: 0 auto;
+            }
+
+            /* ===== SVG Hero Illustration ===== */
+            .hero-svg {
+                margin: var(--space-3xl) auto 0;
+                max-width: 800px;
+            }
+
+            /* ===== Series Notice ===== */
+            .series-notice {
+                background: rgba(255, 255, 255, 0.9);
+                -webkit-backdrop-filter: blur(12px) saturate(180%);
+                backdrop-filter: blur(12px) saturate(180%);
+                border-left: 4px solid var(--color-accent-1);
+                padding: var(--space-lg);
+                margin: var(--space-2xl) auto;
+                max-width: 1200px;
+                border-radius: var(--radius-lg);
+                box-shadow: var(--shadow-md);
+                animation: slideInUp 0.6s ease-out 0.3s both;
+            }
+
+            @keyframes slideInUp {
+                from {
+                    opacity: 0;
+                    transform: translateY(30px);
                 }
 
-                #sidebar .title {
-                    text-align: center;
-                    position: fixed;
-                    margin-top: 6vh;
-                    left: 0px;
-                    right: 0px;
-                    line-height: 3.5vmax;
-                    font-size: 1.5vmax;
-                    font-family: 'Arial';
+                to {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            }
+
+            .series-notice strong {
+                color: var(--color-accent-2);
+                font-weight: var(--weight-semibold);
+            }
+
+            .series-notice a {
+                color: var(--color-accent-1);
+                text-decoration: none;
+                font-weight: var(--weight-semibold);
+                border-bottom: 2px solid transparent;
+                transition: border-color 0.3s ease;
+            }
+
+            .series-notice a:hover {
+                border-bottom-color: var(--color-accent-1);
+            }
+
+            /* ===== Main Content Container ===== */
+            .container {
+                max-width: 1200px;
+                margin: 0 auto;
+                padding: var(--space-3xl) var(--space-xl);
+            }
+
+            /* ===== Section Styling ===== */
+            section {
+                margin-bottom: var(--space-4xl);
+                animation: fadeIn 0.8s ease-out both;
+            }
+
+            section:nth-child(2) {
+                animation-delay: 0.1s;
+            }
+
+            section:nth-child(3) {
+                animation-delay: 0.2s;
+            }
+
+            section:nth-child(4) {
+                animation-delay: 0.3s;
+            }
+
+            section:nth-child(5) {
+                animation-delay: 0.4s;
+            }
+
+            section:nth-child(6) {
+                animation-delay: 0.5s;
+            }
+
+            section:nth-child(7) {
+                animation-delay: 0.6s;
+            }
+
+            @keyframes fadeIn {
+                from {
+                    opacity: 0;
+                    transform: translateY(20px);
                 }
 
-                #sidebar .subtitle {
-                    text-align: center;
-                    top: 5vh;
-                    left: 0px;
-                    right: 0px;
-                    position: fixed;
-                    margin-top: 10vh;
-                    font-size: 1.5vmax;
+                to {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            }
+
+            /* ===== Headings ===== */
+            h2 {
+                font-size: var(--text-3xl);
+                font-weight: var(--weight-bold);
+                color: var(--color-accent-2);
+                margin-bottom: var(--space-xl);
+                letter-spacing: -0.02em;
+                line-height: var(--leading-tight);
+                position: relative;
+                padding-bottom: var(--space-md);
+            }
+
+            h2::after {
+                content: '';
+                position: absolute;
+                bottom: 0;
+                left: 0;
+                width: 80px;
+                height: 4px;
+                background: var(--gradient-primary);
+                border-radius: var(--radius-full);
+            }
+
+            h3 {
+                font-size: var(--text-2xl);
+                font-weight: var(--weight-semibold);
+                color: var(--color-accent-1);
+                margin-bottom: var(--space-lg);
+                letter-spacing: -0.01em;
+                line-height: var(--leading-snug);
+                position: relative;
+                padding-left: var(--space-md);
+            }
+
+            h3::before {
+                content: '';
+                position: absolute;
+                left: 0;
+                top: 50%;
+                transform: translateY(-50%);
+                width: 4px;
+                height: 70%;
+                background: var(--gradient-primary);
+                border-radius: var(--radius-full);
+            }
+
+            /* ===== Paragraphs ===== */
+            p {
+                margin-bottom: var(--space-lg);
+                color: var(--color-base-text);
+                max-width: 75ch;
+            }
+
+            section p:last-child {
+                margin-bottom: 0;
+            }
+
+            /* ===== Links ===== */
+            a {
+                color: var(--color-accent-1);
+                text-decoration: none;
+                transition: color 0.3s ease;
+            }
+
+            a:hover {
+                color: var(--color-accent-2);
+            }
+
+            /* ===== Emphasized Text ===== */
+            strong {
+                font-weight: var(--weight-semibold);
+                color: var(--color-accent-2);
+            }
+
+            em {
+                font-style: italic;
+                color: var(--color-base-text);
+            }
+
+            /* ===== Section Divider ===== */
+            .section-divider {
+                width: 100%;
+                height: 2px;
+                background: linear-gradient(90deg, transparent, var(--color-accent-1), transparent);
+                margin: var(--space-3xl) 0;
+                opacity: 0.3;
+            }
+
+            /* ===== Footer & References ===== */
+            footer {
+                background: rgba(255, 255, 255, 0.8);
+                -webkit-backdrop-filter: blur(12px) saturate(180%);
+                backdrop-filter: blur(12px) saturate(180%);
+                padding: var(--space-2xl);
+                border-radius: var(--radius-2xl);
+                box-shadow: var(--shadow-lg);
+                margin-top: var(--space-4xl);
+            }
+
+            footer h3 {
+                margin-bottom: var(--space-xl);
+            }
+
+            footer ol {
+                list-style-position: inside;
+                padding-left: 0;
+            }
+
+            footer li {
+                margin-bottom: var(--space-md);
+                padding-left: var(--space-md);
+                line-height: var(--leading-relaxed);
+            }
+
+            footer a {
+                color: var(--color-accent-1);
+                text-decoration: none;
+                border-bottom: 1px solid transparent;
+                transition: all 0.3s ease;
+            }
+
+            footer a:hover {
+                border-bottom-color: var(--color-accent-1);
+            }
+
+            /* ===== Language Selector in Footer ===== */
+            .footer-bottom {
+                margin-top: var(--space-3xl);
+                padding-top: var(--space-xl);
+                border-top: 1px solid var(--color-border);
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                flex-wrap: wrap;
+                gap: var(--space-lg);
+            }
+
+            .language-selector {
+                display: flex;
+                gap: var(--space-sm);
+                align-items: center;
+            }
+
+            .language-selector span {
+                color: var(--color-base-text-muted);
+                font-size: var(--text-sm);
+                font-weight: var(--weight-medium);
+            }
+
+            .language-links {
+                display: flex;
+                gap: var(--space-sm);
+                flex-wrap: wrap;
+            }
+
+            .language-links a {
+                padding: var(--space-xs) var(--space-md);
+                border-radius: var(--radius-full);
+                background: var(--color-accent-glass);
+                color: var(--color-accent-1);
+                font-size: var(--text-sm);
+                font-weight: var(--weight-medium);
+                transition: all 0.3s ease;
+                border: 1px solid var(--color-border);
+            }
+
+            .language-links a:hover {
+                background: var(--color-accent-1);
+                color: white;
+                transform: translateY(-2px);
+                box-shadow: var(--shadow-md);
+            }
+
+            .copyright {
+                color: var(--color-base-text-muted);
+                font-size: var(--text-sm);
+            }
+
+            /* ===== Floating Elements (Decorative) ===== */
+            .floating-shape {
+                position: fixed;
+                border-radius: var(--radius-organic);
+                background: var(--color-accent-glass);
+                pointer-events: none;
+                z-index: -1;
+                animation: float 8s ease-in-out infinite;
+            }
+
+            .floating-shape-1 {
+                width: 300px;
+                height: 300px;
+                top: 20%;
+                right: -150px;
+                animation-delay: 0s;
+            }
+
+            .floating-shape-2 {
+                width: 200px;
+                height: 200px;
+                bottom: 10%;
+                left: -100px;
+                animation-delay: 2s;
+            }
+
+            @keyframes float {
+
+                0%,
+                100% {
+                    transform: translateY(0) rotate(0deg);
                 }
 
-                #sidebar .title a:link,
-                #sidebar .title a:visited {
-                    text-align: center;
-                    color: #FFFFFF;
+                50% {
+                    transform: translateY(-30px) rotate(5deg);
+                }
+            }
+
+            /* ===== Responsive Design ===== */
+            @media (max-width: 768px) {
+                .nav-container {
+                    flex-direction: column;
+                    align-items: flex-start;
+                    padding: var(--space-md);
                 }
 
-                #sidebar .subtitle a:link,
-                #sidebar .subtitle a:visited {
-                    text-align: center;
-                    color: #FFFFFF;
+                .hero {
+                    padding: var(--space-3xl) var(--space-md) var(--space-2xl);
+                    margin-top: 120px;
                 }
 
-                .home {
-                    z-index: 100;
-                    width: 100%;
-                    background-color: #1B80CF;
-                    font-size: 1.5vmax;
+                .container {
+                    padding: var(--space-2xl) var(--space-md);
                 }
 
-                .home a:link,
-                .home a:visited {
-                    text-decoration: none;
-                    color: #FFFFFF;
+                h2::after {
+                    width: 60px;
                 }
 
-                .content {
-                    line-height: 3.8vmax;
-                    font-size: 1.8vmax;
-                    font-family: 'Arial';
-                    margin-top: 22vh;
+                .footer-bottom {
+                    flex-direction: column;
+                    align-items: flex-start;
                 }
 
-                .content a:link,
-                .content a:visited {
-                    color: #1B80CF;
+                .floating-shape {
+                    display: none;
+                }
+            }
+
+            /* ===== Reduced Motion Support ===== */
+            @media (prefers-reduced-motion: reduce) {
+
+                *,
+                *::before,
+                *::after {
+                    animation-duration: 0.01ms !important;
+                    animation-iteration-count: 1 !important;
+                    transition-duration: 0.01ms !important;
                 }
 
-                .page {
-                    top: 40vh;
-                    width: 95%;
-                    margin-left: 0vw;
-                }
-
-                .page img {
-                    max-width: 100%;
-                    max-height: 100%;
-                    border: 0;
+                html {
+                    scroll-behavior: auto;
                 }
             }
         </style>
     </head>
 
-    <body vocab="http://schema.org/">
-        <div class="page">
-            <div class="home">
-                <ul typeof="BreadcrumbList">
-                    <li property="itemListElement" typeof="ListItem">
-                        <a property="item" typeof="WebPage" href="../index.html">
-                            <span property="name">Home</span>
-                        </a>
-                    </li>
-                    <li property="itemListElement" typeof="ListItem">
-                        <a property="item" typeof="WebPage" href="../research/research.html">
-                            <span property="name">Research</span>
-                        </a>
-                    </li>
+    <body>
+        <!-- Floating Decorative Shapes -->
+        <div class="floating-shape floating-shape-1" aria-hidden="true"></div>
+        <div class="floating-shape floating-shape-2" aria-hidden="true"></div>
+
+        <!-- Navigation -->
+        <nav role="navigation" aria-label="Main navigation">
+            <div class="nav-container">
+                <a href="../about.html" class="nav-brand">John Samuel</a>
+                <ul class="breadcrumb">
+                    <li><a href="../index.html">Home</a></li>
+                    <li><a href="../research/research.html">Research</a></li>
+                    <li><a href="./transparency.html">Transparency</a></li>
                 </ul>
-
             </div>
-            <div id="sidebar">
-                <div class="title">
-                    <h1><a href="./transparency.html">Data Science and Transparency</a></h1>
-                </div>
-                <div class="subtitle">
-                    <h3><a href="../about.html">John Samuel</a></h3>
-                </div>
+        </nav>
+
+        <!-- Hero Section -->
+        <header class="hero">
+            <div class="hero-content">
+                <h1>Data Science and Transparency</h1>
+                <p class="hero-subtitle">Understanding the importance of openness, reproducibility, and accountability
+                </p>
+                <p class="hero-description">Exploring how transparent practices build trust and enable better
+                    data-driven decision-making</p>
+
+                <!-- SVG Hero Illustration -->
+                <svg class="hero-svg" viewBox="0 0 800 400" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                    <!-- Glass Layers Representing Transparency -->
+                    <defs>
+                        <linearGradient id="glassGrad1" x1="0%" y1="0%" x2="0%" y2="100%">
+                            <stop offset="0%" style="stop-color:rgba(255,255,255,0.8);stop-opacity:1" />
+                            <stop offset="100%" style="stop-color:rgba(255,255,255,0.3);stop-opacity:1" />
+                        </linearGradient>
+                        <linearGradient id="dataGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                            <stop offset="0%" style="stop-color:#4a9eff;stop-opacity:1" />
+                            <stop offset="100%" style="stop-color:#7db8ff;stop-opacity:1" />
+                        </linearGradient>
+                        <filter id="glow">
+                            <feGaussianBlur stdDeviation="4" result="coloredBlur" />
+                            <feMerge>
+                                <feMergeNode in="coloredBlur" />
+                                <feMergeNode in="SourceGraphic" />
+                            </feMerge>
+                        </filter>
+                    </defs>
+
+                    <!-- Background Glass Panes -->
+                    <rect x="100" y="80" width="200" height="280" rx="12" fill="url(#glassGrad1)" opacity="0.4"
+                        stroke="rgba(255,255,255,0.6)" stroke-width="2">
+                        <animate attributeName="opacity" values="0.4;0.6;0.4" dur="4s" repeatCount="indefinite" />
+                    </rect>
+
+                    <rect x="250" y="120" width="180" height="240" rx="12" fill="url(#glassGrad1)" opacity="0.5"
+                        stroke="rgba(255,255,255,0.6)" stroke-width="2">
+                        <animate attributeName="opacity" values="0.5;0.7;0.5" dur="5s" repeatCount="indefinite" />
+                    </rect>
+
+                    <rect x="380" y="100" width="200" height="260" rx="12" fill="url(#glassGrad1)" opacity="0.45"
+                        stroke="rgba(255,255,255,0.6)" stroke-width="2">
+                        <animate attributeName="opacity" values="0.45;0.65;0.45" dur="4.5s" repeatCount="indefinite" />
+                    </rect>
+
+                    <!-- Data Points Flowing Through Glass -->
+                    <circle cx="150" cy="150" r="6" fill="url(#dataGrad)" filter="url(#glow)">
+                        <animate attributeName="cy" values="150;300;150" dur="6s" repeatCount="indefinite" />
+                        <animate attributeName="opacity" values="0.3;1;0.3" dur="6s" repeatCount="indefinite" />
+                    </circle>
+
+                    <circle cx="320" cy="180" r="5" fill="url(#dataGrad)" filter="url(#glow)">
+                        <animate attributeName="cy" values="180;320;180" dur="7s" repeatCount="indefinite" />
+                        <animate attributeName="opacity" values="0.3;1;0.3" dur="7s" repeatCount="indefinite" />
+                    </circle>
+
+                    <circle cx="480" cy="160" r="5.5" fill="url(#dataGrad)" filter="url(#glow)">
+                        <animate attributeName="cy" values="160;310;160" dur="6.5s" repeatCount="indefinite" />
+                        <animate attributeName="opacity" values="0.3;1;0.3" dur="6.5s" repeatCount="indefinite" />
+                    </circle>
+
+                    <circle cx="200" cy="200" r="4.5" fill="url(#dataGrad)" filter="url(#glow)">
+                        <animate attributeName="cy" values="200;330;200" dur="5.5s" repeatCount="indefinite" />
+                        <animate attributeName="opacity" values="0.3;1;0.3" dur="5.5s" repeatCount="indefinite" />
+                    </circle>
+
+                    <circle cx="530" cy="190" r="5" fill="url(#dataGrad)" filter="url(#glow)">
+                        <animate attributeName="cy" values="190;320;190" dur="6.8s" repeatCount="indefinite" />
+                        <animate attributeName="opacity" values="0.3;1;0.3" dur="6.8s" repeatCount="indefinite" />
+                    </circle>
+
+                    <!-- Magnifying Glass (Symbol of Transparency) -->
+                    <g transform="translate(600, 150)">
+                        <circle cx="0" cy="0" r="50" fill="none" stroke="white" stroke-width="6" opacity="0.9">
+                            <animate attributeName="r" values="50;52;50" dur="3s" repeatCount="indefinite" />
+                        </circle>
+                        <circle cx="0" cy="0" r="45" fill="rgba(255,255,255,0.1)" opacity="0.6" />
+                        <line x1="35" y1="35" x2="65" y2="65" stroke="white" stroke-width="6" stroke-linecap="round"
+                            opacity="0.9">
+                            <animate attributeName="x2" values="65;68;65" dur="3s" repeatCount="indefinite" />
+                            <animate attributeName="y2" values="65;68;65" dur="3s" repeatCount="indefinite" />
+                        </line>
+                        <!-- Grid pattern inside magnifying glass -->
+                        <line x1="-30" y1="-15" x2="30" y2="-15" stroke="white" stroke-width="1" opacity="0.4" />
+                        <line x1="-30" y1="0" x2="30" y2="0" stroke="white" stroke-width="1" opacity="0.4" />
+                        <line x1="-30" y1="15" x2="30" y2="15" stroke="white" stroke-width="1" opacity="0.4" />
+                        <line x1="-15" y1="-30" x2="-15" y2="30" stroke="white" stroke-width="1" opacity="0.4" />
+                        <line x1="0" y1="-30" x2="0" y2="30" stroke="white" stroke-width="1" opacity="0.4" />
+                        <line x1="15" y1="-30" x2="15" y2="30" stroke="white" stroke-width="1" opacity="0.4" />
+                    </g>
+
+                    <!-- Connection Lines (Data Flow) -->
+                    <path d="M 150,250 Q 250,280 320,260" fill="none" stroke="rgba(255,255,255,0.3)" stroke-width="2"
+                        stroke-dasharray="5,5">
+                        <animate attributeName="stroke-dashoffset" from="0" to="10" dur="1s" repeatCount="indefinite" />
+                    </path>
+
+                    <path d="M 320,280 Q 400,270 480,280" fill="none" stroke="rgba(255,255,255,0.3)" stroke-width="2"
+                        stroke-dasharray="5,5">
+                        <animate attributeName="stroke-dashoffset" from="0" to="10" dur="1s" repeatCount="indefinite" />
+                    </path>
+                </svg>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main id="main-content" class="container">
+            <div class="series-notice">
+                <strong>This article is part of a series on <a href="./data-science.html">Data Science</a>.</strong>
             </div>
 
-            <div class="content">
-                <header>
-                    <h2>Transparency in Data Science</h2>
-                    <div
-                        style="background-color: #f0f8ff; border-left: 4px solid #1e90ff; padding: 1em; margin-bottom: 1.5em;">
-                        <strong>This article is part of a series on <a href="./data-science.html">Data
-                                Science</a>.</strong>
+            <section>
+                <h2>What Is Transparency in Data Science?</h2>
+                <p>
+                    Transparency in data science refers to the clear and open communication of all
+                    stages of a research or analytics process, from data collection to interpretation of
+                    results. It involves documenting where data comes from, how it's processed, what
+                    methods are used for analysis, and how conclusions are drawn. This approach helps
+                    other researchers, stakeholders, and the public understand, trust, and potentially
+                    replicate the work.
+                </p>
+                <p>
+                    Transparency is essential because data science affects many parts of everyday
+                    life—from healthcare to finance to public policy. Making the decision-making process
+                    behind data-driven systems visible not only fosters public trust but also guards
+                    against hidden biases, errors, and misinterpretation of results.
+                </p>
+            </section>
+
+            <div class="section-divider" aria-hidden="true"></div>
+
+            <section>
+                <h3>Core Elements of Transparent Practice</h3>
+                <p>
+                    A foundational aspect of transparency is disclosing the sources of data used in a
+                    study. Researchers must specify whether the datasets originate from public
+                    repositories, government portals, private institutions, or scraped from the web.
+                    They should also provide details about dataset size, variables involved, time of
+                    collection, and any preprocessing done (such as anonymization, cleaning, or
+                    formatting). This level of documentation allows others to assess the validity and
+                    reliability of the data itself.
+                </p>
+                <p>
+                    Equally important is disclosing funding sources and potential conflicts of interest.
+                    Knowing who sponsored the research—be it governments, corporations, or academic
+                    institutions—helps readers understand whether the results might have been
+                    unintentionally biased. Even non-financial affiliations can influence outcomes, so
+                    transparency here supports integrity and accountability.
+                </p>
+                <p>
+                    Researchers should also describe their data collection methods in detail. This
+                    includes explaining sampling strategies, the design of surveys or experiments,
+                    technologies used (such as sensors or web scrapers), and how subjects were selected
+                    or excluded. These methodological details help reveal possible limitations, biases,
+                    or errors introduced during the early stages of a project.
+                </p>
+                <p>
+                    Lastly, the analytical methods used—whether statistical models, machine learning
+                    algorithms, or qualitative techniques—must be transparently reported. This includes
+                    justification for choosing specific techniques, how parameters were tuned, and what
+                    alternative approaches were considered. Sharing this information ensures the work
+                    can be independently verified and possibly improved upon.
+                </p>
+            </section>
+
+            <section>
+                <h3>Why Transparency Matters</h3>
+                <p>
+                    One of the most significant reasons for transparency is reproducibility. In science
+                    and data analytics, if others cannot replicate your findings using your methods and
+                    data, the credibility of those results is weakened. Transparent documentation
+                    ensures that results can be reproduced, which is a cornerstone of scientific
+                    inquiry.
+                </p>
+                <p>
+                    Transparency also plays a key role in building public trust. In an age where
+                    algorithms influence credit scores, medical diagnostics, and social media feeds, the
+                    public deserves to know how decisions are being made. Openly explaining the
+                    assumptions, methods, and data behind those decisions helps reduce misinformation
+                    and skepticism.
+                </p>
+                <p>
+                    Moreover, transparency allows stakeholders to spot and address potential biases.
+                    Data-driven models often reflect societal inequalities, especially when trained on
+                    historical data. By openly sharing model logic and training data characteristics,
+                    researchers make it easier to identify and correct unfair or discriminatory
+                    patterns.
+                </p>
+                <p>
+                    Legal and ethical standards also demand transparency. For instance, the General Data
+                    Protection Regulation (GDPR) in Europe requires that individuals understand how
+                    decisions affecting them are made. As AI regulation grows globally, transparency
+                    will become a compliance issue, not just a best practice.
+                </p>
+            </section>
+
+            <div class="section-divider" aria-hidden="true"></div>
+
+            <section>
+                <h3>Best Practices for Transparent Reporting</h3>
+                <p>
+                    A well-documented dataset should include its origin, metadata, access methods, and
+                    any modifications made during preprocessing. Platforms like Kaggle, DataHub, and
+                    Zenodo encourage good documentation practices by requiring data descriptions and
+                    licenses.
+                </p>
+                <p>
+                    Declaring funding sources and affiliations prevents conflicts of interest from going
+                    unnoticed. For example, studies evaluating the safety of a drug should disclose any
+                    ties to pharmaceutical sponsors. Journals, conferences, and research institutions
+                    now require conflict-of-interest statements in most submissions.
+                </p>
+                <p>
+                    Transparent projects often publish their analysis pipelines, including the code and
+                    tools used. Tools like Jupyter Notebooks, R Markdown, and GitHub repositories enable
+                    researchers to share their workflows and enable others to run them end-to-end.
+                    Platforms such as MLflow and Data Version Control (DVC) also help manage versions of
+                    data and models.
+                </p>
+                <p>
+                    Conclusions should never overstate the certainty of results. Honest reporting
+                    includes discussing limitations, acknowledging uncertainty, and identifying areas
+                    for future work. For example, a correlation found in the data may not imply
+                    causation, and readers should be made aware of such nuances.
+                </p>
+            </section>
+
+            <section>
+                <h3>Next-Generation Transparency: Explainability and Openness</h3>
+                <p>
+                    In recent years, the need for transparency has evolved to include the inner workings
+                    of algorithms themselves. This field, known as <strong>Explainable AI
+                        (XAI)</strong>, seeks to make complex machine learning models interpretable to
+                    humans. Tools such as SHAP (SHapley Additive exPlanations) and LIME (Local
+                    Interpretable Model-Agnostic Explanations) help reveal which inputs influence a
+                    model's decision, and by how much.
+                </p>
+                <p>
+                    In addition, open access to code and data has become a hallmark of transparent
+                    research. Interactive dashboards, data visualizations, and dynamic notebooks allow
+                    wider audiences to explore findings in intuitive ways. These tools not only improve
+                    accessibility but also increase public engagement in scientific discourse.
+                </p>
+            </section>
+
+            <section>
+                <h3>Multiverse Analysis: Exploring All Reasonable Alternatives</h3>
+                <p>
+                    One of the most innovative techniques for increasing transparency is
+                    <strong>multiverse analysis</strong>. Rather than conducting a single analysis,
+                    researchers perform multiple plausible analyses using different but defensible
+                    choices in data cleaning, model selection, and variable definitions. This creates a
+                    "multiverse" of analytical paths, helping to identify how robust the results are to
+                    these choices.
+                </p>
+                <p>
+                    For example, a researcher studying the impact of education on income might try
+                    different ways of defining education levels, handling missing data, or including
+                    covariates. Multiverse analysis reveals whether findings are consistent across these
+                    choices or highly sensitive to them. This helps prevent the selective reporting of
+                    only the most favorable results.
+                </p>
+                <p>
+                    Tools such as the <em>multiverse</em> R package automate the process of generating
+                    and testing these multiple analytic decisions. This innovation is particularly
+                    useful in fields like psychology and neuroscience, where methodological flexibility
+                    can easily lead to misleading conclusions.
+                </p>
+            </section>
+
+            <footer>
+                <h3>References</h3>
+                <ol>
+                    <li><a href="https://doi.org/10.1177/1745691616658637">Steegen, S., et
+                            al. (2016). <em>Increasing transparency through a multiverse analysis</em>.</a>
+                        Perspectives on Psychological Science, 11(5), 702–712.</li>
+                    <li><a href="https://doi.org/10.1371/journal.pbio.2006930">Stodden, V.,
+                            et al. (2018). <em>Computational transparency in science</em>.</a> PLOS Biology.
+                    </li>
+                    <li><a href="https://doi.org/10.1016/j.cub.2013.11.014">Vines, T. H., et
+                            al. (2014). <em>The availability of research data declines rapidly with article
+                                age</em>.</a> Current Biology.</li>
+                    <li><a href="https://doi.org/10.1145/3236009">Guidotti, R., et al.
+                            (2018). <em>A survey of methods for explaining black box models</em>.</a> ACM
+                        Computing Surveys.</li>
+                    <li><a href="https://www.science.org/doi/10.1126/science.1213847">Peng,
+                            R. D. (2011). <em>Reproducible research in computational science</em>.</a>
+                        Science.</li>
+                    <li><a href="https://doi.org/10.1371/journal.pmed.0020124">Ioannidis, J.
+                            P. A. (2005). <em>Why most published research findings are false</em>.</a> PLOS
+                        Medicine.</li>
+                    <li><a href="https://cran.r-project.org/package=multiverse">Sarma, A.,
+                            et al. (2021). <em>multiverse: Multiplexing Alternative Data Analyses in R
+                                Notebooks</em>.</a> CRAN Project.</li>
+                    <li><a href="https://www.nature.com/articles/d41586-018-01023-3">Munafò,
+                            M. R., & Chambers, C. D. (2021). <em>Robust research needs many lines of
+                                evidence</em>.</a> Nature.</li>
+                    <li><a href="https://digital-strategy.ec.europa.eu/en/library/ethics-guidelines-trustworthy-ai">European
+                            Commission. (2019). <em>Ethics guidelines for
+                                trustworthy AI</em>.</a></li>
+                    <li><a href="https://en.wikipedia.org/wiki/Transparency_(behavior)">
+                            <em>Transparency (behavior)</em>.</a>
+                        Wikipedia.</li>
+                    <li><a href="https://christophm.github.io/interpretable-ml-book/">Molnar, C. (2020).
+                            <em>Interpretable Machine Learning</em>.</a>
+                        Lulu Press.</li>
+                    <li><a href="https://en.wikipedia.org/wiki/Explainable_artificial_intelligence">Wikipedia
+                            contributors. <em>Explainable artificial
+                                intelligence</em>.</a> Wikipedia.</li>
+                    <li><a href="https://doi.org/10.1371/journal.pone.0021101">Tenopir, C.,
+                            et al. (2011). <em>Data sharing by scientists: practices and
+                                perceptions</em>.</a> PLOS ONE.</li>
+                    <li><a href="https://en.wikipedia.org/wiki/Conflict_of_interest">
+                            <em>Conflict of interest</em>.</a>
+                        Wikipedia.</li>
+                    <li><a href="https://shap.readthedocs.io/en/latest/index.html">SHAP</a></li>
+                    <li><a href="https://en.wikipedia.org/wiki/Multiverse_analysis">
+                            <em>Multiverse analysis</em>.</a>
+                        Wikipedia.</li>
+                    <li><a href="https://artificialintelligenceact.eu">European Parliament.
+                            (2023). <em>Proposal for a Regulation on Artificial Intelligence (AI
+                                Act)</em>.</a></li>
+                    <li><a href="https://fairmlbook.org">Barocas, S., Hardt, M., &
+                            Narayanan, A. (2019). <em>Fairness and Machine Learning</em>.</a></li>
+                    <li><a href="https://opendatahandbook.org/guide/en/what-is-open-data/">Open Data Handbook.
+                            (2024). <em>What is open data?</em></a></li>
+                    <li><a href="https://mlflow.org">MLflow Documentation. (2025).</a></li>
+                    <li><a href="https://dvc.org">Data Version Control (DVC). (2025).</a>
+                    </li>
+                    <li><a href="https://doi.org/10.1177/1745691616658637">Steegen, S., et
+                            al. (2016). Increasing Transparency Through a Multiverse Analysis.</a></li>
+                </ol>
+
+                <div class="footer-bottom">
+                    <div class="language-selector">
+                        <span>Languages:</span>
+                        <div class="language-links">
+                            <a href="./transparency.html" lang="en">English</a>
+                        </div>
                     </div>
-                    <p>Understanding the importance of openness, reproducibility, and accountability in
-                        data-driven decision-making.</p>
-                </header>
-
-                <main>
-                    <section>
-                        <h3>What Is Transparency in Data Science?</h3>
-                        <p>
-                            Transparency in data science refers to the clear and open communication of all
-                            stages of a research or analytics process, from data collection to interpretation of
-                            results. It involves documenting where data comes from, how it's processed, what
-                            methods are used for analysis, and how conclusions are drawn. This approach helps
-                            other researchers, stakeholders, and the public understand, trust, and potentially
-                            replicate the work.
-                        </p>
-                        <p>
-                            Transparency is essential because data science affects many parts of everyday
-                            life—from healthcare to finance to public policy. Making the decision-making process
-                            behind data-driven systems visible not only fosters public trust but also guards
-                            against hidden biases, errors, and misinterpretation of results.
-                        </p>
-                    </section>
-
-                    <section>
-                        <h3>Core Elements of Transparent Practice</h3>
-                        <p>
-                            A foundational aspect of transparency is disclosing the sources of data used in a
-                            study. Researchers must specify whether the datasets originate from public
-                            repositories, government portals, private institutions, or scraped from the web.
-                            They should also provide details about dataset size, variables involved, time of
-                            collection, and any preprocessing done (such as anonymization, cleaning, or
-                            formatting). This level of documentation allows others to assess the validity and
-                            reliability of the data itself.
-                        </p>
-                        <p>
-                            Equally important is disclosing funding sources and potential conflicts of interest.
-                            Knowing who sponsored the research—be it governments, corporations, or academic
-                            institutions—helps readers understand whether the results might have been
-                            unintentionally biased. Even non-financial affiliations can influence outcomes, so
-                            transparency here supports integrity and accountability.
-                        </p>
-                        <p>
-                            Researchers should also describe their data collection methods in detail. This
-                            includes explaining sampling strategies, the design of surveys or experiments,
-                            technologies used (such as sensors or web scrapers), and how subjects were selected
-                            or excluded. These methodological details help reveal possible limitations, biases,
-                            or errors introduced during the early stages of a project.
-                        </p>
-                        <p>
-                            Lastly, the analytical methods used—whether statistical models, machine learning
-                            algorithms, or qualitative techniques—must be transparently reported. This includes
-                            justification for choosing specific techniques, how parameters were tuned, and what
-                            alternative approaches were considered. Sharing this information ensures the work
-                            can be independently verified and possibly improved upon.
-                        </p>
-                    </section>
-
-                    <section>
-                        <h3>Why Transparency Matters</h3>
-                        <p>
-                            One of the most significant reasons for transparency is reproducibility. In science
-                            and data analytics, if others cannot replicate your findings using your methods and
-                            data, the credibility of those results is weakened. Transparent documentation
-                            ensures that results can be reproduced, which is a cornerstone of scientific
-                            inquiry.
-                        </p>
-                        <p>
-                            Transparency also plays a key role in building public trust. In an age where
-                            algorithms influence credit scores, medical diagnostics, and social media feeds, the
-                            public deserves to know how decisions are being made. Openly explaining the
-                            assumptions, methods, and data behind those decisions helps reduce misinformation
-                            and skepticism.
-                        </p>
-                        <p>
-                            Moreover, transparency allows stakeholders to spot and address potential biases.
-                            Data-driven models often reflect societal inequalities, especially when trained on
-                            historical data. By openly sharing model logic and training data characteristics,
-                            researchers make it easier to identify and correct unfair or discriminatory
-                            patterns.
-                        </p>
-                        <p>
-                            Legal and ethical standards also demand transparency. For instance, the General Data
-                            Protection Regulation (GDPR) in Europe requires that individuals understand how
-                            decisions affecting them are made. As AI regulation grows globally, transparency
-                            will become a compliance issue, not just a best practice.
-                        </p>
-                    </section>
-
-                    <section>
-                        <h3>Best Practices for Transparent Reporting</h3>
-                        <p>
-                            A well-documented dataset should include its origin, metadata, access methods, and
-                            any modifications made during preprocessing. Platforms like Kaggle, DataHub, and
-                            Zenodo encourage good documentation practices by requiring data descriptions and
-                            licenses.
-                        </p>
-                        <p>
-                            Declaring funding sources and affiliations prevents conflicts of interest from going
-                            unnoticed. For example, studies evaluating the safety of a drug should disclose any
-                            ties to pharmaceutical sponsors. Journals, conferences, and research institutions
-                            now require conflict-of-interest statements in most submissions.
-                        </p>
-                        <p>
-                            Transparent projects often publish their analysis pipelines, including the code and
-                            tools used. Tools like Jupyter Notebooks, R Markdown, and GitHub repositories enable
-                            researchers to share their workflows and enable others to run them end-to-end.
-                            Platforms such as MLflow and Data Version Control (DVC) also help manage versions of
-                            data and models.
-                        </p>
-                        <p>
-                            Conclusions should never overstate the certainty of results. Honest reporting
-                            includes discussing limitations, acknowledging uncertainty, and identifying areas
-                            for future work. For example, a correlation found in the data may not imply
-                            causation, and readers should be made aware of such nuances.
-                        </p>
-                    </section>
-
-                    <section>
-                        <h3>Next-Generation Transparency: Explainability and Openness</h3>
-                        <p>
-                            In recent years, the need for transparency has evolved to include the inner workings
-                            of algorithms themselves. This field, known as <strong>Explainable AI
-                                (XAI)</strong>, seeks to make complex machine learning models interpretable to
-                            humans. Tools such as SHAP (SHapley Additive exPlanations) and LIME (Local
-                            Interpretable Model-Agnostic Explanations) help reveal which inputs influence a
-                            model’s decision, and by how much.
-                        </p>
-                        <p>
-                            In addition, open access to code and data has become a hallmark of transparent
-                            research. Interactive dashboards, data visualizations, and dynamic notebooks allow
-                            wider audiences to explore findings in intuitive ways. These tools not only improve
-                            accessibility but also increase public engagement in scientific
-                            discourse.
-                        </p>
-                    </section>
-
-                    <section>
-                        <h3>Multiverse Analysis: Exploring All Reasonable Alternatives</h3>
-                        <p>
-                            One of the most innovative techniques for increasing transparency is
-                            <strong>multiverse analysis</strong>. Rather than conducting a single analysis,
-                            researchers perform multiple plausible analyses using different but defensible
-                            choices in data cleaning, model selection, and variable definitions. This creates a
-                            "multiverse" of analytical paths, helping to identify how robust the results are to
-                            these choices.
-                        </p>
-                        <p>
-                            For example, a researcher studying the impact of education on income might try
-                            different ways of defining education levels, handling missing data, or including
-                            covariates. Multiverse analysis reveals whether findings are consistent across these
-                            choices or highly sensitive to them. This helps prevent the selective reporting of
-                            only the most favorable results.
-                        </p>
-                        <p>
-                            Tools such as the <em>multiverse</em> R package automate the process of generating
-                            and testing these multiple analytic decisions. This innovation is particularly
-                            useful in fields like psychology and neuroscience, where methodological flexibility
-                            can easily lead to misleading conclusions.
-                        </p>
-                    </section>
-
-                    <footer>
-                        <h3>References</h3>
-                        <ol>
-                            <li><a href="https://doi.org/10.1177/1745691616658637">Steegen, S., et
-                                    al. (2016). <em>Increasing transparency through a multiverse analysis</em>.</a>
-                                Perspectives on Psychological Science, 11(5), 702–712.</li>
-                            <li><a href="https://doi.org/10.1371/journal.pbio.2006930">Stodden, V.,
-                                    et al. (2018). <em>Computational transparency in science</em>.</a> PLOS Biology.
-                            </li>
-                            <li><a href="https://doi.org/10.1016/j.cub.2013.11.014">Vines, T. H., et
-                                    al. (2014). <em>The availability of research data declines rapidly with article
-                                        age</em>.</a> Current Biology.</li>
-                            <li><a href="https://doi.org/10.1145/3236009">Guidotti, R., et al.
-                                    (2018). <em>A survey of methods for explaining black box models</em>.</a> ACM
-                                Computing Surveys.</li>
-                            <li><a href="https://www.science.org/doi/10.1126/science.1213847">Peng,
-                                    R. D. (2011). <em>Reproducible research in computational science</em>.</a>
-                                Science.</li>
-                            <li><a href="https://doi.org/10.1371/journal.pmed.0020124">Ioannidis, J.
-                                    P. A. (2005). <em>Why most published research findings are false</em>.</a> PLOS
-                                Medicine.</li>
-                            <li><a href="https://cran.r-project.org/package=multiverse">Sarma, A.,
-                                    et al. (2021). <em>multiverse: Multiplexing Alternative Data Analyses in R
-                                        Notebooks</em>.</a> CRAN Project.</li>
-                            <li><a href="https://www.nature.com/articles/d41586-018-01023-3">Munafò,
-                                    M. R., & Chambers, C. D. (2021). <em>Robust research needs many lines of
-                                        evidence</em>.</a> Nature.</li>
-                            <li><a
-                                    href="https://digital-strategy.ec.europa.eu/en/library/ethics-guidelines-trustworthy-ai">European
-                                    Commission. (2019). <em>Ethics guidelines for
-                                        trustworthy AI</em>.</a></li>
-                            <li><a href="https://en.wikipedia.org/wiki/Transparency_(behavior)">
-                                    <em>Transparency (behavior)</em>.</a>
-                                Wikipedia.</li>
-                            <li><a href="https://christophm.github.io/interpretable-ml-book/">Molnar, C. (2020).
-                                    <em>Interpretable Machine Learning</em>.</a>
-                                Lulu Press.</li>
-                            <li><a href="https://en.wikipedia.org/wiki/Explainable_artificial_intelligence">Wikipedia
-                                    contributors. <em>Explainable artificial
-                                        intelligence</em>.</a> Wikipedia.</li>
-                            <li><a href="https://doi.org/10.1371/journal.pone.0021101">Tenopir, C.,
-                                    et al. (2011). <em>Data sharing by scientists: practices and
-                                        perceptions</em>.</a> PLOS ONE.</li>
-                            <li><a href="https://en.wikipedia.org/wiki/Conflict_of_interest">
-                                    <em>Conflict of interest</em>.</a>
-                                Wikipedia.</li>
-                            <li><a href="https://shap.readthedocs.io/en/latest/index.html">SHAP</a></li>
-                            <li><a href="https://en.wikipedia.org/wiki/Multiverse_analysis">
-                                    <em>Multiverse analysis</em>.</a>
-                                Wikipedia.</li>
-                            <li><a href="https://artificialintelligenceact.eu">European Parliament.
-                                    (2023). <em>Proposal for a Regulation on Artificial Intelligence (AI
-                                        Act)</em>.</a></li>
-                            <li><a href="https://fairmlbook.org">Barocas, S., Hardt, M., &
-                                    Narayanan, A. (2019). <em>Fairness and Machine Learning</em>.</a></li>
-                            <li><a href="https://opendatahandbook.org/guide/en/what-is-open-data/">Open Data Handbook.
-                                    (2024). <em>What is open data?</em></a></li>
-                            <li><a href="https://mlflow.org">MLflow Documentation. (2025).</a></li>
-                            <li><a href="https://dvc.org">Data Version Control (DVC). (2025).</a>
-                            </li>
-                            <li><a href="https://doi.org/10.1177/1745691616658637">Steegen, S., et
-                                    al. (2016). Increasing Transparency Through a Multiverse Analysis.</a></li>
-                        </ol>
-                    </footer>
-                </main>
-            </div>
-        </div>
+                    <p class="copyright">&copy; 2025 John Samuel. All rights reserved.</p>
+                </div>
+            </footer>
+        </main>
     </body>
 
 </html>

@@ -3,261 +3,673 @@
 
     <head>
         <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <meta http-equiv="Content-Language" content="en" />
         <link rel="shortcut icon" href="../../images/logo/favicon.png" />
         <title>Data Science and the Right to Explanation: John Samuel</title>
         <style type="text/css">
-            body {
-                background-color: #FFFFFF;
+            /* Design Tokens */
+            :root {
+                /* Transparency/Clarity Theme Colors */
+                --color-base-bg: #faf9f7;
+                --color-base-surface: #ffffff;
+                --color-base-text: #1a202c;
+                --color-base-text-muted: #4a5568;
+
+                /* Explainability Theme Accents - Warm amber/orange for illumination and clarity */
+                --color-accent-1: #e07a3f;
+                --color-accent-2: #c75a2a;
+                --color-accent-3: #f4a261;
+                --color-accent-light: #fef3ed;
+                --color-accent-dark: #9a4819;
+
+                /* Functional Colors */
+                --color-shadow: rgba(224, 122, 63, 0.12);
+                --color-border: rgba(224, 122, 63, 0.15);
+                --color-hover: rgba(224, 122, 63, 0.08);
+
+                /* Gradients */
+                --gradient-primary: linear-gradient(135deg, var(--color-accent-1) 0%, var(--color-accent-2) 50%, var(--color-accent-3) 100%);
+                --gradient-subtle: linear-gradient(180deg, var(--color-base-bg), var(--color-accent-light));
+
+                /* Spacing Scale */
+                --space-xs: 0.25rem;
+                --space-sm: 0.5rem;
+                --space-md: 1rem;
+                --space-lg: 3rem;
+                --space-xl: 2rem;
+                --space-2xl: 3rem;
+                --space-3xl: 4rem;
+                --space-4xl: 6rem;
+
+                /* Border Radius Scale */
+                --radius-sm: 4px;
+                --radius-md: 8px;
+                --radius-lg: 12px;
+                --radius-xl: 16px;
+                --radius-2xl: 24px;
+                --radius-full: 9999px;
+
+                /* Shadows */
+                --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.04), 0 1px 3px rgba(0, 0, 0, 0.06);
+                --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.05), 0 2px 4px rgba(0, 0, 0, 0.06), 0 0 0 1px var(--color-border);
+                --shadow-lg: 0 10px 24px rgba(0, 0, 0, 0.08), 0 4px 8px rgba(0, 0, 0, 0.06), 0 1px 3px rgba(0, 0, 0, 0.04);
+                --shadow-xl: 0 20px 40px rgba(0, 0, 0, 0.12), 0 8px 16px rgba(0, 0, 0, 0.08), 0 3px 6px rgba(0, 0, 0, 0.06);
+                --shadow-theme: 0 10px 30px var(--color-shadow), 0 4px 10px rgba(0, 0, 0, 0.06);
+
+                /* Typography */
+                --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+                --font-mono: 'SF Mono', Monaco, 'Cascadia Code', 'Consolas', 'Courier New', monospace;
+
+                /* Fluid Type Scale */
+                --text-xs: clamp(0.75rem, 0.7rem + 0.25vw, 0.875rem);
+                --text-sm: clamp(0.875rem, 0.8rem + 0.35vw, 1rem);
+                --text-base: clamp(1rem, 0.95rem + 0.25vw, 1.125rem);
+                --text-lg: clamp(1.125rem, 1.05rem + 0.35vw, 1.25rem);
+                --text-xl: clamp(1.25rem, 1.15rem + 0.5vw, 1.5rem);
+                --text-2xl: clamp(1.5rem, 1.3rem + 1vw, 2rem);
+                --text-3xl: clamp(2rem, 1.6rem + 2vw, 2.5rem);
+                --text-4xl: clamp(2.5rem, 2rem + 2.5vw, 3.5rem);
+
+                /* Font Weights */
+                --weight-normal: 400;
+                --weight-medium: 500;
+                --weight-semibold: 600;
+                --weight-bold: 700;
+                --weight-extrabold: 800;
+
+                /* Line Heights */
+                --leading-tight: 1.25;
+                --leading-snug: 1.375;
+                --leading-normal: 1.5;
+                --leading-relaxed: 1.625;
+                --leading-loose: 2;
             }
 
-            #sidebar {
-                position: fixed;
-                background-color: #1B80CF;
-                top: 0;
-                left: 0;
-                bottom: 0;
-                width: 30vw;
-            }
-
-            #sidebar .title {
-                position: relative;
-                text-align: center;
-                line-height: 4vmax;
-                font-size: 1.4vmax;
-                font-family: 'Arial';
-                margin-top: 25vh;
-            }
-
-            #sidebar .title a:link,
-            #sidebar .title a:visited {
-                color: #FFFFFF;
-                text-decoration: none;
-            }
-
-            .subtitle {
-                top: 50vh;
-                text-align: center;
-                line-height: 1.3vmax;
-                font-family: 'Arial';
-                font-size: 1.5vmax;
-                color: #FFFFFF;
-            }
-
-            .subtitle a:link,
-            .subtitle a:visited {
-                color: #FFFFFF;
-                text-decoration: none;
-            }
-
-            .licence {
-                position: fixed;
-                text-align: right;
-                bottom: 0;
-                right: 0;
-            }
-
-            .home {
-                position: fixed;
-                text-align: left;
-                font-family: 'Arial';
-                color: #D3D3D3;
-                z-index: 100;
-                width: 100%;
-                background-color: #FFFFFF;
-                top: 0px;
-                margin-bottom: 10px;
-                padding-bottom: 10px;
-            }
-
-            .home a:link,
-            .home a:visited {
-                text-decoration: none;
-                color: #D3D3D3;
-            }
-
-            .home ul {
+            /* Reset and Base Styles */
+            * {
                 margin: 0;
                 padding: 0;
-                text-align: left;
-                list-style: none;
+                box-sizing: border-box;
             }
 
-            .home li {
+            html {
+                scroll-behavior: smooth;
+                scroll-padding-top: 100px;
+            }
+
+            body {
+                font-family: var(--font-sans);
+                font-size: var(--text-base);
+                line-height: var(--leading-relaxed);
+                color: var(--color-base-text);
+                background: var(--gradient-subtle);
+                min-height: 100vh;
                 position: relative;
-                float: left;
-                padding-top: 15px;
-                margin-right: 1em;
-                font-family: 'Arial';
+                overflow-x: hidden;
             }
 
-            .home li:hover {
-                display: block;
+            /* Animated Background Pattern - Light Rays */
+            body::before {
+                content: '';
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background-image:
+                    radial-gradient(ellipse at 20% 20%, rgba(224, 122, 63, 0.05) 0%, transparent 50%),
+                    radial-gradient(ellipse at 80% 80%, rgba(244, 162, 97, 0.04) 0%, transparent 50%),
+                    linear-gradient(135deg, transparent 0%, rgba(224, 122, 63, 0.02) 50%, transparent 100%);
+                pointer-events: none;
+                z-index: -1;
+                animation: lightShift 15s ease-in-out infinite;
             }
 
-            .home a:link,
-            .home a:visited {
-                color: #D3D3D3;
+            @keyframes lightShift {
+
+                0%,
+                100% {
+                    opacity: 1;
+                }
+
+                50% {
+                    opacity: 0.8;
+                }
             }
 
-            .home li:hover a:link,
-            .home li:hover a:visited {
+            /* Navigation Bar */
+            nav {
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                background: rgba(255, 255, 255, 0.92);
+                -webkit-backdrop-filter: blur(12px) saturate(180%);
+                backdrop-filter: blur(12px) saturate(180%);
+                border-bottom: 1px solid var(--color-border);
+                box-shadow: var(--shadow-sm);
+                z-index: 100;
+                padding: var(--space-lg) 0;
+            }
+
+            nav .container {
+                max-width: 1400px;
+                margin: 0 auto;
+                padding: 0 var(--space-xl);
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                flex-wrap: wrap;
+                gap: var(--space-md);
+            }
+
+            nav .brand {
+                font-size: var(--text-lg);
+                font-weight: var(--weight-bold);
+                color: var(--color-accent-1);
                 text-decoration: none;
-                padding: 15px;
-                color: #FFFFFF;
-                background-color: #1B80CF;
+                padding: var(--space-sm) var(--space-md);
+                background: var(--gradient-primary);
+                -webkit-background-clip: text;
+                background-clip: text;
+                -webkit-text-fill-color: transparent;
+                transition: all 0.3s ease;
+                position: relative;
+            }
+
+            nav .brand::after {
+                content: '💡';
+                position: absolute;
+                right: -22px;
+                top: 50%;
+                transform: translateY(-50%);
+                font-size: 0.85em;
+                opacity: 0;
+                transition: all 0.3s ease;
+            }
+
+            nav .brand:hover::after {
+                opacity: 1;
+                right: -28px;
+            }
+
+            nav .brand:hover {
+                transform: translateY(-2px);
+            }
+
+            nav .breadcrumbs {
+                display: flex;
+                list-style: none;
+                gap: var(--space-sm);
+                flex-wrap: wrap;
+                align-items: center;
+            }
+
+            nav .breadcrumbs li {
+                display: flex;
+                align-items: center;
+            }
+
+            nav .breadcrumbs li::after {
+                content: '→';
+                margin: 0 var(--space-sm);
+                color: var(--color-base-text-muted);
+                opacity: 0.5;
+            }
+
+            nav .breadcrumbs li:last-child::after {
+                display: none;
+            }
+
+            nav .breadcrumbs a {
+                color: var(--color-base-text-muted);
+                text-decoration: none;
+                padding: var(--space-xs) var(--space-sm);
+                border-radius: var(--radius-sm);
+                transition: all 0.3s ease;
+                font-size: var(--text-sm);
+            }
+
+            nav .breadcrumbs a:hover {
+                color: var(--color-accent-1);
+                background: var(--color-hover);
+            }
+
+            /* Hero Section with SVG */
+            .hero {
+                margin-top: 100px;
+                padding: var(--space-4xl) 0 var(--space-3xl);
+                position: relative;
+            }
+
+            .hero .container {
+                max-width: 1400px;
+                margin: 0 auto;
+                padding: 0 var(--space-xl);
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: var(--space-3xl);
+                align-items: center;
+            }
+
+            .hero-content h1 {
+                font-size: var(--text-4xl);
+                font-weight: var(--weight-extrabold);
+                line-height: var(--leading-tight);
+                letter-spacing: -0.03em;
+                background: var(--gradient-primary);
+                -webkit-background-clip: text;
+                background-clip: text;
+                -webkit-text-fill-color: transparent;
+                margin-bottom: var(--space-lg);
+                animation: fadeInUp 0.8s ease;
+            }
+
+            .hero-content .intro {
+                font-size: var(--text-lg);
+                color: var(--color-base-text-muted);
+                margin-bottom: var(--space-xl);
+                line-height: var(--leading-relaxed);
+                animation: fadeInUp 0.8s ease 0.2s backwards;
+            }
+
+            .info-banner {
+                background: linear-gradient(135deg, rgba(224, 122, 63, 0.08), rgba(244, 162, 97, 0.08));
+                border-left: 4px solid var(--color-accent-1);
+                padding: var(--space-lg);
+                border-radius: var(--radius-md);
+                margin-bottom: var(--space-2xl);
+                animation: fadeInUp 0.8s ease 0.4s backwards;
+            }
+
+            .info-banner strong {
+                font-weight: var(--weight-semibold);
+                color: var(--color-accent-2);
+            }
+
+            .info-banner a {
+                color: var(--color-accent-1);
+                text-decoration: none;
+                font-weight: var(--weight-medium);
+            }
+
+            .info-banner a:hover {
+                text-decoration: underline;
+            }
+
+            /* Custom SVG Illustration - Transparency & Illumination */
+            .hero-visual {
+                position: relative;
+                animation: fadeInUp 0.8s ease 0.6s backwards;
+            }
+
+            .hero-visual svg {
+                width: 100%;
+                height: auto;
+                max-width: 600px;
+                filter: drop-shadow(0 10px 30px rgba(224, 122, 63, 0.2));
+            }
+
+            /* Main Content */
+            main {
+                max-width: 1400px;
+                margin: 0 auto;
+                padding: 0 var(--space-xl) var(--space-4xl);
             }
 
             .content {
-                line-height: 1.8vmax;
-                font-size: 1.2vmax;
-                font-family: 'Arial';
-                margin-top: 15vh;
-                width: 90%;
+                background: var(--color-base-surface);
+                border-radius: var(--radius-2xl);
+                padding: var(--space-3xl);
+                box-shadow: var(--shadow-lg);
+                position: relative;
+                overflow: hidden;
             }
 
-            .content h2,
-            h3,
-            h4 {
-                color: #1B80CF;
+            .content::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                height: 4px;
+                background: var(--gradient-primary);
             }
 
-            .content a:link,
-            .content a:visited {
-                color: #1B80CF;
+            /* Typography */
+            .content h2 {
+                font-size: var(--text-3xl);
+                font-weight: var(--weight-bold);
+                color: var(--color-accent-2);
+                margin-top: var(--space-3xl);
+                margin-bottom: var(--space-lg);
+                letter-spacing: -0.02em;
+                line-height: var(--leading-tight);
+                position: relative;
+                padding-bottom: var(--space-md);
+            }
+
+            .content h2::after {
+                content: '';
+                position: absolute;
+                bottom: 0;
+                left: 0;
+                width: 60px;
+                height: 3px;
+                background: var(--gradient-primary);
+                border-radius: var(--radius-sm);
+            }
+
+            .content h2:first-of-type {
+                margin-top: 0;
             }
 
             .content h3 {
-                color: #1B80CF;
+                font-size: var(--text-2xl);
+                font-weight: var(--weight-semibold);
+                color: var(--color-accent-1);
+                margin-top: var(--space-2xl);
+                margin-bottom: var(--space-md);
+                letter-spacing: -0.01em;
+                line-height: var(--leading-snug);
+                position: relative;
+                padding-left: var(--space-lg);
             }
 
-            .content h2::before,
             .content h3::before {
-                display: block;
-                content: " ";
-                visibility: hidden;
-                height: 50px;
-                margin-top: -50px;
-                pointer-events: none;
-                background-color: #FFFFFF;
+                content: '◆';
+                position: absolute;
+                left: 0;
+                top: 0;
+                color: var(--color-accent-3);
+                font-size: 0.7em;
             }
 
-            .content a:link,
-            .content a:visited {
-                color: #1B80CF;
+            .content h4 {
+                font-size: var(--text-xl);
+                font-weight: var(--weight-semibold);
+                color: var(--color-accent-1);
+                margin-top: var(--space-xl);
+                margin-bottom: var(--space-sm);
+            }
+
+            .content p {
+                margin-bottom: var(--space-lg);
+                color: var(--color-base-text);
+                line-height: var(--leading-relaxed);
+            }
+
+            .content a {
+                color: var(--color-accent-1);
+                text-decoration: none;
+                font-weight: var(--weight-medium);
+                transition: all 0.3s ease;
+                position: relative;
+                padding-bottom: 2px;
+            }
+
+            .content a::after {
+                content: '';
+                position: absolute;
+                bottom: 0;
+                left: 0;
+                width: 0;
+                height: 2px;
+                background: var(--color-accent-1);
+                transition: width 0.3s ease;
+            }
+
+            .content a:hover::after {
+                width: 100%;
+            }
+
+            /* Lists */
+            .content ul {
+                margin-left: var(--space-xl);
+                margin-bottom: var(--space-xl);
+            }
+
+            .content ol {
+                margin-left: var(--space-xl);
+                margin-bottom: var(--space-xl);
             }
 
             .content li {
-                margin: 5px;
+                margin-bottom: var(--space-md);
+                color: var(--color-base-text);
+                line-height: var(--leading-relaxed);
+                padding-left: var(--space-sm);
             }
 
-            .page {
-                width: 65vw;
-                height: 100%;
-                margin-left: 30vw;
-                overflow: hidden;
-                padding: 0 1em;
-                font-family: 'Arial';
+            .content ul li::marker {
+                color: var(--color-accent-1);
+                font-weight: var(--weight-semibold);
             }
 
-            .page img {
-                max-width: 100%;
-                max-height: 100%;
+            .content ol li::marker {
+                color: var(--color-accent-1);
+                font-weight: var(--weight-semibold);
             }
 
-            @media (max-width: 640px),
-            screen and (orientation: portrait) {
-                body {
-                    max-width: 100%;
-                    max-height: 100%;
+            .content li strong {
+                color: var(--color-accent-2);
+                font-weight: var(--weight-semibold);
+            }
+
+            /* Footer */
+            footer {
+                background: var(--color-accent-dark);
+                color: rgba(255, 255, 255, 0.9);
+                padding: var(--space-3xl) 0 var(--space-xl);
+                margin-top: var(--space-4xl);
+            }
+
+            footer .container {
+                max-width: 1400px;
+                margin: 0 auto;
+                padding: 0 var(--space-xl);
+            }
+
+            footer .footer-content {
+                display: grid;
+                grid-template-columns: 2fr 1fr;
+                gap: var(--space-3xl);
+                margin-bottom: var(--space-2xl);
+            }
+
+            footer h3 {
+                color: white;
+                font-size: var(--text-xl);
+                font-weight: var(--weight-semibold);
+                margin-bottom: var(--space-lg);
+            }
+
+            footer p {
+                color: rgba(255, 255, 255, 0.8);
+                line-height: var(--leading-relaxed);
+                margin-bottom: var(--space-md);
+            }
+
+            footer a {
+                color: rgba(255, 255, 255, 0.9);
+                text-decoration: none;
+                transition: all 0.3s ease;
+            }
+
+            footer a:hover {
+                color: white;
+                text-decoration: underline;
+            }
+
+            .language-links {
+                display: flex;
+                flex-wrap: wrap;
+                gap: var(--space-sm);
+                margin-top: var(--space-md);
+            }
+
+            .language-links a {
+                padding: var(--space-xs) var(--space-md);
+                background: rgba(255, 255, 255, 0.1);
+                border-radius: var(--radius-sm);
+                font-size: var(--text-sm);
+                transition: all 0.3s ease;
+            }
+
+            .language-links a:hover {
+                background: rgba(255, 255, 255, 0.2);
+                text-decoration: none;
+                transform: translateY(-2px);
+            }
+
+            .footer-bottom {
+                padding-top: var(--space-xl);
+                border-top: 1px solid rgba(255, 255, 255, 0.1);
+                text-align: center;
+                color: rgba(255, 255, 255, 0.7);
+                font-size: var(--text-sm);
+            }
+
+            /* Animations */
+            @keyframes fadeInUp {
+                from {
+                    opacity: 0;
+                    transform: translateY(30px);
                 }
 
-                #sidebar {
-                    position: fixed;
-                    background-color: #1B80CF;
-                    top: 0;
-                    left: 0;
-                    bottom: 80vh;
-                    width: 100vw;
+                to {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            }
+
+            @keyframes illuminate {
+
+                0%,
+                100% {
+                    opacity: 0.3;
                 }
 
-                #sidebar .title {
-                    text-align: center;
-                    position: fixed;
-                    margin-top: 6vh;
-                    left: 0px;
-                    right: 0px;
-                    line-height: 3.5vmax;
-                    font-size: 1.5vmax;
-                    font-family: 'Arial';
+                50% {
+                    opacity: 0.8;
+                }
+            }
+
+            @keyframes revealPath {
+                from {
+                    stroke-dashoffset: 1000;
                 }
 
-                #sidebar .subtitle {
-                    text-align: center;
-                    top: 5vh;
-                    left: 0px;
-                    right: 0px;
-                    position: fixed;
-                    margin-top: 10vh;
-                    font-size: 1.5vmax;
+                to {
+                    stroke-dashoffset: 0;
+                }
+            }
+
+            @keyframes lightPulse {
+
+                0%,
+                100% {
+                    opacity: 0.5;
                 }
 
-                #sidebar .title a:link,
-                #sidebar .title a:visited {
-                    text-align: center;
-                    color: #FFFFFF;
+                50% {
+                    opacity: 1;
+                }
+            }
+
+            /* Reduced Motion Support */
+            @media (prefers-reduced-motion: reduce) {
+
+                *,
+                *::before,
+                *::after {
+                    animation-duration: 0.01ms !important;
+                    animation-iteration-count: 1 !important;
+                    transition-duration: 0.01ms !important;
+                }
+            }
+
+            /* Responsive Design */
+            @media (max-width: 1024px) {
+                .hero .container {
+                    grid-template-columns: 1fr;
+                    gap: var(--space-2xl);
                 }
 
-                #sidebar .subtitle a:link,
-                #sidebar .subtitle a:visited {
-                    text-align: center;
-                    color: #FFFFFF;
+                .hero-visual {
+                    order: -1;
                 }
 
-                .home {
-                    z-index: 100;
-                    width: 100%;
-                    background-color: #1B80CF;
-                    font-size: 1.5vmax;
+                footer .footer-content {
+                    grid-template-columns: 1fr;
+                }
+            }
+
+            @media (max-width: 768px) {
+                :root {
+                    --space-xl: 1.5rem;
+                    --space-2xl: 2rem;
+                    --space-3xl: 2.5rem;
+                    --space-4xl: 3rem;
                 }
 
-                .home a:link,
-                .home a:visited {
-                    text-decoration: none;
-                    color: #FFFFFF;
+                nav .container {
+                    flex-direction: column;
+                    align-items: flex-start;
+                }
+
+                nav .brand {
+                    order: -1;
+                    margin-bottom: var(--space-sm);
+                }
+
+                .hero {
+                    margin-top: 150px;
                 }
 
                 .content {
-                    line-height: 3.8vmax;
-                    font-size: 1.8vmax;
-                    font-family: 'Arial';
-                    margin-top: 22vh;
+                    padding: var(--space-xl);
+                    border-radius: var(--radius-lg);
                 }
 
-                .content a:link,
-                .content a:visited {
-                    color: #1B80CF;
+                .content h2 {
+                    font-size: var(--text-2xl);
                 }
 
-                .page {
-                    top: 40vh;
-                    width: 95%;
-                    margin-left: 0vw;
+                .content h3 {
+                    font-size: var(--text-xl);
+                    padding-left: var(--space-md);
+                }
+            }
+
+            @media (max-width: 480px) {
+
+                nav .container,
+                main,
+                footer .container {
+                    padding-left: var(--space-md);
+                    padding-right: var(--space-md);
                 }
 
-                .page img {
-                    max-width: 100%;
-                    max-height: 100%;
-                    border: 0;
+                .hero {
+                    padding: var(--space-2xl) 0;
+                }
+
+                .content {
+                    padding: var(--space-lg);
                 }
             }
         </style>
     </head>
 
     <body vocab="http://schema.org/">
-        <div class="page">
-            <div class="home">
-                <ul typeof="BreadcrumbList">
+
+        <!-- Navigation -->
+        <nav role="navigation" aria-label="Main navigation">
+            <div class="container">
+                <a href="../about.html" class="brand">John Samuel</a>
+                <ul class="breadcrumbs" typeof="BreadcrumbList">
                     <li property="itemListElement" typeof="ListItem">
                         <a property="item" typeof="WebPage" href="../index.html">
                             <span property="name">Home</span>
@@ -268,235 +680,461 @@
                             <span property="name">Research</span>
                         </a>
                     </li>
+                    <li property="itemListElement" typeof="ListItem">
+                        <span property="name">Right to Explanation</span>
+                    </li>
                 </ul>
+            </div>
+        </nav>
 
-            </div>
-            <div id="sidebar">
-                <div class="title">
-                    <h1><a href="./explanation.html">Right to Explanation</a></h1>
+        <!-- Hero Section -->
+        <header class="hero">
+            <div class="container">
+                <div class="hero-content">
+                    <h1>The Right to Explanation</h1>
+                    <p class="intro">Understanding algorithmic decisions in the age of artificial intelligence and
+                        machine learning.</p>
+                    <div class="info-banner">
+                        <strong>This article is part of a series on <a href="./artificial-intelligence.html">Artificial
+                                Intelligence</a>.</strong>
+                    </div>
                 </div>
-                <div class="subtitle">
-                    <h3><a href="../about.html">John Samuel</a></h3>
+                <div class="hero-visual">
+                    <svg viewBox="0 0 600 600" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                        <!-- Definitions -->
+                        <defs>
+                            <radialGradient id="lightGlow" cx="50%" cy="50%" r="50%">
+                                <stop offset="0%" style="stop-color:#e07a3f;stop-opacity:0.4" />
+                                <stop offset="100%" style="stop-color:#e07a3f;stop-opacity:0" />
+                            </radialGradient>
+                            <linearGradient id="beamGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                                <stop offset="0%" style="stop-color:#e07a3f;stop-opacity:0" />
+                                <stop offset="50%" style="stop-color:#f4a261;stop-opacity:0.8" />
+                                <stop offset="100%" style="stop-color:#e07a3f;stop-opacity:0" />
+                            </linearGradient>
+                            <linearGradient id="bulbGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+                                <stop offset="0%" style="stop-color:#f4a261" />
+                                <stop offset="100%" style="stop-color:#e07a3f" />
+                            </linearGradient>
+                            <filter id="softGlow">
+                                <feGaussianBlur stdDeviation="5" result="coloredBlur" />
+                                <feMerge>
+                                    <feMergeNode in="coloredBlur" />
+                                    <feMergeNode in="SourceGraphic" />
+                                </feMerge>
+                            </filter>
+                        </defs>
+
+                        <!-- Background Illumination -->
+                        <circle cx="300" cy="200" r="150" fill="url(#lightGlow)">
+                            <animate attributeName="r" values="150;160;150" dur="4s" repeatCount="indefinite" />
+                            <animate attributeName="opacity" values="0.8;1;0.8" dur="4s" repeatCount="indefinite" />
+                        </circle>
+
+                        <!-- Central Lightbulb (Explanation/Understanding) -->
+                        <g transform="translate(300, 200)" filter="url(#softGlow)">
+                            <!-- Bulb Body -->
+                            <ellipse cx="0" cy="0" rx="45" ry="60" fill="url(#bulbGrad)" opacity="0.9">
+                                <animate attributeName="opacity" values="0.9;1;0.9" dur="3s" repeatCount="indefinite" />
+                            </ellipse>
+
+                            <!-- Bulb Highlight -->
+                            <ellipse cx="-15" cy="-15" rx="12" ry="18" fill="rgba(255,255,255,0.6)">
+                                <animate attributeName="opacity" values="0.6;0.8;0.6" dur="3s"
+                                    repeatCount="indefinite" />
+                            </ellipse>
+
+                            <!-- Filament -->
+                            <path d="M -8 -10 Q 0 0 8 -10" stroke="#c75a2a" stroke-width="3" fill="none"
+                                stroke-linecap="round" />
+                            <path d="M -8 10 Q 0 0 8 10" stroke="#c75a2a" stroke-width="3" fill="none"
+                                stroke-linecap="round" />
+
+                            <!-- Base/Screw -->
+                            <rect x="-20" y="55" width="40" height="8" rx="2" fill="#c75a2a" />
+                            <rect x="-20" y="65" width="40" height="6" rx="2" fill="#9a4819" />
+                            <rect x="-20" y="73" width="40" height="6" rx="2" fill="#c75a2a" />
+                        </g>
+
+                        <!-- Light Rays (Transparency/Clarity) -->
+                        <g opacity="0.6">
+                            <!-- Ray 1 - Top -->
+                            <line x1="300" y1="100" x2="300" y2="40" stroke="url(#beamGrad)" stroke-width="4"
+                                stroke-linecap="round">
+                                <animate attributeName="opacity" values="0.6;1;0.6" dur="2.5s"
+                                    repeatCount="indefinite" />
+                            </line>
+
+                            <!-- Ray 2 - Top Right -->
+                            <line x1="340" y1="130" x2="380" y2="90" stroke="url(#beamGrad)" stroke-width="4"
+                                stroke-linecap="round">
+                                <animate attributeName="opacity" values="0.6;1;0.6" dur="2.8s"
+                                    repeatCount="indefinite" />
+                            </line>
+
+                            <!-- Ray 3 - Right -->
+                            <line x1="365" y1="200" x2="425" y2="200" stroke="url(#beamGrad)" stroke-width="4"
+                                stroke-linecap="round">
+                                <animate attributeName="opacity" values="0.6;1;0.6" dur="3.2s"
+                                    repeatCount="indefinite" />
+                            </line>
+
+                            <!-- Ray 4 - Top Left -->
+                            <line x1="260" y1="130" x2="220" y2="90" stroke="url(#beamGrad)" stroke-width="4"
+                                stroke-linecap="round">
+                                <animate attributeName="opacity" values="0.6;1;0.6" dur="2.6s"
+                                    repeatCount="indefinite" />
+                            </line>
+
+                            <!-- Ray 5 - Left -->
+                            <line x1="235" y1="200" x2="175" y2="200" stroke="url(#beamGrad)" stroke-width="4"
+                                stroke-linecap="round">
+                                <animate attributeName="opacity" values="0.6;1;0.6" dur="3s" repeatCount="indefinite" />
+                            </line>
+                        </g>
+
+                        <!-- Illuminated Paths (Understanding Pathways) -->
+                        <g stroke="#e07a3f" stroke-width="2.5" fill="none" opacity="0.5">
+                            <!-- Path 1 - Revealing complexity -->
+                            <path d="M 300 280 Q 250 350 200 380" stroke-dasharray="500" stroke-dashoffset="500">
+                                <animate attributeName="stroke-dashoffset" from="500" to="0" dur="4s"
+                                    repeatCount="indefinite" />
+                            </path>
+
+                            <!-- Path 2 -->
+                            <path d="M 300 280 Q 350 350 400 380" stroke-dasharray="500" stroke-dashoffset="500">
+                                <animate attributeName="stroke-dashoffset" from="500" to="0" dur="4.5s"
+                                    repeatCount="indefinite" />
+                            </path>
+
+                            <!-- Path 3 -->
+                            <path d="M 300 280 L 300 420" stroke-dasharray="500" stroke-dashoffset="500">
+                                <animate attributeName="stroke-dashoffset" from="500" to="0" dur="3.8s"
+                                    repeatCount="indefinite" />
+                            </path>
+                        </g>
+
+                        <!-- Information Nodes (Explained Decisions) -->
+                        <g filter="url(#softGlow)">
+                            <!-- Node 1 -->
+                            <circle cx="200" cy="380" r="18" fill="#f4a261" opacity="0">
+                                <animate attributeName="opacity" values="0;0.8;0.8" dur="4s" repeatCount="indefinite" />
+                            </circle>
+                            <text x="200" y="388" text-anchor="middle" fill="white" font-size="16" font-weight="bold"
+                                opacity="0">
+                                ?
+                                <animate attributeName="opacity" values="0;1;1" dur="4s" repeatCount="indefinite" />
+                            </text>
+
+                            <!-- Node 2 -->
+                            <circle cx="400" cy="380" r="18" fill="#f4a261" opacity="0">
+                                <animate attributeName="opacity" values="0;0.8;0.8" dur="4.5s"
+                                    repeatCount="indefinite" />
+                            </circle>
+                            <text x="400" y="388" text-anchor="middle" fill="white" font-size="16" font-weight="bold"
+                                opacity="0">
+                                ?
+                                <animate attributeName="opacity" values="0;1;1" dur="4.5s" repeatCount="indefinite" />
+                            </text>
+
+                            <!-- Node 3 -->
+                            <circle cx="300" cy="420" r="18" fill="#f4a261" opacity="0">
+                                <animate attributeName="opacity" values="0;0.8;0.8" dur="3.8s"
+                                    repeatCount="indefinite" />
+                            </circle>
+                            <text x="300" y="428" text-anchor="middle" fill="white" font-size="16" font-weight="bold"
+                                opacity="0">
+                                ?
+                                <animate attributeName="opacity" values="0;1;1" dur="3.8s" repeatCount="indefinite" />
+                            </text>
+                        </g>
+
+                        <!-- Magnifying Glass (Investigation/Clarity) -->
+                        <g transform="translate(450, 120)">
+                            <!-- Handle -->
+                            <line x1="30" y1="30" x2="60" y2="60" stroke="#c75a2a" stroke-width="6"
+                                stroke-linecap="round">
+                                <animateTransform attributeName="transform" type="rotate"
+                                    values="0 30 30;5 30 30;0 30 30" dur="4s" repeatCount="indefinite" />
+                            </line>
+
+                            <!-- Glass Circle -->
+                            <circle cx="0" cy="0" r="28" fill="none" stroke="#e07a3f" stroke-width="5">
+                                <animate attributeName="opacity" values="0.8;1;0.8" dur="3s" repeatCount="indefinite" />
+                            </circle>
+                            <circle cx="0" cy="0" r="26" fill="rgba(244, 162, 97, 0.15)" />
+
+                            <!-- Reflection/Glare -->
+                            <path d="M -12 -12 Q -8 -15 -5 -12" stroke="white" stroke-width="3" fill="none"
+                                stroke-linecap="round" opacity="0.7" />
+                        </g>
+
+                        <!-- Document/Code Symbol (Explainability) -->
+                        <g transform="translate(150, 120)">
+                            <rect x="0" y="0" width="50" height="65" rx="4" fill="rgba(244, 162, 97, 0.3)"
+                                stroke="#e07a3f" stroke-width="2" />
+
+                            <!-- Lines representing code/explanation -->
+                            <line x1="8" y1="15" x2="42" y2="15" stroke="#e07a3f" stroke-width="2" />
+                            <line x1="8" y1="25" x2="35" y2="25" stroke="#e07a3f" stroke-width="2" />
+                            <line x1="8" y1="35" x2="42" y2="35" stroke="#e07a3f" stroke-width="2" />
+                            <line x1="8" y1="45" x2="30" y2="45" stroke="#e07a3f" stroke-width="2" />
+
+                            <animate attributeName="opacity" values="0.7;1;0.7" dur="3.5s" repeatCount="indefinite" />
+                        </g>
+
+                        <!-- Circular Transparency Ring -->
+                        <circle cx="300" cy="300" r="250" fill="none" stroke="#e07a3f" stroke-width="2" opacity="0.2"
+                            stroke-dasharray="10,5">
+                            <animateTransform attributeName="transform" type="rotate" from="0 300 300" to="360 300 300"
+                                dur="40s" repeatCount="indefinite" />
+                        </circle>
+
+                        <!-- Pulse Rings (Understanding Spreading) -->
+                        <g>
+                            <circle cx="300" cy="200" r="80" fill="none" stroke="#f4a261" stroke-width="2" opacity="0">
+                                <animate attributeName="r" values="80;130" dur="3s" repeatCount="indefinite" />
+                                <animate attributeName="opacity" values="0.6;0" dur="3s" repeatCount="indefinite" />
+                            </circle>
+
+                            <circle cx="300" cy="200" r="80" fill="none" stroke="#e07a3f" stroke-width="2" opacity="0">
+                                <animate attributeName="r" values="80;130" dur="3s" begin="1.5s"
+                                    repeatCount="indefinite" />
+                                <animate attributeName="opacity" values="0.6;0" dur="3s" begin="1.5s"
+                                    repeatCount="indefinite" />
+                            </circle>
+                        </g>
+
+                        <!-- Floating Clarity Particles -->
+                        <g opacity="0.5">
+                            <circle cx="180" cy="280" r="4" fill="#f4a261">
+                                <animate attributeName="cy" values="280;270;280" dur="3s" repeatCount="indefinite" />
+                                <animate attributeName="opacity" values="0.5;1;0.5" dur="3s" repeatCount="indefinite" />
+                            </circle>
+
+                            <circle cx="420" cy="300" r="3" fill="#e07a3f">
+                                <animate attributeName="cx" values="420;425;420" dur="4s" repeatCount="indefinite" />
+                                <animate attributeName="opacity" values="0.5;1;0.5" dur="4s" repeatCount="indefinite" />
+                            </circle>
+
+                            <circle cx="250" cy="450" r="4" fill="#f4a261">
+                                <animate attributeName="cy" values="450;445;450" dur="3.5s" repeatCount="indefinite" />
+                                <animate attributeName="opacity" values="0.5;1;0.5" dur="3.5s"
+                                    repeatCount="indefinite" />
+                            </circle>
+
+                            <circle cx="350" cy="460" r="3" fill="#e07a3f">
+                                <animate attributeName="cx" values="350;355;350" dur="4.2s" repeatCount="indefinite" />
+                                <animate attributeName="opacity" values="0.5;1;0.5" dur="4.2s"
+                                    repeatCount="indefinite" />
+                            </circle>
+                        </g>
+                    </svg>
                 </div>
             </div>
-            <div class="content">
-                <article>
-                    <header>
-                        <h2>The Right to Explanation in Data Science and Artificial Intelligence</h2>
-                        <div
-                            style="background-color: #f0f8ff; border-left: 4px solid #1e90ff; padding: 1em; margin-bottom: 1.5em;">
-                            <strong>This article is part of a series on <a
-                                    href="./artificial-intelligence.html">Artificial
-                                    Intelligence</a>.</strong>
+        </header>
+
+        <!-- Main Content -->
+        <main id="main-content">
+            <article class="content">
+                <section>
+                    <h3>Introduction</h3>
+                    <p>As algorithmic systems become deeply embedded in modern life—from social media feeds and credit
+                        scoring to job recruitment and healthcare—questions of transparency, fairness, and individual
+                        rights have taken center stage. One key demand emerging from this ethical and legal conversation
+                        is the <strong>right to explanation</strong>: the right of individuals to understand, question,
+                        and contest algorithmic decisions that affect their lives.</p>
+
+                    <p>Although rooted in legal frameworks like the European Union's General Data Protection Regulation
+                        (GDPR), the right to explanation is also a social, ethical, and technical imperative. This
+                        article explores its foundations, global relevance, challenges, and future directions in the age
+                        of artificial intelligence and machine learning.</p>
+                </section>
+
+                <section>
+                    <h3>Defining the Right to Explanation</h3>
+                    <p>The right to explanation refers to the notion that individuals should have the ability to receive
+                        meaningful information about automated decisions that significantly impact them. According to <a
+                            href="https://en.wikipedia.org/wiki/General_Data_Protection_Regulation">Article 22 of the
+                            GDPR</a>, individuals have the right not to be subject to decisions based solely on
+                        automated processing that produce legal effects or similarly significant consequences, and they
+                        must be informed about the logic involved.</p>
+
+                    <p>However, the interpretation of this right varies globally. Some jurisdictions incorporate
+                        explanation obligations via sector-specific regulation (e.g., financial credit decisions), while
+                        others emphasize principles like fairness and non-discrimination without mandating explanations
+                        per se.</p>
+                </section>
+
+                <section>
+                    <h3>Why Explanations Matter</h3>
+                    <ul>
+                        <li><strong>Transparency:</strong> Explaining how a model works builds public trust and makes
+                            the use of AI more accountable.</li>
+                        <li><strong>Fairness:</strong> Understanding why someone was denied a loan or flagged by a
+                            predictive policing system enables scrutiny for potential bias or discrimination.</li>
+                        <li><strong>Empowerment:</strong> Individuals can challenge, appeal, or seek remedies when
+                            decisions are transparent.</li>
+                        <li><strong>Compliance:</strong> Organizations must often meet legal standards requiring
+                            intelligibility and interpretability of their algorithms.</li>
+                    </ul>
+                </section>
+
+                <section>
+                    <h3>Challenges in Implementing the Right to Explanation</h3>
+                    <p>Implementing meaningful explanations is not trivial. Many modern AI systems, especially deep
+                        neural networks and ensemble models, function as <a
+                            href="https://en.wikipedia.org/wiki/Black_box">black boxes</a>, making their decision-making
+                        opaque even to developers.</p>
+
+                    <ul>
+                        <li><strong>Complexity:</strong> High-performing models often involve millions of parameters and
+                            non-linear relationships that are difficult to interpret.</li>
+                        <li><strong>Trade-offs:</strong> Enhancing explainability may reduce accuracy or expose
+                            proprietary intellectual property.</li>
+                        <li><strong>Audience mismatch:</strong> Explanations useful for developers may not be accessible
+                            to end-users, regulators, or laypeople.</li>
+                        <li><strong>Ambiguity in rights:</strong> Legal texts like GDPR do not precisely define what
+                            constitutes a "meaningful explanation."</li>
+                    </ul>
+                </section>
+
+                <section>
+                    <h3>Techniques for Explainability</h3>
+                    <p>To operationalize the right to explanation, the field of <a
+                            href="https://en.wikipedia.org/wiki/Explainable_artificial_intelligence">Explainable AI
+                            (XAI)</a> has developed several methods to make algorithms more interpretable:</p>
+
+                    <h4>Model-Agnostic Methods</h4>
+                    <ul>
+                        <li><strong><a href="https://github.com/marcotcr/lime">LIME (Local Interpretable Model-agnostic
+                                    Explanations)</a>:</strong> Perturbs inputs to see how predictions change locally.
+                        </li>
+                        <li><strong><a href="https://shap.readthedocs.io/en/latest/">SHAP (SHapley Additive
+                                    exPlanations)</a>:</strong> Uses cooperative game theory to assign importance to
+                            features for individual predictions.</li>
+                    </ul>
+
+                    <h4>Interpretable Models</h4>
+                    <ul>
+                        <li><strong>Decision Trees and Rule-Based Models:</strong> Transparent by design, though less
+                            powerful than black-box models.</li>
+                        <li><strong><a href="https://github.com/interpretml/interpret">EBM (Explainable Boosting
+                                    Machine)</a>:</strong> A generalized additive model that is accurate and
+                            interpretable.</li>
+                    </ul>
+
+                    <h4>Visual Tools</h4>
+                    <ul>
+                        <li><strong><a href="https://pair-code.github.io/what-if-tool/">What-If Tool:</a></strong> Helps
+                            visualize model predictions and test fairness across subgroups.</li>
+                        <li><strong>Fairlearn Dashboard:</strong> Offers visualization and mitigation tools for fairness
+                            analysis.</li>
+                    </ul>
+
+                    <h4>Next-Generation Techniques</h4>
+                    <ul>
+                        <li><strong>Counterfactual Explanations:</strong> Show how an input could be changed to receive
+                            a different outcome (e.g., "If your income were $5,000 higher, you would have been
+                            approved").</li>
+                        <li><strong>Concept Bottlenecks:</strong> Train models to rely on human-understandable concepts
+                            as intermediate layers.</li>
+                        <li><strong>Natural Language Explanations:</strong> Large Language Models (LLMs) like GPT-4 and
+                            Gemini are being used to generate human-readable justifications.</li>
+                    </ul>
+                </section>
+
+                <section>
+                    <h3>Ethical and Societal Implications</h3>
+                    <p>Beyond the technical and legal aspects, the right to explanation has deep ethical implications.
+                        Algorithmic decisions can reinforce existing social inequalities and amplify biases if not
+                        carefully designed.</p>
+
+                    <ul>
+                        <li><strong>Bias and Discrimination:</strong> Explanations allow for auditing decisions that may
+                            be racially, gender, or class biased.</li>
+                        <li><strong>Power Asymmetry:</strong> Companies and governments often control the models, while
+                            users have limited means to understand or challenge decisions.</li>
+                        <li><strong>Algorithmic Harm:</strong> A lack of explanation can prevent individuals from
+                            identifying harms in criminal justice, healthcare triage, or welfare allocation.</li>
+                        <li><strong>Dark Patterns and Manipulation:</strong> Algorithms may obscure decision logic to
+                            drive certain behaviors, such as targeted advertising or addiction loops, making
+                            explanations even more critical.</li>
+                    </ul>
+                </section>
+
+                <section>
+                    <h3>Legal Landscape and Global Perspectives</h3>
+                    <p>Although the GDPR remains a landmark, other regions are adopting similar measures:</p>
+
+                    <ul>
+                        <li><strong>EU AI Act:</strong> Introduces risk-based obligations, including transparency for
+                            high-risk systems.</li>
+                        <li><strong>U.S.:</strong> Lacks a federal "right to explanation," though some state-level laws
+                            (e.g., California's CCPA) offer limited transparency requirements.</li>
+                        <li><strong>OECD AI Principles:</strong> Advocate for transparency and accountability globally.
+                        </li>
+                        <li><strong>Brazil's LGPD and Canada's AIDA:</strong> Reflect emerging consensus on human
+                            oversight and intelligibility in automated systems.</li>
+                    </ul>
+                </section>
+
+                <section>
+                    <h3>Conclusion: Toward Responsible AI</h3>
+                    <p>The right to explanation is not merely a regulatory checkbox—it is a cornerstone of responsible
+                        and ethical AI. As AI systems become more powerful and widespread, explainability ensures that
+                        individuals retain agency in a world increasingly shaped by algorithms.</p>
+
+                    <p>Meeting this goal requires collaboration between data scientists, designers, policymakers,
+                        ethicists, and civil society. Whether through simple models, advanced visualization, or natural
+                        language reasoning, the future of AI must be intelligible, contestable, and just.</p>
+                </section>
+
+                <footer>
+                    <h3>References</h3>
+                    <ol>
+                        <li><a href="https://en.wikipedia.org/wiki/General_Data_Protection_Regulation">General Data
+                                Protection Regulation (Wikipedia)</a></li>
+                        <li><a href="https://en.wikipedia.org/wiki/Explainable_artificial_intelligence">Explainable
+                                Artificial Intelligence (Wikipedia)</a></li>
+                        <li><a href="https://arxiv.org/abs/1711.00399">"Counterfactual Explanations without Opening the
+                                Black Box" – Wachter et al., 2017</a></li>
+                        <li><a href="https://shap.readthedocs.io/">SHAP Documentation</a></li>
+                        <li><a href="https://github.com/marcotcr/lime">LIME GitHub Repository</a></li>
+                        <li><a href="https://pair-code.github.io/what-if-tool/">What-If Tool by Google PAIR</a></li>
+                        <li><a href="https://www.oecd.org/going-digital/ai/principles/">OECD Principles on AI</a></li>
+                        <li><a href="https://bidenwhitehouse.archives.gov/ostp/ai-bill-of-rights/">Blueprint for an AI
+                                Bill of Rights (U.S.)</a></li>
+                        <li><a href="https://ec.europa.eu/commission/presscorner/detail/en/ip_21_1682">European
+                                Commission: Proposal for the AI Act</a></li>
+                    </ol>
+                </footer>
+            </article>
+        </main>
+
+        <!-- Footer -->
+        <footer>
+            <div class="container">
+                <div class="footer-content">
+                    <div>
+                        <h3>About</h3>
+                        <p>This page is part of John Samuel's research on artificial intelligence, data science,
+                            semantic web technologies, and ethical AI practices.</p>
+                        <p>For more information, visit <a href="../about.html">about page</a> or explore the <a
+                                href="../research/research.html">research section</a>.</p>
+                    </div>
+                    <div>
+                        <h3>Language Versions</h3>
+                        <div class="language-links">
+                            <a href="./explanation.html" hreflang="en">English</a>
                         </div>
-                    </header>
-
-                    <section>
-                        <h3>Introduction</h3>
-                        <p>
-                            As algorithmic systems become deeply embedded in modern life—from social media feeds
-                            and credit scoring to job recruitment and healthcare—questions of transparency,
-                            fairness, and individual rights have taken center stage. One key demand emerging
-                            from this ethical and legal conversation is the <strong>right to
-                                explanation</strong>: the right of individuals to understand, question, and
-                            contest algorithmic decisions that affect their lives.
-                        </p>
-                        <p>
-                            Although rooted in legal frameworks like the European Union’s General Data
-                            Protection Regulation (GDPR), the right to explanation is also a social, ethical,
-                            and technical imperative. This article explores its foundations, global relevance,
-                            challenges, and future directions in the age of artificial intelligence and machine
-                            learning.
-                        </p>
-                    </section>
-
-                    <section>
-                        <h3>Defining the Right to Explanation</h3>
-                        <p>
-                            The right to explanation refers to the notion that individuals should have the
-                            ability to receive meaningful information about automated decisions that
-                            significantly impact them. According to <a
-                                href="https://en.wikipedia.org/wiki/General_Data_Protection_Regulation">Article 22 of
-                                the GDPR</a>, individuals have the right not to be
-                            subject to decisions based solely on automated processing that produce legal effects
-                            or similarly significant consequences, and they must be informed about the logic
-                            involved.
-                        </p>
-                        <p>
-                            However, the interpretation of this right varies globally. Some jurisdictions
-                            incorporate explanation obligations via sector-specific regulation (e.g., financial
-                            credit decisions), while others emphasize principles like fairness and
-                            non-discrimination without mandating explanations per se.
-                        </p>
-                    </section>
-
-                    <section>
-                        <h3>Why Explanations Matter</h3>
-                        <ul>
-                            <li><strong>Transparency:</strong> Explaining how a model works builds public trust
-                                and makes the use of AI more accountable.</li>
-                            <li><strong>Fairness:</strong> Understanding why someone was denied a loan or
-                                flagged by a predictive policing system enables scrutiny for potential bias or
-                                discrimination.</li>
-                            <li><strong>Empowerment:</strong> Individuals can challenge, appeal, or seek
-                                remedies when decisions are transparent.</li>
-                            <li><strong>Compliance:</strong> Organizations must often meet legal standards
-                                requiring intelligibility and interpretability of their algorithms.</li>
-                        </ul>
-                    </section>
-
-                    <section>
-                        <h3>Challenges in Implementing the Right to Explanation</h3>
-                        <p>
-                            Implementing meaningful explanations is not trivial. Many modern AI systems,
-                            especially deep neural networks and ensemble models, function as <a
-                                href="https://en.wikipedia.org/wiki/Black_box">black boxes</a>,
-                            making their decision-making opaque even to developers.
-                        </p>
-                        <ul>
-                            <li><strong>Complexity:</strong> High-performing models often involve millions of
-                                parameters and non-linear relationships that are difficult to interpret.</li>
-                            <li><strong>Trade-offs:</strong> Enhancing explainability may reduce accuracy or
-                                expose proprietary intellectual property.</li>
-                            <li><strong>Audience mismatch:</strong> Explanations useful for developers may not
-                                be accessible to end-users, regulators, or laypeople.</li>
-                            <li><strong>Ambiguity in rights:</strong> Legal texts like GDPR do not precisely
-                                define what constitutes a “meaningful explanation.”</li>
-                        </ul>
-                    </section>
-
-                    <section>
-                        <h3>Techniques for Explainability</h3>
-                        <p>
-                            To operationalize the right to explanation, the field of <a
-                                href="https://en.wikipedia.org/wiki/Explainable_artificial_intelligence">Explainable AI
-                                (XAI)</a> has developed several methods to make
-                            algorithms more interpretable:
-                        </p>
-
-                        <h3>Model-Agnostic Methods</h3>
-                        <ul>
-                            <li><strong><a href="https://github.com/marcotcr/lime">LIME (Local
-                                        Interpretable Model-agnostic Explanations)</a>:</strong> Perturbs inputs
-                                to see how predictions change locally.</li>
-                            <li><strong><a href="https://shap.readthedocs.io/en/latest/">SHAP
-                                        (SHapley Additive exPlanations)</a>:</strong> Uses cooperative game
-                                theory to assign importance to features for individual predictions.</li>
-                        </ul>
-
-                        <h3>Interpretable Models</h3>
-                        <ul>
-                            <li><strong>Decision Trees and Rule-Based Models:</strong> Transparent by design,
-                                though less powerful than black-box models.</li>
-                            <li><strong><a href="https://github.com/interpretml/interpret">EBM
-                                        (Explainable Boosting Machine)</a>:</strong> A generalized additive
-                                model that is accurate and interpretable.</li>
-                        </ul>
-
-                        <h3>Visual Tools</h3>
-                        <ul>
-                            <li><strong><a href="https://pair-code.github.io/what-if-tool/">What-If
-                                        Tool:</a></strong> Helps visualize model
-                                predictions and test fairness across subgroups.</li>
-                            <li><strong>Fairlearn Dashboard:</strong> Offers visualization and mitigation tools
-                                for fairness analysis.</li>
-                        </ul>
-
-                        <h3>Next-Generation Techniques</h3>
-                        <ul>
-                            <li><strong>Counterfactual Explanations:</strong> Show how an input could be changed
-                                to receive a different outcome (e.g., “If your income were $5,000 higher, you
-                                would have been approved”).</li>
-                            <li><strong>Concept Bottlenecks:</strong> Train models to rely on
-                                human-understandable concepts as intermediate layers.</li>
-                            <li><strong>Natural Language Explanations:</strong> Large Language Models (LLMs)
-                                like GPT-4 and Gemini are being used to generate human-readable justifications.
-                            </li>
-                        </ul>
-                    </section>
-
-                    <section>
-                        <h3>Ethical and Societal Implications</h3>
-                        <p>
-                            Beyond the technical and legal aspects, the right to explanation has deep ethical
-                            implications. Algorithmic decisions can reinforce existing social inequalities and
-                            amplify biases if not carefully designed.
-                        </p>
-                        <ul>
-                            <li><strong>Bias and Discrimination:</strong> Explanations allow for auditing
-                                decisions that may be racially, gender, or class biased.</li>
-                            <li><strong>Power Asymmetry:</strong> Companies and governments often control the
-                                models, while users have limited means to understand or challenge decisions.
-                            </li>
-                            <li><strong>Algorithmic Harm:</strong> A lack of explanation can prevent individuals
-                                from identifying harms in criminal justice, healthcare triage, or welfare
-                                allocation.</li>
-                            <li><strong>Dark Patterns and Manipulation:</strong> Algorithms may obscure decision
-                                logic to drive certain behaviors, such as targeted advertising or addiction
-                                loops, making explanations even more critical.</li>
-                        </ul>
-                    </section>
-
-                    <section>
-                        <h3>Legal Landscape and Global Perspectives</h3>
-                        <p>
-                            Although the GDPR remains a landmark, other regions are adopting similar measures:
-                        </p>
-                        <ul>
-                            <li><strong>EU AI Act:</strong> Introduces risk-based obligations, including
-                                transparency for high-risk systems.</li>
-                            <li><strong>U.S.:</strong> Lacks a federal “right to explanation,” though some
-                                state-level laws (e.g., California’s CCPA) offer limited transparency
-                                requirements.</li>
-                            <li><strong>OECD AI Principles:</strong> Advocate for transparency and
-                                accountability globally.</li>
-                            <li><strong>Brazil’s LGPD and Canada’s AIDA:</strong> Reflect emerging consensus on
-                                human oversight and intelligibility in automated systems.</li>
-                        </ul>
-                    </section>
-
-                    <section>
-                        <h3>Conclusion: Toward Responsible AI</h3>
-                        <p>
-                            The right to explanation is not merely a regulatory checkbox—it is a cornerstone of
-                            responsible and ethical AI. As AI systems become more powerful and widespread,
-                            explainability ensures that individuals retain agency in a world increasingly shaped
-                            by algorithms.
-                        </p>
-                        <p>
-                            Meeting this goal requires collaboration between data scientists, designers,
-                            policymakers, ethicists, and civil society. Whether through simple models, advanced
-                            visualization, or natural language reasoning, the future of AI must be intelligible,
-                            contestable, and just.
-                        </p>
-                    </section>
-
-                    <footer>
-                        <h3>References</h3>
-                        <ol>
-                            <li><a href="https://en.wikipedia.org/wiki/General_Data_Protection_Regulation">General Data
-                                    Protection Regulation (Wikipedia)</a></li>
-                            <li><a href="https://en.wikipedia.org/wiki/Explainable_artificial_intelligence">Explainable
-                                    Artificial Intelligence (Wikipedia)</a></li>
-                            <li><a href="https://arxiv.org/abs/1711.00399">"Counterfactual
-                                    Explanations without Opening the Black Box" – Wachter et al., 2017</a></li>
-                            <li><a href="https://shap.readthedocs.io/">SHAP Documentation</a>
-                            </li>
-                            <li><a href="https://github.com/marcotcr/lime">LIME GitHub
-                                    Repository</a></li>
-                            <li><a href="https://pair-code.github.io/what-if-tool/">What-If Tool
-                                    by Google PAIR</a></li>
-                            <li><a href="https://www.oecd.org/going-digital/ai/principles/">OECD
-                                    Principles on AI</a></li>
-                            <li><a href="https://bidenwhitehouse.archives.gov/ostp/ai-bill-of-rights/">Blueprint
-                                    for an AI Bill of Rights (U.S.)</a></li>
-                            <li><a href="https://ec.europa.eu/commission/presscorner/detail/en/ip_21_1682">European
-                                    Commission: Proposal for the AI Act</a></li>
-                        </ol>
-                    </footer>
-                </article>
+                    </div>
+                </div>
+                <div class="footer-bottom">
+                    <p>&copy; 2025 John Samuel. All rights reserved.</p>
+                </div>
             </div>
-        </div>
+        </footer>
     </body>
 
 </html>
