@@ -2,459 +2,968 @@
 <html lang="en">
 
     <head>
-        <meta charset="utf-8" />
-        <meta http-equiv="Content-Language" content="en" />
-        <link rel="shortcut icon" href="../../images/logo/favicon.png" />
-        <title>Recommendation and Personalization: John Samuel</title>
-        <style type="text/css">
-            body {
-                background-color: #FFFFFF;
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta name="description"
+            content="Exploring the double-edged nature of personalization, algorithmic bias, and self-knowledge in data science">
+        <title>Recommendation and Personalization | John Samuel</title>
+        <style>
+            /* ==================== CSS Custom Properties ==================== */
+            :root {
+                /* Color Palette - Data Science Theme (Neural Networks, Filtering, Self-Reflection) */
+                --color-base-bg: #f8f9fc;
+                --color-base-surface: #ffffff;
+                --color-base-text: #1a202c;
+                --color-base-text-muted: #4a5568;
+
+                /* Accent Colors - Deep Purple (Neural), Teal (Data), Amber (Insight) */
+                --color-accent-1: #6366f1;
+                /* Indigo - primary algorithms */
+                --color-accent-2: #4f46e5;
+                /* Deep indigo - neural depth */
+                --color-accent-3: #14b8a6;
+                /* Teal - data flow */
+                --color-accent-4: #f59e0b;
+                /* Amber - insight/warning */
+                --color-accent-light: #eef2ff;
+                /* Pale indigo background */
+
+                /* Functional Colors */
+                --color-shadow: rgba(99, 102, 241, 0.12);
+                --color-border: rgba(99, 102, 241, 0.15);
+                --color-hover: rgba(99, 102, 241, 0.08);
+
+                /* Gradients */
+                --gradient-primary: linear-gradient(135deg, var(--color-accent-1) 0%, var(--color-accent-2) 50%, var(--color-accent-3) 100%);
+                --gradient-subtle: linear-gradient(180deg, var(--color-base-bg), var(--color-accent-light));
+                --gradient-radial: radial-gradient(circle at 50% 50%, var(--color-accent-1), var(--color-accent-2));
+
+                /* Spacing Scale */
+                --space-xs: 0.25rem;
+                --space-sm: 0.5rem;
+                --space-md: 1rem;
+                --space-lg: 1.5rem;
+                --space-xl: 2rem;
+                --space-2xl: 3rem;
+                --space-3xl: 4rem;
+                --space-4xl: 6rem;
+
+                /* Border Radius */
+                --radius-sm: 4px;
+                --radius-md: 8px;
+                --radius-lg: 12px;
+                --radius-xl: 16px;
+                --radius-2xl: 24px;
+                --radius-full: 9999px;
+                --radius-organic: 63% 37% 54% 46% / 45% 62% 38% 55%;
+
+                /* Shadows */
+                --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.04), 0 1px 3px rgba(0, 0, 0, 0.06);
+                --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.05), 0 2px 4px rgba(0, 0, 0, 0.06);
+                --shadow-lg: 0 10px 24px rgba(0, 0, 0, 0.08), 0 4px 8px rgba(0, 0, 0, 0.06);
+                --shadow-xl: 0 20px 40px rgba(0, 0, 0, 0.12), 0 8px 16px rgba(0, 0, 0, 0.08);
+                --shadow-theme: 0 10px 30px var(--color-shadow), 0 4px 10px rgba(0, 0, 0, 0.06);
+
+                /* Typography */
+                --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+                --text-xs: clamp(0.75rem, 0.7rem + 0.25vw, 0.875rem);
+                --text-sm: clamp(0.875rem, 0.8rem + 0.35vw, 1rem);
+                --text-base: clamp(1rem, 0.95rem + 0.25vw, 1.125rem);
+                --text-lg: clamp(1.125rem, 1.05rem + 0.35vw, 1.25rem);
+                --text-xl: clamp(1.25rem, 1.15rem + 0.5vw, 1.5rem);
+                --text-2xl: clamp(1.5rem, 1.3rem + 1vw, 2rem);
+                --text-3xl: clamp(2rem, 1.6rem + 2vw, 2.5rem);
+                --text-4xl: clamp(2.5rem, 2rem + 2.5vw, 3.5rem);
+                --text-5xl: clamp(3rem, 2.5rem + 2.5vw, 5rem);
+
+                --weight-normal: 400;
+                --weight-medium: 500;
+                --weight-semibold: 600;
+                --weight-bold: 700;
+                --weight-extrabold: 800;
+
+                --leading-tight: 1.25;
+                --leading-normal: 1.5;
+                --leading-relaxed: 1.75;
             }
 
-            #sidebar {
-                position: fixed;
-                background-color: #1B80CF;
-                top: 0;
-                left: 0;
-                bottom: 0;
-                width: 30vw;
-            }
-
-            #sidebar .title {
-                position: relative;
-                text-align: center;
-                line-height: 4vmax;
-                font-size: 1.4vmax;
-                font-family: 'Arial';
-                margin-top: 25vh;
-            }
-
-            #sidebar .title a:link,
-            #sidebar .title a:visited {
-                color: #FFFFFF;
-                text-decoration: none;
-            }
-
-            .subtitle {
-                top: 50vh;
-                text-align: center;
-                line-height: 1.3vmax;
-                font-family: 'Arial';
-                font-size: 1.5vmax;
-                color: #FFFFFF;
-            }
-
-            .subtitle a:link,
-            .subtitle a:visited {
-                color: #FFFFFF;
-                text-decoration: none;
-            }
-
-            .licence {
-                position: fixed;
-                text-align: right;
-                bottom: 0;
-                right: 0;
-            }
-
-            .home {
-                position: fixed;
-                text-align: left;
-                font-family: 'Arial';
-                color: #D3D3D3;
-                z-index: 100;
-                width: 100%;
-                background-color: #FFFFFF;
-                top: 0px;
-                margin-bottom: 10px;
-                padding-bottom: 10px;
-            }
-
-            .home a:link,
-            .home a:visited {
-                text-decoration: none;
-                color: #D3D3D3;
-            }
-
-            .home ul {
+            /* ==================== Reset & Base Styles ==================== */
+            *,
+            *::before,
+            *::after {
+                box-sizing: border-box;
                 margin: 0;
                 padding: 0;
-                text-align: left;
+            }
+
+            html {
+                scroll-behavior: smooth;
+                scroll-padding-top: 80px;
+            }
+
+            body {
+                font-family: var(--font-sans);
+                font-size: var(--text-base);
+                line-height: var(--leading-relaxed);
+                color: var(--color-base-text);
+                background: var(--color-base-bg);
+                overflow-x: hidden;
+            }
+
+            /* ==================== Skip Link ==================== */
+            .skip-link {
+                position: absolute;
+                top: -40px;
+                left: 0;
+                background: var(--color-accent-1);
+                color: white;
+                padding: var(--space-sm) var(--space-md);
+                text-decoration: none;
+                border-radius: var(--radius-sm);
+                z-index: 10000;
+            }
+
+            .skip-link:focus {
+                top: 0;
+            }
+
+            /* ==================== Navigation Bar ==================== */
+            .navbar {
+                position: fixed;
+                top: 0;
+                width: 100%;
+                z-index: 1000;
+                background: rgba(255, 255, 255, 0.8);
+                -webkit-backdrop-filter: blur(12px) saturate(180%);
+                backdrop-filter: blur(12px) saturate(180%);
+                border-bottom: 1px solid var(--color-border);
+                box-shadow: var(--shadow-sm);
+                transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            }
+
+            .navbar-container {
+                max-width: 1400px;
+                margin: 0 auto;
+                padding: var(--space-md) var(--space-lg);
+                display: flex;
+                align-items: center;
+                gap: var(--space-lg);
+                flex-wrap: wrap;
+            }
+
+            .navbar-brand {
+                font-weight: var(--weight-bold);
+                color: var(--color-accent-1);
+                text-decoration: none;
+                font-size: var(--text-lg);
+                transition: all 0.3s ease;
+            }
+
+            .navbar-brand:hover {
+                color: var(--color-accent-2);
+                transform: translateY(-1px);
+            }
+
+            .navbar-links {
+                display: flex;
+                gap: var(--space-md);
                 list-style: none;
             }
 
-            .home li {
-                position: relative;
-                float: left;
-                padding-top: 15px;
-                margin-right: 1em;
-                font-family: 'Arial';
-            }
-
-            .home li:hover {
-                display: block;
-            }
-
-            .home a:link,
-            .home a:visited {
-                color: #D3D3D3;
-            }
-
-            .home li:hover a:link,
-            .home li:hover a:visited {
+            .navbar-link {
+                color: var(--color-base-text-muted);
                 text-decoration: none;
-                padding: 15px;
-                color: #FFFFFF;
-                background-color: #1B80CF;
+                font-size: var(--text-sm);
+                transition: all 0.3s ease;
+                padding: var(--space-xs) var(--space-sm);
+                border-radius: var(--radius-sm);
             }
 
-            .content {
-                line-height: 1.8vmax;
-                font-size: 1.2vmax;
-                font-family: 'Arial';
-                margin-top: 15vh;
-                width: 90%;
+            .navbar-link:hover {
+                color: var(--color-accent-1);
+                background: var(--color-hover);
             }
 
-            .content h2,
-            h3,
-            h4 {
-                color: #1B80CF;
-                line-height: 3rem;
-            }
-
-            .content a:link,
-            .content a:visited {
-                color: #1B80CF;
-            }
-
-            .content h3 {
-                color: #1B80CF;
-            }
-
-            .content h2::before,
-            .content h3::before {
-                display: block;
-                content: " ";
-                visibility: hidden;
-                height: 50px;
-                margin-top: -50px;
-                pointer-events: none;
-                background-color: #FFFFFF;
-            }
-
-            .content a:link,
-            .content a:visited {
-                color: #1B80CF;
-            }
-
-            .content li {
-                margin: 5px;
-            }
-
-            .page {
-                width: 65vw;
-                height: 100%;
-                margin-left: 30vw;
+            /* ==================== Hero Section ==================== */
+            .hero {
+                min-height: 75vh;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                padding: var(--space-4xl) var(--space-lg);
+                background: var(--gradient-subtle);
+                position: relative;
                 overflow: hidden;
-                padding: 0 1em;
-                font-family: 'Arial';
+                margin-top: 60px;
             }
 
-            .page img {
-                max-width: 100%;
-                max-height: 100%;
+            .hero::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background-image:
+                    radial-gradient(circle at 20% 80%, rgba(99, 102, 241, 0.05) 0%, transparent 50%),
+                    radial-gradient(circle at 80% 20%, rgba(20, 184, 166, 0.05) 0%, transparent 50%);
+                pointer-events: none;
             }
 
-            @media (max-width: 640px),
-            screen and (orientation: portrait) {
-                body {
-                    max-width: 100%;
-                    max-height: 100%;
+            .hero-content {
+                max-width: 900px;
+                text-align: center;
+                position: relative;
+                z-index: 1;
+            }
+
+            .hero-svg {
+                width: 350px;
+                height: 350px;
+                margin: 0 auto var(--space-2xl);
+            }
+
+            .hero-title {
+                font-size: var(--text-5xl);
+                font-weight: var(--weight-extrabold);
+                line-height: var(--leading-tight);
+                margin-bottom: var(--space-lg);
+                background: var(--gradient-primary);
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                background-clip: text;
+                letter-spacing: -0.03em;
+            }
+
+            .hero-subtitle {
+                font-size: var(--text-xl);
+                color: var(--color-base-text-muted);
+                margin-bottom: var(--space-md);
+                font-weight: var(--weight-medium);
+            }
+
+            .data-science-badge {
+                display: inline-block;
+                padding: var(--space-sm) var(--space-lg);
+                background: rgba(99, 102, 241, 0.1);
+                border: 2px solid var(--color-accent-1);
+                border-radius: var(--radius-full);
+                font-size: var(--text-sm);
+                font-weight: var(--weight-semibold);
+                color: var(--color-accent-1);
+                text-decoration: none;
+                transition: all 0.3s ease;
+                margin-top: var(--space-md);
+            }
+
+            .data-science-badge:hover {
+                background: var(--color-accent-1);
+                color: white;
+                transform: translateY(-2px);
+                box-shadow: var(--shadow-theme);
+            }
+
+            /* ==================== Section Styles ==================== */
+            .section {
+                padding: var(--space-4xl) var(--space-lg);
+                max-width: 1400px;
+                margin: 0 auto;
+            }
+
+            .section-title {
+                font-size: var(--text-4xl);
+                font-weight: var(--weight-bold);
+                margin-bottom: var(--space-2xl);
+                color: var(--color-accent-1);
+                letter-spacing: -0.02em;
+                position: relative;
+                display: inline-block;
+            }
+
+            .section-title::after {
+                content: '';
+                position: absolute;
+                bottom: -8px;
+                left: 0;
+                width: 60%;
+                height: 4px;
+                background: var(--gradient-primary);
+                border-radius: var(--radius-full);
+            }
+
+            /* ==================== Content Grid ==================== */
+            .content-grid {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+                gap: var(--space-xl);
+                margin-top: var(--space-3xl);
+            }
+
+            /* ==================== Card Styles ==================== */
+            .card {
+                background: var(--color-base-surface);
+                border-radius: var(--radius-xl);
+                padding: var(--space-xl);
+                box-shadow: var(--shadow-md);
+                transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+                position: relative;
+                overflow: hidden;
+            }
+
+            .card::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 4px;
+                background: var(--gradient-primary);
+                transform: scaleX(0);
+                transform-origin: left;
+                transition: transform 0.4s ease;
+            }
+
+            .card:hover {
+                transform: translateY(-12px);
+                box-shadow: var(--shadow-theme);
+            }
+
+            .card:hover::before {
+                transform: scaleX(1);
+            }
+
+            .card-icon {
+                width: 60px;
+                height: 60px;
+                margin-bottom: var(--space-lg);
+                background: var(--gradient-primary);
+                border-radius: var(--radius-organic);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: var(--text-2xl);
+                animation: morphIcon 8s ease-in-out infinite;
+            }
+
+            .card-title {
+                font-size: var(--text-2xl);
+                font-weight: var(--weight-bold);
+                margin-bottom: var(--space-md);
+                color: var(--color-accent-1);
+                letter-spacing: -0.01em;
+            }
+
+            .card-text {
+                color: var(--color-base-text-muted);
+                line-height: var(--leading-relaxed);
+            }
+
+            /* ==================== Article Content ==================== */
+            .article-content {
+                max-width: 900px;
+                margin: 0 auto;
+                background: var(--color-base-surface);
+                padding: var(--space-3xl);
+                border-radius: var(--radius-2xl);
+                box-shadow: var(--shadow-lg);
+            }
+
+            .article-content h2 {
+                font-size: var(--text-3xl);
+                font-weight: var(--weight-bold);
+                color: var(--color-accent-1);
+                margin-top: var(--space-3xl);
+                margin-bottom: var(--space-lg);
+                letter-spacing: -0.02em;
+                position: relative;
+                padding-bottom: var(--space-sm);
+            }
+
+            .article-content h2::after {
+                content: '';
+                position: absolute;
+                bottom: 0;
+                left: 0;
+                width: 50px;
+                height: 3px;
+                background: var(--gradient-primary);
+                border-radius: var(--radius-full);
+            }
+
+            .article-content h3 {
+                font-size: var(--text-2xl);
+                font-weight: var(--weight-semibold);
+                color: var(--color-accent-2);
+                margin-top: var(--space-2xl);
+                margin-bottom: var(--space-md);
+            }
+
+            .article-content p {
+                margin-bottom: var(--space-lg);
+                line-height: var(--leading-relaxed);
+            }
+
+            .article-content a {
+                color: var(--color-accent-1);
+                text-decoration: none;
+                border-bottom: 2px solid transparent;
+                transition: all 0.3s ease;
+            }
+
+            .article-content a:hover {
+                color: var(--color-accent-2);
+                border-bottom-color: var(--color-accent-2);
+            }
+
+            .article-content ul,
+            .article-content ol {
+                margin-left: var(--space-xl);
+                margin-bottom: var(--space-lg);
+            }
+
+            .article-content li {
+                margin-bottom: var(--space-sm);
+            }
+
+            /* ==================== Info Box ==================== */
+            .info-box {
+                background: linear-gradient(135deg, rgba(99, 102, 241, 0.05), rgba(20, 184, 166, 0.05));
+                border-left: 4px solid var(--color-accent-1);
+                padding: var(--space-lg);
+                border-radius: var(--radius-md);
+                margin-bottom: var(--space-xl);
+            }
+
+            .info-box strong {
+                color: var(--color-accent-1);
+            }
+
+            .info-box a {
+                color: var(--color-accent-2);
+                font-weight: var(--weight-semibold);
+            }
+
+            /* ==================== Footer ==================== */
+            .footer {
+                background: var(--color-base-bg);
+                padding: var(--space-3xl) var(--space-lg);
+                border-top: 1px solid var(--color-border);
+                margin-top: var(--space-4xl);
+            }
+
+            .footer-content {
+                max-width: 1400px;
+                margin: 0 auto;
+                text-align: center;
+            }
+
+            .language-section {
+                margin-bottom: var(--space-xl);
+            }
+
+            .language-section h3 {
+                font-size: var(--text-lg);
+                font-weight: var(--weight-semibold);
+                color: var(--color-accent-1);
+                margin-bottom: var(--space-md);
+            }
+
+            .language-links {
+                display: flex;
+                gap: var(--space-md);
+                justify-content: center;
+                flex-wrap: wrap;
+            }
+
+            .language-links a {
+                padding: var(--space-sm) var(--space-md);
+                border-radius: var(--radius-full);
+                background: transparent;
+                border: 1px solid var(--color-border);
+                color: var(--color-base-text-muted);
+                font-size: var(--text-sm);
+                text-decoration: none;
+                transition: all 0.3s ease;
+                display: inline-block;
+            }
+
+            .language-links a:hover {
+                background: var(--gradient-primary);
+                color: white;
+                border-color: transparent;
+                transform: translateY(-2px);
+            }
+
+            .footer-text {
+                color: var(--color-base-text-muted);
+                font-size: var(--text-sm);
+            }
+
+            .footer-link {
+                color: var(--color-accent-1);
+                text-decoration: none;
+                transition: all 0.3s ease;
+            }
+
+            .footer-link:hover {
+                color: var(--color-accent-2);
+            }
+
+            /* ==================== Animations ==================== */
+            @keyframes float {
+
+                0%,
+                100% {
+                    transform: translateY(0px) rotate(0deg);
                 }
 
-                #sidebar {
-                    position: fixed;
-                    background-color: #1B80CF;
-                    top: 0;
-                    left: 0;
-                    bottom: 80vh;
-                    width: 100vw;
+                50% {
+                    transform: translateY(-20px) rotate(5deg);
+                }
+            }
+
+            @keyframes rotate {
+                from {
+                    transform: rotate(0deg);
                 }
 
-                #sidebar .title {
-                    text-align: center;
-                    position: fixed;
-                    margin-top: 6vh;
-                    left: 0px;
-                    right: 0px;
-                    line-height: 3.5vmax;
-                    font-size: 1.5vmax;
-                    font-family: 'Arial';
+                to {
+                    transform: rotate(360deg);
+                }
+            }
+
+            @keyframes pulse {
+
+                0%,
+                100% {
+                    opacity: 1;
+                    transform: scale(1);
                 }
 
-                #sidebar .subtitle {
-                    text-align: center;
-                    top: 5vh;
-                    left: 0px;
-                    right: 0px;
-                    position: fixed;
-                    margin-top: 10vh;
-                    font-size: 1.5vmax;
+                50% {
+                    opacity: 0.7;
+                    transform: scale(1.05);
+                }
+            }
+
+            @keyframes morphIcon {
+
+                0%,
+                100% {
+                    border-radius: 63% 37% 54% 46% / 45% 62% 38% 55%;
                 }
 
-                #sidebar .title a:link,
-                #sidebar .title a:visited {
-                    text-align: center;
-                    color: #FFFFFF;
+                50% {
+                    border-radius: 37% 63% 46% 54% / 62% 45% 55% 38%;
+                }
+            }
+
+            @keyframes gradientShift {
+                0% {
+                    background-position: 0% 50%;
                 }
 
-                #sidebar .subtitle a:link,
-                #sidebar .subtitle a:visited {
-                    text-align: center;
-                    color: #FFFFFF;
+                50% {
+                    background-position: 100% 50%;
                 }
 
-                .home {
-                    z-index: 100;
-                    width: 100%;
-                    background-color: #1B80CF;
-                    font-size: 1.5vmax;
+                100% {
+                    background-position: 0% 50%;
+                }
+            }
+
+            @keyframes fadeInUp {
+                from {
+                    opacity: 0;
+                    transform: translateY(30px);
                 }
 
-                .home a:link,
-                .home a:visited {
-                    text-decoration: none;
-                    color: #FFFFFF;
+                to {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            }
+
+            /* SVG Animations */
+            .svg-layer-1 {
+                animation: float 4s ease-in-out infinite;
+            }
+
+            .svg-layer-2 {
+                animation: float 5s ease-in-out infinite 0.5s;
+            }
+
+            .svg-layer-3 {
+                animation: rotate 20s linear infinite;
+            }
+
+            .svg-layer-4 {
+                animation: pulse 3s ease-in-out infinite;
+            }
+
+            .svg-layer-5 {
+                animation: float 6s ease-in-out infinite 1s;
+            }
+
+            /* ==================== Responsive Design ==================== */
+            @media (max-width: 768px) {
+                .navbar-container {
+                    flex-direction: column;
+                    gap: var(--space-sm);
                 }
 
-                .content {
-                    line-height: 3.8vmax;
-                    font-size: 1.8vmax;
-                    font-family: 'Arial';
-                    margin-top: 22vh;
+                .hero {
+                    min-height: 60vh;
+                    padding: var(--space-2xl) var(--space-md);
                 }
 
-                .content a:link,
-                .content a:visited {
-                    color: #1B80CF;
+                .hero-svg {
+                    width: 250px;
+                    height: 250px;
                 }
 
-                .page {
-                    top: 40vh;
-                    width: 95%;
-                    margin-left: 0vw;
+                .section {
+                    padding: var(--space-2xl) var(--space-md);
                 }
 
-                .page img {
-                    max-width: 100%;
-                    max-height: 100%;
-                    border: 0;
+                .article-content {
+                    padding: var(--space-xl);
+                }
+
+                .content-grid {
+                    grid-template-columns: 1fr;
+                }
+            }
+
+            /* ==================== Accessibility ==================== */
+            :focus-visible {
+                outline: 3px solid var(--color-accent-1);
+                outline-offset: 2px;
+                border-radius: var(--radius-sm);
+            }
+
+            @media (prefers-reduced-motion: reduce) {
+
+                *,
+                *::before,
+                *::after {
+                    animation-duration: 0.01ms !important;
+                    animation-iteration-count: 1 !important;
+                    transition-duration: 0.01ms !important;
+                }
+            }
+
+            @media (prefers-contrast: high) {
+                :root {
+                    --color-base-text: #000000;
+                    --color-base-bg: #ffffff;
                 }
             }
         </style>
     </head>
 
-    <body vocab="http://schema.org/">
-        <div class="page">
-            <div class="home">
-                <ul typeof="BreadcrumbList">
-                    <li property="itemListElement" typeof="ListItem">
-                        <a property="item" typeof="WebPage" href="../index.html">
-                            <span property="name">Home</span>
-                        </a>
-                    </li>
-                    <li property="itemListElement" typeof="ListItem">
-                        <a property="item" typeof="WebPage" href="../research/research.html">
-                            <span property="name">Research</span>
-                        </a>
-                    </li>
+    <body>
+        <a href="#main-content" class="skip-link">Skip to main content</a>
+
+        <!-- Navigation Bar -->
+        <nav class="navbar" role="navigation" aria-label="Main navigation">
+            <div class="navbar-container">
+                <a href="../about.html" class="navbar-brand">John Samuel</a>
+                <ul class="navbar-links">
+                    <li><a href="../index.html" class="navbar-link">Home</a></li>
+                    <li><a href="../research/research.html" class="navbar-link">Research</a></li>
+                    <li><a href="./data-science.html" class="navbar-link">Data Science</a></li>
                 </ul>
-
             </div>
-            <div id="sidebar">
-                <div class="title">
-                    <h1><a href="./recommendation-personalization.html">Recommendation and Personalization</a></h1>
-                </div>
-                <div class="subtitle">
-                    <h3><a href="../about.html">John Samuel</a></h3>
-                </div>
+        </nav>
+
+        <!-- Hero Section -->
+        <header class="hero">
+            <div class="hero-content">
+                <svg class="hero-svg" viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg" role="img"
+                    aria-label="Algorithmic filtering visualization with data flow and neural network nodes">
+                    <defs>
+                        <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" style="stop-color:#6366f1;stop-opacity:1" />
+                            <stop offset="50%" style="stop-color:#4f46e5;stop-opacity:1" />
+                            <stop offset="100%" style="stop-color:#14b8a6;stop-opacity:1" />
+                        </linearGradient>
+                        <linearGradient id="grad2" x1="0%" y1="0%" x2="100%" y2="0%">
+                            <stop offset="0%" style="stop-color:#14b8a6;stop-opacity:1" />
+                            <stop offset="100%" style="stop-color:#f59e0b;stop-opacity:1" />
+                        </linearGradient>
+                        <filter id="glow">
+                            <feGaussianBlur stdDeviation="4" result="coloredBlur" />
+                            <feMerge>
+                                <feMergeNode in="coloredBlur" />
+                                <feMergeNode in="SourceGraphic" />
+                            </feMerge>
+                        </filter>
+                    </defs>
+
+                    <!-- Background circle representing filter bubble -->
+                    <circle cx="200" cy="200" r="150" fill="none" stroke="url(#grad1)" stroke-width="2" opacity="0.2"
+                        class="svg-layer-4" />
+                    <circle cx="200" cy="200" r="120" fill="none" stroke="url(#grad1)" stroke-width="1.5" opacity="0.3"
+                        class="svg-layer-4" />
+
+                    <!-- Central lens/filter -->
+                    <g class="svg-layer-3">
+                        <circle cx="200" cy="200" r="60" fill="none" stroke="url(#grad1)" stroke-width="3"
+                            filter="url(#glow)" />
+                        <circle cx="200" cy="200" r="50" fill="rgba(99, 102, 241, 0.1)" stroke="url(#grad1)"
+                            stroke-width="2" />
+
+                        <!-- Lens elements -->
+                        <path d="M 200,150 L 200,250" stroke="#6366f1" stroke-width="1.5" opacity="0.4" />
+                        <path d="M 150,200 L 250,200" stroke="#6366f1" stroke-width="1.5" opacity="0.4" />
+                        <circle cx="200" cy="200" r="8" fill="url(#grad1)" />
+                    </g>
+
+                    <!-- Data nodes (input) - left side -->
+                    <g class="svg-layer-1">
+                        <circle cx="80" cy="120" r="12" fill="url(#grad1)" opacity="0.8" />
+                        <circle cx="60" cy="180" r="10" fill="url(#grad1)" opacity="0.7" />
+                        <circle cx="90" cy="240" r="11" fill="url(#grad1)" opacity="0.8" />
+                        <circle cx="70" cy="300" r="9" fill="url(#grad1)" opacity="0.6" />
+
+                        <!-- Connection lines to filter -->
+                        <line x1="80" y1="120" x2="145" y2="170" stroke="#6366f1" stroke-width="1" opacity="0.3"
+                            stroke-dasharray="5,5" />
+                        <line x1="60" y1="180" x2="145" y2="190" stroke="#6366f1" stroke-width="1" opacity="0.3"
+                            stroke-dasharray="5,5" />
+                        <line x1="90" y1="240" x2="150" y2="210" stroke="#6366f1" stroke-width="1" opacity="0.3"
+                            stroke-dasharray="5,5" />
+                        <line x1="70" y1="300" x2="155" y2="235" stroke="#6366f1" stroke-width="1" opacity="0.3"
+                            stroke-dasharray="5,5" />
+                    </g>
+
+                    <!-- Filtered data nodes (output) - right side -->
+                    <g class="svg-layer-2">
+                        <circle cx="320" cy="180" r="14" fill="url(#grad2)" opacity="0.9" />
+                        <circle cx="340" cy="220" r="12" fill="url(#grad2)" opacity="0.8" />
+
+                        <!-- Connection lines from filter -->
+                        <line x1="255" y1="190" x2="320" y2="180" stroke="#14b8a6" stroke-width="1.5" opacity="0.4"
+                            stroke-dasharray="5,5" />
+                        <line x1="250" y1="210" x2="340" y2="220" stroke="#14b8a6" stroke-width="1.5" opacity="0.4"
+                            stroke-dasharray="5,5" />
+                    </g>
+
+                    <!-- Neural network pattern in background -->
+                    <g opacity="0.15" class="svg-layer-5">
+                        <circle cx="100" cy="100" r="5" fill="#6366f1" />
+                        <circle cx="140" cy="80" r="4" fill="#6366f1" />
+                        <circle cx="180" cy="90" r="4" fill="#6366f1" />
+                        <circle cx="300" cy="300" r="5" fill="#14b8a6" />
+                        <circle cx="320" cy="320" r="4" fill="#14b8a6" />
+                        <circle cx="280" cy="340" r="4" fill="#14b8a6" />
+
+                        <line x1="100" y1="100" x2="140" y2="80" stroke="#6366f1" stroke-width="0.5" />
+                        <line x1="140" y1="80" x2="180" y2="90" stroke="#6366f1" stroke-width="0.5" />
+                        <line x1="300" y1="300" x2="320" y2="320" stroke="#14b8a6" stroke-width="0.5" />
+                        <line x1="320" y1="320" x2="280" y2="340" stroke="#14b8a6" stroke-width="0.5" />
+                    </g>
+
+                    <!-- Warning indicator (bias) -->
+                    <g class="svg-layer-4">
+                        <circle cx="200" cy="340" r="20" fill="rgba(245, 158, 11, 0.2)" stroke="#f59e0b"
+                            stroke-width="2" />
+                        <text x="200" y="348" text-anchor="middle" fill="#f59e0b" font-size="20"
+                            font-weight="bold">!</text>
+                    </g>
+                </svg>
+
+                <h1 class="hero-title">Recommendation and Personalization</h1>
+                <p class="hero-subtitle">The Double-Edged Nature of Personalization: Self-Knowledge, Metadata, and
+                    Algorithmic Bias</p>
+                <a href="./data-science.html" class="data-science-badge">Part of Data Science Series</a>
             </div>
+        </header>
 
-            <div class="content">
-                <div
-                    style="background-color: #f0f8ff; border-left: 4px solid #1e90ff; padding: 1em; margin-bottom: 1.5em;">
-                    <strong>This article is part of a series on <a href="./data-science.html">Data
-                            Science</a>.</strong>
+        <!-- Main Content -->
+        <main id="main-content" class="section">
+            <article class="article-content">
+                <div class="info-box">
+                    <strong>This article is part of a series on <a href="./data-science.html">Data Science</a>.</strong>
                 </div>
-                <article>
-                    <header>
-                        <h2>The Double-Edged Nature of Personalization: Self-Knowledge, Metadata, and Algorithmic Bias
-                        </h2>
-                    </header>
 
-                    <section>
-                        <h3>Introduction</h3>
-                        <p>
-                            In the age of ubiquitous personalization—through curated news feeds, recommendation engines,
-                            and digital assistants—our daily information diets are increasingly shaped by algorithms.
-                            These systems often rely on our digital traces: what we read, watch, bookmark, or search.
-                            While such personalization can enhance user experience, reduce information overload, and
-                            promote relevance, it also raises fundamental questions about self-awareness, agency, and
-                            the ethics of algorithmic filtering.
-                        </p>
-                    </section>
+                <section>
+                    <h2>Introduction</h2>
+                    <p>
+                        In the age of ubiquitous personalization—through curated news feeds, recommendation engines,
+                        and digital assistants—our daily information diets are increasingly shaped by algorithms.
+                        These systems often rely on our digital traces: what we read, watch, bookmark, or search.
+                        While such personalization can enhance user experience, reduce information overload, and
+                        promote relevance, it also raises fundamental questions about self-awareness, agency, and
+                        the ethics of algorithmic filtering.
+                    </p>
+                </section>
 
-                    <section>
-                        <h3>Digital Traces and the Self</h3>
-                        <p>
-                            How much do we truly know about ourselves? Does our behavior—such as our reading patterns or
-                            online interactions—accurately reflect our values or self-image? These questions lie at the
-                            heart of personal
-                            informatics, an interdisciplinary field that explores how individuals can collect
-                            and reflect on their own data to gain self-knowledge and improve decision-making.
-                        </p>
-                        <p>
-                            For example, someone might believe they are intellectually curious, but an analysis of their
-                            reading history may reveal a preference for confirmation rather than exploration. Such
-                            contradictions raise the question: is ignorance about the self sometimes preferable to
-                            uncomfortable truths? Or is the discomfort a necessary condition for personal growth?
-                        </p>
-                    </section>
+                <section>
+                    <h3>Digital Traces and the Self</h3>
+                    <p>
+                        How much do we truly know about ourselves? Does our behavior—such as our reading patterns or
+                        online interactions—accurately reflect our values or self-image? These questions lie at the
+                        heart of personal
+                        informatics, an interdisciplinary field that explores how individuals can collect
+                        and reflect on their own data to gain self-knowledge and improve decision-making.
+                    </p>
+                    <p>
+                        For example, someone might believe they are intellectually curious, but an analysis of their
+                        reading history may reveal a preference for confirmation rather than exploration. Such
+                        contradictions raise the question: is ignorance about the self sometimes preferable to
+                        uncomfortable truths? Or is the discomfort a necessary condition for personal growth?
+                    </p>
+                </section>
 
-                    <section>
-                        <h3>Personal Informatics and Self-Tracking</h3>
-                        <p>
-                            The <a href="https://en.wikipedia.org/wiki/Quantified_Self">Quantified Self</a> movement
-                            promotes tracking daily activities—such as diet, sleep, or screen time—as a way to reflect,
-                            understand habits, and enact behavioral change. This extends to digital behavior as well:
-                            personal experiments, browsing history, liked posts, bookmarks, and annotations may all
-                            serve as data points in a larger self-narrative.
-                        </p>
-                        <p>
-                            But can this knowledge actually help us improve ourselves? And who gets to interpret this
-                            data—ourselves or a machine learning model? The question is not merely technical, but
-                            epistemological: who defines what is meaningful in the self?
-                        </p>
-                    </section>
+                <section>
+                    <h3>Personal Informatics and Self-Tracking</h3>
+                    <p>
+                        The <a href="https://en.wikipedia.org/wiki/Quantified_Self">Quantified Self</a> movement
+                        promotes tracking daily activities—such as diet, sleep, or screen time—as a way to reflect,
+                        understand habits, and enact behavioral change. This extends to digital behavior as well:
+                        personal experiments, browsing history, liked posts, bookmarks, and annotations may all
+                        serve as data points in a larger self-narrative.
+                    </p>
+                    <p>
+                        But can this knowledge actually help us improve ourselves? And who gets to interpret this
+                        data—ourselves or a machine learning model? The question is not merely technical, but
+                        epistemological: who defines what is meaningful in the self?
+                    </p>
+                </section>
 
-                    <section>
-                        <h3>Metadata and Personalization Systems</h3>
-                        <p>
-                            Personalization systems rely heavily on metadata: structured information about user behavior
-                            and content. For instance, a typical bookmark or news feed entry may include:
-                        </p>
-                        <ul>
-                            <li>Title</li>
-                            <li>URL</li>
-                            <li>Tags and categories (including sub-categories)</li>
-                            <li>Keywords</li>
-                            <li>Creation and modification timestamps</li>
-                            <li>Application-specific metadata (e.g., device, app usage context)</li>
-                        </ul>
-                        <p>
-                            Similarly, shell command-line history, frequently used GUI menu options, and command
-                            sequences (especially those involving pipes and arguments) can reveal patterns of behavior
-                            and efficiency preferences. These traces can be used to build personal models that assist
-                            with automation, documentation, or training—but they also pose privacy risks if mishandled
-                            or interpreted out of context.
-                        </p>
-                        <p>
-                            Over time, timestamps provide not only history but also a record of the evolution of
-                            interests and workflows, which can inform adaptive systems. However, deriving meaningful
-                            insight from this metadata is a nontrivial challenge and often requires contextual or
-                            semantic interpretation.
-                        </p>
-                    </section>
+                <section>
+                    <h3>Metadata and Personalization Systems</h3>
+                    <p>
+                        Personalization systems rely heavily on metadata: structured information about user behavior
+                        and content. For instance, a typical bookmark or news feed entry may include:
+                    </p>
+                    <ul>
+                        <li>Title</li>
+                        <li>URL</li>
+                        <li>Tags and categories (including sub-categories)</li>
+                        <li>Keywords</li>
+                        <li>Creation and modification timestamps</li>
+                        <li>Application-specific metadata (e.g., device, app usage context)</li>
+                    </ul>
+                    <p>
+                        Similarly, shell command-line history, frequently used GUI menu options, and command
+                        sequences (especially those involving pipes and arguments) can reveal patterns of behavior
+                        and efficiency preferences. These traces can be used to build personal models that assist
+                        with automation, documentation, or training—but they also pose privacy risks if mishandled
+                        or interpreted out of context.
+                    </p>
+                    <p>
+                        Over time, timestamps provide not only history but also a record of the evolution of
+                        interests and workflows, which can inform adaptive systems. However, deriving meaningful
+                        insight from this metadata is a nontrivial challenge and often requires contextual or
+                        semantic interpretation.
+                    </p>
+                </section>
 
-                    <section>
-                        <h3>Echo Chambers, Bias, and the Illusion of Surprise</h3>
-                        <p>
-                            While recommendation systems aim to deliver relevant content, they can inadvertently
-                            reinforce existing beliefs, leading to <a
-                                href="https://en.wikipedia.org/wiki/Confirmation_bias">confirmation bias</a>. As users
-                            engage more with content that aligns with their views, algorithms adjust and optimize to
-                            provide more of the same. Over time, this dynamic results in <a
-                                href="https://en.wikipedia.org/wiki/Filter_bubble">filter bubbles</a> and <a
-                                href="https://en.wikipedia.org/wiki/Echo_chamber_(media)">echo chambers</a> that limit
-                            exposure to diverse perspectives.
-                        </p>
-                        <p>
-                            For example, a user's reading history on a news aggregator might become increasingly
-                            one-sided, even if their initial preferences were balanced. Likewise, bookmarking or tagging
-                            behavior that favors certain topics can bias recommendation systems. As these systems rely
-                            on past activity to suggest future content, the element of surprise or serendipitous
-                            discovery may diminish.
-                        </p>
-                        <p>
-                            This phenomenon has been well-documented in algorithmic personalization research, including
-                            studies like Bozdag's on bias in filtering mechanisms, which argue that lack of transparency
-                            in ranking algorithms further exacerbates ideological polarization.
-                        </p>
-                    </section>
+                <section>
+                    <h3>Echo Chambers, Bias, and the Illusion of Surprise</h3>
+                    <p>
+                        While recommendation systems aim to deliver relevant content, they can inadvertently
+                        reinforce existing beliefs, leading to <a
+                            href="https://en.wikipedia.org/wiki/Confirmation_bias">confirmation bias</a>. As users
+                        engage more with content that aligns with their views, algorithms adjust and optimize to
+                        provide more of the same. Over time, this dynamic results in <a
+                            href="https://en.wikipedia.org/wiki/Filter_bubble">filter bubbles</a> and <a
+                            href="https://en.wikipedia.org/wiki/Echo_chamber_(media)">echo chambers</a> that limit
+                        exposure to diverse perspectives.
+                    </p>
+                    <p>
+                        For example, a user's reading history on a news aggregator might become increasingly
+                        one-sided, even if their initial preferences were balanced. Likewise, bookmarking or tagging
+                        behavior that favors certain topics can bias recommendation systems. As these systems rely
+                        on past activity to suggest future content, the element of surprise or serendipitous
+                        discovery may diminish.
+                    </p>
+                    <p>
+                        This phenomenon has been well-documented in algorithmic personalization research, including
+                        studies like Bozdag's on bias in filtering mechanisms, which argue that lack of transparency
+                        in ranking algorithms further exacerbates ideological polarization.
+                    </p>
+                </section>
 
-                    <section>
-                        <h3>Privacy, Autonomy, and Ethical Concerns</h3>
-                        <p>
-                            With the growing integration of personalized systems, the tension between utility and
-                            privacy becomes more pronounced. The data that fuels personalization—activity logs,
-                            clickstreams, geolocation, usage time—can reveal intimate patterns. Yet most users are
-                            unaware of how this data is collected, stored, and analyzed.
-                        </p>
-                        <p>
-                            Concepts such as <a href="https://en.wikipedia.org/wiki/Contextual_integrity">contextual
-                                integrity</a> (Helen Nissenbaum) argue that privacy should be defined not by secrecy but
-                            by appropriate information flow within social contexts. Even with opt-in mechanisms,
-                            personalized systems can subtly erode user autonomy by shaping decisions through nudging and
-                            selective visibility of options.
-                        </p>
-                        <p>
-                            Moreover, the absence of <a
-                                href="https://en.wikipedia.org/wiki/Explainable_artificial_intelligence">explainability</a>
-                            in recommender systems makes it difficult for users to understand or question the basis of
-                            suggestions, further reducing their control over the experience.
-                        </p>
-                    </section>
+                <section>
+                    <h3>Privacy, Autonomy, and Ethical Concerns</h3>
+                    <p>
+                        With the growing integration of personalized systems, the tension between utility and
+                        privacy becomes more pronounced. The data that fuels personalization—activity logs,
+                        clickstreams, geolocation, usage time—can reveal intimate patterns. Yet most users are
+                        unaware of how this data is collected, stored, and analyzed.
+                    </p>
+                    <p>
+                        Concepts such as <a href="https://en.wikipedia.org/wiki/Contextual_integrity">contextual
+                            integrity</a> (Helen Nissenbaum) argue that privacy should be defined not by secrecy but
+                        by appropriate information flow within social contexts. Even with opt-in mechanisms,
+                        personalized systems can subtly erode user autonomy by shaping decisions through nudging and
+                        selective visibility of options.
+                    </p>
+                    <p>
+                        Moreover, the absence of <a
+                            href="https://en.wikipedia.org/wiki/Explainable_artificial_intelligence">explainability</a>
+                        in recommender systems makes it difficult for users to understand or question the basis of
+                        suggestions, further reducing their control over the experience.
+                    </p>
+                </section>
 
-                    <section>
-                        <h3>Conclusion</h3>
-                        <p>
-                            Personalization offers undeniable benefits—improved relevance, reduced overload, and
-                            convenience—but it also presents critical challenges in the domains of self-knowledge,
-                            algorithmic bias, and digital ethics. By becoming more aware of the digital traces we leave
-                            behind, we can better understand how systems model us, and in turn, how we might resist
-                            reductive or manipulative forms of personalization. A reflective and transparent approach to
-                            both system design and personal data awareness is necessary to ensure that personalization
-                            empowers rather than constrains us.
-                        </p>
-                    </section>
+                <section>
+                    <h3>Conclusion</h3>
+                    <p>
+                        Personalization offers undeniable benefits—improved relevance, reduced overload, and
+                        convenience—but it also presents critical challenges in the domains of self-knowledge,
+                        algorithmic bias, and digital ethics. By becoming more aware of the digital traces we leave
+                        behind, we can better understand how systems model us, and in turn, how we might resist
+                        reductive or manipulative forms of personalization. A reflective and transparent approach to
+                        both system design and personal data awareness is necessary to ensure that personalization
+                        empowers rather than constrains us.
+                    </p>
+                </section>
 
-                    <section>
-                        <h3>References</h3>
-                        <ol>
-                            <li><a href="https://en.wikipedia.org/wiki/Personalization">Personalization</a></li>
-                            <li><a href="https://en.wikipedia.org/wiki/Recommender_system">Recommender System</a></li>
-                            <li><a href="https://en.wikipedia.org/wiki/Confirmation_bias">Confirmation Bias</a></li>
-                            <li><a href="https://en.wikipedia.org/wiki/Quantified_Self">Quantified Self</a></li>
-                            <li><a href="https://en.wikipedia.org/wiki/Filter_bubble">Filter Bubble</a></li>
-                            <li><a href="https://en.wikipedia.org/wiki/Echo_chamber_(media)">Echo Chamber</a></li>
-                            <li><a href="https://en.wikipedia.org/wiki/Explainable_artificial_intelligence">Explainable
-                                    Artificial Intelligence (XAI)</a></li>
-                            <li><a href="https://en.wikipedia.org/wiki/Information_overload">Information Overload</a>
-                            </li>
-                            <li><em>Bias in algorithmic filtering and personalization</em>, Engin Bozdag, <i>Ethics and
-                                    Information Technology</i>, 2013, vol. 15, no. 3, pp. 209–227.</li>
-                            <li><a href="https://en.wikipedia.org/wiki/Contextual_integrity">Contextual Integrity</a>
-                            </li>
-                            <li><a href="https://www.sciencedirect.com/science/article/abs/pii/S107158191630060X">Personal
-                                    informatics for everyday life: How users without prior self-tracking experience
-                                    engage with personal data</a></li>
-                        </ol>
-                    </section>
-                </article>
+                <section>
+                    <h3>References</h3>
+                    <ol>
+                        <li><a href="https://en.wikipedia.org/wiki/Personalization">Personalization</a></li>
+                        <li><a href="https://en.wikipedia.org/wiki/Recommender_system">Recommender System</a></li>
+                        <li><a href="https://en.wikipedia.org/wiki/Confirmation_bias">Confirmation Bias</a></li>
+                        <li><a href="https://en.wikipedia.org/wiki/Quantified_Self">Quantified Self</a></li>
+                        <li><a href="https://en.wikipedia.org/wiki/Filter_bubble">Filter Bubble</a></li>
+                        <li><a href="https://en.wikipedia.org/wiki/Echo_chamber_(media)">Echo Chamber</a></li>
+                        <li><a href="https://en.wikipedia.org/wiki/Explainable_artificial_intelligence">Explainable
+                                Artificial Intelligence (XAI)</a></li>
+                        <li><a href="https://en.wikipedia.org/wiki/Information_overload">Information Overload</a>
+                        </li>
+                        <li><em>Bias in algorithmic filtering and personalization</em>, Engin Bozdag, <i>Ethics and
+                                Information Technology</i>, 2013, vol. 15, no. 3, pp. 209–227.</li>
+                        <li><a href="https://en.wikipedia.org/wiki/Contextual_integrity">Contextual Integrity</a>
+                        </li>
+                        <li><a href="https://www.sciencedirect.com/science/article/abs/pii/S107158191630060X">Personal
+                                informatics for everyday life: How users without prior self-tracking experience
+                                engage with personal data</a></li>
+                    </ol>
+                </section>
+            </article>
+        </main>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <div class="footer-content">
+                <div class="language-section">
+                    <h3>Languages</h3>
+                    <div class="language-links">
+                        <a href="./recommendation-personalization.html" hreflang="en">English</a>
+                    </div>
+                </div>
+                <p class="footer-text">
+                    © 2025 <a href="../about.html" class="footer-link">John Samuel</a> |
+                    <a href="../research/research.html" class="footer-link">Research</a>
+                </p>
             </div>
-
-        </div>
+        </footer>
     </body>
 
 </html>

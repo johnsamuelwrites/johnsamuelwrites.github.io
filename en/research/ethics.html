@@ -2,262 +2,631 @@
 <html lang="en">
 
     <head>
-        <meta charset="utf-8" />
-        <meta http-equiv="Content-Language" content="en" />
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta name="description"
+            content="Exploring ethical frameworks in artificial intelligence and data science - from bias mitigation to algorithmic accountability">
         <link rel="shortcut icon" href="../../images/logo/favicon.png" />
-        <title>Data Science and Ethics: John Samuel</title>
-        <style type="text/css">
-            body {
-                background-color: #FFFFFF;
+        <title>Data Science and Ethics | John Samuel</title>
+        <style>
+            /* ========================================
+           DESIGN TOKENS & CUSTOM PROPERTIES
+           Theme: Ethics & AI - Balance, Transparency, Trust
+           ======================================== */
+            :root {
+                /* Color Palette - Ethics Theme */
+                --color-base-bg: #f8f9fb;
+                --color-base-surface: #ffffff;
+                --color-base-text: #1a202c;
+                --color-base-text-muted: #4a5568;
+
+                /* Ethics-inspired accent colors */
+                --color-accent-1: #4a6fa5;
+                /* Trust blue - primary */
+                --color-accent-2: #2d4a6d;
+                /* Deep blue - integrity */
+                --color-accent-3: #7c3aed;
+                /* Algorithmic purple */
+                --color-accent-4: #059669;
+                /* Ethical green - balance */
+                --color-accent-light: #e0e7f1;
+
+                /* Functional colors */
+                --color-shadow: rgba(74, 111, 165, 0.12);
+                --color-border: rgba(74, 111, 165, 0.15);
+                --color-hover: rgba(74, 111, 165, 0.08);
+
+                /* Gradients */
+                --gradient-primary: linear-gradient(135deg, var(--color-accent-1) 0%, var(--color-accent-3) 100%);
+                --gradient-hero: linear-gradient(135deg, #4a6fa5 0%, #7c3aed 50%, #2d4a6d 100%);
+                --gradient-subtle: linear-gradient(180deg, var(--color-base-bg), var(--color-accent-light));
+
+                /* Spacing Scale */
+                --space-xs: 0.25rem;
+                --space-sm: 0.5rem;
+                --space-md: 1rem;
+                --space-lg: 1.5rem;
+                --space-xl: 2rem;
+                --space-2xl: 3rem;
+                --space-3xl: 4rem;
+                --space-4xl: 6rem;
+
+                /* Typography Scale */
+                --text-xs: clamp(0.75rem, 0.7rem + 0.25vw, 0.875rem);
+                --text-sm: clamp(0.875rem, 0.8rem + 0.35vw, 1rem);
+                --text-base: clamp(1rem, 0.95rem + 0.25vw, 1.125rem);
+                --text-lg: clamp(1.125rem, 1.05rem + 0.35vw, 1.25rem);
+                --text-xl: clamp(1.25rem, 1.15rem + 0.5vw, 1.5rem);
+                --text-2xl: clamp(1.5rem, 1.3rem + 1vw, 2rem);
+                --text-3xl: clamp(2rem, 1.6rem + 2vw, 2.5rem);
+                --text-4xl: clamp(2.5rem, 2rem + 2.5vw, 3.5rem);
+
+                /* Font Stack */
+                --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+
+                /* Shadows */
+                --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.04), 0 1px 3px rgba(0, 0, 0, 0.06);
+                --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.05), 0 2px 4px rgba(0, 0, 0, 0.06);
+                --shadow-lg: 0 10px 24px rgba(0, 0, 0, 0.08), 0 4px 8px rgba(0, 0, 0, 0.06);
+                --shadow-xl: 0 20px 40px rgba(0, 0, 0, 0.12), 0 8px 16px rgba(0, 0, 0, 0.08);
+                --shadow-theme: 0 10px 30px var(--color-shadow), 0 4px 10px rgba(0, 0, 0, 0.06);
+
+                /* Border Radius */
+                --radius-sm: 4px;
+                --radius-md: 8px;
+                --radius-lg: 12px;
+                --radius-xl: 16px;
+                --radius-2xl: 24px;
+                --radius-organic: 63% 37% 54% 46% / 45% 62% 38% 55%;
             }
 
-            #sidebar {
-                position: fixed;
-                background-color: #1B80CF;
-                top: 0;
-                left: 0;
-                bottom: 0;
-                width: 30vw;
-            }
-
-            #sidebar .title {
-                position: relative;
-                text-align: center;
-                line-height: 4vmax;
-                font-size: 1.4vmax;
-                font-family: 'Arial';
-                margin-top: 25vh;
-            }
-
-            #sidebar .title a:link,
-            #sidebar .title a:visited {
-                color: #FFFFFF;
-                text-decoration: none;
-            }
-
-            .subtitle {
-                top: 50vh;
-                text-align: center;
-                line-height: 1.3vmax;
-                font-family: 'Arial';
-                font-size: 1.5vmax;
-                color: #FFFFFF;
-            }
-
-            .subtitle a:link,
-            .subtitle a:visited {
-                color: #FFFFFF;
-                text-decoration: none;
-            }
-
-            .licence {
-                position: fixed;
-                text-align: right;
-                bottom: 0;
-                right: 0;
-            }
-
-            .home {
-                position: fixed;
-                text-align: left;
-                font-family: 'Arial';
-                color: #D3D3D3;
-                z-index: 100;
-                width: 100%;
-                background-color: #FFFFFF;
-                top: 0px;
-                margin-bottom: 10px;
-                padding-bottom: 10px;
-            }
-
-            .home a:link,
-            .home a:visited {
-                text-decoration: none;
-                color: #D3D3D3;
-            }
-
-            .home ul {
+            /* ========================================
+           RESET & BASE STYLES
+           ======================================== */
+            * {
                 margin: 0;
                 padding: 0;
-                text-align: left;
-                list-style: none;
+                box-sizing: border-box;
             }
 
-            .home li {
-                position: relative;
-                float: left;
-                padding-top: 15px;
-                margin-right: 1em;
-                font-family: 'Arial';
+            html {
+                scroll-behavior: smooth;
+                scroll-padding-top: 100px;
             }
 
-            .home li:hover {
-                display: block;
+            body {
+                font-family: var(--font-sans);
+                font-size: var(--text-base);
+                line-height: 1.7;
+                color: var(--color-base-text);
+                background: var(--color-base-bg);
+                overflow-x: hidden;
             }
 
-            .home a:link,
-            .home a:visited {
-                color: #D3D3D3;
-            }
-
-            .home li:hover a:link,
-            .home li:hover a:visited {
+            /* Skip to main content link */
+            .skip-link {
+                position: absolute;
+                top: -40px;
+                left: 0;
+                background: var(--color-accent-1);
+                color: white;
+                padding: 8px;
                 text-decoration: none;
-                padding: 15px;
-                color: #FFFFFF;
-                background-color: #1B80CF;
+                z-index: 100;
             }
 
-            .content {
-                line-height: 1.8vmax;
-                font-size: 1.2vmax;
-                font-family: 'Arial';
-                margin-top: 15vh;
-                width: 90%;
+            .skip-link:focus {
+                top: 0;
             }
 
-            .content h2,
-            h3,
-            h4 {
-                color: #1B80CF;
+            /* ========================================
+           NAVIGATION
+           ======================================== */
+            .navigation {
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                background: rgba(255, 255, 255, 0.85);
+                -webkit-backdrop-filter: blur(12px) saturate(180%);
+                backdrop-filter: blur(12px) saturate(180%);
+                border-bottom: 1px solid var(--color-border);
+                padding: var(--space-lg) var(--space-2xl);
+                z-index: 1000;
+                box-shadow: var(--shadow-sm);
             }
 
-            .content a:link,
-            .content a:visited {
-                color: #1B80CF;
+            .nav-container {
+                max-width: 1400px;
+                margin: 0 auto;
+                display: flex;
+                align-items: center;
+                gap: var(--space-2xl);
             }
 
-            .content h3 {
-                color: #1B80CF;
+            .site-name {
+                font-size: var(--text-xl);
+                font-weight: 700;
+                color: var(--color-accent-1);
+                text-decoration: none;
+                letter-spacing: -0.02em;
+                position: relative;
+                padding: var(--space-sm) var(--space-lg);
+                border-radius: var(--radius-md);
+                background: linear-gradient(135deg, var(--color-accent-1), var(--color-accent-3));
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                background-clip: text;
+                transition: all 0.3s ease;
             }
 
-            .content h2::before,
-            .content h3::before {
-                display: block;
-                content: " ";
-                visibility: hidden;
-                height: 50px;
-                margin-top: -50px;
-                pointer-events: none;
-                background-color: #FFFFFF;
+            .site-name::before {
+                content: '';
+                position: absolute;
+                inset: 0;
+                background: var(--gradient-primary);
+                opacity: 0;
+                border-radius: var(--radius-md);
+                transition: opacity 0.3s ease;
+                z-index: -1;
             }
 
-            .content a:link,
-            .content a:visited {
-                color: #1B80CF;
+            .site-name:hover::before {
+                opacity: 0.1;
             }
 
-            .content li {
-                margin: 5px;
+            .breadcrumbs {
+                display: flex;
+                align-items: center;
+                gap: var(--space-sm);
+                list-style: none;
+                flex-wrap: wrap;
             }
 
-            .page {
-                width: 65vw;
-                height: 100%;
-                margin-left: 30vw;
+            .breadcrumbs li {
+                display: flex;
+                align-items: center;
+                gap: var(--space-sm);
+            }
+
+            .breadcrumbs li:not(:last-child)::after {
+                content: '→';
+                color: var(--color-base-text-muted);
+                font-size: var(--text-sm);
+            }
+
+            .breadcrumbs a {
+                color: var(--color-base-text-muted);
+                text-decoration: none;
+                font-size: var(--text-sm);
+                transition: color 0.3s ease;
+                padding: var(--space-xs) var(--space-sm);
+                border-radius: var(--radius-sm);
+            }
+
+            .breadcrumbs a:hover {
+                color: var(--color-accent-1);
+                background: var(--color-hover);
+            }
+
+            /* ========================================
+           HERO SECTION
+           ======================================== */
+            .hero {
+                margin-top: 80px;
+                padding: var(--space-4xl) var(--space-2xl);
+                background: var(--gradient-hero);
+                background-size: 200% 200%;
+                animation: gradientShift 15s ease infinite;
+                position: relative;
                 overflow: hidden;
-                padding: 0 1em;
-                font-family: 'Arial';
             }
 
-            .page img {
-                max-width: 100%;
-                max-height: 100%;
+            @keyframes gradientShift {
+
+                0%,
+                100% {
+                    background-position: 0% 50%;
+                }
+
+                50% {
+                    background-position: 100% 50%;
+                }
             }
 
-            @media (max-width: 640px),
-            screen and (orientation: portrait) {
-                body {
-                    max-width: 100%;
-                    max-height: 100%;
+            /* Neural network pattern overlay */
+            .hero::before {
+                content: '';
+                position: absolute;
+                inset: 0;
+                background-image:
+                    radial-gradient(circle at 20% 30%, rgba(255, 255, 255, 0.1) 1px, transparent 1px),
+                    radial-gradient(circle at 80% 70%, rgba(255, 255, 255, 0.1) 1px, transparent 1px),
+                    radial-gradient(circle at 40% 80%, rgba(255, 255, 255, 0.1) 1px, transparent 1px);
+                background-size: 50px 50px;
+                animation: patternFloat 20s linear infinite;
+            }
+
+            @keyframes patternFloat {
+                0% {
+                    transform: translate(0, 0);
                 }
 
-                #sidebar {
-                    position: fixed;
-                    background-color: #1B80CF;
-                    top: 0;
-                    left: 0;
-                    bottom: 80vh;
-                    width: 100vw;
+                100% {
+                    transform: translate(50px, 50px);
+                }
+            }
+
+            .hero-content {
+                max-width: 1200px;
+                margin: 0 auto;
+                position: relative;
+                z-index: 1;
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: var(--space-3xl);
+                align-items: center;
+            }
+
+            .hero-text h1 {
+                font-size: var(--text-4xl);
+                font-weight: 800;
+                color: white;
+                margin-bottom: var(--space-lg);
+                letter-spacing: -0.03em;
+                line-height: 1.1;
+            }
+
+            .hero-text .subtitle {
+                font-size: var(--text-xl);
+                color: rgba(255, 255, 255, 0.9);
+                margin-bottom: var(--space-xl);
+                line-height: 1.5;
+            }
+
+            .series-badge {
+                display: inline-flex;
+                align-items: center;
+                gap: var(--space-sm);
+                background: rgba(255, 255, 255, 0.2);
+                -webkit-backdrop-filter: blur(12px);
+                backdrop-filter: blur(12px);
+                border: 1px solid rgba(255, 255, 255, 0.3);
+                padding: var(--space-sm) var(--space-lg);
+                border-radius: var(--radius-2xl);
+                font-size: var(--text-sm);
+                color: white;
+                text-decoration: none;
+                transition: all 0.3s ease;
+            }
+
+            .series-badge:hover {
+                background: rgba(255, 255, 255, 0.3);
+                transform: translateY(-2px);
+            }
+
+            .hero-visual {
+                display: flex;
+                justify-content: center;
+                align-items: center;
+            }
+
+            /* ========================================
+           MAIN CONTENT
+           ======================================== */
+            .main-container {
+                max-width: 1200px;
+                margin: 0 auto;
+                padding: var(--space-4xl) var(--space-2xl);
+            }
+
+            .content-section {
+                margin-bottom: var(--space-4xl);
+                animation: fadeInUp 0.8s ease-out backwards;
+            }
+
+            .content-section:nth-child(1) {
+                animation-delay: 0.1s;
+            }
+
+            .content-section:nth-child(2) {
+                animation-delay: 0.2s;
+            }
+
+            .content-section:nth-child(3) {
+                animation-delay: 0.3s;
+            }
+
+            .content-section:nth-child(4) {
+                animation-delay: 0.4s;
+            }
+
+            .content-section:nth-child(5) {
+                animation-delay: 0.5s;
+            }
+
+            @keyframes fadeInUp {
+                from {
+                    opacity: 0;
+                    transform: translateY(30px);
                 }
 
-                #sidebar .title {
-                    text-align: center;
-                    position: fixed;
-                    margin-top: 6vh;
-                    left: 0px;
-                    right: 0px;
-                    line-height: 3.5vmax;
-                    font-size: 1.5vmax;
-                    font-family: 'Arial';
+                to {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            }
+
+            .content-section h3 {
+                font-size: var(--text-2xl);
+                color: var(--color-accent-1);
+                margin-bottom: var(--space-lg);
+                font-weight: 700;
+                letter-spacing: -0.02em;
+                position: relative;
+                padding-bottom: var(--space-md);
+            }
+
+            /* Unique heading decoration - balance scale */
+            .content-section h3::after {
+                content: '';
+                position: absolute;
+                bottom: 0;
+                left: 0;
+                width: 60px;
+                height: 3px;
+                background: var(--gradient-primary);
+                border-radius: var(--radius-sm);
+            }
+
+            .content-section p {
+                margin-bottom: var(--space-lg);
+                color: var(--color-base-text);
+                line-height: 1.8;
+            }
+
+            .content-section ul,
+            .content-section ol {
+                margin-bottom: var(--space-lg);
+                padding-left: var(--space-xl);
+            }
+
+            .content-section li {
+                margin-bottom: var(--space-md);
+                line-height: 1.8;
+            }
+
+            .content-section li strong {
+                color: var(--color-accent-2);
+                font-weight: 600;
+            }
+
+            .content-section a {
+                color: var(--color-accent-1);
+                text-decoration: none;
+                border-bottom: 1px solid transparent;
+                transition: all 0.3s ease;
+            }
+
+            .content-section a:hover {
+                border-bottom-color: var(--color-accent-1);
+            }
+
+            /* Quote styling */
+            em {
+                color: var(--color-accent-2);
+                font-style: italic;
+            }
+
+            sup a {
+                font-size: var(--text-xs);
+                padding: 2px 6px;
+                background: var(--color-accent-light);
+                border-radius: var(--radius-sm);
+                border-bottom: none;
+            }
+
+            /* ========================================
+           REFERENCES SECTION
+           ======================================== */
+            .references-section {
+                background: white;
+                padding: var(--space-3xl);
+                border-radius: var(--radius-xl);
+                box-shadow: var(--shadow-theme);
+                margin-bottom: var(--space-4xl);
+            }
+
+            .references-section h3 {
+                font-size: var(--text-2xl);
+                color: var(--color-accent-1);
+                margin-bottom: var(--space-xl);
+                padding-bottom: var(--space-md);
+                border-bottom: 2px solid var(--color-accent-light);
+            }
+
+            .references-section ol {
+                counter-reset: reference;
+                list-style: none;
+                padding: 0;
+            }
+
+            .references-section li {
+                counter-increment: reference;
+                margin-bottom: var(--space-lg);
+                padding-left: var(--space-2xl);
+                position: relative;
+            }
+
+            .references-section li::before {
+                content: '[' counter(reference) ']';
+                position: absolute;
+                left: 0;
+                color: var(--color-accent-1);
+                font-weight: 600;
+                font-size: var(--text-sm);
+            }
+
+            /* ========================================
+           FOOTER
+           ======================================== */
+            .footer {
+                background: var(--color-accent-2);
+                color: white;
+                padding: var(--space-3xl) var(--space-2xl);
+                margin-top: var(--space-4xl);
+            }
+
+            .footer-content {
+                max-width: 1200px;
+                margin: 0 auto;
+                display: grid;
+                grid-template-columns: 2fr 1fr;
+                gap: var(--space-3xl);
+                align-items: start;
+            }
+
+            .footer-info h2 {
+                font-size: var(--text-xl);
+                margin-bottom: var(--space-md);
+                color: white;
+            }
+
+            .footer-info p {
+                color: rgba(255, 255, 255, 0.8);
+                line-height: 1.6;
+                margin-bottom: var(--space-md);
+            }
+
+            .footer-info a {
+                color: var(--color-accent-4);
+                text-decoration: none;
+                border-bottom: 1px solid transparent;
+                transition: border-color 0.3s ease;
+            }
+
+            .footer-info a:hover {
+                border-bottom-color: var(--color-accent-4);
+            }
+
+            .language-selector {
+                background: rgba(255, 255, 255, 0.1);
+                -webkit-backdrop-filter: blur(12px);
+                backdrop-filter: blur(12px);
+                padding: var(--space-xl);
+                border-radius: var(--radius-lg);
+                border: 1px solid rgba(255, 255, 255, 0.2);
+            }
+
+            .language-selector h3 {
+                font-size: var(--text-lg);
+                margin-bottom: var(--space-lg);
+                color: white;
+            }
+
+            .language-links {
+                display: flex;
+                flex-direction: column;
+                gap: var(--space-sm);
+            }
+
+            .language-links a {
+                color: rgba(255, 255, 255, 0.9);
+                text-decoration: none;
+                padding: var(--space-sm) var(--space-md);
+                border-radius: var(--radius-sm);
+                transition: all 0.3s ease;
+                display: flex;
+                align-items: center;
+                gap: var(--space-sm);
+            }
+
+            .language-links a:hover {
+                background: rgba(255, 255, 255, 0.15);
+                transform: translateX(4px);
+            }
+
+            .footer-bottom {
+                max-width: 1200px;
+                margin: var(--space-2xl) auto 0;
+                padding-top: var(--space-xl);
+                border-top: 1px solid rgba(255, 255, 255, 0.2);
+                text-align: center;
+                color: rgba(255, 255, 255, 0.7);
+                font-size: var(--text-sm);
+            }
+
+            /* ========================================
+           RESPONSIVE DESIGN
+           ======================================== */
+            @media (max-width: 1024px) {
+                .hero-content {
+                    grid-template-columns: 1fr;
+                    gap: var(--space-2xl);
                 }
 
-                #sidebar .subtitle {
-                    text-align: center;
-                    top: 5vh;
-                    left: 0px;
-                    right: 0px;
-                    position: fixed;
-                    margin-top: 10vh;
-                    font-size: 1.5vmax;
+                .hero-visual {
+                    order: -1;
                 }
 
-                #sidebar .title a:link,
-                #sidebar .title a:visited {
-                    text-align: center;
-                    color: #FFFFFF;
+                .footer-content {
+                    grid-template-columns: 1fr;
+                }
+            }
+
+            @media (max-width: 768px) {
+                .navigation {
+                    padding: var(--space-md) var(--space-lg);
                 }
 
-                #sidebar .subtitle a:link,
-                #sidebar .subtitle a:visited {
-                    text-align: center;
-                    color: #FFFFFF;
+                .nav-container {
+                    flex-direction: column;
+                    align-items: flex-start;
+                    gap: var(--space-md);
                 }
 
-                .home {
-                    z-index: 100;
-                    width: 100%;
-                    background-color: #1B80CF;
-                    font-size: 1.5vmax;
+                .hero {
+                    padding: var(--space-3xl) var(--space-lg);
                 }
 
-                .home a:link,
-                .home a:visited {
-                    text-decoration: none;
-                    color: #FFFFFF;
+                .main-container {
+                    padding: var(--space-3xl) var(--space-lg);
                 }
 
-                .content {
-                    line-height: 3.8vmax;
-                    font-size: 1.8vmax;
-                    font-family: 'Arial';
-                    margin-top: 22vh;
+                .references-section {
+                    padding: var(--space-xl) var(--space-lg);
                 }
+            }
 
-                .content a:link,
-                .content a:visited {
-                    color: #1B80CF;
-                }
+            /* ========================================
+           ACCESSIBILITY
+           ======================================== */
+            @media (prefers-reduced-motion: reduce) {
 
-                .page {
-                    top: 40vh;
-                    width: 95%;
-                    margin-left: 0vw;
+                *,
+                *::before,
+                *::after {
+                    animation-duration: 0.01ms !important;
+                    animation-iteration-count: 1 !important;
+                    transition-duration: 0.01ms !important;
                 }
+            }
 
-                .page img {
-                    max-width: 100%;
-                    max-height: 100%;
-                    border: 0;
-                }
+            :focus-visible {
+                outline: 2px solid var(--color-accent-1);
+                outline-offset: 2px;
             }
         </style>
     </head>
 
     <body vocab="http://schema.org/">
-        <div class="page">
-            <div class="home">
-                <ul typeof="BreadcrumbList">
+        <a href="#main-content" class="skip-link">Skip to main content</a>
+
+        <!-- Navigation -->
+        <nav class="navigation" role="navigation" aria-label="Main navigation">
+            <div class="nav-container">
+                <a href="../about.html" class="site-name" aria-label="John Samuel - Homepage">John Samuel</a>
+                <ul class="breadcrumbs" typeof="BreadcrumbList">
                     <li property="itemListElement" typeof="ListItem">
                         <a property="item" typeof="WebPage" href="../index.html">
                             <span property="name">Home</span>
@@ -268,223 +637,303 @@
                             <span property="name">Research</span>
                         </a>
                     </li>
+                    <li property="itemListElement" typeof="ListItem">
+                        <span property="name">Data Science and Ethics</span>
+                    </li>
                 </ul>
-
             </div>
-            <div id="sidebar">
-                <div class="title">
-                    <h1><a href="./ethics.html">Data Science and Ethics</a></h1>
+        </nav>
+
+        <!-- Hero Section -->
+        <header class="hero">
+            <div class="hero-content">
+                <div class="hero-text">
+                    <h1>Building Ethical Systems in AI and Data Science</h1>
+                    <p class="subtitle">Exploring the intersection of technology, morality, and societal impact in the
+                        age of artificial intelligence</p>
+                    <a href="./data-science.html" class="series-badge">
+                        <span>📚</span>
+                        <span>Part of the Data Science Series</span>
+                    </a>
                 </div>
-                <div class="subtitle">
-                    <h3><a href="../about.html">John Samuel</a></h3>
+                <div class="hero-visual">
+                    <svg width="400" height="400" viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg"
+                        aria-hidden="true">
+                        <!-- Central balance point -->
+                        <circle cx="200" cy="200" r="8" fill="white" opacity="0.9">
+                            <animate attributeName="r" values="8;10;8" dur="3s" repeatCount="indefinite" />
+                        </circle>
+
+                        <!-- Ethics scales - left side -->
+                        <g transform="translate(80, 200)">
+                            <line x1="0" y1="0" x2="100" y2="-60" stroke="white" stroke-width="2" opacity="0.7">
+                                <animateTransform attributeName="transform" type="rotate" values="0 0 0;-5 0 0;0 0 0"
+                                    dur="4s" repeatCount="indefinite" />
+                            </line>
+                            <circle cx="100" cy="-60" r="40" fill="none" stroke="white" stroke-width="2"
+                                opacity="0.6" />
+                            <text x="100" y="-55" text-anchor="middle" fill="white" font-size="12"
+                                opacity="0.8">Fairness</text>
+                        </g>
+
+                        <!-- Ethics scales - right side -->
+                        <g transform="translate(200, 200)">
+                            <line x1="0" y1="0" x2="100" y2="-60" stroke="white" stroke-width="2" opacity="0.7">
+                                <animateTransform attributeName="transform" type="rotate"
+                                    values="0 100 -60;5 100 -60;0 100 -60" dur="4s" repeatCount="indefinite"
+                                    begin="0.5s" />
+                            </line>
+                            <circle cx="100" cy="-60" r="40" fill="none" stroke="white" stroke-width="2"
+                                opacity="0.6" />
+                            <text x="100" y="-55" text-anchor="middle" fill="white" font-size="12"
+                                opacity="0.8">Privacy</text>
+                        </g>
+
+                        <!-- Data flow particles -->
+                        <g opacity="0.5">
+                            <circle cx="150" cy="250" r="3" fill="rgba(5, 150, 105, 0.8)">
+                                <animateMotion path="M 0,0 Q 50,-100 100,-50" dur="5s" repeatCount="indefinite" />
+                                <animate attributeName="opacity" values="0.3;0.8;0.3" dur="5s"
+                                    repeatCount="indefinite" />
+                            </circle>
+                            <circle cx="250" cy="250" r="3" fill="rgba(124, 58, 237, 0.8)">
+                                <animateMotion path="M 0,0 Q -50,-100 -100,-50" dur="6s" repeatCount="indefinite" />
+                                <animate attributeName="opacity" values="0.3;0.8;0.3" dur="6s"
+                                    repeatCount="indefinite" />
+                            </circle>
+                        </g>
+
+                        <!-- Neural network nodes -->
+                        <g opacity="0.4">
+                            <circle cx="100" cy="300" r="4" fill="white">
+                                <animate attributeName="opacity" values="0.2;0.6;0.2" dur="3s"
+                                    repeatCount="indefinite" />
+                            </circle>
+                            <circle cx="300" cy="300" r="4" fill="white">
+                                <animate attributeName="opacity" values="0.2;0.6;0.2" dur="3s" repeatCount="indefinite"
+                                    begin="0.5s" />
+                            </circle>
+                            <circle cx="200" cy="350" r="4" fill="white">
+                                <animate attributeName="opacity" values="0.2;0.6;0.2" dur="3s" repeatCount="indefinite"
+                                    begin="1s" />
+                            </circle>
+
+                            <!-- Connecting lines -->
+                            <line x1="100" y1="300" x2="200" y2="350" stroke="white" stroke-width="1" opacity="0.3" />
+                            <line x1="300" y1="300" x2="200" y2="350" stroke="white" stroke-width="1" opacity="0.3" />
+                        </g>
+
+                        <!-- Transparency overlay - hexagonal mesh -->
+                        <g opacity="0.2">
+                            <polygon points="200,100 230,115 230,145 200,160 170,145 170,115" fill="none" stroke="white"
+                                stroke-width="1">
+                                <animate attributeName="opacity" values="0.2;0.4;0.2" dur="4s"
+                                    repeatCount="indefinite" />
+                            </polygon>
+                            <polygon points="200,50 240,72.5 240,117.5 200,140 160,117.5 160,72.5" fill="none"
+                                stroke="white" stroke-width="1">
+                                <animate attributeName="opacity" values="0.2;0.4;0.2" dur="4s" repeatCount="indefinite"
+                                    begin="0.5s" />
+                            </polygon>
+                        </g>
+                    </svg>
                 </div>
             </div>
+        </header>
 
-            <div class="content">
+        <!-- Main Content -->
+        <main id="main-content" class="main-container">
+            <section class="content-section">
+                <h3>1. Introduction</h3>
+                <p>Ethics, as a branch of philosophy, examines principles of right and wrong, justice and injustice, and
+                    how individuals ought to act. As artificial intelligence (AI) and data-driven systems increasingly
+                    influence decisions in domains like healthcare, law, finance, and social media, embedding ethical
+                    principles into these systems becomes essential. The goal is not only to minimize harm but also to
+                    promote fairness, human dignity, and societal benefit.</p>
+            </section>
 
-                <body>
-                    <header>
-                        <h1>Building Ethical Systems in AI and Data Science</h1>
-                        <div
-                            style="background-color: #f0f8ff; border-left: 4px solid #1e90ff; padding: 1em; margin-bottom: 1.5em;">
-                            <strong>This article is part of a series on <a
-                                    href="./artificial-intelligence.html">Artificial
-                                    Intelligence</a>.</strong>
-                        </div>
-                    </header>
+            <section class="content-section">
+                <h3>2. Ethical Theories and Their Relevance to Technology</h3>
+                <p>Several foundational ethical frameworks guide our understanding of moral decision-making:</p>
+                <ul>
+                    <li><strong>Utilitarianism:</strong> Focuses on maximizing overall happiness or utility. In AI, this
+                        may justify decisions that benefit the majority but risks marginalizing minority perspectives.
+                    </li>
+                    <li><strong>Deontology:</strong> Emphasizes duties and rules over consequences. This is important in
+                        ensuring AI respects human rights and legal norms regardless of outcomes.</li>
+                    <li><strong>Virtue Ethics:</strong> Centers on character and moral virtues such as honesty and
+                        compassion. In design terms, this would mean fostering developers' ethical responsibility.</li>
+                    <li><strong>Care Ethics:</strong> Focuses on relationships and responsibilities to others, which is
+                        particularly useful when dealing with vulnerable populations or marginal groups.</li>
+                </ul>
+                <p>While these theories often overlap, selecting an appropriate ethical lens is context-dependent and
+                    crucial for responsible AI design.</p>
+            </section>
 
-                    <main>
-                        <section>
-                            <h3>1. Introduction</h3>
-                            <p>Ethics, as a branch of philosophy, examines principles of right and wrong, justice
-                                and injustice, and how individuals ought to act. As artificial intelligence (AI) and
-                                data-driven systems increasingly influence decisions in domains like healthcare,
-                                law, finance, and social media, embedding ethical principles into these systems
-                                becomes essential. The goal is not only to minimize harm but also to promote
-                                fairness, human dignity, and societal benefit.</p>
-                        </section>
+            <section class="content-section">
+                <h3>3. Ethics in Practice: Sectors and Implications</h3>
+                <p>Ethical systems must be tailored to the domains in which they operate:</p>
+                <ul>
+                    <li><strong>Business:</strong> Ensuring fair labor practices, data privacy, and ethical supply
+                        chains.</li>
+                    <li><strong>Healthcare:</strong> Preserving patient dignity, informed consent, and equitable access
+                        to care.</li>
+                    <li><strong>Education:</strong> Avoiding algorithmic bias in admissions or grading systems.</li>
+                    <li><strong>Government:</strong> Transparency in public service algorithms and avoidance of
+                        surveillance overreach.</li>
+                </ul>
+                <p>In each domain, ethical considerations are closely linked to justice, equality, and public trust.</p>
+            </section>
 
-                        <section>
-                            <h3>2. Ethical Theories and Their Relevance to Technology</h3>
-                            <p>Several foundational ethical frameworks guide our understanding of moral
-                                decision-making:</p>
-                            <ul>
-                                <li><strong>Utilitarianism:</strong> Focuses on maximizing overall happiness or
-                                    utility. In AI, this may justify decisions that benefit the majority but risks
-                                    marginalizing minority perspectives.</li>
-                                <li><strong>Deontology:</strong> Emphasizes duties and rules over consequences. This
-                                    is important in ensuring AI respects human rights and legal norms regardless of
-                                    outcomes.</li>
-                                <li><strong>Virtue Ethics:</strong> Centers on character and moral virtues such as
-                                    honesty and compassion. In design terms, this would mean fostering developers’
-                                    ethical responsibility.</li>
-                                <li><strong>Care Ethics:</strong> Focuses on relationships and responsibilities to
-                                    others, which is particularly useful when dealing with vulnerable populations or
-                                    marginal groups.</li>
-                            </ul>
-                            <p>While these theories often overlap, selecting an appropriate ethical lens is
-                                context-dependent and crucial for responsible AI design.</p>
-                        </section>
+            <section class="content-section">
+                <h3>4. Data Bias and Its Impact on AI</h3>
+                <p>Machine learning models are only as good as the data they are trained on. Often, these datasets
+                    originate from social media platforms, search histories, or other user-generated sources.
+                    Unfortunately, such data is frequently:</p>
+                <ul>
+                    <li><strong>Incomplete:</strong> Lacking representation from certain demographic groups.</li>
+                    <li><strong>Biased:</strong> Reflecting the societal prejudices present in historical data.</li>
+                    <li><strong>Noisy:</strong> Containing misinformation, spam, or irrelevant content.</li>
+                </ul>
+                <p>For example, if an AI system trained on biased data is used in a hiring process, it may
+                    systematically disadvantage certain ethnicities or genders. As the saying goes: <em>"Garbage in,
+                        garbage out."</em> Bias in, bias out <sup><a href="#transparency-IA">[10]</a></sup>.</p>
+            </section>
 
-                        <section>
-                            <h3>3. Ethics in Practice: Sectors and Implications</h3>
-                            <p>Ethical systems must be tailored to the domains in which they operate:</p>
-                            <ul>
-                                <li><strong>Business:</strong> Ensuring fair labor practices, data privacy, and
-                                    ethical supply chains.</li>
-                                <li><strong>Healthcare:</strong> Preserving patient dignity, informed consent, and
-                                    equitable access to care.</li>
-                                <li><strong>Education:</strong> Avoiding algorithmic bias in admissions or grading
-                                    systems.</li>
-                                <li><strong>Government:</strong> Transparency in public service algorithms and
-                                    avoidance of surveillance overreach.</li>
-                            </ul>
-                            <p>In each domain, ethical considerations are closely linked to justice, equality, and
-                                public trust.</p>
-                        </section>
+            <section class="content-section">
+                <h3>5. Data Consent and Digital Rights</h3>
+                <p>Ethical AI requires informed consent and respect for digital rights. Critical questions must be
+                    asked:</p>
+                <ul>
+                    <li>Were individuals aware their data would be used for algorithmic training?</li>
+                    <li>Did they consent freely, or was the consent coerced through opaque Terms of Service?</li>
+                    <li>Do users have a right to withdraw their data?</li>
+                </ul>
+                <p>Informed consent must be explicit and granular. The <a
+                        href="https://en.wikipedia.org/wiki/General_Data_Protection_Regulation">General Data Protection
+                        Regulation (GDPR)</a> in the EU provides a legal basis for these rights, including data access,
+                    correction, and erasure.</p>
+            </section>
 
-                        <section>
-                            <h3>4. Data Bias and Its Impact on AI</h3>
-                            <p>Machine learning models are only as good as the data they are trained on. Often,
-                                these datasets originate from social media platforms, search histories, or other
-                                user-generated sources. Unfortunately, such data is frequently:</p>
-                            <ul>
-                                <li><strong>Incomplete:</strong> Lacking representation from certain demographic
-                                    groups.</li>
-                                <li><strong>Biased:</strong> Reflecting the societal prejudices present in
-                                    historical data.</li>
-                                <li><strong>Noisy:</strong> Containing misinformation, spam, or irrelevant content.
-                                </li>
-                            </ul>
-                            <p>For example, if an AI system trained on biased data is used in a hiring process, it
-                                may systematically disadvantage certain ethnicities or genders. As the saying goes:
-                                <em>"Garbage in, garbage out."</em> Bias in, bias out <sup><a
-                                        href="#transparency-IA">[10]</a></sup>.
-                            </p>
-                        </section>
+            <section class="content-section">
+                <h3>6. Transparency and Explainability</h3>
+                <p>Transparency means making the internal workings of AI systems understandable to both experts and
+                    non-experts. Explainability is a technical approach to achieve this—offering insight into how a
+                    model reached a decision. This is particularly vital in high-stakes domains such as:</p>
+                <ul>
+                    <li><strong>Healthcare:</strong> Explaining diagnoses or treatment suggestions.</li>
+                    <li><strong>Criminal Justice:</strong> Interpreting risk scores for bail or sentencing.</li>
+                    <li><strong>Finance:</strong> Clarifying credit scoring and loan approvals.</li>
+                </ul>
+                <p>Lack of transparency hinders accountability and undermines public trust in AI. Black-box models
+                    should not be used in critical decisions without appropriate oversight.</p>
+            </section>
 
-                        <section>
-                            <h3>5. Data Consent and Digital Rights</h3>
-                            <p>Ethical AI requires informed consent and respect for digital rights. Critical
-                                questions must be asked:</p>
-                            <ul>
-                                <li>Were individuals aware their data would be used for algorithmic training?</li>
-                                <li>Did they consent freely, or was the consent coerced through opaque Terms of
-                                    Service?</li>
-                                <li>Do users have a right to withdraw their data?</li>
-                            </ul>
-                            <p>Informed consent must be explicit and granular. The <a
-                                    href="https://en.wikipedia.org/wiki/General_Data_Protection_Regulation">General
-                                    Data Protection Regulation (GDPR)</a> in the EU provides a legal basis for these
-                                rights, including data access, correction, and erasure.</p>
-                        </section>
+            <section class="content-section">
+                <h3>7. Algorithmic Accountability</h3>
+                <p>Accountability refers to the ability to hold designers, developers, and deployers of AI systems
+                    responsible for outcomes. In anonymous, automated systems, this becomes complex. Should developers
+                    be liable for harm caused by a model? Who should audit and regulate these systems?</p>
+                <p>Calls are growing to ban anonymous accounts on major platforms to ensure accountability, especially
+                    where online learning algorithms continuously adapt based on user interactions. However, such bans
+                    must balance with the right to anonymity and free speech, particularly for whistleblowers or
+                    vulnerable populations.</p>
+            </section>
 
-                        <section>
-                            <h3>6. Transparency and Explainability</h3>
-                            <p>Transparency means making the internal workings of AI systems understandable to both
-                                experts and non-experts. Explainability is a technical approach to achieve
-                                this—offering insight into how a model reached a decision. This is particularly
-                                vital in high-stakes domains such as:</p>
-                            <ul>
-                                <li><strong>Healthcare:</strong> Explaining diagnoses or treatment suggestions.</li>
-                                <li><strong>Criminal Justice:</strong> Interpreting risk scores for bail or
-                                    sentencing.</li>
-                                <li><strong>Finance:</strong> Clarifying credit scoring and loan approvals.</li>
-                            </ul>
-                            <p>Lack of transparency hinders accountability and undermines public trust in AI.
-                                Black-box models should not be used in critical decisions without appropriate
-                                oversight.</p>
-                        </section>
+            <section class="content-section">
+                <h3>8. Regulation and Ethical Frameworks</h3>
+                <p>International organizations and governments are developing AI ethics frameworks:</p>
+                <ul>
+                    <li><a
+                            href="https://digital-strategy.ec.europa.eu/en/policies/european-approach-artificial-intelligence">EU
+                            AI Act</a>: Regulates high-risk AI applications and enforces transparency and human
+                        oversight.</li>
+                    <li><a href="https://oecd.ai/">OECD Principles on AI</a>: Promote inclusive growth, sustainable
+                        development, and human-centered values.</li>
+                    <li><a href="https://en.unesco.org/artificial-intelligence/ethics">UNESCO Recommendation on the
+                            Ethics of AI</a>: Emphasizes human rights, data governance, and environmental
+                        sustainability.</li>
+                </ul>
+                <p>Such frameworks help ensure global consistency while allowing for cultural and legal diversity in
+                    implementation.</p>
+            </section>
 
-                        <section>
-                            <h3>7. Algorithmic Accountability</h3>
-                            <p>Accountability refers to the ability to hold designers, developers, and deployers of
-                                AI systems responsible for outcomes. In anonymous, automated systems, this becomes
-                                complex. Should developers be liable for harm caused by a model? Who should audit
-                                and regulate these systems?</p>
-                            <p>Calls are growing to ban anonymous accounts on major platforms to ensure
-                                accountability, especially where online learning algorithms continuously adapt based
-                                on user interactions. However, such bans must balance with the right to anonymity
-                                and free speech, particularly for whistleblowers or vulnerable populations.</p>
-                        </section>
+            <section class="content-section">
+                <h3>9. Public Awareness and Education</h3>
+                <p>The public must be engaged in discussions around AI ethics. Ethical systems cannot be designed behind
+                    closed doors. External audits, citizen assemblies, and educational campaigns are critical to
+                    fostering informed debate. As demonstrated during the COVID-19 pandemic, data sharing can save
+                    lives—but only if trust, privacy, and consent are maintained.</p>
+            </section>
 
-                        <section>
-                            <h3>8. Regulation and Ethical Frameworks</h3>
-                            <p>International organizations and governments are developing AI ethics frameworks:</p>
-                            <ul>
-                                <li><a
-                                        href="https://digital-strategy.ec.europa.eu/en/policies/european-approach-artificial-intelligence">EU
-                                        AI Act</a>: Regulates high-risk AI applications and enforces transparency
-                                    and human oversight.</li>
-                                <li><a href="https://oecd.ai/">OECD Principles on
-                                        AI</a>: Promote inclusive growth, sustainable development, and
-                                    human-centered values.</li>
-                                <li><a href="https://en.unesco.org/artificial-intelligence/ethics">UNESCO
-                                        Recommendation on the Ethics of AI</a>: Emphasizes human rights, data
-                                    governance, and environmental sustainability.</li>
-                            </ul>
-                            <p>Such frameworks help ensure global consistency while allowing for cultural and legal
-                                diversity in implementation.</p>
-                        </section>
+            <section class="content-section">
+                <h3>10. Conclusion</h3>
+                <p>Ethical systems in AI are not optional—they are essential. From minimizing harm to promoting justice,
+                    ethical frameworks help align AI with human values. As autonomous systems continue to evolve, public
+                    debate, regulatory safeguards, and developer responsibility must go hand in hand to ensure that
+                    technology serves humanity, not the other way around.</p>
+            </section>
 
-                        <section>
-                            <h3>9. Public Awareness and Education</h3>
-                            <p>The public must be engaged in discussions around AI ethics. Ethical systems cannot be
-                                designed behind closed doors. External audits, citizen assemblies, and educational
-                                campaigns are critical to fostering informed debate. As demonstrated during the
-                                COVID-19 pandemic, data sharing can save lives—but only if trust, privacy, and
-                                consent are maintained.</p>
-                        </section>
+            <section class="references-section">
+                <h3>References</h3>
+                <ol>
+                    <li><a href="https://en.wikipedia.org/wiki/Ethics">Ethics – Wikipedia</a></li>
+                    <li><a href="http://www.fastcoexist.com/3027854/how-can-we-build-ethics-into-big-data">How Can We
+                            Build Ethics Into Big Data?</a></li>
+                    <li><a
+                            href="https://www.technologyreview.com/2015/07/29/166941/how-to-help-self-driving-cars-make-ethical-decisions/">Self-Driving
+                            Cars Get a Code of Ethics</a></li>
+                    <li><a href="https://www.nytimes.com/2018/02/12/business/computer-science-ethics-courses.html">Tech's
+                            Ethical 'Dark Side': Harvard, Stanford and Others Want to Address It</a></li>
+                    <li><a href="https://theconversation.com/whats-the-point-of-an-ethics-course-74025">What's the point
+                            of an ethics course?</a></li>
+                    <li><a
+                            href="https://www.forbes.com/sites/kalevleetaru/2017/07/20/should-open-access-and-open-data-come-with-open-ethics/">Should
+                            Open Access And Open Data Come With Open Ethics?</a></li>
+                    <li><a
+                            href="https://medium.com/cityai/the-ethics-of-ai-building-technology-that-benefits-people-and-society-ea6b10c5ff3">The
+                            Ethics of AI: Building technology that benefits people and society</a></li>
+                    <li><a href="https://en.wikipedia.org/wiki/General_Data_Protection_Regulation">General Data
+                            Protection Regulation – Wikipedia</a></li>
+                    <li><a href="https://en.wikipedia.org/wiki/Explainable_artificial_intelligence">Explainable
+                            Artificial Intelligence – Wikipedia</a></li>
+                    <li id="transparency-IA"><a href="https://www.youtube.com/watch?v=a7qBfEA6hTA">Les enjeux éthiques
+                            et sociaux de l'intelligence artificielle</a></li>
+                    <li><a
+                            href="https://digital-strategy.ec.europa.eu/en/policies/european-approach-artificial-intelligence">European
+                            AI Act – EU Digital Strategy</a></li>
+                    <li><a href="https://www.oecd.org/en/topics/policy-issues/artificial-intelligence.html">OECD
+                            Artificial Intelligence</a></li>
+                    <li><a href="https://en.unesco.org/artificial-intelligence/ethics">UNESCO AI Ethics
+                            Recommendation</a></li>
+                </ol>
+            </section>
+        </main>
 
-                        <section>
-                            <h3>10. Conclusion</h3>
-                            <p>Ethical systems in AI are not optional—they are essential. From minimizing harm to
-                                promoting justice, ethical frameworks help align AI with human values. As autonomous
-                                systems continue to evolve, public debate, regulatory safeguards, and developer
-                                responsibility must go hand in hand to ensure that technology serves humanity, not
-                                the other way around.</p>
-                        </section>
-
-                        <section>
-                            <h3>References</h3>
-                            <ol>
-                                <li><a href="https://en.wikipedia.org/wiki/Ethics">Ethics – Wikipedia</a></li>
-                                <li><a href="http://www.fastcoexist.com/3027854/how-can-we-build-ethics-into-big-data">How
-                                        Can We Build Ethics Into Big Data?</a></li>
-                                <li><a
-                                        href="https://www.technologyreview.com/2015/07/29/166941/how-to-help-self-driving-cars-make-ethical-decisions/">Self-Driving
-                                        Cars Get a Code of Ethics</a></li>
-                                <li><a
-                                        href="https://www.nytimes.com/2018/02/12/business/computer-science-ethics-courses.html">Tech’s
-                                        Ethical ‘Dark Side’: Harvard, Stanford and Others Want to Address It</a>
-                                </li>
-                                <li><a href="https://theconversation.com/whats-the-point-of-an-ethics-course-74025">What’s
-                                        the point of an ethics course?</a></li>
-                                <li><a
-                                        href="https://www.forbes.com/sites/kalevleetaru/2017/07/20/should-open-access-and-open-data-come-with-open-ethics/">Should
-                                        Open Access And Open Data Come With Open Ethics?</a></li>
-                                <li><a
-                                        href="https://medium.com/cityai/the-ethics-of-ai-building-technology-that-benefits-people-and-society-ea6b10c5ff3">The
-                                        Ethics of AI: Building technology that benefits people and society</a></li>
-                                <li><a href="https://en.wikipedia.org/wiki/General_Data_Protection_Regulation">General
-                                        Data Protection Regulation – Wikipedia</a></li>
-                                <li><a href="https://en.wikipedia.org/wiki/Explainable_artificial_intelligence">Explainable
-                                        Artificial Intelligence – Wikipedia</a></li>
-                                <li id="transparency-IA"><a href="https://www.youtube.com/watch?v=a7qBfEA6hTA">Les
-                                        enjeux éthiques et sociaux de l’intelligence artificielle</a></li>
-                                <li><a
-                                        href="https://digital-strategy.ec.europa.eu/en/policies/european-approach-artificial-intelligence">European
-                                        AI Act – EU Digital Strategy</a></li>
-                                <li><a href="https://www.oecd.org/en/topics/policy-issues/artificial-intelligence.html">OECD
-                                        Artificial Intelligence</a></li>
-                                <li><a href="https://en.unesco.org/artificial-intelligence/ethics">UNESCO AI Ethics
-                                        Recommendation</a></li>
-                            </ol>
-                        </section>
-                    </main>
+        <!-- Footer -->
+        <footer class="footer">
+            <div class="footer-content">
+                <div class="footer-info">
+                    <h2>About This Series</h2>
+                    <p>This article is part of an ongoing exploration into the ethical dimensions of artificial
+                        intelligence and data science. The series examines how we can build technology that serves
+                        humanity while respecting fundamental values of fairness, transparency, and accountability.</p>
+                    <p>For more information, visit the <a href="./data-science.html">Data Science
+                            series page</a> or explore other <a href="../research/research.html">research topics</a>.
+                    </p>
+                </div>
+                <div class="language-selector">
+                    <h3>Language / Langue</h3>
+                    <div class="language-links">
+                        <a href="./ethics.html" aria-label="View in English">English</a>
+                    </div>
+                </div>
             </div>
-
-        </div>
+            <div class="footer-bottom">
+                <p>&copy; 2024 John Samuel. All rights reserved. | <a href="../about.html"
+                        style="color: rgba(255, 255, 255, 0.7);">Contact</a></p>
+            </div>
+        </footer>
     </body>
 
 </html>
