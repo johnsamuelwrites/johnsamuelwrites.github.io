@@ -2,286 +2,687 @@
 <html lang="en">
 
     <head>
-        <meta charset="utf-8" />
-        <meta http-equiv="Content-Language" content="en" />
-        <link rel="shortcut icon" href="../../images/logo/favicon.png" />
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta http-equiv="Content-Language" content="en">
+        <link rel="shortcut icon" href="../../images/logo/favicon.png">
         <title>Shape Expressions (ShEx) for Wikidata: John Samuel</title>
-        <style type="text/css">
-            body {
-                background-color: #FFFFFF;
+        <style>
+            /* ==================== Design Tokens ==================== */
+            :root {
+                /* Color Palette - Technology/Semantic Web Theme */
+                --color-base-bg: #f5f8fa;
+                --color-base-surface: #ffffff;
+                --color-base-text: #1a202c;
+                --color-base-text-muted: #4a5568;
+
+                /* Theme Accents - Data/Knowledge Graph Colors */
+                --color-accent-1: #4a90e2;
+                --color-accent-2: #2d5f8d;
+                --color-accent-3: #7b68ee;
+                --color-accent-light: #e8f2f9;
+                --color-accent-node: #00a896;
+                --color-accent-validate: #ff6b6b;
+
+                /* Functional Colors */
+                --color-shadow: rgba(74, 144, 226, 0.12);
+                --color-border: rgba(74, 144, 226, 0.15);
+                --color-hover: rgba(74, 144, 226, 0.08);
+
+                /* Gradients */
+                --gradient-primary: linear-gradient(135deg, #4a90e2 0%, #7b68ee 100%);
+                --gradient-hero: linear-gradient(135deg, #4a90e2 0%, #2d5f8d 50%, #7b68ee 100%);
+                --gradient-card: linear-gradient(180deg, rgba(255, 255, 255, 0.9), rgba(232, 242, 249, 0.3));
+
+                /* Spacing Scale */
+                --space-xs: 0.25rem;
+                --space-sm: 0.5rem;
+                --space-md: 1rem;
+                --space-lg: 1.5rem;
+                --space-xl: 2rem;
+                --space-2xl: 3rem;
+                --space-3xl: 4rem;
+                --space-4xl: 6rem;
+
+                /* Border Radius */
+                --radius-sm: 4px;
+                --radius-md: 8px;
+                --radius-lg: 12px;
+                --radius-xl: 16px;
+                --radius-2xl: 24px;
+                --radius-organic: 63% 37% 54% 46% / 45% 62% 38% 55%;
+
+                /* Shadows */
+                --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.04), 0 1px 3px rgba(0, 0, 0, 0.06);
+                --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.05), 0 2px 4px rgba(0, 0, 0, 0.06);
+                --shadow-lg: 0 10px 24px rgba(0, 0, 0, 0.08), 0 4px 8px rgba(0, 0, 0, 0.06);
+                --shadow-xl: 0 20px 40px rgba(0, 0, 0, 0.12), 0 8px 16px rgba(0, 0, 0, 0.08);
+                --shadow-theme: 0 10px 30px var(--color-shadow), 0 4px 10px rgba(0, 0, 0, 0.06);
+
+                /* Typography */
+                --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+                --font-mono: 'SF Mono', Monaco, 'Cascadia Code', 'Consolas', 'Courier New', monospace;
+
+                --text-xs: clamp(0.75rem, 0.7rem + 0.25vw, 0.875rem);
+                --text-sm: clamp(0.875rem, 0.8rem + 0.35vw, 1rem);
+                --text-base: clamp(1rem, 0.95rem + 0.25vw, 1.125rem);
+                --text-lg: clamp(1.125rem, 1.05rem + 0.35vw, 1.25rem);
+                --text-xl: clamp(1.25rem, 1.15rem + 0.5vw, 1.5rem);
+                --text-2xl: clamp(1.5rem, 1.3rem + 1vw, 2rem);
+                --text-3xl: clamp(2rem, 1.6rem + 2vw, 2.5rem);
+
+                /* Weights */
+                --weight-normal: 400;
+                --weight-medium: 500;
+                --weight-semibold: 600;
+                --weight-bold: 700;
             }
 
-            #sidebar {
-                position: fixed;
-                background-color: #1B80CF;
-                top: 0;
-                left: 0;
-                bottom: 0;
-                width: 30vw;
-            }
-
-            #sidebar .title {
-                position: relative;
-                text-align: center;
-                line-height: 4vmax;
-                font-size: 1.4vmax;
-                font-family: 'Arial';
-                margin-top: 30vh;
-            }
-
-            #sidebar .title a:link,
-            #sidebar .title a:visited {
-                color: #FFFFFF;
-                text-decoration: none;
-            }
-
-            .subtitle {
-                top: 50vh;
-                text-align: center;
-                line-height: 1.3vmax;
-                font-family: 'Arial';
-                font-size: 1.5vmax;
-                color: #FFFFFF;
-            }
-
-            .subtitle a:link,
-            .subtitle a:visited {
-                color: #FFFFFF;
-                text-decoration: none;
-            }
-
-            .licence {
-                position: fixed;
-                text-align: right;
-                bottom: 0;
-                right: 0;
-            }
-
-            .home {
-                position: fixed;
-                text-align: left;
-                font-family: 'Arial';
-                color: #D3D3D3;
-                z-index: 100;
-                width: 100%;
-                background-color: #FFFFFF;
-                top: 0px;
-                margin-bottom: 10px;
-                padding-bottom: 10px;
-            }
-
-            .home a:link,
-            .home a:visited {
-                text-decoration: none;
-                color: #D3D3D3;
-            }
-
-            .home ul {
+            /* ==================== Reset & Base ==================== */
+            * {
                 margin: 0;
                 padding: 0;
-                text-align: left;
-                list-style: none;
+                box-sizing: border-box;
             }
 
-            .home li {
-                position: relative;
-                float: left;
-                padding-top: 15px;
-                margin-right: 1em;
-                font-family: 'Arial';
+            html {
+                scroll-behavior: smooth;
+                scroll-padding-top: 80px;
             }
 
-            .home li:hover {
-                display: block;
+            body {
+                font-family: var(--font-sans);
+                font-size: var(--text-base);
+                line-height: 1.7;
+                color: var(--color-base-text);
+                background: var(--color-base-bg);
+                background-image:
+                    radial-gradient(circle at 20% 50%, rgba(74, 144, 226, 0.03) 0%, transparent 50%),
+                    radial-gradient(circle at 80% 80%, rgba(123, 104, 238, 0.03) 0%, transparent 50%);
+                background-attachment: fixed;
+                overflow-x: hidden;
             }
 
-            .home a:link,
-            .home a:visited {
-                color: #D3D3D3;
-            }
-
-            .home li:hover a:link,
-            .home li:hover a:visited {
+            /* Skip Link for Accessibility */
+            .skip-link {
+                position: absolute;
+                top: -40px;
+                left: 0;
+                background: var(--color-accent-1);
+                color: white;
+                padding: var(--space-sm) var(--space-md);
                 text-decoration: none;
-                padding: 15px;
-                color: #FFFFFF;
-                background-color: #1B80CF;
+                border-radius: 0 0 var(--radius-md) 0;
+                z-index: 1000;
             }
 
-            .content {
-                line-height: 1.8vmax;
-                font-size: 1.2vmax;
-                font-family: 'Arial';
-                margin-top: 15vh;
-                width: 90%;
+            .skip-link:focus {
+                top: 0;
             }
 
-            .content h2,
+            /* ==================== Navigation ==================== */
+            .nav-wrapper {
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                z-index: 900;
+                background: rgba(255, 255, 255, 0.85);
+                -webkit-backdrop-filter: blur(12px) saturate(180%);
+                backdrop-filter: blur(12px) saturate(180%);
+                border-bottom: 1px solid var(--color-border);
+                box-shadow: var(--shadow-sm);
+            }
+
+            nav {
+                max-width: 1400px;
+                margin: 0 auto;
+                padding: var(--space-lg) var(--space-xl);
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                gap: var(--space-xl);
+            }
+
+            .nav-brand {
+                font-size: var(--text-xl);
+                font-weight: var(--weight-bold);
+                background: var(--gradient-primary);
+                -webkit-background-clip: text;
+                background-clip: text;
+                -webkit-text-fill-color: transparent;
+                text-decoration: none;
+                letter-spacing: -0.02em;
+                position: relative;
+                padding: var(--space-xs) var(--space-md);
+            }
+
+            .nav-brand::before {
+                content: '';
+                position: absolute;
+                inset: 0;
+                background: var(--gradient-primary);
+                opacity: 0.08;
+                border-radius: var(--radius-md);
+                z-index: -1;
+                transition: opacity 0.3s ease;
+            }
+
+            .nav-brand:hover::before {
+                opacity: 0.15;
+            }
+
+            .nav-links {
+                display: flex;
+                list-style: none;
+                gap: var(--space-lg);
+                align-items: center;
+            }
+
+            .nav-links a {
+                color: var(--color-base-text-muted);
+                text-decoration: none;
+                font-size: var(--text-sm);
+                font-weight: var(--weight-medium);
+                padding: var(--space-sm) var(--space-md);
+                border-radius: var(--radius-md);
+                transition: all 0.3s ease;
+                position: relative;
+            }
+
+            .nav-links a::after {
+                content: '';
+                position: absolute;
+                bottom: 0;
+                left: 50%;
+                width: 0;
+                height: 2px;
+                background: var(--gradient-primary);
+                transform: translateX(-50%);
+                transition: width 0.3s ease;
+            }
+
+            .nav-links a:hover {
+                color: var(--color-accent-1);
+                background: var(--color-hover);
+            }
+
+            .nav-links a:hover::after {
+                width: 60%;
+            }
+
+            /* ==================== Hero Section ==================== */
+            .hero {
+                margin-top: 80px;
+                padding: var(--space-4xl) var(--space-xl) var(--space-3xl);
+                background: var(--gradient-hero);
+                background-size: 200% 200%;
+                animation: gradientShift 15s ease infinite;
+                position: relative;
+                overflow: hidden;
+            }
+
+            @keyframes gradientShift {
+
+                0%,
+                100% {
+                    background-position: 0% 50%;
+                }
+
+                50% {
+                    background-position: 100% 50%;
+                }
+            }
+
+            .hero::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background:
+                    repeating-linear-gradient(90deg,
+                        transparent,
+                        transparent 50px,
+                        rgba(255, 255, 255, 0.03) 50px,
+                        rgba(255, 255, 255, 0.03) 51px);
+                animation: patternSlide 20s linear infinite;
+            }
+
+            @keyframes patternSlide {
+                0% {
+                    transform: translateX(0);
+                }
+
+                100% {
+                    transform: translateX(100px);
+                }
+            }
+
+            .hero-content {
+                max-width: 1200px;
+                margin: 0 auto;
+                text-align: center;
+                position: relative;
+                z-index: 2;
+            }
+
+            .hero h1 {
+                font-size: var(--text-3xl);
+                font-weight: var(--weight-bold);
+                color: white;
+                margin-bottom: var(--space-lg);
+                letter-spacing: -0.03em;
+                line-height: 1.2;
+            }
+
+            .hero-subtitle {
+                font-size: var(--text-lg);
+                color: rgba(255, 255, 255, 0.9);
+                max-width: 700px;
+                margin: 0 auto;
+                line-height: 1.6;
+            }
+
+            .hero-svg {
+                margin-top: var(--space-2xl);
+                max-width: 600px;
+                width: 100%;
+                height: auto;
+            }
+
+            /* ==================== Main Content ==================== */
+            .container {
+                max-width: 1200px;
+                margin: 0 auto;
+                padding: var(--space-4xl) var(--space-xl);
+            }
+
+            .info-box {
+                background: linear-gradient(135deg, rgba(74, 144, 226, 0.08) 0%, rgba(123, 104, 238, 0.08) 100%);
+                border-left: 4px solid var(--color-accent-node);
+                padding: var(--space-lg);
+                margin-bottom: var(--space-2xl);
+                border-radius: var(--radius-md);
+                position: relative;
+                overflow: hidden;
+            }
+
+            .info-box::before {
+                content: '';
+                position: absolute;
+                top: -2px;
+                left: -2px;
+                right: -2px;
+                bottom: -2px;
+                background: var(--gradient-primary);
+                opacity: 0;
+                border-radius: var(--radius-md);
+                z-index: -1;
+                transition: opacity 0.3s ease;
+            }
+
+            .info-box:hover::before {
+                opacity: 0.05;
+            }
+
+            .info-box strong {
+                color: var(--color-accent-2);
+            }
+
+            .info-box a {
+                color: var(--color-accent-1);
+                text-decoration: none;
+                border-bottom: 1px solid transparent;
+                transition: border-color 0.3s ease;
+            }
+
+            .info-box a:hover {
+                border-bottom-color: var(--color-accent-1);
+            }
+
+            h2,
             h3,
             h4 {
-                color: #1B80CF;
+                color: var(--color-accent-2);
+                font-weight: var(--weight-bold);
+                margin: var(--space-2xl) 0 var(--space-lg);
+                letter-spacing: -0.02em;
+                position: relative;
+                padding-bottom: var(--space-md);
             }
 
-            .content a:link,
-            .content a:visited {
-                color: #1B80CF;
+            h2 {
+                font-size: var(--text-2xl);
             }
 
-            .content h3 {
-                color: #1B80CF;
+            h3 {
+                font-size: var(--text-xl);
             }
 
-            .content h2::before,
-            .content h3::before {
-                display: block;
-                content: " ";
-                visibility: hidden;
-                height: 50px;
-                margin-top: -50px;
-                pointer-events: none;
-                background-color: #FFFFFF;
+            h4 {
+                font-size: var(--text-lg);
             }
 
-            .content a:link,
-            .content a:visited {
-                color: #1B80CF;
+            h2::after,
+            h3::after {
+                content: '';
+                position: absolute;
+                bottom: 0;
+                left: 0;
+                width: 60px;
+                height: 3px;
+                background: var(--gradient-primary);
+                border-radius: 2px;
             }
 
-            .content li {
-                margin: 5px;
+            h3::after {
+                width: 40px;
+                height: 2px;
             }
 
-            .page {
-                width: 65vw;
-                height: 100%;
-                margin-left: 30vw;
-                overflow: hidden;
-                padding: 0 1em;
-                font-family: 'Arial';
+            p {
+                margin-bottom: var(--space-lg);
+                color: var(--color-base-text);
             }
 
-            .page figure {
-                margin-right: 0;
-                margin-left: 0;
+            a {
+                color: var(--color-accent-1);
+                text-decoration: none;
+                transition: all 0.3s ease;
+                position: relative;
+            }
+
+            a:hover {
+                color: var(--color-accent-2);
+            }
+
+            strong {
+                font-weight: var(--weight-semibold);
+                color: var(--color-accent-2);
+            }
+
+            em {
+                font-style: italic;
+                color: var(--color-accent-3);
+            }
+
+            /* ==================== Lists ==================== */
+            ul,
+            ol {
+                margin: var(--space-lg) 0;
+                padding-left: var(--space-xl);
+            }
+
+            li {
+                margin: var(--space-md) 0;
+                padding-left: var(--space-sm);
+                position: relative;
+            }
+
+            ul li::marker {
+                color: var(--color-accent-1);
+            }
+
+            ol li::marker {
+                color: var(--color-accent-1);
+                font-weight: var(--weight-semibold);
+            }
+
+            /* ==================== Table ==================== */
+            .table-wrapper {
+                overflow-x: auto;
+                margin: var(--space-2xl) 0;
+                border-radius: var(--radius-lg);
+                box-shadow: var(--shadow-md);
+                background: var(--color-base-surface);
+            }
+
+            table {
                 width: 100%;
+                border-collapse: collapse;
+                font-size: var(--text-sm);
             }
 
-            .page figure>figcaption {
+            thead {
+                background: var(--gradient-primary);
+                color: white;
+            }
+
+            th {
+                padding: var(--space-md) var(--space-lg);
+                text-align: left;
+                font-weight: var(--weight-semibold);
+                border-bottom: 2px solid rgba(255, 255, 255, 0.3);
+            }
+
+            td {
+                padding: var(--space-md) var(--space-lg);
+                border-bottom: 1px solid var(--color-border);
+            }
+
+            tbody tr {
+                transition: background-color 0.2s ease;
+            }
+
+            tbody tr:hover {
+                background: var(--color-hover);
+            }
+
+            tbody tr:nth-child(even) {
+                background: rgba(74, 144, 226, 0.02);
+            }
+
+            tbody tr:nth-child(even):hover {
+                background: var(--color-hover);
+            }
+
+            /* ==================== Code Block ==================== */
+            pre {
+                background: linear-gradient(135deg, #2d3748 0%, #1a202c 100%);
+                color: #e2e8f0;
+                padding: var(--space-xl);
+                border-radius: var(--radius-lg);
+                overflow-x: auto;
+                margin: var(--space-2xl) 0;
+                font-family: var(--font-mono);
+                font-size: var(--text-sm);
+                line-height: 1.6;
+                box-shadow: var(--shadow-lg);
+                position: relative;
+            }
+
+            pre::before {
+                content: 'ShExC';
+                position: absolute;
+                top: var(--space-sm);
+                right: var(--space-md);
+                font-size: var(--text-xs);
+                color: rgba(255, 255, 255, 0.4);
+                font-weight: var(--weight-semibold);
+                text-transform: uppercase;
+                letter-spacing: 0.1em;
+            }
+
+            /* ==================== Footer ==================== */
+            footer {
+                background: linear-gradient(135deg, #2d3748 0%, #1a202c 100%);
+                color: rgba(255, 255, 255, 0.8);
+                padding: var(--space-3xl) var(--space-xl) var(--space-xl);
+                margin-top: var(--space-4xl);
+            }
+
+            .footer-content {
+                max-width: 1200px;
+                margin: 0 auto;
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+                gap: var(--space-2xl);
+            }
+
+            .footer-section h4 {
+                color: white;
+                margin-top: 0;
+                margin-bottom: var(--space-md);
+                font-size: var(--text-lg);
+            }
+
+            .footer-section h4::after {
+                background: linear-gradient(90deg, rgba(255, 255, 255, 0.5), transparent);
+            }
+
+            .footer-links {
+                list-style: none;
+                padding: 0;
+            }
+
+            .footer-links li {
+                margin: var(--space-sm) 0;
+                padding: 0;
+            }
+
+            .footer-links a {
+                color: rgba(255, 255, 255, 0.7);
+                text-decoration: none;
+                transition: all 0.3s ease;
+                display: inline-flex;
+                align-items: center;
+                gap: var(--space-xs);
+            }
+
+            .footer-links a:hover {
+                color: white;
+                transform: translateX(4px);
+            }
+
+            .footer-links a::before {
+                content: '→';
+                opacity: 0;
+                transition: opacity 0.3s ease;
+            }
+
+            .footer-links a:hover::before {
+                opacity: 1;
+            }
+
+            .footer-bottom {
+                max-width: 1200px;
+                margin: var(--space-2xl) auto 0;
+                padding-top: var(--space-xl);
+                border-top: 1px solid rgba(255, 255, 255, 0.1);
                 text-align: center;
-                font-weight: bold;
+                font-size: var(--text-sm);
+                color: rgba(255, 255, 255, 0.5);
             }
 
-            .page img {
-                max-width: 100%;
-                max-height: 100%;
-            }
-
-            @media (max-width: 640px),
-            screen and (orientation: portrait) {
-                body {
-                    max-width: 100%;
-                    max-height: 100%;
+            /* ==================== Responsive Design ==================== */
+            @media (max-width: 768px) {
+                nav {
+                    flex-direction: column;
+                    padding: var(--space-md);
+                    gap: var(--space-md);
                 }
 
-                #sidebar {
-                    position: fixed;
-                    background-color: #1B80CF;
-                    top: 0;
-                    left: 0;
-                    bottom: 80vh;
-                    width: 100vw;
-                }
-
-                #sidebar .title {
-                    text-align: center;
-                    position: fixed;
-                    margin-top: 6vh;
-                    left: 0px;
-                    right: 0px;
-                    line-height: 3.5vmax;
-                    font-size: 1.5vmax;
-                    font-family: 'Arial';
-                }
-
-                #sidebar .subtitle {
-                    text-align: center;
-                    top: 5vh;
-                    left: 0px;
-                    right: 0px;
-                    position: fixed;
-                    margin-top: 10vh;
-                    font-size: 1.5vmax;
-                }
-
-                #sidebar .title a:link,
-                #sidebar .title a:visited {
-                    text-align: center;
-                    color: #FFFFFF;
-                }
-
-                #sidebar .subtitle a:link,
-                #sidebar .subtitle a:visited {
-                    text-align: center;
-                    color: #FFFFFF;
-                }
-
-                .home {
-                    z-index: 100;
+                .nav-links {
+                    flex-direction: column;
+                    gap: var(--space-sm);
                     width: 100%;
-                    background-color: #1B80CF;
-                    font-size: 1.5vmax;
                 }
 
-                .home a:link,
-                .home a:visited {
-                    text-decoration: none;
-                    color: #FFFFFF;
+                .nav-links li {
+                    width: 100%;
+                    text-align: center;
                 }
 
-                .content {
-                    line-height: 3.8vmax;
-                    font-size: 1.8vmax;
-                    font-family: 'Arial';
-                    margin-top: 22vh;
+                .hero {
+                    padding: var(--space-3xl) var(--space-md) var(--space-2xl);
                 }
 
-                .content a:link,
-                .content a:visited {
-                    color: #1B80CF;
+                .container {
+                    padding: var(--space-2xl) var(--space-md);
                 }
 
-                .page {
-                    top: 40vh;
-                    width: 95%;
-                    margin-left: 0vw;
+                .footer-content {
+                    grid-template-columns: 1fr;
                 }
 
-                .page img {
-                    max-width: 100%;
-                    max-height: 100%;
-                    border: 0;
+                .table-wrapper {
+                    font-size: var(--text-xs);
                 }
+
+                th,
+                td {
+                    padding: var(--space-sm) var(--space-md);
+                }
+            }
+
+            /* ==================== Animations ==================== */
+            @keyframes fadeInUp {
+                from {
+                    opacity: 0;
+                    transform: translateY(30px);
+                }
+
+                to {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            }
+
+            .container>* {
+                animation: fadeInUp 0.6s ease-out backwards;
+            }
+
+            .container>*:nth-child(1) {
+                animation-delay: 0.1s;
+            }
+
+            .container>*:nth-child(2) {
+                animation-delay: 0.2s;
+            }
+
+            .container>*:nth-child(3) {
+                animation-delay: 0.3s;
+            }
+
+            .container>*:nth-child(4) {
+                animation-delay: 0.4s;
+            }
+
+            /* ==================== Reduced Motion ==================== */
+            @media (prefers-reduced-motion: reduce) {
+
+                *,
+                *::before,
+                *::after {
+                    animation-duration: 0.01ms !important;
+                    animation-iteration-count: 1 !important;
+                    transition-duration: 0.01ms !important;
+                }
+
+                html {
+                    scroll-behavior: auto;
+                }
+            }
+
+            /* ==================== Focus Styles ==================== */
+            *:focus-visible {
+                outline: 3px solid var(--color-accent-1);
+                outline-offset: 2px;
+                border-radius: var(--radius-sm);
             }
         </style>
     </head>
 
     <body vocab="http://schema.org/" typeof="Website">
-        <div id="sidebar">
-            <div id="sidebar">
-                <div class="title">
-                    <h1 lang="en"><a href="./index.html" property="url" typeof="WebPage"><span typeof="WebPage">Shape
-                                Expressions (ShEx) for Wikidata</span></a></h1>
-                </div>
-                <div class="subtitle">
-                    <h3 lang="en"><a href="../../index.html" property="url" typeof="WebPage"><span typeof="WebPage"
-                                property="author">John Samuel</span></a></h4>
-                </div>
-            </div>
-        </div>
+        <a href="#main-content" class="skip-link">Skip to main content</a>
 
-        <div class="page" typeof="WebPage">
-            <div class="home">
-                <ul typeof="BreadcrumbList">
+        <!-- Navigation -->
+        <div class="nav-wrapper">
+            <nav role="navigation" aria-label="Main navigation">
+                <a href="../../index.html" class="nav-brand">John Samuel</a>
+                <ul class="nav-links" typeof="BreadcrumbList">
                     <li property="itemListElement" typeof="ListItem">
                         <a property="item" typeof="WebPage" href="../index.html">
                             <span property="name">Home</span>
@@ -293,78 +694,175 @@
                         </a>
                     </li>
                 </ul>
+            </nav>
+        </div>
 
+        <!-- Hero Section -->
+        <header class="hero">
+            <div class="hero-content">
+                <h1>Shape Expressions (ShEx) for Wikidata</h1>
+                <p class="hero-subtitle">Validating and structuring knowledge graphs with formal schemas</p>
+
+                <!-- SVG Illustration: Knowledge Graph Validation -->
+                <svg class="hero-svg" viewBox="0 0 600 300" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                    <!-- Central validation node -->
+                    <circle cx="300" cy="150" r="40" fill="rgba(255,255,255,0.2)" stroke="white" stroke-width="2">
+                        <animate attributeName="r" values="40;45;40" dur="4s" repeatCount="indefinite" />
+                    </circle>
+                    <text x="300" y="157" font-size="14" fill="white" text-anchor="middle"
+                        font-weight="bold">ShEx</text>
+
+                    <!-- Data nodes -->
+                    <g id="node1">
+                        <circle cx="150" cy="80" r="25" fill="rgba(0,168,150,0.3)" stroke="white" stroke-width="1.5">
+                            <animate attributeName="opacity" values="0.6;1;0.6" dur="3s" repeatCount="indefinite" />
+                        </circle>
+                        <text x="150" y="85" font-size="10" fill="white" text-anchor="middle">RDF</text>
+                    </g>
+
+                    <g id="node2">
+                        <circle cx="450" cy="80" r="25" fill="rgba(0,168,150,0.3)" stroke="white" stroke-width="1.5">
+                            <animate attributeName="opacity" values="0.8;1;0.8" dur="3.5s" repeatCount="indefinite" />
+                        </circle>
+                        <text x="450" y="85" font-size="10" fill="white" text-anchor="middle">Data</text>
+                    </g>
+
+                    <g id="node3">
+                        <circle cx="150" cy="220" r="25" fill="rgba(0,168,150,0.3)" stroke="white" stroke-width="1.5">
+                            <animate attributeName="opacity" values="0.7;1;0.7" dur="4s" repeatCount="indefinite" />
+                        </circle>
+                        <text x="150" y="225" font-size="10" fill="white" text-anchor="middle">CSV</text>
+                    </g>
+
+                    <g id="node4">
+                        <circle cx="450" cy="220" r="25" fill="rgba(0,168,150,0.3)" stroke="white" stroke-width="1.5">
+                            <animate attributeName="opacity" values="0.9;1;0.9" dur="3.2s" repeatCount="indefinite" />
+                        </circle>
+                        <text x="450" y="225" font-size="10" fill="white" text-anchor="middle">Wiki</text>
+                    </g>
+
+                    <!-- Connecting lines with animation -->
+                    <line x1="175" y1="90" x2="265" y2="130" stroke="rgba(255,255,255,0.4)" stroke-width="2"
+                        stroke-dasharray="5,5">
+                        <animate attributeName="stroke-dashoffset" from="0" to="-10" dur="2s"
+                            repeatCount="indefinite" />
+                    </line>
+                    <line x1="425" y1="90" x2="335" y2="130" stroke="rgba(255,255,255,0.4)" stroke-width="2"
+                        stroke-dasharray="5,5">
+                        <animate attributeName="stroke-dashoffset" from="0" to="-10" dur="2.3s"
+                            repeatCount="indefinite" />
+                    </line>
+                    <line x1="175" y1="210" x2="265" y2="170" stroke="rgba(255,255,255,0.4)" stroke-width="2"
+                        stroke-dasharray="5,5">
+                        <animate attributeName="stroke-dashoffset" from="0" to="-10" dur="2.5s"
+                            repeatCount="indefinite" />
+                    </line>
+                    <line x1="425" y1="210" x2="335" y2="170" stroke="rgba(255,255,255,0.4)" stroke-width="2"
+                        stroke-dasharray="5,5">
+                        <animate attributeName="stroke-dashoffset" from="0" to="-10" dur="2.7s"
+                            repeatCount="indefinite" />
+                    </line>
+
+                    <!-- Validation pulse rings -->
+                    <circle cx="300" cy="150" r="50" fill="none" stroke="rgba(255,107,107,0.3)" stroke-width="2">
+                        <animate attributeName="r" values="50;70;50" dur="5s" repeatCount="indefinite" />
+                        <animate attributeName="opacity" values="0.6;0;0.6" dur="5s" repeatCount="indefinite" />
+                    </circle>
+                    <circle cx="300" cy="150" r="60" fill="none" stroke="rgba(123,104,238,0.3)" stroke-width="2">
+                        <animate attributeName="r" values="60;85;60" dur="6s" repeatCount="indefinite" />
+                        <animate attributeName="opacity" values="0.5;0;0.5" dur="6s" repeatCount="indefinite" />
+                    </circle>
+
+                    <!-- Decorative grid dots -->
+                    <circle cx="80" cy="40" r="2" fill="rgba(255,255,255,0.3)">
+                        <animate attributeName="opacity" values="0.3;0.8;0.3" dur="4s" repeatCount="indefinite" />
+                    </circle>
+                    <circle cx="520" cy="40" r="2" fill="rgba(255,255,255,0.3)">
+                        <animate attributeName="opacity" values="0.4;0.9;0.4" dur="4.5s" repeatCount="indefinite" />
+                    </circle>
+                    <circle cx="80" cy="260" r="2" fill="rgba(255,255,255,0.3)">
+                        <animate attributeName="opacity" values="0.5;1;0.5" dur="5s" repeatCount="indefinite" />
+                    </circle>
+                    <circle cx="520" cy="260" r="2" fill="rgba(255,255,255,0.3)">
+                        <animate attributeName="opacity" values="0.3;0.7;0.3" dur="3.5s" repeatCount="indefinite" />
+                    </circle>
+                </svg>
             </div>
-            <div class="content">
-                <div
-                    style="background-color: #f0f8ff; border-left: 4px solid #009AA6; padding: 1em; margin-bottom: 1.5em;">
-                    <strong>This article is part of a series on <a
-                            href="../research/knowledge-representation.html">Knowledge Representation and Semantic
-                            Web</a>.</strong>
-                </div>
-                <h3>Overview</h3>
-                <p>
-                    <strong>Shape Expressions (ShEx)</strong> is a concise, formal language for describing and
-                    validating data structures in RDF (Resource Description Framework) graphs, which underpin
-                    Wikidata. Through ShEx, contributors can define <em>schemas</em>—also called <em>entity
-                        schemas</em>—that enforce consistent patterns and quality standards in Wikidata data. This
-                    article introduces ShEx for Wikidata with an emphasis on how CSV-like tabular formats using
-                    <strong>ShExStatements</strong> simplify schema authoring for users without deep technical
-                    knowledge.
-                </p>
+        </header>
 
-                <h3>Why Use ShEx in Wikidata?</h3>
-                <ul>
-                    <li><strong>Improved Data Quality:</strong> ShEx validation catches missing or inconsistent
-                        statements, ensuring reliable, well-structured data.</li>
-                    <li><strong>Better Documentation:</strong> ShEx schemas serve as living documentation of data
-                        models, making complex Wikidata structures more transparent to current and new contributors.
-                    </li>
-                    <li><strong>Enhanced Interoperability:</strong> Adherence to formal schemas ensures
-                        compatibility with other RDF and Linked Data systems, facilitating data reuse on the
-                        semantic web.</li>
-                    <li><strong>Automated Error Detection:</strong> Schemas allow tools and editors to flag
-                        structural issues in real time, improving both human and automated contributions.</li>
-                </ul>
+        <!-- Main Content -->
+        <main id="main-content" class="container">
+            <div class="info-box">
+                <strong>This article is part of a series on <a
+                        href="../research/knowledge-representation.html">Knowledge Representation and Semantic
+                        Web</a>.</strong>
+            </div>
 
-                <h3>Simplifying ShEx with ShExStatements</h3>
-                <p>
-                    <strong>ShExStatements</strong> is a tool that enables users to create ShEx schemas using
-                    straightforward, tabular CSV files rather than traditional ShEx syntax. This makes authoring and
-                    maintaining entity schemas accessible to Wikidata users with diverse backgrounds.
-                </p>
-                <ul>
-                    <li><strong>Tabular Input:</strong> Users enter schema constraints in CSV files, with each row
-                        representing a statement or prefix.</li>
-                    <li><strong>Accessible Tools:</strong> ShExStatements can be used via the command line or web
-                        interfaces, and supports common spreadsheet formats.</li>
-                    <li><strong>Wide Adoption:</strong> Used to simplify schema creation for various data models,
-                        from languages to TV series and more.</li>
-                </ul>
+            <h2>Overview</h2>
+            <p>
+                <strong>Shape Expressions (ShEx)</strong> is a concise, formal language for describing and
+                validating data structures in RDF (Resource Description Framework) graphs, which underpin
+                Wikidata. Through ShEx, contributors can define <em>schemas</em>—also called <em>entity
+                    schemas</em>—that enforce consistent patterns and quality standards in Wikidata data. This
+                article introduces ShEx for Wikidata with an emphasis on how CSV-like tabular formats using
+                <strong>ShExStatements</strong> simplify schema authoring for users without deep technical
+                knowledge.
+            </p>
 
-                <h4>CSV Format Structure</h4>
-                <p>
-                    A typical ShExStatements CSV includes the following columns:
-                </p>
-                <ol>
-                    <li><strong>Node name</strong> (e.g., @language)</li>
-                    <li><strong>Property name</strong> (e.g., wdt:P31)</li>
-                    <li><strong>Value(s)</strong> (e.g., wd:Q34770 or . for any value)</li>
-                    <li><strong>Cardinality</strong> (e.g., +, *, ?, left empty for required, or m, m,n for custom
-                        ranges)</li>
-                    <li><strong>Comment</strong> (starts with #)</li>
-                </ol>
-                <p>
-                    The CSV may start with definitions for prefixes, where only the first three columns are used.
-                </p>
+            <h2>Why Use ShEx in Wikidata?</h2>
+            <ul>
+                <li><strong>Improved Data Quality:</strong> ShEx validation catches missing or inconsistent
+                    statements, ensuring reliable, well-structured data.</li>
+                <li><strong>Better Documentation:</strong> ShEx schemas serve as living documentation of data
+                    models, making complex Wikidata structures more transparent to current and new contributors.
+                </li>
+                <li><strong>Enhanced Interoperability:</strong> Adherence to formal schemas ensures
+                    compatibility with other RDF and Linked Data systems, facilitating data reuse on the
+                    semantic web.</li>
+                <li><strong>Automated Error Detection:</strong> Schemas allow tools and editors to flag
+                    structural issues in real time, improving both human and automated contributions.</li>
+            </ul>
 
-                <h4>Example: Language Schema in CSV and ShExC</h4>
+            <h2>Simplifying ShEx with ShExStatements</h2>
+            <p>
+                <strong>ShExStatements</strong> is a tool that enables users to create ShEx schemas using
+                straightforward, tabular CSV files rather than traditional ShEx syntax. This makes authoring and
+                maintaining entity schemas accessible to Wikidata users with diverse backgrounds.
+            </p>
+            <ul>
+                <li><strong>Tabular Input:</strong> Users enter schema constraints in CSV files, with each row
+                    representing a statement or prefix.</li>
+                <li><strong>Accessible Tools:</strong> ShExStatements can be used via the command line or web
+                    interfaces, and supports common spreadsheet formats.</li>
+                <li><strong>Wide Adoption:</strong> Used to simplify schema creation for various data models,
+                    from languages to TV series and more.</li>
+            </ul>
 
-                <p>
-                    Below is a direct example from the ShExStatements documentation for modeling a
-                    <strong>language</strong> entity in Wikidata, first in the CSV-like format, then the generated
-                    ShEx Compact syntax (ShExC):
-                </p>
+            <h3>CSV Format Structure</h3>
+            <p>
+                A typical ShExStatements CSV includes the following columns:
+            </p>
+            <ol>
+                <li><strong>Node name</strong> (e.g., @language)</li>
+                <li><strong>Property name</strong> (e.g., wdt:P31)</li>
+                <li><strong>Value(s)</strong> (e.g., wd:Q34770 or . for any value)</li>
+                <li><strong>Cardinality</strong> (e.g., +, *, ?, left empty for required, or m, m,n for custom
+                    ranges)</li>
+                <li><strong>Comment</strong> (starts with #)</li>
+            </ol>
+            <p>
+                The CSV may start with definitions for prefixes, where only the first three columns are used.
+            </p>
+
+            <h3>Example: Language Schema in CSV and ShExC</h3>
+
+            <p>
+                Below is a direct example from the ShExStatements documentation for modeling a
+                <strong>language</strong> entity in Wikidata, first in the CSV-like format, then the generated
+                ShEx Compact syntax (ShExC):
+            </p>
+
+            <div class="table-wrapper">
                 <table>
                     <thead>
                         <tr>
@@ -455,78 +953,113 @@
                         </tr>
                     </tbody>
                 </table>
-
-                <p>
-                    The above CSV can be converted using ShExStatements into the following ShExC:
-                </p>
-
-                <pre>
-                  PREFIX wd: <http://www.wikidata.org/entity/>
-                  PREFIX wdt: <http://www.wikidata.org/prop/direct/>
-                  PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
-                  
-                  start = @<language>
-                  <language> {
-                    wdt:P31 [ wd:Q34770 ] ;        # instance of a language
-                    wdt:P1705 LITERAL ;            # native name
-                    wdt:P17 .+ ;                   # spoken in country
-                    wdt:P2989 .+ ;                 # grammatical cases
-                    wdt:P282 .+ ;                  # writing system
-                    wdt:P1098 .+ ;                 # speakers
-                    wdt:P1999 .* ;                 # UNESCO language status
-                    wdt:P2341 .+ ;                 # indigenous to
-                  }
-                    </pre>
-
-                <h4>Other Examples</h4>
-                <p>
-                    More example CSV files for other Wikidata entity types are available in the <a
-                        href="https://github.com/johnsamuelwrites/ShExStatements/tree/master/examples/wikidata">ShExStatements
-                        GitHub repository</a>, such as schemas for TV series, footballers, and more. The process
-                    remains the same: edit a simple CSV, and use the tool to generate robust ShEx code.
-                </p>
-
-                <h3>Development and Tooling</h3>
-                <ul>
-                    <li><strong>Python Implementation:</strong> ShExStatements is primarily built in Python for both
-                        CLI and API usage.</li>
-                    <li><strong>Integration with Spreadsheets:</strong> Supports .csv, .xls, .xlsx, and .ods file
-                        formats for schema definitions.</li>
-                </ul>
-
-                <h3>Challenges and Ongoing Efforts</h3>
-                <ul>
-                    <li><strong>Schema Adoption:</strong> There is a gap between available schemas and the breadth
-                        of Wikidata’s domains. Community engagement and tool improvements aim to close this gap.
-                    </li>
-                    <li><strong>Coverage and References:</strong> Ensuring comprehensive schemas, including
-                        references and sources, is a continuous task as Wikidata’s structure evolves.</li>
-                    <li><strong>Ease of Use:</strong> Striking the right balance between simplicity and
-                        expressiveness in schema authoring tools is a priority for the community.</li>
-                </ul>
-
-                <h3>Conclusion</h3>
-                <p>
-                    ShExStatements enables Wikidata contributors to author, maintain, and apply data validation
-                    schemas with minimal technical hurdles. Its CSV-based approach lowers the barrier for
-                    high-quality data modeling, promoting robust, interoperable, and well-documented Wikidata
-                    content.
-                </p>
-
-                <h3>References</h3>
-                <ol>
-                    <li><strong>ShExStatements Documentation:</strong> <a
-                            href="https://shexstatements.readthedocs.io">Official Docs</a></li>
-                    <li><strong>Wikidata Schema Portal:</strong> Guidance and tutorials for entity schemas</li>
-                    <li><strong>ShEx Primer and Specification:</strong> Learn more about Shape Expressions as a
-                        language</li>
-                    <li><strong>GitHub Examples:</strong> Practical CSV and ShExC examples for various domains in
-                        Wikidata</li>
-                    <li><a href="https://dl.acm.org/doi/10.1145/3442442.3452349">ShExStatements: Simplifying Shape
-                            Expressions for Wikidata</a></li>
-                </ol>
             </div>
-        </div>
+
+            <p>
+                The above CSV can be converted using ShExStatements into the following ShExC:
+            </p>
+
+            <pre>PREFIX wd: &lt;http://www.wikidata.org/entity/&gt;
+PREFIX wdt: &lt;http://www.wikidata.org/prop/direct/&gt;
+PREFIX xsd: &lt;http://www.w3.org/2001/XMLSchema#&gt;
+
+start = @&lt;language&gt;
+&lt;language&gt; {
+  wdt:P31 [ wd:Q34770 ] ;        # instance of a language
+  wdt:P1705 LITERAL ;            # native name
+  wdt:P17 .+ ;                   # spoken in country
+  wdt:P2989 .+ ;                 # grammatical cases
+  wdt:P282 .+ ;                  # writing system
+  wdt:P1098 .+ ;                 # speakers
+  wdt:P1999 .* ;                 # UNESCO language status
+  wdt:P2341 .+ ;                 # indigenous to
+}</pre>
+
+            <h3>Other Examples</h3>
+            <p>
+                More example CSV files for other Wikidata entity types are available in the <a
+                    href="https://github.com/johnsamuelwrites/ShExStatements/tree/master/examples/wikidata">ShExStatements
+                    GitHub repository</a>, such as schemas for TV series, footballers, and more. The process
+                remains the same: edit a simple CSV, and use the tool to generate robust ShEx code.
+            </p>
+
+            <h2>Development and Tooling</h2>
+            <ul>
+                <li><strong>Python Implementation:</strong> ShExStatements is primarily built in Python for both
+                    CLI and API usage.</li>
+                <li><strong>Integration with Spreadsheets:</strong> Supports .csv, .xls, .xlsx, and .ods file
+                    formats for schema definitions.</li>
+            </ul>
+
+            <h2>Challenges and Ongoing Efforts</h2>
+            <ul>
+                <li><strong>Schema Adoption:</strong> There is a gap between available schemas and the breadth
+                    of Wikidata's domains. Community engagement and tool improvements aim to close this gap.
+                </li>
+                <li><strong>Coverage and References:</strong> Ensuring comprehensive schemas, including
+                    references and sources, is a continuous task as Wikidata's structure evolves.</li>
+                <li><strong>Ease of Use:</strong> Striking the right balance between simplicity and
+                    expressiveness in schema authoring tools is a priority for the community.</li>
+            </ul>
+
+            <h2>Conclusion</h2>
+            <p>
+                ShExStatements enables Wikidata contributors to author, maintain, and apply data validation
+                schemas with minimal technical hurdles. Its CSV-based approach lowers the barrier for
+                high-quality data modeling, promoting robust, interoperable, and well-documented Wikidata
+                content.
+            </p>
+
+            <h2>References</h2>
+            <ol>
+                <li><strong>ShExStatements Documentation:</strong> <a
+                        href="https://shexstatements.readthedocs.io">Official Docs</a></li>
+                <li><strong>Wikidata Schema Portal:</strong> Guidance and tutorials for entity schemas</li>
+                <li><strong>ShEx Primer and Specification:</strong> Learn more about Shape Expressions as a
+                    language</li>
+                <li><strong>GitHub Examples:</strong> Practical CSV and ShExC examples for various domains in
+                    Wikidata</li>
+                <li><a href="https://dl.acm.org/doi/10.1145/3442442.3452349">ShExStatements: Simplifying Shape
+                        Expressions for Wikidata</a></li>
+            </ol>
+        </main>
+
+        <!-- Footer -->
+        <footer>
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h4>About</h4>
+                    <p style="color: rgba(255,255,255,0.7); font-size: var(--text-sm); line-height: 1.6;">
+                        Research and teaching in computer science, specializing in semantic web technologies,
+                        knowledge representation, and urban data science.
+                    </p>
+                </div>
+
+                <div class="footer-section">
+                    <h4>Quick Links</h4>
+                    <ul class="footer-links">
+                        <li><a href="../../index.html">Home</a></li>
+                        <li><a href="../research/research.html">Research</a></li>
+                        <li><a href="../research/knowledge-representation.html">Knowledge Representation</a></li>
+                        <li><a href="./shex-wikidata.html">ShEx for Wikidata</a></li>
+                    </ul>
+                </div>
+
+                <div class="footer-section">
+                    <h4>Resources</h4>
+                    <ul class="footer-links">
+                        <li><a href="https://shexstatements.readthedocs.io">ShExStatements Docs</a></li>
+                        <li><a href="https://github.com/johnsamuelwrites/ShExStatements">GitHub Repository</a></li>
+                        <li><a href="https://www.wikidata.org">Wikidata</a></li>
+                        <li><a href="https://dl.acm.org/doi/10.1145/3442442.3452349">ACM Paper</a></li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="footer-bottom">
+                <p>&copy; 2025 John Samuel. All content available under open licenses.</p>
+            </div>
+        </footer>
     </body>
 
 </html>
