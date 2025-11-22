@@ -2,262 +2,909 @@
 <html lang="en">
 
     <head>
-        <meta charset="utf-8" />
-        <meta http-equiv="Content-Language" content="en" />
-        <link rel="shortcut icon" href="../../images/logo/favicon.png" />
-        <title>Language Models: John Samuel</title>
-        <style type="text/css">
-            body {
-                background-color: #FFFFFF;
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta http-equiv="Content-Language" content="en">
+        <link rel="shortcut icon" href="../../images/logo/favicon.png">
+        <title>Language Models: From Statistical Methods to Neural Architectures | John Samuel</title>
+        <style>
+            /* ===== DESIGN TOKENS ===== */
+            :root {
+                /* Linguistics/Communication Theme Color Palette */
+                --color-base-bg: #fafbfc;
+                --color-base-surface: #ffffff;
+                --color-base-text: #2d3748;
+                --color-base-text-muted: #718096;
+
+                /* Theme Accents - Language & Semantics */
+                --color-accent-1: #e07856;
+                --color-accent-2: #d65a31;
+                --color-accent-3: #9333ea;
+                --color-accent-light: rgba(224, 120, 86, 0.08);
+
+                /* Functional Colors */
+                --color-shadow: rgba(224, 120, 86, 0.12);
+                --color-border: rgba(224, 120, 86, 0.15);
+                --color-hover: rgba(224, 120, 86, 0.08);
+
+                /* Gradients */
+                --gradient-primary: linear-gradient(135deg, #e07856 0%, #d65a31 50%, #9333ea 100%);
+                --gradient-surface: linear-gradient(145deg, rgba(255, 255, 255, 1), rgba(250, 251, 252, 0.98));
+                --gradient-hero: linear-gradient(180deg, rgba(224, 120, 86, 0.05) 0%, rgba(250, 251, 252, 1) 100%);
+
+                /* Spacing Scale */
+                --space-xs: 0.25rem;
+                --space-sm: 0.5rem;
+                --space-md: 1rem;
+                --space-lg: 1.5rem;
+                --space-xl: 2rem;
+                --space-2xl: 3rem;
+                --space-3xl: 4rem;
+                --space-4xl: 6rem;
+
+                /* Border Radius */
+                --radius-sm: 4px;
+                --radius-md: 8px;
+                --radius-lg: 12px;
+                --radius-xl: 16px;
+                --radius-2xl: 24px;
+                --radius-organic: 63% 37% 54% 46% / 45% 62% 38% 55%;
+
+                /* Typography Scale */
+                --text-xs: clamp(0.75rem, 0.7rem + 0.25vw, 0.875rem);
+                --text-sm: clamp(0.875rem, 0.8rem + 0.35vw, 1rem);
+                --text-base: clamp(1rem, 0.95rem + 0.25vw, 1.125rem);
+                --text-lg: clamp(1.125rem, 1.05rem + 0.35vw, 1.25rem);
+                --text-xl: clamp(1.25rem, 1.15rem + 0.5vw, 1.5rem);
+                --text-2xl: clamp(1.5rem, 1.3rem + 1vw, 2rem);
+                --text-3xl: clamp(2rem, 1.6rem + 2vw, 2.5rem);
+                --text-4xl: clamp(2.5rem, 2rem + 2.5vw, 3.5rem);
+
+                /* Shadows */
+                --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.04), 0 1px 3px rgba(0, 0, 0, 0.06);
+                --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.05), 0 2px 4px rgba(0, 0, 0, 0.06);
+                --shadow-lg: 0 10px 24px rgba(0, 0, 0, 0.08), 0 4px 8px rgba(0, 0, 0, 0.06);
+                --shadow-theme: 0 10px 30px var(--color-shadow), 0 4px 10px rgba(0, 0, 0, 0.06);
+
+                /* Font Stack */
+                --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+                --font-mono: 'SF Mono', Monaco, 'Cascadia Code', 'Consolas', 'Courier New', monospace;
             }
 
-            #sidebar {
-                position: fixed;
-                background-color: #1B80CF;
-                top: 0;
-                left: 0;
-                bottom: 0;
-                width: 30vw;
-            }
-
-            #sidebar .title {
-                position: relative;
-                text-align: center;
-                line-height: 4vmax;
-                font-size: 1.4vmax;
-                font-family: 'Arial';
-                margin-top: 25vh;
-            }
-
-            #sidebar .title a:link,
-            #sidebar .title a:visited {
-                color: #FFFFFF;
-                text-decoration: none;
-            }
-
-            .subtitle {
-                top: 50vh;
-                text-align: center;
-                line-height: 1.3vmax;
-                font-family: 'Arial';
-                font-size: 1.5vmax;
-                color: #FFFFFF;
-            }
-
-            .subtitle a:link,
-            .subtitle a:visited {
-                color: #FFFFFF;
-                text-decoration: none;
-            }
-
-            .licence {
-                position: fixed;
-                text-align: right;
-                bottom: 0;
-                right: 0;
-            }
-
-            .home {
-                position: fixed;
-                text-align: left;
-                font-family: 'Arial';
-                color: #D3D3D3;
-                z-index: 100;
-                width: 100%;
-                background-color: #FFFFFF;
-                top: 0px;
-                margin-bottom: 10px;
-                padding-bottom: 10px;
-            }
-
-            .home a:link,
-            .home a:visited {
-                text-decoration: none;
-                color: #D3D3D3;
-            }
-
-            .home ul {
+            /* ===== RESET & BASE STYLES ===== */
+            * {
                 margin: 0;
                 padding: 0;
-                text-align: left;
+                box-sizing: border-box;
+            }
+
+            html {
+                scroll-behavior: smooth;
+                scroll-padding-top: 100px;
+            }
+
+            body {
+                font-family: var(--font-sans);
+                font-size: var(--text-base);
+                line-height: 1.7;
+                color: var(--color-base-text);
+                background: var(--color-base-bg);
+                overflow-x: hidden;
+                letter-spacing: -0.005em;
+            }
+
+            /* ===== ANIMATED BACKGROUND ===== */
+            .bg-words {
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                pointer-events: none;
+                z-index: 0;
+                overflow: hidden;
+                opacity: 0.03;
+            }
+
+            .floating-word {
+                position: absolute;
+                font-size: clamp(2rem, 5vw, 4rem);
+                font-weight: 700;
+                color: var(--color-accent-1);
+                animation: floatWord 25s linear infinite;
+                white-space: nowrap;
+            }
+
+            .floating-word:nth-child(1) {
+                top: 10%;
+                left: 5%;
+                animation-delay: 0s;
+            }
+
+            .floating-word:nth-child(2) {
+                top: 30%;
+                right: 10%;
+                animation-delay: 5s;
+            }
+
+            .floating-word:nth-child(3) {
+                top: 60%;
+                left: 15%;
+                animation-delay: 10s;
+            }
+
+            .floating-word:nth-child(4) {
+                top: 80%;
+                right: 20%;
+                animation-delay: 15s;
+            }
+
+            @keyframes floatWord {
+                0% {
+                    transform: translateY(0) rotate(0deg);
+                    opacity: 0.5;
+                }
+
+                50% {
+                    transform: translateY(-50px) rotate(5deg);
+                    opacity: 0.8;
+                }
+
+                100% {
+                    transform: translateY(0) rotate(0deg);
+                    opacity: 0.5;
+                }
+            }
+
+            /* ===== NAVIGATION ===== */
+            .nav-wrapper {
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                z-index: 1000;
+                background: rgba(255, 255, 255, 0.95);
+                -webkit-backdrop-filter: blur(12px) saturate(180%);
+                backdrop-filter: blur(12px) saturate(180%);
+                border-bottom: 1px solid var(--color-border);
+                box-shadow: var(--shadow-sm);
+            }
+
+            .nav {
+                max-width: 1400px;
+                margin: 0 auto;
+                padding: var(--space-lg) var(--space-xl);
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                gap: var(--space-xl);
+            }
+
+            .nav-brand {
+                font-size: var(--text-xl);
+                font-weight: 700;
+                color: var(--color-base-text);
+                text-decoration: none;
+                letter-spacing: -0.02em;
+                position: relative;
+                padding: var(--space-sm) var(--space-lg);
+                background: var(--gradient-primary);
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                background-clip: text;
+                transition: all 0.3s ease;
+            }
+
+            .nav-brand:hover {
+                transform: scale(1.05);
+            }
+
+            .nav-brand::after {
+                content: '';
+                position: absolute;
+                bottom: 0;
+                left: var(--space-lg);
+                right: var(--space-lg);
+                height: 2px;
+                background: var(--gradient-primary);
+                transform: scaleX(0);
+                transition: transform 0.3s ease;
+            }
+
+            .nav-brand:hover::after {
+                transform: scaleX(1);
+            }
+
+            .breadcrumb {
+                display: flex;
+                list-style: none;
+                gap: var(--space-sm);
+                flex-wrap: wrap;
+            }
+
+            .breadcrumb li {
+                color: var(--color-base-text-muted);
+                font-size: var(--text-sm);
+            }
+
+            .breadcrumb li:not(:last-child)::after {
+                content: '/';
+                margin-left: var(--space-sm);
+                color: var(--color-border);
+            }
+
+            .breadcrumb a {
+                color: var(--color-base-text-muted);
+                text-decoration: none;
+                transition: all 0.3s ease;
+                padding: var(--space-xs) var(--space-sm);
+                border-radius: var(--radius-sm);
+            }
+
+            .breadcrumb a:hover {
+                color: var(--color-accent-1);
+                background: var(--color-hover);
+            }
+
+            /* ===== HERO SECTION ===== */
+            .hero {
+                position: relative;
+                margin-top: 80px;
+                padding: var(--space-4xl) var(--space-xl) var(--space-3xl);
+                max-width: 1400px;
+                margin-left: auto;
+                margin-right: auto;
+                background: var(--gradient-hero);
+                min-height: 60vh;
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+            }
+
+            .series-badge {
+                display: inline-flex;
+                align-items: center;
+                gap: var(--space-sm);
+                padding: var(--space-md) var(--space-lg);
+                background: rgba(224, 120, 86, 0.1);
+                border: 1px solid rgba(224, 120, 86, 0.2);
+                border-radius: var(--radius-xl);
+                font-size: var(--text-sm);
+                color: var(--color-accent-1);
+                font-weight: 600;
+                margin-bottom: var(--space-xl);
+                animation: fadeIn 0.8s ease-out;
+                width: fit-content;
+            }
+
+            .series-badge::before {
+                content: '📚';
+                font-size: var(--text-lg);
+            }
+
+            .series-badge a {
+                color: var(--color-accent-2);
+                text-decoration: none;
+                border-bottom: 1px solid transparent;
+                transition: border-color 0.3s ease;
+            }
+
+            .series-badge a:hover {
+                border-bottom-color: var(--color-accent-2);
+            }
+
+            @keyframes fadeIn {
+                from {
+                    opacity: 0;
+                }
+
+                to {
+                    opacity: 1;
+                }
+            }
+
+            .hero-content {
+                max-width: 900px;
+                animation: fadeInUp 0.8s ease-out;
+            }
+
+            .hero-content h1 {
+                font-size: var(--text-4xl);
+                font-weight: 700;
+                line-height: 1.2;
+                letter-spacing: -0.03em;
+                margin-bottom: var(--space-lg);
+                color: var(--color-base-text);
+            }
+
+            .hero-subtitle {
+                font-size: var(--text-lg);
+                color: var(--color-base-text-muted);
+                line-height: 1.6;
+                max-width: 700px;
+            }
+
+            @keyframes fadeInUp {
+                from {
+                    opacity: 0;
+                    transform: translateY(30px);
+                }
+
+                to {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            }
+
+            /* ===== WORD EMBEDDING VISUALIZATION ===== */
+            .semantic-space {
+                position: absolute;
+                right: 5%;
+                top: 50%;
+                transform: translateY(-50%);
+                width: 350px;
+                height: 350px;
+                animation: fadeIn 1s ease-out 0.4s both;
+            }
+
+            .word-node {
+                position: absolute;
+                padding: var(--space-sm) var(--space-md);
+                background: rgba(255, 255, 255, 0.9);
+                border: 2px solid var(--color-accent-1);
+                border-radius: var(--radius-lg);
+                font-size: var(--text-sm);
+                font-weight: 600;
+                color: var(--color-accent-1);
+                box-shadow: var(--shadow-md);
+                animation: floatNode 4s ease-in-out infinite;
+                white-space: nowrap;
+            }
+
+            .word-node:nth-child(1) {
+                top: 20%;
+                left: 30%;
+                animation-delay: 0s;
+            }
+
+            .word-node:nth-child(2) {
+                top: 50%;
+                left: 10%;
+                animation-delay: 0.5s;
+            }
+
+            .word-node:nth-child(3) {
+                top: 70%;
+                left: 40%;
+                animation-delay: 1s;
+            }
+
+            .word-node:nth-child(4) {
+                top: 30%;
+                right: 10%;
+                animation-delay: 1.5s;
+            }
+
+            .word-node:nth-child(5) {
+                top: 60%;
+                right: 20%;
+                animation-delay: 2s;
+            }
+
+            @keyframes floatNode {
+
+                0%,
+                100% {
+                    transform: translate(0, 0);
+                }
+
+                50% {
+                    transform: translate(10px, -10px);
+                }
+            }
+
+            .semantic-connection {
+                position: absolute;
+                height: 1px;
+                background: linear-gradient(90deg, var(--color-accent-1), transparent);
+                transform-origin: left center;
+                opacity: 0.3;
+            }
+
+            /* ===== MAIN CONTENT ===== */
+            .container {
+                max-width: 1400px;
+                margin: 0 auto;
+                padding: 0 var(--space-xl);
+                position: relative;
+                z-index: 1;
+            }
+
+            .content-section {
+                padding: var(--space-4xl) 0;
+            }
+
+            /* ===== INTRO CARD ===== */
+            .intro-card {
+                background: var(--gradient-surface);
+                border: 1px solid var(--color-border);
+                border-radius: var(--radius-2xl);
+                padding: var(--space-3xl);
+                margin-bottom: var(--space-4xl);
+                box-shadow: var(--shadow-theme);
+                position: relative;
+                overflow: hidden;
+            }
+
+            .intro-card::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                height: 4px;
+                background: var(--gradient-primary);
+            }
+
+            .intro-card p {
+                font-size: var(--text-lg);
+                line-height: 1.8;
+                color: var(--color-base-text);
+                margin-bottom: var(--space-lg);
+            }
+
+            .intro-card p:last-child {
+                margin-bottom: 0;
+            }
+
+            /* ===== HEADINGS ===== */
+            h2 {
+                font-size: var(--text-3xl);
+                font-weight: 700;
+                letter-spacing: -0.02em;
+                margin-top: var(--space-4xl);
+                margin-bottom: var(--space-xl);
+                color: var(--color-base-text);
+                position: relative;
+                padding-bottom: var(--space-md);
+            }
+
+            h2::after {
+                content: '';
+                position: absolute;
+                bottom: 0;
+                left: 0;
+                width: 70px;
+                height: 4px;
+                background: var(--gradient-primary);
+                border-radius: var(--radius-sm);
+            }
+
+            h3 {
+                font-size: var(--text-2xl);
+                font-weight: 600;
+                letter-spacing: -0.01em;
+                margin-top: var(--space-3xl);
+                margin-bottom: var(--space-lg);
+                color: var(--color-accent-1);
+                display: flex;
+                align-items: center;
+                gap: var(--space-md);
+            }
+
+            h3::before {
+                content: '';
+                width: 6px;
+                height: 6px;
+                background: var(--color-accent-3);
+                border-radius: 50%;
+                box-shadow: 0 0 12px var(--color-accent-3);
+            }
+
+            /* ===== CONTENT BLOCKS ===== */
+            .content-block {
+                background: var(--gradient-surface);
+                border: 1px solid var(--color-border);
+                border-radius: var(--radius-xl);
+                padding: var(--space-2xl);
+                margin-bottom: var(--space-2xl);
+                box-shadow: var(--shadow-md);
+                transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            }
+
+            .content-block:hover {
+                transform: translateY(-4px);
+                box-shadow: var(--shadow-theme);
+                border-color: var(--color-accent-1);
+            }
+
+            .content-block p {
+                font-size: var(--text-base);
+                line-height: 1.8;
+                color: var(--color-base-text);
+                margin-bottom: var(--space-md);
+            }
+
+            .content-block p:last-child {
+                margin-bottom: 0;
+            }
+
+            .content-block strong {
+                color: var(--color-accent-1);
+                font-weight: 600;
+            }
+
+            .content-block em {
+                color: var(--color-accent-2);
+                font-style: italic;
+            }
+
+            /* ===== LISTS ===== */
+            ul,
+            ol {
+                margin-left: var(--space-xl);
+                margin-bottom: var(--space-xl);
+            }
+
+            ul li,
+            ol li {
+                font-size: var(--text-base);
+                line-height: 1.8;
+                color: var(--color-base-text);
+                margin-bottom: var(--space-md);
+                padding-left: var(--space-sm);
+            }
+
+            ul li strong,
+            ol li strong {
+                color: var(--color-accent-1);
+                font-weight: 600;
+            }
+
+            ul li em,
+            ol li em {
+                color: var(--color-accent-2);
+                font-style: italic;
+            }
+
+            ul li a,
+            ol li a,
+            p a {
+                color: var(--color-accent-2);
+                text-decoration: none;
+                border-bottom: 1px solid transparent;
+                transition: all 0.3s ease;
+            }
+
+            ul li a:hover,
+            ol li a:hover,
+            p a:hover {
+                color: var(--color-accent-1);
+                border-bottom-color: var(--color-accent-1);
+            }
+
+            /* ===== TECHNIQUE CARDS ===== */
+            .technique-grid {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+                gap: var(--space-xl);
+                margin: var(--space-2xl) 0;
+            }
+
+            .technique-card {
+                background: var(--gradient-surface);
+                border: 1px solid var(--color-border);
+                border-radius: var(--radius-xl);
+                padding: var(--space-xl);
+                transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+                box-shadow: var(--shadow-md);
+                position: relative;
+                overflow: hidden;
+            }
+
+            .technique-card::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 4px;
+                background: var(--gradient-primary);
+                transform: scaleX(0);
+                transition: transform 0.4s ease;
+            }
+
+            .technique-card:hover::before {
+                transform: scaleX(1);
+            }
+
+            .technique-card:hover {
+                transform: translateY(-8px);
+                box-shadow: var(--shadow-theme);
+                border-color: var(--color-accent-1);
+            }
+
+            .technique-card h4 {
+                font-size: var(--text-xl);
+                color: var(--color-accent-1);
+                margin-bottom: var(--space-md);
+                font-weight: 600;
+            }
+
+            .technique-card p {
+                font-size: var(--text-base);
+                line-height: 1.7;
+                color: var(--color-base-text);
+            }
+
+            /* ===== DECORATIVE DIVIDERS ===== */
+            .section-divider {
+                margin: var(--space-4xl) 0;
+                height: 1px;
+                background: linear-gradient(90deg, transparent, var(--color-accent-1), transparent);
+                position: relative;
+            }
+
+            .section-divider::after {
+                content: '';
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                width: 8px;
+                height: 8px;
+                background: var(--color-accent-1);
+                border-radius: 50%;
+                box-shadow: 0 0 12px var(--color-accent-1);
+            }
+
+            /* ===== RELATED & REFERENCES SECTIONS ===== */
+            .related-section,
+            .references {
+                margin-top: var(--space-4xl);
+                padding: var(--space-3xl);
+                background: var(--gradient-surface);
+                border: 1px solid var(--color-border);
+                border-radius: var(--radius-2xl);
+                box-shadow: var(--shadow-lg);
+            }
+
+            .related-section h3,
+            .references h3 {
+                font-size: var(--text-2xl);
+                font-weight: 600;
+                margin-bottom: var(--space-xl);
+                color: var(--color-accent-1);
+            }
+
+            .related-section ul {
+                list-style: none;
+                padding: 0;
+                margin: 0;
+            }
+
+            .related-section li {
+                margin-bottom: var(--space-md);
+                padding-left: var(--space-2xl);
+                position: relative;
+            }
+
+            .related-section li::before {
+                content: '→';
+                position: absolute;
+                left: 0;
+                color: var(--color-accent-1);
+                font-weight: 700;
+                font-size: var(--text-lg);
+            }
+
+            .references ol {
+                list-style: none;
+                counter-reset: reference-counter;
+                padding: 0;
+                margin: 0;
+            }
+
+            .references li {
+                counter-increment: reference-counter;
+                margin-bottom: var(--space-lg);
+                padding-left: var(--space-3xl);
+                position: relative;
+                line-height: 1.7;
+            }
+
+            .references li::before {
+                content: counter(reference-counter);
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 32px;
+                height: 32px;
+                background: var(--gradient-primary);
+                border-radius: 50%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: var(--text-sm);
+                font-weight: 600;
+                color: white;
+                box-shadow: var(--shadow-md);
+            }
+
+            .references a {
+                color: var(--color-accent-2);
+                text-decoration: none;
+                transition: all 0.3s ease;
+                border-bottom: 1px solid transparent;
+            }
+
+            .references a:hover {
+                color: var(--color-accent-1);
+                border-bottom-color: var(--color-accent-1);
+            }
+
+            .references em {
+                font-style: italic;
+                color: var(--color-base-text-muted);
+            }
+
+            /* ===== FOOTER ===== */
+            .footer {
+                margin-top: var(--space-4xl);
+                padding: var(--space-3xl) var(--space-xl);
+                background: white;
+                border-top: 1px solid var(--color-border);
+            }
+
+            .footer-content {
+                max-width: 1400px;
+                margin: 0 auto;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                gap: var(--space-xl);
+                flex-wrap: wrap;
+            }
+
+            .footer-brand {
+                font-size: var(--text-base);
+                font-weight: 600;
+                color: var(--color-base-text);
+            }
+
+            .footer-links {
+                display: flex;
+                gap: var(--space-xl);
                 list-style: none;
             }
 
-            .home li {
-                position: relative;
-                float: left;
-                padding-top: 15px;
-                margin-right: 1em;
-                font-family: 'Arial';
-            }
-
-            .home li:hover {
-                display: block;
-            }
-
-            .home a:link,
-            .home a:visited {
-                color: #D3D3D3;
-            }
-
-            .home li:hover a:link,
-            .home li:hover a:visited {
+            .footer-links a {
+                color: var(--color-base-text-muted);
                 text-decoration: none;
-                padding: 15px;
-                color: #FFFFFF;
-                background-color: #1B80CF;
+                font-size: var(--text-sm);
+                transition: all 0.3s ease;
+                padding: var(--space-xs) var(--space-sm);
+                border-radius: var(--radius-sm);
             }
 
-            .content {
-                line-height: 1.8vmax;
-                font-size: 1.2vmax;
-                font-family: 'Arial';
-                margin-top: 15vh;
-                width: 90%;
+            .footer-links a:hover {
+                color: var(--color-accent-1);
+                background: var(--color-hover);
             }
 
-            .content h2,
-            h3,
-            h4 {
-                color: #1B80CF;
-            }
-
-            .content a:link,
-            .content a:visited {
-                color: #1B80CF;
-            }
-
-            .content h3 {
-                color: #1B80CF;
-            }
-
-            .content h2::before,
-            .content h3::before {
-                display: block;
-                content: " ";
-                visibility: hidden;
-                height: 50px;
-                margin-top: -50px;
-                pointer-events: none;
-                background-color: #FFFFFF;
-            }
-
-            .content a:link,
-            .content a:visited {
-                color: #1B80CF;
-            }
-
-            .content li {
-                margin: 5px;
-            }
-
-            .page {
-                width: 65vw;
-                height: 100%;
-                margin-left: 30vw;
-                overflow: hidden;
-                padding: 0 1em;
-                font-family: 'Arial';
-            }
-
-            .page img {
-                max-width: 100%;
-                max-height: 100%;
-            }
-
-            @media (max-width: 640px),
-            screen and (orientation: portrait) {
-                body {
-                    max-width: 100%;
-                    max-height: 100%;
+            /* ===== RESPONSIVE DESIGN ===== */
+            @media (max-width: 1024px) {
+                .semantic-space {
+                    display: none;
                 }
 
-                #sidebar {
-                    position: fixed;
-                    background-color: #1B80CF;
-                    top: 0;
-                    left: 0;
-                    bottom: 80vh;
-                    width: 100vw;
+                .technique-grid {
+                    grid-template-columns: 1fr;
+                }
+            }
+
+            @media (max-width: 768px) {
+                .nav {
+                    flex-direction: column;
+                    gap: var(--space-md);
+                    padding: var(--space-md) var(--space-lg);
                 }
 
-                #sidebar .title {
+                .breadcrumb {
+                    justify-content: center;
+                }
+
+                .hero {
+                    padding: var(--space-3xl) var(--space-lg);
+                    margin-top: 140px;
+                    min-height: auto;
+                }
+
+                .container {
+                    padding: 0 var(--space-lg);
+                }
+
+                .content-section {
+                    padding: var(--space-2xl) 0;
+                }
+
+                .intro-card,
+                .content-block,
+                .related-section,
+                .references {
+                    padding: var(--space-xl);
+                }
+
+                .footer-content {
+                    flex-direction: column;
                     text-align: center;
-                    position: fixed;
-                    margin-top: 6vh;
-                    left: 0px;
-                    right: 0px;
-                    line-height: 3.5vmax;
-                    font-size: 1.5vmax;
-                    font-family: 'Arial';
                 }
 
-                #sidebar .subtitle {
-                    text-align: center;
-                    top: 5vh;
-                    left: 0px;
-                    right: 0px;
-                    position: fixed;
-                    margin-top: 10vh;
-                    font-size: 1.5vmax;
+                .footer-links {
+                    flex-direction: column;
+                    gap: var(--space-sm);
+                    align-items: center;
+                }
+            }
+
+            @media (max-width: 480px) {
+                .hero {
+                    padding: var(--space-2xl) var(--space-md);
                 }
 
-                #sidebar .title a:link,
-                #sidebar .title a:visited {
-                    text-align: center;
-                    color: #FFFFFF;
+                .container {
+                    padding: 0 var(--space-md);
                 }
 
-                #sidebar .subtitle a:link,
-                #sidebar .subtitle a:visited {
-                    text-align: center;
-                    color: #FFFFFF;
+                h2 {
+                    font-size: var(--text-2xl);
                 }
 
-                .home {
-                    z-index: 100;
-                    width: 100%;
-                    background-color: #1B80CF;
-                    font-size: 1.5vmax;
+                h3 {
+                    font-size: var(--text-xl);
                 }
+            }
 
-                .home a:link,
-                .home a:visited {
-                    text-decoration: none;
-                    color: #FFFFFF;
-                }
+            /* ===== ACCESSIBILITY ===== */
+            @media (prefers-reduced-motion: reduce) {
 
-                .content {
-                    line-height: 3.8vmax;
-                    font-size: 1.8vmax;
-                    font-family: 'Arial';
-                    margin-top: 22vh;
+                *,
+                *::before,
+                *::after {
+                    animation-duration: 0.01ms !important;
+                    animation-iteration-count: 1 !important;
+                    transition-duration: 0.01ms !important;
                 }
+            }
 
-                .content a:link,
-                .content a:visited {
-                    color: #1B80CF;
-                }
+            :focus {
+                outline: 2px solid var(--color-accent-1);
+                outline-offset: 2px;
+            }
 
-                .page {
-                    top: 40vh;
-                    width: 95%;
-                    margin-left: 0vw;
-                }
-
-                .page img {
-                    max-width: 100%;
-                    max-height: 100%;
-                    border: 0;
-                }
+            :focus:not(:focus-visible) {
+                outline: none;
             }
         </style>
     </head>
 
-    <body vocab="http://schema.org/">
-        <div class="page">
-            <div class="home">
-                <ul typeof="BreadcrumbList">
+    <body vocab="http://schema.org/" typeof="Website">
+
+        <!-- Background Words -->
+        <div class="bg-words" aria-hidden="true">
+            <div class="floating-word">Language</div>
+            <div class="floating-word">Embeddings</div>
+            <div class="floating-word">Neural</div>
+            <div class="floating-word">Semantics</div>
+        </div>
+
+        <!-- Navigation -->
+        <div class="nav-wrapper">
+            <nav class="nav" role="navigation" aria-label="Main navigation">
+                <a href="../../index.html" class="nav-brand" property="url" typeof="WebPage">
+                    <span property="name">John Samuel</span>
+                </a>
+                <ul class="breadcrumb" typeof="BreadcrumbList">
                     <li property="itemListElement" typeof="ListItem">
                         <a property="item" typeof="WebPage" href="../index.html">
                             <span property="name">Home</span>
@@ -268,179 +915,233 @@
                             <span property="name">Research</span>
                         </a>
                     </li>
+                    <li property="itemListElement" typeof="ListItem">
+                        <span property="name">Language Models</span>
+                    </li>
                 </ul>
-
-            </div>
-            <div id="sidebar">
-                <div class="title">
-                    <h1><a href="./language-models.html">Language Models</a></h1>
-                </div>
-                <div class="subtitle">
-                    <h3><a href="../about.html">John Samuel</a></h3>
-                </div>
-            </div>
-
-            <div class="content">
-                <div
-                    style="background-color: #f0f8ff; border-left: 4px solid #1e90ff; padding: 1em; margin-bottom: 1.5em;">
-                    <strong>This article is part of a series on <a href="./artificial-intelligence.html">Artificial
-                            Intelligence</a>.</strong>
-                </div>
-                <article>
-                    <section>
-                        <p>Language models are a class of artificial intelligence systems designed to process,
-                            understand, and generate human language. These models are foundational to the field
-                            of Natural Language Processing (NLP), enabling tasks such as text classification,
-                            machine translation, question answering, and information retrieval.</p>
-
-                        <p>Traditionally, language models have been categorized into statistical, neural, and
-                            hybrid approaches. Classical language models include rule-based systems, n-gram
-                            models, and probabilistic methods, while more recent developments feature
-                            lightweight neural networks capable of delivering high performance without the
-                            resource demands of large-scale architectures.</p>
-                    </section>
-
-                    <section>
-                        <h2>Classical Statistical Language Models</h2>
-                        <p>Before the advent of neural networks, language modeling relied on statistical
-                            approaches. One of the earliest and most influential techniques was the
-                            <strong>n-gram model</strong>, which estimates the probability of a word based on
-                            the preceding <em>n−1</em> words.
-                        </p>
-                        <p>For example, in a bigram model (<em>n = 2</em>), the probability of a word depends
-                            only on the previous word. These models are simple, efficient, and interpretable,
-                            but suffer from data sparsity and limited context.</p>
-
-                        <p>More advanced statistical models include:</p>
-                        <ul>
-                            <li><strong>Hidden Markov Models (HMMs)</strong>: Used extensively in speech
-                                recognition and part-of-speech tagging. HMMs model sequences where the system
-                                being modeled is assumed to follow a Markov process with hidden states.</li>
-                            <li><strong>Probabilistic Context-Free Grammars (PCFGs)</strong>: Extend traditional
-                                grammars by associating probabilities with each production rule, enabling
-                                probabilistic parsing of sentences.</li>
-                        </ul>
-
-                        <p>These models laid the groundwork for many early NLP applications.</p>
-                    </section>
-
-                    <section>
-                        <h2>Early Neural Language Models</h2>
-                        <p>The limitations of statistical models led to the development of neural language
-                            models. These models learn dense vector representations of words and contexts,
-                            enabling generalization beyond observed data.</p>
-
-                        <h3>Word Embeddings</h3>
-                        <p><strong>Word embeddings</strong> are numerical vector representations of words in a
-                            continuous space where semantically similar words are mapped to nearby points. This
-                            representation enables machines to process textual input more meaningfully.</p>
-
-                        <p>Notable models include:</p>
-                        <ul>
-                            <li><strong>word2vec</strong>: Developed by Mikolov et al. (2013), it introduced two
-                                architectures: Continuous Bag of Words (CBOW) and Skip-Gram. These models
-                                predict context from a target word or vice versa using shallow neural networks.
-                            </li>
-                            <li><strong>GloVe (Global Vectors)</strong>: Introduced by Pennington et al., this
-                                model combines global matrix factorization and local context windowing to
-                                generate word vectors that capture both semantic and syntactic relationships.
-                            </li>
-                            <li><strong>ELMo (Embeddings from Language Models)</strong>: Developed by Peters et
-                                al. (2018), ELMo introduced contextualized embeddings derived from a
-                                bidirectional LSTM trained on a language modeling objective. Unlike static
-                                embeddings, ELMo's word vectors change based on context.</li>
-                        </ul>
-
-                        <p>These models marked a significant shift in NLP, allowing for transfer learning and
-                            better semantic understanding with relatively modest computational resources.</p>
-                    </section>
-
-                    <section>
-                        <h2>Compact Transformer-Based Models</h2>
-                        <p>While transformers are commonly associated with large language models, compact
-                            transformer architectures offer the benefits of deep contextual representation with
-                            significantly reduced computational overhead.</p>
-
-                        <ul>
-                            <li><strong>DistilBERT</strong>: A smaller version of BERT created using knowledge
-                                distillation. It retains ~97% of BERT's performance while being 60% faster and
-                                lighter, making it suitable for resource-constrained environments.</li>
-                            <li><strong>ALBERT (A Lite BERT)</strong>: Introduces parameter reduction techniques
-                                such as cross-layer parameter sharing and factorized embedding parameterization,
-                                allowing for more scalable models without loss in accuracy.</li>
-                        </ul>
-
-                        <p>These models are increasingly popular in mobile applications and real-time systems,
-                            where inference speed and model size are critical.</p>
-                    </section>
-
-                    <section>
-                        <h2>Applications of Classical and Small Language Models</h2>
-                        <p>Despite the attention given to large-scale models, small and classical language
-                            models remain crucial in many domains due to their transparency, efficiency, and
-                            ease of deployment. Common use cases include:</p>
-                        <ul>
-                            <li><strong>Spell checking and autocorrection</strong> in text editors</li>
-                            <li><strong>Speech recognition and part-of-speech tagging</strong> using HMMs</li>
-                            <li><strong>Sentiment analysis</strong> with bag-of-words or word embedding-based
-                                classifiers</li>
-                            <li><strong>Information retrieval and ranking</strong> using TF-IDF or probabilistic
-                                relevance models</li>
-                        </ul>
-                        <p>Moreover, in educational and low-resource settings, classical models serve as
-                            interpretable and computationally feasible alternatives to larger architectures.</p>
-                    </section>
-
-                    <section>
-                        <h2>Word Vectors Summary</h2>
-                        <p>Word vectors are integral to many language models. Whether derived from neural
-                            embeddings or matrix factorization techniques, they enable machines to capture
-                            relationships such as analogies (<em>Car - Wheels + Wings ≈ Airplane</em>).</p>
-
-                        <p>They serve as foundational input for both classical models and compact transformer
-                            architectures, bridging the gap between symbolic and sub-symbolic AI.</p>
-                    </section>
-
-                    <section>
-                        <h3>Related Articles</h3>
-                        <ul>
-                            <li><a href="./large-language-models.html">Large language models</a></li>
-                            <li><a href="./large-language-models-language-communities.html">Large language
-                                    models versus language communities</a></li>
-                            <li><a href="./large-language-models-energy.html">Large language models - Energy
-                                    Consumption</a></li>
-                            <li><a href="./large-language-models-search-engine-optimization.html">Large language
-                                    models based search engine optimization</a></li>
-                            <li><a href="./nogenai-nofilter.html">NoGenAI is the new NoFilter</a></li>
-                        </ul>
-                    </section>
-
-                    <section>
-                        <h3>References</h3>
-                        <ol>
-                            <li>Manning, C. D., Raghavan, P., & Schütze, H. (2008). <em>Introduction to
-                                    Information Retrieval</em>. Cambridge University Press. [<a
-                                    href="https://nlp.stanford.edu/IR-book/">Link</a>]</li>
-                            <li>Jurafsky, D., & Martin, J. H. (2023). <em>Speech and Language Processing</em>
-                                (3rd ed.). [<a href="https://web.stanford.edu/~jurafsky/slp3/">Link</a>]</li>
-                            <li><a href="https://en.wikipedia.org/wiki/N-gram">Wikipedia: N-gram</a></li>
-                            <li><a href="https://en.wikipedia.org/wiki/Word2vec">Wikipedia: word2vec</a></li>
-                            <li><a href="https://en.wikipedia.org/wiki/Hidden_Markov_model">Wikipedia: Hidden
-                                    Markov Model</a></li>
-                            <li><a href="https://en.wikipedia.org/wiki/ELMo_(language_model)">Wikipedia:
-                                    ELMo</a></li>
-                            <li><a href="https://en.wikipedia.org/wiki/GloVe_(machine_learning)">Wikipedia:
-                                    GloVe</a></li>
-                            <li><a href="https://en.wikipedia.org/wiki/DistilBERT">Wikipedia: DistilBERT</a>
-                            </li>
-                            <li><a href="https://en.wikipedia.org/wiki/ALBERT_(language_model)">Wikipedia:
-                                    ALBERT</a></li>
-                        </ol>
-                    </section>
-                </article>
-
-            </div>
+            </nav>
         </div>
+
+        <!-- Hero Section -->
+        <section class="hero">
+            <div class="hero-content">
+                <div class="series-badge">
+                    Part of the series on <a href="./artificial-intelligence.html">Artificial Intelligence</a>
+                </div>
+                <h1>Language Models: From Statistical Methods to Neural Architectures</h1>
+                <p class="hero-subtitle">Exploring the evolution of language modeling—from classical n-grams and
+                    statistical approaches to modern word embeddings and compact neural architectures that power natural
+                    language understanding.</p>
+            </div>
+
+            <!-- Semantic Space Visualization -->
+            <div class="semantic-space" aria-hidden="true">
+                <div class="word-node">language</div>
+                <div class="word-node">word2vec</div>
+                <div class="word-node">embedding</div>
+                <div class="word-node">BERT</div>
+                <div class="word-node">context</div>
+            </div>
+        </section>
+
+        <!-- Main Content -->
+        <main id="main-content" class="container">
+            <article class="content-section">
+                <section class="intro-card">
+                    <p>Language models are a class of artificial intelligence systems designed to process, understand,
+                        and generate human language. These models are foundational to the field of Natural Language
+                        Processing (NLP), enabling tasks such as text classification, machine translation, question
+                        answering, and information retrieval.</p>
+
+                    <p>Traditionally, language models have been categorized into statistical, neural, and hybrid
+                        approaches. Classical language models include rule-based systems, n-gram models, and
+                        probabilistic methods, while more recent developments feature lightweight neural networks
+                        capable of delivering high performance without the resource demands of large-scale
+                        architectures.</p>
+                </section>
+
+                <h2>Classical Statistical Language Models</h2>
+                <div class="content-block">
+                    <p>Before the advent of neural networks, language modeling relied on statistical approaches. One of
+                        the earliest and most influential techniques was the <strong>n-gram model</strong>, which
+                        estimates the probability of a word based on the preceding <em>n−1</em> words.</p>
+
+                    <p>For example, in a bigram model (<em>n = 2</em>), the probability of a word depends only on the
+                        previous word. These models are simple, efficient, and interpretable, but suffer from data
+                        sparsity and limited context.</p>
+                </div>
+
+                <div class="technique-grid">
+                    <div class="technique-card">
+                        <h4>Hidden Markov Models (HMMs)</h4>
+                        <p>Used extensively in speech recognition and part-of-speech tagging. HMMs model sequences where
+                            the system being modeled is assumed to follow a Markov process with hidden states.</p>
+                    </div>
+
+                    <div class="technique-card">
+                        <h4>Probabilistic Context-Free Grammars (PCFGs)</h4>
+                        <p>Extend traditional grammars by associating probabilities with each production rule, enabling
+                            probabilistic parsing of sentences.</p>
+                    </div>
+                </div>
+
+                <p>These models laid the groundwork for many early NLP applications.</p>
+
+                <div class="section-divider" aria-hidden="true"></div>
+
+                <h2>Early Neural Language Models</h2>
+                <div class="content-block">
+                    <p>The limitations of statistical models led to the development of neural language models. These
+                        models learn dense vector representations of words and contexts, enabling generalization beyond
+                        observed data.</p>
+                </div>
+
+                <h3>Word Embeddings</h3>
+                <div class="content-block">
+                    <p><strong>Word embeddings</strong> are numerical vector representations of words in a continuous
+                        space where semantically similar words are mapped to nearby points. This representation enables
+                        machines to process textual input more meaningfully.</p>
+                </div>
+
+                <div class="technique-grid">
+                    <div class="technique-card">
+                        <h4>word2vec</h4>
+                        <p>Developed by Mikolov et al. (2013), it introduced two architectures: Continuous Bag of Words
+                            (CBOW) and Skip-Gram. These models predict context from a target word or vice versa using
+                            shallow neural networks.</p>
+                    </div>
+
+                    <div class="technique-card">
+                        <h4>GloVe (Global Vectors)</h4>
+                        <p>Introduced by Pennington et al., this model combines global matrix factorization and local
+                            context windowing to generate word vectors that capture both semantic and syntactic
+                            relationships.</p>
+                    </div>
+
+                    <div class="technique-card">
+                        <h4>ELMo (Embeddings from Language Models)</h4>
+                        <p>Developed by Peters et al. (2018), ELMo introduced contextualized embeddings derived from a
+                            bidirectional LSTM trained on a language modeling objective. Unlike static embeddings,
+                            ELMo's word vectors change based on context.</p>
+                    </div>
+                </div>
+
+                <p>These models marked a significant shift in NLP, allowing for transfer learning and better semantic
+                    understanding with relatively modest computational resources.</p>
+
+                <div class="section-divider" aria-hidden="true"></div>
+
+                <h2>Compact Transformer-Based Models</h2>
+                <div class="content-block">
+                    <p>While transformers are commonly associated with large language models, compact transformer
+                        architectures offer the benefits of deep contextual representation with significantly reduced
+                        computational overhead.</p>
+                </div>
+
+                <div class="technique-grid">
+                    <div class="technique-card">
+                        <h4>DistilBERT</h4>
+                        <p>A smaller version of BERT created using knowledge distillation. It retains ~97% of BERT's
+                            performance while being 60% faster and lighter, making it suitable for resource-constrained
+                            environments.</p>
+                    </div>
+
+                    <div class="technique-card">
+                        <h4>ALBERT (A Lite BERT)</h4>
+                        <p>Introduces parameter reduction techniques such as cross-layer parameter sharing and
+                            factorized embedding parameterization, allowing for more scalable models without loss in
+                            accuracy.</p>
+                    </div>
+                </div>
+
+                <p>These models are increasingly popular in mobile applications and real-time systems, where inference
+                    speed and model size are critical.</p>
+
+                <div class="section-divider" aria-hidden="true"></div>
+
+                <h2>Applications of Classical and Small Language Models</h2>
+                <div class="content-block">
+                    <p>Despite the attention given to large-scale models, small and classical language models remain
+                        crucial in many domains due to their transparency, efficiency, and ease of deployment. Common
+                        use cases include:</p>
+
+                    <ul>
+                        <li><strong>Spell checking and autocorrection</strong> in text editors</li>
+                        <li><strong>Speech recognition and part-of-speech tagging</strong> using HMMs</li>
+                        <li><strong>Sentiment analysis</strong> with bag-of-words or word embedding-based classifiers
+                        </li>
+                        <li><strong>Information retrieval and ranking</strong> using TF-IDF or probabilistic relevance
+                            models</li>
+                    </ul>
+
+                    <p>Moreover, in educational and low-resource settings, classical models serve as interpretable and
+                        computationally feasible alternatives to larger architectures.</p>
+                </div>
+
+                <div class="section-divider" aria-hidden="true"></div>
+
+                <h2>Word Vectors Summary</h2>
+                <div class="content-block">
+                    <p>Word vectors are integral to many language models. Whether derived from neural embeddings or
+                        matrix factorization techniques, they enable machines to capture relationships such as analogies
+                        (<em>Car - Wheels + Wings ≈ Airplane</em>).</p>
+
+                    <p>They serve as foundational input for both classical models and compact transformer architectures,
+                        bridging the gap between symbolic and sub-symbolic AI.</p>
+                </div>
+
+                <section class="related-section">
+                    <h3>Related Articles</h3>
+                    <ul>
+                        <li><a href="./large-language-models.html">Large language models</a></li>
+                        <li><a href="./large-language-models-language-communities.html">Large language models versus
+                                language communities</a></li>
+                        <li><a href="./large-language-models-energy.html">Large language models - Energy Consumption</a>
+                        </li>
+                        <li><a href="./large-language-models-search-engine-optimization.html">Large language models
+                                based search engine optimization</a></li>
+                        <li><a href="./nogenai-nofilter.html">NoGenAI is the new NoFilter</a></li>
+                    </ul>
+                </section>
+
+                <section class="references">
+                    <h3>References</h3>
+                    <ol>
+                        <li>Manning, C. D., Raghavan, P., & Schütze, H. (2008). <em>Introduction to Information
+                                Retrieval</em>. Cambridge University Press. [<a href="https://nlp.stanford.edu/IR-book/"
+                                target="_blank" rel="noopener">Link</a>]</li>
+                        <li>Jurafsky, D., & Martin, J. H. (2023). <em>Speech and Language Processing</em> (3rd ed.). [<a
+                                href="https://web.stanford.edu/~jurafsky/slp3/" target="_blank" rel="noopener">Link</a>]
+                        </li>
+                        <li><a href="https://en.wikipedia.org/wiki/N-gram" target="_blank" rel="noopener">Wikipedia:
+                                N-gram</a></li>
+                        <li><a href="https://en.wikipedia.org/wiki/Word2vec" target="_blank" rel="noopener">Wikipedia:
+                                word2vec</a></li>
+                        <li><a href="https://en.wikipedia.org/wiki/Hidden_Markov_model" target="_blank"
+                                rel="noopener">Wikipedia: Hidden Markov Model</a></li>
+                        <li><a href="https://en.wikipedia.org/wiki/ELMo_(language_model)" target="_blank"
+                                rel="noopener">Wikipedia: ELMo</a></li>
+                        <li><a href="https://en.wikipedia.org/wiki/GloVe_(machine_learning)" target="_blank"
+                                rel="noopener">Wikipedia: GloVe</a></li>
+                        <li><a href="https://en.wikipedia.org/wiki/DistilBERT" target="_blank" rel="noopener">Wikipedia:
+                                DistilBERT</a></li>
+                        <li><a href="https://en.wikipedia.org/wiki/ALBERT_(language_model)" target="_blank"
+                                rel="noopener">Wikipedia: ALBERT</a></li>
+                    </ol>
+                </section>
+            </article>
+        </main>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <div class="footer-content">
+                <div class="footer-brand">© 2024 John Samuel</div>
+                <ul class="footer-links">
+                    <li><a href="../../index.html">Home</a></li>
+                    <li><a href="../research/research.html">Research</a></li>
+                </ul>
+            </div>
+        </footer>
     </body>
 
 </html>

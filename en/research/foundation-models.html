@@ -2,262 +2,998 @@
 <html lang="en">
 
     <head>
-        <meta charset="utf-8" />
-        <meta http-equiv="Content-Language" content="en" />
-        <link rel="shortcut icon" href="../../images/logo/favicon.png" />
-        <title>Foundation Models: John Samuel</title>
-        <style type="text/css">
-            body {
-                background-color: #FFFFFF;
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta http-equiv="Content-Language" content="en">
+        <link rel="shortcut icon" href="../../images/logo/favicon.png">
+        <title>Foundation Models: Architecture, Domains, and Impact | John Samuel</title>
+        <style>
+            /* ===== DESIGN TOKENS ===== */
+            :root {
+                /* Technology/Research Theme Color Palette */
+                --color-base-bg: #f8fafb;
+                --color-base-surface: #ffffff;
+                --color-base-text: #1a2332;
+                --color-base-text-muted: #4a5568;
+
+                /* Theme Accents - AI Research & Neural Networks */
+                --color-accent-1: #2d5f8d;
+                --color-accent-2: #4a90e2;
+                --color-accent-3: #7b68ee;
+                --color-accent-light: rgba(74, 144, 226, 0.08);
+
+                /* Functional Colors */
+                --color-shadow: rgba(45, 95, 141, 0.12);
+                --color-border: rgba(45, 95, 141, 0.15);
+                --color-hover: rgba(74, 144, 226, 0.08);
+
+                /* Gradients */
+                --gradient-primary: linear-gradient(135deg, #2d5f8d 0%, #4a90e2 50%, #7b68ee 100%);
+                --gradient-surface: linear-gradient(145deg, rgba(255, 255, 255, 0.98), rgba(248, 250, 251, 0.95));
+                --gradient-hero: linear-gradient(180deg, rgba(45, 95, 141, 0.03) 0%, rgba(248, 250, 251, 1) 100%);
+
+                /* Spacing Scale */
+                --space-xs: 0.25rem;
+                --space-sm: 0.5rem;
+                --space-md: 1rem;
+                --space-lg: 1.5rem;
+                --space-xl: 2rem;
+                --space-2xl: 3rem;
+                --space-3xl: 4rem;
+                --space-4xl: 6rem;
+                --space-phi-md: 1.618rem;
+                --space-phi-lg: 2.618rem;
+
+                /* Border Radius */
+                --radius-sm: 4px;
+                --radius-md: 8px;
+                --radius-lg: 12px;
+                --radius-xl: 16px;
+                --radius-2xl: 24px;
+                --radius-organic: 63% 37% 54% 46% / 45% 62% 38% 55%;
+
+                /* Typography Scale */
+                --text-xs: clamp(0.75rem, 0.7rem + 0.25vw, 0.875rem);
+                --text-sm: clamp(0.875rem, 0.8rem + 0.35vw, 1rem);
+                --text-base: clamp(1rem, 0.95rem + 0.25vw, 1.125rem);
+                --text-lg: clamp(1.125rem, 1.05rem + 0.35vw, 1.25rem);
+                --text-xl: clamp(1.25rem, 1.15rem + 0.5vw, 1.5rem);
+                --text-2xl: clamp(1.5rem, 1.3rem + 1vw, 2rem);
+                --text-3xl: clamp(2rem, 1.6rem + 2vw, 2.5rem);
+                --text-4xl: clamp(2.5rem, 2rem + 2.5vw, 3.5rem);
+
+                /* Shadows */
+                --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.04), 0 1px 3px rgba(0, 0, 0, 0.06);
+                --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.05), 0 2px 4px rgba(0, 0, 0, 0.06);
+                --shadow-lg: 0 10px 24px rgba(0, 0, 0, 0.08), 0 4px 8px rgba(0, 0, 0, 0.06);
+                --shadow-theme: 0 10px 30px var(--color-shadow), 0 4px 10px rgba(0, 0, 0, 0.06);
+
+                /* Font Stack */
+                --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+                --font-mono: 'SF Mono', Monaco, 'Cascadia Code', 'Consolas', 'Courier New', monospace;
             }
 
-            #sidebar {
-                position: fixed;
-                background-color: #1B80CF;
-                top: 0;
-                left: 0;
-                bottom: 0;
-                width: 30vw;
-            }
-
-            #sidebar .title {
-                position: relative;
-                text-align: center;
-                line-height: 4vmax;
-                font-size: 1.4vmax;
-                font-family: 'Arial';
-                margin-top: 25vh;
-            }
-
-            #sidebar .title a:link,
-            #sidebar .title a:visited {
-                color: #FFFFFF;
-                text-decoration: none;
-            }
-
-            .subtitle {
-                top: 50vh;
-                text-align: center;
-                line-height: 1.3vmax;
-                font-family: 'Arial';
-                font-size: 1.5vmax;
-                color: #FFFFFF;
-            }
-
-            .subtitle a:link,
-            .subtitle a:visited {
-                color: #FFFFFF;
-                text-decoration: none;
-            }
-
-            .licence {
-                position: fixed;
-                text-align: right;
-                bottom: 0;
-                right: 0;
-            }
-
-            .home {
-                position: fixed;
-                text-align: left;
-                font-family: 'Arial';
-                color: #D3D3D3;
-                z-index: 100;
-                width: 100%;
-                background-color: #FFFFFF;
-                top: 0px;
-                margin-bottom: 10px;
-                padding-bottom: 10px;
-            }
-
-            .home a:link,
-            .home a:visited {
-                text-decoration: none;
-                color: #D3D3D3;
-            }
-
-            .home ul {
+            /* ===== RESET & BASE STYLES ===== */
+            * {
                 margin: 0;
                 padding: 0;
+                box-sizing: border-box;
+            }
+
+            html {
+                scroll-behavior: smooth;
+                scroll-padding-top: 100px;
+            }
+
+            body {
+                font-family: var(--font-sans);
+                font-size: var(--text-base);
+                line-height: 1.7;
+                color: var(--color-base-text);
+                background: var(--color-base-bg);
+                overflow-x: hidden;
+                letter-spacing: -0.005em;
+            }
+
+            /* ===== SKIP LINK ===== */
+            .skip-link {
+                position: absolute;
+                top: -40px;
+                left: 0;
+                background: var(--color-accent-1);
+                color: white;
+                padding: var(--space-md);
+                text-decoration: none;
+                z-index: 100;
+                border-radius: 0 0 var(--radius-md) 0;
+            }
+
+            .skip-link:focus {
+                top: 0;
+            }
+
+            /* ===== ANIMATED BACKGROUND ===== */
+            .bg-grid {
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                pointer-events: none;
+                z-index: 0;
+                background-image:
+                    linear-gradient(rgba(45, 95, 141, 0.03) 1px, transparent 1px),
+                    linear-gradient(90deg, rgba(45, 95, 141, 0.03) 1px, transparent 1px);
+                background-size: 50px 50px;
+                opacity: 0.6;
+            }
+
+            .bg-orb {
+                position: fixed;
+                border-radius: var(--radius-organic);
+                pointer-events: none;
+                z-index: 0;
+                filter: blur(60px);
+                opacity: 0.15;
+                animation: morphShape 8s ease-in-out infinite;
+            }
+
+            .bg-orb-1 {
+                top: 10%;
+                left: 10%;
+                width: 400px;
+                height: 400px;
+                background: radial-gradient(circle, #4a90e2, transparent);
+            }
+
+            .bg-orb-2 {
+                bottom: 20%;
+                right: 10%;
+                width: 500px;
+                height: 500px;
+                background: radial-gradient(circle, #7b68ee, transparent);
+                animation-delay: 2s;
+            }
+
+            @keyframes morphShape {
+
+                0%,
+                100% {
+                    border-radius: 63% 37% 54% 46% / 45% 62% 38% 55%;
+                    transform: rotate(0deg) scale(1);
+                }
+
+                33% {
+                    border-radius: 37% 63% 46% 54% / 62% 45% 55% 38%;
+                    transform: rotate(120deg) scale(1.1);
+                }
+
+                66% {
+                    border-radius: 54% 46% 63% 37% / 55% 38% 62% 45%;
+                    transform: rotate(240deg) scale(0.9);
+                }
+            }
+
+            /* ===== NAVIGATION ===== */
+            .nav-wrapper {
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                z-index: 1000;
+                background: rgba(255, 255, 255, 0.95);
+                -webkit-backdrop-filter: blur(12px) saturate(180%);
+                backdrop-filter: blur(12px) saturate(180%);
+                border-bottom: 1px solid var(--color-border);
+                box-shadow: var(--shadow-sm);
+            }
+
+            .nav {
+                max-width: 1400px;
+                margin: 0 auto;
+                padding: var(--space-lg) var(--space-xl);
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                gap: var(--space-xl);
+            }
+
+            .nav-brand {
+                font-size: var(--text-xl);
+                font-weight: 700;
+                color: var(--color-base-text);
+                text-decoration: none;
+                letter-spacing: -0.02em;
+                position: relative;
+                padding: var(--space-sm) var(--space-lg);
+                background: var(--gradient-primary);
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                background-clip: text;
+                transition: all 0.3s ease;
+            }
+
+            .nav-brand:hover {
+                transform: scale(1.05);
+            }
+
+            .nav-brand::after {
+                content: '';
+                position: absolute;
+                bottom: 0;
+                left: var(--space-lg);
+                right: var(--space-lg);
+                height: 2px;
+                background: var(--gradient-primary);
+                transform: scaleX(0);
+                transition: transform 0.3s ease;
+            }
+
+            .nav-brand:hover::after {
+                transform: scaleX(1);
+            }
+
+            .breadcrumb {
+                display: flex;
+                list-style: none;
+                gap: var(--space-sm);
+                flex-wrap: wrap;
+            }
+
+            .breadcrumb li {
+                color: var(--color-base-text-muted);
+                font-size: var(--text-sm);
+            }
+
+            .breadcrumb li:not(:last-child)::after {
+                content: '/';
+                margin-left: var(--space-sm);
+                color: var(--color-border);
+            }
+
+            .breadcrumb a {
+                color: var(--color-base-text-muted);
+                text-decoration: none;
+                transition: all 0.3s ease;
+                padding: var(--space-xs) var(--space-sm);
+                border-radius: var(--radius-sm);
+            }
+
+            .breadcrumb a:hover {
+                color: var(--color-accent-2);
+                background: var(--color-hover);
+            }
+
+            /* ===== HERO SECTION ===== */
+            .hero {
+                position: relative;
+                margin-top: 80px;
+                padding: var(--space-4xl) var(--space-xl);
+                max-width: 1400px;
+                margin-left: auto;
+                margin-right: auto;
+                background: var(--gradient-hero);
+                display: grid;
+                grid-template-columns: 1.2fr 1fr;
+                gap: var(--space-4xl);
+                align-items: center;
+                min-height: 70vh;
+            }
+
+            .hero-content {
+                animation: fadeInUp 0.8s ease-out;
+            }
+
+            .hero-content h1 {
+                font-size: var(--text-4xl);
+                font-weight: 700;
+                line-height: 1.2;
+                letter-spacing: -0.03em;
+                margin-bottom: var(--space-lg);
+                color: var(--color-base-text);
+            }
+
+            .hero-subtitle {
+                font-size: var(--text-lg);
+                color: var(--color-base-text-muted);
+                margin-bottom: var(--space-xl);
+                line-height: 1.6;
+            }
+
+            @keyframes fadeInUp {
+                from {
+                    opacity: 0;
+                    transform: translateY(30px);
+                }
+
+                to {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            }
+
+            /* ===== SERIES BADGE ===== */
+            .series-badge {
+                display: inline-flex;
+                align-items: center;
+                gap: var(--space-sm);
+                padding: var(--space-md) var(--space-lg);
+                background: rgba(74, 144, 226, 0.1);
+                border: 1px solid rgba(74, 144, 226, 0.2);
+                border-radius: var(--radius-xl);
+                font-size: var(--text-sm);
+                color: var(--color-accent-1);
+                font-weight: 600;
+                margin-bottom: var(--space-xl);
+                animation: fadeIn 0.8s ease-out 0.2s both;
+            }
+
+            .series-badge::before {
+                content: '📚';
+                font-size: var(--text-lg);
+            }
+
+            .series-badge a {
+                color: var(--color-accent-2);
+                text-decoration: none;
+                border-bottom: 1px solid transparent;
+                transition: border-color 0.3s ease;
+            }
+
+            .series-badge a:hover {
+                border-bottom-color: var(--color-accent-2);
+            }
+
+            @keyframes fadeIn {
+                from {
+                    opacity: 0;
+                }
+
+                to {
+                    opacity: 1;
+                }
+            }
+
+            /* ===== ANIMATED SVG VISUALIZATION ===== */
+            .hero-visual {
+                position: relative;
+                animation: fadeIn 1s ease-out 0.4s both;
+            }
+
+            .svg-container {
+                width: 100%;
+                max-width: 450px;
+                margin: 0 auto;
+                filter: drop-shadow(0 10px 30px rgba(45, 95, 141, 0.15));
+            }
+
+            /* Neural Network Animations */
+            .neural-node {
+                animation: pulse 3s ease-in-out infinite;
+                transform-origin: center;
+            }
+
+            .neural-node:nth-child(1) {
+                animation-delay: 0s;
+            }
+
+            .neural-node:nth-child(2) {
+                animation-delay: 0.3s;
+            }
+
+            .neural-node:nth-child(3) {
+                animation-delay: 0.6s;
+            }
+
+            @keyframes pulse {
+
+                0%,
+                100% {
+                    transform: scale(1);
+                    opacity: 0.7;
+                }
+
+                50% {
+                    transform: scale(1.1);
+                    opacity: 1;
+                }
+            }
+
+            .data-flow {
+                stroke-dasharray: 500;
+                stroke-dashoffset: 500;
+                animation: flow 4s ease-in-out infinite;
+            }
+
+            .data-flow:nth-child(1) {
+                animation-delay: 0s;
+            }
+
+            .data-flow:nth-child(2) {
+                animation-delay: 0.5s;
+            }
+
+            .data-flow:nth-child(3) {
+                animation-delay: 1s;
+            }
+
+            @keyframes flow {
+                0% {
+                    stroke-dashoffset: 500;
+                    opacity: 0.3;
+                }
+
+                50% {
+                    stroke-dashoffset: 0;
+                    opacity: 1;
+                }
+
+                100% {
+                    stroke-dashoffset: -500;
+                    opacity: 0.3;
+                }
+            }
+
+            .transformer-block {
+                animation: float 5s ease-in-out infinite;
+            }
+
+            @keyframes float {
+
+                0%,
+                100% {
+                    transform: translateY(0px);
+                }
+
+                50% {
+                    transform: translateY(-15px);
+                }
+            }
+
+            .glow-layer {
+                animation: glow 2.5s ease-in-out infinite;
+            }
+
+            @keyframes glow {
+
+                0%,
+                100% {
+                    opacity: 0.3;
+                }
+
+                50% {
+                    opacity: 0.7;
+                }
+            }
+
+            /* ===== MAIN CONTENT ===== */
+            .container {
+                max-width: 1400px;
+                margin: 0 auto;
+                padding: 0 var(--space-xl);
+                position: relative;
+                z-index: 1;
+            }
+
+            .content-section {
+                padding: var(--space-4xl) 0;
+            }
+
+            /* ===== SECTION STYLING ===== */
+            .intro-section {
+                background: var(--gradient-surface);
+                border: 1px solid var(--color-border);
+                border-radius: var(--radius-2xl);
+                padding: var(--space-3xl);
+                margin-bottom: var(--space-4xl);
+                box-shadow: var(--shadow-theme);
+                position: relative;
+                overflow: hidden;
+            }
+
+            .intro-section::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                height: 4px;
+                background: var(--gradient-primary);
+            }
+
+            .intro-section p {
+                font-size: var(--text-lg);
+                line-height: 1.8;
+                color: var(--color-base-text);
+                margin-bottom: var(--space-lg);
+            }
+
+            .intro-section p:last-child {
+                margin-bottom: 0;
+            }
+
+            .intro-section a {
+                color: var(--color-accent-2);
+                text-decoration: none;
+                border-bottom: 1px solid transparent;
+                transition: all 0.3s ease;
+            }
+
+            .intro-section a:hover {
+                color: var(--color-accent-1);
+                border-bottom-color: var(--color-accent-1);
+            }
+
+            .intro-section strong {
+                color: var(--color-accent-1);
+                font-weight: 600;
+            }
+
+            /* ===== HEADINGS ===== */
+            h2 {
+                font-size: var(--text-3xl);
+                font-weight: 700;
+                letter-spacing: -0.02em;
+                margin-top: var(--space-4xl);
+                margin-bottom: var(--space-xl);
+                color: var(--color-base-text);
+                position: relative;
+                padding-bottom: var(--space-md);
+            }
+
+            h2::after {
+                content: '';
+                position: absolute;
+                bottom: 0;
+                left: 0;
+                width: 60px;
+                height: 4px;
+                background: var(--gradient-primary);
+                border-radius: var(--radius-sm);
+            }
+
+            h3 {
+                font-size: var(--text-2xl);
+                font-weight: 600;
+                letter-spacing: -0.01em;
+                margin-top: var(--space-3xl);
+                margin-bottom: var(--space-lg);
+                color: var(--color-accent-1);
+                display: flex;
+                align-items: center;
+                gap: var(--space-md);
+            }
+
+            h3::before {
+                content: '';
+                width: 6px;
+                height: 6px;
+                background: var(--color-accent-3);
+                border-radius: 50%;
+                box-shadow: 0 0 12px var(--color-accent-3);
+            }
+
+            /* ===== LISTS ===== */
+            ol,
+            ul {
+                margin-left: var(--space-xl);
+                margin-bottom: var(--space-xl);
+            }
+
+            ol li,
+            ul li {
+                font-size: var(--text-base);
+                line-height: 1.8;
+                color: var(--color-base-text);
+                margin-bottom: var(--space-md);
+                padding-left: var(--space-sm);
+            }
+
+            ol li strong,
+            ul li strong {
+                color: var(--color-accent-1);
+                font-weight: 600;
+            }
+
+            ol li a,
+            ul li a {
+                color: var(--color-accent-2);
+                text-decoration: none;
+                border-bottom: 1px solid transparent;
+                transition: all 0.3s ease;
+            }
+
+            ol li a:hover,
+            ul li a:hover {
+                color: var(--color-accent-1);
+                border-bottom-color: var(--color-accent-1);
+            }
+
+            /* ===== TABLE STYLING ===== */
+            .table-container {
+                overflow-x: auto;
+                margin: var(--space-2xl) 0;
+                border-radius: var(--radius-xl);
+                box-shadow: var(--shadow-lg);
+            }
+
+            table {
+                width: 100%;
+                border-collapse: separate;
+                border-spacing: 0;
+                background: white;
+                border-radius: var(--radius-xl);
+                overflow: hidden;
+            }
+
+            thead {
+                background: var(--gradient-primary);
+            }
+
+            thead th {
+                padding: var(--space-lg) var(--space-md);
                 text-align: left;
+                font-weight: 600;
+                font-size: var(--text-sm);
+                color: white;
+                text-transform: uppercase;
+                letter-spacing: 0.05em;
+                border-bottom: 2px solid rgba(255, 255, 255, 0.2);
+            }
+
+            tbody tr {
+                transition: all 0.3s ease;
+                border-bottom: 1px solid var(--color-border);
+            }
+
+            tbody tr:hover {
+                background: var(--color-accent-light);
+                transform: scale(1.01);
+            }
+
+            tbody tr:last-child {
+                border-bottom: none;
+            }
+
+            tbody td {
+                padding: var(--space-lg) var(--space-md);
+                font-size: var(--text-sm);
+                color: var(--color-base-text);
+            }
+
+            tbody td a {
+                color: var(--color-accent-2);
+                text-decoration: none;
+                border-bottom: 1px solid transparent;
+                transition: all 0.3s ease;
+                font-weight: 500;
+            }
+
+            tbody td a:hover {
+                color: var(--color-accent-1);
+                border-bottom-color: var(--color-accent-1);
+            }
+
+            /* ===== CHALLENGE CARDS ===== */
+            .challenge-grid {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+                gap: var(--space-xl);
+                margin: var(--space-2xl) 0;
+            }
+
+            .challenge-card {
+                background: var(--gradient-surface);
+                border: 1px solid var(--color-border);
+                border-radius: var(--radius-xl);
+                padding: var(--space-xl);
+                transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+                box-shadow: var(--shadow-md);
+                position: relative;
+                overflow: hidden;
+            }
+
+            .challenge-card::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 4px;
+                height: 100%;
+                background: var(--gradient-primary);
+                transform: scaleY(0);
+                transition: transform 0.4s ease;
+            }
+
+            .challenge-card:hover::before {
+                transform: scaleY(1);
+            }
+
+            .challenge-card:hover {
+                transform: translateY(-8px);
+                box-shadow: var(--shadow-theme);
+                border-color: var(--color-accent-2);
+            }
+
+            .challenge-card strong {
+                display: block;
+                font-size: var(--text-lg);
+                color: var(--color-accent-1);
+                margin-bottom: var(--space-sm);
+                font-weight: 600;
+            }
+
+            .challenge-card a {
+                color: var(--color-accent-2);
+                text-decoration: none;
+                border-bottom: 1px solid transparent;
+                transition: all 0.3s ease;
+            }
+
+            .challenge-card a:hover {
+                color: var(--color-accent-1);
+                border-bottom-color: var(--color-accent-1);
+            }
+
+            /* ===== DECORATIVE DIVIDERS ===== */
+            .section-divider {
+                margin: var(--space-4xl) 0;
+                height: 1px;
+                background: linear-gradient(90deg, transparent, var(--color-accent-2), transparent);
+                position: relative;
+            }
+
+            .section-divider::after {
+                content: '';
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                width: 8px;
+                height: 8px;
+                background: var(--color-accent-2);
+                border-radius: 50%;
+                box-shadow: 0 0 12px var(--color-accent-2);
+            }
+
+            /* ===== REFERENCES SECTION ===== */
+            .references {
+                margin-top: var(--space-4xl);
+                padding: var(--space-3xl);
+                background: var(--gradient-surface);
+                border: 1px solid var(--color-border);
+                border-radius: var(--radius-2xl);
+                box-shadow: var(--shadow-lg);
+            }
+
+            .references h3 {
+                font-size: var(--text-2xl);
+                font-weight: 600;
+                margin-bottom: var(--space-xl);
+                color: var(--color-accent-1);
+            }
+
+            .references ol {
+                list-style: none;
+                counter-reset: reference-counter;
+                padding: 0;
+                margin: 0;
+            }
+
+            .references li {
+                counter-increment: reference-counter;
+                margin-bottom: var(--space-lg);
+                padding-left: var(--space-3xl);
+                position: relative;
+                line-height: 1.7;
+            }
+
+            .references li::before {
+                content: counter(reference-counter);
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 32px;
+                height: 32px;
+                background: var(--gradient-primary);
+                border-radius: 50%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: var(--text-sm);
+                font-weight: 600;
+                color: white;
+                box-shadow: var(--shadow-md);
+            }
+
+            .references a {
+                color: var(--color-accent-2);
+                text-decoration: none;
+                transition: all 0.3s ease;
+                border-bottom: 1px solid transparent;
+            }
+
+            .references a:hover {
+                color: var(--color-accent-1);
+                border-bottom-color: var(--color-accent-1);
+            }
+
+            /* ===== FOOTER ===== */
+            .footer {
+                margin-top: var(--space-4xl);
+                padding: var(--space-3xl) var(--space-xl);
+                background: white;
+                border-top: 1px solid var(--color-border);
+            }
+
+            .footer-content {
+                max-width: 1400px;
+                margin: 0 auto;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                gap: var(--space-xl);
+                flex-wrap: wrap;
+            }
+
+            .footer-brand {
+                font-size: var(--text-base);
+                font-weight: 600;
+                color: var(--color-base-text);
+            }
+
+            .footer-links {
+                display: flex;
+                gap: var(--space-xl);
                 list-style: none;
             }
 
-            .home li {
-                position: relative;
-                float: left;
-                padding-top: 15px;
-                margin-right: 1em;
-                font-family: 'Arial';
-            }
-
-            .home li:hover {
-                display: block;
-            }
-
-            .home a:link,
-            .home a:visited {
-                color: #D3D3D3;
-            }
-
-            .home li:hover a:link,
-            .home li:hover a:visited {
+            .footer-links a {
+                color: var(--color-base-text-muted);
                 text-decoration: none;
-                padding: 15px;
-                color: #FFFFFF;
-                background-color: #1B80CF;
+                font-size: var(--text-sm);
+                transition: all 0.3s ease;
+                padding: var(--space-xs) var(--space-sm);
+                border-radius: var(--radius-sm);
             }
 
-            .content {
-                line-height: 1.8vmax;
-                font-size: 1.2vmax;
-                font-family: 'Arial';
-                margin-top: 15vh;
-                width: 90%;
+            .footer-links a:hover {
+                color: var(--color-accent-2);
+                background: var(--color-hover);
             }
 
-            .content h2,
-            h3,
-            h4 {
-                color: #1B80CF;
-            }
-
-            .content a:link,
-            .content a:visited {
-                color: #1B80CF;
-            }
-
-            .content h3 {
-                color: #1B80CF;
-            }
-
-            .content h2::before,
-            .content h3::before {
-                display: block;
-                content: " ";
-                visibility: hidden;
-                height: 50px;
-                margin-top: -50px;
-                pointer-events: none;
-                background-color: #FFFFFF;
-            }
-
-            .content a:link,
-            .content a:visited {
-                color: #1B80CF;
-            }
-
-            .content li {
-                margin: 5px;
-            }
-
-            .page {
-                width: 65vw;
-                height: 100%;
-                margin-left: 30vw;
-                overflow: hidden;
-                padding: 0 1em;
-                font-family: 'Arial';
-            }
-
-            .page img {
-                max-width: 100%;
-                max-height: 100%;
-            }
-
-            @media (max-width: 640px),
-            screen and (orientation: portrait) {
-                body {
-                    max-width: 100%;
-                    max-height: 100%;
+            /* ===== RESPONSIVE DESIGN ===== */
+            @media (max-width: 1024px) {
+                .hero {
+                    grid-template-columns: 1fr;
+                    gap: var(--space-2xl);
                 }
 
-                #sidebar {
-                    position: fixed;
-                    background-color: #1B80CF;
-                    top: 0;
-                    left: 0;
-                    bottom: 80vh;
-                    width: 100vw;
+                .hero-visual {
+                    order: -1;
                 }
 
-                #sidebar .title {
+                .svg-container {
+                    max-width: 350px;
+                }
+
+                .challenge-grid {
+                    grid-template-columns: 1fr;
+                }
+            }
+
+            @media (max-width: 768px) {
+                .nav {
+                    flex-direction: column;
+                    gap: var(--space-md);
+                    padding: var(--space-md) var(--space-lg);
+                }
+
+                .breadcrumb {
+                    justify-content: center;
+                }
+
+                .hero {
+                    padding: var(--space-3xl) var(--space-lg);
+                    margin-top: 140px;
+                    min-height: auto;
+                }
+
+                .container {
+                    padding: 0 var(--space-lg);
+                }
+
+                .content-section {
+                    padding: var(--space-2xl) 0;
+                }
+
+                .intro-section,
+                .references {
+                    padding: var(--space-xl);
+                }
+
+                .footer-content {
+                    flex-direction: column;
                     text-align: center;
-                    position: fixed;
-                    margin-top: 6vh;
-                    left: 0px;
-                    right: 0px;
-                    line-height: 3.5vmax;
-                    font-size: 1.5vmax;
-                    font-family: 'Arial';
                 }
 
-                #sidebar .subtitle {
-                    text-align: center;
-                    top: 5vh;
-                    left: 0px;
-                    right: 0px;
-                    position: fixed;
-                    margin-top: 10vh;
-                    font-size: 1.5vmax;
+                .footer-links {
+                    flex-direction: column;
+                    gap: var(--space-sm);
+                    align-items: center;
                 }
 
-                #sidebar .title a:link,
-                #sidebar .title a:visited {
-                    text-align: center;
-                    color: #FFFFFF;
+                .table-container {
+                    margin: var(--space-lg) -var(--space-lg);
+                    border-radius: 0;
                 }
 
-                #sidebar .subtitle a:link,
-                #sidebar .subtitle a:visited {
-                    text-align: center;
-                    color: #FFFFFF;
+                table {
+                    font-size: var(--text-xs);
                 }
 
-                .home {
-                    z-index: 100;
-                    width: 100%;
-                    background-color: #1B80CF;
-                    font-size: 1.5vmax;
+                thead th,
+                tbody td {
+                    padding: var(--space-sm) var(--space-xs);
+                }
+            }
+
+            @media (max-width: 480px) {
+                .hero {
+                    padding: var(--space-2xl) var(--space-md);
                 }
 
-                .home a:link,
-                .home a:visited {
-                    text-decoration: none;
-                    color: #FFFFFF;
+                .container {
+                    padding: 0 var(--space-md);
                 }
 
-                .content {
-                    line-height: 3.8vmax;
-                    font-size: 1.8vmax;
-                    font-family: 'Arial';
-                    margin-top: 22vh;
+                h2 {
+                    font-size: var(--text-2xl);
                 }
 
-                .content a:link,
-                .content a:visited {
-                    color: #1B80CF;
+                h3 {
+                    font-size: var(--text-xl);
                 }
+            }
 
-                .page {
-                    top: 40vh;
-                    width: 95%;
-                    margin-left: 0vw;
-                }
+            /* ===== ACCESSIBILITY ===== */
+            @media (prefers-reduced-motion: reduce) {
 
-                .page img {
-                    max-width: 100%;
-                    max-height: 100%;
-                    border: 0;
+                *,
+                *::before,
+                *::after {
+                    animation-duration: 0.01ms !important;
+                    animation-iteration-count: 1 !important;
+                    transition-duration: 0.01ms !important;
                 }
+            }
+
+            :focus {
+                outline: 2px solid var(--color-accent-2);
+                outline-offset: 2px;
+            }
+
+            :focus:not(:focus-visible) {
+                outline: none;
             }
         </style>
     </head>
 
-    <body vocab="http://schema.org/">
-        <div class="page">
-            <div class="home">
-                <ul typeof="BreadcrumbList">
+    <body vocab="http://schema.org/" typeof="Website">
+        <a href="#main-content" class="skip-link">Skip to main content</a>
+
+        <!-- Background Elements -->
+        <div class="bg-grid" aria-hidden="true"></div>
+        <div class="bg-orb bg-orb-1" aria-hidden="true"></div>
+        <div class="bg-orb bg-orb-2" aria-hidden="true"></div>
+
+        <!-- Navigation -->
+        <div class="nav-wrapper">
+            <nav class="nav" role="navigation" aria-label="Main navigation">
+                <a href="../../index.html" class="nav-brand" property="url" typeof="WebPage">
+                    <span property="name">John Samuel</span>
+                </a>
+                <ul class="breadcrumb" typeof="BreadcrumbList">
                     <li property="itemListElement" typeof="ListItem">
                         <a property="item" typeof="WebPage" href="../index.html">
                             <span property="name">Home</span>
@@ -268,94 +1004,218 @@
                             <span property="name">Research</span>
                         </a>
                     </li>
+                    <li property="itemListElement" typeof="ListItem">
+                        <span property="name">Foundation Models</span>
+                    </li>
                 </ul>
+            </nav>
+        </div>
 
-            </div>
-            <div id="sidebar">
-                <div class="title">
-                    <h1><a href="./foundation-models.html">Foundation Models</a></h1>
+        <!-- Hero Section -->
+        <section class="hero">
+            <div class="hero-content">
+                <div class="series-badge">
+                    Part of the series on <a href="./artificial-intelligence.html">Artificial Intelligence</a>
                 </div>
-                <div class="subtitle">
-                    <h3><a href="../about.html">John Samuel</a></h3>
+                <h1>Foundation Models: Architecture, Domains, and Impact in Artificial Intelligence</h1>
+                <p class="hero-subtitle">Exploring the evolution, capabilities, and future directions of large-scale AI
+                    systems that are reshaping how machines understand and interact with the world.</p>
+            </div>
+            <div class="hero-visual">
+                <div class="svg-container">
+                    <svg viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                        <!-- Background Glow Layer -->
+                        <defs>
+                            <radialGradient id="nodeGlow" cx="50%" cy="50%">
+                                <stop offset="0%" style="stop-color:#4a90e2;stop-opacity:0.8" />
+                                <stop offset="100%" style="stop-color:#4a90e2;stop-opacity:0" />
+                            </radialGradient>
+                            <radialGradient id="coreGlow" cx="50%" cy="50%">
+                                <stop offset="0%" style="stop-color:#7b68ee;stop-opacity:0.9" />
+                                <stop offset="100%" style="stop-color:#7b68ee;stop-opacity:0" />
+                            </radialGradient>
+                            <linearGradient id="flowGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" style="stop-color:#2d5f8d" />
+                                <stop offset="50%" style="stop-color:#4a90e2" />
+                                <stop offset="100%" style="stop-color:#7b68ee" />
+                            </linearGradient>
+                        </defs>
+
+                        <!-- Central Core (Foundation Model) -->
+                        <g class="transformer-block">
+                            <!-- Main transformer block -->
+                            <rect x="170" y="170" width="60" height="60" rx="8" fill="none" stroke="url(#flowGradient)"
+                                stroke-width="3" />
+
+                            <!-- Internal layers -->
+                            <line x1="175" y1="185" x2="225" y2="185" stroke="#4a90e2" stroke-width="2" opacity="0.6" />
+                            <line x1="175" y1="200" x2="225" y2="200" stroke="#4a90e2" stroke-width="2" opacity="0.6" />
+                            <line x1="175" y1="215" x2="225" y2="215" stroke="#4a90e2" stroke-width="2" opacity="0.6" />
+
+                            <!-- Core glow -->
+                            <circle cx="200" cy="200" r="20" fill="url(#coreGlow)" class="glow-layer" />
+                            <circle cx="200" cy="200" r="12" fill="none" stroke="#7b68ee" stroke-width="2" />
+                        </g>
+
+                        <!-- Input Layer Nodes (Data Sources) -->
+                        <g class="neural-node">
+                            <circle cx="100" cy="100" r="15" fill="url(#nodeGlow)" />
+                            <circle cx="100" cy="100" r="10" fill="none" stroke="#4a90e2" stroke-width="2" />
+                            <text x="100" y="75" text-anchor="middle" font-size="11" fill="#2d5f8d"
+                                font-family="Arial">Text</text>
+                        </g>
+
+                        <g class="neural-node">
+                            <circle cx="200" cy="80" r="15" fill="url(#nodeGlow)" />
+                            <circle cx="200" cy="80" r="10" fill="none" stroke="#4a90e2" stroke-width="2" />
+                            <text x="200" y="55" text-anchor="middle" font-size="11" fill="#2d5f8d"
+                                font-family="Arial">Vision</text>
+                        </g>
+
+                        <g class="neural-node">
+                            <circle cx="300" cy="100" r="15" fill="url(#nodeGlow)" />
+                            <circle cx="300" cy="100" r="10" fill="none" stroke="#4a90e2" stroke-width="2" />
+                            <text x="300" y="75" text-anchor="middle" font-size="11" fill="#2d5f8d"
+                                font-family="Arial">Audio</text>
+                        </g>
+
+                        <!-- Output Layer Nodes (Applications) -->
+                        <g class="neural-node">
+                            <circle cx="100" cy="300" r="15" fill="url(#nodeGlow)" />
+                            <circle cx="100" cy="300" r="10" fill="none" stroke="#7b68ee" stroke-width="2" />
+                            <text x="100" y="330" text-anchor="middle" font-size="11" fill="#2d5f8d"
+                                font-family="Arial">NLP</text>
+                        </g>
+
+                        <g class="neural-node">
+                            <circle cx="200" cy="320" r="15" fill="url(#nodeGlow)" />
+                            <circle cx="200" cy="320" r="10" fill="none" stroke="#7b68ee" stroke-width="2" />
+                            <text x="200" y="350" text-anchor="middle" font-size="11" fill="#2d5f8d"
+                                font-family="Arial">Vision</text>
+                        </g>
+
+                        <g class="neural-node">
+                            <circle cx="300" cy="300" r="15" fill="url(#nodeGlow)" />
+                            <circle cx="300" cy="300" r="10" fill="none" stroke="#7b68ee" stroke-width="2" />
+                            <text x="300" y="330" text-anchor="middle" font-size="11" fill="#2d5f8d"
+                                font-family="Arial">Speech</text>
+                        </g>
+
+                        <!-- Data Flow Lines (Input to Core) -->
+                        <path class="data-flow" d="M 110 110 Q 150 150 175 180" stroke="url(#flowGradient)"
+                            stroke-width="2" fill="none" />
+                        <path class="data-flow" d="M 200 95 L 200 165" stroke="url(#flowGradient)" stroke-width="2"
+                            fill="none" />
+                        <path class="data-flow" d="M 290 110 Q 240 150 225 180" stroke="url(#flowGradient)"
+                            stroke-width="2" fill="none" />
+
+                        <!-- Data Flow Lines (Core to Output) -->
+                        <path class="data-flow" d="M 175 220 Q 140 260 110 290" stroke="url(#flowGradient)"
+                            stroke-width="2" fill="none" />
+                        <path class="data-flow" d="M 200 235 L 200 305" stroke="url(#flowGradient)" stroke-width="2"
+                            fill="none" />
+                        <path class="data-flow" d="M 225 220 Q 260 260 290 290" stroke="url(#flowGradient)"
+                            stroke-width="2" fill="none" />
+
+                        <!-- Attention Mechanism Visualization -->
+                        <g opacity="0.3">
+                            <circle cx="200" cy="200" r="80" fill="none" stroke="#4a90e2" stroke-width="1"
+                                stroke-dasharray="4,4" />
+                            <circle cx="200" cy="200" r="100" fill="none" stroke="#7b68ee" stroke-width="1"
+                                stroke-dasharray="4,4" />
+                        </g>
+
+                        <!-- Data Particles -->
+                        <circle cx="120" cy="130" r="3" fill="#4a90e2" opacity="0.6" class="glow-layer" />
+                        <circle cx="280" cy="130" r="3" fill="#4a90e2" opacity="0.6" class="glow-layer" />
+                        <circle cx="120" cy="270" r="3" fill="#7b68ee" opacity="0.6" class="glow-layer" />
+                        <circle cx="280" cy="270" r="3" fill="#7b68ee" opacity="0.6" class="glow-layer" />
+
+                        <!-- Parameter Count Indicator -->
+                        <g transform="translate(320, 200)">
+                            <text x="0" y="0" text-anchor="start" font-size="12" fill="#2d5f8d" font-family="Arial"
+                                font-weight="bold">Billions</text>
+                            <text x="0" y="15" text-anchor="start" font-size="12" fill="#4a90e2" font-family="Arial">of
+                                parameters</text>
+                        </g>
+                    </svg>
                 </div>
             </div>
+        </section>
 
-            <div class="content">
-                <article>
-                    <div
-                        style="background-color: #f0f8ff; border-left: 4px solid #1e90ff; padding: 1em; margin-bottom: 1.5em;">
-                        <strong>This article is part of a series on <a href="./artificial-intelligence.html">Artificial
-                                Intelligence</a>.</strong>
-                    </div>
-
-                    <h2>Foundation Models: Architecture, Domains, and Impact in Artificial Intelligence</h2>
-
-                    <h3>1. Introduction</h3>
-                    <p>
-                        Over the past decade, artificial intelligence has evolved dramatically, driven by the rise of
+        <!-- Main Content -->
+        <main id="main-content" class="container">
+            <article class="content-section">
+                <section class="intro-section">
+                    <p>Over the past decade, artificial intelligence has evolved dramatically, driven by the rise of
                         <strong>foundation models</strong>—a new class of large-scale, general-purpose models capable of
                         performing a wide variety of tasks. These models are typically trained on vast datasets using
                         scalable architectures such as the <a
-                            href="https://en.wikipedia.org/wiki/Transformer_(machine_learning_model)">Transformer</a>,
-                        and are adapted through fine-tuning or prompting for downstream applications.
+                            href="https://en.wikipedia.org/wiki/Transformer_(machine_learning_model)" target="_blank"
+                            rel="noopener">Transformer</a>, and are adapted through fine-tuning or prompting for
+                        downstream applications.
                     </p>
-                    <p>
-                        Foundation models mark a departure from traditional task-specific systems. They are designed to
+
+                    <p>Foundation models mark a departure from traditional task-specific systems. They are designed to
                         generalize across domains—ranging from <a
-                            href="https://en.wikipedia.org/wiki/Natural_language_processing">natural language
-                            processing</a> and <a href="https://en.wikipedia.org/wiki/Computer_vision">computer
-                            vision</a> to <a href="https://en.wikipedia.org/wiki/Speech_recognition">speech
-                            recognition</a>, <a href="https://en.wikipedia.org/wiki/Robotics">robotics</a>, and <a
-                            href="https://en.wikipedia.org/wiki/Multimodal_learning">multimodal learning</a>.
-                    </p>
+                            href="https://en.wikipedia.org/wiki/Natural_language_processing" target="_blank"
+                            rel="noopener">natural language processing</a> and <a
+                            href="https://en.wikipedia.org/wiki/Computer_vision" target="_blank" rel="noopener">computer
+                            vision</a> to <a href="https://en.wikipedia.org/wiki/Speech_recognition" target="_blank"
+                            rel="noopener">speech recognition</a>, <a href="https://en.wikipedia.org/wiki/Robotics"
+                            target="_blank" rel="noopener">robotics</a>, and <a
+                            href="https://en.wikipedia.org/wiki/Multimodal_learning" target="_blank"
+                            rel="noopener">multimodal learning</a>.</p>
+                </section>
 
-                    <h3>2. Defining Characteristics of Foundation Models</h3>
-                    <ol>
-                        <li><strong>Pretraining on Broad Data</strong> – Foundation models are pretrained on large,
-                            diverse datasets that span multiple modalities, including web-scale text corpora, images,
-                            audio recordings, video, and sensor streams.</li>
-                        <li><strong>Scalability</strong> – These models utilize billions of parameters and are trained
-                            using high-performance compute infrastructure, enabling them to scale in both capacity and
-                            performance.</li>
-                        <li><strong>Adaptability</strong> – Once pretrained, foundation models can be fine-tuned or
-                            prompted to handle a range of downstream tasks with minimal additional data or training.
-                        </li>
-                    </ol>
-                    <p>
-                        In contrast to earlier models that were retrained for every task, <strong>foundation
-                            models</strong> support transfer learning at scale. For instance, <strong>GPT-4</strong> by
-                        <a href="https://openai.com/gpt-4">OpenAI</a> can perform translation, summarization,
-                        programming assistance, and more, all from a single pretrained model. Likewise,
-                        <strong>CLIP</strong> by <a href="https://openai.com/research/clip">OpenAI</a> aligns images and
-                        text for tasks such as classification and semantic search. Other notable examples include
-                        <strong>BERT</strong> from Google, which excels in natural language understanding tasks, and
-                        <strong>DALL-E 3</strong>, also by OpenAI, which generates high-quality images from text
-                        descriptions. Additionally, <strong>Llama</strong> models from Meta have significantly
-                        contributed to the open-source large language model landscape. These advancements demonstrate
-                        the versatility and efficiency of foundation models across various domains.
-                    </p>
-                    <h3>3. Historical Evolution of Foundation Models</h3>
-                    <p>
-                        The evolution of foundation models is rooted in early advances in deep learning and
-                        representation learning:
-                    </p>
-                    <ul>
-                        <li><strong>2013:</strong> <a href="https://en.wikipedia.org/wiki/Word2vec">Word2Vec</a>
-                            introduced distributed word representations.</li>
-                        <li><strong>2018:</strong> <strong>BERT</strong> (Bidirectional Encoder Representations from
-                            Transformers) by Google demonstrated masked language modeling and fine-tuning for multiple
-                            NLP tasks.</li>
-                        <li><strong>2020:</strong> <strong>GPT-3</strong> showed that few-shot learning was possible
-                            through in-context prompting, with 175 billion parameters.</li>
-                        <li><strong>2021:</strong> <strong>CLIP</strong> and <strong>DALL·E</strong> opened the door to
-                            vision-language and generative multimodal models.</li>
-                        <li><strong>2022–2024:</strong> <strong>Whisper</strong> (speech), <strong>RT-1</strong>
-                            (robotics), and <strong>GPT-4</strong> (multimodal) generalized this approach across
-                            domains.</li>
-                    </ul>
+                <h2>Defining Characteristics of Foundation Models</h2>
+                <ol>
+                    <li><strong>Pretraining on Broad Data</strong> – Foundation models are pretrained on large, diverse
+                        datasets that span multiple modalities, including web-scale text corpora, images, audio
+                        recordings, video, and sensor streams.</li>
+                    <li><strong>Scalability</strong> – These models utilize billions of parameters and are trained using
+                        high-performance compute infrastructure, enabling them to scale in both capacity and
+                        performance.</li>
+                    <li><strong>Adaptability</strong> – Once pretrained, foundation models can be fine-tuned or prompted
+                        to handle a range of downstream tasks with minimal additional data or training.</li>
+                </ol>
 
-                    <h3>4. Key Foundation Models Across Domains</h3>
-                    <table border="1" cellspacing="0" cellpadding="8">
+                <p>In contrast to earlier models that were retrained for every task, <strong>foundation models</strong>
+                    support transfer learning at scale. For instance, <strong>GPT-4</strong> by <a
+                        href="https://openai.com/gpt-4" target="_blank" rel="noopener">OpenAI</a> can perform
+                    translation, summarization, programming assistance, and more, all from a single pretrained model.
+                    Likewise, <strong>CLIP</strong> by <a href="https://openai.com/research/clip" target="_blank"
+                        rel="noopener">OpenAI</a> aligns images and text for tasks such as classification and semantic
+                    search. Other notable examples include <strong>BERT</strong> from Google, which excels in natural
+                    language understanding tasks, and <strong>DALL-E 3</strong>, also by OpenAI, which generates
+                    high-quality images from text descriptions. Additionally, <strong>Llama</strong> models from Meta
+                    have significantly contributed to the open-source large language model landscape. These advancements
+                    demonstrate the versatility and efficiency of foundation models across various domains.</p>
+
+                <div class="section-divider" aria-hidden="true"></div>
+
+                <h2>Historical Evolution of Foundation Models</h2>
+                <p>The evolution of foundation models is rooted in early advances in deep learning and representation
+                    learning:</p>
+                <ul>
+                    <li><strong>2013:</strong> <a href="https://en.wikipedia.org/wiki/Word2vec" target="_blank"
+                            rel="noopener">Word2Vec</a> introduced distributed word representations.</li>
+                    <li><strong>2018:</strong> <strong>BERT</strong> (Bidirectional Encoder Representations from
+                        Transformers) by Google demonstrated masked language modeling and fine-tuning for multiple NLP
+                        tasks.</li>
+                    <li><strong>2020:</strong> <strong>GPT-3</strong> showed that few-shot learning was possible through
+                        in-context prompting, with 175 billion parameters.</li>
+                    <li><strong>2021:</strong> <strong>CLIP</strong> and <strong>DALL·E</strong> opened the door to
+                        vision-language and generative multimodal models.</li>
+                    <li><strong>2022–2024:</strong> <strong>Whisper</strong> (speech), <strong>RT-1</strong> (robotics),
+                        and <strong>GPT-4</strong> (multimodal) generalized this approach across domains.</li>
+                </ul>
+
+                <div class="section-divider" aria-hidden="true"></div>
+
+                <h2>Key Foundation Models Across Domains</h2>
+                <div class="table-container">
+                    <table>
                         <thead>
                             <tr>
                                 <th>Domain</th>
@@ -368,118 +1228,158 @@
                         <tbody>
                             <tr>
                                 <td>Natural Language Processing</td>
-                                <td><a href="https://en.wikipedia.org/wiki/BERT_(language_model)">BERT</a></td>
+                                <td><a href="https://en.wikipedia.org/wiki/BERT_(language_model)" target="_blank"
+                                        rel="noopener">BERT</a></td>
                                 <td>Google</td>
                                 <td>Transformer (Encoder)</td>
                                 <td>2018</td>
                             </tr>
                             <tr>
                                 <td>Natural Language Processing</td>
-                                <td><a href="https://openai.com/gpt-4">GPT-4</a></td>
+                                <td><a href="https://openai.com/gpt-4" target="_blank" rel="noopener">GPT-4</a></td>
                                 <td>OpenAI</td>
                                 <td>Transformer (Decoder)</td>
                                 <td>2023</td>
                             </tr>
                             <tr>
                                 <td>Computer Vision</td>
-                                <td><a href="https://en.wikipedia.org/wiki/ResNet">ResNet</a></td>
+                                <td><a href="https://en.wikipedia.org/wiki/ResNet" target="_blank"
+                                        rel="noopener">ResNet</a></td>
                                 <td>Microsoft</td>
                                 <td>Convolutional Neural Network</td>
                                 <td>2015</td>
                             </tr>
                             <tr>
                                 <td>Computer Vision</td>
-                                <td><a
-                                        href="https://research.google/blog/transformers-for-image-recognition-at-scale/">ViT</a>
-                                </td>
+                                <td><a href="https://research.google/blog/transformers-for-image-recognition-at-scale/"
+                                        target="_blank" rel="noopener">ViT</a></td>
                                 <td>Google</td>
                                 <td>Vision Transformer</td>
                                 <td>2020</td>
                             </tr>
                             <tr>
                                 <td>Speech and Audio</td>
-                                <td><a href="https://openai.com/research/whisper">Whisper</a></td>
+                                <td><a href="https://openai.com/research/whisper" target="_blank"
+                                        rel="noopener">Whisper</a></td>
                                 <td>OpenAI</td>
                                 <td>Transformer (Encoder-Decoder)</td>
                                 <td>2022</td>
                             </tr>
                             <tr>
                                 <td>Robotics</td>
-                                <td><a href="https://robotics-transformer1.github.io/">RT-1</a></td>
+                                <td><a href="https://robotics-transformer1.github.io/" target="_blank"
+                                        rel="noopener">RT-1</a></td>
                                 <td>Google DeepMind</td>
                                 <td>Transformer + Multimodal Inputs</td>
                                 <td>2022</td>
                             </tr>
                             <tr>
                                 <td>Multimodal AI</td>
-                                <td><a href="https://openai.com/research/clip">CLIP</a></td>
+                                <td><a href="https://openai.com/research/clip" target="_blank" rel="noopener">CLIP</a>
+                                </td>
                                 <td>OpenAI</td>
-                                <td>Contrastive Vision-Language Model (Transformer-based)</td>
+                                <td>Contrastive Vision-Language Model</td>
                                 <td>2021</td>
                             </tr>
                             <tr>
                                 <td>Multimodal AI</td>
-                                <td><a href="https://openai.com/dall-e">DALL·E</a></td>
+                                <td><a href="https://openai.com/dall-e" target="_blank" rel="noopener">DALL·E</a></td>
                                 <td>OpenAI</td>
                                 <td>Diffusion Model (various iterations)</td>
-                                <td>2021 (DALL-E 1), 2022 (DALL-E 2), 2023 (DALL-E 3)</td>
+                                <td>2021–2023</td>
                             </tr>
                         </tbody>
                     </table>
+                </div>
 
-                    <h3>5. Challenges and Limitations</h3>
-                    <ul>
-                        <li><strong>Bias and Fairness:</strong> Foundation models often reflect biases present in their
-                            training data, leading to potentially unfair or unsafe outputs.</li>
-                        <li><strong>Resource Consumption:</strong> Training large models requires significant energy and
-                            compute resources, raising environmental and economic concerns.</li>
-                        <li><strong>Hallucination and Reliability:</strong> Language models may generate plausible but
-                            factually incorrect outputs—a phenomenon known as <a
-                                href="https://en.wikipedia.org/wiki/Hallucination_(artificial_intelligence)">hallucination</a>.
-                        </li>
-                        <li><strong>Opacity and Explainability:</strong> Due to their scale and complexity, foundation
-                            models often behave as black boxes, challenging interpretability.</li>
-                        <li><strong>Security and Misuse:</strong> Malicious use cases (e.g., disinformation, deepfakes)
-                            underscore the need for robust safety mechanisms and governance.</li>
-                    </ul>
+                <div class="section-divider" aria-hidden="true"></div>
 
-                    <h3>6. Future Directions</h3>
-                    <p>
-                        The future of foundation models is likely to be shaped by trends such as <strong>efficient
-                            fine-tuning</strong> (e.g., LoRA, adapters), <strong>open-weight models</strong> (e.g.,
-                        LLaMA), and <strong>alignment with human values</strong> through techniques like <a
-                            href="https://en.wikipedia.org/wiki/Reinforcement_learning_from_human_feedback">Reinforcement
-                            Learning from Human Feedback (RLHF)</a>. Emerging research in <strong>multimodal
-                            agents</strong> and <strong>neurosymbolic architectures</strong> may further extend the
-                        capabilities of foundation models into reasoning and decision-making.
-                    </p>
+                <h2>Challenges and Limitations</h2>
+                <div class="challenge-grid">
+                    <div class="challenge-card">
+                        <strong>Bias and Fairness</strong>
+                        Foundation models often reflect biases present in their training data, leading to potentially
+                        unfair or unsafe outputs.
+                    </div>
+                    <div class="challenge-card">
+                        <strong>Resource Consumption</strong>
+                        Training large models requires significant energy and compute resources, raising environmental
+                        and economic concerns.
+                    </div>
+                    <div class="challenge-card">
+                        <strong>Hallucination and Reliability</strong>
+                        Language models may generate plausible but factually incorrect outputs—a phenomenon known as <a
+                            href="https://en.wikipedia.org/wiki/Hallucination_(artificial_intelligence)" target="_blank"
+                            rel="noopener">hallucination</a>.
+                    </div>
+                    <div class="challenge-card">
+                        <strong>Opacity and Explainability</strong>
+                        Due to their scale and complexity, foundation models often behave as black boxes, challenging
+                        interpretability.
+                    </div>
+                    <div class="challenge-card">
+                        <strong>Security and Misuse</strong>
+                        Malicious use cases (e.g., disinformation, deepfakes) underscore the need for robust safety
+                        mechanisms and governance.
+                    </div>
+                </div>
 
-                    <h3>7. References</h3>
+                <div class="section-divider" aria-hidden="true"></div>
+
+                <h2>Future Directions</h2>
+                <p>The future of foundation models is likely to be shaped by trends such as <strong>efficient
+                        fine-tuning</strong> (e.g., LoRA, adapters), <strong>open-weight models</strong> (e.g., LLaMA),
+                    and <strong>alignment with human values</strong> through techniques like <a
+                        href="https://en.wikipedia.org/wiki/Reinforcement_learning_from_human_feedback" target="_blank"
+                        rel="noopener">Reinforcement Learning from Human Feedback (RLHF)</a>. Emerging research in
+                    <strong>multimodal agents</strong> and <strong>neurosymbolic architectures</strong> may further
+                    extend the capabilities of foundation models into reasoning and decision-making.
+                </p>
+
+                <section class="references">
+                    <h3>References</h3>
                     <ol>
-                        <li><a href="https://en.wikipedia.org/wiki/Foundation_model">Foundation model – Wikipedia</a>
+                        <li><a href="https://en.wikipedia.org/wiki/Foundation_model" target="_blank"
+                                rel="noopener">Foundation model – Wikipedia</a></li>
+                        <li><a href="https://en.wikipedia.org/wiki/Transformer_(deep_learning_architecture)"
+                                target="_blank" rel="noopener">Transformer (deep learning architecture) – Wikipedia</a>
                         </li>
-                        <li><a href="https://en.wikipedia.org/wiki/Transformer_(deep_learning_architecture)">Transformer
-                                (deep learning architecture) – Wikipedia</a></li>
-                        <li><a href="https://openai.com/gpt-4">GPT-4 – OpenAI</a></li>
-                        <li><a href="https://openai.com/research/whisper">Whisper – OpenAI</a></li>
-                        <li><a href="https://robotics-transformer1.github.io/">RT-1 – Robotics Transformer</a></li>
-                        <li><a href="https://en.wikipedia.org/wiki/BERT_(language_model)">BERT – Wikipedia</a></li>
-                        <li><a href="https://en.wikipedia.org/wiki/ResNet">ResNet – Wikipedia</a></li>
-                        <li><a href="https://ai.googleblog.com/2020/12/transformers-for-image-recognition-at.html">ViT –
-                                Google AI Blog</a></li>
-                        <li><a
-                                href="https://research.google/blog/rt-1-robotics-transformer-for-real-world-control-at-scale/">RT-1:
-                                Robotics Transformer for real-world control at scale</a>
-                        </li>
-                        <li><a href="https://openai.com/research/clip">CLIP – OpenAI</a></li>
-                        <li><a href="https://en.wikipedia.org/wiki/Reinforcement_learning_from_human_feedback">RLHF –
+                        <li><a href="https://openai.com/gpt-4" target="_blank" rel="noopener">GPT-4 – OpenAI</a></li>
+                        <li><a href="https://openai.com/research/whisper" target="_blank" rel="noopener">Whisper –
+                                OpenAI</a></li>
+                        <li><a href="https://robotics-transformer1.github.io/" target="_blank" rel="noopener">RT-1 –
+                                Robotics Transformer</a></li>
+                        <li><a href="https://en.wikipedia.org/wiki/BERT_(language_model)" target="_blank"
+                                rel="noopener">BERT – Wikipedia</a></li>
+                        <li><a href="https://en.wikipedia.org/wiki/ResNet" target="_blank" rel="noopener">ResNet –
                                 Wikipedia</a></li>
-                        <li>Bommasani, R., Hudson, D. A., et al. (2021). <a href="https://arxiv.org/abs/2108.07258">On
-                                the Opportunities and Risks of Foundation Models</a>. arXiv:2108.07258.</li>
+                        <li><a href="https://ai.googleblog.com/2020/12/transformers-for-image-recognition-at.html"
+                                target="_blank" rel="noopener">ViT – Google AI Blog</a></li>
+                        <li><a href="https://research.google/blog/rt-1-robotics-transformer-for-real-world-control-at-scale/"
+                                target="_blank" rel="noopener">RT-1: Robotics Transformer for real-world control at
+                                scale</a></li>
+                        <li><a href="https://openai.com/research/clip" target="_blank" rel="noopener">CLIP – OpenAI</a>
+                        </li>
+                        <li><a href="https://en.wikipedia.org/wiki/Reinforcement_learning_from_human_feedback"
+                                target="_blank" rel="noopener">RLHF – Wikipedia</a></li>
+                        <li>Bommasani, R., Hudson, D. A., et al. (2021). <a href="https://arxiv.org/abs/2108.07258"
+                                target="_blank" rel="noopener">On the Opportunities and Risks of Foundation Models</a>.
+                            arXiv:2108.07258.</li>
                     </ol>
-                </article>
+                </section>
+            </article>
+        </main>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <div class="footer-content">
+                <div class="footer-brand">© 2024 John Samuel</div>
+                <ul class="footer-links">
+                    <li><a href="../../index.html">Home</a></li>
+                    <li><a href="../research/research.html">Research</a></li>
+                </ul>
             </div>
-        </div>
+        </footer>
     </body>
 
 </html>
