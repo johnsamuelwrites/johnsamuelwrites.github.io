@@ -2,262 +2,776 @@
 <html lang="en">
 
     <head>
-        <meta charset="utf-8" />
-        <meta http-equiv="Content-Language" content="en" />
-        <link rel="shortcut icon" href="../../images/logo/favicon.png" />
-        <title>Large language models versus language communities: John Samuel</title>
-        <style type="text/css">
-            body {
-                background-color: #FFFFFF;
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta http-equiv="Content-Language" content="en">
+        <link rel="shortcut icon" href="../../images/logo/favicon.png">
+        <title>Large Language Models versus Language Communities | John Samuel</title>
+        <style>
+            /* ===== Design Tokens ===== */
+            :root {
+                /* Linguistic Diversity & Cultural Theme */
+                --color-base-bg: #fafbfc;
+                --color-base-surface: #ffffff;
+                --color-base-text: #1a202c;
+                --color-base-text-muted: #4a5568;
+
+                /* Multicultural Accent Colors */
+                --color-accent-1: #f59e0b;
+                /* Amber - linguistic warmth */
+                --color-accent-2: #dc2626;
+                /* Red - cultural vitality */
+                --color-accent-3: #7c3aed;
+                /* Violet - diversity */
+                --color-accent-4: #0891b2;
+                /* Cyan - global connection */
+                --color-accent-light: #fef3c7;
+
+                /* Functional Colors */
+                --color-shadow: rgba(245, 158, 11, 0.12);
+                --color-border: rgba(245, 158, 11, 0.15);
+                --color-hover: rgba(245, 158, 11, 0.08);
+
+                /* Gradients */
+                --gradient-primary: linear-gradient(135deg, #f59e0b 0%, #dc2626 33%, #7c3aed 66%, #0891b2 100%);
+                --gradient-subtle: linear-gradient(180deg, #fafbfc 0%, #fef3c7 100%);
+                --gradient-hero: linear-gradient(135deg, #dc2626 0%, #f59e0b 50%, #7c3aed 100%);
+
+                /* Typography */
+                --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+                --text-xs: clamp(0.75rem, 0.7rem + 0.25vw, 0.875rem);
+                --text-sm: clamp(0.875rem, 0.8rem + 0.35vw, 1rem);
+                --text-base: clamp(1rem, 0.95rem + 0.25vw, 1.125rem);
+                --text-lg: clamp(1.125rem, 1.05rem + 0.35vw, 1.25rem);
+                --text-xl: clamp(1.25rem, 1.15rem + 0.5vw, 1.5rem);
+                --text-2xl: clamp(1.5rem, 1.3rem + 1vw, 2rem);
+                --text-3xl: clamp(2rem, 1.6rem + 2vw, 2.5rem);
+                --text-4xl: clamp(2.5rem, 2rem + 2.5vw, 3.5rem);
+
+                /* Spacing */
+                --space-xs: 0.25rem;
+                --space-sm: 0.5rem;
+                --space-md: 1rem;
+                --space-lg: 1.5rem;
+                --space-xl: 2rem;
+                --space-2xl: 3rem;
+                --space-3xl: 4rem;
+                --space-4xl: 6rem;
+
+                /* Border Radius */
+                --radius-sm: 4px;
+                --radius-md: 8px;
+                --radius-lg: 12px;
+                --radius-xl: 16px;
+                --radius-2xl: 24px;
+                --radius-full: 9999px;
+
+                /* Shadows */
+                --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.04), 0 1px 3px rgba(0, 0, 0, 0.06);
+                --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.05), 0 2px 4px rgba(0, 0, 0, 0.06);
+                --shadow-lg: 0 10px 24px rgba(0, 0, 0, 0.08), 0 4px 8px rgba(0, 0, 0, 0.06);
+                --shadow-theme: 0 10px 30px var(--color-shadow), 0 4px 10px rgba(0, 0, 0, 0.06);
             }
 
-            #sidebar {
-                position: fixed;
-                background-color: #1B80CF;
-                top: 0;
-                left: 0;
-                bottom: 0;
-                width: 30vw;
-            }
-
-            #sidebar .title {
-                position: relative;
-                text-align: center;
-                line-height: 4vmax;
-                font-size: 1.4vmax;
-                font-family: 'Arial';
-                margin-top: 25vh;
-            }
-
-            #sidebar .title a:link,
-            #sidebar .title a:visited {
-                color: #FFFFFF;
-                text-decoration: none;
-            }
-
-            .subtitle {
-                top: 50vh;
-                text-align: center;
-                line-height: 1.3vmax;
-                font-family: 'Arial';
-                font-size: 1.5vmax;
-                color: #FFFFFF;
-            }
-
-            .subtitle a:link,
-            .subtitle a:visited {
-                color: #FFFFFF;
-                text-decoration: none;
-            }
-
-            .licence {
-                position: fixed;
-                text-align: right;
-                bottom: 0;
-                right: 0;
-            }
-
-            .home {
-                position: fixed;
-                text-align: left;
-                font-family: 'Arial';
-                color: #D3D3D3;
-                z-index: 100;
-                width: 100%;
-                background-color: #FFFFFF;
-                top: 0px;
-                margin-bottom: 10px;
-                padding-bottom: 10px;
-            }
-
-            .home a:link,
-            .home a:visited {
-                text-decoration: none;
-                color: #D3D3D3;
-            }
-
-            .home ul {
+            /* ===== Reset & Base ===== */
+            *,
+            *::before,
+            *::after {
+                box-sizing: border-box;
                 margin: 0;
                 padding: 0;
-                text-align: left;
-                list-style: none;
             }
 
-            .home li {
-                position: relative;
-                float: left;
-                padding-top: 15px;
-                margin-right: 1em;
-                font-family: 'Arial';
+            html {
+                scroll-behavior: smooth;
+                scroll-padding-top: 80px;
             }
 
-            .home li:hover {
-                display: block;
+            body {
+                font-family: var(--font-sans);
+                font-size: var(--text-base);
+                line-height: 1.7;
+                color: var(--color-base-text);
+                background: var(--gradient-subtle);
+                background-attachment: fixed;
+                -webkit-font-smoothing: antialiased;
+                -moz-osx-font-smoothing: grayscale;
+                overflow-x: hidden;
             }
 
-            .home a:link,
-            .home a:visited {
-                color: #D3D3D3;
-            }
-
-            .home li:hover a:link,
-            .home li:hover a:visited {
+            /* ===== Skip Link ===== */
+            .skip-link {
+                position: absolute;
+                top: -40px;
+                left: 0;
+                background: var(--color-accent-1);
+                color: white;
+                padding: var(--space-sm) var(--space-md);
                 text-decoration: none;
-                padding: 15px;
-                color: #FFFFFF;
-                background-color: #1B80CF;
+                border-radius: var(--radius-md);
+                z-index: 100;
             }
 
-            .content {
-                line-height: 1.8vmax;
-                font-size: 1.2vmax;
-                font-family: 'Arial';
-                margin-top: 15vh;
-                width: 90%;
+            .skip-link:focus {
+                top: var(--space-sm);
+                left: var(--space-sm);
             }
 
-            .content h2,
-            h3,
-            h4 {
-                color: #1B80CF;
+            /* ===== Navigation ===== */
+            .main-nav {
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                z-index: 50;
+                background: rgba(255, 255, 255, 0.85);
+                -webkit-backdrop-filter: blur(12px) saturate(180%);
+                backdrop-filter: blur(12px) saturate(180%);
+                border-bottom: 1px solid var(--color-border);
+                box-shadow: var(--shadow-sm);
             }
 
-            .content a:link,
-            .content a:visited {
-                color: #1B80CF;
+            .nav-container {
+                max-width: 1400px;
+                margin: 0 auto;
+                padding: var(--space-md) var(--space-xl);
+                display: flex;
+                align-items: center;
+                gap: var(--space-lg);
             }
 
-            .content h3 {
-                color: #1B80CF;
+            .nav-brand {
+                font-size: var(--text-lg);
+                font-weight: 700;
+                color: var(--color-accent-1);
+                text-decoration: none;
+                letter-spacing: -0.01em;
+                background: var(--gradient-primary);
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                background-clip: text;
+                transition: transform 0.3s ease;
             }
 
-            .content h2::before,
-            .content h3::before {
-                display: block;
-                content: " ";
-                visibility: hidden;
-                height: 50px;
-                margin-top: -50px;
-                pointer-events: none;
-                background-color: #FFFFFF;
+            .nav-brand:hover {
+                transform: scale(1.05);
             }
 
-            .content a:link,
-            .content a:visited {
-                color: #1B80CF;
+            .breadcrumb {
+                display: flex;
+                list-style: none;
+                gap: var(--space-sm);
+                flex-wrap: wrap;
+                align-items: center;
             }
 
-            .content li {
-                margin: 5px;
+            .breadcrumb li {
+                display: flex;
+                align-items: center;
+                gap: var(--space-sm);
             }
 
-            .page {
-                width: 65vw;
-                height: 100%;
-                margin-left: 30vw;
+            .breadcrumb li:not(:last-child)::after {
+                content: '→';
+                color: var(--color-base-text-muted);
+                font-size: var(--text-sm);
+            }
+
+            .breadcrumb a {
+                color: var(--color-base-text-muted);
+                text-decoration: none;
+                font-size: var(--text-sm);
+                transition: color 0.3s ease;
+            }
+
+            .breadcrumb a:hover {
+                color: var(--color-accent-1);
+            }
+
+            /* ===== Hero Section ===== */
+            .hero-section {
+                margin-top: 80px;
+                padding: var(--space-4xl) var(--space-xl);
+                background: var(--gradient-hero);
+                position: relative;
                 overflow: hidden;
-                padding: 0 1em;
-                font-family: 'Arial';
             }
 
-            .page img {
-                max-width: 100%;
-                max-height: 100%;
+            .hero-section::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background:
+                    radial-gradient(circle at 20% 50%, rgba(124, 58, 237, 0.15) 0%, transparent 50%),
+                    radial-gradient(circle at 80% 50%, rgba(8, 145, 178, 0.15) 0%, transparent 50%);
+                pointer-events: none;
             }
 
-            @media (max-width: 640px),
-            screen and (orientation: portrait) {
-                body {
-                    max-width: 100%;
-                    max-height: 100%;
+            .hero-container {
+                max-width: 1400px;
+                margin: 0 auto;
+                position: relative;
+                z-index: 1;
+            }
+
+            .hero-content {
+                max-width: 850px;
+            }
+
+            .hero-title {
+                font-size: var(--text-4xl);
+                font-weight: 800;
+                color: white;
+                letter-spacing: -0.03em;
+                line-height: 1.2;
+                margin-bottom: var(--space-lg);
+            }
+
+            .hero-author {
+                font-size: var(--text-xl);
+                color: rgba(255, 255, 255, 0.9);
+                font-weight: 500;
+            }
+
+            .hero-author a {
+                color: white;
+                text-decoration: none;
+                border-bottom: 2px solid rgba(255, 255, 255, 0.5);
+                transition: border-color 0.3s ease;
+            }
+
+            .hero-author a:hover {
+                border-color: white;
+            }
+
+            /* ===== SVG Global Language Network Illustration ===== */
+            .hero-illustration {
+                position: absolute;
+                right: 5%;
+                top: 50%;
+                transform: translateY(-50%);
+                width: 400px;
+                height: 400px;
+                opacity: 0.12;
+                pointer-events: none;
+            }
+
+            @keyframes pulseNode {
+
+                0%,
+                100% {
+                    opacity: 0.4;
+                    transform: scale(1);
                 }
 
-                #sidebar {
-                    position: fixed;
-                    background-color: #1B80CF;
-                    top: 0;
-                    left: 0;
-                    bottom: 80vh;
-                    width: 100vw;
+                50% {
+                    opacity: 1;
+                    transform: scale(1.3);
+                }
+            }
+
+            @keyframes orbitLanguage {
+                from {
+                    transform: rotate(0deg) translateX(80px) rotate(0deg);
                 }
 
-                #sidebar .title {
+                to {
+                    transform: rotate(360deg) translateX(80px) rotate(-360deg);
+                }
+            }
+
+            /* ===== Main Content ===== */
+            .main-content {
+                max-width: 1400px;
+                margin: 0 auto;
+                padding: var(--space-4xl) var(--space-xl);
+            }
+
+            .series-notice {
+                background: linear-gradient(135deg, rgba(245, 158, 11, 0.1) 0%, rgba(124, 58, 237, 0.05) 100%);
+                border-left: 4px solid var(--color-accent-1);
+                border-radius: var(--radius-lg);
+                padding: var(--space-lg);
+                margin-bottom: var(--space-3xl);
+                box-shadow: var(--shadow-sm);
+            }
+
+            .series-notice strong {
+                color: var(--color-accent-1);
+            }
+
+            .series-notice a {
+                color: var(--color-accent-1);
+                text-decoration: none;
+                border-bottom: 2px solid var(--color-accent-1);
+                transition: opacity 0.3s ease;
+            }
+
+            .series-notice a:hover {
+                opacity: 0.7;
+            }
+
+            /* ===== Content Sections ===== */
+            .content-section {
+                margin-bottom: var(--space-3xl);
+            }
+
+            .content-section p {
+                margin-bottom: var(--space-xl);
+                line-height: 1.8;
+                color: var(--color-base-text);
+            }
+
+            .content-section h2 {
+                font-size: var(--text-3xl);
+                font-weight: 700;
+                color: var(--color-accent-1);
+                margin-bottom: var(--space-xl);
+                letter-spacing: -0.02em;
+                position: relative;
+                padding-bottom: var(--space-md);
+            }
+
+            .content-section h2::after {
+                content: '';
+                position: absolute;
+                bottom: 0;
+                left: 0;
+                width: 100px;
+                height: 4px;
+                background: var(--gradient-primary);
+                border-radius: var(--radius-full);
+            }
+
+            .content-section h3 {
+                font-size: var(--text-2xl);
+                font-weight: 700;
+                color: var(--color-accent-2);
+                margin: var(--space-2xl) 0 var(--space-lg);
+                letter-spacing: -0.01em;
+                position: relative;
+                padding-left: var(--space-lg);
+            }
+
+            .content-section h3::before {
+                content: '◆';
+                position: absolute;
+                left: 0;
+                color: var(--color-accent-3);
+                font-size: var(--text-lg);
+            }
+
+            .content-section a {
+                color: var(--color-accent-1);
+                text-decoration: none;
+                border-bottom: 1px solid transparent;
+                transition: border-color 0.3s ease;
+            }
+
+            .content-section a:hover {
+                border-color: var(--color-accent-1);
+            }
+
+            .content-section em {
+                color: var(--color-base-text-muted);
+                font-style: italic;
+            }
+
+            /* ===== Lists ===== */
+            .content-section ol {
+                margin-left: var(--space-xl);
+                margin-bottom: var(--space-xl);
+            }
+
+            .content-section li {
+                margin-bottom: var(--space-md);
+                line-height: 1.7;
+            }
+
+            /* ===== Section Cards ===== */
+            .section-card {
+                background: rgba(255, 255, 255, 0.7);
+                -webkit-backdrop-filter: blur(12px) saturate(180%);
+                backdrop-filter: blur(12px) saturate(180%);
+                border: 1px solid var(--color-border);
+                border-radius: var(--radius-2xl);
+                padding: var(--space-2xl);
+                margin-bottom: var(--space-3xl);
+                box-shadow: var(--shadow-theme);
+                transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+                position: relative;
+                overflow: hidden;
+            }
+
+            .section-card::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 4px;
+                background: var(--gradient-primary);
+            }
+
+            .section-card:hover {
+                transform: translateY(-4px);
+                box-shadow: 0 20px 40px rgba(245, 158, 11, 0.15);
+            }
+
+            /* ===== Highlight Box ===== */
+            .highlight-box {
+                background: linear-gradient(135deg, rgba(245, 158, 11, 0.08) 0%, rgba(124, 58, 237, 0.08) 100%);
+                border: 2px solid var(--color-accent-3);
+                border-radius: var(--radius-xl);
+                padding: var(--space-xl);
+                margin: var(--space-2xl) 0;
+                position: relative;
+            }
+
+            .highlight-box::before {
+                content: '🌐';
+                position: absolute;
+                top: var(--space-md);
+                right: var(--space-md);
+                font-size: var(--text-3xl);
+                opacity: 0.2;
+            }
+
+            /* ===== Dividers ===== */
+            .section-divider {
+                height: 3px;
+                background: var(--gradient-primary);
+                border-radius: var(--radius-full);
+                margin: var(--space-3xl) auto;
+                max-width: 200px;
+                position: relative;
+                animation: shimmer 3s ease-in-out infinite;
+            }
+
+            @keyframes shimmer {
+
+                0%,
+                100% {
+                    opacity: 0.6;
+                }
+
+                50% {
+                    opacity: 1;
+                }
+            }
+
+            .section-divider::before,
+            .section-divider::after {
+                content: '';
+                position: absolute;
+                top: 50%;
+                width: 12px;
+                height: 12px;
+                border-radius: 50%;
+                transform: translateY(-50%);
+            }
+
+            .section-divider::before {
+                left: -18px;
+                background: var(--color-accent-1);
+                animation: pulseNode 2s ease-in-out infinite;
+            }
+
+            .section-divider::after {
+                right: -18px;
+                background: var(--color-accent-3);
+                animation: pulseNode 2s ease-in-out infinite 1s;
+            }
+
+            /* ===== Footer ===== */
+            .main-footer {
+                margin-top: var(--space-4xl);
+                padding: var(--space-3xl) var(--space-xl);
+                background: var(--gradient-hero);
+                color: white;
+                position: relative;
+                overflow: hidden;
+            }
+
+            .main-footer::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background:
+                    radial-gradient(circle at 30% 50%, rgba(124, 58, 237, 0.2) 0%, transparent 50%),
+                    radial-gradient(circle at 70% 50%, rgba(8, 145, 178, 0.2) 0%, transparent 50%);
+                pointer-events: none;
+            }
+
+            .footer-content {
+                max-width: 1400px;
+                margin: 0 auto;
+                position: relative;
+                z-index: 1;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                flex-wrap: wrap;
+                gap: var(--space-xl);
+            }
+
+            .footer-copyright {
+                font-size: var(--text-sm);
+                opacity: 0.9;
+            }
+
+            .language-selector {
+                display: flex;
+                gap: var(--space-md);
+                flex-wrap: wrap;
+            }
+
+            .language-selector span {
+                opacity: 0.7;
+                font-size: var(--text-sm);
+            }
+
+            .language-selector a {
+                color: white;
+                text-decoration: none;
+                font-size: var(--text-sm);
+                padding: var(--space-xs) var(--space-md);
+                background: rgba(255, 255, 255, 0.1);
+                border-radius: var(--radius-full);
+                border: 1px solid rgba(255, 255, 255, 0.2);
+                transition: all 0.3s ease;
+            }
+
+            .language-selector a:hover {
+                background: rgba(255, 255, 255, 0.2);
+                transform: translateY(-2px);
+            }
+
+            /* ===== Background Language Symbols ===== */
+            .background-symbols {
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                pointer-events: none;
+                z-index: -1;
+                overflow: hidden;
+                font-size: var(--text-4xl);
+                opacity: 0.03;
+            }
+
+            .symbol {
+                position: absolute;
+                color: var(--color-accent-1);
+                animation: float 20s ease-in-out infinite;
+            }
+
+            .symbol-1 {
+                top: 15%;
+                left: 10%;
+                content: '字';
+                animation-delay: 0s;
+            }
+
+            .symbol-2 {
+                top: 40%;
+                right: 15%;
+                content: 'А';
+                animation-delay: 3s;
+            }
+
+            .symbol-3 {
+                bottom: 30%;
+                left: 20%;
+                content: 'ع';
+                animation-delay: 6s;
+            }
+
+            .symbol-4 {
+                bottom: 20%;
+                right: 25%;
+                content: 'अ';
+                animation-delay: 9s;
+            }
+
+            @keyframes float {
+
+                0%,
+                100% {
+                    transform: translate(0, 0) rotate(0deg);
+                }
+
+                25% {
+                    transform: translate(20px, -20px) rotate(5deg);
+                }
+
+                50% {
+                    transform: translate(-15px, 15px) rotate(-5deg);
+                }
+
+                75% {
+                    transform: translate(15px, 10px) rotate(3deg);
+                }
+            }
+
+            /* ===== Floating Orbs ===== */
+            .background-orbs {
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                pointer-events: none;
+                z-index: -1;
+                overflow: hidden;
+            }
+
+            .orb {
+                position: absolute;
+                border-radius: 50%;
+                filter: blur(70px);
+                opacity: 0.08;
+                animation: floatOrb 25s ease-in-out infinite;
+            }
+
+            .orb-1 {
+                width: 350px;
+                height: 350px;
+                background: var(--color-accent-1);
+                top: 15%;
+                left: -8%;
+                animation-delay: 0s;
+            }
+
+            .orb-2 {
+                width: 300px;
+                height: 300px;
+                background: var(--color-accent-2);
+                bottom: 25%;
+                right: -5%;
+                animation-delay: 5s;
+            }
+
+            .orb-3 {
+                width: 280px;
+                height: 280px;
+                background: var(--color-accent-3);
+                top: 60%;
+                left: 50%;
+                animation-delay: 10s;
+            }
+
+            @keyframes floatOrb {
+
+                0%,
+                100% {
+                    transform: translate(0, 0) scale(1);
+                }
+
+                33% {
+                    transform: translate(35px, -25px) scale(1.1);
+                }
+
+                66% {
+                    transform: translate(-25px, 25px) scale(0.9);
+                }
+            }
+
+            /* ===== Responsive Design ===== */
+            @media (max-width: 1024px) {
+                .hero-illustration {
+                    opacity: 0.08;
+                    width: 300px;
+                    height: 300px;
+                }
+            }
+
+            @media (max-width: 768px) {
+                .nav-container {
+                    flex-direction: column;
+                    align-items: flex-start;
+                    gap: var(--space-sm);
+                }
+
+                .hero-section {
+                    padding: var(--space-3xl) var(--space-md);
+                }
+
+                .hero-illustration {
+                    display: none;
+                }
+
+                .main-content {
+                    padding: var(--space-2xl) var(--space-md);
+                }
+
+                .section-card {
+                    padding: var(--space-lg);
+                }
+
+                .footer-content {
+                    flex-direction: column;
                     text-align: center;
-                    position: fixed;
-                    margin-top: 6vh;
-                    left: 0px;
-                    right: 0px;
-                    line-height: 3.5vmax;
-                    font-size: 1.5vmax;
-                    font-family: 'Arial';
                 }
 
-                #sidebar .subtitle {
-                    text-align: center;
-                    top: 5vh;
-                    left: 0px;
-                    right: 0px;
-                    position: fixed;
-                    margin-top: 10vh;
-                    font-size: 1.5vmax;
+                .language-selector {
+                    justify-content: center;
                 }
+            }
 
-                #sidebar .title a:link,
-                #sidebar .title a:visited {
-                    text-align: center;
-                    color: #FFFFFF;
-                }
+            /* ===== Reduced Motion ===== */
+            @media (prefers-reduced-motion: reduce) {
 
-                #sidebar .subtitle a:link,
-                #sidebar .subtitle a:visited {
-                    text-align: center;
-                    color: #FFFFFF;
+                *,
+                *::before,
+                *::after {
+                    animation-duration: 0.01ms !important;
+                    animation-iteration-count: 1 !important;
+                    transition-duration: 0.01ms !important;
                 }
+            }
 
-                .home {
-                    z-index: 100;
-                    width: 100%;
-                    background-color: #1B80CF;
-                    font-size: 1.5vmax;
-                }
-
-                .home a:link,
-                .home a:visited {
-                    text-decoration: none;
-                    color: #FFFFFF;
-                }
-
-                .content {
-                    line-height: 3.8vmax;
-                    font-size: 1.8vmax;
-                    font-family: 'Arial';
-                    margin-top: 22vh;
-                }
-
-                .content a:link,
-                .content a:visited {
-                    color: #1B80CF;
-                }
-
-                .page {
-                    top: 40vh;
-                    width: 95%;
-                    margin-left: 0vw;
-                }
-
-                .page img {
-                    max-width: 100%;
-                    max-height: 100%;
-                    border: 0;
-                }
+            /* ===== Focus Styles ===== */
+            a:focus-visible,
+            button:focus-visible {
+                outline: 3px solid var(--color-accent-1);
+                outline-offset: 2px;
+                border-radius: var(--radius-sm);
             }
         </style>
     </head>
 
-    <body vocab="http://schema.org/">
-        <div class="page">
-            <div class="home">
-                <ul typeof="BreadcrumbList">
+    <body>
+        <!-- Skip Link -->
+        <a href="#main-content" class="skip-link">Skip to main content</a>
+
+        <!-- Background Orbs -->
+        <div class="background-orbs" aria-hidden="true">
+            <div class="orb orb-1"></div>
+            <div class="orb orb-2"></div>
+            <div class="orb orb-3"></div>
+        </div>
+
+        <!-- Background Language Symbols -->
+        <div class="background-symbols" aria-hidden="true">
+            <div class="symbol symbol-1">字</div>
+            <div class="symbol symbol-2">А</div>
+            <div class="symbol symbol-3">ع</div>
+            <div class="symbol symbol-4">अ</div>
+        </div>
+
+        <!-- Navigation -->
+        <nav class="main-nav" role="navigation" aria-label="Main navigation">
+            <div class="nav-container">
+                <a href="../about.html" class="nav-brand">John Samuel</a>
+                <ul class="breadcrumb" vocab="http://schema.org/" typeof="BreadcrumbList">
                     <li property="itemListElement" typeof="ListItem">
                         <a property="item" typeof="WebPage" href="../index.html">
                             <span property="name">Home</span>
@@ -268,39 +782,175 @@
                             <span property="name">Research</span>
                         </a>
                     </li>
+                    <li property="itemListElement" typeof="ListItem">
+                        <span property="name">LLMs vs Language Communities</span>
+                    </li>
                 </ul>
-
             </div>
-            <div id="sidebar">
-                <div class="title">
-                    <h1><a href="./language-models.html">Large language models versus language communities</a></h1>
-                </div>
-                <div class="subtitle">
-                    <h3><a href="../about.html">John Samuel</a></h3>
+        </nav>
+
+        <!-- Hero Section -->
+        <header class="hero-section">
+            <div class="hero-container">
+                <div class="hero-content">
+                    <h1 class="hero-title">Role of Language Communities in the Era of Large Language Models</h1>
+                    <p class="hero-author">by <a href="../about.html">John Samuel</a></p>
                 </div>
             </div>
 
-            <div class="content">
-                <article>
-                    <header>
-                        <h2>Role of Language Communities in the Era of Large Language Models</h2>
-                        <div
-                            style="background-color: #f0f8ff; border-left: 4px solid #1e90ff; padding: 1em; margin-bottom: 1.5em;">
-                            <strong>This article is part of a series on <a
-                                    href="./artificial-intelligence.html">Artificial
-                                    Intelligence</a>.</strong>
-                        </div>
-                    </header>
+            <!-- SVG Global Language Network Illustration -->
+            <svg class="hero-illustration" viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                <!-- Central Hub -->
+                <g transform="translate(200, 200)">
+                    <circle r="40" fill="white" opacity="0.5">
+                        <animate attributeName="r" values="40;45;40" dur="4s" repeatCount="indefinite" />
+                    </circle>
+                    <circle r="25" fill="white" opacity="0.7">
+                        <animate attributeName="r" values="25;30;25" dur="3s" repeatCount="indefinite" />
+                    </circle>
+                </g>
 
-                    <p>Large Language Models (LLMs) such as GPT, PaLM, and Galactica have revolutionized natural
-                        language processing by enabling machines to generate coherent and contextually relevant text
-                        across many languages. However, the benefits of these models are disproportionately distributed,
-                        favoring high-resource languages with extensive digital corpora. This article discusses the
-                        critical role of language communities in supporting under-resourced and endangered languages in
-                        the context of LLM development and deployment, and explores collaborative strategies involving
-                        researchers, policymakers, language activists, and technologists to promote linguistic diversity
-                        in AI systems.</p>
+                <!-- Language Community Nodes (different sizes representing diversity) -->
+                <g opacity="0.8">
+                    <!-- Major language communities -->
+                    <circle cx="120" cy="80" r="15" fill="white">
+                        <animate attributeName="opacity" values="0.6;1;0.6" dur="3s" repeatCount="indefinite" />
+                    </circle>
+                    <circle cx="280" cy="90" r="12" fill="white">
+                        <animate attributeName="opacity" values="0.6;1;0.6" dur="3.5s" repeatCount="indefinite" />
+                    </circle>
+                    <circle cx="320" cy="200" r="14" fill="white">
+                        <animate attributeName="opacity" values="0.6;1;0.6" dur="4s" repeatCount="indefinite" />
+                    </circle>
+                    <circle cx="270" cy="310" r="11" fill="white">
+                        <animate attributeName="opacity" values="0.6;1;0.6" dur="4.5s" repeatCount="indefinite" />
+                    </circle>
+                    <circle cx="130" cy="320" r="13" fill="white">
+                        <animate attributeName="opacity" values="0.6;1;0.6" dur="5s" repeatCount="indefinite" />
+                    </circle>
+                    <circle cx="80" cy="200" r="10" fill="white">
+                        <animate attributeName="opacity" values="0.6;1;0.6" dur="3.2s" repeatCount="indefinite" />
+                    </circle>
 
+                    <!-- Smaller/endangered language communities -->
+                    <circle cx="160" cy="120" r="7" fill="white">
+                        <animate attributeName="opacity" values="0.4;0.8;0.4" dur="2.5s" repeatCount="indefinite" />
+                    </circle>
+                    <circle cx="240" cy="140" r="6" fill="white">
+                        <animate attributeName="opacity" values="0.4;0.8;0.4" dur="2.8s" repeatCount="indefinite" />
+                    </circle>
+                    <circle cx="180" cy="280" r="8" fill="white">
+                        <animate attributeName="opacity" values="0.4;0.8;0.4" dur="3.3s" repeatCount="indefinite" />
+                    </circle>
+                </g>
+
+                <!-- Connection Lines (representing collaboration) -->
+                <g stroke="white" stroke-width="2" fill="none" opacity="0.3">
+                    <line x1="200" y1="200" x2="120" y2="80">
+                        <animate attributeName="opacity" values="0.2;0.5;0.2" dur="3s" repeatCount="indefinite" />
+                    </line>
+                    <line x1="200" y1="200" x2="280" y2="90">
+                        <animate attributeName="opacity" values="0.2;0.5;0.2" dur="3.5s" repeatCount="indefinite" />
+                    </line>
+                    <line x1="200" y1="200" x2="320" y2="200">
+                        <animate attributeName="opacity" values="0.2;0.5;0.2" dur="4s" repeatCount="indefinite" />
+                    </line>
+                    <line x1="200" y1="200" x2="270" y2="310">
+                        <animate attributeName="opacity" values="0.2;0.5;0.2" dur="4.5s" repeatCount="indefinite" />
+                    </line>
+                    <line x1="200" y1="200" x2="130" y2="320">
+                        <animate attributeName="opacity" values="0.2;0.5;0.2" dur="5s" repeatCount="indefinite" />
+                    </line>
+                    <line x1="200" y1="200" x2="80" y2="200">
+                        <animate attributeName="opacity" values="0.2;0.5;0.2" dur="3.2s" repeatCount="indefinite" />
+                    </line>
+
+                    <!-- Connections to smaller communities -->
+                    <line x1="120" y1="80" x2="160" y2="120" stroke-width="1">
+                        <animate attributeName="opacity" values="0.1;0.3;0.1" dur="2.5s" repeatCount="indefinite" />
+                    </line>
+                    <line x1="280" y1="90" x2="240" y2="140" stroke-width="1">
+                        <animate attributeName="opacity" values="0.1;0.3;0.1" dur="2.8s" repeatCount="indefinite" />
+                    </line>
+                    <line x1="130" y1="320" x2="180" y2="280" stroke-width="1">
+                        <animate attributeName="opacity" values="0.1;0.3;0.1" dur="3.3s" repeatCount="indefinite" />
+                    </line>
+                </g>
+
+                <!-- Data Flow Particles -->
+                <g>
+                    <circle r="3" fill="white" opacity="0.8">
+                        <animateMotion dur="6s" repeatCount="indefinite" path="M 120 80 L 200 200" />
+                        <animate attributeName="opacity" values="0;1;0" dur="6s" repeatCount="indefinite" />
+                    </circle>
+                    <circle r="3" fill="white" opacity="0.8">
+                        <animateMotion dur="6s" repeatCount="indefinite" begin="2s" path="M 280 90 L 200 200" />
+                        <animate attributeName="opacity" values="0;1;0" dur="6s" repeatCount="indefinite" begin="2s" />
+                    </circle>
+                    <circle r="3" fill="white" opacity="0.8">
+                        <animateMotion dur="6s" repeatCount="indefinite" begin="4s" path="M 320 200 L 200 200" />
+                        <animate attributeName="opacity" values="0;1;0" dur="6s" repeatCount="indefinite" begin="4s" />
+                    </circle>
+                </g>
+
+                <!-- Orbiting Cultural Symbols -->
+                <g transform="translate(200, 200)">
+                    <text font-size="16" fill="white" opacity="0.6" text-anchor="middle">
+                        <animateTransform attributeName="transform" type="rotate" from="0 0 0" to="360 0 0" dur="30s"
+                            repeatCount="indefinite" />
+                        <tspan x="0" y="-90">A</tspan>
+                    </text>
+                    <text font-size="16" fill="white" opacity="0.6" text-anchor="middle">
+                        <animateTransform attributeName="transform" type="rotate" from="60 0 0" to="420 0 0" dur="30s"
+                            repeatCount="indefinite" />
+                        <tspan x="0" y="-90">字</tspan>
+                    </text>
+                    <text font-size="16" fill="white" opacity="0.6" text-anchor="middle">
+                        <animateTransform attributeName="transform" type="rotate" from="120 0 0" to="480 0 0" dur="30s"
+                            repeatCount="indefinite" />
+                        <tspan x="0" y="-90">ع</tspan>
+                    </text>
+                    <text font-size="16" fill="white" opacity="0.6" text-anchor="middle">
+                        <animateTransform attributeName="transform" type="rotate" from="180 0 0" to="540 0 0" dur="30s"
+                            repeatCount="indefinite" />
+                        <tspan x="0" y="-90">अ</tspan>
+                    </text>
+                    <text font-size="16" fill="white" opacity="0.6" text-anchor="middle">
+                        <animateTransform attributeName="transform" type="rotate" from="240 0 0" to="600 0 0" dur="30s"
+                            repeatCount="indefinite" />
+                        <tspan x="0" y="-90">Α</tspan>
+                    </text>
+                    <text font-size="16" fill="white" opacity="0.6" text-anchor="middle">
+                        <animateTransform attributeName="transform" type="rotate" from="300 0 0" to="660 0 0" dur="30s"
+                            repeatCount="indefinite" />
+                        <tspan x="0" y="-90">ᚨ</tspan>
+                    </text>
+                </g>
+            </svg>
+        </header>
+
+        <!-- Main Content -->
+        <main id="main-content" class="main-content">
+            <div class="series-notice">
+                <strong>This article is part of a series on <a href="./artificial-intelligence.html">Artificial
+                        Intelligence</a>.</strong>
+            </div>
+
+            <section class="content-section">
+                <h2>Role of Language Communities in the Era of Large Language Models</h2>
+
+                <p>Large Language Models (LLMs) such as GPT, PaLM, and Galactica have revolutionized natural language
+                    processing by enabling machines to generate coherent and contextually relevant text across many
+                    languages. However, the benefits of these models are disproportionately distributed, favoring
+                    high-resource languages with extensive digital corpora. This article discusses the critical role of
+                    language communities in supporting under-resourced and endangered languages in the context of LLM
+                    development and deployment, and explores collaborative strategies involving researchers,
+                    policymakers, language activists, and technologists to promote linguistic diversity in AI systems.
+                </p>
+            </section>
+
+            <div class="section-card">
+                <section class="content-section">
                     <h3>Availability of Large Language Models for Selected Languages</h3>
 
                     <p>Most publicly available LLMs have been predominantly trained on large-scale datasets derived from
@@ -310,12 +960,17 @@
                         annotated datasets challenge the development of effective LLMs for these languages.</p>
 
                     <p>The <a href="https://arxiv.org/abs/2006.07264">low-resource language</a> problem poses
-                        significant risks for
-                        digital inequality and cultural erosion, as linguistic communities without adequate
-                        technological support face marginalization in the digital era. It is imperative that language
-                        communities, together with AI researchers and policymakers, address these challenges through
-                        concerted efforts in data collection, curation, and model development.</p>
+                        significant risks for digital inequality and cultural erosion, as linguistic communities without
+                        adequate technological support face marginalization in the digital era. It is imperative that
+                        language communities, together with AI researchers and policymakers, address these challenges
+                        through concerted efforts in data collection, curation, and model development.</p>
+                </section>
+            </div>
 
+            <div class="section-divider" aria-hidden="true"></div>
+
+            <div class="highlight-box">
+                <section class="content-section">
                     <h3>Documentation and Ethical Data Collection</h3>
 
                     <p>One of the foundational steps toward supporting under-resourced languages is thorough linguistic
@@ -328,10 +983,14 @@
                         usage relevant for everyday communication and specialized domains. These data serve as valuable
                         resources for building language models, lexicons, and translation systems. Initiatives such as
                         the <a href="https://www.endangeredlanguages.com/">Endangered Languages Project</a> and <a
-                            href="https://www.unesco.org/en/articles/best-practices-and-lessons-learned-preserve-revitalize-and-promote-indigenous-languages">UNESCO’s
-                            language revitalization programs</a>
-                        provide frameworks and best practices for such work.</p>
+                            href="https://www.unesco.org/en/articles/best-practices-and-lessons-learned-preserve-revitalize-and-promote-indigenous-languages">UNESCO's
+                            language revitalization programs</a> provide frameworks and best practices for such work.
+                    </p>
+                </section>
+            </div>
 
+            <div class="section-card">
+                <section class="content-section">
                     <h3>Improving Data Quality and Quantity for All Languages</h3>
 
                     <p>Enhancing the data available for under-resourced languages requires multi-faceted approaches,
@@ -345,7 +1004,11 @@
                         and standardizing these terms. Traditionally, official language bodies or academic institutions
                         have led this work. However, with LLMs generating multiple possible translations, ensuring the
                         accuracy and consistency of official terminology has become more complex.</p>
+                </section>
+            </div>
 
+            <div class="section-card">
+                <section class="content-section">
                     <h3>Ensuring Official and Consistent Translations with LLMs</h3>
 
                     <p>As LLMs generate diverse outputs, including multiple translations for the same term or phrase,
@@ -359,7 +1022,13 @@
                         appropriate language usage. Incorporating community input during model fine-tuning ensures that
                         LLMs respect linguistic norms and contribute positively to language preservation and evolution.
                     </p>
+                </section>
+            </div>
 
+            <div class="section-divider" aria-hidden="true"></div>
+
+            <div class="section-card">
+                <section class="content-section">
                     <h3>Collaboration Between Language Communities and LLM Developers</h3>
 
                     <p>Successful integration of under-resourced languages into LLMs demands ongoing collaboration
@@ -367,51 +1036,61 @@
                         communities transparently, respecting data sovereignty and intellectual property rights.
                         Participatory approaches, such as <a
                             href="https://en.wikipedia.org/wiki/Citizen_science">citizen science</a> and crowdsourcing,
-                        can harness
-                        collective knowledge and foster empowerment.</p>
+                        can harness collective knowledge and foster empowerment.</p>
 
                     <p>Institutional support through funding, policy frameworks, and infrastructure is equally vital.
                         International organizations like UNESCO, the United Nations, and the <a
-                            href="https://www.ethnologue.com">Ethnologue</a>
-                        contribute to language preservation agendas that can align with technological development.
-                        National language academies and educational institutions play roles in standardization and
-                        resource creation.</p>
+                            href="https://www.ethnologue.com">Ethnologue</a> contribute to language preservation agendas
+                        that can align with technological development. National language academies and educational
+                        institutions play roles in standardization and resource creation.</p>
+                </section>
+            </div>
 
+            <div class="section-card">
+                <section class="content-section">
                     <h3>Data Governance, Licensing, and Ethical Considerations</h3>
 
                     <p>Data governance frameworks must prioritize ethical concerns, including informed consent, privacy,
                         and cultural sensitivity. Open licenses such as <a
                             href="https://creativecommons.org/licenses/by/4.0/">Creative Commons</a> facilitate the
-                        sharing of linguistic data
-                        while protecting contributors' rights. At the same time, mechanisms for community control over
-                        data use, sometimes referred to as data sovereignty, are increasingly recognized as essential
-                        for respecting Indigenous and minority groups’ interests.</p>
+                        sharing of linguistic data while protecting contributors' rights. At the same time, mechanisms
+                        for community control over data use, sometimes referred to as data sovereignty, are increasingly
+                        recognized as essential for respecting Indigenous and minority groups' interests.</p>
 
                     <p>Ensuring transparency about how data are used, stored, and integrated into LLMs is fundamental to
                         building trust between developers and language communities. Ethical AI principles, such as those
                         articulated by the <a href="https://en.wikipedia.org/wiki/AI_ethics">AI Ethics Guidelines</a> of
-                        major organizations, reinforce the
-                        need for inclusivity and fairness in language technologies.</p>
+                        major organizations, reinforce the need for inclusivity and fairness in language technologies.
+                    </p>
+                </section>
+            </div>
 
-                    <h3>Conclusion</h3>
+            <div class="section-divider" aria-hidden="true"></div>
 
-                    <p>Language communities are indispensable partners in advancing equitable and effective Large
-                        Language Models. Their participation in documentation, data curation, validation, and feedback
-                        mechanisms ensures that LLMs reflect linguistic diversity and cultural richness. Through
-                        collaborative efforts involving researchers, policymakers, language activists, technologists,
-                        and international institutions, it is possible to mitigate digital inequalities and preserve
-                        endangered languages in the era of AI.</p>
+            <section class="content-section">
+                <h3>Conclusion</h3>
 
+                <p>Language communities are indispensable partners in advancing equitable and effective Large Language
+                    Models. Their participation in documentation, data curation, validation, and feedback mechanisms
+                    ensures that LLMs reflect linguistic diversity and cultural richness. Through collaborative efforts
+                    involving researchers, policymakers, language activists, technologists, and international
+                    institutions, it is possible to mitigate digital inequalities and preserve endangered languages in
+                    the era of AI.</p>
+            </section>
+
+            <div class="section-card">
+                <section class="content-section">
                     <h3>References</h3>
+
                     <ol>
-                        <li id="languagemodels">Bender, Emily M., et al. “On the Dangers of Stochastic Parrots: Can
-                            Language Models Be Too Big?” <em>Proceedings of the 2021 ACM Conference on Fairness,
+                        <li id="languagemodels">Bender, Emily M., et al. "On the Dangers of Stochastic Parrots: Can
+                            Language Models Be Too Big?" <em>Proceedings of the 2021 ACM Conference on Fairness,
                                 Accountability, and Transparency</em>, ACM, 2021, pp. 610–623. <a
                                 href="https://dl.acm.org/doi/pdf/10.1145/3442188.3445922">PDF</a></li>
-                        <li id="tom">Trott, Sean, et al. “Do Large Language Models Know What Humans Know?” <em>Cognitive
+                        <li id="tom">Trott, Sean, et al. "Do Large Language Models Know What Humans Know?" <em>Cognitive
                                 Science</em>, vol. 47, no. 7, July 2023, p. e13309. <a
                                 href="https://doi.org/10.1111/cogs.13309">Link</a></li>
-                        <li>“Citizen science.” <em>Wikipedia</em>, Wikimedia Foundation, <a
+                        <li>"Citizen science." <em>Wikipedia</em>, Wikimedia Foundation, <a
                                 href="https://en.wikipedia.org/wiki/Citizen_science">https://en.wikipedia.org/wiki/Citizen_science</a>.
                         </li>
                         <li>Endangered Languages Project. <a
@@ -420,25 +1099,32 @@
                         <li>UNESCO Language Revitalization Ecosystems. <a
                                 href="https://www.unesco.org/en/articles/best-practices-and-lessons-learned-preserve-revitalize-and-promote-indigenous-languages">Best
                                 practices and lessons learned to preserve, revitalize and promote Indigenous
-                                Languages</a>.
-                        </li>
+                                Languages</a>.</li>
                         <li>Creative Commons Licenses. <a
                                 href="https://creativecommons.org/licenses/by/4.0/">https://creativecommons.org/licenses/by/4.0/</a>.
                         </li>
-                        <li>“AI ethics.” <em>Wikipedia</em>, Wikimedia Foundation, <a
+                        <li>"AI ethics." <em>Wikipedia</em>, Wikimedia Foundation, <a
                                 href="https://en.wikipedia.org/wiki/AI_ethics">https://en.wikipedia.org/wiki/AI_ethics</a>.
                         </li>
                         <li>Ethnologue: Languages of the World. <a
                                 href="https://www.ethnologue.com">https://www.ethnologue.com</a>.</li>
                     </ol>
-
-                </article>
-
+                </section>
             </div>
+        </main>
 
-            <br />
-
-        </div>
+        <!-- Footer -->
+        <footer class="main-footer">
+            <div class="footer-content">
+                <div class="footer-copyright">
+                    <p>© 2024 John Samuel. All rights reserved.</p>
+                </div>
+                <div class="language-selector">
+                    <span>Languages:</span>
+                    <a href="./large-language-models-language-communities.html" hreflang="en">English</a>
+                </div>
+            </div>
+        </footer>
     </body>
 
 </html>
