@@ -2,262 +2,599 @@
 <html lang="en">
 
     <head>
-        <meta charset="utf-8" />
-        <meta http-equiv="Content-Language" content="en" />
-        <link rel="shortcut icon" href="../../images/logo/favicon.png" />
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta http-equiv="Content-Language" content="en">
+        <link rel="shortcut icon" href="../../images/logo/favicon.png">
         <title>Data Analysis: John Samuel</title>
-        <style type="text/css">
-            body {
-                background-color: #FFFFFF;
+        <style>
+            /* ===== CSS CUSTOM PROPERTIES (DESIGN TOKENS) ===== */
+            :root {
+                /* Base Colors - Light Theme Foundation */
+                --color-base-bg: #f5f8fa;
+                --color-base-surface: #ffffff;
+                --color-base-text: #1a202c;
+                --color-base-text-muted: #4a5568;
+
+                /* Data Science Theme Accents */
+                --color-accent-1: #4a90e2;
+                --color-accent-2: #2d5f8d;
+                --color-accent-3: #7b68ee;
+                --color-accent-light: #e8f2fc;
+
+                /* Functional Colors */
+                --color-shadow: rgba(74, 144, 226, 0.12);
+                --color-border: rgba(74, 144, 226, 0.15);
+                --color-hover: rgba(74, 144, 226, 0.08);
+
+                /* Gradients */
+                --gradient-primary: linear-gradient(135deg, #4a90e2 0%, #7b68ee 100%);
+                --gradient-subtle: linear-gradient(180deg, #f5f8fa 0%, #e8f2fc 100%);
+                --gradient-hero: linear-gradient(135deg, #4a90e2 0%, #7b68ee 50%, #2d5f8d 100%);
+
+                /* Spacing Scale */
+                --space-xs: 0.25rem;
+                --space-sm: 0.5rem;
+                --space-md: 1rem;
+                --space-lg: 1.5rem;
+                --space-xl: 2rem;
+                --space-2xl: 3rem;
+                --space-3xl: 4rem;
+                --space-4xl: 6rem;
+
+                /* Border Radius */
+                --radius-sm: 4px;
+                --radius-md: 8px;
+                --radius-lg: 12px;
+                --radius-xl: 16px;
+                --radius-2xl: 24px;
+                --radius-full: 9999px;
+
+                /* Shadows */
+                --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.04), 0 1px 3px rgba(0, 0, 0, 0.06);
+                --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.05), 0 2px 4px rgba(0, 0, 0, 0.06);
+                --shadow-lg: 0 10px 24px rgba(0, 0, 0, 0.08), 0 4px 8px rgba(0, 0, 0, 0.06);
+                --shadow-xl: 0 20px 40px rgba(0, 0, 0, 0.12), 0 8px 16px rgba(0, 0, 0, 0.08);
+                --shadow-theme: 0 10px 30px var(--color-shadow), 0 4px 10px rgba(0, 0, 0, 0.06);
+
+                /* Typography */
+                --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+                --text-xs: clamp(0.75rem, 0.7rem + 0.25vw, 0.875rem);
+                --text-sm: clamp(0.875rem, 0.8rem + 0.35vw, 1rem);
+                --text-base: clamp(1rem, 0.95rem + 0.25vw, 1.125rem);
+                --text-lg: clamp(1.125rem, 1.05rem + 0.35vw, 1.25rem);
+                --text-xl: clamp(1.25rem, 1.15rem + 0.5vw, 1.5rem);
+                --text-2xl: clamp(1.5rem, 1.3rem + 1vw, 2rem);
+                --text-3xl: clamp(2rem, 1.6rem + 2vw, 2.5rem);
+                --text-4xl: clamp(2.5rem, 2rem + 2.5vw, 3.5rem);
+
+                /* Weights */
+                --weight-normal: 400;
+                --weight-medium: 500;
+                --weight-semibold: 600;
+                --weight-bold: 700;
             }
 
-            #sidebar {
-                position: fixed;
-                background-color: #1B80CF;
-                top: 0;
-                left: 0;
-                bottom: 0;
-                width: 30vw;
-            }
-
-            #sidebar .title {
-                position: relative;
-                text-align: center;
-                line-height: 4vmax;
-                font-size: 1.4vmax;
-                font-family: 'Arial';
-                margin-top: 25vh;
-            }
-
-            #sidebar .title a:link,
-            #sidebar .title a:visited {
-                color: #FFFFFF;
-                text-decoration: none;
-            }
-
-            .subtitle {
-                top: 50vh;
-                text-align: center;
-                line-height: 1.3vmax;
-                font-family: 'Arial';
-                font-size: 1.5vmax;
-                color: #FFFFFF;
-            }
-
-            .subtitle a:link,
-            .subtitle a:visited {
-                color: #FFFFFF;
-                text-decoration: none;
-            }
-
-            .licence {
-                position: fixed;
-                text-align: right;
-                bottom: 0;
-                right: 0;
-            }
-
-            .home {
-                position: fixed;
-                text-align: left;
-                font-family: 'Arial';
-                color: #D3D3D3;
-                z-index: 100;
-                width: 100%;
-                background-color: #FFFFFF;
-                top: 0px;
-                margin-bottom: 10px;
-                padding-bottom: 10px;
-            }
-
-            .home a:link,
-            .home a:visited {
-                text-decoration: none;
-                color: #D3D3D3;
-            }
-
-            .home ul {
+            /* ===== RESET & BASE STYLES ===== */
+            *,
+            *::before,
+            *::after {
+                box-sizing: border-box;
                 margin: 0;
                 padding: 0;
-                text-align: left;
-                list-style: none;
             }
 
-            .home li {
-                position: relative;
-                float: left;
-                padding-top: 15px;
-                margin-right: 1em;
-                font-family: 'Arial';
+            html {
+                scroll-behavior: smooth;
+                scroll-padding-top: 100px;
             }
 
-            .home li:hover {
-                display: block;
+            body {
+                font-family: var(--font-sans);
+                font-size: var(--text-base);
+                line-height: 1.7;
+                color: var(--color-base-text);
+                background: var(--gradient-subtle);
+                background-attachment: fixed;
+                min-height: 100vh;
+                letter-spacing: -0.005em;
             }
 
-            .home a:link,
-            .home a:visited {
-                color: #D3D3D3;
+            /* ===== NAVIGATION BAR ===== */
+            .navbar {
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                background: rgba(255, 255, 255, 0.85);
+                -webkit-backdrop-filter: blur(12px) saturate(180%);
+                backdrop-filter: blur(12px) saturate(180%);
+                border-bottom: 1px solid var(--color-border);
+                box-shadow: var(--shadow-md);
+                z-index: 100;
+                padding: var(--space-md) var(--space-xl);
             }
 
-            .home li:hover a:link,
-            .home li:hover a:visited {
+            .navbar-content {
+                max-width: 1400px;
+                margin: 0 auto;
+                display: flex;
+                align-items: center;
+                gap: var(--space-xl);
+            }
+
+            .site-name {
+                font-size: var(--text-xl);
+                font-weight: var(--weight-bold);
+                color: var(--color-accent-1);
                 text-decoration: none;
-                padding: 15px;
-                color: #FFFFFF;
-                background-color: #1B80CF;
+                padding: var(--space-sm) var(--space-md);
+                background: var(--gradient-primary);
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                background-clip: text;
+                transition: all 0.3s ease;
             }
 
-            .content {
-                line-height: 1.8vmax;
-                font-size: 1.2vmax;
-                font-family: 'Arial';
-                margin-top: 15vh;
-                width: 90%;
+            .site-name:hover {
+                transform: translateY(-2px);
             }
 
-            .content h2,
+            .breadcrumb {
+                display: flex;
+                list-style: none;
+                gap: var(--space-sm);
+                flex-wrap: wrap;
+                align-items: center;
+            }
+
+            .breadcrumb li {
+                display: flex;
+                align-items: center;
+                gap: var(--space-sm);
+            }
+
+            .breadcrumb li:not(:last-child)::after {
+                content: '→';
+                color: var(--color-base-text-muted);
+                font-size: var(--text-sm);
+            }
+
+            .breadcrumb a {
+                color: var(--color-base-text-muted);
+                text-decoration: none;
+                font-size: var(--text-sm);
+                transition: color 0.3s ease;
+            }
+
+            .breadcrumb a:hover {
+                color: var(--color-accent-1);
+            }
+
+            /* ===== HERO SECTION ===== */
+            .hero {
+                margin-top: 80px;
+                padding: var(--space-4xl) var(--space-xl) var(--space-3xl);
+                background: var(--gradient-hero);
+                background-size: 200% 200%;
+                animation: gradientShift 12s ease infinite;
+                position: relative;
+                overflow: hidden;
+            }
+
+            @keyframes gradientShift {
+
+                0%,
+                100% {
+                    background-position: 0% 50%;
+                }
+
+                50% {
+                    background-position: 100% 50%;
+                }
+            }
+
+            .hero::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background-image:
+                    radial-gradient(circle at 20% 30%, rgba(255, 255, 255, 0.1) 0%, transparent 50%),
+                    radial-gradient(circle at 80% 70%, rgba(255, 255, 255, 0.08) 0%, transparent 50%);
+                pointer-events: none;
+            }
+
+            .hero-content {
+                max-width: 1400px;
+                margin: 0 auto;
+                position: relative;
+                z-index: 1;
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: var(--space-3xl);
+                align-items: center;
+            }
+
+            .hero-text h1 {
+                font-size: var(--text-4xl);
+                font-weight: var(--weight-bold);
+                color: white;
+                margin-bottom: var(--space-lg);
+                letter-spacing: -0.03em;
+                line-height: 1.2;
+            }
+
+            .hero-text .subtitle {
+                font-size: var(--text-lg);
+                color: rgba(255, 255, 255, 0.9);
+                margin-bottom: var(--space-md);
+            }
+
+            .hero-text .author {
+                font-size: var(--text-base);
+                color: rgba(255, 255, 255, 0.8);
+            }
+
+            .hero-text .author a {
+                color: white;
+                text-decoration: none;
+                border-bottom: 2px solid rgba(255, 255, 255, 0.4);
+                transition: border-color 0.3s ease;
+            }
+
+            .hero-text .author a:hover {
+                border-color: white;
+            }
+
+            .hero-svg {
+                display: flex;
+                justify-content: center;
+                align-items: center;
+            }
+
+            /* ===== MAIN CONTENT ===== */
+            .container {
+                max-width: 1400px;
+                margin: 0 auto;
+                padding: var(--space-3xl) var(--space-xl);
+            }
+
+            /* Context Banner */
+            .context-banner {
+                background: linear-gradient(135deg, rgba(74, 144, 226, 0.1) 0%, rgba(123, 104, 238, 0.1) 100%);
+                border-left: 4px solid var(--color-accent-1);
+                padding: var(--space-lg);
+                border-radius: var(--radius-lg);
+                margin-bottom: var(--space-3xl);
+                box-shadow: var(--shadow-md);
+            }
+
+            .context-banner strong {
+                color: var(--color-accent-2);
+                font-weight: var(--weight-semibold);
+            }
+
+            .context-banner a {
+                color: var(--color-accent-1);
+                text-decoration: none;
+                border-bottom: 2px solid transparent;
+                transition: border-color 0.3s ease;
+            }
+
+            .context-banner a:hover {
+                border-color: var(--color-accent-1);
+            }
+
+            /* Article Sections */
+            article {
+                background: white;
+                border-radius: var(--radius-2xl);
+                padding: var(--space-3xl);
+                box-shadow: var(--shadow-theme);
+                margin-bottom: var(--space-3xl);
+            }
+
+            article header {
+                margin-bottom: var(--space-3xl);
+                padding-bottom: var(--space-xl);
+                border-bottom: 2px solid var(--color-accent-light);
+                position: relative;
+            }
+
+            article header::after {
+                content: '';
+                position: absolute;
+                bottom: -2px;
+                left: 0;
+                width: 120px;
+                height: 2px;
+                background: var(--gradient-primary);
+                border-radius: var(--radius-full);
+            }
+
+            h2,
             h3,
             h4 {
-                color: #1B80CF;
+                color: var(--color-accent-2);
+                font-weight: var(--weight-bold);
+                margin-top: var(--space-2xl);
+                margin-bottom: var(--space-lg);
+                position: relative;
             }
 
-            .content a:link,
-            .content a:visited {
-                color: #1B80CF;
+            h2 {
+                font-size: var(--text-3xl);
+                letter-spacing: -0.02em;
             }
 
-            .content h3 {
-                color: #1B80CF;
+            h3 {
+                font-size: var(--text-2xl);
+                letter-spacing: -0.01em;
             }
 
-            .content h2::before,
-            .content h3::before {
-                display: block;
-                content: " ";
-                visibility: hidden;
-                height: 50px;
-                margin-top: -50px;
-                pointer-events: none;
-                background-color: #FFFFFF;
+            h4 {
+                font-size: var(--text-xl);
             }
 
-            .content a:link,
-            .content a:visited {
-                color: #1B80CF;
+            article header h3:first-child {
+                margin-top: 0;
+                font-size: var(--text-3xl);
             }
 
-            .content li {
-                margin: 5px;
+            section {
+                margin-bottom: var(--space-3xl);
             }
 
-            .page {
-                width: 65vw;
-                height: 100%;
-                margin-left: 30vw;
-                overflow: hidden;
-                padding: 0 1em;
-                font-family: 'Arial';
+            section:last-of-type {
+                margin-bottom: 0;
             }
 
-            .page img {
-                max-width: 100%;
-                max-height: 100%;
+            p {
+                margin-bottom: var(--space-lg);
+                line-height: 1.8;
+                color: var(--color-base-text);
             }
 
-            @media (max-width: 640px),
-            screen and (orientation: portrait) {
-                body {
-                    max-width: 100%;
-                    max-height: 100%;
+            /* Lists */
+            ol,
+            ul {
+                margin: var(--space-lg) 0;
+                padding-left: var(--space-2xl);
+            }
+
+            li {
+                margin-bottom: var(--space-md);
+                line-height: 1.8;
+                color: var(--color-base-text);
+            }
+
+            li strong {
+                color: var(--color-accent-2);
+                font-weight: var(--weight-semibold);
+            }
+
+            /* Links */
+            a {
+                color: var(--color-accent-1);
+                text-decoration: none;
+                transition: all 0.3s ease;
+            }
+
+            a:hover {
+                color: var(--color-accent-2);
+            }
+
+            /* Section Decorators */
+            .section-decorator {
+                width: 60px;
+                height: 3px;
+                background: var(--gradient-primary);
+                border-radius: var(--radius-full);
+                margin: var(--space-xl) 0;
+                opacity: 0;
+                animation: slideIn 0.6s ease forwards;
+            }
+
+            @keyframes slideIn {
+                to {
+                    opacity: 1;
+                    transform: translateX(0);
                 }
 
-                #sidebar {
-                    position: fixed;
-                    background-color: #1B80CF;
-                    top: 0;
-                    left: 0;
-                    bottom: 80vh;
-                    width: 100vw;
+                from {
+                    opacity: 0;
+                    transform: translateX(-20px);
+                }
+            }
+
+            /* Footer */
+            footer {
+                background: white;
+                border-radius: var(--radius-2xl);
+                padding: var(--space-2xl) var(--space-3xl);
+                box-shadow: var(--shadow-theme);
+                margin-top: var(--space-3xl);
+            }
+
+            footer h3 {
+                margin-top: 0;
+                margin-bottom: var(--space-lg);
+                color: var(--color-accent-2);
+            }
+
+            /* Language Selector */
+            .language-selector {
+                margin-top: var(--space-3xl);
+                padding-top: var(--space-2xl);
+                border-top: 2px solid var(--color-accent-light);
+            }
+
+            .language-selector h4 {
+                font-size: var(--text-base);
+                color: var(--color-base-text-muted);
+                margin-bottom: var(--space-md);
+                font-weight: var(--weight-medium);
+                text-transform: uppercase;
+                letter-spacing: 0.05em;
+            }
+
+            .language-links {
+                display: flex;
+                gap: var(--space-md);
+                flex-wrap: wrap;
+            }
+
+            .language-links a {
+                display: inline-block;
+                padding: var(--space-sm) var(--space-lg);
+                background: var(--color-accent-light);
+                color: var(--color-accent-1);
+                border-radius: var(--radius-full);
+                font-size: var(--text-sm);
+                font-weight: var(--weight-medium);
+                transition: all 0.3s ease;
+            }
+
+            .language-links a:hover {
+                background: var(--color-accent-1);
+                color: white;
+                transform: translateY(-2px);
+                box-shadow: var(--shadow-md);
+            }
+
+            /* ===== RESPONSIVE DESIGN ===== */
+            @media (max-width: 768px) {
+                .navbar {
+                    padding: var(--space-md);
                 }
 
-                #sidebar .title {
-                    text-align: center;
-                    position: fixed;
-                    margin-top: 6vh;
-                    left: 0px;
-                    right: 0px;
-                    line-height: 3.5vmax;
-                    font-size: 1.5vmax;
-                    font-family: 'Arial';
+                .navbar-content {
+                    flex-direction: column;
+                    gap: var(--space-md);
+                    align-items: flex-start;
                 }
 
-                #sidebar .subtitle {
-                    text-align: center;
-                    top: 5vh;
-                    left: 0px;
-                    right: 0px;
-                    position: fixed;
-                    margin-top: 10vh;
-                    font-size: 1.5vmax;
+                .hero {
+                    padding: var(--space-3xl) var(--space-md) var(--space-2xl);
+                    margin-top: 120px;
                 }
 
-                #sidebar .title a:link,
-                #sidebar .title a:visited {
-                    text-align: center;
-                    color: #FFFFFF;
+                .hero-content {
+                    grid-template-columns: 1fr;
+                    gap: var(--space-2xl);
                 }
 
-                #sidebar .subtitle a:link,
-                #sidebar .subtitle a:visited {
-                    text-align: center;
-                    color: #FFFFFF;
+                .hero-svg {
+                    order: -1;
                 }
 
-                .home {
-                    z-index: 100;
-                    width: 100%;
-                    background-color: #1B80CF;
-                    font-size: 1.5vmax;
+                .container {
+                    padding: var(--space-2xl) var(--space-md);
                 }
 
-                .home a:link,
-                .home a:visited {
-                    text-decoration: none;
-                    color: #FFFFFF;
+                article {
+                    padding: var(--space-xl) var(--space-lg);
                 }
 
-                .content {
-                    line-height: 3.8vmax;
-                    font-size: 1.8vmax;
-                    font-family: 'Arial';
-                    margin-top: 22vh;
+                footer {
+                    padding: var(--space-xl) var(--space-lg);
                 }
 
-                .content a:link,
-                .content a:visited {
-                    color: #1B80CF;
+                .language-links {
+                    gap: var(--space-sm);
+                }
+            }
+
+            /* ===== ACCESSIBILITY ===== */
+            @media (prefers-reduced-motion: reduce) {
+
+                *,
+                *::before,
+                *::after {
+                    animation-duration: 0.01ms !important;
+                    animation-iteration-count: 1 !important;
+                    transition-duration: 0.01ms !important;
+                }
+            }
+
+            /* Focus Styles */
+            a:focus,
+            button:focus {
+                outline: 3px solid var(--color-accent-1);
+                outline-offset: 2px;
+                border-radius: var(--radius-sm);
+            }
+
+            /* ===== SVG ANIMATIONS ===== */
+            .data-viz circle {
+                animation: pulse 3s ease-in-out infinite;
+            }
+
+            .data-viz circle:nth-child(2) {
+                animation-delay: 0.5s;
+            }
+
+            .data-viz circle:nth-child(3) {
+                animation-delay: 1s;
+            }
+
+            @keyframes pulse {
+
+                0%,
+                100% {
+                    opacity: 0.6;
+                    transform: scale(1);
                 }
 
-                .page {
-                    top: 40vh;
-                    width: 95%;
-                    margin-left: 0vw;
+                50% {
+                    opacity: 1;
+                    transform: scale(1.1);
+                }
+            }
+
+            .data-viz line {
+                animation: draw 4s ease-in-out infinite;
+            }
+
+            @keyframes draw {
+
+                0%,
+                100% {
+                    stroke-dashoffset: 0;
                 }
 
-                .page img {
-                    max-width: 100%;
-                    max-height: 100%;
-                    border: 0;
+                50% {
+                    stroke-dashoffset: 200;
+                }
+            }
+
+            .data-viz path {
+                animation: float 6s ease-in-out infinite;
+            }
+
+            @keyframes float {
+
+                0%,
+                100% {
+                    transform: translateY(0);
+                }
+
+                50% {
+                    transform: translateY(-10px);
                 }
             }
         </style>
     </head>
 
     <body vocab="http://schema.org/">
-        <div class="page">
-            <div class="home">
-                <ul typeof="BreadcrumbList">
+        <!-- Navigation Bar -->
+        <nav class="navbar" role="navigation" aria-label="Main navigation">
+            <div class="navbar-content">
+                <a href="../about.html" class="site-name">John Samuel</a>
+                <ul class="breadcrumb" typeof="BreadcrumbList">
                     <li property="itemListElement" typeof="ListItem">
                         <a property="item" typeof="WebPage" href="../index.html">
                             <span property="name">Home</span>
@@ -269,162 +606,226 @@
                         </a>
                     </li>
                 </ul>
-
             </div>
-            <div id="sidebar">
-                <div class="title">
-                    <h1><a href="./data-analysis.html">Data Analysis</a></h1>
+        </nav>
+
+        <!-- Hero Section -->
+        <header class="hero">
+            <div class="hero-content">
+                <div class="hero-text">
+                    <h1>Data Analysis</h1>
+                    <p class="subtitle">Transforming Raw Data into Actionable Insights</p>
+                    <p class="author">by <a href="../about.html">John Samuel</a></p>
                 </div>
-                <div class="subtitle">
-                    <h3><a href="../about.html">John Samuel</a></h3>
+                <div class="hero-svg">
+                    <svg width="400" height="400" viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg"
+                        aria-hidden="true">
+                        <defs>
+                            <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" style="stop-color:rgba(255,255,255,0.9);stop-opacity:1" />
+                                <stop offset="100%" style="stop-color:rgba(255,255,255,0.6);stop-opacity:1" />
+                            </linearGradient>
+                            <filter id="glow">
+                                <feGaussianBlur stdDeviation="4" result="coloredBlur" />
+                                <feMerge>
+                                    <feMergeNode in="coloredBlur" />
+                                    <feMergeNode in="SourceGraphic" />
+                                </feMerge>
+                            </filter>
+                        </defs>
+
+                        <!-- Data Network Visualization -->
+                        <g class="data-viz" filter="url(#glow)">
+                            <!-- Connection Lines -->
+                            <line x1="200" y1="100" x2="150" y2="200" stroke="rgba(255,255,255,0.6)" stroke-width="2"
+                                stroke-dasharray="5,5" />
+                            <line x1="200" y1="100" x2="250" y2="200" stroke="rgba(255,255,255,0.6)" stroke-width="2"
+                                stroke-dasharray="5,5" />
+                            <line x1="150" y1="200" x2="100" y2="300" stroke="rgba(255,255,255,0.6)" stroke-width="2"
+                                stroke-dasharray="5,5" />
+                            <line x1="150" y1="200" x2="200" y2="300" stroke="rgba(255,255,255,0.6)" stroke-width="2"
+                                stroke-dasharray="5,5" />
+                            <line x1="250" y1="200" x2="200" y2="300" stroke="rgba(255,255,255,0.6)" stroke-width="2"
+                                stroke-dasharray="5,5" />
+                            <line x1="250" y1="200" x2="300" y2="300" stroke="rgba(255,255,255,0.6)" stroke-width="2"
+                                stroke-dasharray="5,5" />
+
+                            <!-- Data Nodes -->
+                            <circle cx="200" cy="100" r="20" fill="url(#grad1)" opacity="0.8" />
+                            <circle cx="150" cy="200" r="16" fill="url(#grad1)" opacity="0.8" />
+                            <circle cx="250" cy="200" r="16" fill="url(#grad1)" opacity="0.8" />
+                            <circle cx="100" cy="300" r="14" fill="url(#grad1)" opacity="0.8" />
+                            <circle cx="200" cy="300" r="14" fill="url(#grad1)" opacity="0.8" />
+                            <circle cx="300" cy="300" r="14" fill="url(#grad1)" opacity="0.8" />
+
+                            <!-- Data Flow Arrows -->
+                            <path d="M 80 150 Q 100 180 120 150" stroke="rgba(255,255,255,0.7)" stroke-width="2"
+                                fill="none" />
+                            <path d="M 320 150 Q 300 180 280 150" stroke="rgba(255,255,255,0.7)" stroke-width="2"
+                                fill="none" />
+
+                            <!-- Central Analysis Symbol -->
+                            <circle cx="200" cy="200" r="35" fill="none" stroke="rgba(255,255,255,0.5)"
+                                stroke-width="2" />
+                            <circle cx="200" cy="200" r="25" fill="rgba(255,255,255,0.2)" />
+
+                            <!-- Chart Bars -->
+                            <rect x="180" y="340" width="8" height="40" fill="rgba(255,255,255,0.7)" rx="2" />
+                            <rect x="195" y="330" width="8" height="50" fill="rgba(255,255,255,0.8)" rx="2" />
+                            <rect x="210" y="320" width="8" height="60" fill="rgba(255,255,255,0.9)" rx="2" />
+                        </g>
+                    </svg>
                 </div>
             </div>
+        </header>
 
-            <div class="content">
-                <div
-                    style="background-color: #f0f8ff; border-left: 4px solid #1e90ff; padding: 1em; margin-bottom: 1.5em;">
-                    <strong>This article is part of a series on <a href="./data-science.html">Data
-                            Science</a>.</strong>
-                </div>
-                <article>
-                    <header>
-                        <h3>Introduction to Data Analysis</h3>
-                        <p>Data analysis is the systematic process of inspecting, cleaning, transforming, and modeling
-                            data to discover useful insights, inform conclusions, and support decision-making. It plays
-                            a vital role across domains such as business, science, and social science.</p>
-                    </header>
-
-                    <section>
-                        <h3>Core Activities in Data Analysis</h3>
-                        <p>Data analysis includes a variety of operations aimed at preparing, transforming, and
-                            understanding data:</p>
-                        <ol>
-                            <li><strong>Value Retrieval:</strong> Extract relevant data from various sources for
-                                analysis.</li>
-                            <li><strong>Filtering:</strong> Select specific data based on predefined criteria to reduce
-                                volume and focus on relevant subsets.</li>
-                            <li><strong>Derived Value Calculation:</strong> Create new variables through calculations
-                                based on existing data (e.g., profit = revenue - cost).</li>
-                            <li><strong>Finding Extremes:</strong> Identify maximum and minimum values in a dataset.
-                            </li>
-                            <li><strong>Sorting:</strong> Arrange data in a specific order (ascending/descending).</li>
-                            <li><strong>Threshold Determination:</strong> Establish limits to define or highlight
-                                certain conditions (e.g., high-risk thresholds).</li>
-                            <li><strong>Distribution Characterization:</strong> Analyze how data values are distributed
-                                using statistical measures (e.g., skewness, kurtosis).</li>
-                            <li><strong>Anomaly Detection:</strong> Identify outliers or unusual patterns that may
-                                indicate errors or significant events.</li>
-                            <li><strong>Clustering:</strong> Group similar data points to uncover structures, segments,
-                                or trends.</li>
-                            <li><strong>Correlation Analysis:</strong> Examine relationships between variables (e.g.,
-                                using Pearson or Spearman coefficients).</li>
-                            <li><strong>Contextualization:</strong> Interpret data within its broader context for deeper
-                                understanding (e.g., time, location, or demographics).</li>
-                        </ol>
-                    </section>
-
-                    <section>
-                        <h3>Data Analysis Frameworks and Tools</h3>
-                        <p>Several tools and frameworks facilitate data analysis workflows:</p>
-                        <ul>
-                            <li><a href="https://pandas.pydata.org/">Pandas</a>: Data manipulation and analysis in
-                                Python</li>
-                            <li><a href="https://scikit-learn.org/">Scikit-learn</a>: Machine learning and data mining
-                                library</li>
-                            <li><a href="https://spark.apache.org/">Apache Spark</a>: Big data processing engine</li>
-                        </ul>
-                    </section>
-
-
-                    <section>
-                        <h3>Models of Analysis</h3>
-                        <p>Data analysis can be structured into three conceptual levels:</p>
-                        <ul>
-                            <li><strong>Conceptual Models:</strong> High-level representations of data and relationships
-                                (e.g., ER diagrams).</li>
-                            <li><strong>Logical Models:</strong> Descriptions of data structures and constraints without
-                                implementation details.</li>
-                            <li><strong>Physical Models:</strong> Actual implementation of the database schema using
-                                specific technologies.</li>
-                        </ul>
-                    </section>
-
-                    <section>
-                        <h3>Exploratory Data Analysis (EDA)</h3>
-                        <p>Exploratory Data Analysis is an initial step in data analysis where analysts use statistical
-                            techniques and visualization tools to summarize the main characteristics of data sets.</p>
-                        <p>Typical EDA methods include:</p>
-                        <ul>
-                            <li>Histograms and box plots to examine distributions</li>
-                            <li>Scatter plots to investigate relationships</li>
-                            <li>Summary statistics such as mean, median, and standard deviation</li>
-                        </ul>
-                        <p>These tools help reveal patterns, detect anomalies, test assumptions, and generate hypotheses
-                            for further analysis.</p>
-                    </section>
-
-                    <section>
-                        <h3>Data Mining</h3>
-                        <p>Data mining involves discovering patterns, correlations, and trends in large data sets using
-                            statistical and computational methods. It is a key step in knowledge discovery in databases
-                            (KDD).</p>
-                        <p>Common tools and techniques include:</p>
-                        <ul>
-                            <li>Association rule learning (e.g., Apriori algorithm)</li>
-                            <li>Clustering methods (e.g., K-means, DBSCAN)</li>
-                            <li>Classification algorithms (e.g., decision trees, random forests)</li>
-                        </ul>
-                    </section>
-
-                    <section>
-                        <h3>Multiverse Analysis</h3>
-                        <p>Multiverse analysis refers to the systematic exploration of all reasonable analytical choices
-                            that can be made when analyzing a dataset. It acknowledges that different preprocessing,
-                            filtering, or modeling decisions can yield different outcomes—effectively producing a
-                            “multiverse” of possible results.</p>
-                        <p>Originally proposed in the psychological sciences to improve transparency and
-                            reproducibility, this approach is increasingly relevant in data science where complex
-                            pipelines can yield varied interpretations.</p>
-                    </section>
-
-
-                    <section>
-                        <h3>Related Works</h3>
-                        <ol>
-                            <li><a href="./six-w-one-h-analysis.html">Six W One H Analysis</a></li>
-                            <li><a href="./data-mining.html">Data Mining</a></li>
-                        </ol>
-                    </section>
-                    <footer>
-                        <h3>References</h3>
-                        <ol>
-                            <li id="analysis"><a href="https://en.wikipedia.org/wiki/Data_analysis">Data
-                                    Analysis</a>
-                                (Wikipedia)</li>
-                            <li><a href="https://en.wikipedia.org/wiki/Exploratory_data_analysis">Exploratory Data
-                                    Analysis</a> (Wikipedia)</li>
-                            <li><a href="https://en.wikipedia.org/wiki/Data_mining">Data Mining</a> (Wikipedia)</li>
-                            <li id="multiverse"><a href="https://doi.org/10.1177/1745691616658637">Steegen, S. et
-                                    al.,
-                                    “Multiverse Analysis” (2016)</a></li>
-                            <li><a href="https://pandas.pydata.org/">Pandas Documentation</a></li>
-                            <li><a href="https://scikit-learn.org/">Scikit-learn Documentation</a></li>
-                            <li><a href="https://spark.apache.org/">Apache Spark Documentation</a></li>
-                            <li>Steegen, Sara, et al. “Increasing Transparency Through a Multiverse Analysis.”
-                                <em>Perspectives on Psychological Science</em>, vol. 11, no. 5, Sept. 2016, pp.
-                                702–12.
-                                DOI:
-                                <a href="https://doi.org/10.1177/1745691616658637">10.1177/1745691616658637</a>.
-                            </li>
-                        </ol>
-                    </footer>
-                </article>
-
+        <!-- Main Content -->
+        <main id="main-content" class="container">
+            <div class="context-banner">
+                <strong>This article is part of a series on <a href="./data-science.html">Data Science</a>.</strong>
             </div>
 
-            <br />
+            <article>
+                <header>
+                    <h3>Introduction to Data Analysis</h3>
+                    <p>Data analysis is the systematic process of inspecting, cleaning, transforming, and modeling data
+                        to discover useful insights, inform conclusions, and support decision-making. It plays a vital
+                        role across domains such as business, science, and social science.</p>
+                </header>
 
-        </div>
+                <section>
+                    <h3>Core Activities in Data Analysis</h3>
+                    <div class="section-decorator"></div>
+                    <p>Data analysis includes a variety of operations aimed at preparing, transforming, and
+                        understanding data:</p>
+                    <ol>
+                        <li><strong>Value Retrieval:</strong> Extract relevant data from various sources for analysis.
+                        </li>
+                        <li><strong>Filtering:</strong> Select specific data based on predefined criteria to reduce
+                            volume and focus on relevant subsets.</li>
+                        <li><strong>Derived Value Calculation:</strong> Create new variables through calculations based
+                            on existing data (e.g., profit = revenue - cost).</li>
+                        <li><strong>Finding Extremes:</strong> Identify maximum and minimum values in a dataset.</li>
+                        <li><strong>Sorting:</strong> Arrange data in a specific order (ascending/descending).</li>
+                        <li><strong>Threshold Determination:</strong> Establish limits to define or highlight certain
+                            conditions (e.g., high-risk thresholds).</li>
+                        <li><strong>Distribution Characterization:</strong> Analyze how data values are distributed
+                            using statistical measures (e.g., skewness, kurtosis).</li>
+                        <li><strong>Anomaly Detection:</strong> Identify outliers or unusual patterns that may indicate
+                            errors or significant events.</li>
+                        <li><strong>Clustering:</strong> Group similar data points to uncover structures, segments, or
+                            trends.</li>
+                        <li><strong>Correlation Analysis:</strong> Examine relationships between variables (e.g., using
+                            Pearson or Spearman coefficients).</li>
+                        <li><strong>Contextualization:</strong> Interpret data within its broader context for deeper
+                            understanding (e.g., time, location, or demographics).</li>
+                    </ol>
+                </section>
+
+                <section>
+                    <h3>Data Analysis Frameworks and Tools</h3>
+                    <div class="section-decorator"></div>
+                    <p>Several tools and frameworks facilitate data analysis workflows:</p>
+                    <ul>
+                        <li><a href="https://pandas.pydata.org/">Pandas</a>: Data manipulation and analysis in Python
+                        </li>
+                        <li><a href="https://scikit-learn.org/">Scikit-learn</a>: Machine learning and data mining
+                            library</li>
+                        <li><a href="https://spark.apache.org/">Apache Spark</a>: Big data processing engine</li>
+                    </ul>
+                </section>
+
+                <section>
+                    <h3>Models of Analysis</h3>
+                    <div class="section-decorator"></div>
+                    <p>Data analysis can be structured into three conceptual levels:</p>
+                    <ul>
+                        <li><strong>Conceptual Models:</strong> High-level representations of data and relationships
+                            (e.g., ER diagrams).</li>
+                        <li><strong>Logical Models:</strong> Descriptions of data structures and constraints without
+                            implementation details.</li>
+                        <li><strong>Physical Models:</strong> Actual implementation of the database schema using
+                            specific technologies.</li>
+                    </ul>
+                </section>
+
+                <section>
+                    <h3>Exploratory Data Analysis (EDA)</h3>
+                    <div class="section-decorator"></div>
+                    <p>Exploratory Data Analysis is an initial step in data analysis where analysts use statistical
+                        techniques and visualization tools to summarize the main characteristics of data sets.</p>
+                    <p>Typical EDA methods include:</p>
+                    <ul>
+                        <li>Histograms and box plots to examine distributions</li>
+                        <li>Scatter plots to investigate relationships</li>
+                        <li>Summary statistics such as mean, median, and standard deviation</li>
+                    </ul>
+                    <p>These tools help reveal patterns, detect anomalies, test assumptions, and generate hypotheses for
+                        further analysis.</p>
+                </section>
+
+                <section>
+                    <h3>Data Mining</h3>
+                    <div class="section-decorator"></div>
+                    <p>Data mining involves discovering patterns, correlations, and trends in large data sets using
+                        statistical and computational methods. It is a key step in knowledge discovery in databases
+                        (KDD).</p>
+                    <p>Common tools and techniques include:</p>
+                    <ul>
+                        <li>Association rule learning (e.g., Apriori algorithm)</li>
+                        <li>Clustering methods (e.g., K-means, DBSCAN)</li>
+                        <li>Classification algorithms (e.g., decision trees, random forests)</li>
+                    </ul>
+                </section>
+
+                <section>
+                    <h3>Multiverse Analysis</h3>
+                    <div class="section-decorator"></div>
+                    <p>Multiverse analysis refers to the systematic exploration of all reasonable analytical choices
+                        that can be made when analyzing a dataset. It acknowledges that different preprocessing,
+                        filtering, or modeling decisions can yield different outcomes—effectively producing a
+                        "multiverse" of possible results.</p>
+                    <p>Originally proposed in the psychological sciences to improve transparency and reproducibility,
+                        this approach is increasingly relevant in data science where complex pipelines can yield varied
+                        interpretations.</p>
+                </section>
+
+                <section>
+                    <h3>Related Works</h3>
+                    <div class="section-decorator"></div>
+                    <ol>
+                        <li><a href="./six-w-one-h-analysis.html">Six W One H Analysis</a></li>
+                        <li><a href="./data-mining.html">Data Mining</a></li>
+                    </ol>
+                </section>
+            </article>
+
+            <footer>
+                <h3>References</h3>
+                <ol>
+                    <li id="analysis"><a href="https://en.wikipedia.org/wiki/Data_analysis">Data Analysis</a>
+                        (Wikipedia)</li>
+                    <li><a href="https://en.wikipedia.org/wiki/Exploratory_data_analysis">Exploratory Data Analysis</a>
+                        (Wikipedia)</li>
+                    <li><a href="https://en.wikipedia.org/wiki/Data_mining">Data Mining</a> (Wikipedia)</li>
+                    <li id="multiverse"><a href="https://doi.org/10.1177/1745691616658637">Steegen, S. et al.,
+                            "Multiverse Analysis" (2016)</a></li>
+                    <li><a href="https://pandas.pydata.org/">Pandas Documentation</a></li>
+                    <li><a href="https://scikit-learn.org/">Scikit-learn Documentation</a></li>
+                    <li><a href="https://spark.apache.org/">Apache Spark Documentation</a></li>
+                    <li>Steegen, Sara, et al. "Increasing Transparency Through a Multiverse Analysis." <em>Perspectives
+                            on Psychological Science</em>, vol. 11, no. 5, Sept. 2016, pp. 702–12. DOI: <a
+                            href="https://doi.org/10.1177/1745691616658637">10.1177/1745691616658637</a>.</li>
+                </ol>
+
+                <div class="language-selector">
+                    <h4>Languages</h4>
+                    <div class="language-links">
+                        <a href="./data-analysis.html" hreflang="en">English</a>
+                    </div>
+                </div>
+            </footer>
+        </main>
     </body>
 
 </html>

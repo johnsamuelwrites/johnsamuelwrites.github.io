@@ -2,203 +2,471 @@
 <html lang="en">
 
     <head>
-        <meta charset="utf-8" />
-        <meta http-equiv="Content-Language" content="en" />
-        <link rel="shortcut icon" href="../../images/logo/favicon.png" />
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta http-equiv="Content-Language" content="en">
+        <link rel="shortcut icon" href="../../images/logo/favicon.png">
         <title>Data Cleaning: John Samuel</title>
-        <style type="text/css">
-            body {
-                background-color: #FFFFFF;
+        <style>
+            /* ===== CSS CUSTOM PROPERTIES (DESIGN TOKENS) ===== */
+            :root {
+                /* Base Colors - Light Theme Foundation */
+                --color-base-bg: #f7f9fc;
+                --color-base-surface: #ffffff;
+                --color-base-text: #1a202c;
+                --color-base-text-muted: #4a5568;
+
+                /* Data Cleaning Theme Accents - Purification & Refinement */
+                --color-accent-1: #2dd4bf;
+                --color-accent-2: #0d9488;
+                --color-accent-3: #6366f1;
+                --color-accent-light: #ccfbf1;
+
+                /* Functional Colors */
+                --color-shadow: rgba(45, 212, 191, 0.12);
+                --color-border: rgba(45, 212, 191, 0.15);
+                --color-hover: rgba(45, 212, 191, 0.08);
+
+                /* Error/Warning Colors */
+                --color-error: #ef4444;
+                --color-warning: #f59e0b;
+                --color-success: #10b981;
+
+                /* Gradients */
+                --gradient-primary: linear-gradient(135deg, #2dd4bf 0%, #6366f1 100%);
+                --gradient-subtle: linear-gradient(180deg, #f7f9fc 0%, #ccfbf1 100%);
+                --gradient-hero: linear-gradient(135deg, #2dd4bf 0%, #6366f1 50%, #0d9488 100%);
+
+                /* Spacing Scale */
+                --space-xs: 0.25rem;
+                --space-sm: 0.5rem;
+                --space-md: 1rem;
+                --space-lg: 1.5rem;
+                --space-xl: 2rem;
+                --space-2xl: 3rem;
+                --space-3xl: 4rem;
+                --space-4xl: 6rem;
+
+                /* Border Radius */
+                --radius-sm: 4px;
+                --radius-md: 8px;
+                --radius-lg: 12px;
+                --radius-xl: 16px;
+                --radius-2xl: 24px;
+                --radius-full: 9999px;
+
+                /* Shadows */
+                --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.04), 0 1px 3px rgba(0, 0, 0, 0.06);
+                --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.05), 0 2px 4px rgba(0, 0, 0, 0.06);
+                --shadow-lg: 0 10px 24px rgba(0, 0, 0, 0.08), 0 4px 8px rgba(0, 0, 0, 0.06);
+                --shadow-xl: 0 20px 40px rgba(0, 0, 0, 0.12), 0 8px 16px rgba(0, 0, 0, 0.08);
+                --shadow-theme: 0 10px 30px var(--color-shadow), 0 4px 10px rgba(0, 0, 0, 0.06);
+
+                /* Typography */
+                --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+                --font-mono: 'SF Mono', Monaco, 'Cascadia Code', Consolas, 'Courier New', monospace;
+                --text-xs: clamp(0.75rem, 0.7rem + 0.25vw, 0.875rem);
+                --text-sm: clamp(0.875rem, 0.8rem + 0.35vw, 1rem);
+                --text-base: clamp(1rem, 0.95rem + 0.25vw, 1.125rem);
+                --text-lg: clamp(1.125rem, 1.05rem + 0.35vw, 1.25rem);
+                --text-xl: clamp(1.25rem, 1.15rem + 0.5vw, 1.5rem);
+                --text-2xl: clamp(1.5rem, 1.3rem + 1vw, 2rem);
+                --text-3xl: clamp(2rem, 1.6rem + 2vw, 2.5rem);
+                --text-4xl: clamp(2.5rem, 2rem + 2.5vw, 3.5rem);
+
+                /* Weights */
+                --weight-normal: 400;
+                --weight-medium: 500;
+                --weight-semibold: 600;
+                --weight-bold: 700;
             }
 
-            #sidebar {
-                position: fixed;
-                background-color: #1B80CF;
-                top: 0;
-                left: 0;
-                bottom: 0;
-                width: 30vw;
-            }
-
-            #sidebar .title {
-                position: relative;
-                text-align: center;
-                line-height: 4vmax;
-                font-size: 1.4vmax;
-                font-family: 'Arial';
-                margin-top: 25vh;
-            }
-
-            #sidebar .title a:link,
-            #sidebar .title a:visited {
-                color: #FFFFFF;
-                text-decoration: none;
-            }
-
-            .subtitle {
-                top: 50vh;
-                text-align: center;
-                line-height: 1.3vmax;
-                font-family: 'Arial';
-                font-size: 1.5vmax;
-                color: #FFFFFF;
-            }
-
-            .subtitle a:link,
-            .subtitle a:visited {
-                color: #FFFFFF;
-                text-decoration: none;
-            }
-
-            .licence {
-                position: fixed;
-                text-align: right;
-                bottom: 0;
-                right: 0;
-            }
-
-            .home {
-                position: fixed;
-                text-align: left;
-                font-family: 'Arial';
-                color: #D3D3D3;
-                z-index: 100;
-                width: 100%;
-                background-color: #FFFFFF;
-                top: 0px;
-                margin-bottom: 10px;
-                padding-bottom: 10px;
-            }
-
-            .home a:link,
-            .home a:visited {
-                text-decoration: none;
-                color: #D3D3D3;
-            }
-
-            .home ul {
+            /* ===== RESET & BASE STYLES ===== */
+            *,
+            *::before,
+            *::after {
+                box-sizing: border-box;
                 margin: 0;
                 padding: 0;
-                text-align: left;
-                list-style: none;
             }
 
-            .home li {
-                position: relative;
-                float: left;
-                padding-top: 15px;
-                margin-right: 1em;
-                font-family: 'Arial';
+            html {
+                scroll-behavior: smooth;
+                scroll-padding-top: 100px;
             }
 
-            .home li:hover {
-                display: block;
+            body {
+                font-family: var(--font-sans);
+                font-size: var(--text-base);
+                line-height: 1.7;
+                color: var(--color-base-text);
+                background: var(--gradient-subtle);
+                background-attachment: fixed;
+                min-height: 100vh;
+                letter-spacing: -0.005em;
             }
 
-            .home a:link,
-            .home a:visited {
-                color: #D3D3D3;
+            /* ===== NAVIGATION BAR ===== */
+            .navbar {
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                background: rgba(255, 255, 255, 0.85);
+                -webkit-backdrop-filter: blur(12px) saturate(180%);
+                backdrop-filter: blur(12px) saturate(180%);
+                border-bottom: 1px solid var(--color-border);
+                box-shadow: var(--shadow-md);
+                z-index: 100;
+                padding: var(--space-md) var(--space-xl);
             }
 
-            .home li:hover a:link,
-            .home li:hover a:visited {
+            .navbar-content {
+                max-width: 1400px;
+                margin: 0 auto;
+                display: flex;
+                align-items: center;
+                gap: var(--space-xl);
+            }
+
+            .site-name {
+                font-size: var(--text-xl);
+                font-weight: var(--weight-bold);
+                color: var(--color-accent-1);
                 text-decoration: none;
-                padding: 15px;
-                color: #FFFFFF;
-                background-color: #1B80CF;
+                padding: var(--space-sm) var(--space-md);
+                background: var(--gradient-primary);
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                background-clip: text;
+                transition: all 0.3s ease;
             }
 
-            .content {
-                line-height: 1.8vmax;
-                font-size: 1.2vmax;
-                font-family: 'Arial';
-                margin-top: 15vh;
-                width: 90%;
+            .site-name:hover {
+                transform: translateY(-2px);
             }
 
-            .content h2,
+            .breadcrumb {
+                display: flex;
+                list-style: none;
+                gap: var(--space-sm);
+                flex-wrap: wrap;
+                align-items: center;
+            }
+
+            .breadcrumb li {
+                display: flex;
+                align-items: center;
+                gap: var(--space-sm);
+            }
+
+            .breadcrumb li:not(:last-child)::after {
+                content: '→';
+                color: var(--color-base-text-muted);
+                font-size: var(--text-sm);
+            }
+
+            .breadcrumb a {
+                color: var(--color-base-text-muted);
+                text-decoration: none;
+                font-size: var(--text-sm);
+                transition: color 0.3s ease;
+            }
+
+            .breadcrumb a:hover {
+                color: var(--color-accent-1);
+            }
+
+            /* ===== HERO SECTION ===== */
+            .hero {
+                margin-top: 80px;
+                padding: var(--space-4xl) var(--space-xl) var(--space-3xl);
+                background: var(--gradient-hero);
+                background-size: 200% 200%;
+                animation: gradientShift 12s ease infinite;
+                position: relative;
+                overflow: hidden;
+            }
+
+            @keyframes gradientShift {
+
+                0%,
+                100% {
+                    background-position: 0% 50%;
+                }
+
+                50% {
+                    background-position: 100% 50%;
+                }
+            }
+
+            .hero::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background-image:
+                    radial-gradient(circle at 20% 30%, rgba(255, 255, 255, 0.1) 0%, transparent 50%),
+                    radial-gradient(circle at 80% 70%, rgba(255, 255, 255, 0.08) 0%, transparent 50%);
+                pointer-events: none;
+            }
+
+            .hero-content {
+                max-width: 1400px;
+                margin: 0 auto;
+                position: relative;
+                z-index: 1;
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: var(--space-3xl);
+                align-items: center;
+            }
+
+            .hero-text h1 {
+                font-size: var(--text-4xl);
+                font-weight: var(--weight-bold);
+                color: white;
+                margin-bottom: var(--space-lg);
+                letter-spacing: -0.03em;
+                line-height: 1.2;
+            }
+
+            .hero-text .subtitle {
+                font-size: var(--text-lg);
+                color: rgba(255, 255, 255, 0.9);
+                margin-bottom: var(--space-md);
+            }
+
+            .hero-text .author {
+                font-size: var(--text-base);
+                color: rgba(255, 255, 255, 0.8);
+            }
+
+            .hero-text .author a {
+                color: white;
+                text-decoration: none;
+                border-bottom: 2px solid rgba(255, 255, 255, 0.4);
+                transition: border-color 0.3s ease;
+            }
+
+            .hero-text .author a:hover {
+                border-color: white;
+            }
+
+            .hero-svg {
+                display: flex;
+                justify-content: center;
+                align-items: center;
+            }
+
+            /* ===== MAIN CONTENT ===== */
+            .container {
+                max-width: 1400px;
+                margin: 0 auto;
+                padding: var(--space-3xl) var(--space-xl);
+            }
+
+            /* Context Banner */
+            .context-banner {
+                background: linear-gradient(135deg, rgba(45, 212, 191, 0.1) 0%, rgba(99, 102, 241, 0.1) 100%);
+                border-left: 4px solid var(--color-accent-1);
+                padding: var(--space-lg);
+                border-radius: var(--radius-lg);
+                margin-bottom: var(--space-3xl);
+                box-shadow: var(--shadow-md);
+            }
+
+            .context-banner strong {
+                color: var(--color-accent-2);
+                font-weight: var(--weight-semibold);
+            }
+
+            .context-banner a {
+                color: var(--color-accent-1);
+                text-decoration: none;
+                border-bottom: 2px solid transparent;
+                transition: border-color 0.3s ease;
+            }
+
+            .context-banner a:hover {
+                border-color: var(--color-accent-1);
+            }
+
+            /* Article Sections */
+            article {
+                background: white;
+                border-radius: var(--radius-2xl);
+                padding: var(--space-3xl);
+                box-shadow: var(--shadow-theme);
+                margin-bottom: var(--space-2xl);
+            }
+
+            h2,
             h3,
             h4 {
-                color: #1B80CF;
+                color: var(--color-accent-2);
+                font-weight: var(--weight-bold);
+                margin-top: var(--space-2xl);
+                margin-bottom: var(--space-lg);
+                position: relative;
             }
 
-            .content a:link,
-            .content a:visited {
-                color: #1B80CF;
+            h2 {
+                font-size: var(--text-3xl);
+                letter-spacing: -0.02em;
+                padding-bottom: var(--space-md);
+                border-bottom: 2px solid var(--color-accent-light);
             }
 
-            .content h3 {
-                color: #1B80CF;
+            h2::after {
+                content: '';
+                position: absolute;
+                bottom: -2px;
+                left: 0;
+                width: 100px;
+                height: 2px;
+                background: var(--gradient-primary);
+                border-radius: var(--radius-full);
             }
 
-            .content h2::before,
-            .content h3::before {
-                display: block;
-                content: " ";
-                visibility: hidden;
-                height: 50px;
-                margin-top: -50px;
-                pointer-events: none;
-                background-color: #FFFFFF;
+            h3 {
+                font-size: var(--text-2xl);
+                letter-spacing: -0.01em;
             }
 
-            .content a:link,
-            .content a:visited {
-                color: #1B80CF;
+            h4 {
+                font-size: var(--text-xl);
             }
 
-            .content li {
-                margin: 5px;
+            section {
+                margin-bottom: var(--space-3xl);
             }
 
-            .page {
-                width: 65vw;
-                height: 100%;
-                margin-left: 30vw;
-                overflow: hidden;
-                padding: 0 1em;
-                font-family: 'Arial';
+            p {
+                margin-bottom: var(--space-lg);
+                line-height: 1.8;
+                color: var(--color-base-text);
             }
 
-            .page img {
-                max-width: 100%;
-                max-height: 100%;
+            /* Lists */
+            ol,
+            ul {
+                margin: var(--space-lg) 0;
+                padding-left: var(--space-2xl);
             }
 
-            .arrow {
-                font-size: 1.2em;
-                vertical-align: middle;
-                margin: 0 5px;
+            li {
+                margin-bottom: var(--space-md);
+                line-height: 1.8;
+                color: var(--color-base-text);
             }
 
-            .block {
-                margin-bottom: 10px;
+            li b,
+            li strong {
+                color: var(--color-accent-2);
+                font-weight: var(--weight-semibold);
             }
 
+            li i {
+                color: var(--color-base-text-muted);
+                font-style: italic;
+            }
+
+            /* Links */
+            a {
+                color: var(--color-accent-1);
+                text-decoration: none;
+                transition: all 0.3s ease;
+            }
+
+            a:hover {
+                color: var(--color-accent-2);
+            }
+
+            /* Code Elements */
+            code {
+                background: var(--color-accent-light);
+                color: var(--color-accent-2);
+                padding: var(--space-xs) var(--space-sm);
+                border-radius: var(--radius-sm);
+                font-family: var(--font-mono);
+                font-size: 0.9em;
+            }
+
+            /* Code Blocks */
             pre {
-                background-color: #f4f4f4;
-                padding: 15px;
-                border-radius: 5px;
-                font-family: 'Courier New', Courier, monospace;
-                font-size: 16px;
-                line-height: 22px;
+                background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+                color: #e2e8f0;
+                padding: var(--space-xl);
+                border-radius: var(--radius-lg);
                 overflow-x: auto;
+                font-family: var(--font-mono);
+                font-size: var(--text-sm);
+                line-height: 1.6;
+                margin: var(--space-xl) 0;
+                box-shadow: var(--shadow-lg);
+                border: 1px solid rgba(45, 212, 191, 0.2);
             }
 
+            pre code {
+                background: none;
+                padding: 0;
+                color: inherit;
+            }
+
+            /* Code Syntax Highlighting */
             .tag {
-                color: #800000;
-                /* Dark Red */
+                color: #f472b6;
                 font-weight: bold;
             }
 
             .attribute-name {
-                color: #FF0000;
-                /* Red */
+                color: #fbbf24;
             }
 
             .attribute-value {
-                color: #0000FF;
-                /* Blue */
+                color: #60a5fa;
+            }
+
+            .operator {
+                color: #94a3b8;
+            }
+
+            .keyword {
+                color: #c084fc;
+                font-weight: bold;
+            }
+
+            .string {
+                color: #86efac;
+            }
+
+            .comment {
+                color: #64748b;
+                font-style: italic;
+            }
+
+            .function {
+                color: #38bdf8;
+            }
+
+            .variable {
+                color: #fcd34d;
+            }
+
+            .number {
+                color: #fb923c;
+            }
+
+            .builtin {
+                color: #f472b6;
+                font-weight: bold;
+            }
+
+            .none {
+                color: #f87171;
             }
 
             .indent-1 {
@@ -221,140 +489,278 @@
                 margin-left: 100px;
             }
 
-            .keyword {
-                color: #0000FF;
-                /* Blue */
-                font-weight: bold;
+            /* Tables */
+            table {
+                width: 100%;
+                border-collapse: collapse;
+                margin: var(--space-xl) 0;
+                background: white;
+                border-radius: var(--radius-lg);
+                overflow: hidden;
+                box-shadow: var(--shadow-md);
             }
 
-            .string {
-                color: #A31515;
-                /* Reddish */
+            th,
+            td {
+                padding: var(--space-md);
+                text-align: left;
+                border-bottom: 1px solid var(--color-accent-light);
             }
 
-            .comment {
-                color: #008000;
-                /* Green */
+            th {
+                background: var(--gradient-primary);
+                color: white;
+                font-weight: var(--weight-semibold);
+                text-transform: uppercase;
+                font-size: var(--text-sm);
+                letter-spacing: 0.05em;
             }
 
-            .function {
-                color: #7928A1;
-                /* Purple */
+            tr:last-child td {
+                border-bottom: none;
             }
 
-            .variable {
-                color: #001080;
-                /* Dark Blue */
+            tr:hover {
+                background: var(--color-hover);
             }
 
-            .operator {
-                color: #000000;
-                /* Black */
+            /* Arrows and Blocks */
+            .arrow {
+                font-size: 1.2em;
+                vertical-align: middle;
+                margin: 0 5px;
+                color: var(--color-accent-1);
             }
 
-            .number {
-                color: #1C01AC;
-                /* Darker Blue */
+            .block {
+                margin-bottom: var(--space-md);
+                padding: var(--space-md);
+                background: var(--color-accent-light);
+                border-radius: var(--radius-md);
+                font-family: var(--font-mono);
+                font-size: var(--text-base);
+                border-left: 3px solid var(--color-accent-1);
             }
 
-            .builtin {
-                color: #8B0000;
-                /* Dark Red */
+            /* Footer */
+            footer {
+                background: white;
+                border-radius: var(--radius-2xl);
+                padding: var(--space-2xl) var(--space-3xl);
+                box-shadow: var(--shadow-theme);
             }
 
-            @media (max-width: 640px),
-            screen and (orientation: portrait) {
-                body {
-                    max-width: 100%;
-                    max-height: 100%;
+            footer h2 {
+                margin-top: 0;
+                margin-bottom: var(--space-lg);
+                color: var(--color-accent-2);
+            }
+
+            /* Language Selector */
+            .language-selector {
+                margin-top: var(--space-3xl);
+                padding-top: var(--space-2xl);
+                border-top: 2px solid var(--color-accent-light);
+            }
+
+            .language-selector h4 {
+                font-size: var(--text-base);
+                color: var(--color-base-text-muted);
+                margin-bottom: var(--space-md);
+                font-weight: var(--weight-medium);
+                text-transform: uppercase;
+                letter-spacing: 0.05em;
+            }
+
+            .language-links {
+                display: flex;
+                gap: var(--space-md);
+                flex-wrap: wrap;
+            }
+
+            .language-links a {
+                display: inline-block;
+                padding: var(--space-sm) var(--space-lg);
+                background: var(--color-accent-light);
+                color: var(--color-accent-1);
+                border-radius: var(--radius-full);
+                font-size: var(--text-sm);
+                font-weight: var(--weight-medium);
+                transition: all 0.3s ease;
+            }
+
+            .language-links a:hover {
+                background: var(--color-accent-1);
+                color: white;
+                transform: translateY(-2px);
+                box-shadow: var(--shadow-md);
+            }
+
+            /* ===== RESPONSIVE DESIGN ===== */
+            @media (max-width: 768px) {
+                .navbar {
+                    padding: var(--space-md);
                 }
 
-                #sidebar {
-                    position: fixed;
-                    background-color: #1B80CF;
-                    top: 0;
-                    left: 0;
-                    bottom: 80vh;
-                    width: 100vw;
+                .navbar-content {
+                    flex-direction: column;
+                    gap: var(--space-md);
+                    align-items: flex-start;
                 }
 
-                #sidebar .title {
-                    text-align: center;
-                    position: fixed;
-                    margin-top: 6vh;
-                    left: 0px;
-                    right: 0px;
-                    line-height: 3.5vmax;
-                    font-size: 1.5vmax;
-                    font-family: 'Arial';
+                .hero {
+                    padding: var(--space-3xl) var(--space-md) var(--space-2xl);
+                    margin-top: 120px;
                 }
 
-                #sidebar .subtitle {
-                    text-align: center;
-                    top: 5vh;
-                    left: 0px;
-                    right: 0px;
-                    position: fixed;
-                    margin-top: 10vh;
-                    font-size: 1.5vmax;
+                .hero-content {
+                    grid-template-columns: 1fr;
+                    gap: var(--space-2xl);
                 }
 
-                #sidebar .title a:link,
-                #sidebar .title a:visited {
-                    text-align: center;
-                    color: #FFFFFF;
+                .hero-svg {
+                    order: -1;
                 }
 
-                #sidebar .subtitle a:link,
-                #sidebar .subtitle a:visited {
-                    text-align: center;
-                    color: #FFFFFF;
+                .container {
+                    padding: var(--space-2xl) var(--space-md);
                 }
 
-                .home {
-                    z-index: 100;
-                    width: 100%;
-                    background-color: #1B80CF;
-                    font-size: 1.5vmax;
+                article {
+                    padding: var(--space-xl) var(--space-lg);
                 }
 
-                .home a:link,
-                .home a:visited {
-                    text-decoration: none;
-                    color: #FFFFFF;
+                footer {
+                    padding: var(--space-xl) var(--space-lg);
                 }
 
-                .content {
-                    line-height: 3.8vmax;
-                    font-size: 1.8vmax;
-                    font-family: 'Arial';
-                    margin-top: 22vh;
+                pre {
+                    padding: var(--space-md);
+                    font-size: var(--text-xs);
                 }
 
-                .content a:link,
-                .content a:visited {
-                    color: #1B80CF;
+                table {
+                    font-size: var(--text-sm);
                 }
 
-                .page {
-                    top: 40vh;
-                    width: 95%;
-                    margin-left: 0vw;
+                th,
+                td {
+                    padding: var(--space-sm);
+                }
+            }
+
+            /* ===== ACCESSIBILITY ===== */
+            @media (prefers-reduced-motion: reduce) {
+
+                *,
+                *::before,
+                *::after {
+                    animation-duration: 0.01ms !important;
+                    animation-iteration-count: 1 !important;
+                    transition-duration: 0.01ms !important;
+                }
+            }
+
+            /* Focus Styles */
+            a:focus,
+            button:focus {
+                outline: 3px solid var(--color-accent-1);
+                outline-offset: 2px;
+                border-radius: var(--radius-sm);
+            }
+
+            /* ===== SVG ANIMATIONS ===== */
+            .filter-icon {
+                animation: filterPulse 3s ease-in-out infinite;
+            }
+
+            @keyframes filterPulse {
+
+                0%,
+                100% {
+                    opacity: 0.8;
+                    transform: scale(1);
                 }
 
-                .page img {
-                    max-width: 100%;
-                    max-height: 100%;
-                    border: 0;
+                50% {
+                    opacity: 1;
+                    transform: scale(1.05);
+                }
+            }
+
+            .particle {
+                animation: particleFloat 4s ease-in-out infinite;
+            }
+
+            .particle:nth-child(2) {
+                animation-delay: 0.5s;
+            }
+
+            .particle:nth-child(3) {
+                animation-delay: 1s;
+            }
+
+            .particle:nth-child(4) {
+                animation-delay: 1.5s;
+            }
+
+            @keyframes particleFloat {
+
+                0%,
+                100% {
+                    transform: translateY(0);
+                    opacity: 0.3;
+                }
+
+                50% {
+                    transform: translateY(-20px);
+                    opacity: 0.8;
+                }
+            }
+
+            .clean-path {
+                stroke-dasharray: 300;
+                stroke-dashoffset: 300;
+                animation: drawPath 5s ease-in-out infinite;
+            }
+
+            @keyframes drawPath {
+                0% {
+                    stroke-dashoffset: 300;
+                }
+
+                50%,
+                100% {
+                    stroke-dashoffset: 0;
+                }
+            }
+
+            .error-indicator {
+                animation: errorBlink 2s ease-in-out infinite;
+            }
+
+            @keyframes errorBlink {
+
+                0%,
+                100% {
+                    opacity: 0.3;
+                }
+
+                50% {
+                    opacity: 1;
                 }
             }
         </style>
     </head>
 
     <body vocab="http://schema.org/">
-        <div class="page">
-            <div class="home">
-                <ul typeof="BreadcrumbList">
+        <a href="#main-content" class="skip-link">Skip to main content</a>
+
+        <!-- Navigation Bar -->
+        <nav class="navbar" role="navigation" aria-label="Main navigation">
+            <div class="navbar-content">
+                <a href="../about.html" class="site-name">John Samuel</a>
+                <ul class="breadcrumb" typeof="BreadcrumbList">
                     <li property="itemListElement" typeof="ListItem">
                         <a property="item" typeof="WebPage" href="../index.html">
                             <span property="name">Home</span>
@@ -366,29 +772,118 @@
                         </a>
                     </li>
                 </ul>
-
             </div>
-            <div id="sidebar">
-                <div class="title">
-                    <h1><a href="./data-cleaning.html">Data Cleaning</a></h1>
+        </nav>
+
+        <!-- Hero Section -->
+        <header class="hero">
+            <div class="hero-content">
+                <div class="hero-text">
+                    <h1>Data Cleaning</h1>
+                    <p class="subtitle">Purifying Data for Quality and Reliability</p>
+                    <p class="author">by <a href="../about.html">John Samuel</a></p>
                 </div>
-                <div class="subtitle">
-                    <h3><a href="../about.html">John Samuel</a></h3>
+                <div class="hero-svg">
+                    <svg width="400" height="400" viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg"
+                        aria-hidden="true">
+                        <defs>
+                            <linearGradient id="cleanGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" style="stop-color:rgba(255,255,255,0.9);stop-opacity:1" />
+                                <stop offset="100%" style="stop-color:rgba(255,255,255,0.6);stop-opacity:1" />
+                            </linearGradient>
+                            <filter id="glow">
+                                <feGaussianBlur stdDeviation="4" result="coloredBlur" />
+                                <feMerge>
+                                    <feMergeNode in="coloredBlur" />
+                                    <feMergeNode in="SourceGraphic" />
+                                </feMerge>
+                            </filter>
+                            <filter id="droplet">
+                                <feGaussianBlur in="SourceAlpha" stdDeviation="3" />
+                                <feOffset dx="0" dy="2" result="offsetblur" />
+                                <feComponentTransfer>
+                                    <feFuncA type="linear" slope="0.5" />
+                                </feComponentTransfer>
+                                <feMerge>
+                                    <feMergeNode />
+                                    <feMergeNode in="SourceGraphic" />
+                                </feMerge>
+                            </filter>
+                        </defs>
+
+                        <!-- Data Cleaning Visualization -->
+                        <g filter="url(#glow)">
+                            <!-- Funnel/Filter Shape -->
+                            <path class="filter-icon" d="M 100 80 L 300 80 L 250 180 L 250 280 L 150 280 L 150 180 Z"
+                                fill="none" stroke="rgba(255,255,255,0.7)" stroke-width="3" stroke-linejoin="round" />
+
+                            <!-- Top layer - dirty data particles -->
+                            <circle class="particle error-indicator" cx="120" cy="60" r="6"
+                                fill="rgba(239,68,68,0.6)" />
+                            <circle class="particle error-indicator" cx="170" cy="65" r="5"
+                                fill="rgba(239,68,68,0.6)" />
+                            <circle class="particle error-indicator" cx="230" cy="58" r="7"
+                                fill="rgba(239,68,68,0.6)" />
+                            <circle class="particle error-indicator" cx="280" cy="62" r="5"
+                                fill="rgba(239,68,68,0.6)" />
+
+                            <!-- Middle layer - cleaning in progress -->
+                            <circle class="particle" cx="180" cy="140" r="5" fill="rgba(245,158,11,0.7)" />
+                            <circle class="particle" cx="220" cy="145" r="4" fill="rgba(245,158,11,0.7)" />
+                            <circle class="particle" cx="200" cy="160" r="6" fill="rgba(245,158,11,0.7)" />
+
+                            <!-- Bottom layer - clean data -->
+                            <circle class="particle" cx="170" cy="250" r="5" fill="rgba(16,185,129,0.8)" />
+                            <circle class="particle" cx="200" cy="255" r="6" fill="rgba(16,185,129,0.8)" />
+                            <circle class="particle" cx="230" cy="252" r="5" fill="rgba(16,185,129,0.8)" />
+
+                            <!-- Clean data flow path -->
+                            <path class="clean-path" d="M 200 280 L 200 320 L 150 340 L 250 340 L 200 320" fill="none"
+                                stroke="rgba(16,185,129,0.6)" stroke-width="2" />
+
+                            <!-- Filter mesh lines -->
+                            <line x1="110" y1="100" x2="290" y2="100" stroke="rgba(255,255,255,0.3)" stroke-width="1" />
+                            <line x1="120" y1="120" x2="280" y2="120" stroke="rgba(255,255,255,0.3)" stroke-width="1" />
+                            <line x1="130" y1="140" x2="270" y2="140" stroke="rgba(255,255,255,0.3)" stroke-width="1" />
+                            <line x1="140" y1="160" x2="260" y2="160" stroke="rgba(255,255,255,0.3)" stroke-width="1" />
+
+                            <!-- Side annotations -->
+                            <text x="320" y="70" fill="rgba(255,255,255,0.8)" font-size="14"
+                                font-family="Arial">Raw</text>
+                            <text x="310" y="180" fill="rgba(255,255,255,0.8)" font-size="14"
+                                font-family="Arial">Processing</text>
+                            <text x="315" y="290" fill="rgba(255,255,255,0.8)" font-size="14"
+                                font-family="Arial">Clean</text>
+
+                            <!-- Output container -->
+                            <rect x="140" y="330" width="120" height="40" rx="8" fill="rgba(16,185,129,0.2)"
+                                stroke="rgba(16,185,129,0.6)" stroke-width="2" />
+
+                            <!-- Sparkle effects on clean data -->
+                            <circle cx="160" cy="345" r="2" fill="rgba(255,255,255,0.9)">
+                                <animate attributeName="opacity" values="0;1;0" dur="2s" repeatCount="indefinite" />
+                            </circle>
+                            <circle cx="240" cy="350" r="2" fill="rgba(255,255,255,0.9)">
+                                <animate attributeName="opacity" values="0;1;0" dur="2s" begin="0.5s"
+                                    repeatCount="indefinite" />
+                            </circle>
+                        </g>
+                    </svg>
                 </div>
             </div>
+        </header>
 
-            <div class="content">
-                <div
-                    style="background-color: #f0f8ff; border-left: 4px solid #1e90ff; padding: 1em; margin-bottom: 1.5em;">
-                    <strong>This article is part of a series on <a href="./data-science.html">Data
-                            Science</a>.</strong>
-                </div>
+        <!-- Main Content -->
+        <main id="main-content" class="container">
+            <div class="context-banner">
+                <strong>This article is part of a series on <a href="./data-science.html">Data Science</a>.</strong>
+            </div>
+
+            <article>
                 <p>
                     Data cleaning is the foundational process of identifying and correcting errors, inconsistencies, and
-                    gaps in datasets
-                    to ensure high-quality, reliable analysis. Poor data quality can compromise the validity of machine
-                    learning models,
-                    reporting dashboards, and business decisions.
+                    gaps in datasets to ensure high-quality, reliable analysis. Poor data quality can compromise the
+                    validity of machine learning models, reporting dashboards, and business decisions.
                 </p>
 
                 <h2>Types of Data Quality Issues</h2>
@@ -403,13 +898,13 @@
                     <li><b>Coverage Errors</b> – Missing values or entire missing records that reduce the completeness
                         of the dataset.</li>
                 </ul>
+
                 <h2>Syntax Errors</h2>
                 <p>
                     Syntax errors occur when data does not conform to the expected structural rules—such as data types,
-                    formatting,
-                    or encoding. These issues often arise during data entry, extraction from legacy systems, or file
-                    format conversion.
-                    They can typically be detected using schema validation, regular expressions, or parsing tools.
+                    formatting, or encoding. These issues often arise during data entry, extraction from legacy systems,
+                    or file format conversion. They can typically be detected using schema validation, regular
+                    expressions, or parsing tools.
                 </p>
 
                 <ul>
@@ -436,18 +931,15 @@
                 <ul>
                     <li>
                         <b>Schema Validation</b> – Tools such as <a
-                            href="https://en.wikipedia.org/wiki/XML_Schema_(W3C)">XML Schema (XSD)</a>
-                        or <a href="https://json-schema.org/">JSON Schema</a> help enforce structural
-                        constraints on data.
+                            href="https://en.wikipedia.org/wiki/XML_Schema_(W3C)">XML Schema (XSD)</a> or <a
+                            href="https://json-schema.org/">JSON Schema</a> help enforce structural constraints on data.
                         <br><i>Example:</i> An XML document can be validated against an XSD file to ensure correct tag
                         order, types, and required fields.
                     </li>
                     <li>
                         <b>Data Transformation</b> – When inconsistencies are detected, transformations can normalize
-                        the data.
-                        Tools like <a href="https://en.wikipedia.org/wiki/XSLT">XSLT</a> (for XML) or
-                        <a href="https://pandas.pydata.org/">Pandas</a> (for tabular data) are commonly
-                        used.
+                        the data. Tools like <a href="https://en.wikipedia.org/wiki/XSLT">XSLT</a> (for XML) or <a
+                            href="https://pandas.pydata.org/">Pandas</a> (for tabular data) are commonly used.
                     </li>
                 </ul>
 
@@ -474,36 +966,31 @@
                     Validation tools will reject any document that violates this structure—for instance, by providing
                     text instead of a number in the <code>year</code> field.
                 </p>
+
                 <h2>Semantic Errors</h2>
                 <p>
                     Semantic errors refer to logical inconsistencies or violations of meaning within the data. These
-                    errors often pass
-                    format validation but result in contradictions, invalid relationships, or violations of business
-                    rules.
-                    Correcting semantic errors typically requires deeper understanding of the domain and data
-                    dependencies.
+                    errors often pass format validation but result in contradictions, invalid relationships, or
+                    violations of business rules. Correcting semantic errors typically requires deeper understanding of
+                    the domain and data dependencies.
                 </p>
 
                 <ul>
                     <li>
                         <b>Integrity Constraint Violations</b> – These occur when the data fails to respect constraints
-                        that ensure
-                        coherence across fields or tables.
+                        that ensure coherence across fields or tables.
                         <br><i>Example:</i> A rule states that a student can only be enrolled in one course at a time,
-                        but
-                        a student record lists multiple concurrent courses.
+                        but a student record lists multiple concurrent courses.
                     </li>
                     <li>
                         <b>Contradictory Values</b> – Inconsistent entries that contradict each other, often due to
-                        integration
-                        from multiple sources.
+                        integration from multiple sources.
                         <br><i>Example:</i> A product is marked as "in stock" in one field and "out of stock" in
                         another.
                     </li>
                     <li>
                         <b>Duplicate Records</b> – Redundant entries that represent the same real-world entity,
-                        degrading data
-                        efficiency and leading to misleading aggregates.
+                        degrading data efficiency and leading to misleading aggregates.
                         <br><i>Example:</i> Two identical customer records differing only by email capitalization.
                     </li>
                     <li>
@@ -517,22 +1004,20 @@
                 <ul>
                     <li>
                         <b>Functional Dependencies</b> – Functional dependencies describe relationships where one
-                        attribute uniquely determines another.
-                        These are fundamental to data cleaning and normalization.
+                        attribute uniquely determines another. These are fundamental to data cleaning and normalization.
                         <br><i>Example:</i> If <code>languageLabel</code> uniquely determines <code>year</code>, then
                         conflicting years under the same label suggest an error.
                     </li>
                     <li>
                         <b>Data Profiling</b> – Profiling identifies relationships, distributions, and anomalies in
-                        data. Tools such as
-                        <a href="https://docs.greatexpectations.io/">Great Expectations</a> or
-                        <a href="https://openrefine.org/">OpenRefine</a> can detect outliers, dependency
-                        violations, and duplicates.
+                        data. Tools such as <a href="https://docs.greatexpectations.io/">Great Expectations</a> or <a
+                            href="https://openrefine.org/">OpenRefine</a> can detect outliers, dependency violations,
+                        and duplicates.
                     </li>
                 </ul>
 
                 <h3>Example: Functional Dependencies</h3>
-                <table border="1" cellpadding="5">
+                <table>
                     <tr>
                         <th>ID</th>
                         <th>languageLabel</th>
@@ -546,15 +1031,15 @@
                 </table>
                 <p>From the data:</p>
                 <div class="block">
-                    ID <span class="arrow">&rarr;</span> languageLabel
+                    ID <span class="arrow">→</span> languageLabel
                 </div>
 
                 <div class="block">
-                    languageLabel <span class="arrow">&rarr;</span> year
+                    languageLabel <span class="arrow">→</span> year
                 </div>
 
                 <div class="block">
-                    Thus: ID <span class="arrow">&rarr;</span> year
+                    Thus: ID <span class="arrow">→</span> year
                 </div>
                 <p>
                     If a second row with the same <code>languageLabel</code> maps to a different <code>year</code>, it
@@ -575,18 +1060,16 @@
 <span class="variable">df</span> <span class="operator">=</span> <span class="variable">df</span>.<span class="function">drop_duplicates</span>()
 </pre>
 
-
                 <p>
                     This snippet demonstrates deduplication after normalization. In real-world scenarios, fuzzy matching
                     algorithms such as Levenshtein distance or clustering can further refine duplicate detection.
                 </p>
+
                 <h2>Coverage Errors</h2>
                 <p>
                     Coverage errors reduce the completeness of a dataset. These issues arise when values or entire
-                    records are absent,
-                    preventing full representation of the target population or phenomena. Incomplete data can bias
-                    statistical models,
-                    compromise machine learning training, and hinder reproducibility.
+                    records are absent, preventing full representation of the target population or phenomena. Incomplete
+                    data can bias statistical models, compromise machine learning training, and hinder reproducibility.
                 </p>
 
                 <ul>
@@ -645,30 +1128,26 @@
                 <h2>Administrative Handling of Data Errors</h2>
                 <p>
                     Beyond algorithmic detection, effective data quality management also involves administrative
-                    strategies. These rely
-                    on both automated systems and human intervention to identify, report, and correct anomalies.
-                    Incorporating users,
-                    domain experts, and automated controls into the cleaning workflow can significantly enhance data
-                    integrity.
+                    strategies. These rely on both automated systems and human intervention to identify, report, and
+                    correct anomalies. Incorporating users, domain experts, and automated controls into the cleaning
+                    workflow can significantly enhance data integrity.
                 </p>
 
                 <ul>
                     <li>
                         <b>User Feedback and Community-Based Correction</b> – Engaging users to report errors and
-                        contribute
-                        corrections increases data quality over time.
-                        <br><i>Example:</i> Platforms like <a href="https://www.openstreetmap.org">OpenStreetMap</a>
-                        and <a href="https://en.wikipedia.org/wiki/Wikipedia:About">Wikipedia</a> allow
-                        users to flag
-                        and fix erroneous entries collaboratively, often using revision history and moderation layers.
+                        contribute corrections increases data quality over time.
+                        <br><i>Example:</i> Platforms like <a href="https://www.openstreetmap.org">OpenStreetMap</a> and
+                        <a href="https://en.wikipedia.org/wiki/Wikipedia:About">Wikipedia</a> allow users to flag and
+                        fix erroneous entries collaboratively, often using revision history and moderation layers.
                     </li>
 
                     <li>
                         <b>Automated Alerts and Triggers</b> – Setting up rules to detect inconsistencies at the time of
                         data entry or modification.
                         <br><i>Example:</i> A database trigger can raise an alert if a new order is inserted without a
-                        corresponding customer ID.
-                        Alerts can be logged, emailed to administrators, or used to block invalid transactions.
+                        corresponding customer ID. Alerts can be logged, emailed to administrators, or used to block
+                        invalid transactions.
                     </li>
                 </ul>
 
@@ -685,73 +1164,71 @@
 
                 <p>
                     This SQL trigger ensures that no order is inserted without an associated customer. Administrative
-                    enforcement of
-                    rules like this reduces semantic and coverage errors proactively.
+                    enforcement of rules like this reduces semantic and coverage errors proactively.
                 </p>
+
                 <h2>Conclusion</h2>
                 <p>
                     Data cleaning is a critical step in any data science or analytics workflow. It involves identifying
-                    and correcting
-                    errors in syntax, semantics, and coverage to ensure the quality, reliability, and usability of
-                    datasets. These errors
-                    may appear trivial at first glance but can propagate through pipelines and distort analyses or
-                    predictions in profound
-                    ways.
+                    and correcting errors in syntax, semantics, and coverage to ensure the quality, reliability, and
+                    usability of datasets. These errors may appear trivial at first glance but can propagate through
+                    pipelines and distort analyses or predictions in profound ways.
                 </p>
                 <p>
                     Modern data cleaning integrates both automated and manual processes, leveraging schema validation,
-                    statistical
-                    imputation, domain knowledge, and collaborative user input. Functional dependencies, data profiling
-                    techniques, and
-                    tooling ecosystems such as <a href="https://pandas.pydata.org/">Pandas</a>,
-                    <a href="https://openrefine.org/">OpenRefine</a>, etc. provide powerful
-                    solutions to
-                    address the wide spectrum of errors encountered in real-world datasets.
+                    statistical imputation, domain knowledge, and collaborative user input. Functional dependencies,
+                    data profiling techniques, and tooling ecosystems such as <a
+                        href="https://pandas.pydata.org/">Pandas</a>, <a href="https://openrefine.org/">OpenRefine</a>,
+                    etc. provide powerful solutions to address the wide spectrum of errors encountered in real-world
+                    datasets.
                 </p>
                 <p>
                     Effective data quality management should not be treated as a one-time process but as an ongoing
-                    practice—embedded
-                    into the lifecycle of data collection, transformation, modeling, and governance.
+                    practice—embedded into the lifecycle of data collection, transformation, modeling, and governance.
                 </p>
+            </article>
 
+            <footer>
                 <h2>References</h2>
                 <ol>
                     <li>
-                        <a href="https://en.wikipedia.org/wiki/Data_cleansing">
-                            Wikipedia – Data cleansing</a>
+                        <a href="https://en.wikipedia.org/wiki/Data_cleansing">Wikipedia – Data cleansing</a>
                     </li>
                     <li>
-                        <a href="https://fr.wikipedia.org/wiki/Nettoyage_de_donn%C3%A9es">
-                            Wikipedia – Nettoyage de données</a>
+                        <a href="https://fr.wikipedia.org/wiki/Nettoyage_de_donn%C3%A9es">Wikipedia – Nettoyage de
+                            données</a>
                     </li>
                     <li>
-                        <a href="https://en.wikipedia.org/wiki/XML_Schema_(W3C)">
-                            Wikipedia – XML Schema Definition (XSD)</a>
+                        <a href="https://en.wikipedia.org/wiki/XML_Schema_(W3C)">Wikipedia – XML Schema Definition
+                            (XSD)</a>
                     </li>
                     <li>
-                        <a href="https://en.wikipedia.org/wiki/Functional_dependency">
-                            Wikipedia – Functional Dependency</a>
+                        <a href="https://en.wikipedia.org/wiki/Functional_dependency">Wikipedia – Functional
+                            Dependency</a>
                     </li>
                     <li>
-                        <a href="https://pandas.pydata.org/docs/">
-                            Pandas Documentation</a>
+                        <a href="https://pandas.pydata.org/docs/">Pandas Documentation</a>
                     </li>
                     <li>
-                        <a href="https://scikit-learn.org/stable/modules/impute.html">
-                            scikit-learn – Imputation Methods</a>
+                        <a href="https://scikit-learn.org/stable/modules/impute.html">scikit-learn – Imputation
+                            Methods</a>
                     </li>
                     <li>
-                        <a href="https://openrefine.org/">
-                            OpenRefine – A powerful tool for working with messy data</a>
+                        <a href="https://openrefine.org/">OpenRefine – A powerful tool for working with messy data</a>
                     </li>
                     <li>
-                        <a href="https://json-schema.org/">
-                            JSON Schema – A vocabulary for JSON data validation</a>
+                        <a href="https://json-schema.org/">JSON Schema – A vocabulary for JSON data validation</a>
                     </li>
                 </ol>
 
-            </div>
-        </div>
+                <div class="language-selector">
+                    <h4>Languages</h4>
+                    <div class="language-links">
+                        <a href="./data-cleaning.html" hreflang="en">English</a>
+                    </div>
+                </div>
+            </footer>
+        </main>
     </body>
 
 </html>

@@ -2,262 +2,631 @@
 <html lang="en">
 
     <head>
-        <meta charset="utf-8" />
-        <meta http-equiv="Content-Language" content="en" />
-        <link rel="shortcut icon" href="../../images/logo/favicon.png" />
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta http-equiv="Content-Language" content="en">
+        <link rel="shortcut icon" href="../../images/logo/favicon.png">
         <title>Introduction to Data Mining: John Samuel</title>
-        <style type="text/css">
-            body {
-                background-color: #FFFFFF;
+        <style>
+            /* ===== CSS CUSTOM PROPERTIES (DESIGN TOKENS) ===== */
+            :root {
+                /* Base Colors - Light Theme Foundation */
+                --color-base-bg: #f9fafb;
+                --color-base-surface: #ffffff;
+                --color-base-text: #1a202c;
+                --color-base-text-muted: #4a5568;
+
+                /* Data Mining Theme Accents - Discovery & Extraction */
+                --color-accent-1: #10b981;
+                --color-accent-2: #059669;
+                --color-accent-3: #34d399;
+                --color-accent-light: #d1fae5;
+
+                /* Functional Colors */
+                --color-shadow: rgba(16, 185, 129, 0.12);
+                --color-border: rgba(16, 185, 129, 0.15);
+                --color-hover: rgba(16, 185, 129, 0.08);
+
+                /* Pattern Colors */
+                --color-pattern-blue: #3b82f6;
+                --color-pattern-purple: #8b5cf6;
+                --color-pattern-orange: #f59e0b;
+
+                /* Gradients */
+                --gradient-primary: linear-gradient(135deg, #10b981 0%, #34d399 100%);
+                --gradient-subtle: linear-gradient(180deg, #f9fafb 0%, #d1fae5 100%);
+                --gradient-hero: linear-gradient(135deg, #10b981 0%, #34d399 50%, #059669 100%);
+
+                /* Spacing Scale */
+                --space-xs: 0.25rem;
+                --space-sm: 0.5rem;
+                --space-md: 1rem;
+                --space-lg: 1.5rem;
+                --space-xl: 2rem;
+                --space-2xl: 3rem;
+                --space-3xl: 4rem;
+                --space-4xl: 6rem;
+
+                /* Border Radius */
+                --radius-sm: 4px;
+                --radius-md: 8px;
+                --radius-lg: 12px;
+                --radius-xl: 16px;
+                --radius-2xl: 24px;
+                --radius-full: 9999px;
+
+                /* Shadows */
+                --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.04), 0 1px 3px rgba(0, 0, 0, 0.06);
+                --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.05), 0 2px 4px rgba(0, 0, 0, 0.06);
+                --shadow-lg: 0 10px 24px rgba(0, 0, 0, 0.08), 0 4px 8px rgba(0, 0, 0, 0.06);
+                --shadow-xl: 0 20px 40px rgba(0, 0, 0, 0.12), 0 8px 16px rgba(0, 0, 0, 0.08);
+                --shadow-theme: 0 10px 30px var(--color-shadow), 0 4px 10px rgba(0, 0, 0, 0.06);
+
+                /* Typography */
+                --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+                --text-xs: clamp(0.75rem, 0.7rem + 0.25vw, 0.875rem);
+                --text-sm: clamp(0.875rem, 0.8rem + 0.35vw, 1rem);
+                --text-base: clamp(1rem, 0.95rem + 0.25vw, 1.125rem);
+                --text-lg: clamp(1.125rem, 1.05rem + 0.35vw, 1.25rem);
+                --text-xl: clamp(1.25rem, 1.15rem + 0.5vw, 1.5rem);
+                --text-2xl: clamp(1.5rem, 1.3rem + 1vw, 2rem);
+                --text-3xl: clamp(2rem, 1.6rem + 2vw, 2.5rem);
+                --text-4xl: clamp(2.5rem, 2rem + 2.5vw, 3.5rem);
+
+                /* Weights */
+                --weight-normal: 400;
+                --weight-medium: 500;
+                --weight-semibold: 600;
+                --weight-bold: 700;
             }
 
-            #sidebar {
-                position: fixed;
-                background-color: #1B80CF;
-                top: 0;
-                left: 0;
-                bottom: 0;
-                width: 30vw;
-            }
-
-            #sidebar .title {
-                position: relative;
-                text-align: center;
-                line-height: 4vmax;
-                font-size: 1.4vmax;
-                font-family: 'Arial';
-                margin-top: 25vh;
-            }
-
-            #sidebar .title a:link,
-            #sidebar .title a:visited {
-                color: #FFFFFF;
-                text-decoration: none;
-            }
-
-            .subtitle {
-                top: 50vh;
-                text-align: center;
-                line-height: 1.3vmax;
-                font-family: 'Arial';
-                font-size: 1.5vmax;
-                color: #FFFFFF;
-            }
-
-            .subtitle a:link,
-            .subtitle a:visited {
-                color: #FFFFFF;
-                text-decoration: none;
-            }
-
-            .licence {
-                position: fixed;
-                text-align: right;
-                bottom: 0;
-                right: 0;
-            }
-
-            .home {
-                position: fixed;
-                text-align: left;
-                font-family: 'Arial';
-                color: #D3D3D3;
-                z-index: 100;
-                width: 100%;
-                background-color: #FFFFFF;
-                top: 0px;
-                margin-bottom: 10px;
-                padding-bottom: 10px;
-            }
-
-            .home a:link,
-            .home a:visited {
-                text-decoration: none;
-                color: #D3D3D3;
-            }
-
-            .home ul {
+            /* ===== RESET & BASE STYLES ===== */
+            *,
+            *::before,
+            *::after {
+                box-sizing: border-box;
                 margin: 0;
                 padding: 0;
-                text-align: left;
-                list-style: none;
             }
 
-            .home li {
-                position: relative;
-                float: left;
-                padding-top: 15px;
-                margin-right: 1em;
-                font-family: 'Arial';
+            html {
+                scroll-behavior: smooth;
+                scroll-padding-top: 100px;
             }
 
-            .home li:hover {
-                display: block;
+            body {
+                font-family: var(--font-sans);
+                font-size: var(--text-base);
+                line-height: 1.7;
+                color: var(--color-base-text);
+                background: var(--gradient-subtle);
+                background-attachment: fixed;
+                min-height: 100vh;
+                letter-spacing: -0.005em;
             }
 
-            .home a:link,
-            .home a:visited {
-                color: #D3D3D3;
+            /* ===== NAVIGATION BAR ===== */
+            .navbar {
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                background: rgba(255, 255, 255, 0.85);
+                -webkit-backdrop-filter: blur(12px) saturate(180%);
+                backdrop-filter: blur(12px) saturate(180%);
+                border-bottom: 1px solid var(--color-border);
+                box-shadow: var(--shadow-md);
+                z-index: 100;
+                padding: var(--space-md) var(--space-xl);
             }
 
-            .home li:hover a:link,
-            .home li:hover a:visited {
+            .navbar-content {
+                max-width: 1400px;
+                margin: 0 auto;
+                display: flex;
+                align-items: center;
+                gap: var(--space-xl);
+            }
+
+            .site-name {
+                font-size: var(--text-xl);
+                font-weight: var(--weight-bold);
+                color: var(--color-accent-1);
                 text-decoration: none;
-                padding: 15px;
-                color: #FFFFFF;
-                background-color: #1B80CF;
+                padding: var(--space-sm) var(--space-md);
+                background: var(--gradient-primary);
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                background-clip: text;
+                transition: all 0.3s ease;
             }
 
-            .content {
-                line-height: 1.8vmax;
-                font-size: 1.2vmax;
-                font-family: 'Arial';
-                margin-top: 15vh;
-                width: 90%;
+            .site-name:hover {
+                transform: translateY(-2px);
             }
 
-            .content h2,
+            .breadcrumb {
+                display: flex;
+                list-style: none;
+                gap: var(--space-sm);
+                flex-wrap: wrap;
+                align-items: center;
+            }
+
+            .breadcrumb li {
+                display: flex;
+                align-items: center;
+                gap: var(--space-sm);
+            }
+
+            .breadcrumb li:not(:last-child)::after {
+                content: '→';
+                color: var(--color-base-text-muted);
+                font-size: var(--text-sm);
+            }
+
+            .breadcrumb a {
+                color: var(--color-base-text-muted);
+                text-decoration: none;
+                font-size: var(--text-sm);
+                transition: color 0.3s ease;
+            }
+
+            .breadcrumb a:hover {
+                color: var(--color-accent-1);
+            }
+
+            /* ===== HERO SECTION ===== */
+            .hero {
+                margin-top: 80px;
+                padding: var(--space-4xl) var(--space-xl) var(--space-3xl);
+                background: var(--gradient-hero);
+                background-size: 200% 200%;
+                animation: gradientShift 12s ease infinite;
+                position: relative;
+                overflow: hidden;
+            }
+
+            @keyframes gradientShift {
+
+                0%,
+                100% {
+                    background-position: 0% 50%;
+                }
+
+                50% {
+                    background-position: 100% 50%;
+                }
+            }
+
+            .hero::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background-image:
+                    radial-gradient(circle at 20% 30%, rgba(255, 255, 255, 0.1) 0%, transparent 50%),
+                    radial-gradient(circle at 80% 70%, rgba(255, 255, 255, 0.08) 0%, transparent 50%);
+                pointer-events: none;
+            }
+
+            .hero-content {
+                max-width: 1400px;
+                margin: 0 auto;
+                position: relative;
+                z-index: 1;
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: var(--space-3xl);
+                align-items: center;
+            }
+
+            .hero-text h1 {
+                font-size: var(--text-4xl);
+                font-weight: var(--weight-bold);
+                color: white;
+                margin-bottom: var(--space-lg);
+                letter-spacing: -0.03em;
+                line-height: 1.2;
+            }
+
+            .hero-text .subtitle {
+                font-size: var(--text-lg);
+                color: rgba(255, 255, 255, 0.9);
+                margin-bottom: var(--space-md);
+            }
+
+            .hero-text .author {
+                font-size: var(--text-base);
+                color: rgba(255, 255, 255, 0.8);
+            }
+
+            .hero-text .author a {
+                color: white;
+                text-decoration: none;
+                border-bottom: 2px solid rgba(255, 255, 255, 0.4);
+                transition: border-color 0.3s ease;
+            }
+
+            .hero-text .author a:hover {
+                border-color: white;
+            }
+
+            .hero-svg {
+                display: flex;
+                justify-content: center;
+                align-items: center;
+            }
+
+            /* ===== MAIN CONTENT ===== */
+            .container {
+                max-width: 1400px;
+                margin: 0 auto;
+                padding: var(--space-3xl) var(--space-xl);
+            }
+
+            /* Context Banner */
+            .context-banner {
+                background: linear-gradient(135deg, rgba(16, 185, 129, 0.1) 0%, rgba(52, 211, 153, 0.1) 100%);
+                border-left: 4px solid var(--color-accent-1);
+                padding: var(--space-lg);
+                border-radius: var(--radius-lg);
+                margin-bottom: var(--space-3xl);
+                box-shadow: var(--shadow-md);
+            }
+
+            .context-banner strong {
+                color: var(--color-accent-2);
+                font-weight: var(--weight-semibold);
+            }
+
+            .context-banner a {
+                color: var(--color-accent-1);
+                text-decoration: none;
+                border-bottom: 2px solid transparent;
+                transition: border-color 0.3s ease;
+            }
+
+            .context-banner a:hover {
+                border-color: var(--color-accent-1);
+            }
+
+            /* Article Sections */
+            article {
+                background: white;
+                border-radius: var(--radius-2xl);
+                padding: var(--space-3xl);
+                box-shadow: var(--shadow-theme);
+                margin-bottom: var(--space-2xl);
+            }
+
+            h2,
             h3,
             h4 {
-                color: #1B80CF;
+                color: var(--color-accent-2);
+                font-weight: var(--weight-bold);
+                margin-top: var(--space-2xl);
+                margin-bottom: var(--space-lg);
+                position: relative;
             }
 
-            .content a:link,
-            .content a:visited {
-                color: #1B80CF;
+            h2 {
+                font-size: var(--text-3xl);
+                letter-spacing: -0.02em;
+                padding-bottom: var(--space-md);
+                border-bottom: 2px solid var(--color-accent-light);
             }
 
-            .content h3 {
-                color: #1B80CF;
+            h2::after {
+                content: '';
+                position: absolute;
+                bottom: -2px;
+                left: 0;
+                width: 100px;
+                height: 2px;
+                background: var(--gradient-primary);
+                border-radius: var(--radius-full);
             }
 
-            .content h2::before,
-            .content h3::before {
-                display: block;
-                content: " ";
-                visibility: hidden;
-                height: 50px;
-                margin-top: -50px;
-                pointer-events: none;
-                background-color: #FFFFFF;
+            h3 {
+                font-size: var(--text-2xl);
+                letter-spacing: -0.01em;
             }
 
-            .content a:link,
-            .content a:visited {
-                color: #1B80CF;
+            h4 {
+                font-size: var(--text-xl);
             }
 
-            .content li {
-                margin: 5px;
+            article>h2:first-child {
+                margin-top: 0;
             }
 
-            .page {
-                width: 65vw;
-                height: 100%;
-                margin-left: 30vw;
-                overflow: hidden;
-                padding: 0 1em;
-                font-family: 'Arial';
+            section {
+                margin-bottom: var(--space-3xl);
             }
 
-            .page img {
-                max-width: 100%;
-                max-height: 100%;
+            p {
+                margin-bottom: var(--space-lg);
+                line-height: 1.8;
+                color: var(--color-base-text);
             }
 
-            @media (max-width: 640px),
-            screen and (orientation: portrait) {
-                body {
-                    max-width: 100%;
-                    max-height: 100%;
+            /* Lists */
+            ol,
+            ul {
+                margin: var(--space-lg) 0;
+                padding-left: var(--space-2xl);
+            }
+
+            li {
+                margin-bottom: var(--space-md);
+                line-height: 1.8;
+                color: var(--color-base-text);
+            }
+
+            li strong,
+            li em {
+                color: var(--color-accent-2);
+                font-weight: var(--weight-semibold);
+                font-style: normal;
+            }
+
+            /* Links */
+            a {
+                color: var(--color-accent-1);
+                text-decoration: none;
+                transition: all 0.3s ease;
+            }
+
+            a:hover {
+                color: var(--color-accent-2);
+            }
+
+            /* Footer */
+            footer {
+                background: white;
+                border-radius: var(--radius-2xl);
+                padding: var(--space-2xl) var(--space-3xl);
+                box-shadow: var(--shadow-theme);
+            }
+
+            footer h4 {
+                margin-top: 0;
+                margin-bottom: var(--space-lg);
+                color: var(--color-accent-2);
+            }
+
+            /* Language Selector */
+            .language-selector {
+                margin-top: var(--space-3xl);
+                padding-top: var(--space-2xl);
+                border-top: 2px solid var(--color-accent-light);
+            }
+
+            .language-selector h4 {
+                font-size: var(--text-base);
+                color: var(--color-base-text-muted);
+                margin-bottom: var(--space-md);
+                font-weight: var(--weight-medium);
+                text-transform: uppercase;
+                letter-spacing: 0.05em;
+            }
+
+            .language-links {
+                display: flex;
+                gap: var(--space-md);
+                flex-wrap: wrap;
+            }
+
+            .language-links a {
+                display: inline-block;
+                padding: var(--space-sm) var(--space-lg);
+                background: var(--color-accent-light);
+                color: var(--color-accent-1);
+                border-radius: var(--radius-full);
+                font-size: var(--text-sm);
+                font-weight: var(--weight-medium);
+                transition: all 0.3s ease;
+            }
+
+            .language-links a:hover {
+                background: var(--color-accent-1);
+                color: white;
+                transform: translateY(-2px);
+                box-shadow: var(--shadow-md);
+            }
+
+            /* ===== RESPONSIVE DESIGN ===== */
+            @media (max-width: 768px) {
+                .navbar {
+                    padding: var(--space-md);
                 }
 
-                #sidebar {
-                    position: fixed;
-                    background-color: #1B80CF;
-                    top: 0;
-                    left: 0;
-                    bottom: 80vh;
-                    width: 100vw;
+                .navbar-content {
+                    flex-direction: column;
+                    gap: var(--space-md);
+                    align-items: flex-start;
                 }
 
-                #sidebar .title {
-                    text-align: center;
-                    position: fixed;
-                    margin-top: 6vh;
-                    left: 0px;
-                    right: 0px;
-                    line-height: 3.5vmax;
-                    font-size: 1.5vmax;
-                    font-family: 'Arial';
+                .hero {
+                    padding: var(--space-3xl) var(--space-md) var(--space-2xl);
+                    margin-top: 120px;
                 }
 
-                #sidebar .subtitle {
-                    text-align: center;
-                    top: 5vh;
-                    left: 0px;
-                    right: 0px;
-                    position: fixed;
-                    margin-top: 10vh;
-                    font-size: 1.5vmax;
+                .hero-content {
+                    grid-template-columns: 1fr;
+                    gap: var(--space-2xl);
                 }
 
-                #sidebar .title a:link,
-                #sidebar .title a:visited {
-                    text-align: center;
-                    color: #FFFFFF;
+                .hero-svg {
+                    order: -1;
                 }
 
-                #sidebar .subtitle a:link,
-                #sidebar .subtitle a:visited {
-                    text-align: center;
-                    color: #FFFFFF;
+                .container {
+                    padding: var(--space-2xl) var(--space-md);
                 }
 
-                .home {
-                    z-index: 100;
-                    width: 100%;
-                    background-color: #1B80CF;
-                    font-size: 1.5vmax;
+                article {
+                    padding: var(--space-xl) var(--space-lg);
                 }
 
-                .home a:link,
-                .home a:visited {
-                    text-decoration: none;
-                    color: #FFFFFF;
+                footer {
+                    padding: var(--space-xl) var(--space-lg);
+                }
+            }
+
+            /* ===== ACCESSIBILITY ===== */
+            @media (prefers-reduced-motion: reduce) {
+
+                *,
+                *::before,
+                *::after {
+                    animation-duration: 0.01ms !important;
+                    animation-iteration-count: 1 !important;
+                    transition-duration: 0.01ms !important;
+                }
+            }
+
+            /* Focus Styles */
+            a:focus,
+            button:focus {
+                outline: 3px solid var(--color-accent-1);
+                outline-offset: 2px;
+                border-radius: var(--radius-sm);
+            }
+
+            /* ===== SVG ANIMATIONS ===== */
+            .data-nugget {
+                animation: nuggetFloat 4s ease-in-out infinite;
+            }
+
+            .data-nugget:nth-child(1) {
+                animation-delay: 0s;
+            }
+
+            .data-nugget:nth-child(2) {
+                animation-delay: 0.5s;
+            }
+
+            .data-nugget:nth-child(3) {
+                animation-delay: 1s;
+            }
+
+            .data-nugget:nth-child(4) {
+                animation-delay: 1.5s;
+            }
+
+            @keyframes nuggetFloat {
+
+                0%,
+                100% {
+                    transform: translateY(0);
+                    opacity: 0.6;
                 }
 
-                .content {
-                    line-height: 3.8vmax;
-                    font-size: 1.8vmax;
-                    font-family: 'Arial';
-                    margin-top: 22vh;
+                50% {
+                    transform: translateY(-15px);
+                    opacity: 1;
+                }
+            }
+
+            .mining-beam {
+                stroke-dasharray: 200;
+                stroke-dashoffset: 200;
+                animation: beamScan 3s ease-in-out infinite;
+            }
+
+            .mining-beam:nth-child(1) {
+                animation-delay: 0s;
+            }
+
+            .mining-beam:nth-child(2) {
+                animation-delay: 0.4s;
+            }
+
+            .mining-beam:nth-child(3) {
+                animation-delay: 0.8s;
+            }
+
+            @keyframes beamScan {
+                0% {
+                    stroke-dashoffset: 200;
+                    opacity: 0;
                 }
 
-                .content a:link,
-                .content a:visited {
-                    color: #1B80CF;
+                50% {
+                    stroke-dashoffset: 0;
+                    opacity: 1;
                 }
 
-                .page {
-                    top: 40vh;
-                    width: 95%;
-                    margin-left: 0vw;
+                100% {
+                    stroke-dashoffset: -200;
+                    opacity: 0;
+                }
+            }
+
+            .pattern-node {
+                animation: nodeDiscovery 3s ease-in-out infinite;
+            }
+
+            @keyframes nodeDiscovery {
+
+                0%,
+                100% {
+                    r: 6;
+                    opacity: 0.5;
                 }
 
-                .page img {
-                    max-width: 100%;
-                    max-height: 100%;
-                    border: 0;
+                50% {
+                    r: 10;
+                    opacity: 1;
+                }
+            }
+
+            .knowledge-gem {
+                animation: gemShine 5s ease-in-out infinite;
+            }
+
+            @keyframes gemShine {
+
+                0%,
+                100% {
+                    opacity: 0.7;
+                    transform: scale(1) rotate(0deg);
+                }
+
+                50% {
+                    opacity: 1;
+                    transform: scale(1.1) rotate(180deg);
+                }
+            }
+
+            .extraction-path {
+                stroke-dasharray: 300;
+                animation: pathExtract 6s ease-in-out infinite;
+            }
+
+            @keyframes pathExtract {
+                0% {
+                    stroke-dashoffset: 300;
+                }
+
+                100% {
+                    stroke-dashoffset: 0;
                 }
             }
         </style>
     </head>
 
     <body vocab="http://schema.org/">
-        <div class="page">
-            <div class="home">
-                <ul typeof="BreadcrumbList">
+
+        <!-- Navigation Bar -->
+        <nav class="navbar" role="navigation" aria-label="Main navigation">
+            <div class="navbar-content">
+                <a href="../about.html" class="site-name">John Samuel</a>
+                <ul class="breadcrumb" typeof="BreadcrumbList">
                     <li property="itemListElement" typeof="ListItem">
                         <a property="item" typeof="WebPage" href="../index.html">
                             <span property="name">Home</span>
@@ -270,167 +639,285 @@
                     </li>
                 </ul>
             </div>
-            <div id="sidebar">
-                <div class="title">
-                    <h1><a href="./data-mining.html">Introduction to Data Mining</a></h1>
+        </nav>
+
+        <!-- Hero Section -->
+        <header class="hero">
+            <div class="hero-content">
+                <div class="hero-text">
+                    <h1>Data Mining</h1>
+                    <p class="subtitle">Discovering Patterns and Knowledge from Data</p>
+                    <p class="author">by <a href="../about.html">John Samuel</a></p>
                 </div>
-                <div class="subtitle">
-                    <h3><a href="../about.html">John Samuel</a></h3>
+                <div class="hero-svg">
+                    <svg width="400" height="400" viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg"
+                        aria-hidden="true">
+                        <defs>
+                            <linearGradient id="miningGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" style="stop-color:rgba(255,255,255,0.9);stop-opacity:1" />
+                                <stop offset="100%" style="stop-color:rgba(255,255,255,0.6);stop-opacity:1" />
+                            </linearGradient>
+                            <filter id="glow">
+                                <feGaussianBlur stdDeviation="4" result="coloredBlur" />
+                                <feMerge>
+                                    <feMergeNode in="coloredBlur" />
+                                    <feMergeNode in="SourceGraphic" />
+                                </feMerge>
+                            </filter>
+                            <radialGradient id="gemGrad">
+                                <stop offset="0%" style="stop-color:rgba(255,255,255,1);stop-opacity:1" />
+                                <stop offset="100%" style="stop-color:rgba(52,211,153,0.6);stop-opacity:1" />
+                            </radialGradient>
+                        </defs>
+
+                        <!-- Data Mining Visualization: Raw Data to Knowledge -->
+                        <g filter="url(#glow)">
+                            <!-- Raw Data Layer (bottom) -->
+                            <g class="data-nugget">
+                                <circle cx="80" cy="320" r="8" fill="rgba(255,255,255,0.5)"
+                                    stroke="rgba(255,255,255,0.8)" stroke-width="2" />
+                            </g>
+                            <g class="data-nugget">
+                                <circle cx="140" cy="340" r="6" fill="rgba(255,255,255,0.5)"
+                                    stroke="rgba(255,255,255,0.8)" stroke-width="2" />
+                            </g>
+                            <g class="data-nugget">
+                                <circle cx="200" cy="330" r="7" fill="rgba(255,255,255,0.5)"
+                                    stroke="rgba(255,255,255,0.8)" stroke-width="2" />
+                            </g>
+                            <g class="data-nugget">
+                                <circle cx="260" cy="345" r="6" fill="rgba(255,255,255,0.5)"
+                                    stroke="rgba(255,255,255,0.8)" stroke-width="2" />
+                            </g>
+                            <g class="data-nugget">
+                                <circle cx="320" cy="325" r="8" fill="rgba(255,255,255,0.5)"
+                                    stroke="rgba(255,255,255,0.8)" stroke-width="2" />
+                            </g>
+
+                            <!-- Mining Beams scanning data -->
+                            <line class="mining-beam" x1="80" y1="320" x2="150" y2="240" stroke="rgba(16,185,129,0.7)"
+                                stroke-width="2" />
+                            <line class="mining-beam" x1="200" y1="330" x2="200" y2="240" stroke="rgba(16,185,129,0.7)"
+                                stroke-width="2" />
+                            <line class="mining-beam" x1="320" y1="325" x2="250" y2="240" stroke="rgba(16,185,129,0.7)"
+                                stroke-width="2" />
+
+                            <!-- Pattern Discovery Layer (middle) -->
+                            <circle class="pattern-node" cx="150" cy="240" r="6" fill="rgba(52,211,153,0.7)" />
+                            <circle class="pattern-node" cx="200" cy="240" r="6" fill="rgba(52,211,153,0.7)" />
+                            <circle class="pattern-node" cx="250" cy="240" r="6" fill="rgba(52,211,153,0.7)" />
+
+                            <!-- Connection lines showing pattern relationships -->
+                            <line x1="150" y1="240" x2="200" y2="240" stroke="rgba(255,255,255,0.6)" stroke-width="2" />
+                            <line x1="200" y1="240" x2="250" y2="240" stroke="rgba(255,255,255,0.6)" stroke-width="2" />
+
+                            <!-- Extraction paths to knowledge -->
+                            <path class="extraction-path" d="M 150 240 Q 165 180 200 140" fill="none"
+                                stroke="rgba(16,185,129,0.8)" stroke-width="3" />
+                            <path class="extraction-path" d="M 200 240 Q 200 200 200 140" fill="none"
+                                stroke="rgba(16,185,129,0.8)" stroke-width="3" />
+                            <path class="extraction-path" d="M 250 240 Q 235 180 200 140" fill="none"
+                                stroke="rgba(16,185,129,0.8)" stroke-width="3" />
+
+                            <!-- Knowledge Gem (top) - the extracted insight -->
+                            <g class="knowledge-gem" transform-origin="200 100">
+                                <polygon points="200,80 220,100 210,130 190,130 180,100" fill="url(#gemGrad)"
+                                    stroke="rgba(255,255,255,0.9)" stroke-width="3" />
+                                <line x1="200" y1="80" x2="200" y2="130" stroke="rgba(255,255,255,0.5)"
+                                    stroke-width="1" />
+                                <line x1="180" y1="100" x2="220" y2="100" stroke="rgba(255,255,255,0.5)"
+                                    stroke-width="1" />
+
+                                <!-- Sparkles around the gem -->
+                                <circle cx="170" cy="85" r="2" fill="rgba(255,255,255,0.9)">
+                                    <animate attributeName="opacity" values="0;1;0" dur="2s" repeatCount="indefinite" />
+                                </circle>
+                                <circle cx="230" cy="90" r="2" fill="rgba(255,255,255,0.9)">
+                                    <animate attributeName="opacity" values="0;1;0" dur="2s" begin="0.5s"
+                                        repeatCount="indefinite" />
+                                </circle>
+                                <circle cx="185" cy="120" r="2" fill="rgba(255,255,255,0.9)">
+                                    <animate attributeName="opacity" values="0;1;0" dur="2s" begin="1s"
+                                        repeatCount="indefinite" />
+                                </circle>
+                                <circle cx="215" cy="115" r="2" fill="rgba(255,255,255,0.9)">
+                                    <animate attributeName="opacity" values="0;1;0" dur="2s" begin="1.5s"
+                                        repeatCount="indefinite" />
+                                </circle>
+                            </g>
+
+                            <!-- Process Labels -->
+                            <text x="200" y="370" fill="rgba(255,255,255,0.8)" font-size="14" text-anchor="middle"
+                                font-family="Arial">Raw Data</text>
+                            <text x="200" y="275" fill="rgba(255,255,255,0.8)" font-size="14" text-anchor="middle"
+                                font-family="Arial">Patterns</text>
+                            <text x="200" y="60" fill="rgba(255,255,255,0.9)" font-size="16" text-anchor="middle"
+                                font-family="Arial" font-weight="bold">Knowledge</text>
+
+                            <!-- Mining Process Indicators -->
+                            <rect x="310" y="160" width="80" height="25" rx="5" fill="rgba(16,185,129,0.2)"
+                                stroke="rgba(255,255,255,0.6)" stroke-width="1" />
+                            <text x="350" y="177" fill="rgba(255,255,255,0.9)" font-size="11" text-anchor="middle"
+                                font-family="Arial">Clustering</text>
+
+                            <rect x="310" y="195" width="80" height="25" rx="5" fill="rgba(59,130,246,0.2)"
+                                stroke="rgba(255,255,255,0.6)" stroke-width="1" />
+                            <text x="350" y="212" fill="rgba(255,255,255,0.9)" font-size="11" text-anchor="middle"
+                                font-family="Arial">Classification</text>
+
+                            <rect x="310" y="230" width="80" height="25" rx="5" fill="rgba(139,92,246,0.2)"
+                                stroke="rgba(255,255,255,0.6)" stroke-width="1" />
+                            <text x="350" y="247" fill="rgba(255,255,255,0.9)" font-size="11" text-anchor="middle"
+                                font-family="Arial">Association</text>
+
+                            <!-- Decorative circuit lines -->
+                            <line x1="50" y1="150" x2="120" y2="150" stroke="rgba(255,255,255,0.3)" stroke-width="1"
+                                stroke-dasharray="3,3" />
+                            <line x1="280" y1="170" x2="310" y2="172" stroke="rgba(255,255,255,0.3)" stroke-width="1"
+                                stroke-dasharray="3,3" />
+                        </g>
+                    </svg>
                 </div>
             </div>
-            <div class="content">
+        </header>
+
+        <!-- Main Content -->
+        <main id="main-content" class="container">
+            <div class="context-banner">
+                <strong>This article is part of a series on <a href="./data-science.html">Data Science</a>.</strong>
+            </div>
+
+            <article>
                 <h2>Data Mining: From Data to Insights</h2>
-                <div
-                    style="background-color: #f0f8ff; border-left: 4px solid #1e90ff; padding: 1em; margin-bottom: 1.5em;">
-                    <strong>This article is part of a series on <a href="./data-science.html">Data
-                            Science</a>.</strong>
-                </div>
-                <p>Data mining is the systematic process of discovering meaningful patterns and knowledge from
-                    large data sets. It combines methods from machine learning, statistics, and database systems
-                    to extract actionable insights for informed decision-making.</p>
+                <p>Data mining is the systematic process of discovering meaningful patterns and knowledge from large
+                    data sets. It combines methods from machine learning, statistics, and database systems to extract
+                    actionable insights for informed decision-making.</p>
 
                 <h3>What is Data Mining?</h3>
                 <p>
-                    At its core, data mining refers to extracting valuable information from vast amounts of
-                    data, often stored in databases, data warehouses, or other information
-                    repositories. This process involves the identification of previously unknown
-                    or hidden patterns and relationships, supporting the transition of raw data into actionable
-                    knowledge.
+                    At its core, data mining refers to extracting valuable information from vast amounts of data, often
+                    stored in databases, data warehouses, or other information repositories. This process involves the
+                    identification of previously unknown or hidden patterns and relationships, supporting the transition
+                    of raw data into actionable knowledge.
                 </p>
 
                 <h3>From Data to Insights: The Data Value Chain</h3>
-                <p>The adage "data is the new oil" highlights the value of data in today’s digital era. However,
-                    just as crude oil must be refined before use, raw data must undergo processing and analysis
-                    to yield value.</p>
-                <p>Merely collecting vast quantities of data is insufficient. Extracting meaningful insights
-                    that inform decision-making is imperative.</p>
+                <p>The adage "data is the new oil" highlights the value of data in today's digital era. However, just as
+                    crude oil must be refined before use, raw data must undergo processing and analysis to yield value.
+                </p>
+                <p>Merely collecting vast quantities of data is insufficient. Extracting meaningful insights that inform
+                    decision-making is imperative.</p>
 
                 <h4>Stages in the Data Lifecycle</h4>
                 <ul>
-                    <li><strong>Data acquisition</strong>: Collecting data from diverse sources such as sensors,
-                        social media, web logs, enterprise databases, or external APIs.</li>
-                    <li><strong>Data transformation into knowledge</strong>: Raw data is cleaned and
-                        preprocessed to remove errors and inconsistencies, making it reliable for
-                        analysis.</li>
-                    <li><strong>Knowledge to insights</strong>: Analytical methods and modeling are applied to
-                        uncover patterns. This transforms cleaned data into actionable insights.
-                    </li>
-                    <li><strong>Insights to action</strong>: Insights are operationalized to make strategic
-                        decisions or automate processes for business, science, or industry.</li>
-                    <li><strong>Action to new data</strong>: Actions taken generate new data points, continuing
-                        the cycle for ongoing improvement.</li>
+                    <li><strong>Data acquisition</strong>: Collecting data from diverse sources such as sensors, social
+                        media, web logs, enterprise databases, or external APIs.</li>
+                    <li><strong>Data transformation into knowledge</strong>: Raw data is cleaned and preprocessed to
+                        remove errors and inconsistencies, making it reliable for analysis.</li>
+                    <li><strong>Knowledge to insights</strong>: Analytical methods and modeling are applied to uncover
+                        patterns. This transforms cleaned data into actionable insights.</li>
+                    <li><strong>Insights to action</strong>: Insights are operationalized to make strategic decisions or
+                        automate processes for business, science, or industry.</li>
+                    <li><strong>Action to new data</strong>: Actions taken generate new data points, continuing the
+                        cycle for ongoing improvement.</li>
                 </ul>
 
                 <h3>Transforming Data into Knowledge</h3>
-                <p>Turning raw data into knowledge involves several critical steps. Key phases include data
-                    acquisition, extraction, cleaning, transformation, loading (ETL), modeling, storage,
-                    analysis, and visualization.</p>
+                <p>Turning raw data into knowledge involves several critical steps. Key phases include data acquisition,
+                    extraction, cleaning, transformation, loading (ETL), modeling, storage, analysis, and visualization.
+                </p>
                 <ol>
-                    <li><strong>Data Acquisition</strong>: Collecting data from various sources, such as IoT
-                        sensors, transactional records, social networks, or public datasets.</li>
-                    <li><strong>Data Extraction</strong>: Retrieving and aggregating data into a usable format
-                        for analysis. May include parsing files, API requests, or web scraping.</li>
-                    <li><strong>Data Cleaning</strong>: Detecting and correcting errors, inconsistencies,
-                        duplicates, and missing values, ensuring high data quality.</li>
-                    <li><strong>Data Transformation</strong>: Structuring and converting data into formats
-                        suitable for analysis, such as normalizing values, encoding categories, or aggregating
-                        features.</li>
-                    <li><strong>ETL (Extract, Transform, Load)</strong>: Integrating the entire data preparation
-                        process to load clean, transformed data into analytical databases or data
-                        warehouses.</li>
-                    <li><strong>Modeling and Analysis</strong>: Applying statistical, machine learning, or data
-                        mining models to reveal patterns, trends, and predictive relationships.</li>
-                    <li><strong>Data Storage</strong>: Securely storing data for current and future analytical
-                        needs, often in scalable databases, distributed file systems, or data
-                        lakes.</li>
-                    <li><strong>Analysis and Visualization</strong>: Using computational and visualization
-                        techniques (graphs, dashboards, reports) to interpret the results and communicate
-                        findings effectively.</li>
+                    <li><strong>Data Acquisition</strong>: Collecting data from various sources, such as IoT sensors,
+                        transactional records, social networks, or public datasets.</li>
+                    <li><strong>Data Extraction</strong>: Retrieving and aggregating data into a usable format for
+                        analysis. May include parsing files, API requests, or web scraping.</li>
+                    <li><strong>Data Cleaning</strong>: Detecting and correcting errors, inconsistencies, duplicates,
+                        and missing values, ensuring high data quality.</li>
+                    <li><strong>Data Transformation</strong>: Structuring and converting data into formats suitable for
+                        analysis, such as normalizing values, encoding categories, or aggregating features.</li>
+                    <li><strong>ETL (Extract, Transform, Load)</strong>: Integrating the entire data preparation process
+                        to load clean, transformed data into analytical databases or data warehouses.</li>
+                    <li><strong>Modeling and Analysis</strong>: Applying statistical, machine learning, or data mining
+                        models to reveal patterns, trends, and predictive relationships.</li>
+                    <li><strong>Data Storage</strong>: Securely storing data for current and future analytical needs,
+                        often in scalable databases, distributed file systems, or data lakes.</li>
+                    <li><strong>Analysis and Visualization</strong>: Using computational and visualization techniques
+                        (graphs, dashboards, reports) to interpret the results and communicate findings effectively.
+                    </li>
                 </ol>
 
                 <h3>ETL: Extraction, Transformation, and Loading</h3>
-                <p>ETL is a crucial workflow in modern data management. It ensures data is accurate, consistent,
-                    and ready for analysis.</p>
+                <p>ETL is a crucial workflow in modern data management. It ensures data is accurate, consistent, and
+                    ready for analysis.</p>
                 <ol>
-                    <li><strong>Data Extraction</strong>: Gathering data from source systems such as databases,
-                        flat files, APIs, or real-time streams.</li>
-                    <li><strong>Data Cleaning</strong>: Removing anomalies, inconsistencies, and errors;
-                        imputing missing values.</li>
-                    <li><strong>Data Transformation</strong>: Converting and structuring data according to
-                        analytical needs, e.g., aggregating by date or region, normalizing values.</li>
-                    <li><strong>Data Loading</strong>: Inserting processed data into storage platforms like
-                        relational databases, data warehouses, or data lakes for long-term
-                        analysis.</li>
+                    <li><strong>Data Extraction</strong>: Gathering data from source systems such as databases, flat
+                        files, APIs, or real-time streams.</li>
+                    <li><strong>Data Cleaning</strong>: Removing anomalies, inconsistencies, and errors; imputing
+                        missing values.</li>
+                    <li><strong>Data Transformation</strong>: Converting and structuring data according to analytical
+                        needs, e.g., aggregating by date or region, normalizing values.</li>
+                    <li><strong>Data Loading</strong>: Inserting processed data into storage platforms like relational
+                        databases, data warehouses, or data lakes for long-term analysis.</li>
                 </ol>
 
                 <h4>Data Modeling for Analysis</h4>
                 <p>Effective data analysis often relies on structured models, such as:</p>
                 <ul>
-                    <li><strong>Multidimensional Analysis</strong>: Data is organized into <em>dimensions</em>
-                        (context categories, e.g., time, region) and <em>facts</em> (measurable quantities,
-                        e.g., sales, profits).
+                    <li><strong>Multidimensional Analysis</strong>: Data is organized into <em>dimensions</em> (context
+                        categories, e.g., time, region) and <em>facts</em> (measurable quantities, e.g., sales,
+                        profits).
                         <ul>
-                            <li><strong>Attributes</strong>: Qualities or properties (e.g., product name,
-                                region).</li>
+                            <li><strong>Attributes</strong>: Qualities or properties (e.g., product name, region).</li>
                             <li><strong>Levels/Hierarchies</strong>: Representation of data granularity, e.g.,
                                 day–month–year or store–city–country.</li>
-                            <li><strong>Measures</strong>: Numerical values such as sales volume or revenue.
-                            </li>
+                            <li><strong>Measures</strong>: Numerical values such as sales volume or revenue.</li>
                         </ul>
                     </li>
-                    <li><strong>Star Schema, Snowflake Schema, Data Cubes</strong>: Schemes used in data
-                        warehousing to structure and interconnect facts and dimensions
-                        efficiently.</li>
+                    <li><strong>Star Schema, Snowflake Schema, Data Cubes</strong>: Schemes used in data warehousing to
+                        structure and interconnect facts and dimensions efficiently.</li>
                 </ul>
 
                 <h3>Data Analysis Activities</h3>
-                <p>Data analysis investigates datasets to extract meaningful information and support
-                    decision-making. Essential activities include:</p>
+                <p>Data analysis investigates datasets to extract meaningful information and support decision-making.
+                    Essential activities include:</p>
                 <ul>
                     <li><strong>Retrieving values:</strong> Extracting selected values from a dataset.</li>
-                    <li><strong>Filtering:</strong> Selecting subsets of data based on conditions or thresholds.
-                    </li>
-                    <li><strong>Computing derived values:</strong> Calculating new metrics (e.g., averages,
-                        totals, ratios) from existing data.</li>
-                    <li><strong>Finding extremum:</strong> Locating minimum or maximum values, such as
-                        identifying the best/worst performing categories.</li>
-                    <li><strong>Sorting:</strong> Arranging data points by magnitude, date, or another
-                        attribute.</li>
-                    <li><strong>Determining range:</strong> Finding the span between minimum and maximum values.
-                    </li>
-                    <li><strong>Characterizing distribution:</strong> Assessing frequency distributions or
-                        statistical properties (mean, variance).</li>
-                    <li><strong>Pattern and trend analysis:</strong> Detecting relationships, trends, and
-                        underlying patterns.</li>
-                    <li><strong>Clustering:</strong> Grouping similar data points based on feature similarity.
-                    </li>
-                    <li><strong>Correlation:</strong> Quantifying relationships between different variables.
-                    </li>
-                    <li><strong>Contextualization:</strong> Embedding relevant business, market, or social
-                        context for deeper interpretation.</li>
+                    <li><strong>Filtering:</strong> Selecting subsets of data based on conditions or thresholds.</li>
+                    <li><strong>Computing derived values:</strong> Calculating new metrics (e.g., averages, totals,
+                        ratios) from existing data.</li>
+                    <li><strong>Finding extremum:</strong> Locating minimum or maximum values, such as identifying the
+                        best/worst performing categories.</li>
+                    <li><strong>Sorting:</strong> Arranging data points by magnitude, date, or another attribute.</li>
+                    <li><strong>Determining range:</strong> Finding the span between minimum and maximum values.</li>
+                    <li><strong>Characterizing distribution:</strong> Assessing frequency distributions or statistical
+                        properties (mean, variance).</li>
+                    <li><strong>Pattern and trend analysis:</strong> Detecting relationships, trends, and underlying
+                        patterns.</li>
+                    <li><strong>Clustering:</strong> Grouping similar data points based on feature similarity.</li>
+                    <li><strong>Correlation:</strong> Quantifying relationships between different variables.</li>
+                    <li><strong>Contextualization:</strong> Embedding relevant business, market, or social context for
+                        deeper interpretation.</li>
                 </ul>
 
                 <h3>Data Visualization</h3>
                 <p>Data visualization is the representation of data through visual means. By translating complex
-                    analytical results into graphical forms (charts, graphs, maps), it enhances human
-                    interpretation and insight generation.</p>
+                    analytical results into graphical forms (charts, graphs, maps), it enhances human interpretation and
+                    insight generation.</p>
 
                 <h4>Types of Data Visualizations</h4>
                 <ul>
-                    <li><strong>Time-series charts</strong>: Display data trends across time (e.g., line charts
-                        of stock prices or temperature).</li>
-                    <li><strong>Ranking/Bar Charts</strong>: Show ordered relationships (e.g., top 10 products,
-                        country comparisons).</li>
-                    <li><strong>Part-to-whole/Pie Charts</strong>: Visualize proportions within a whole (e.g.,
-                        sales by region as part of total sales).</li>
-                    <li><strong>Deviation/Network Graphs</strong>: Illustrate differences from a norm (e.g.,
-                        sales performance vs average).</li>
-                    <li><strong>Frequency Distribution/Histograms</strong>: Show how data points are distributed
-                        within value ranges (e.g., exam score frequency).</li>
-                    <li><strong>Correlation/Scatter Plots</strong>: Reveal relationships between two variables.
-                    </li>
-                    <li><strong>Geospatial/Heatmaps</strong>: Depict data distributed across geographic
-                        locations.</li>
+                    <li><strong>Time-series charts</strong>: Display data trends across time (e.g., line charts of stock
+                        prices or temperature).</li>
+                    <li><strong>Ranking/Bar Charts</strong>: Show ordered relationships (e.g., top 10 products, country
+                        comparisons).</li>
+                    <li><strong>Part-to-whole/Pie Charts</strong>: Visualize proportions within a whole (e.g., sales by
+                        region as part of total sales).</li>
+                    <li><strong>Deviation/Network Graphs</strong>: Illustrate differences from a norm (e.g., sales
+                        performance vs average).</li>
+                    <li><strong>Frequency Distribution/Histograms</strong>: Show how data points are distributed within
+                        value ranges (e.g., exam score frequency).</li>
+                    <li><strong>Correlation/Scatter Plots</strong>: Reveal relationships between two variables.</li>
+                    <li><strong>Geospatial/Heatmaps</strong>: Depict data distributed across geographic locations.</li>
                     <li><strong>Gantt charts</strong>: Visualize project timelines and resource allocation.</li>
                     <li><strong>Treemaps</strong>: Show hierarchical data using nested rectangles.</li>
                 </ul>
@@ -439,10 +926,8 @@
                 <h4>Natural Patterns</h4>
                 <ul>
                     <li><strong>Symmetry:</strong> Found in organisms and crystalline structures.</li>
-                    <li><strong>Fractals:</strong> Branching trees, river networks, snowflakes.
-                    </li>
-                    <li><strong>Spirals:</strong> Seen in shells, galaxies, hurricanes (Fibonacci, golden
-                        spirals).</li>
+                    <li><strong>Fractals:</strong> Branching trees, river networks, snowflakes.</li>
+                    <li><strong>Spirals:</strong> Seen in shells, galaxies, hurricanes (Fibonacci, golden spirals).</li>
                     <li><strong>Chaos:</strong> Lightning, cloud turbulence, river paths.</li>
                     <li><strong>Waves:</strong> Water surfaces, sound, electromagnetic waves.</li>
                     <li><strong>Bubbles and foam:</strong> Patterns in fluids and surfaces.</li>
@@ -453,29 +938,28 @@
 
                 <h4>Human-created Patterns</h4>
                 <ul>
-                    <li><strong>Buildings:</strong> Geometric, symmetric, and fractal motifs in architecture.
-                    </li>
+                    <li><strong>Buildings:</strong> Geometric, symmetric, and fractal motifs in architecture.</li>
                     <li><strong>Cities:</strong> Gridded urban layouts, fractal-like urban sprawl.</li>
-                    <li><strong>Virtual environments:</strong> Procedural symmetry, fractals in
-                        computer-generated worlds.</li>
-                    <li><strong>Artifacts:</strong> Patterns in pottery, textiles, jewelry—often geometric or
-                        floral.</li>
+                    <li><strong>Virtual environments:</strong> Procedural symmetry, fractals in computer-generated
+                        worlds.</li>
+                    <li><strong>Artifacts:</strong> Patterns in pottery, textiles, jewelry—often geometric or floral.
+                    </li>
                 </ul>
 
                 <h4>Pattern Creation Techniques</h4>
                 <ul>
-                    <li><strong>Repetition:</strong> Crucial to both natural and artificial patterns (e.g.,
-                        cellular automata, L-systems).</li>
-                    <li><strong>Fractals:</strong> Complex, self-similar designs, such as the Mandelbrot and
-                        Julia sets.</li>
+                    <li><strong>Repetition:</strong> Crucial to both natural and artificial patterns (e.g., cellular
+                        automata, L-systems).</li>
+                    <li><strong>Fractals:</strong> Complex, self-similar designs, such as the Mandelbrot and Julia sets.
+                    </li>
                 </ul>
 
                 <h3>Data Mining: Synonyms and Related Concepts</h3>
                 <ul>
-                    <li><strong>Pattern recognition</strong>: Focuses on detecting patterns and regularities in
-                        data.</li>
-                    <li><strong>Knowledge discovery in databases (KDD)</strong>: Encompasses the overall process
-                        from data preparation to pattern discovery.</li>
+                    <li><strong>Pattern recognition</strong>: Focuses on detecting patterns and regularities in data.
+                    </li>
+                    <li><strong>Knowledge discovery in databases (KDD)</strong>: Encompasses the overall process from
+                        data preparation to pattern discovery.</li>
                     <li><strong>Machine learning</strong>: Automates detection of data patterns by training
                         computational models.</li>
                 </ul>
@@ -486,10 +970,10 @@
                         prediction/classification.</li>
                     <li><strong>Unsupervised learning</strong>: Discovers structures in unlabeled data (e.g.,
                         clustering).</li>
-                    <li><strong>Semi-supervised learning</strong>: Combines small labeled and large unlabeled
-                        datasets.</li>
-                    <li><strong>Self-supervised learning</strong>: Automatically generates labels from data
-                        itself, powering many deep learning breakthroughs.</li>
+                    <li><strong>Semi-supervised learning</strong>: Combines small labeled and large unlabeled datasets.
+                    </li>
+                    <li><strong>Self-supervised learning</strong>: Automatically generates labels from data itself,
+                        powering many deep learning breakthroughs.</li>
                 </ul>
 
                 <h3>Major Data Mining Tasks</h3>
@@ -497,78 +981,61 @@
                     <li><strong>Classification</strong>: Assigning items to predefined categories.</li>
                     <li><strong>Clustering</strong>: Grouping similar items without predefined labels.</li>
                     <li><strong>Regression</strong>: Predicting numeric values based on data trends.</li>
-                    <li><strong>Sequence labeling</strong>: Assigning labels to elements in ordered sequences
-                        (e.g., part-of-speech tagging).</li>
-                    <li><strong>Association rule learning</strong>: Discovering relationships among variables
-                        (e.g., market basket analysis).</li>
-                    <li><strong>Anomaly detection</strong>: Identifying outliers or rare events that do not
-                        conform to expected patterns.</li>
-                    <li><strong>Summarization</strong>: Generating compact descriptions of
-                        datasets.</li>
+                    <li><strong>Sequence labeling</strong>: Assigning labels to elements in ordered sequences (e.g.,
+                        part-of-speech tagging).</li>
+                    <li><strong>Association rule learning</strong>: Discovering relationships among variables (e.g.,
+                        market basket analysis).</li>
+                    <li><strong>Anomaly detection</strong>: Identifying outliers or rare events that do not conform to
+                        expected patterns.</li>
+                    <li><strong>Summarization</strong>: Generating compact descriptions of datasets.</li>
                 </ol>
+            </article>
+
+            <footer>
                 <h4>References</h4>
                 <ol>
-                    <li id="mining">Piatetsky-Shapiro, Gregory. “Data Mining and Knowledge Discovery 1996 to
-                        2005:
-                        Overcoming the Hype and Moving from ‘University’ to ‘Business’ and ‘Analytics.’” Data
-                        Mining
-                        and
-                        Knowledge Discovery, vol. 15, no. 1, July 2007, pp. 99–105.
-                        DOI.org (Crossref), doi:10.1007/s10618-006-0058-2.</li>
-                    <li id="trends">Kriegel, Hans-Peter, et al. “Future Trends in Data Mining.” Data Mining and
-                        Knowledge
-                        Discovery, vol. 15, no. 1, July 2007, pp. 87–97. DOI.org (Crossref),
-                        doi:10.1007/s10618-007-0067-9.
-                    </li>
-                    <li id="patterns">Fayyad, Usama, et al. “Knowledge Discovery and Data Mining: Towards a
-                        Unifying
-                        Framework.” Proceedings of the Second International Conference on Knowledge Discovery
-                        and
-                        Data
+                    <li id="mining">Piatetsky-Shapiro, Gregory. "Data Mining and Knowledge Discovery 1996 to 2005:
+                        Overcoming the Hype and Moving from 'University' to 'Business' and 'Analytics.'" Data Mining and
+                        Knowledge Discovery, vol. 15, no. 1, July 2007, pp. 99–105. DOI.org (Crossref),
+                        doi:10.1007/s10618-006-0058-2.</li>
+                    <li id="trends">Kriegel, Hans-Peter, et al. "Future Trends in Data Mining." Data Mining and
+                        Knowledge Discovery, vol. 15, no. 1, July 2007, pp. 87–97. DOI.org (Crossref),
+                        doi:10.1007/s10618-007-0067-9.</li>
+                    <li id="patterns">Fayyad, Usama, et al. "Knowledge Discovery and Data Mining: Towards a Unifying
+                        Framework." Proceedings of the Second International Conference on Knowledge Discovery and Data
                         Mining, AAAI Press, 1996, pp. 82–88.</li>
                     <li id="sqlnosql"><a href="https://cacm.acm.org/blogs/blog-cacm/250843-nosql-vs-sql/fulltext">NoSQL
-                            vs.
-                            SQL</a></li>
-                    <li> <a href="https://en.wikipedia.org/wiki/Data_mining">Wikipedia: Data Mining</a>
+                            vs. SQL</a></li>
+                    <li><a href="https://en.wikipedia.org/wiki/Data_mining">Wikipedia: Data Mining</a></li>
+                    <li><a href="https://scikit-learn.org/stable/modules/clustering.html">Scikit-learn: Clustering</a>
                     </li>
-                    <li> <a href="https://scikit-learn.org/stable/modules/clustering.html">Scikit-learn:
-                            Clustering</a>
-                    </li>
-                    <li> <a
+                    <li><a
                             href="https://www.forbes.com/councils/forbestechcouncil/2019/11/15/data-is-the-new-oil-and-thats-a-good-thing/">Forbes:
-                            Why data is the new oil</a>
+                            Why data is the new oil</a></li>
+                    <li><a href="https://en.wikipedia.org/wiki/Data_acquisition">Wikipedia: Data Acquisition</a></li>
+                    <li><a href="https://en.wikipedia.org/wiki/Data_cleaning">Wikipedia: Data Cleaning</a></li>
+                    <li><a href="https://en.wikipedia.org/wiki/Extract,_transform,_load">Wikipedia: Extract, Transform,
+                            Load (ETL)</a></li>
+                    <li><a href="https://en.wikipedia.org/wiki/Data_warehouse">Wikipedia: Data Warehouse</a></li>
+                    <li><a href="https://en.wikipedia.org/wiki/Data_visualization">Wikipedia: Data Visualization</a>
                     </li>
-                    <li> <a href="https://en.wikipedia.org/wiki/Data_acquisition">Wikipedia: Data
-                            Acquisition</a>
-                    </li>
-                    <li> <a href="https://en.wikipedia.org/wiki/Data_cleaning">Wikipedia: Data Cleaning</a>
-                    </li>
-                    <li> <a href="https://en.wikipedia.org/wiki/Extract,_transform,_load">Wikipedia: Extract,
-                            Transform, Load (ETL)</a>
-                    </li>
-                    <li> <a href="https://en.wikipedia.org/wiki/Data_warehouse">Wikipedia: Data Warehouse</a>
-                    </li>
-                    <li> <a href="https://en.wikipedia.org/wiki/Data_visualization">Wikipedia: Data
-                            Visualization</a>
-                    </li>
-                    <li> <a href="https://en.wikipedia.org/wiki/Star_schema">Wikipedia: Star Schema</a>
-                    </li>
-                    <li> <a href="https://en.wikipedia.org/wiki/Snowflake_schema">Wikipedia: Snowflake
-                            Schema</a>
-                    </li>
-                    <li> <a href="https://en.wikipedia.org/wiki/Data_analysis">Wikipedia: Data Analysis</a>
-                    </li>
-                    <li> <a href="https://en.wikipedia.org/wiki/Fractal">Wikipedia: Fractal</a>
-                    </li>
-                    <li> <a href="https://en.wikipedia.org/wiki/Machine_learning">Wikipedia: Machine
-                            Learning</a>
-                    </li>
-                    <li> <a href="https://en.wikipedia.org/wiki/Self-supervised_learning">Wikipedia:
-                            Self-supervised Learning</a>
-                    </li>
+                    <li><a href="https://en.wikipedia.org/wiki/Star_schema">Wikipedia: Star Schema</a></li>
+                    <li><a href="https://en.wikipedia.org/wiki/Snowflake_schema">Wikipedia: Snowflake Schema</a></li>
+                    <li><a href="https://en.wikipedia.org/wiki/Data_analysis">Wikipedia: Data Analysis</a></li>
+                    <li><a href="https://en.wikipedia.org/wiki/Fractal">Wikipedia: Fractal</a></li>
+                    <li><a href="https://en.wikipedia.org/wiki/Machine_learning">Wikipedia: Machine Learning</a></li>
+                    <li><a href="https://en.wikipedia.org/wiki/Self-supervised_learning">Wikipedia: Self-supervised
+                            Learning</a></li>
                 </ol>
-            </div>
-        </div>
+
+                <div class="language-selector">
+                    <h4>Languages</h4>
+                    <div class="language-links">
+                        <a href="./data-mining.html" hreflang="en">English</a>
+                    </div>
+                </div>
+            </footer>
+        </main>
     </body>
 
 </html>

@@ -2,262 +2,849 @@
 <html lang="en">
 
     <head>
-        <meta charset="utf-8" />
-        <meta http-equiv="Content-Language" content="en" />
-        <link rel="shortcut icon" href="../../images/logo/favicon.png" />
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta http-equiv="Content-Language" content="en">
+        <link rel="shortcut icon" href="../../images/logo/favicon.png">
         <title>Data Warehousing: John Samuel</title>
-        <style type="text/css">
-            body {
-                background-color: #FFFFFF;
+        <style>
+            :root {
+                /* Color Palette - Centralized Storage/Architecture Theme */
+                --color-base-bg: #f7f9fb;
+                --color-base-surface: #ffffff;
+                --color-base-text: #1a202c;
+                --color-base-text-muted: #4a5568;
+
+                /* Theme Accents - Warehouse/Storage Colors */
+                --color-accent-1: #2e7d32;
+                --color-accent-2: #1b5e20;
+                --color-accent-3: #558b2f;
+                --color-accent-4: #66bb6a;
+                --color-accent-light: #e8f5e9;
+
+                /* Functional Colors */
+                --color-shadow: rgba(46, 125, 50, 0.12);
+                --color-border: rgba(46, 125, 50, 0.15);
+                --color-hover: rgba(46, 125, 50, 0.08);
+
+                /* Gradients */
+                --gradient-primary: linear-gradient(135deg, var(--color-accent-1) 0%, var(--color-accent-3) 100%);
+                --gradient-secondary: linear-gradient(225deg, var(--color-accent-2) 0%, var(--color-accent-4) 100%);
+                --gradient-subtle: linear-gradient(180deg, var(--color-base-bg) 0%, var(--color-accent-light) 100%);
+
+                /* Spacing Scale */
+                --space-xs: 0.25rem;
+                --space-sm: 0.5rem;
+                --space-md: 1rem;
+                --space-lg: 1.5rem;
+                --space-xl: 2rem;
+                --space-2xl: 3rem;
+                --space-3xl: 4rem;
+                --space-4xl: 6rem;
+
+                /* Typography */
+                --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+                --text-xs: clamp(0.75rem, 0.7rem + 0.25vw, 0.875rem);
+                --text-sm: clamp(0.875rem, 0.8rem + 0.35vw, 1rem);
+                --text-base: clamp(1rem, 0.95rem + 0.25vw, 1.125rem);
+                --text-lg: clamp(1.125rem, 1.05rem + 0.35vw, 1.25rem);
+                --text-xl: clamp(1.25rem, 1.15rem + 0.5vw, 1.5rem);
+                --text-2xl: clamp(1.5rem, 1.3rem + 1vw, 2rem);
+                --text-3xl: clamp(2rem, 1.6rem + 2vw, 2.5rem);
+                --text-4xl: clamp(2.5rem, 2rem + 2.5vw, 3.5rem);
+
+                /* Borders and Shadows */
+                --radius-sm: 4px;
+                --radius-md: 8px;
+                --radius-lg: 12px;
+                --radius-xl: 16px;
+                --radius-2xl: 24px;
+
+                --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.04), 0 1px 3px rgba(0, 0, 0, 0.06);
+                --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.05), 0 2px 4px rgba(0, 0, 0, 0.06);
+                --shadow-lg: 0 10px 24px rgba(0, 0, 0, 0.08), 0 4px 8px rgba(0, 0, 0, 0.06);
+                --shadow-xl: 0 20px 40px rgba(0, 0, 0, 0.12), 0 8px 16px rgba(0, 0, 0, 0.08);
+                --shadow-theme: 0 10px 30px var(--color-shadow), 0 4px 10px rgba(0, 0, 0, 0.06);
             }
 
-            #sidebar {
-                position: fixed;
-                background-color: #1B80CF;
-                top: 0;
-                left: 0;
-                bottom: 0;
-                width: 30vw;
-            }
-
-            #sidebar .title {
-                position: relative;
-                text-align: center;
-                line-height: 4vmax;
-                font-size: 1.4vmax;
-                font-family: 'Arial';
-                margin-top: 25vh;
-            }
-
-            #sidebar .title a:link,
-            #sidebar .title a:visited {
-                color: #FFFFFF;
-                text-decoration: none;
-            }
-
-            .subtitle {
-                top: 50vh;
-                text-align: center;
-                line-height: 1.3vmax;
-                font-family: 'Arial';
-                font-size: 1.5vmax;
-                color: #FFFFFF;
-            }
-
-            .subtitle a:link,
-            .subtitle a:visited {
-                color: #FFFFFF;
-                text-decoration: none;
-            }
-
-            .licence {
-                position: fixed;
-                text-align: right;
-                bottom: 0;
-                right: 0;
-            }
-
-            .home {
-                position: fixed;
-                text-align: left;
-                font-family: 'Arial';
-                color: #D3D3D3;
-                z-index: 100;
-                width: 100%;
-                background-color: #FFFFFF;
-                top: 0px;
-                margin-bottom: 10px;
-                padding-bottom: 10px;
-            }
-
-            .home a:link,
-            .home a:visited {
-                text-decoration: none;
-                color: #D3D3D3;
-            }
-
-            .home ul {
+            /* Reset and Base Styles */
+            * {
                 margin: 0;
                 padding: 0;
-                text-align: left;
+                box-sizing: border-box;
+            }
+
+            html {
+                scroll-behavior: smooth;
+                scroll-padding-top: 80px;
+            }
+
+            body {
+                font-family: var(--font-sans);
+                font-size: var(--text-base);
+                line-height: 1.7;
+                color: var(--color-base-text);
+                background: var(--gradient-subtle);
+                background-attachment: fixed;
+                -webkit-font-smoothing: antialiased;
+                -moz-osx-font-smoothing: grayscale;
+                overflow-x: hidden;
+            }
+
+            /* Animated Background Pattern */
+            body::before {
+                content: '';
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background-image:
+                    repeating-linear-gradient(90deg, rgba(46, 125, 50, 0.03) 0px, transparent 1px, transparent 40px, rgba(46, 125, 50, 0.03) 41px),
+                    repeating-linear-gradient(0deg, rgba(46, 125, 50, 0.03) 0px, transparent 1px, transparent 40px, rgba(46, 125, 50, 0.03) 41px);
+                pointer-events: none;
+                z-index: -1;
+                animation: gridSlide 30s linear infinite;
+            }
+
+            @keyframes gridSlide {
+                0% {
+                    transform: translate(0, 0);
+                }
+
+                100% {
+                    transform: translate(40px, 40px);
+                }
+            }
+
+            /* Navigation Header */
+            .nav-header {
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                z-index: 1000;
+                background: rgba(255, 255, 255, 0.7);
+                -webkit-backdrop-filter: blur(12px) saturate(180%);
+                backdrop-filter: blur(12px) saturate(180%);
+                border-bottom: 1px solid var(--color-border);
+                box-shadow: var(--shadow-sm);
+                animation: slideDown 0.6s ease-out;
+            }
+
+            @keyframes slideDown {
+                from {
+                    transform: translateY(-100%);
+                    opacity: 0;
+                }
+
+                to {
+                    transform: translateY(0);
+                    opacity: 1;
+                }
+            }
+
+            .nav-container {
+                max-width: 1400px;
+                margin: 0 auto;
+                padding: var(--space-md) var(--space-xl);
+                display: flex;
+                align-items: center;
+                gap: var(--space-xl);
+            }
+
+            .site-name {
+                font-size: var(--text-lg);
+                font-weight: 700;
+                letter-spacing: -0.02em;
+                background: var(--gradient-primary);
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                background-clip: text;
+                text-decoration: none;
+                transition: transform 0.3s ease;
+            }
+
+            .site-name:hover {
+                transform: scale(1.05);
+            }
+
+            .breadcrumb {
+                display: flex;
+                list-style: none;
+                gap: var(--space-sm);
+                flex-wrap: wrap;
+                align-items: center;
+            }
+
+            .breadcrumb li {
+                display: flex;
+                align-items: center;
+                gap: var(--space-sm);
+            }
+
+            .breadcrumb li:not(:last-child)::after {
+                content: '→';
+                color: var(--color-base-text-muted);
+                font-size: var(--text-sm);
+            }
+
+            .breadcrumb a {
+                color: var(--color-base-text-muted);
+                text-decoration: none;
+                font-size: var(--text-sm);
+                transition: color 0.3s ease;
+                padding: var(--space-xs) var(--space-sm);
+                border-radius: var(--radius-sm);
+            }
+
+            .breadcrumb a:hover {
+                color: var(--color-accent-1);
+                background: var(--color-hover);
+            }
+
+            /* Main Container */
+            .container {
+                max-width: 1400px;
+                margin: 0 auto;
+                padding: var(--space-4xl) var(--space-xl) var(--space-3xl);
+            }
+
+            /* Hero Section */
+            .hero {
+                margin-top: var(--space-3xl);
+                margin-bottom: var(--space-4xl);
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: var(--space-3xl);
+                align-items: center;
+                animation: fadeInUp 0.8s ease-out 0.2s both;
+            }
+
+            @keyframes fadeInUp {
+                from {
+                    opacity: 0;
+                    transform: translateY(30px);
+                }
+
+                to {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            }
+
+            .hero-content h1 {
+                font-size: var(--text-4xl);
+                font-weight: 800;
+                letter-spacing: -0.03em;
+                line-height: 1.15;
+                color: var(--color-base-text);
+                margin-bottom: var(--space-lg);
+                background: var(--gradient-primary);
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                background-clip: text;
+            }
+
+            .hero-content .subtitle {
+                font-size: var(--text-xl);
+                color: var(--color-base-text-muted);
+                line-height: 1.6;
+                margin-bottom: var(--space-xl);
+            }
+
+            .series-badge {
+                display: inline-flex;
+                align-items: center;
+                gap: var(--space-sm);
+                background: var(--gradient-primary);
+                color: white;
+                padding: var(--space-sm) var(--space-lg);
+                border-radius: var(--radius-2xl);
+                font-size: var(--text-sm);
+                font-weight: 600;
+                box-shadow: var(--shadow-theme);
+                animation: pulse 2s ease-in-out infinite;
+            }
+
+            @keyframes pulse {
+
+                0%,
+                100% {
+                    transform: scale(1);
+                }
+
+                50% {
+                    transform: scale(1.02);
+                }
+            }
+
+            .series-badge a {
+                color: white;
+                text-decoration: underline;
+                text-decoration-color: rgba(255, 255, 255, 0.5);
+                text-underline-offset: 3px;
+                transition: text-decoration-color 0.3s ease;
+            }
+
+            .series-badge a:hover {
+                text-decoration-color: white;
+            }
+
+            /* SVG Illustration Container */
+            .hero-illustration {
+                position: relative;
+                min-height: 400px;
+                animation: fadeInUp 0.8s ease-out 0.4s both;
+            }
+
+            .illustration-svg {
+                width: 100%;
+                height: auto;
+                filter: drop-shadow(0 10px 30px rgba(46, 125, 50, 0.15));
+            }
+
+            /* Content Sections */
+            .content-section {
+                margin-bottom: var(--space-4xl);
+                animation: fadeInUp 0.6s ease-out both;
+            }
+
+            .content-section:nth-child(1) {
+                animation-delay: 0.3s;
+            }
+
+            .content-section:nth-child(2) {
+                animation-delay: 0.4s;
+            }
+
+            .content-section:nth-child(3) {
+                animation-delay: 0.5s;
+            }
+
+            .content-section h2 {
+                font-size: var(--text-3xl);
+                font-weight: 700;
+                letter-spacing: -0.02em;
+                color: var(--color-accent-1);
+                margin-bottom: var(--space-xl);
+                position: relative;
+                padding-bottom: var(--space-md);
+            }
+
+            .content-section h2::after {
+                content: '';
+                position: absolute;
+                bottom: 0;
+                left: 0;
+                width: 60px;
+                height: 4px;
+                background: var(--gradient-primary);
+                border-radius: var(--radius-sm);
+            }
+
+            .content-section h3 {
+                font-size: var(--text-xl);
+                font-weight: 600;
+                letter-spacing: -0.01em;
+                color: var(--color-accent-2);
+                margin-top: var(--space-2xl);
+                margin-bottom: var(--space-lg);
+                position: relative;
+                padding-left: var(--space-lg);
+            }
+
+            .content-section h3::before {
+                content: '';
+                position: absolute;
+                left: 0;
+                top: 50%;
+                transform: translateY(-50%);
+                width: 6px;
+                height: 60%;
+                background: var(--gradient-primary);
+                border-radius: var(--radius-sm);
+            }
+
+            .content-section p {
+                color: var(--color-base-text);
+                margin-bottom: var(--space-lg);
+                line-height: 1.8;
+            }
+
+            .content-section ul,
+            .content-section ol {
+                margin-left: var(--space-xl);
+                margin-bottom: var(--space-lg);
+            }
+
+            .content-section li {
+                margin-bottom: var(--space-md);
+                line-height: 1.8;
+                padding-left: var(--space-sm);
+            }
+
+            .content-section a {
+                color: var(--color-accent-1);
+                text-decoration: none;
+                border-bottom: 2px solid transparent;
+                transition: all 0.3s ease;
+                font-weight: 500;
+            }
+
+            .content-section a:hover {
+                color: var(--color-accent-2);
+                border-bottom-color: var(--color-accent-2);
+            }
+
+            .content-section strong {
+                font-weight: 600;
+                color: var(--color-base-text);
+            }
+
+            /* Component Cards */
+            .component-grid {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+                gap: var(--space-lg);
+                margin: var(--space-2xl) 0;
+            }
+
+            .component-card {
+                background: rgba(255, 255, 255, 0.7);
+                -webkit-backdrop-filter: blur(12px) saturate(180%);
+                backdrop-filter: blur(12px) saturate(180%);
+                border: 1px solid var(--color-border);
+                border-radius: var(--radius-xl);
+                padding: var(--space-xl);
+                box-shadow: var(--shadow-md);
+                transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+                position: relative;
+                overflow: hidden;
+            }
+
+            .component-card::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                height: 4px;
+                background: var(--gradient-primary);
+                transform: scaleX(0);
+                transform-origin: left;
+                transition: transform 0.4s ease;
+            }
+
+            .component-card:hover {
+                transform: translateY(-8px) scale(1.02);
+                box-shadow: var(--shadow-xl);
+                border-color: var(--color-accent-1);
+            }
+
+            .component-card:hover::before {
+                transform: scaleX(1);
+            }
+
+            .component-card .icon {
+                width: 48px;
+                height: 48px;
+                background: var(--gradient-primary);
+                border-radius: var(--radius-lg);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                color: white;
+                font-weight: 700;
+                font-size: var(--text-lg);
+                margin-bottom: var(--space-md);
+            }
+
+            .component-card h4 {
+                font-size: var(--text-lg);
+                font-weight: 600;
+                color: var(--color-accent-1);
+                margin-bottom: var(--space-md);
+            }
+
+            .component-card p {
+                font-size: var(--text-sm);
+                color: var(--color-base-text-muted);
+                line-height: 1.7;
+                margin: 0;
+            }
+
+            /* Lifecycle Steps */
+            .lifecycle-steps {
+                counter-reset: step-counter;
+                list-style: none;
+                margin-left: 0;
+                margin-bottom: var(--space-2xl);
+            }
+
+            .lifecycle-steps li {
+                counter-increment: step-counter;
+                position: relative;
+                padding: var(--space-lg);
+                padding-left: var(--space-4xl);
+                margin-bottom: var(--space-lg);
+                background: rgba(255, 255, 255, 0.5);
+                border-radius: var(--radius-lg);
+                border-left: 4px solid var(--color-accent-1);
+                box-shadow: var(--shadow-sm);
+                transition: all 0.3s ease;
+            }
+
+            .lifecycle-steps li:hover {
+                background: rgba(255, 255, 255, 0.8);
+                transform: translateX(8px);
+                box-shadow: var(--shadow-md);
+            }
+
+            .lifecycle-steps li::before {
+                content: counter(step-counter);
+                position: absolute;
+                left: var(--space-lg);
+                top: var(--space-lg);
+                width: 40px;
+                height: 40px;
+                background: var(--gradient-primary);
+                color: white;
+                border-radius: 50%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-weight: 700;
+                font-size: var(--text-lg);
+                box-shadow: var(--shadow-theme);
+            }
+
+            /* Comparison Section */
+            .comparison-box {
+                background: linear-gradient(135deg, rgba(46, 125, 50, 0.08) 0%, rgba(85, 139, 47, 0.08) 100%);
+                border: 2px solid var(--color-border);
+                border-radius: var(--radius-xl);
+                padding: var(--space-2xl);
+                margin: var(--space-2xl) 0;
+                box-shadow: var(--shadow-md);
+            }
+
+            .comparison-box h3 {
+                margin-top: 0;
+                padding-left: 0;
+            }
+
+            .comparison-box h3::before {
+                display: none;
+            }
+
+            /* Challenge Cards */
+            .challenge-grid {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+                gap: var(--space-lg);
+                margin: var(--space-2xl) 0;
+            }
+
+            .challenge-card {
+                background: rgba(255, 255, 255, 0.7);
+                -webkit-backdrop-filter: blur(12px) saturate(180%);
+                backdrop-filter: blur(12px) saturate(180%);
+                border: 1px solid var(--color-border);
+                border-radius: var(--radius-xl);
+                padding: var(--space-xl);
+                box-shadow: var(--shadow-md);
+            }
+
+            .challenge-card h4 {
+                font-size: var(--text-lg);
+                font-weight: 600;
+                color: var(--color-accent-1);
+                margin-bottom: var(--space-md);
+                display: flex;
+                align-items: center;
+                gap: var(--space-sm);
+            }
+
+            .challenge-card h4::before {
+                content: '⚠';
+                font-size: var(--text-xl);
+            }
+
+            /* Model Cards */
+            .model-showcase {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+                gap: var(--space-xl);
+                margin: var(--space-2xl) 0;
+            }
+
+            .model-card {
+                background: rgba(255, 255, 255, 0.7);
+                -webkit-backdrop-filter: blur(12px) saturate(180%);
+                backdrop-filter: blur(12px) saturate(180%);
+                border: 2px solid var(--color-border);
+                border-radius: var(--radius-2xl);
+                padding: var(--space-2xl);
+                box-shadow: var(--shadow-lg);
+                transition: all 0.4s ease;
+                position: relative;
+            }
+
+            .model-card::after {
+                content: '';
+                position: absolute;
+                inset: -2px;
+                background: var(--gradient-primary);
+                border-radius: var(--radius-2xl);
+                z-index: -1;
+                opacity: 0;
+                transition: opacity 0.4s ease;
+            }
+
+            .model-card:hover {
+                transform: translateY(-12px);
+                box-shadow: var(--shadow-xl);
+            }
+
+            .model-card:hover::after {
+                opacity: 1;
+            }
+
+            .model-card h4 {
+                font-size: var(--text-2xl);
+                font-weight: 700;
+                color: var(--color-accent-1);
+                margin-bottom: var(--space-md);
+            }
+
+            /* Industry Applications */
+            .industry-grid {
+                display: grid;
+                grid-template-columns: repeat(2, 1fr);
+                gap: var(--space-lg);
+                margin: var(--space-2xl) 0;
+            }
+
+            .industry-item {
+                display: flex;
+                align-items: flex-start;
+                gap: var(--space-md);
+                padding: var(--space-lg);
+                background: rgba(255, 255, 255, 0.5);
+                border-radius: var(--radius-lg);
+                border-left: 4px solid var(--color-accent-3);
+                transition: all 0.3s ease;
+            }
+
+            .industry-item:hover {
+                background: rgba(255, 255, 255, 0.8);
+                border-left-width: 8px;
+                transform: translateX(4px);
+            }
+
+            .industry-icon {
+                width: 36px;
+                height: 36px;
+                background: var(--gradient-primary);
+                border-radius: var(--radius-md);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                color: white;
+                font-weight: 700;
+                flex-shrink: 0;
+            }
+
+            .industry-content strong {
+                display: block;
+                color: var(--color-accent-1);
+                font-weight: 600;
+                margin-bottom: var(--space-xs);
+            }
+
+            /* References Section */
+            .references {
+                background: rgba(255, 255, 255, 0.7);
+                -webkit-backdrop-filter: blur(12px) saturate(180%);
+                backdrop-filter: blur(12px) saturate(180%);
+                border: 1px solid var(--color-border);
+                border-radius: var(--radius-xl);
+                padding: var(--space-2xl);
+                box-shadow: var(--shadow-md);
+                margin-top: var(--space-3xl);
+            }
+
+            .references h3 {
+                margin-top: 0;
+                color: var(--color-accent-1);
+                margin-bottom: var(--space-xl);
+                padding-left: 0;
+            }
+
+            .references h3::before {
+                display: none;
+            }
+
+            .references ol {
+                margin-left: var(--space-xl);
+            }
+
+            .references li {
+                margin-bottom: var(--space-md);
+                line-height: 1.8;
+            }
+
+            /* Footer */
+            .footer {
+                margin-top: var(--space-4xl);
+                padding: var(--space-2xl) 0;
+                border-top: 1px solid var(--color-border);
+                background: rgba(255, 255, 255, 0.5);
+                -webkit-backdrop-filter: blur(8px);
+                backdrop-filter: blur(8px);
+            }
+
+            .footer-content {
+                max-width: 1400px;
+                margin: 0 auto;
+                padding: 0 var(--space-xl);
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                flex-wrap: wrap;
+                gap: var(--space-lg);
+            }
+
+            .footer-links {
+                display: flex;
+                gap: var(--space-lg);
                 list-style: none;
             }
 
-            .home li {
-                position: relative;
-                float: left;
-                padding-top: 15px;
-                margin-right: 1em;
-                font-family: 'Arial';
-            }
-
-            .home li:hover {
-                display: block;
-            }
-
-            .home a:link,
-            .home a:visited {
-                color: #D3D3D3;
-            }
-
-            .home li:hover a:link,
-            .home li:hover a:visited {
+            .footer-links a {
+                color: var(--color-base-text-muted);
                 text-decoration: none;
-                padding: 15px;
-                color: #FFFFFF;
-                background-color: #1B80CF;
+                font-size: var(--text-sm);
+                transition: color 0.3s ease;
             }
 
-            .content {
-                line-height: 1.8vmax;
-                font-size: 1.2vmax;
-                font-family: 'Arial';
-                margin-top: 15vh;
-                width: 90%;
+            .footer-links a:hover {
+                color: var(--color-accent-1);
             }
 
-            .content h2,
-            h3,
-            h4 {
-                color: #1B80CF;
+            .copyright {
+                color: var(--color-base-text-muted);
+                font-size: var(--text-sm);
             }
 
-            .content a:link,
-            .content a:visited {
-                color: #1B80CF;
+            /* Responsive Design */
+            @media (max-width: 1024px) {
+                .hero {
+                    grid-template-columns: 1fr;
+                    gap: var(--space-2xl);
+                }
+
+                .hero-illustration {
+                    min-height: 300px;
+                }
+
+                .industry-grid {
+                    grid-template-columns: 1fr;
+                }
             }
 
-            .content h3 {
-                color: #1B80CF;
+            @media (max-width: 768px) {
+                .nav-container {
+                    flex-direction: column;
+                    align-items: flex-start;
+                    gap: var(--space-md);
+                    padding: var(--space-md);
+                }
+
+                .container {
+                    padding: var(--space-2xl) var(--space-md);
+                }
+
+                .hero {
+                    margin-top: var(--space-2xl);
+                }
+
+                .hero-content h1 {
+                    font-size: var(--text-3xl);
+                }
+
+                .component-grid,
+                .model-showcase,
+                .challenge-grid {
+                    grid-template-columns: 1fr;
+                }
+
+                .footer-content {
+                    flex-direction: column;
+                    align-items: flex-start;
+                }
+
+                .footer-links {
+                    flex-direction: column;
+                    gap: var(--space-sm);
+                }
             }
 
-            .content h2::before,
-            .content h3::before {
-                display: block;
-                content: " ";
-                visibility: hidden;
-                height: 50px;
-                margin-top: -50px;
-                pointer-events: none;
-                background-color: #FFFFFF;
+            @media (max-width: 480px) {
+                .lifecycle-steps li {
+                    padding-left: var(--space-3xl);
+                }
+
+                .lifecycle-steps li::before {
+                    left: var(--space-sm);
+                    width: 32px;
+                    height: 32px;
+                    font-size: var(--text-base);
+                }
             }
 
-            .content a:link,
-            .content a:visited {
-                color: #1B80CF;
+            /* Reduced Motion */
+            @media (prefers-reduced-motion: reduce) {
+
+                *,
+                *::before,
+                *::after {
+                    animation-duration: 0.01ms !important;
+                    animation-iteration-count: 1 !important;
+                    transition-duration: 0.01ms !important;
+                }
             }
 
-            .content li {
-                margin: 5px;
-            }
+            /* Print Styles */
+            @media print {
 
-            .page {
-                width: 65vw;
-                height: 100%;
-                margin-left: 30vw;
-                overflow: hidden;
-                padding: 0 1em;
-                font-family: 'Arial';
-            }
-
-            .page img {
-                max-width: 100%;
-                max-height: 100%;
-            }
-
-            @media (max-width: 640px),
-            screen and (orientation: portrait) {
-                body {
-                    max-width: 100%;
-                    max-height: 100%;
+                .nav-header,
+                .footer {
+                    display: none;
                 }
 
-                #sidebar {
-                    position: fixed;
-                    background-color: #1B80CF;
-                    top: 0;
-                    left: 0;
-                    bottom: 80vh;
-                    width: 100vw;
+                .container {
+                    padding: 0;
                 }
 
-                #sidebar .title {
-                    text-align: center;
-                    position: fixed;
-                    margin-top: 6vh;
-                    left: 0px;
-                    right: 0px;
-                    line-height: 3.5vmax;
-                    font-size: 1.5vmax;
-                    font-family: 'Arial';
+                .hero {
+                    page-break-after: avoid;
                 }
 
-                #sidebar .subtitle {
-                    text-align: center;
-                    top: 5vh;
-                    left: 0px;
-                    right: 0px;
-                    position: fixed;
-                    margin-top: 10vh;
-                    font-size: 1.5vmax;
-                }
-
-                #sidebar .title a:link,
-                #sidebar .title a:visited {
-                    text-align: center;
-                    color: #FFFFFF;
-                }
-
-                #sidebar .subtitle a:link,
-                #sidebar .subtitle a:visited {
-                    text-align: center;
-                    color: #FFFFFF;
-                }
-
-                .home {
-                    z-index: 100;
-                    width: 100%;
-                    background-color: #1B80CF;
-                    font-size: 1.5vmax;
-                }
-
-                .home a:link,
-                .home a:visited {
-                    text-decoration: none;
-                    color: #FFFFFF;
-                }
-
-                .content {
-                    line-height: 3.8vmax;
-                    font-size: 1.8vmax;
-                    font-family: 'Arial';
-                    margin-top: 22vh;
-                }
-
-                .content a:link,
-                .content a:visited {
-                    color: #1B80CF;
-                }
-
-                .page {
-                    top: 40vh;
-                    width: 95%;
-                    margin-left: 0vw;
-                }
-
-                .page img {
-                    max-width: 100%;
-                    max-height: 100%;
-                    border: 0;
+                .content-section {
+                    page-break-inside: avoid;
                 }
             }
         </style>
     </head>
 
     <body vocab="http://schema.org/">
-        <div class="page">
-            <div class="home">
-                <ul typeof="BreadcrumbList">
+
+        <nav class="nav-header" role="navigation" aria-label="Main navigation">
+            <div class="nav-container">
+                <a href="../about.html" class="site-name">John Samuel</a>
+                <ul class="breadcrumb" typeof="BreadcrumbList">
                     <li property="itemListElement" typeof="ListItem">
                         <a property="item" typeof="WebPage" href="../index.html">
                             <span property="name">Home</span>
@@ -268,186 +855,475 @@
                             <span property="name">Research</span>
                         </a>
                     </li>
-                </ul>
-
-            </div>
-            <div id="sidebar">
-                <div class="title">
-                    <h1><a href="./data-warehousing.html">Data Warehousing</a></h1>
-                </div>
-                <div class="subtitle">
-                    <h3><a href="../about.html">John Samuel</a></h3>
-                </div>
-            </div>
-
-            <div class="content">
-                <div
-                    style="background-color: #f0f8ff; border-left: 4px solid #1e90ff; padding: 1em; margin-bottom: 1.5em;">
-                    <strong>This article is part of a series on <a href="./data-science.html">Data
-                            Science</a>.</strong>
-                </div>
-                <h2>Data Warehousing</h2>
-                <p>Data warehousing is a core technology for storing, integrating, and analyzing large volumes of
-                    structured data from multiple sources. It plays a pivotal role in business intelligence (BI) and
-                    analytics, empowering organizations to make informed, data-driven decisions.</p>
-
-                <h3>Data Warehousing vs. Data Lakes</h3>
-                <p>While both data warehouses and data lakes are used for data storage and analysis, they serve
-                    different purposes. Data warehouses are optimized for structured data and support complex queries
-                    for reporting and analytics. In contrast, data lakes are designed to store vast amounts of raw,
-                    often unstructured or semi-structured data in its native format. Data lakes provide greater
-                    flexibility for data science and machine learning applications, whereas data warehouses prioritize
-                    speed, consistency, and reliability for business reporting.</p>
-
-                <h3>Key Components of a Data Warehouse</h3>
-                <p>A modern data warehouse architecture typically includes the following components:</p>
-                <ul>
-                    <li><strong>Data Sources</strong>: These include internal systems (e.g., transactional databases,
-                        CRM, ERP),
-                        flat files, sensors, APIs, and external data providers.</li>
-                    <li><strong>ETL/ELT Processes</strong>: ETL (Extract, Transform, Load) or ELT (Extract, Load,
-                        Transform)
-                        pipelines are responsible for ingesting, cleaning, transforming, and loading data into the
-                        warehouse according to the target schema.</li>
-                    <li><strong>Data Modeling</strong>: A logical and physical design of how data is organized using
-                        schemas such
-                        as star, snowflake, or galaxy models.</li>
-                    <li><strong>Storage Engine</strong>: The underlying infrastructure (on-premises or cloud) for
-                        storing the
-                        integrated and modeled data.</li>
-                    <li><strong>Query and Analysis Tools</strong>: BI tools, dashboards, and reporting engines that
-                        allow users to
-                        explore, visualize, and analyze the data.</li>
-                    <li><strong>Materialized Views</strong>: Pre-computed summaries of data to enhance performance for
-                        frequently
-                        used queries.</li>
-                </ul>
-
-                <h3>Data Warehousing Lifecycle</h3>
-                <ol>
-                    <li><strong>Requirement Analysis</strong>: Understand business needs and define the scope and
-                        objectives of
-                        the data warehouse.</li>
-                    <li><strong>Source System Identification</strong>: Identify and evaluate relevant data sources.</li>
-                    <li><strong>ETL/ELT Design and Implementation</strong>: Extract data, perform necessary
-                        transformations
-                        (e.g.,
-                        data cleaning, enrichment), and load it into the warehouse.</li>
-                    <li><strong>Data Modeling</strong>: Define the schema and relationships for efficient querying and
-                        storage.
-                    </li>
-                    <li><strong>Performance Optimization</strong>: Create indexes, partitions, and materialized views to
-                        improve
-                        query performance.</li>
-                    <li><strong>Access and Analysis</strong>: Provide users with access through dashboards, reporting
-                        tools, or
-                        direct SQL queries.</li>
-                </ol>
-
-                <h3>Challenges in Data Warehousing</h3>
-                <p>Implementing and maintaining a data warehouse involves several challenges:</p>
-                <ul>
-                    <li><strong>Data Integration</strong>: Merging disparate datasets with inconsistent formats and
-                        semantics can
-                        be complex.</li>
-                    <li><strong>Data Quality</strong>: Ensuring accuracy, consistency, and completeness is critical for
-                        reliable
-                        analytics.</li>
-                    <li><strong>Scalability</strong>: Accommodating growing data volumes and user demands requires
-                        scalable
-                        infrastructure and architecture.</li>
-                    <li><strong>Security and Compliance</strong>: Protecting sensitive data and ensuring regulatory
-                        compliance
-                        (e.g., GDPR, HIPAA) is essential.</li>
-                    <li><strong>Latency</strong>: Real-time or near-real-time analysis demands low-latency data
-                        pipelines and
-                        refresh mechanisms.</li>
-                </ul>
-
-                <h3>Industry Applications</h3>
-                <p>Data warehousing is widely adopted across various sectors:</p>
-                <ul>
-                    <li><strong>Finance</strong>: Fraud detection, portfolio analysis, regulatory reporting.</li>
-                    <li><strong>Healthcare</strong>: Patient outcome analysis, billing, and operational efficiency.</li>
-                    <li><strong>Retail</strong>: Customer segmentation, sales trend analysis, inventory forecasting.
-                    </li>
-                    <li><strong>Telecommunications</strong>: Network optimization, churn prediction, customer support
-                        analytics.
+                    <li property="itemListElement" typeof="ListItem">
+                        <span property="name">Data Warehousing</span>
                     </li>
                 </ul>
-
-                <h3>Conceptual Views: Data Model vs. Data Source</h3>
-                <p>In the context of data warehousing:</p>
-                <ul>
-                    <li><strong>Data Source</strong>: The original system or repository (e.g., a relational database or
-                        API) from
-                        which data is collected.</li>
-                    <li><strong>Data Model</strong>: A logical structure that defines how data is stored, related, and
-                        queried
-                        within the warehouse.</li>
-                </ul>
-                <p>While some literature refers to data warehousing as "materialized data integration," highlighting its
-                    unifying role, there remains debate over whether it should be considered a model or a source. In
-                    practice, it functions as a centralized analytical repository derived from various data sources
-                    using well-defined modeling techniques.</p>
-
-                <h3>Popular Data Models</h3>
-                <p>Several data modeling techniques are commonly used in data warehouses:</p>
-                <ul>
-                    <li><strong>Star Schema</strong>: Organizes data into a central fact table linked to multiple
-                        dimension
-                        tables. It is simple, denormalized, and optimized for fast querying.</li>
-                    <li><strong>Snowflake Schema</strong>: A normalized version of the star schema, where dimension
-                        tables are
-                        split into multiple related tables for improved storage efficiency.</li>
-                    <li><strong>Galaxy Schema</strong>: Also known as a fact constellation, this approach includes
-                        multiple fact
-                        tables sharing dimension tables. It supports complex analytical requirements.</li>
-                </ul>
-
-                <h3>Materialized Views</h3>
-                <p>Materialized views store the results of pre-defined queries and are periodically refreshed. They are
-                    particularly beneficial for reducing query time in environments with high volumes of complex
-                    aggregations and joins.</p>
-
-                <h3>ETL vs. ELT</h3>
-                <p>Modern data pipelines often favor ELT, especially in cloud-based warehouses (like Snowflake or
-                    BigQuery), where transformations occur after loading data into the warehouse. This allows for more
-                    scalable and flexible processing compared to traditional ETL pipelines.</p>
-
-                <h3>Emerging Trends: Data Mesh</h3>
-                <p><a href="./data-mesh.html">Data Mesh</a> is a modern architectural paradigm that decentralizes data
-                    ownership and architecture. Rather than maintaining a centralized data warehouse, organizations
-                    treat data as a product and distribute responsibility to domain-oriented teams. This approach aims
-                    to overcome bottlenecks associated with traditional monolithic warehouses, promoting scalability,
-                    autonomy, and real-time data access.</p>
-
-                <h3>Conclusion</h3>
-                <p>Data warehousing remains a cornerstone of enterprise data strategy, offering robust support for
-                    reporting, performance tracking, and decision-making. While it faces competition from emerging
-                    paradigms like data lakes and data meshes, it continues to evolve with cloud-native architectures,
-                    real-time capabilities, and improved integration with machine learning workflows.</p>
-
-                <h3>References</h3>
-                <ol>
-                    <li><a href="https://en.wikipedia.org/wiki/Data_warehouse">Wikipedia – Data Warehouse</a></li>
-                    <li><a href="https://www.informatica.com/resources/articles/what-is-a-data-warehouse.html">Informatica:
-                            What Is a Data Warehouse?</a></li>
-                    <li><a href="https://fivetran.com/blog/etl-vs-elt">Fivetran: How ELT is Replacing
-                            ETL</a></li>
-                    <li><a href="https://www.ibm.com/think/topics/etl">IBM:
-                            Extract, Transform, and Load (ETL)</a></li>
-                    <li><a href="https://docs.snowflake.com/en/user-guide/intro-key-concepts">Snowflake Documentation –
-                            Key Concepts</a></li>
-                    <li><a href="https://martinfowler.com/articles/data-monolith-to-mesh.html">Martin Fowler: From Data
-                            Monolith to Data Mesh</a></li>
-                </ol>
-
             </div>
+        </nav>
 
-            <br />
+        <main id="main-content" class="container">
+            <section class="hero">
+                <div class="hero-content">
+                    <h1>Data Warehousing</h1>
+                    <p class="subtitle">Core technology for storing, integrating, and analyzing structured data to power
+                        business intelligence and data-driven decision making</p>
+                    <div class="series-badge">
+                        <span>📊</span>
+                        <span>Part of the <a href="./data-science.html">Data Science</a> series</span>
+                    </div>
+                </div>
+                <div class="hero-illustration">
+                    <svg class="illustration-svg" viewBox="0 0 600 500" xmlns="http://www.w3.org/2000/svg"
+                        aria-hidden="true">
+                        <defs>
+                            <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" style="stop-color:#2e7d32;stop-opacity:1" />
+                                <stop offset="100%" style="stop-color:#558b2f;stop-opacity:1" />
+                            </linearGradient>
+                            <linearGradient id="grad2" x1="0%" y1="0%" x2="0%" y2="100%">
+                                <stop offset="0%" style="stop-color:#66bb6a;stop-opacity:1" />
+                                <stop offset="100%" style="stop-color:#2e7d32;stop-opacity:1" />
+                            </linearGradient>
+                            <filter id="glow">
+                                <feGaussianBlur stdDeviation="3" result="coloredBlur" />
+                                <feMerge>
+                                    <feMergeNode in="coloredBlur" />
+                                    <feMergeNode in="SourceGraphic" />
+                                </feMerge>
+                            </filter>
+                        </defs>
 
-        </div>
+                        <!-- Central Warehouse Structure -->
+                        <g filter="url(#glow)">
+                            <!-- Base -->
+                            <rect x="200" y="300" width="200" height="120" fill="url(#grad1)" rx="8">
+                                <animate attributeName="opacity" values="0.9;1;0.9" dur="4s" repeatCount="indefinite" />
+                            </rect>
+
+                            <!-- Mid Level -->
+                            <rect x="220" y="240" width="160" height="60" fill="url(#grad2)" rx="6">
+                                <animate attributeName="opacity" values="0.85;0.95;0.85" dur="4s" begin="0.5s"
+                                    repeatCount="indefinite" />
+                            </rect>
+
+                            <!-- Top Level -->
+                            <rect x="240" y="190" width="120" height="50" fill="url(#grad1)" rx="4">
+                                <animate attributeName="opacity" values="0.8;0.9;0.8" dur="4s" begin="1s"
+                                    repeatCount="indefinite" />
+                            </rect>
+
+                            <!-- Warehouse Details - Windows/Storage -->
+                            <g opacity="0.3">
+                                <rect x="220" y="320" width="30" height="30" fill="white" rx="2" />
+                                <rect x="270" y="320" width="30" height="30" fill="white" rx="2" />
+                                <rect x="320" y="320" width="30" height="30" fill="white" rx="2" />
+                                <rect x="370" y="320" width="30" height="30" fill="white" rx="2" />
+
+                                <rect x="220" y="370" width="30" height="30" fill="white" rx="2" />
+                                <rect x="270" y="370" width="30" height="30" fill="white" rx="2" />
+                                <rect x="320" y="370" width="30" height="30" fill="white" rx="2" />
+                                <rect x="370" y="370" width="30" height="30" fill="white" rx="2" />
+                            </g>
+                        </g>
+
+                        <!-- Data Sources - Input Streams -->
+                        <!-- Left Source -->
+                        <g>
+                            <circle cx="80" cy="150" r="24" fill="url(#grad2)" opacity="0.9">
+                                <animate attributeName="opacity" values="0.9;1;0.9" dur="3s" repeatCount="indefinite" />
+                            </circle>
+                            <text x="80" y="157" text-anchor="middle" fill="white" font-size="14"
+                                font-weight="bold">DB</text>
+
+                            <!-- Data flow line -->
+                            <path d="M 104 150 L 200 220" stroke="url(#grad1)" stroke-width="3" opacity="0.5"
+                                stroke-dasharray="8,4">
+                                <animate attributeName="stroke-dashoffset" from="0" to="-12" dur="2s"
+                                    repeatCount="indefinite" />
+                            </path>
+                        </g>
+
+                        <!-- Top Left Source -->
+                        <g>
+                            <circle cx="120" cy="80" r="24" fill="url(#grad2)" opacity="0.9">
+                                <animate attributeName="opacity" values="0.9;1;0.9" dur="3.5s"
+                                    repeatCount="indefinite" />
+                            </circle>
+                            <text x="120" y="87" text-anchor="middle" fill="white" font-size="12"
+                                font-weight="bold">API</text>
+
+                            <path d="M 135 100 L 240 190" stroke="url(#grad1)" stroke-width="3" opacity="0.5"
+                                stroke-dasharray="8,4">
+                                <animate attributeName="stroke-dashoffset" from="0" to="-12" dur="2.3s"
+                                    repeatCount="indefinite" />
+                            </path>
+                        </g>
+
+                        <!-- Top Center Source -->
+                        <g>
+                            <circle cx="300" cy="60" r="24" fill="url(#grad2)" opacity="0.9">
+                                <animate attributeName="opacity" values="0.9;1;0.9" dur="4s" repeatCount="indefinite" />
+                            </circle>
+                            <text x="300" y="67" text-anchor="middle" fill="white" font-size="11"
+                                font-weight="bold">ERP</text>
+
+                            <path d="M 300 84 L 300 190" stroke="url(#grad1)" stroke-width="3" opacity="0.5"
+                                stroke-dasharray="8,4">
+                                <animate attributeName="stroke-dashoffset" from="0" to="-12" dur="2.5s"
+                                    repeatCount="indefinite" />
+                            </path>
+                        </g>
+
+                        <!-- Top Right Source -->
+                        <g>
+                            <circle cx="480" cy="80" r="24" fill="url(#grad2)" opacity="0.9">
+                                <animate attributeName="opacity" values="0.9;1;0.9" dur="3.3s"
+                                    repeatCount="indefinite" />
+                            </circle>
+                            <text x="480" y="87" text-anchor="middle" fill="white" font-size="11"
+                                font-weight="bold">CRM</text>
+
+                            <path d="M 465 100 L 360 190" stroke="url(#grad1)" stroke-width="3" opacity="0.5"
+                                stroke-dasharray="8,4">
+                                <animate attributeName="stroke-dashoffset" from="0" to="-12" dur="2.7s"
+                                    repeatCount="indefinite" />
+                            </path>
+                        </g>
+
+                        <!-- Right Source -->
+                        <g>
+                            <circle cx="520" cy="150" r="24" fill="url(#grad2)" opacity="0.9">
+                                <animate attributeName="opacity" values="0.9;1;0.9" dur="3.8s"
+                                    repeatCount="indefinite" />
+                            </circle>
+                            <text x="520" y="157" text-anchor="middle" fill="white" font-size="12"
+                                font-weight="bold">IoT</text>
+
+                            <path d="M 496 150 L 400 220" stroke="url(#grad1)" stroke-width="3" opacity="0.5"
+                                stroke-dasharray="8,4">
+                                <animate attributeName="stroke-dashoffset" from="0" to="-12" dur="2.9s"
+                                    repeatCount="indefinite" />
+                            </path>
+                        </g>
+
+                        <!-- ETL Process Indicator -->
+                        <g>
+                            <rect x="250" y="130" width="100" height="40" fill="url(#grad2)" rx="20" opacity="0.85">
+                                <animate attributeName="opacity" values="0.85;1;0.85" dur="2s"
+                                    repeatCount="indefinite" />
+                            </rect>
+                            <text x="300" y="155" text-anchor="middle" fill="white" font-size="14"
+                                font-weight="bold">ETL</text>
+                        </g>
+
+                        <!-- Output/Query Layer -->
+                        <!-- Bottom Left - BI Tool -->
+                        <g>
+                            <circle cx="150" cy="450" r="22" fill="url(#grad2)" opacity="0.9">
+                                <animate attributeName="opacity" values="0.9;1;0.9" dur="3.2s"
+                                    repeatCount="indefinite" />
+                            </circle>
+                            <text x="150" y="456" text-anchor="middle" fill="white" font-size="12"
+                                font-weight="bold">BI</text>
+
+                            <path d="M 230 420 L 165 435" stroke="url(#grad1)" stroke-width="2" opacity="0.5"
+                                stroke-dasharray="6,3">
+                                <animate attributeName="stroke-dashoffset" from="0" to="9" dur="2s"
+                                    repeatCount="indefinite" />
+                            </path>
+                        </g>
+
+                        <!-- Bottom Center - Reports -->
+                        <g>
+                            <circle cx="300" cy="470" r="22" fill="url(#grad2)" opacity="0.9">
+                                <animate attributeName="opacity" values="0.9;1;0.9" dur="3.6s"
+                                    repeatCount="indefinite" />
+                            </circle>
+                            <text x="300" y="477" text-anchor="middle" fill="white" font-size="10"
+                                font-weight="bold">RPT</text>
+
+                            <path d="M 300 420 L 300 448" stroke="url(#grad1)" stroke-width="2" opacity="0.5"
+                                stroke-dasharray="6,3">
+                                <animate attributeName="stroke-dashoffset" from="0" to="9" dur="2.2s"
+                                    repeatCount="indefinite" />
+                            </path>
+                        </g>
+
+                        <!-- Bottom Right - Analytics -->
+                        <g>
+                            <circle cx="450" cy="450" r="22" fill="url(#grad2)" opacity="0.9">
+                                <animate attributeName="opacity" values="0.9;1;0.9" dur="3.4s"
+                                    repeatCount="indefinite" />
+                            </circle>
+                            <text x="450" y="457" text-anchor="middle" fill="white" font-size="10"
+                                font-weight="bold">SQL</text>
+
+                            <path d="M 370 420 L 435 435" stroke="url(#grad1)" stroke-width="2" opacity="0.5"
+                                stroke-dasharray="6,3">
+                                <animate attributeName="stroke-dashoffset" from="0" to="9" dur="2.4s"
+                                    repeatCount="indefinite" />
+                            </path>
+                        </g>
+
+                        <!-- Data Particles Flowing -->
+                        <circle cx="100" cy="150" r="2" fill="#2e7d32" opacity="0">
+                            <animate attributeName="cx" values="100;200" dur="2s" repeatCount="indefinite" />
+                            <animate attributeName="cy" values="150;220" dur="2s" repeatCount="indefinite" />
+                            <animate attributeName="opacity" values="0;1;0" dur="2s" repeatCount="indefinite" />
+                        </circle>
+                        <circle cx="300" cy="80" r="2" fill="#558b2f" opacity="0">
+                            <animate attributeName="cy" values="80;190" dur="2.5s" repeatCount="indefinite" />
+                            <animate attributeName="opacity" values="0;1;0" dur="2.5s" repeatCount="indefinite" />
+                        </circle>
+                        <circle cx="480" cy="100" r="2" fill="#66bb6a" opacity="0">
+                            <animate attributeName="cx" values="480;360" dur="2.7s" repeatCount="indefinite" />
+                            <animate attributeName="cy" values="100;190" dur="2.7s" repeatCount="indefinite" />
+                            <animate attributeName="opacity" values="0;1;0" dur="2.7s" repeatCount="indefinite" />
+                        </circle>
+                    </svg>
+                </div>
+            </section>
+
+            <article>
+                <section class="content-section">
+                    <h2>Data Warehousing</h2>
+                    <p>Data warehousing is a core technology for storing, integrating, and analyzing large volumes of
+                        structured data from multiple sources. It plays a pivotal role in business intelligence (BI) and
+                        analytics, empowering organizations to make informed, data-driven decisions.</p>
+                </section>
+
+                <section class="content-section comparison-box">
+                    <h3>Data Warehousing vs. Data Lakes</h3>
+                    <p>While both data warehouses and data lakes are used for data storage and analysis, they serve
+                        different purposes. Data warehouses are optimized for structured data and support complex
+                        queries for reporting and analytics. In contrast, data lakes are designed to store vast amounts
+                        of raw, often unstructured or semi-structured data in its native format. Data lakes provide
+                        greater flexibility for data science and machine learning applications, whereas data warehouses
+                        prioritize speed, consistency, and reliability for business reporting.</p>
+                </section>
+
+                <section class="content-section">
+                    <h3>Key Components of a Data Warehouse</h3>
+                    <p>A modern data warehouse architecture typically includes the following components:</p>
+                    <div class="component-grid">
+                        <div class="component-card">
+                            <div class="icon">DS</div>
+                            <h4>Data Sources</h4>
+                            <p>Internal systems (e.g., transactional databases, CRM, ERP), flat files, sensors, APIs,
+                                and external data providers.</p>
+                        </div>
+                        <div class="component-card">
+                            <div class="icon">ET</div>
+                            <h4>ETL/ELT Processes</h4>
+                            <p>ETL (Extract, Transform, Load) or ELT (Extract, Load, Transform) pipelines for ingesting,
+                                cleaning, transforming, and loading data.</p>
+                        </div>
+                        <div class="component-card">
+                            <div class="icon">DM</div>
+                            <h4>Data Modeling</h4>
+                            <p>Logical and physical design of how data is organized using schemas such as star,
+                                snowflake, or galaxy models.</p>
+                        </div>
+                        <div class="component-card">
+                            <div class="icon">SE</div>
+                            <h4>Storage Engine</h4>
+                            <p>The underlying infrastructure (on-premises or cloud) for storing the integrated and
+                                modeled data.</p>
+                        </div>
+                        <div class="component-card">
+                            <div class="icon">QA</div>
+                            <h4>Query and Analysis Tools</h4>
+                            <p>BI tools, dashboards, and reporting engines that allow users to explore, visualize, and
+                                analyze the data.</p>
+                        </div>
+                        <div class="component-card">
+                            <div class="icon">MV</div>
+                            <h4>Materialized Views</h4>
+                            <p>Pre-computed summaries of data to enhance performance for frequently used queries.</p>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h3>Data Warehousing Lifecycle</h3>
+                    <ol class="lifecycle-steps">
+                        <li><strong>Requirement Analysis</strong>: Understand business needs and define the scope and
+                            objectives of the data warehouse.</li>
+                        <li><strong>Source System Identification</strong>: Identify and evaluate relevant data sources.
+                        </li>
+                        <li><strong>ETL/ELT Design and Implementation</strong>: Extract data, perform necessary
+                            transformations (e.g., data cleaning, enrichment), and load it into the warehouse.</li>
+                        <li><strong>Data Modeling</strong>: Define the schema and relationships for efficient querying
+                            and storage.</li>
+                        <li><strong>Performance Optimization</strong>: Create indexes, partitions, and materialized
+                            views to improve query performance.</li>
+                        <li><strong>Access and Analysis</strong>: Provide users with access through dashboards,
+                            reporting tools, or direct SQL queries.</li>
+                    </ol>
+                </section>
+
+                <section class="content-section">
+                    <h3>Challenges in Data Warehousing</h3>
+                    <p>Implementing and maintaining a data warehouse involves several challenges:</p>
+                    <div class="challenge-grid">
+                        <div class="challenge-card">
+                            <h4>Data Integration</h4>
+                            <p>Merging disparate datasets with inconsistent formats and semantics can be complex.</p>
+                        </div>
+                        <div class="challenge-card">
+                            <h4>Data Quality</h4>
+                            <p>Ensuring accuracy, consistency, and completeness is critical for reliable analytics.</p>
+                        </div>
+                        <div class="challenge-card">
+                            <h4>Scalability</h4>
+                            <p>Accommodating growing data volumes and user demands requires scalable infrastructure and
+                                architecture.</p>
+                        </div>
+                        <div class="challenge-card">
+                            <h4>Security and Compliance</h4>
+                            <p>Protecting sensitive data and ensuring regulatory compliance (e.g., GDPR, HIPAA) is
+                                essential.</p>
+                        </div>
+                        <div class="challenge-card">
+                            <h4>Latency</h4>
+                            <p>Real-time or near-real-time analysis demands low-latency data pipelines and refresh
+                                mechanisms.</p>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h3>Industry Applications</h3>
+                    <p>Data warehousing is widely adopted across various sectors:</p>
+                    <div class="industry-grid">
+                        <div class="industry-item">
+                            <div class="industry-icon">💰</div>
+                            <div class="industry-content">
+                                <strong>Finance</strong>
+                                Fraud detection, portfolio analysis, regulatory reporting.
+                            </div>
+                        </div>
+                        <div class="industry-item">
+                            <div class="industry-icon">🏥</div>
+                            <div class="industry-content">
+                                <strong>Healthcare</strong>
+                                Patient outcome analysis, billing, and operational efficiency.
+                            </div>
+                        </div>
+                        <div class="industry-item">
+                            <div class="industry-icon">🛒</div>
+                            <div class="industry-content">
+                                <strong>Retail</strong>
+                                Customer segmentation, sales trend analysis, inventory forecasting.
+                            </div>
+                        </div>
+                        <div class="industry-item">
+                            <div class="industry-icon">📡</div>
+                            <div class="industry-content">
+                                <strong>Telecommunications</strong>
+                                Network optimization, churn prediction, customer support analytics.
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h3>Conceptual Views: Data Model vs. Data Source</h3>
+                    <p>In the context of data warehousing:</p>
+                    <ul>
+                        <li><strong>Data Source</strong>: The original system or repository (e.g., a relational database
+                            or API) from which data is collected.</li>
+                        <li><strong>Data Model</strong>: A logical structure that defines how data is stored, related,
+                            and queried within the warehouse.</li>
+                    </ul>
+                    <p>While some literature refers to data warehousing as "materialized data integration," highlighting
+                        its unifying role, there remains debate over whether it should be considered a model or a
+                        source. In practice, it functions as a centralized analytical repository derived from various
+                        data sources using well-defined modeling techniques.</p>
+                </section>
+
+                <section class="content-section">
+                    <h3>Popular Data Models</h3>
+                    <p>Several data modeling techniques are commonly used in data warehouses:</p>
+                    <div class="model-showcase">
+                        <div class="model-card">
+                            <h4>Star Schema</h4>
+                            <p>Organizes data into a central fact table linked to multiple dimension tables. It is
+                                simple, denormalized, and optimized for fast querying.</p>
+                        </div>
+                        <div class="model-card">
+                            <h4>Snowflake Schema</h4>
+                            <p>A normalized version of the star schema, where dimension tables are split into multiple
+                                related tables for improved storage efficiency.</p>
+                        </div>
+                        <div class="model-card">
+                            <h4>Galaxy Schema</h4>
+                            <p>Also known as a fact constellation, this approach includes multiple fact tables sharing
+                                dimension tables. It supports complex analytical requirements.</p>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h3>Materialized Views</h3>
+                    <p>Materialized views store the results of pre-defined queries and are periodically refreshed. They
+                        are particularly beneficial for reducing query time in environments with high volumes of complex
+                        aggregations and joins.</p>
+                </section>
+
+                <section class="content-section">
+                    <h3>ETL vs. ELT</h3>
+                    <p>Modern data pipelines often favor ELT, especially in cloud-based warehouses (like Snowflake or
+                        BigQuery), where transformations occur after loading data into the warehouse. This allows for
+                        more scalable and flexible processing compared to traditional ETL pipelines.</p>
+                </section>
+
+                <section class="content-section">
+                    <h3>Emerging Trends: Data Mesh</h3>
+                    <p><a href="./data-mesh.html">Data Mesh</a> is a modern architectural paradigm that decentralizes
+                        data ownership and architecture. Rather than maintaining a centralized data warehouse,
+                        organizations treat data as a product and distribute responsibility to domain-oriented teams.
+                        This approach aims to overcome bottlenecks associated with traditional monolithic warehouses,
+                        promoting scalability, autonomy, and real-time data access.</p>
+                </section>
+
+                <section class="content-section">
+                    <h3>Conclusion</h3>
+                    <p>Data warehousing remains a cornerstone of enterprise data strategy, offering robust support for
+                        reporting, performance tracking, and decision-making. While it faces competition from emerging
+                        paradigms like data lakes and data meshes, it continues to evolve with cloud-native
+                        architectures, real-time capabilities, and improved integration with machine learning workflows.
+                    </p>
+                </section>
+
+                <section class="references">
+                    <h3>References</h3>
+                    <ol>
+                        <li><a href="https://en.wikipedia.org/wiki/Data_warehouse">Wikipedia – Data Warehouse</a></li>
+                        <li><a href="https://www.informatica.com/resources/articles/what-is-a-data-warehouse.html">Informatica:
+                                What Is a Data Warehouse?</a></li>
+                        <li><a href="https://fivetran.com/blog/etl-vs-elt">Fivetran: How ELT is Replacing ETL</a></li>
+                        <li><a href="https://www.ibm.com/think/topics/etl">IBM: Extract, Transform, and Load (ETL)</a>
+                        </li>
+                        <li><a href="https://docs.snowflake.com/en/user-guide/intro-key-concepts">Snowflake
+                                Documentation – Key Concepts</a></li>
+                        <li><a href="https://martinfowler.com/articles/data-monolith-to-mesh.html">Martin Fowler: From
+                                Data Monolith to Data Mesh</a></li>
+                    </ol>
+                </section>
+            </article>
+        </main>
+
+        <footer class="footer">
+            <div class="footer-content">
+                <p class="copyright">© 2025 John Samuel. All content licensed under Creative Commons CC-BY-SA.</p>
+                <ul class="footer-links">
+                    <li><a href="../about.html">About</a></li>
+                    <li><a href="../research/research.html">Research</a></li>
+                </ul>
+            </div>
+        </footer>
     </body>
 
 </html>

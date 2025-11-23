@@ -2,262 +2,824 @@
 <html lang="en">
 
     <head>
-        <meta charset="utf-8" />
-        <meta http-equiv="Content-Language" content="en" />
-        <link rel="shortcut icon" href="../../images/logo/favicon.png" />
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta http-equiv="Content-Language" content="en">
+        <link rel="shortcut icon" href="../../images/logo/favicon.png">
         <title>Data Compression: John Samuel</title>
-        <style type="text/css">
-            body {
-                background-color: #FFFFFF;
+        <style>
+            :root {
+                /* Color Palette - Compression/Efficiency Theme */
+                --color-base-bg: #fafbfc;
+                --color-base-surface: #ffffff;
+                --color-base-text: #1a202c;
+                --color-base-text-muted: #4a5568;
+
+                /* Theme Accents - Compression/Transformation Colors */
+                --color-accent-1: #7c3aed;
+                --color-accent-2: #5b21b6;
+                --color-accent-3: #a78bfa;
+                --color-accent-4: #c4b5fd;
+                --color-accent-light: #ede9fe;
+
+                /* Functional Colors */
+                --color-shadow: rgba(124, 58, 237, 0.12);
+                --color-border: rgba(124, 58, 237, 0.15);
+                --color-hover: rgba(124, 58, 237, 0.08);
+
+                /* Gradients */
+                --gradient-primary: linear-gradient(135deg, var(--color-accent-1) 0%, var(--color-accent-3) 100%);
+                --gradient-secondary: linear-gradient(225deg, var(--color-accent-2) 0%, var(--color-accent-4) 100%);
+                --gradient-subtle: linear-gradient(180deg, var(--color-base-bg) 0%, var(--color-accent-light) 100%);
+
+                /* Spacing Scale */
+                --space-xs: 0.25rem;
+                --space-sm: 0.5rem;
+                --space-md: 1rem;
+                --space-lg: 1.5rem;
+                --space-xl: 2rem;
+                --space-2xl: 3rem;
+                --space-3xl: 4rem;
+                --space-4xl: 6rem;
+
+                /* Typography */
+                --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+                --text-xs: clamp(0.75rem, 0.7rem + 0.25vw, 0.875rem);
+                --text-sm: clamp(0.875rem, 0.8rem + 0.35vw, 1rem);
+                --text-base: clamp(1rem, 0.95rem + 0.25vw, 1.125rem);
+                --text-lg: clamp(1.125rem, 1.05rem + 0.35vw, 1.25rem);
+                --text-xl: clamp(1.25rem, 1.15rem + 0.5vw, 1.5rem);
+                --text-2xl: clamp(1.5rem, 1.3rem + 1vw, 2rem);
+                --text-3xl: clamp(2rem, 1.6rem + 2vw, 2.5rem);
+                --text-4xl: clamp(2.5rem, 2rem + 2.5vw, 3.5rem);
+
+                /* Borders and Shadows */
+                --radius-sm: 4px;
+                --radius-md: 8px;
+                --radius-lg: 12px;
+                --radius-xl: 16px;
+                --radius-2xl: 24px;
+
+                --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.04), 0 1px 3px rgba(0, 0, 0, 0.06);
+                --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.05), 0 2px 4px rgba(0, 0, 0, 0.06);
+                --shadow-lg: 0 10px 24px rgba(0, 0, 0, 0.08), 0 4px 8px rgba(0, 0, 0, 0.06);
+                --shadow-xl: 0 20px 40px rgba(0, 0, 0, 0.12), 0 8px 16px rgba(0, 0, 0, 0.08);
+                --shadow-theme: 0 10px 30px var(--color-shadow), 0 4px 10px rgba(0, 0, 0, 0.06);
             }
 
-            #sidebar {
-                position: fixed;
-                background-color: #1B80CF;
-                top: 0;
-                left: 0;
-                bottom: 0;
-                width: 30vw;
-            }
-
-            #sidebar .title {
-                position: relative;
-                text-align: center;
-                line-height: 4vmax;
-                font-size: 1.4vmax;
-                font-family: 'Arial';
-                margin-top: 25vh;
-            }
-
-            #sidebar .title a:link,
-            #sidebar .title a:visited {
-                color: #FFFFFF;
-                text-decoration: none;
-            }
-
-            .subtitle {
-                top: 50vh;
-                text-align: center;
-                line-height: 1.3vmax;
-                font-family: 'Arial';
-                font-size: 1.5vmax;
-                color: #FFFFFF;
-            }
-
-            .subtitle a:link,
-            .subtitle a:visited {
-                color: #FFFFFF;
-                text-decoration: none;
-            }
-
-            .licence {
-                position: fixed;
-                text-align: right;
-                bottom: 0;
-                right: 0;
-            }
-
-            .home {
-                position: fixed;
-                text-align: left;
-                font-family: 'Arial';
-                color: #D3D3D3;
-                z-index: 100;
-                width: 100%;
-                background-color: #FFFFFF;
-                top: 0px;
-                margin-bottom: 10px;
-                padding-bottom: 10px;
-            }
-
-            .home a:link,
-            .home a:visited {
-                text-decoration: none;
-                color: #D3D3D3;
-            }
-
-            .home ul {
+            /* Reset and Base Styles */
+            * {
                 margin: 0;
                 padding: 0;
-                text-align: left;
+                box-sizing: border-box;
+            }
+
+            html {
+                scroll-behavior: smooth;
+                scroll-padding-top: 80px;
+            }
+
+            body {
+                font-family: var(--font-sans);
+                font-size: var(--text-base);
+                line-height: 1.7;
+                color: var(--color-base-text);
+                background: var(--gradient-subtle);
+                background-attachment: fixed;
+                -webkit-font-smoothing: antialiased;
+                -moz-osx-font-smoothing: grayscale;
+                overflow-x: hidden;
+            }
+
+            /* Skip Link for Accessibility */
+            .skip-link {
+                position: absolute;
+                top: -40px;
+                left: 0;
+                background: var(--color-accent-1);
+                color: white;
+                padding: var(--space-sm) var(--space-md);
+                text-decoration: none;
+                z-index: 100;
+            }
+
+            .skip-link:focus {
+                top: 0;
+            }
+
+            /* Animated Background Pattern - Compression Wave */
+            body::before {
+                content: '';
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background-image:
+                    linear-gradient(90deg, rgba(124, 58, 237, 0.02) 1px, transparent 1px),
+                    linear-gradient(0deg, rgba(124, 58, 237, 0.02) 1px, transparent 1px);
+                background-size: 50px 50px, 50px 50px;
+                pointer-events: none;
+                z-index: -1;
+                animation: compress 20s linear infinite;
+            }
+
+            @keyframes compress {
+                0% {
+                    background-size: 50px 50px, 50px 50px;
+                    opacity: 1;
+                }
+
+                50% {
+                    background-size: 20px 20px, 20px 20px;
+                    opacity: 0.5;
+                }
+
+                100% {
+                    background-size: 50px 50px, 50px 50px;
+                    opacity: 1;
+                }
+            }
+
+            /* Navigation Header */
+            .nav-header {
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                z-index: 1000;
+                background: rgba(255, 255, 255, 0.7);
+                -webkit-backdrop-filter: blur(12px) saturate(180%);
+                backdrop-filter: blur(12px) saturate(180%);
+                border-bottom: 1px solid var(--color-border);
+                box-shadow: var(--shadow-sm);
+                animation: slideDown 0.6s ease-out;
+            }
+
+            @keyframes slideDown {
+                from {
+                    transform: translateY(-100%);
+                    opacity: 0;
+                }
+
+                to {
+                    transform: translateY(0);
+                    opacity: 1;
+                }
+            }
+
+            .nav-container {
+                max-width: 1400px;
+                margin: 0 auto;
+                padding: var(--space-md) var(--space-xl);
+                display: flex;
+                align-items: center;
+                gap: var(--space-xl);
+            }
+
+            .site-name {
+                font-size: var(--text-lg);
+                font-weight: 700;
+                letter-spacing: -0.02em;
+                background: var(--gradient-primary);
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                background-clip: text;
+                text-decoration: none;
+                transition: transform 0.3s ease;
+            }
+
+            .site-name:hover {
+                transform: scale(1.05);
+            }
+
+            .breadcrumb {
+                display: flex;
+                list-style: none;
+                gap: var(--space-sm);
+                flex-wrap: wrap;
+                align-items: center;
+            }
+
+            .breadcrumb li {
+                display: flex;
+                align-items: center;
+                gap: var(--space-sm);
+            }
+
+            .breadcrumb li:not(:last-child)::after {
+                content: '→';
+                color: var(--color-base-text-muted);
+                font-size: var(--text-sm);
+            }
+
+            .breadcrumb a {
+                color: var(--color-base-text-muted);
+                text-decoration: none;
+                font-size: var(--text-sm);
+                transition: color 0.3s ease;
+                padding: var(--space-xs) var(--space-sm);
+                border-radius: var(--radius-sm);
+            }
+
+            .breadcrumb a:hover {
+                color: var(--color-accent-1);
+                background: var(--color-hover);
+            }
+
+            /* Main Container */
+            .container {
+                max-width: 1400px;
+                margin: 0 auto;
+                padding: var(--space-4xl) var(--space-xl) var(--space-3xl);
+            }
+
+            /* Hero Section */
+            .hero {
+                margin-top: var(--space-3xl);
+                margin-bottom: var(--space-4xl);
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: var(--space-3xl);
+                align-items: center;
+                animation: fadeInUp 0.8s ease-out 0.2s both;
+            }
+
+            @keyframes fadeInUp {
+                from {
+                    opacity: 0;
+                    transform: translateY(30px);
+                }
+
+                to {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            }
+
+            .hero-content h1 {
+                font-size: var(--text-4xl);
+                font-weight: 800;
+                letter-spacing: -0.03em;
+                line-height: 1.15;
+                color: var(--color-base-text);
+                margin-bottom: var(--space-lg);
+                background: var(--gradient-primary);
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                background-clip: text;
+            }
+
+            .hero-content .subtitle {
+                font-size: var(--text-xl);
+                color: var(--color-base-text-muted);
+                line-height: 1.6;
+                margin-bottom: var(--space-xl);
+            }
+
+            .series-badge {
+                display: inline-flex;
+                align-items: center;
+                gap: var(--space-sm);
+                background: var(--gradient-primary);
+                color: white;
+                padding: var(--space-sm) var(--space-lg);
+                border-radius: var(--radius-2xl);
+                font-size: var(--text-sm);
+                font-weight: 600;
+                box-shadow: var(--shadow-theme);
+                animation: pulse 2s ease-in-out infinite;
+            }
+
+            @keyframes pulse {
+
+                0%,
+                100% {
+                    transform: scale(1);
+                }
+
+                50% {
+                    transform: scale(1.02);
+                }
+            }
+
+            .series-badge a {
+                color: white;
+                text-decoration: underline;
+                text-decoration-color: rgba(255, 255, 255, 0.5);
+                text-underline-offset: 3px;
+                transition: text-decoration-color 0.3s ease;
+            }
+
+            .series-badge a:hover {
+                text-decoration-color: white;
+            }
+
+            /* SVG Illustration Container */
+            .hero-illustration {
+                position: relative;
+                min-height: 400px;
+                animation: fadeInUp 0.8s ease-out 0.4s both;
+            }
+
+            .illustration-svg {
+                width: 100%;
+                height: auto;
+                filter: drop-shadow(0 10px 30px rgba(124, 58, 237, 0.15));
+            }
+
+            /* Content Sections */
+            .content-section {
+                margin-bottom: var(--space-4xl);
+                animation: fadeInUp 0.6s ease-out both;
+            }
+
+            .content-section:nth-child(1) {
+                animation-delay: 0.3s;
+            }
+
+            .content-section:nth-child(2) {
+                animation-delay: 0.4s;
+            }
+
+            .content-section:nth-child(3) {
+                animation-delay: 0.5s;
+            }
+
+            .content-section h2 {
+                font-size: var(--text-3xl);
+                font-weight: 700;
+                letter-spacing: -0.02em;
+                color: var(--color-accent-1);
+                margin-bottom: var(--space-xl);
+                position: relative;
+                padding-bottom: var(--space-md);
+            }
+
+            .content-section h2::after {
+                content: '';
+                position: absolute;
+                bottom: 0;
+                left: 0;
+                width: 60px;
+                height: 4px;
+                background: var(--gradient-primary);
+                border-radius: var(--radius-sm);
+            }
+
+            .content-section h3 {
+                font-size: var(--text-xl);
+                font-weight: 600;
+                letter-spacing: -0.01em;
+                color: var(--color-accent-2);
+                margin-top: var(--space-2xl);
+                margin-bottom: var(--space-lg);
+                position: relative;
+                padding-left: var(--space-lg);
+            }
+
+            .content-section h3::before {
+                content: '▸';
+                position: absolute;
+                left: 0;
+                top: 0;
+                color: var(--color-accent-3);
+                font-size: var(--text-2xl);
+                line-height: 1;
+            }
+
+            .content-section h4 {
+                font-size: var(--text-lg);
+                font-weight: 600;
+                color: var(--color-accent-2);
+                margin-top: var(--space-xl);
+                margin-bottom: var(--space-md);
+                padding-left: var(--space-md);
+                border-left: 3px solid var(--color-accent-3);
+            }
+
+            .content-section p {
+                color: var(--color-base-text);
+                margin-bottom: var(--space-lg);
+                line-height: 1.8;
+            }
+
+            .content-section a {
+                color: var(--color-accent-1);
+                text-decoration: none;
+                border-bottom: 2px solid transparent;
+                transition: all 0.3s ease;
+                font-weight: 500;
+            }
+
+            .content-section a:hover {
+                color: var(--color-accent-2);
+                border-bottom-color: var(--color-accent-2);
+            }
+
+            /* Compression Types */
+            .types-grid {
+                display: grid;
+                grid-template-columns: repeat(2, 1fr);
+                gap: var(--space-xl);
+                margin: var(--space-2xl) 0;
+            }
+
+            .type-card {
+                background: rgba(255, 255, 255, 0.7);
+                -webkit-backdrop-filter: blur(12px) saturate(180%);
+                backdrop-filter: blur(12px) saturate(180%);
+                border: 2px solid var(--color-border);
+                border-radius: var(--radius-2xl);
+                padding: var(--space-2xl);
+                box-shadow: var(--shadow-lg);
+                transition: all 0.4s ease;
+                position: relative;
+                overflow: hidden;
+            }
+
+            .type-card::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                height: 6px;
+                background: var(--gradient-primary);
+                transform: scaleX(0);
+                transform-origin: left;
+                transition: transform 0.4s ease;
+            }
+
+            .type-card:hover {
+                transform: translateY(-8px);
+                box-shadow: var(--shadow-xl);
+                border-color: var(--color-accent-1);
+            }
+
+            .type-card:hover::before {
+                transform: scaleX(1);
+            }
+
+            .type-icon {
+                width: 64px;
+                height: 64px;
+                background: var(--gradient-primary);
+                border-radius: var(--radius-xl);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: var(--text-3xl);
+                margin-bottom: var(--space-lg);
+                box-shadow: var(--shadow-theme);
+            }
+
+            .type-card h4 {
+                margin: 0 0 var(--space-md) 0;
+                padding: 0;
+                border: none;
+                font-size: var(--text-2xl);
+                color: var(--color-accent-1);
+            }
+
+            .type-card p {
+                margin: 0;
+                color: var(--color-base-text-muted);
+            }
+
+            /* Algorithm Cards */
+            .algorithm-grid {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+                gap: var(--space-lg);
+                margin: var(--space-2xl) 0;
+            }
+
+            .algorithm-card {
+                background: linear-gradient(135deg, rgba(124, 58, 237, 0.05) 0%, rgba(167, 139, 250, 0.05) 100%);
+                border: 1px solid var(--color-border);
+                border-radius: var(--radius-xl);
+                padding: var(--space-xl);
+                transition: all 0.3s ease;
+            }
+
+            .algorithm-card:hover {
+                background: rgba(255, 255, 255, 0.9);
+                border-color: var(--color-accent-1);
+                transform: translateY(-4px);
+                box-shadow: var(--shadow-md);
+            }
+
+            .algorithm-card h4 {
+                margin: 0 0 var(--space-md) 0;
+                padding: 0 0 var(--space-sm) 0;
+                border: none;
+                border-bottom: 2px solid var(--color-accent-3);
+                color: var(--color-accent-1);
+                font-size: var(--text-lg);
+            }
+
+            .algorithm-card p {
+                margin: 0;
+                font-size: var(--text-sm);
+                color: var(--color-base-text-muted);
+            }
+
+            /* Next-Gen Techniques */
+            .nextgen-showcase {
+                display: grid;
+                grid-template-columns: repeat(2, 1fr);
+                gap: var(--space-xl);
+                margin: var(--space-2xl) 0;
+            }
+
+            .nextgen-card {
+                background: rgba(255, 255, 255, 0.7);
+                -webkit-backdrop-filter: blur(12px) saturate(180%);
+                backdrop-filter: blur(12px) saturate(180%);
+                border: 2px solid var(--color-border);
+                border-radius: var(--radius-2xl);
+                padding: var(--space-2xl);
+                box-shadow: var(--shadow-md);
+                position: relative;
+                transition: all 0.4s ease;
+            }
+
+            .nextgen-card::after {
+                content: '';
+                position: absolute;
+                inset: -2px;
+                background: var(--gradient-primary);
+                border-radius: var(--radius-2xl);
+                z-index: -1;
+                opacity: 0;
+                transition: opacity 0.4s ease;
+            }
+
+            .nextgen-card:hover {
+                transform: translateY(-12px);
+                box-shadow: var(--shadow-xl);
+            }
+
+            .nextgen-card:hover::after {
+                opacity: 1;
+            }
+
+            .nextgen-badge {
+                display: inline-block;
+                background: var(--gradient-primary);
+                color: white;
+                padding: var(--space-xs) var(--space-md);
+                border-radius: var(--radius-2xl);
+                font-size: var(--text-xs);
+                font-weight: 700;
+                text-transform: uppercase;
+                letter-spacing: 0.05em;
+                margin-bottom: var(--space-md);
+            }
+
+            .nextgen-card h4 {
+                margin: 0 0 var(--space-md) 0;
+                padding: 0;
+                border: none;
+                font-size: var(--text-2xl);
+                color: var(--color-accent-1);
+            }
+
+            /* Highlight Box */
+            .highlight-box {
+                background: linear-gradient(135deg, rgba(124, 58, 237, 0.08) 0%, rgba(167, 139, 250, 0.08) 100%);
+                border: 2px solid var(--color-accent-3);
+                border-radius: var(--radius-xl);
+                padding: var(--space-2xl);
+                margin: var(--space-2xl) 0;
+                box-shadow: var(--shadow-sm);
+            }
+
+            .highlight-box h3 {
+                margin-top: 0;
+                padding-left: 0;
+            }
+
+            .highlight-box h3::before {
+                display: none;
+            }
+
+            /* Stats Display */
+            .stats-grid {
+                display: grid;
+                grid-template-columns: repeat(3, 1fr);
+                gap: var(--space-lg);
+                margin: var(--space-2xl) 0;
+            }
+
+            .stat-card {
+                background: rgba(255, 255, 255, 0.7);
+                -webkit-backdrop-filter: blur(8px);
+                backdrop-filter: blur(8px);
+                border: 1px solid var(--color-border);
+                border-radius: var(--radius-lg);
+                padding: var(--space-xl);
+                text-align: center;
+                transition: all 0.3s ease;
+            }
+
+            .stat-card:hover {
+                transform: translateY(-4px);
+                box-shadow: var(--shadow-md);
+            }
+
+            .stat-number {
+                font-size: var(--text-4xl);
+                font-weight: 800;
+                background: var(--gradient-primary);
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                background-clip: text;
+                line-height: 1;
+                margin-bottom: var(--space-sm);
+            }
+
+            .stat-label {
+                font-size: var(--text-sm);
+                color: var(--color-base-text-muted);
+                text-transform: uppercase;
+                letter-spacing: 0.05em;
+            }
+
+            /* References Section */
+            .references {
+                background: rgba(255, 255, 255, 0.7);
+                -webkit-backdrop-filter: blur(12px) saturate(180%);
+                backdrop-filter: blur(12px) saturate(180%);
+                border: 1px solid var(--color-border);
+                border-radius: var(--radius-xl);
+                padding: var(--space-2xl);
+                box-shadow: var(--shadow-md);
+                margin-top: var(--space-3xl);
+            }
+
+            .references h3 {
+                margin-top: 0;
+                color: var(--color-accent-1);
+                margin-bottom: var(--space-xl);
+                padding-left: 0;
+            }
+
+            .references h3::before {
+                display: none;
+            }
+
+            .references ol {
+                margin-left: var(--space-xl);
+            }
+
+            .references li {
+                margin-bottom: var(--space-md);
+                line-height: 1.8;
+            }
+
+            /* Footer */
+            .footer {
+                margin-top: var(--space-4xl);
+                padding: var(--space-2xl) 0;
+                border-top: 1px solid var(--color-border);
+                background: rgba(255, 255, 255, 0.5);
+                -webkit-backdrop-filter: blur(8px);
+                backdrop-filter: blur(8px);
+            }
+
+            .footer-content {
+                max-width: 1400px;
+                margin: 0 auto;
+                padding: 0 var(--space-xl);
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                flex-wrap: wrap;
+                gap: var(--space-lg);
+            }
+
+            .footer-links {
+                display: flex;
+                gap: var(--space-lg);
                 list-style: none;
             }
 
-            .home li {
-                position: relative;
-                float: left;
-                padding-top: 15px;
-                margin-right: 1em;
-                font-family: 'Arial';
-            }
-
-            .home li:hover {
-                display: block;
-            }
-
-            .home a:link,
-            .home a:visited {
-                color: #D3D3D3;
-            }
-
-            .home li:hover a:link,
-            .home li:hover a:visited {
+            .footer-links a {
+                color: var(--color-base-text-muted);
                 text-decoration: none;
-                padding: 15px;
-                color: #FFFFFF;
-                background-color: #1B80CF;
+                font-size: var(--text-sm);
+                transition: color 0.3s ease;
             }
 
-            .content {
-                line-height: 1.8vmax;
-                font-size: 1.2vmax;
-                font-family: 'Arial';
-                margin-top: 15vh;
-                width: 90%;
+            .footer-links a:hover {
+                color: var(--color-accent-1);
             }
 
-            .content h2,
-            h3,
-            h4 {
-                color: #1B80CF;
+            .copyright {
+                color: var(--color-base-text-muted);
+                font-size: var(--text-sm);
             }
 
-            .content a:link,
-            .content a:visited {
-                color: #1B80CF;
+            /* Responsive Design */
+            @media (max-width: 1024px) {
+                .hero {
+                    grid-template-columns: 1fr;
+                    gap: var(--space-2xl);
+                }
+
+                .hero-illustration {
+                    min-height: 300px;
+                }
+
+                .types-grid,
+                .nextgen-showcase {
+                    grid-template-columns: 1fr;
+                }
+
+                .stats-grid {
+                    grid-template-columns: 1fr;
+                }
             }
 
-            .content h3 {
-                color: #1B80CF;
+            @media (max-width: 768px) {
+                .nav-container {
+                    flex-direction: column;
+                    align-items: flex-start;
+                    gap: var(--space-md);
+                    padding: var(--space-md);
+                }
+
+                .container {
+                    padding: var(--space-2xl) var(--space-md);
+                }
+
+                .hero {
+                    margin-top: var(--space-2xl);
+                }
+
+                .hero-content h1 {
+                    font-size: var(--text-3xl);
+                }
+
+                .algorithm-grid {
+                    grid-template-columns: 1fr;
+                }
+
+                .footer-content {
+                    flex-direction: column;
+                    align-items: flex-start;
+                }
+
+                .footer-links {
+                    flex-direction: column;
+                    gap: var(--space-sm);
+                }
             }
 
-            .content h2::before,
-            .content h3::before {
-                display: block;
-                content: " ";
-                visibility: hidden;
-                height: 50px;
-                margin-top: -50px;
-                pointer-events: none;
-                background-color: #FFFFFF;
+            /* Reduced Motion */
+            @media (prefers-reduced-motion: reduce) {
+
+                *,
+                *::before,
+                *::after {
+                    animation-duration: 0.01ms !important;
+                    animation-iteration-count: 1 !important;
+                    transition-duration: 0.01ms !important;
+                }
             }
 
-            .content a:link,
-            .content a:visited {
-                color: #1B80CF;
-            }
+            /* Print Styles */
+            @media print {
 
-            .content li {
-                margin: 5px;
-            }
-
-            .page {
-                width: 65vw;
-                height: 100%;
-                margin-left: 30vw;
-                overflow: hidden;
-                padding: 0 1em;
-                font-family: 'Arial';
-            }
-
-            .page img {
-                max-width: 100%;
-                max-height: 100%;
-            }
-
-            @media (max-width: 640px),
-            screen and (orientation: portrait) {
-                body {
-                    max-width: 100%;
-                    max-height: 100%;
+                .nav-header,
+                .footer {
+                    display: none;
                 }
 
-                #sidebar {
-                    position: fixed;
-                    background-color: #1B80CF;
-                    top: 0;
-                    left: 0;
-                    bottom: 80vh;
-                    width: 100vw;
+                .container {
+                    padding: 0;
                 }
 
-                #sidebar .title {
-                    text-align: center;
-                    position: fixed;
-                    margin-top: 6vh;
-                    left: 0px;
-                    right: 0px;
-                    line-height: 3.5vmax;
-                    font-size: 1.5vmax;
-                    font-family: 'Arial';
+                .hero {
+                    page-break-after: avoid;
                 }
 
-                #sidebar .subtitle {
-                    text-align: center;
-                    top: 5vh;
-                    left: 0px;
-                    right: 0px;
-                    position: fixed;
-                    margin-top: 10vh;
-                    font-size: 1.5vmax;
-                }
-
-                #sidebar .title a:link,
-                #sidebar .title a:visited {
-                    text-align: center;
-                    color: #FFFFFF;
-                }
-
-                #sidebar .subtitle a:link,
-                #sidebar .subtitle a:visited {
-                    text-align: center;
-                    color: #FFFFFF;
-                }
-
-                .home {
-                    z-index: 100;
-                    width: 100%;
-                    background-color: #1B80CF;
-                    font-size: 1.5vmax;
-                }
-
-                .home a:link,
-                .home a:visited {
-                    text-decoration: none;
-                    color: #FFFFFF;
-                }
-
-                .content {
-                    line-height: 3.8vmax;
-                    font-size: 1.8vmax;
-                    font-family: 'Arial';
-                    margin-top: 22vh;
-                }
-
-                .content a:link,
-                .content a:visited {
-                    color: #1B80CF;
-                }
-
-                .page {
-                    top: 40vh;
-                    width: 95%;
-                    margin-left: 0vw;
-                }
-
-                .page img {
-                    max-width: 100%;
-                    max-height: 100%;
-                    border: 0;
+                .content-section {
+                    page-break-inside: avoid;
                 }
             }
         </style>
     </head>
 
     <body vocab="http://schema.org/">
-        <div class="page">
-            <div class="home">
-                <ul typeof="BreadcrumbList">
+        <a href="#main-content" class="skip-link">Skip to main content</a>
+
+        <nav class="nav-header" role="navigation" aria-label="Main navigation">
+            <div class="nav-container">
+                <a href="../about.html" class="site-name">John Samuel</a>
+                <ul class="breadcrumb" typeof="BreadcrumbList">
                     <li property="itemListElement" typeof="ListItem">
                         <a property="item" typeof="WebPage" href="../index.html">
                             <span property="name">Home</span>
@@ -268,200 +830,365 @@
                             <span property="name">Research</span>
                         </a>
                     </li>
+                    <li property="itemListElement" typeof="ListItem">
+                        <span property="name">Data Compression</span>
+                    </li>
                 </ul>
-
             </div>
-            <div id="sidebar">
-                <div class="title">
-                    <h1><a href="./compression.html">Data Compression</a></h1>
-                </div>
-                <div class="subtitle">
-                    <h4><a href="../about.html">John Samuel</a></h4>
-                </div>
-            </div>
+        </nav>
 
-            <div class="content">
-
-                <header>
-                    <h2>Data Compression: Algorithms and Applications</h2>
-                    <div
-                        style="background-color: #f0f8ff; border-left: 4px solid #1e90ff; padding: 1em; margin-bottom: 1.5em;">
-                        <strong>This article is part of a series on <a href="./data-science.html">Data
-                                Science</a>.</strong>
+        <main id="main-content" class="container">
+            <section class="hero">
+                <div class="hero-content">
+                    <h1>Data Compression: Algorithms and Applications</h1>
+                    <p class="subtitle">Encoding information using fewer bits to enable efficient storage, faster
+                        transmission, and reduced bandwidth consumption across computing systems</p>
+                    <div class="series-badge">
+                        <span>📊</span>
+                        <span>Part of the <a href="./data-science.html">Data Science</a> series</span>
                     </div>
-                </header>
+                </div>
+                <div class="hero-illustration">
+                    <svg class="illustration-svg" viewBox="0 0 600 500" xmlns="http://www.w3.org/2000/svg"
+                        aria-hidden="true">
+                        <defs>
+                            <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" style="stop-color:#7c3aed;stop-opacity:1" />
+                                <stop offset="100%" style="stop-color:#a78bfa;stop-opacity:1" />
+                            </linearGradient>
+                            <linearGradient id="grad2" x1="0%" y1="0%" x2="0%" y2="100%">
+                                <stop offset="0%" style="stop-color:#c4b5fd;stop-opacity:1" />
+                                <stop offset="100%" style="stop-color:#7c3aed;stop-opacity:1" />
+                            </linearGradient>
+                            <filter id="glow">
+                                <feGaussianBlur stdDeviation="3" result="coloredBlur" />
+                                <feMerge>
+                                    <feMergeNode in="coloredBlur" />
+                                    <feMergeNode in="SourceGraphic" />
+                                </feMerge>
+                            </filter>
+                        </defs>
 
-                <section>
+                        <!-- Large Data Block - Left -->
+                        <g>
+                            <rect x="50" y="150" width="180" height="200" fill="url(#grad2)" rx="8" opacity="0.8">
+                                <animate attributeName="opacity" values="0.8;1;0.8" dur="4s" repeatCount="indefinite" />
+                            </rect>
+                            <text x="140" y="200" text-anchor="middle" fill="#5b21b6" font-size="14"
+                                font-weight="bold">Original</text>
+                            <text x="140" y="220" text-anchor="middle" fill="#5b21b6" font-size="12">Data</text>
+
+                            <!-- Data blocks representation -->
+                            <g opacity="0.4">
+                                <rect x="70" y="240" width="35" height="25" fill="#7c3aed" rx="2" />
+                                <rect x="115" y="240" width="35" height="25" fill="#7c3aed" rx="2" />
+                                <rect x="160" y="240" width="35" height="25" fill="#7c3aed" rx="2" />
+                                <rect x="70" y="275" width="35" height="25" fill="#7c3aed" rx="2" />
+                                <rect x="115" y="275" width="35" height="25" fill="#7c3aed" rx="2" />
+                                <rect x="160" y="275" width="35" height="25" fill="#7c3aed" rx="2" />
+                                <rect x="70" y="310" width="35" height="25" fill="#7c3aed" rx="2" />
+                                <rect x="115" y="310" width="35" height="25" fill="#7c3aed" rx="2" />
+                                <rect x="160" y="310" width="35" height="25" fill="#7c3aed" rx="2" />
+                            </g>
+
+                            <text x="140" y="165" text-anchor="middle" fill="#7c3aed" font-size="16"
+                                font-weight="bold">100%</text>
+                        </g>
+
+                        <!-- Compression Process - Middle -->
+                        <g filter="url(#glow)">
+                            <circle cx="300" cy="250" r="50" fill="url(#grad1)" opacity="0.9">
+                                <animate attributeName="r" values="50;55;50" dur="3s" repeatCount="indefinite" />
+                            </circle>
+                            <path d="M 230 250 L 270 250 M 250 230 L 250 270 M 330 250 L 370 250" stroke="white"
+                                stroke-width="4" opacity="0.8" />
+                            <text x="300" y="290" text-anchor="middle" fill="white" font-size="11"
+                                font-weight="bold">COMPRESS</text>
+                        </g>
+
+                        <!-- Compressed Data Block - Right -->
+                        <g>
+                            <rect x="420" y="200" width="130" height="100" fill="url(#grad1)" rx="8" opacity="0.9">
+                                <animate attributeName="opacity" values="0.9;1;0.9" dur="3s" repeatCount="indefinite" />
+                            </rect>
+                            <text x="485" y="235" text-anchor="middle" fill="white" font-size="14"
+                                font-weight="bold">Compressed</text>
+
+                            <!-- Smaller data blocks -->
+                            <g opacity="0.6">
+                                <rect x="440" y="250" width="20" height="15" fill="white" rx="2" />
+                                <rect x="468" y="250" width="20" height="15" fill="white" rx="2" />
+                                <rect x="496" y="250" width="20" height="15" fill="white" rx="2" />
+                                <rect x="524" y="250" width="20" height="15" fill="white" rx="2" />
+                            </g>
+
+                            <text x="485" y="188" text-anchor="middle" fill="#7c3aed" font-size="18"
+                                font-weight="bold">30%</text>
+                        </g>
+
+                        <!-- Data Flow Arrows -->
+                        <g>
+                            <path d="M 230 250 L 250 250" stroke="url(#grad1)" stroke-width="3" opacity="0.6">
+                                <animate attributeName="stroke-dasharray" values="0,20;20,0" dur="2s"
+                                    repeatCount="indefinite" />
+                            </path>
+                            <path d="M 350 250 L 420 250" stroke="url(#grad1)" stroke-width="3" opacity="0.6">
+                                <animate attributeName="stroke-dasharray" values="0,70;70,0" dur="2s"
+                                    repeatCount="indefinite" />
+                            </path>
+                        </g>
+
+                        <!-- Data Particles Flowing -->
+                        <g>
+                            <circle r="4" fill="#7c3aed" opacity="0">
+                                <animate attributeName="cx" values="230;350" dur="2s" repeatCount="indefinite" />
+                                <animate attributeName="cy" values="250;250" dur="2s" repeatCount="indefinite" />
+                                <animate attributeName="opacity" values="0;1;0" dur="2s" repeatCount="indefinite" />
+                            </circle>
+                            <circle r="4" fill="#a78bfa" opacity="0">
+                                <animate attributeName="cx" values="230;350" dur="2.5s" repeatCount="indefinite" />
+                                <animate attributeName="cy" values="240;240" dur="2.5s" repeatCount="indefinite" />
+                                <animate attributeName="opacity" values="0;1;0" dur="2.5s" repeatCount="indefinite" />
+                            </circle>
+                            <circle r="4" fill="#c4b5fd" opacity="0">
+                                <animate attributeName="cx" values="230;350" dur="3s" repeatCount="indefinite" />
+                                <animate attributeName="cy" values="260;260" dur="3s" repeatCount="indefinite" />
+                                <animate attributeName="opacity" values="0;1;0" dur="3s" repeatCount="indefinite" />
+                            </circle>
+                        </g>
+
+                        <!-- Size Comparison Bars -->
+                        <g>
+                            <rect x="50" y="380" width="180" height="30" fill="#a78bfa" opacity="0.3" rx="4" />
+                            <text x="140" y="400" text-anchor="middle" fill="#5b21b6" font-size="12"
+                                font-weight="bold">Before</text>
+
+                            <rect x="420" y="380" width="54" height="30" fill="#7c3aed" opacity="0.8" rx="4">
+                                <animate attributeName="width" values="54;60;54" dur="3s" repeatCount="indefinite" />
+                            </rect>
+                            <text x="447" y="400" text-anchor="middle" fill="white" font-size="12"
+                                font-weight="bold">After</text>
+                        </g>
+
+                        <!-- Efficiency Indicators -->
+                        <g opacity="0.5">
+                            <circle cx="485" cy="330" r="3" fill="#7c3aed">
+                                <animate attributeName="cy" values="330;320;330" dur="2s" repeatCount="indefinite" />
+                            </circle>
+                            <circle cx="500" cy="330" r="3" fill="#a78bfa">
+                                <animate attributeName="cy" values="330;320;330" dur="2.3s" repeatCount="indefinite" />
+                            </circle>
+                            <circle cx="515" cy="330" r="3" fill="#c4b5fd">
+                                <animate attributeName="cy" values="330;320;330" dur="2.6s" repeatCount="indefinite" />
+                            </circle>
+                        </g>
+
+                        <!-- Compression Waves -->
+                        <g opacity="0.2">
+                            <circle cx="300" cy="250" r="60" fill="none" stroke="#7c3aed" stroke-width="2">
+                                <animate attributeName="r" values="60;100" dur="3s" repeatCount="indefinite" />
+                                <animate attributeName="opacity" values="0.5;0" dur="3s" repeatCount="indefinite" />
+                            </circle>
+                            <circle cx="300" cy="250" r="70" fill="none" stroke="#a78bfa" stroke-width="2">
+                                <animate attributeName="r" values="70;110" dur="3s" begin="0.5s"
+                                    repeatCount="indefinite" />
+                                <animate attributeName="opacity" values="0.5;0" dur="3s" begin="0.5s"
+                                    repeatCount="indefinite" />
+                            </circle>
+                        </g>
+                    </svg>
+                </div>
+            </section>
+
+            <article>
+                <section class="content-section">
+                    <h2>Data Compression: Algorithms and Applications</h2>
                     <h3>Definition</h3>
                     <p>
-                        Data compression is the process of encoding information using fewer bits than the
-                        original representation.
-                        It enables more efficient storage, faster data transmission, and reduced bandwidth
-                        consumption.
-                        Compression techniques are foundational in computing, affecting everything from file
-                        storage and streaming to scientific data processing and machine learning.
+                        Data compression is the process of encoding information using fewer bits than the original
+                        representation. It enables more efficient storage, faster data transmission, and reduced
+                        bandwidth consumption. Compression techniques are foundational in computing, affecting
+                        everything from file storage and streaming to scientific data processing and machine learning.
                     </p>
                 </section>
 
-                <section>
+                <section class="content-section">
                     <h3>Motivation and Use Cases</h3>
                     <p>
-                        Compression plays a critical role in numerous domains where large volumes of data are
-                        generated or transferred.
-                        For example, images and videos contain significant amounts of spatial and temporal
-                        redundancy. Compression algorithms exploit this to reduce file sizes while preserving
-                        visual fidelity.
-                        Other applications include log storage, backup systems, real-time data transmission, and
-                        embedded systems with constrained memory.
+                        Compression plays a critical role in numerous domains where large volumes of data are generated
+                        or transferred. For example, images and videos contain significant amounts of spatial and
+                        temporal redundancy. Compression algorithms exploit this to reduce file sizes while preserving
+                        visual fidelity. Other applications include log storage, backup systems, real-time data
+                        transmission, and embedded systems with constrained memory.
                     </p>
                 </section>
 
-                <section>
+                <section class="content-section">
                     <h3>Types of Compression</h3>
-
-                    <h4>Lossless Compression</h4>
-                    <p>
-                        In lossless compression, the original data can be perfectly reconstructed from the
-                        compressed data.
-                        This is crucial for text files, executable code, and any situation where exact
-                        reproduction is necessary.
-                        Common techniques include dictionary-based methods (e.g., Lempel-Ziv family), entropy
-                        encoding (e.g., Huffman, arithmetic coding), and grammar-based methods.
-                    </p>
-
-                    <h4>Lossy Compression</h4>
-                    <p>
-                        Lossy compression allows some degradation of the original data in exchange for higher
-                        compression ratios.
-                        It is used primarily in multimedia applications—such as JPEG for images, MP3/AAC for
-                        audio, and H.264/AV1 for video—where minor losses are imperceptible to human perception.
-                    </p>
+                    <div class="types-grid">
+                        <div class="type-card">
+                            <div class="type-icon">🔒</div>
+                            <h4>Lossless Compression</h4>
+                            <p>
+                                In lossless compression, the original data can be perfectly reconstructed from the
+                                compressed data. This is crucial for text files, executable code, and any situation
+                                where exact reproduction is necessary. Common techniques include dictionary-based
+                                methods (e.g., Lempel-Ziv family), entropy encoding (e.g., Huffman, arithmetic coding),
+                                and grammar-based methods.
+                            </p>
+                        </div>
+                        <div class="type-card">
+                            <div class="type-icon">🎨</div>
+                            <h4>Lossy Compression</h4>
+                            <p>
+                                Lossy compression allows some degradation of the original data in exchange for higher
+                                compression ratios. It is used primarily in multimedia applications—such as JPEG for
+                                images, MP3/AAC for audio, and H.264/AV1 for video—where minor losses are imperceptible
+                                to human perception.
+                            </p>
+                        </div>
+                    </div>
                 </section>
 
-                <section>
+                <section class="content-section">
                     <h3>Core Algorithmic Approaches</h3>
-
-                    <h4>Dictionary-Based Compression</h4>
-                    <p>
-                        Dictionary compression replaces repeated sequences of data with shorter references to a
-                        "dictionary" of previously seen patterns.
-                        Algorithms like LZ77 and LZ78 form the basis of popular formats such as DEFLATE (used in
-                        ZIP, gzip) and LZW (used in GIF).
-                    </p>
-
-                    <h4>Statistical Compression</h4>
-                    <p>
-                        Statistical methods assign shorter codes to more frequent elements and longer codes to
-                        rarer ones.
-                        Huffman coding and arithmetic coding are foundational here, and are used in file formats
-                        like PNG and in Bzip2.
-                    </p>
-
-                    <h4>Transform-Based Compression</h4>
-                    <p>
-                        These algorithms convert data into a different domain where redundancy is easier to
-                        eliminate.
-                        Examples include the Discrete Cosine Transform (DCT) used in JPEG, and the Discrete
-                        Wavelet Transform (DWT) used in JPEG 2000.
-                    </p>
+                    <div class="algorithm-grid">
+                        <div class="algorithm-card">
+                            <h4>Dictionary-Based Compression</h4>
+                            <p>
+                                Dictionary compression replaces repeated sequences of data with shorter references to a
+                                "dictionary" of previously seen patterns. Algorithms like LZ77 and LZ78 form the basis
+                                of popular formats such as DEFLATE (used in ZIP, gzip) and LZW (used in GIF).
+                            </p>
+                        </div>
+                        <div class="algorithm-card">
+                            <h4>Statistical Compression</h4>
+                            <p>
+                                Statistical methods assign shorter codes to more frequent elements and longer codes to
+                                rarer ones. Huffman coding and arithmetic coding are foundational here, and are used in
+                                file formats like PNG and in Bzip2.
+                            </p>
+                        </div>
+                        <div class="algorithm-card">
+                            <h4>Transform-Based Compression</h4>
+                            <p>
+                                These algorithms convert data into a different domain where redundancy is easier to
+                                eliminate. Examples include the Discrete Cosine Transform (DCT) used in JPEG, and the
+                                Discrete Wavelet Transform (DWT) used in JPEG 2000.
+                            </p>
+                        </div>
+                    </div>
                 </section>
 
-                <section>
+                <section class="content-section">
                     <h3>Next-Generation Compression Techniques</h3>
-
-                    <h4>Brotli</h4>
-                    <p>
-                        Developed by Google, Brotli combines a modern variant of LZ77 with Huffman coding and
-                        context modeling.
-                        It is optimized for web content compression and is widely supported by browsers and
-                        CDNs.
-                    </p>
-
-                    <h4>Zstandard</h4>
-                    <p>
-                        Developed by Facebook, Zstandard (Zstd) offers high compression ratios with fast
-                        decompression and tunable trade-offs.
-                        It supports dictionary compression, long-range matching, and streaming mode, and is
-                        replacing gzip in many modern systems.
-                    </p>
-
-                    <h4>JPEG XL</h4>
-                    <p>
-                        JPEG XL is a modern image codec designed to replace legacy JPEG.
-                        It provides superior compression and supports lossless and lossy modes, animation,
-                        progressive decoding, and wide color gamut.
-                    </p>
-
-                    <h4>Neural Compression</h4>
-                    <p>
-                        Neural network-based compression is an emerging field that leverages deep learning for
-                        compressing images, videos, and even text.
-                        Variational autoencoders (VAEs), recurrent neural networks, and transformers are used to
-                        model data distributions.
-                        While not yet mainstream due to compute costs, it is showing promising results for
-                        domain-specific compression.
-                    </p>
+                    <div class="nextgen-showcase">
+                        <div class="nextgen-card">
+                            <span class="nextgen-badge">Modern</span>
+                            <h4>Brotli</h4>
+                            <p>
+                                Developed by Google, Brotli combines a modern variant of LZ77 with Huffman coding and
+                                context modeling. It is optimized for web content compression and is widely supported by
+                                browsers and CDNs.
+                            </p>
+                        </div>
+                        <div class="nextgen-card">
+                            <span class="nextgen-badge">High-Performance</span>
+                            <h4>Zstandard</h4>
+                            <p>
+                                Developed by Facebook, Zstandard (Zstd) offers high compression ratios with fast
+                                decompression and tunable trade-offs. It supports dictionary compression, long-range
+                                matching, and streaming mode, and is replacing gzip in many modern systems.
+                            </p>
+                        </div>
+                        <div class="nextgen-card">
+                            <span class="nextgen-badge">Image Codec</span>
+                            <h4>JPEG XL</h4>
+                            <p>
+                                JPEG XL is a modern image codec designed to replace legacy JPEG. It provides superior
+                                compression and supports lossless and lossy modes, animation, progressive decoding, and
+                                wide color gamut.
+                            </p>
+                        </div>
+                        <div class="nextgen-card">
+                            <span class="nextgen-badge">AI-Powered</span>
+                            <h4>Neural Compression</h4>
+                            <p>
+                                Neural network-based compression is an emerging field that leverages deep learning for
+                                compressing images, videos, and even text. Variational autoencoders (VAEs), recurrent
+                                neural networks, and transformers are used to model data distributions. While not yet
+                                mainstream due to compute costs, it is showing promising results for domain-specific
+                                compression.
+                            </p>
+                        </div>
+                    </div>
                 </section>
 
-                <section>
+                <section class="content-section highlight-box">
                     <h3>Operations on Compressed Data</h3>
                     <p>
                         Modern applications often require not just reading and writing compressed data, but also
-                        searching, updating, or performing analytics directly on compressed formats.
-                        Some data structures (e.g., compressed suffix arrays, succinct trees) enable pattern
-                        matching without decompression.
-                        These capabilities are crucial in large-scale systems, especially in databases and
-                        scientific computing.
+                        searching, updating, or performing analytics directly on compressed formats. Some data
+                        structures (e.g., compressed suffix arrays, succinct trees) enable pattern matching without
+                        decompression. These capabilities are crucial in large-scale systems, especially in databases
+                        and scientific computing.
                     </p>
                 </section>
 
-                <section>
+                <section class="content-section">
                     <h3>Open Standards and FAIR Principles</h3>
                     <p>
-                        Compression algorithms used in open formats (e.g., Brotli, Zstandard, JPEG XL) are
-                        typically standardized via bodies such as the IETF or ISO.
-                        This supports interoperability and long-term accessibility, aligning with the <a
-                            href="https://www.go-fair.org/fair-principles/">FAIR data principles</a> (Findable,
-                        Accessible, Interoperable, Reusable).
-                        Open-source implementations are critical for transparency, reproducibility, and
-                        adoption.
+                        Compression algorithms used in open formats (e.g., Brotli, Zstandard, JPEG XL) are typically
+                        standardized via bodies such as the IETF or ISO. This supports interoperability and long-term
+                        accessibility, aligning with the <a href="https://www.go-fair.org/fair-principles/">FAIR data
+                            principles</a> (Findable, Accessible, Interoperable, Reusable). Open-source implementations
+                        are critical for transparency, reproducibility, and adoption.
                     </p>
                 </section>
 
-                <section>
+                <section class="content-section">
                     <h3>Conclusion</h3>
                     <p>
-                        Data compression is a vital tool in the software engineering and data science toolbox.
-                        From reducing storage costs to enabling real-time processing, it permeates almost every
-                        aspect of computing.
-                        As data volumes continue to grow, advancements in compression—especially neural and
-                        domain-specific methods—will play a pivotal role in efficient and responsible data
-                        handling.
+                        Data compression is a vital tool in the software engineering and data science toolbox. From
+                        reducing storage costs to enabling real-time processing, it permeates almost every aspect of
+                        computing. As data volumes continue to grow, advancements in compression—especially neural and
+                        domain-specific methods—will play a pivotal role in efficient and responsible data handling.
                     </p>
                 </section>
 
-                <section>
+                <section class="references">
                     <h3>References</h3>
                     <ol>
-                        <li><a href="https://en.wikipedia.org/wiki/Data_compression"">Data Compression – Wikipedia</a></li>
-                        <li><a href=" https://en.wikipedia.org/wiki/Lossless_compression"">Lossless Compression –
-                                Wikipedia</a></li>
-                        <li><a href="https://en.wikipedia.org/wiki/Lossy_compression"">Lossy Compression – Wikipedia</a></li>
-                        <li><a href=" https://en.wikipedia.org/wiki/Brotli"">Brotli – Wikipedia</a></li>
-                        <li><a href="https://facebook.github.io/zstd/"">Zstandard Documentation (Facebook)</a></li>
-                        <li><a href=" https://github.com/facebook/zstd"">Zstandard GitHub Repository</a></li>
-                        <li><a href="https://jpeg.org/jpegxl/"">JPEG XL – Official Specification</a></li>
-                        <li><a href=https://arxiv.org/abs/1806.01496"">Deep Image Compression via End-to-End Learning – arXiv</a>
+                        <li><a href="https://en.wikipedia.org/wiki/Data_compression">Data Compression – Wikipedia</a>
                         </li>
-                        <li><a href=" https://www.go-fair.org/fair-principles/"">FAIR Principles – GO FAIR
-                                Initiative</a></li>
-                        <li><a href=" https://blog.jldc.me/posts/word-storage"">How Much Space Would It Take to Store Every Word Ever
-                                Said? – jldc.me</a></li>
+                        <li><a href="https://en.wikipedia.org/wiki/Lossless_compression">Lossless Compression –
+                                Wikipedia</a></li>
+                        <li><a href="https://en.wikipedia.org/wiki/Lossy_compression">Lossy Compression – Wikipedia</a>
+                        </li>
+                        <li><a href="https://en.wikipedia.org/wiki/Brotli">Brotli – Wikipedia</a></li>
+                        <li><a href="https://facebook.github.io/zstd/">Zstandard Documentation (Facebook)</a></li>
+                        <li><a href="https://github.com/facebook/zstd">Zstandard GitHub Repository</a></li>
+                        <li><a href="https://jpeg.org/jpegxl/">JPEG XL – Official Specification</a></li>
+                        <li><a href="https://arxiv.org/abs/1806.01496">Deep Image Compression via End-to-End Learning –
+                                arXiv</a></li>
+                        <li><a href="https://www.go-fair.org/fair-principles/">FAIR Principles – GO FAIR Initiative</a>
+                        </li>
+                        <li><a href="https://blog.jldc.me/posts/word-storage">How Much Space Would It Take to Store
+                                Every Word Ever Said? – jldc.me</a></li>
                     </ol>
                 </section>
-            </div>
+            </article>
+        </main>
 
-        </div>
+        <footer class="footer">
+            <div class="footer-content">
+                <p class="copyright">© 2025 John Samuel. All content licensed under Creative Commons CC-BY-SA.</p>
+                <ul class="footer-links">
+                    <li><a href="../about.html">About</a></li>
+                    <li><a href="../research/research.html">Research</a></li>
+                </ul>
+            </div>
+        </footer>
     </body>
 
 </html>

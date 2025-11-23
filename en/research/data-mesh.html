@@ -2,262 +2,720 @@
 <html lang="en">
 
     <head>
-        <meta charset="utf-8" />
-        <meta http-equiv="Content-Language" content="en" />
-        <link rel="shortcut icon" href="../../images/logo/favicon.png" />
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta http-equiv="Content-Language" content="en">
+        <link rel="shortcut icon" href="../../images/logo/favicon.png">
         <title>Data Mesh: John Samuel</title>
-        <style type="text/css">
-            body {
-                background-color: #FFFFFF;
+        <style>
+            :root {
+                /* Color Palette - Network/Data Architecture Theme */
+                --color-base-bg: #f5f8fa;
+                --color-base-surface: #ffffff;
+                --color-base-text: #1a202c;
+                --color-base-text-muted: #4a5568;
+
+                /* Theme Accents - Distributed Network Colors */
+                --color-accent-1: #4a90e2;
+                --color-accent-2: #2d5f8d;
+                --color-accent-3: #7b68ee;
+                --color-accent-4: #5dade2;
+                --color-accent-light: #e8f4f8;
+
+                /* Functional Colors */
+                --color-shadow: rgba(74, 144, 226, 0.12);
+                --color-border: rgba(74, 144, 226, 0.15);
+                --color-hover: rgba(74, 144, 226, 0.08);
+
+                /* Gradients */
+                --gradient-primary: linear-gradient(135deg, var(--color-accent-1) 0%, var(--color-accent-3) 100%);
+                --gradient-secondary: linear-gradient(225deg, var(--color-accent-2) 0%, var(--color-accent-4) 100%);
+                --gradient-subtle: linear-gradient(180deg, var(--color-base-bg) 0%, var(--color-accent-light) 100%);
+
+                /* Spacing Scale */
+                --space-xs: 0.25rem;
+                --space-sm: 0.5rem;
+                --space-md: 1rem;
+                --space-lg: 1.5rem;
+                --space-xl: 2rem;
+                --space-2xl: 3rem;
+                --space-3xl: 4rem;
+                --space-4xl: 6rem;
+
+                /* Typography */
+                --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+                --text-xs: clamp(0.75rem, 0.7rem + 0.25vw, 0.875rem);
+                --text-sm: clamp(0.875rem, 0.8rem + 0.35vw, 1rem);
+                --text-base: clamp(1rem, 0.95rem + 0.25vw, 1.125rem);
+                --text-lg: clamp(1.125rem, 1.05rem + 0.35vw, 1.25rem);
+                --text-xl: clamp(1.25rem, 1.15rem + 0.5vw, 1.5rem);
+                --text-2xl: clamp(1.5rem, 1.3rem + 1vw, 2rem);
+                --text-3xl: clamp(2rem, 1.6rem + 2vw, 2.5rem);
+                --text-4xl: clamp(2.5rem, 2rem + 2.5vw, 3.5rem);
+
+                /* Borders and Shadows */
+                --radius-sm: 4px;
+                --radius-md: 8px;
+                --radius-lg: 12px;
+                --radius-xl: 16px;
+                --radius-2xl: 24px;
+                --radius-organic: 63% 37% 54% 46% / 45% 62% 38% 55%;
+
+                --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.04), 0 1px 3px rgba(0, 0, 0, 0.06);
+                --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.05), 0 2px 4px rgba(0, 0, 0, 0.06);
+                --shadow-lg: 0 10px 24px rgba(0, 0, 0, 0.08), 0 4px 8px rgba(0, 0, 0, 0.06);
+                --shadow-xl: 0 20px 40px rgba(0, 0, 0, 0.12), 0 8px 16px rgba(0, 0, 0, 0.08);
+                --shadow-theme: 0 10px 30px var(--color-shadow), 0 4px 10px rgba(0, 0, 0, 0.06);
             }
 
-            #sidebar {
-                position: fixed;
-                background-color: #1B80CF;
-                top: 0;
-                left: 0;
-                bottom: 0;
-                width: 30vw;
-            }
-
-            #sidebar .title {
-                position: relative;
-                text-align: center;
-                line-height: 4vmax;
-                font-size: 1.4vmax;
-                font-family: 'Arial';
-                margin-top: 25vh;
-            }
-
-            #sidebar .title a:link,
-            #sidebar .title a:visited {
-                color: #FFFFFF;
-                text-decoration: none;
-            }
-
-            .subtitle {
-                top: 50vh;
-                text-align: center;
-                line-height: 1.3vmax;
-                font-family: 'Arial';
-                font-size: 1.5vmax;
-                color: #FFFFFF;
-            }
-
-            .subtitle a:link,
-            .subtitle a:visited {
-                color: #FFFFFF;
-                text-decoration: none;
-            }
-
-            .licence {
-                position: fixed;
-                text-align: right;
-                bottom: 0;
-                right: 0;
-            }
-
-            .home {
-                position: fixed;
-                text-align: left;
-                font-family: 'Arial';
-                color: #D3D3D3;
-                z-index: 100;
-                width: 100%;
-                background-color: #FFFFFF;
-                top: 0px;
-                margin-bottom: 10px;
-                padding-bottom: 10px;
-            }
-
-            .home a:link,
-            .home a:visited {
-                text-decoration: none;
-                color: #D3D3D3;
-            }
-
-            .home ul {
+            /* Reset and Base Styles */
+            * {
                 margin: 0;
                 padding: 0;
-                text-align: left;
+                box-sizing: border-box;
+            }
+
+            html {
+                scroll-behavior: smooth;
+                scroll-padding-top: 80px;
+            }
+
+            body {
+                font-family: var(--font-sans);
+                font-size: var(--text-base);
+                line-height: 1.7;
+                color: var(--color-base-text);
+                background: var(--gradient-subtle);
+                background-attachment: fixed;
+                -webkit-font-smoothing: antialiased;
+                -moz-osx-font-smoothing: grayscale;
+                overflow-x: hidden;
+            }
+
+            /* Animated Background Pattern */
+            body::before {
+                content: '';
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background-image:
+                    radial-gradient(circle at 20% 50%, rgba(74, 144, 226, 0.05) 0%, transparent 50%),
+                    radial-gradient(circle at 80% 80%, rgba(123, 104, 238, 0.05) 0%, transparent 50%);
+                pointer-events: none;
+                z-index: -1;
+            }
+
+            /* Navigation Header */
+            .nav-header {
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                z-index: 1000;
+                background: rgba(255, 255, 255, 0.7);
+                -webkit-backdrop-filter: blur(12px) saturate(180%);
+                backdrop-filter: blur(12px) saturate(180%);
+                border-bottom: 1px solid var(--color-border);
+                box-shadow: var(--shadow-sm);
+                animation: slideDown 0.6s ease-out;
+            }
+
+            @keyframes slideDown {
+                from {
+                    transform: translateY(-100%);
+                    opacity: 0;
+                }
+
+                to {
+                    transform: translateY(0);
+                    opacity: 1;
+                }
+            }
+
+            .nav-container {
+                max-width: 1400px;
+                margin: 0 auto;
+                padding: var(--space-md) var(--space-xl);
+                display: flex;
+                align-items: center;
+                gap: var(--space-xl);
+            }
+
+            .site-name {
+                font-size: var(--text-lg);
+                font-weight: 700;
+                letter-spacing: -0.02em;
+                background: var(--gradient-primary);
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                background-clip: text;
+                text-decoration: none;
+                transition: transform 0.3s ease;
+            }
+
+            .site-name:hover {
+                transform: scale(1.05);
+            }
+
+            .breadcrumb {
+                display: flex;
+                list-style: none;
+                gap: var(--space-sm);
+                flex-wrap: wrap;
+                align-items: center;
+            }
+
+            .breadcrumb li {
+                display: flex;
+                align-items: center;
+                gap: var(--space-sm);
+            }
+
+            .breadcrumb li:not(:last-child)::after {
+                content: '→';
+                color: var(--color-base-text-muted);
+                font-size: var(--text-sm);
+            }
+
+            .breadcrumb a {
+                color: var(--color-base-text-muted);
+                text-decoration: none;
+                font-size: var(--text-sm);
+                transition: color 0.3s ease;
+                padding: var(--space-xs) var(--space-sm);
+                border-radius: var(--radius-sm);
+            }
+
+            .breadcrumb a:hover {
+                color: var(--color-accent-1);
+                background: var(--color-hover);
+            }
+
+            /* Main Container */
+            .container {
+                max-width: 1400px;
+                margin: 0 auto;
+                padding: var(--space-4xl) var(--space-xl) var(--space-3xl);
+            }
+
+            /* Hero Section */
+            .hero {
+                margin-top: var(--space-3xl);
+                margin-bottom: var(--space-4xl);
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: var(--space-3xl);
+                align-items: center;
+                animation: fadeInUp 0.8s ease-out 0.2s both;
+            }
+
+            @keyframes fadeInUp {
+                from {
+                    opacity: 0;
+                    transform: translateY(30px);
+                }
+
+                to {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            }
+
+            .hero-content h1 {
+                font-size: var(--text-4xl);
+                font-weight: 800;
+                letter-spacing: -0.03em;
+                line-height: 1.15;
+                color: var(--color-base-text);
+                margin-bottom: var(--space-lg);
+                background: var(--gradient-primary);
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                background-clip: text;
+            }
+
+            .hero-content .subtitle {
+                font-size: var(--text-xl);
+                color: var(--color-base-text-muted);
+                line-height: 1.6;
+                margin-bottom: var(--space-xl);
+            }
+
+            .series-badge {
+                display: inline-flex;
+                align-items: center;
+                gap: var(--space-sm);
+                background: var(--gradient-primary);
+                color: white;
+                padding: var(--space-sm) var(--space-lg);
+                border-radius: var(--radius-2xl);
+                font-size: var(--text-sm);
+                font-weight: 600;
+                box-shadow: var(--shadow-theme);
+                animation: pulse 2s ease-in-out infinite;
+            }
+
+            @keyframes pulse {
+
+                0%,
+                100% {
+                    transform: scale(1);
+                }
+
+                50% {
+                    transform: scale(1.02);
+                }
+            }
+
+            .series-badge a {
+                color: white;
+                text-decoration: underline;
+                text-decoration-color: rgba(255, 255, 255, 0.5);
+                text-underline-offset: 3px;
+                transition: text-decoration-color 0.3s ease;
+            }
+
+            .series-badge a:hover {
+                text-decoration-color: white;
+            }
+
+            /* SVG Illustration Container */
+            .hero-illustration {
+                position: relative;
+                min-height: 400px;
+                animation: fadeInUp 0.8s ease-out 0.4s both;
+            }
+
+            .illustration-svg {
+                width: 100%;
+                height: auto;
+                filter: drop-shadow(0 10px 30px rgba(74, 144, 226, 0.15));
+            }
+
+            /* Content Sections */
+            .content-section {
+                margin-bottom: var(--space-4xl);
+                animation: fadeInUp 0.6s ease-out both;
+            }
+
+            .content-section:nth-child(1) {
+                animation-delay: 0.3s;
+            }
+
+            .content-section:nth-child(2) {
+                animation-delay: 0.4s;
+            }
+
+            .content-section:nth-child(3) {
+                animation-delay: 0.5s;
+            }
+
+            .content-section h2 {
+                font-size: var(--text-3xl);
+                font-weight: 700;
+                letter-spacing: -0.02em;
+                color: var(--color-accent-1);
+                margin-bottom: var(--space-xl);
+                position: relative;
+                padding-bottom: var(--space-md);
+            }
+
+            .content-section h2::after {
+                content: '';
+                position: absolute;
+                bottom: 0;
+                left: 0;
+                width: 60px;
+                height: 4px;
+                background: var(--gradient-primary);
+                border-radius: var(--radius-sm);
+            }
+
+            .content-section h3 {
+                font-size: var(--text-xl);
+                font-weight: 600;
+                letter-spacing: -0.01em;
+                color: var(--color-accent-2);
+                margin-top: var(--space-2xl);
+                margin-bottom: var(--space-lg);
+            }
+
+            .content-section h4 {
+                font-size: var(--text-lg);
+                font-weight: 600;
+                color: var(--color-accent-2);
+                margin-top: var(--space-xl);
+                margin-bottom: var(--space-md);
+            }
+
+            .content-section p {
+                color: var(--color-base-text);
+                margin-bottom: var(--space-lg);
+                line-height: 1.8;
+            }
+
+            .content-section ul,
+            .content-section ol {
+                margin-left: var(--space-xl);
+                margin-bottom: var(--space-lg);
+            }
+
+            .content-section li {
+                margin-bottom: var(--space-md);
+                line-height: 1.8;
+                padding-left: var(--space-sm);
+            }
+
+            .content-section a {
+                color: var(--color-accent-1);
+                text-decoration: none;
+                border-bottom: 2px solid transparent;
+                transition: all 0.3s ease;
+                font-weight: 500;
+            }
+
+            .content-section a:hover {
+                color: var(--color-accent-2);
+                border-bottom-color: var(--color-accent-2);
+            }
+
+            .content-section strong {
+                font-weight: 600;
+                color: var(--color-base-text);
+            }
+
+            /* Card Grid for Comparisons */
+            .card-grid {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+                gap: var(--space-xl);
+                margin: var(--space-2xl) 0;
+            }
+
+            .info-card {
+                background: rgba(255, 255, 255, 0.7);
+                -webkit-backdrop-filter: blur(12px) saturate(180%);
+                backdrop-filter: blur(12px) saturate(180%);
+                border: 1px solid var(--color-border);
+                border-radius: var(--radius-xl);
+                padding: var(--space-xl);
+                box-shadow: var(--shadow-md);
+                transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+                position: relative;
+                overflow: hidden;
+            }
+
+            .info-card::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                height: 4px;
+                background: var(--gradient-primary);
+                transform: scaleX(0);
+                transform-origin: left;
+                transition: transform 0.4s ease;
+            }
+
+            .info-card:hover {
+                transform: translateY(-8px) scale(1.02);
+                box-shadow: var(--shadow-xl);
+                border-color: var(--color-accent-1);
+            }
+
+            .info-card:hover::before {
+                transform: scaleX(1);
+            }
+
+            .info-card h4 {
+                margin-top: 0;
+                margin-bottom: var(--space-md);
+                display: flex;
+                align-items: center;
+                gap: var(--space-sm);
+            }
+
+            .info-card .icon {
+                width: 32px;
+                height: 32px;
+                background: var(--gradient-primary);
+                border-radius: var(--radius-md);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                color: white;
+                font-weight: 700;
+                flex-shrink: 0;
+            }
+
+            /* Highlight Box */
+            .highlight-box {
+                background: linear-gradient(135deg, rgba(74, 144, 226, 0.08) 0%, rgba(123, 104, 238, 0.08) 100%);
+                border-left: 4px solid var(--color-accent-1);
+                border-radius: var(--radius-md);
+                padding: var(--space-xl);
+                margin: var(--space-2xl) 0;
+                box-shadow: var(--shadow-sm);
+            }
+
+            /* Principles List */
+            .principles-list {
+                counter-reset: principle-counter;
+                list-style: none;
+                margin-left: 0;
+            }
+
+            .principles-list li {
+                counter-increment: principle-counter;
+                position: relative;
+                padding-left: var(--space-3xl);
+                margin-bottom: var(--space-xl);
+            }
+
+            .principles-list li::before {
+                content: counter(principle-counter);
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 36px;
+                height: 36px;
+                background: var(--gradient-primary);
+                color: white;
+                border-radius: 50%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-weight: 700;
+                font-size: var(--text-lg);
+                box-shadow: var(--shadow-theme);
+            }
+
+            /* Benefits and Challenges */
+            .two-column-layout {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: var(--space-2xl);
+                margin: var(--space-2xl) 0;
+            }
+
+            .column-card {
+                background: rgba(255, 255, 255, 0.7);
+                -webkit-backdrop-filter: blur(12px) saturate(180%);
+                backdrop-filter: blur(12px) saturate(180%);
+                border: 1px solid var(--color-border);
+                border-radius: var(--radius-xl);
+                padding: var(--space-xl);
+                box-shadow: var(--shadow-md);
+            }
+
+            .column-card h4 {
+                margin-top: 0;
+                font-size: var(--text-2xl);
+                color: var(--color-accent-1);
+                margin-bottom: var(--space-lg);
+            }
+
+            .column-card ul {
+                list-style: none;
+                margin-left: 0;
+            }
+
+            .column-card li {
+                position: relative;
+                padding-left: var(--space-xl);
+                margin-bottom: var(--space-md);
+            }
+
+            .column-card li::before {
+                content: '✓';
+                position: absolute;
+                left: 0;
+                color: var(--color-accent-1);
+                font-weight: 700;
+                font-size: var(--text-lg);
+            }
+
+            /* References Section */
+            .references {
+                background: rgba(255, 255, 255, 0.7);
+                -webkit-backdrop-filter: blur(12px) saturate(180%);
+                backdrop-filter: blur(12px) saturate(180%);
+                border: 1px solid var(--color-border);
+                border-radius: var(--radius-xl);
+                padding: var(--space-2xl);
+                box-shadow: var(--shadow-md);
+                margin-top: var(--space-3xl);
+            }
+
+            .references h3 {
+                margin-top: 0;
+                color: var(--color-accent-1);
+                margin-bottom: var(--space-xl);
+            }
+
+            .references ol {
+                margin-left: var(--space-xl);
+            }
+
+            .references li {
+                margin-bottom: var(--space-md);
+                line-height: 1.8;
+            }
+
+            /* Footer */
+            .footer {
+                margin-top: var(--space-4xl);
+                padding: var(--space-2xl) 0;
+                border-top: 1px solid var(--color-border);
+                background: rgba(255, 255, 255, 0.5);
+                -webkit-backdrop-filter: blur(8px);
+                backdrop-filter: blur(8px);
+            }
+
+            .footer-content {
+                max-width: 1400px;
+                margin: 0 auto;
+                padding: 0 var(--space-xl);
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                flex-wrap: wrap;
+                gap: var(--space-lg);
+            }
+
+            .footer-links {
+                display: flex;
+                gap: var(--space-lg);
                 list-style: none;
             }
 
-            .home li {
-                position: relative;
-                float: left;
-                padding-top: 15px;
-                margin-right: 1em;
-                font-family: 'Arial';
-            }
-
-            .home li:hover {
-                display: block;
-            }
-
-            .home a:link,
-            .home a:visited {
-                color: #D3D3D3;
-            }
-
-            .home li:hover a:link,
-            .home li:hover a:visited {
+            .footer-links a {
+                color: var(--color-base-text-muted);
                 text-decoration: none;
-                padding: 15px;
-                color: #FFFFFF;
-                background-color: #1B80CF;
+                font-size: var(--text-sm);
+                transition: color 0.3s ease;
             }
 
-            .content {
-                line-height: 1.8vmax;
-                font-size: 1.2vmax;
-                font-family: 'Arial';
-                margin-top: 15vh;
-                width: 90%;
+            .footer-links a:hover {
+                color: var(--color-accent-1);
             }
 
-            .content h2,
-            h3,
-            h4 {
-                color: #1B80CF;
+            .copyright {
+                color: var(--color-base-text-muted);
+                font-size: var(--text-sm);
             }
 
-            .content a:link,
-            .content a:visited {
-                color: #1B80CF;
+            /* Responsive Design */
+            @media (max-width: 1024px) {
+                .hero {
+                    grid-template-columns: 1fr;
+                    gap: var(--space-2xl);
+                }
+
+                .hero-illustration {
+                    min-height: 300px;
+                }
+
+                .two-column-layout {
+                    grid-template-columns: 1fr;
+                }
             }
 
-            .content h3 {
-                color: #1B80CF;
+            @media (max-width: 768px) {
+                .nav-container {
+                    flex-direction: column;
+                    align-items: flex-start;
+                    gap: var(--space-md);
+                    padding: var(--space-md);
+                }
+
+                .container {
+                    padding: var(--space-2xl) var(--space-md);
+                }
+
+                .hero {
+                    margin-top: var(--space-2xl);
+                }
+
+                .hero-content h1 {
+                    font-size: var(--text-3xl);
+                }
+
+                .card-grid {
+                    grid-template-columns: 1fr;
+                    gap: var(--space-lg);
+                }
+
+                .footer-content {
+                    flex-direction: column;
+                    align-items: flex-start;
+                }
+
+                .footer-links {
+                    flex-direction: column;
+                    gap: var(--space-sm);
+                }
             }
 
-            .content h2::before,
-            .content h3::before {
-                display: block;
-                content: " ";
-                visibility: hidden;
-                height: 50px;
-                margin-top: -50px;
-                pointer-events: none;
-                background-color: #FFFFFF;
+            @media (max-width: 480px) {
+                .breadcrumb {
+                    font-size: var(--text-xs);
+                }
+
+                .content-section ul,
+                .content-section ol {
+                    margin-left: var(--space-lg);
+                }
+
+                .principles-list li {
+                    padding-left: var(--space-2xl);
+                }
             }
 
-            .content a:link,
-            .content a:visited {
-                color: #1B80CF;
+            /* Reduced Motion */
+            @media (prefers-reduced-motion: reduce) {
+
+                *,
+                *::before,
+                *::after {
+                    animation-duration: 0.01ms !important;
+                    animation-iteration-count: 1 !important;
+                    transition-duration: 0.01ms !important;
+                }
             }
 
-            .content li {
-                margin: 5px;
-            }
+            /* Print Styles */
+            @media print {
 
-            .page {
-                width: 65vw;
-                height: 100%;
-                margin-left: 30vw;
-                overflow: hidden;
-                padding: 0 1em;
-                font-family: 'Arial';
-            }
-
-            .page img {
-                max-width: 100%;
-                max-height: 100%;
-            }
-
-            @media (max-width: 640px),
-            screen and (orientation: portrait) {
-                body {
-                    max-width: 100%;
-                    max-height: 100%;
+                .nav-header,
+                .footer {
+                    display: none;
                 }
 
-                #sidebar {
-                    position: fixed;
-                    background-color: #1B80CF;
-                    top: 0;
-                    left: 0;
-                    bottom: 80vh;
-                    width: 100vw;
+                .container {
+                    padding: 0;
                 }
 
-                #sidebar .title {
-                    text-align: center;
-                    position: fixed;
-                    margin-top: 6vh;
-                    left: 0px;
-                    right: 0px;
-                    line-height: 3.5vmax;
-                    font-size: 1.5vmax;
-                    font-family: 'Arial';
+                .hero {
+                    page-break-after: avoid;
                 }
 
-                #sidebar .subtitle {
-                    text-align: center;
-                    top: 5vh;
-                    left: 0px;
-                    right: 0px;
-                    position: fixed;
-                    margin-top: 10vh;
-                    font-size: 1.5vmax;
-                }
-
-                #sidebar .title a:link,
-                #sidebar .title a:visited {
-                    text-align: center;
-                    color: #FFFFFF;
-                }
-
-                #sidebar .subtitle a:link,
-                #sidebar .subtitle a:visited {
-                    text-align: center;
-                    color: #FFFFFF;
-                }
-
-                .home {
-                    z-index: 100;
-                    width: 100%;
-                    background-color: #1B80CF;
-                    font-size: 1.5vmax;
-                }
-
-                .home a:link,
-                .home a:visited {
-                    text-decoration: none;
-                    color: #FFFFFF;
-                }
-
-                .content {
-                    line-height: 3.8vmax;
-                    font-size: 1.8vmax;
-                    font-family: 'Arial';
-                    margin-top: 22vh;
-                }
-
-                .content a:link,
-                .content a:visited {
-                    color: #1B80CF;
-                }
-
-                .page {
-                    top: 40vh;
-                    width: 95%;
-                    margin-left: 0vw;
-                }
-
-                .page img {
-                    max-width: 100%;
-                    max-height: 100%;
-                    border: 0;
+                .content-section {
+                    page-break-inside: avoid;
                 }
             }
         </style>
     </head>
 
     <body vocab="http://schema.org/">
-        <div class="page">
-            <div class="home">
-                <ul typeof="BreadcrumbList">
+
+        <nav class="nav-header" role="navigation" aria-label="Main navigation">
+            <div class="nav-container">
+                <a href="../about.html" class="site-name">John Samuel</a>
+                <ul class="breadcrumb" typeof="BreadcrumbList">
                     <li property="itemListElement" typeof="ListItem">
                         <a property="item" typeof="WebPage" href="../index.html">
                             <span property="name">Home</span>
@@ -268,218 +726,411 @@
                             <span property="name">Research</span>
                         </a>
                     </li>
+                    <li property="itemListElement" typeof="ListItem">
+                        <span property="name">Data Mesh</span>
+                    </li>
                 </ul>
-
             </div>
-            <div id="sidebar">
-                <div class="title">
-                    <h1><a href="./data-warehousing.html">Data Mesh</a></h1>
-                </div>
-                <div class="subtitle">
-                    <h3><a href="../about.html">John Samuel</a></h3>
-                </div>
-            </div>
+        </nav>
 
-            <div class="content">
-                <header>
-                    <h2>Data Mesh: Rethinking Next-Generation Data Architectures</h2>
-                    <div
-                        style="background-color: #f0f8ff; border-left: 4px solid #1e90ff; padding: 1em; margin-bottom: 1.5em;">
-                        <strong>This article is part of a series on <a href="./data-science.html">Data
-                                Science</a>.</strong>
+        <main id="main-content" class="container">
+            <section class="hero">
+                <div class="hero-content">
+                    <h1>Data Mesh: Rethinking Next-Generation Data Architectures</h1>
+                    <p class="subtitle">Exploring decentralized paradigms for scalable, domain-oriented data
+                        infrastructure in modern distributed environments</p>
+                    <div class="series-badge">
+                        <span>📊</span>
+                        <span>Part of the <a href="./data-science.html">Data Science</a> series</span>
                     </div>
-                </header>
-                <article>
-                    <section>
-                        <h3>1. Introduction</h3>
-                        <p>
-                            As organizations increasingly seek agility, scalability, and autonomy in their data
-                            strategies, the limitations of traditional centralized data platforms have become more
-                            evident. The rise of decentralized paradigms such as <strong>Data Mesh</strong> marks a
-                            significant shift in how large-scale data infrastructures are designed and operated. First
-                            proposed by Zhamak Dehghani in 2019, Data Mesh addresses the sociotechnical challenges of
-                            scaling data in modern, distributed environments by treating data as a product and embedding
-                            domain-oriented ownership into the architecture.
-                        </p>
-                    </section>
+                </div>
+                <div class="hero-illustration">
+                    <svg class="illustration-svg" viewBox="0 0 600 500" xmlns="http://www.w3.org/2000/svg"
+                        aria-hidden="true">
+                        <defs>
+                            <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" style="stop-color:#4a90e2;stop-opacity:1" />
+                                <stop offset="100%" style="stop-color:#7b68ee;stop-opacity:1" />
+                            </linearGradient>
+                            <linearGradient id="grad2" x1="0%" y1="0%" x2="100%" y2="0%">
+                                <stop offset="0%" style="stop-color:#5dade2;stop-opacity:1" />
+                                <stop offset="100%" style="stop-color:#4a90e2;stop-opacity:1" />
+                            </linearGradient>
+                            <filter id="glow">
+                                <feGaussianBlur stdDeviation="4" result="coloredBlur" />
+                                <feMerge>
+                                    <feMergeNode in="coloredBlur" />
+                                    <feMergeNode in="SourceGraphic" />
+                                </feMerge>
+                            </filter>
+                        </defs>
 
-                    <section>
-                        <h3>2. Centralized Paradigms: Data Warehouses and Data Lakes</h3>
-                        <p>
-                            Traditionally, organizations have relied on centralized architectures such as <a
-                                href="https://en.wikipedia.org/wiki/Data_warehouse">data warehouses</a> and <a
-                                href="https://en.wikipedia.org/wiki/Data_lake">data lakes</a> to collect, store, and
-                            analyze data.
-                        </p>
-                        <ul>
-                            <li><strong>Data Warehouse:</strong> A structured repository that stores data optimized for
-                                analytical processing using predefined schemas (e.g., Snowflake, Amazon Redshift).</li>
-                            <li><strong>Data Lake:</strong> A more flexible model allowing raw and semi-structured data
-                                storage (e.g., Apache Hadoop, AWS S3-based lakes).</li>
-                        </ul>
-                        <p>
-                            However, both paradigms struggle at scale with issues such as data silos, bottlenecks in
-                            data pipelines, poor data ownership, and slow response times for emerging analytics needs.
-                            This has prompted exploration into more dynamic alternatives like Data Mesh.
-                        </p>
-                    </section>
+                        <!-- Background Network Grid -->
+                        <g opacity="0.15">
+                            <line x1="50" y1="0" x2="50" y2="500" stroke="#4a90e2" stroke-width="1"
+                                stroke-dasharray="5,5">
+                                <animate attributeName="stroke-dashoffset" from="0" to="10" dur="2s"
+                                    repeatCount="indefinite" />
+                            </line>
+                            <line x1="150" y1="0" x2="150" y2="500" stroke="#4a90e2" stroke-width="1"
+                                stroke-dasharray="5,5">
+                                <animate attributeName="stroke-dashoffset" from="0" to="10" dur="2.5s"
+                                    repeatCount="indefinite" />
+                            </line>
+                            <line x1="300" y1="0" x2="300" y2="500" stroke="#4a90e2" stroke-width="1"
+                                stroke-dasharray="5,5">
+                                <animate attributeName="stroke-dashoffset" from="0" to="10" dur="3s"
+                                    repeatCount="indefinite" />
+                            </line>
+                            <line x1="450" y1="0" x2="450" y2="500" stroke="#4a90e2" stroke-width="1"
+                                stroke-dasharray="5,5">
+                                <animate attributeName="stroke-dashoffset" from="0" to="10" dur="2.7s"
+                                    repeatCount="indefinite" />
+                            </line>
+                            <line x1="550" y1="0" x2="550" y2="500" stroke="#4a90e2" stroke-width="1"
+                                stroke-dasharray="5,5">
+                                <animate attributeName="stroke-dashoffset" from="0" to="10" dur="3.2s"
+                                    repeatCount="indefinite" />
+                            </line>
+                        </g>
 
-                    <section>
-                        <h3>3. What Is a Data Mesh?</h3>
-                        <p>
-                            A <strong>Data Mesh</strong> is a decentralized approach to data architecture that
-                            emphasizes domain-oriented data ownership, self-serve data infrastructure, and a product
-                            mindset. It contrasts sharply with monolithic data platforms by distributing data
-                            responsibilities across business domains.
-                        </p>
-                        <p>
-                            Instead of centralizing all data into a single lake or warehouse, each domain team is
-                            responsible for producing, maintaining, and serving its own data products, adhering to
-                            standardized interoperability protocols.
-                        </p>
+                        <!-- Central Hub (Data Mesh Core) -->
+                        <g filter="url(#glow)">
+                            <circle cx="300" cy="250" r="40" fill="url(#grad1)" opacity="0.9">
+                                <animate attributeName="r" values="40;45;40" dur="4s" repeatCount="indefinite" />
+                            </circle>
+                            <circle cx="300" cy="250" r="30" fill="none" stroke="white" stroke-width="2" opacity="0.6">
+                                <animate attributeName="r" values="30;35;30" dur="4s" repeatCount="indefinite" />
+                            </circle>
+                        </g>
+
+                        <!-- Domain Nodes (Distributed Architecture) -->
+                        <!-- Top Left Domain -->
+                        <g>
+                            <circle cx="120" cy="120" r="28" fill="url(#grad2)" opacity="0.85">
+                                <animate attributeName="opacity" values="0.85;1;0.85" dur="3s"
+                                    repeatCount="indefinite" />
+                            </circle>
+                            <path d="M 300 250 L 120 120" stroke="url(#grad1)" stroke-width="2" opacity="0.4"
+                                stroke-dasharray="5,5">
+                                <animate attributeName="stroke-dashoffset" from="0" to="-10" dur="2s"
+                                    repeatCount="indefinite" />
+                            </path>
+                        </g>
+
+                        <!-- Top Right Domain -->
+                        <g>
+                            <circle cx="480" cy="120" r="28" fill="url(#grad2)" opacity="0.85">
+                                <animate attributeName="opacity" values="0.85;1;0.85" dur="3.5s"
+                                    repeatCount="indefinite" />
+                            </circle>
+                            <path d="M 300 250 L 480 120" stroke="url(#grad1)" stroke-width="2" opacity="0.4"
+                                stroke-dasharray="5,5">
+                                <animate attributeName="stroke-dashoffset" from="0" to="-10" dur="2.3s"
+                                    repeatCount="indefinite" />
+                            </path>
+                        </g>
+
+                        <!-- Left Domain -->
+                        <g>
+                            <circle cx="80" cy="250" r="28" fill="url(#grad2)" opacity="0.85">
+                                <animate attributeName="opacity" values="0.85;1;0.85" dur="4s"
+                                    repeatCount="indefinite" />
+                            </circle>
+                            <path d="M 300 250 L 80 250" stroke="url(#grad1)" stroke-width="2" opacity="0.4"
+                                stroke-dasharray="5,5">
+                                <animate attributeName="stroke-dashoffset" from="0" to="-10" dur="2.8s"
+                                    repeatCount="indefinite" />
+                            </path>
+                        </g>
+
+                        <!-- Right Domain -->
+                        <g>
+                            <circle cx="520" cy="250" r="28" fill="url(#grad2)" opacity="0.85">
+                                <animate attributeName="opacity" values="0.85;1;0.85" dur="3.2s"
+                                    repeatCount="indefinite" />
+                            </circle>
+                            <path d="M 300 250 L 520 250" stroke="url(#grad1)" stroke-width="2" opacity="0.4"
+                                stroke-dasharray="5,5">
+                                <animate attributeName="stroke-dashoffset" from="0" to="-10" dur="2.5s"
+                                    repeatCount="indefinite" />
+                            </path>
+                        </g>
+
+                        <!-- Bottom Left Domain -->
+                        <g>
+                            <circle cx="120" cy="380" r="28" fill="url(#grad2)" opacity="0.85">
+                                <animate attributeName="opacity" values="0.85;1;0.85" dur="3.7s"
+                                    repeatCount="indefinite" />
+                            </circle>
+                            <path d="M 300 250 L 120 380" stroke="url(#grad1)" stroke-width="2" opacity="0.4"
+                                stroke-dasharray="5,5">
+                                <animate attributeName="stroke-dashoffset" from="0" to="-10" dur="2.9s"
+                                    repeatCount="indefinite" />
+                            </path>
+                        </g>
+
+                        <!-- Bottom Right Domain -->
+                        <g>
+                            <circle cx="480" cy="380" r="28" fill="url(#grad2)" opacity="0.85">
+                                <animate attributeName="opacity" values="0.85;1;0.85" dur="4.2s"
+                                    repeatCount="indefinite" />
+                            </circle>
+                            <path d="M 300 250 L 480 380" stroke="url(#grad1)" stroke-width="2" opacity="0.4"
+                                stroke-dasharray="5,5">
+                                <animate attributeName="stroke-dashoffset" from="0" to="-10" dur="3.1s"
+                                    repeatCount="indefinite" />
+                            </path>
+                        </g>
+
+                        <!-- Data Flow Particles -->
+                        <circle cx="300" cy="250" r="3" fill="#4a90e2" opacity="0">
+                            <animate attributeName="cx" values="300;120" dur="3s" repeatCount="indefinite" />
+                            <animate attributeName="cy" values="250;120" dur="3s" repeatCount="indefinite" />
+                            <animate attributeName="opacity" values="0;1;0" dur="3s" repeatCount="indefinite" />
+                        </circle>
+                        <circle cx="300" cy="250" r="3" fill="#7b68ee" opacity="0">
+                            <animate attributeName="cx" values="300;480" dur="3.5s" repeatCount="indefinite" />
+                            <animate attributeName="cy" values="250;120" dur="3.5s" repeatCount="indefinite" />
+                            <animate attributeName="opacity" values="0;1;0" dur="3.5s" repeatCount="indefinite" />
+                        </circle>
+                        <circle cx="300" cy="250" r="3" fill="#5dade2" opacity="0">
+                            <animate attributeName="cx" values="300;520" dur="4s" repeatCount="indefinite" />
+                            <animate attributeName="cy" values="250;250" dur="4s" repeatCount="indefinite" />
+                            <animate attributeName="opacity" values="0;1;0" dur="4s" repeatCount="indefinite" />
+                        </circle>
+
+                        <!-- Orbital Rings -->
+                        <circle cx="300" cy="250" r="100" fill="none" stroke="url(#grad1)" stroke-width="1"
+                            opacity="0.2" stroke-dasharray="10,10">
+                            <animateTransform attributeName="transform" type="rotate" from="0 300 250" to="360 300 250"
+                                dur="20s" repeatCount="indefinite" />
+                        </circle>
+                        <circle cx="300" cy="250" r="150" fill="none" stroke="url(#grad1)" stroke-width="1"
+                            opacity="0.15" stroke-dasharray="15,15">
+                            <animateTransform attributeName="transform" type="rotate" from="360 300 250" to="0 300 250"
+                                dur="30s" repeatCount="indefinite" />
+                        </circle>
+                    </svg>
+                </div>
+            </section>
+
+            <article>
+                <section class="content-section">
+                    <h2>1. Introduction</h2>
+                    <p>
+                        As organizations increasingly seek agility, scalability, and autonomy in their data strategies,
+                        the limitations of traditional centralized data platforms have become more evident. The rise of
+                        decentralized paradigms such as <strong>Data Mesh</strong> marks a significant shift in how
+                        large-scale data infrastructures are designed and operated. First proposed by Zhamak Dehghani in
+                        2019, Data Mesh addresses the sociotechnical challenges of scaling data in modern, distributed
+                        environments by treating data as a product and embedding domain-oriented ownership into the
+                        architecture.
+                    </p>
+                </section>
+
+                <section class="content-section">
+                    <h2>2. Centralized Paradigms: Data Warehouses and Data Lakes</h2>
+                    <p>
+                        Traditionally, organizations have relied on centralized architectures such as <a
+                            href="https://en.wikipedia.org/wiki/Data_warehouse">data warehouses</a> and <a
+                            href="https://en.wikipedia.org/wiki/Data_lake">data lakes</a> to collect, store, and analyze
+                        data.
+                    </p>
+                    <div class="card-grid">
+                        <div class="info-card">
+                            <h4><span class="icon">DW</span>Data Warehouse</h4>
+                            <p>A structured repository that stores data optimized for analytical processing using
+                                predefined schemas (e.g., Snowflake, Amazon Redshift).</p>
+                        </div>
+                        <div class="info-card">
+                            <h4><span class="icon">DL</span>Data Lake</h4>
+                            <p>A more flexible model allowing raw and semi-structured data storage (e.g., Apache Hadoop,
+                                AWS S3-based lakes).</p>
+                        </div>
+                    </div>
+                    <p>
+                        However, both paradigms struggle at scale with issues such as data silos, bottlenecks in data
+                        pipelines, poor data ownership, and slow response times for emerging analytics needs. This has
+                        prompted exploration into more dynamic alternatives like Data Mesh.
+                    </p>
+                </section>
+
+                <section class="content-section">
+                    <h2>3. What Is a Data Mesh?</h2>
+                    <p>
+                        A <strong>Data Mesh</strong> is a decentralized approach to data architecture that emphasizes
+                        domain-oriented data ownership, self-serve data infrastructure, and a product mindset. It
+                        contrasts sharply with monolithic data platforms by distributing data responsibilities across
+                        business domains.
+                    </p>
+                    <p>
+                        Instead of centralizing all data into a single lake or warehouse, each domain team is
+                        responsible for producing, maintaining, and serving its own data products, adhering to
+                        standardized interoperability protocols.
+                    </p>
+                    <div class="highlight-box">
                         <p>
                             According to Zhamak Dehghani's <a
                                 href="https://martinfowler.com/articles/data-monolith-to-mesh.html">foundational
                                 article</a>, the four key principles of Data Mesh are:
                         </p>
-                        <ol>
-                            <li><strong>Domain-oriented ownership</strong>: Business units manage their data as
-                                autonomous products.</li>
-                            <li><strong>Data as a product</strong>: Each dataset has clear consumers, service-level
-                                objectives, and documentation.</li>
-                            <li><strong>Self-serve infrastructure</strong>: Developers access tools and platforms to
-                                build, deploy, and manage data products without centralized teams.</li>
-                            <li><strong>Federated computational governance</strong>: Data policies, standards, and
-                                compliance are embedded into a federated governance model.</li>
-                        </ol>
-                    </section>
+                    </div>
+                    <ol class="principles-list">
+                        <li><strong>Domain-oriented ownership</strong>: Business units manage their data as autonomous
+                            products.</li>
+                        <li><strong>Data as a product</strong>: Each dataset has clear consumers, service-level
+                            objectives, and documentation.</li>
+                        <li><strong>Self-serve infrastructure</strong>: Developers access tools and platforms to build,
+                            deploy, and manage data products without centralized teams.</li>
+                        <li><strong>Federated computational governance</strong>: Data policies, standards, and
+                            compliance are embedded into a federated governance model.</li>
+                    </ol>
+                </section>
 
-                    <section>
-                        <h3>4. Comparison with Related Paradigms</h3>
+                <section class="content-section">
+                    <h2>4. Comparison with Related Paradigms</h2>
 
-                        <h3>4.1 Data Mesh vs Data Warehouse</h3>
-                        <p>
-                            While a data warehouse offers consistent performance and reliability for structured
-                            analytics, it lacks the flexibility to evolve with business needs. In contrast, Data Mesh
-                            provides:
-                        </p>
-                        <ul>
-                            <li>Faster time-to-insight through decentralized, domain-specific teams</li>
-                            <li>Scalability via distributed ownership</li>
-                            <li>Improved agility and experimentation</li>
-                        </ul>
+                    <h3>4.1 Data Mesh vs Data Warehouse</h3>
+                    <p>
+                        While a data warehouse offers consistent performance and reliability for structured analytics,
+                        it lacks the flexibility to evolve with business needs. In contrast, Data Mesh provides:
+                    </p>
+                    <ul>
+                        <li>Faster time-to-insight through decentralized, domain-specific teams</li>
+                        <li>Scalability via distributed ownership</li>
+                        <li>Improved agility and experimentation</li>
+                    </ul>
 
-                        <h3>4.2 Data Mesh vs Data Lake</h3>
-                        <p>
-                            Data lakes are flexible but often become data swamps due to ungoverned ingestion of
-                            heterogeneous data. Data Mesh imposes product thinking and governance by design, making data
-                            discoverable, reliable, and accessible.
-                        </p>
+                    <h3>4.2 Data Mesh vs Data Lake</h3>
+                    <p>
+                        Data lakes are flexible but often become data swamps due to ungoverned ingestion of
+                        heterogeneous data. Data Mesh imposes product thinking and governance by design, making data
+                        discoverable, reliable, and accessible.
+                    </p>
 
-                        <h3>4.3 Data Mesh vs Data Lakehouse</h3>
-                        <p>
-                            The <a href="https://en.wikipedia.org/wiki/Data_lakehouse">Lakehouse</a> paradigm (e.g.,
-                            Delta Lake, Apache Iceberg) combines the flexibility of data lakes with the reliability and
-                            performance of warehouses. While it improves physical architecture, it still follows a
-                            centralized operational model. Data Mesh, by contrast, decentralizes both storage and
-                            organizational control.
-                        </p>
+                    <h3>4.3 Data Mesh vs Data Lakehouse</h3>
+                    <p>
+                        The <a href="https://en.wikipedia.org/wiki/Data_lakehouse">Lakehouse</a> paradigm (e.g., Delta
+                        Lake, Apache Iceberg) combines the flexibility of data lakes with the reliability and
+                        performance of warehouses. While it improves physical architecture, it still follows a
+                        centralized operational model. Data Mesh, by contrast, decentralizes both storage and
+                        organizational control.
+                    </p>
 
-                        <h3>4.4 Data Mesh vs Data Fabric</h3>
-                        <p>
-                            A <strong>Data Fabric</strong> focuses on intelligent and automated data integration across
-                            platforms using metadata, AI/ML, and knowledge graphs. It supports centralized orchestration
-                            of distributed data. In contrast, Data Mesh is organizationally decentralized, focusing more
-                            on people and processes than technology.
-                        </p>
+                    <h3>4.4 Data Mesh vs Data Fabric</h3>
+                    <p>
+                        A <strong>Data Fabric</strong> focuses on intelligent and automated data integration across
+                        platforms using metadata, AI/ML, and knowledge graphs. It supports centralized orchestration of
+                        distributed data. In contrast, Data Mesh is organizationally decentralized, focusing more on
+                        people and processes than technology.
+                    </p>
 
-                        <h3>4.5 Semantic Layer</h3>
-                        <p>
-                            Data Mesh is often augmented with a <strong>semantic layer</strong> to standardize meaning
-                            across domains. This allows consumers to query across different domains using unified
-                            business terms, improving discoverability and usability.
-                        </p>
-                    </section>
+                    <h3>4.5 Semantic Layer</h3>
+                    <p>
+                        Data Mesh is often augmented with a <strong>semantic layer</strong> to standardize meaning
+                        across domains. This allows consumers to query across different domains using unified business
+                        terms, improving discoverability and usability.
+                    </p>
+                </section>
 
-                    <section>
-                        <h3>5. Benefits and Challenges</h3>
-                        <h3>5.1 Benefits</h3>
-                        <ul>
-                            <li>Promotes agility and faster delivery of insights</li>
-                            <li>Enables scalability through autonomous teams</li>
-                            <li>Improves data quality via clear ownership and SLAs</li>
-                            <li>Facilitates cross-domain interoperability with well-defined contracts</li>
-                        </ul>
+                <section class="content-section">
+                    <h2>5. Benefits and Challenges</h2>
+                    <div class="two-column-layout">
+                        <div class="column-card">
+                            <h4>Benefits</h4>
+                            <ul>
+                                <li>Promotes agility and faster delivery of insights</li>
+                                <li>Enables scalability through autonomous teams</li>
+                                <li>Improves data quality via clear ownership and SLAs</li>
+                                <li>Facilitates cross-domain interoperability with well-defined contracts</li>
+                            </ul>
+                        </div>
+                        <div class="column-card">
+                            <h4>Challenges</h4>
+                            <ul>
+                                <li>Steep learning curve and cultural shift from centralized models</li>
+                                <li>High implementation and governance complexity</li>
+                                <li>Risk of inconsistent standards without strong federated governance</li>
+                                <li>Tooling ecosystem still evolving</li>
+                            </ul>
+                        </div>
+                    </div>
+                </section>
 
-                        <h3>5.2 Challenges</h3>
-                        <ul>
-                            <li>Steep learning curve and cultural shift from centralized models</li>
-                            <li>High implementation and governance complexity</li>
-                            <li>Risk of inconsistent standards without strong federated governance</li>
-                            <li>Tooling ecosystem still evolving</li>
-                        </ul>
-                    </section>
+                <section class="content-section">
+                    <h2>6. Use Cases and Adoption</h2>
+                    <p>
+                        Several organizations have started adopting Data Mesh principles:
+                    </p>
+                    <div class="card-grid">
+                        <div class="info-card">
+                            <h4><span class="icon">N</span>Netflix & Zalando</h4>
+                            <p>Pioneers in applying domain-oriented data ownership</p>
+                        </div>
+                        <div class="info-card">
+                            <h4><span class="icon">P</span>PayPal</h4>
+                            <p>Advocated Data Mesh as the "next generation of data platforms" in engineering blogs</p>
+                        </div>
+                        <div class="info-card">
+                            <h4><span class="icon">T</span>ThoughtWorks</h4>
+                            <p>Early proponent through whitepapers and consulting</p>
+                        </div>
+                    </div>
+                    <p>
+                        Adoption is particularly suited for enterprises with multiple business units, large engineering
+                        teams, and diverse data needs.
+                    </p>
+                </section>
 
-                    <section>
-                        <h3>6. Use Cases and Adoption</h3>
-                        <p>
-                            Several organizations have started adopting Data Mesh principles:
-                        </p>
-                        <ul>
-                            <li><strong>Netflix</strong> and <strong>Zalando</strong>: Pioneers in applying
-                                domain-oriented data ownership</li>
-                            <li><strong>PayPal</strong>: Advocated Data Mesh as the "next generation of data platforms"
-                                in engineering blogs</li>
-                            <li><strong>ThoughtWorks</strong>: Early proponent through whitepapers and consulting</li>
-                        </ul>
-                        <p>
-                            Adoption is particularly suited for enterprises with multiple business units, large
-                            engineering teams, and diverse data needs.
-                        </p>
-                    </section>
+                <section class="content-section">
+                    <h2>7. Conclusion</h2>
+                    <p>
+                        Data Mesh offers a compelling vision for the future of enterprise data architecture,
+                        prioritizing autonomy, scalability, and cross-functional ownership. While not a silver bullet,
+                        its principles align well with modern software engineering practices and are particularly
+                        relevant for complex, data-rich organizations.
+                    </p>
+                    <p>
+                        As tooling, best practices, and governance models mature, Data Mesh is likely to evolve from an
+                        emerging philosophy to a mainstream paradigm for large-scale data systems.
+                    </p>
+                </section>
 
-                    <section>
-                        <h3>7. Conclusion</h3>
-                        <p>
-                            Data Mesh offers a compelling vision for the future of enterprise data architecture,
-                            prioritizing autonomy, scalability, and cross-functional ownership. While not a silver
-                            bullet, its principles align well with modern software engineering practices and are
-                            particularly relevant for complex, data-rich organizations.
-                        </p>
-                        <p>
-                            As tooling, best practices, and governance models mature, Data Mesh is likely to evolve from
-                            an emerging philosophy to a mainstream paradigm for large-scale data systems.
-                        </p>
-                    </section>
+                <section class="references">
+                    <h3>References</h3>
+                    <ol>
+                        <li id="datamesh"><a href="https://martinfowler.com/articles/data-monolith-to-mesh.html">Martin
+                                Fowler – How to Move Beyond a Monolithic Data Lake to a Distributed Data Mesh</a></li>
+                        <li id="nextgen"><a
+                                href="https://medium.com/paypal-tech/the-next-generation-of-data-platforms-is-the-data-mesh-b7df4b825522">PayPal
+                                Tech Blog – The Next Generation of Data Platforms is the Data Mesh</a></li>
+                        <li><a href="https://en.wikipedia.org/wiki/Data_warehouse">Wikipedia – Data Warehouse</a></li>
+                        <li><a href="https://en.wikipedia.org/wiki/Data_lake">Wikipedia – Data Lake</a></li>
+                        <li><a href="https://www.databricks.com/blog/2020/01/30/what-is-a-data-lakehouse.html">Databricks
+                                – What Is a Lakehouse?</a></li>
+                        <li><a href="https://en.wikipedia.org/wiki/Data_fabric">Wikipedia – Data Fabric</a></li>
+                        <li><a href="https://www.informatica.com/resources/articles/what-is-a-data-warehouse.html">Informatica
+                                – What Is a Data Warehouse?</a></li>
+                        <li><a href="https://datamesh-architecture.com/">Data Mesh Learning – Community Resources</a>
+                        </li>
+                        <li><a
+                                href="https://www.thoughtworks.com/en-us/insights/articles/data-mesh-in-practice-technology-and-the-architecture">ThoughtWorks
+                                – Data Mesh in practice: Technology and the architecture</a></li>
+                    </ol>
+                </section>
+            </article>
+        </main>
 
-                    <section>
-                        <h3>References</h3>
-                        <ol>
-                            <li id="datamesh"><a
-                                    href="https://martinfowler.com/articles/data-monolith-to-mesh.html">Martin Fowler –
-                                    How to Move Beyond a Monolithic Data Lake to a Distributed Data Mesh</a></li>
-                            <li id="nextgen"><a
-                                    href="https://medium.com/paypal-tech/the-next-generation-of-data-platforms-is-the-data-mesh-b7df4b825522">PayPal
-                                    Tech Blog – The Next Generation of Data Platforms is the Data Mesh</a></li>
-                            <li><a href="https://en.wikipedia.org/wiki/Data_warehouse">Wikipedia – Data Warehouse</a>
-                            </li>
-                            <li><a href="https://en.wikipedia.org/wiki/Data_lake">Wikipedia – Data Lake</a></li>
-                            <li><a href="https://www.databricks.com/blog/2020/01/30/what-is-a-data-lakehouse.html">Databricks
-                                    – What Is a Lakehouse?</a>
-                            </li>
-                            <li><a href="https://en.wikipedia.org/wiki/Data_fabric">Wikipedia – Data Fabric</a></li>
-                            <li><a href="https://www.informatica.com/resources/articles/what-is-a-data-warehouse.html">Informatica
-                                    – What Is a Data Warehouse?</a></li>
-                            <li><a href="https://datamesh-architecture.com/">Data Mesh Learning – Community
-                                    Resources</a></li>
-                            <li><a
-                                    href="https://www.thoughtworks.com/en-us/insights/articles/data-mesh-in-practice-technology-and-the-architecture">ThoughtWorks
-                                    – Data Mesh in practice: Technology and the architecture</a></li>
-                        </ol>
-                    </section>
-                </article>
+        <footer class="footer">
+            <div class="footer-content">
+                <p class="copyright">© 2025 John Samuel. All content licensed under Creative Commons CC-BY-SA.</p>
+                <ul class="footer-links">
+                    <li><a href="../about.html">About</a></li>
+                    <li><a href="../research/research.html">Research</a></li>
+                </ul>
             </div>
-        </div>
+        </footer>
     </body>
 
 </html>

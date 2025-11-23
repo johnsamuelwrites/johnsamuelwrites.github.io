@@ -2,262 +2,629 @@
 <html lang="en">
 
     <head>
-        <meta charset="utf-8" />
-        <meta http-equiv="Content-Language" content="en" />
-        <link rel="shortcut icon" href="../../images/logo/favicon.png" />
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta http-equiv="Content-Language" content="en">
+        <link rel="shortcut icon" href="../../images/logo/favicon.png">
         <title>Data Visualization: John Samuel</title>
-        <style type="text/css">
-            body {
-                background-color: #FFFFFF;
+        <style>
+            /* ===== CSS CUSTOM PROPERTIES (DESIGN TOKENS) ===== */
+            :root {
+                /* Base Colors - Light Theme Foundation */
+                --color-base-bg: #fafbfc;
+                --color-base-surface: #ffffff;
+                --color-base-text: #1a202c;
+                --color-base-text-muted: #4a5568;
+
+                /* Data Visualization Theme Accents - Visual Expression & Insight */
+                --color-accent-1: #f59e0b;
+                --color-accent-2: #d97706;
+                --color-accent-3: #f97316;
+                --color-accent-light: #fef3c7;
+
+                /* Functional Colors */
+                --color-shadow: rgba(245, 158, 11, 0.12);
+                --color-border: rgba(245, 158, 11, 0.15);
+                --color-hover: rgba(245, 158, 11, 0.08);
+
+                /* Additional Chart Colors */
+                --color-chart-blue: #3b82f6;
+                --color-chart-green: #10b981;
+                --color-chart-red: #ef4444;
+                --color-chart-purple: #8b5cf6;
+
+                /* Gradients */
+                --gradient-primary: linear-gradient(135deg, #f59e0b 0%, #f97316 100%);
+                --gradient-subtle: linear-gradient(180deg, #fafbfc 0%, #fef3c7 100%);
+                --gradient-hero: linear-gradient(135deg, #f59e0b 0%, #f97316 50%, #d97706 100%);
+
+                /* Spacing Scale */
+                --space-xs: 0.25rem;
+                --space-sm: 0.5rem;
+                --space-md: 1rem;
+                --space-lg: 1.5rem;
+                --space-xl: 2rem;
+                --space-2xl: 3rem;
+                --space-3xl: 4rem;
+                --space-4xl: 6rem;
+
+                /* Border Radius */
+                --radius-sm: 4px;
+                --radius-md: 8px;
+                --radius-lg: 12px;
+                --radius-xl: 16px;
+                --radius-2xl: 24px;
+                --radius-full: 9999px;
+
+                /* Shadows */
+                --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.04), 0 1px 3px rgba(0, 0, 0, 0.06);
+                --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.05), 0 2px 4px rgba(0, 0, 0, 0.06);
+                --shadow-lg: 0 10px 24px rgba(0, 0, 0, 0.08), 0 4px 8px rgba(0, 0, 0, 0.06);
+                --shadow-xl: 0 20px 40px rgba(0, 0, 0, 0.12), 0 8px 16px rgba(0, 0, 0, 0.08);
+                --shadow-theme: 0 10px 30px var(--color-shadow), 0 4px 10px rgba(0, 0, 0, 0.06);
+
+                /* Typography */
+                --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+                --text-xs: clamp(0.75rem, 0.7rem + 0.25vw, 0.875rem);
+                --text-sm: clamp(0.875rem, 0.8rem + 0.35vw, 1rem);
+                --text-base: clamp(1rem, 0.95rem + 0.25vw, 1.125rem);
+                --text-lg: clamp(1.125rem, 1.05rem + 0.35vw, 1.25rem);
+                --text-xl: clamp(1.25rem, 1.15rem + 0.5vw, 1.5rem);
+                --text-2xl: clamp(1.5rem, 1.3rem + 1vw, 2rem);
+                --text-3xl: clamp(2rem, 1.6rem + 2vw, 2.5rem);
+                --text-4xl: clamp(2.5rem, 2rem + 2.5vw, 3.5rem);
+
+                /* Weights */
+                --weight-normal: 400;
+                --weight-medium: 500;
+                --weight-semibold: 600;
+                --weight-bold: 700;
             }
 
-            #sidebar {
-                position: fixed;
-                background-color: #1B80CF;
-                top: 0;
-                left: 0;
-                bottom: 0;
-                width: 30vw;
-            }
-
-            #sidebar .title {
-                position: relative;
-                text-align: center;
-                line-height: 4vmax;
-                font-size: 1.4vmax;
-                font-family: 'Arial';
-                margin-top: 25vh;
-            }
-
-            #sidebar .title a:link,
-            #sidebar .title a:visited {
-                color: #FFFFFF;
-                text-decoration: none;
-            }
-
-            .subtitle {
-                top: 50vh;
-                text-align: center;
-                line-height: 1.3vmax;
-                font-family: 'Arial';
-                font-size: 1.5vmax;
-                color: #FFFFFF;
-            }
-
-            .subtitle a:link,
-            .subtitle a:visited {
-                color: #FFFFFF;
-                text-decoration: none;
-            }
-
-            .licence {
-                position: fixed;
-                text-align: right;
-                bottom: 0;
-                right: 0;
-            }
-
-            .home {
-                position: fixed;
-                text-align: left;
-                font-family: 'Arial';
-                color: #D3D3D3;
-                z-index: 100;
-                width: 100%;
-                background-color: #FFFFFF;
-                top: 0px;
-                margin-bottom: 10px;
-                padding-bottom: 10px;
-            }
-
-            .home a:link,
-            .home a:visited {
-                text-decoration: none;
-                color: #D3D3D3;
-            }
-
-            .home ul {
+            /* ===== RESET & BASE STYLES ===== */
+            *,
+            *::before,
+            *::after {
+                box-sizing: border-box;
                 margin: 0;
                 padding: 0;
-                text-align: left;
-                list-style: none;
             }
 
-            .home li {
-                position: relative;
-                float: left;
-                padding-top: 15px;
-                margin-right: 1em;
-                font-family: 'Arial';
+            html {
+                scroll-behavior: smooth;
+                scroll-padding-top: 100px;
             }
 
-            .home li:hover {
-                display: block;
+            body {
+                font-family: var(--font-sans);
+                font-size: var(--text-base);
+                line-height: 1.7;
+                color: var(--color-base-text);
+                background: var(--gradient-subtle);
+                background-attachment: fixed;
+                min-height: 100vh;
+                letter-spacing: -0.005em;
             }
 
-            .home a:link,
-            .home a:visited {
-                color: #D3D3D3;
+            /* ===== NAVIGATION BAR ===== */
+            .navbar {
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                background: rgba(255, 255, 255, 0.85);
+                -webkit-backdrop-filter: blur(12px) saturate(180%);
+                backdrop-filter: blur(12px) saturate(180%);
+                border-bottom: 1px solid var(--color-border);
+                box-shadow: var(--shadow-md);
+                z-index: 100;
+                padding: var(--space-md) var(--space-xl);
             }
 
-            .home li:hover a:link,
-            .home li:hover a:visited {
+            .navbar-content {
+                max-width: 1400px;
+                margin: 0 auto;
+                display: flex;
+                align-items: center;
+                gap: var(--space-xl);
+            }
+
+            .site-name {
+                font-size: var(--text-xl);
+                font-weight: var(--weight-bold);
+                color: var(--color-accent-1);
                 text-decoration: none;
-                padding: 15px;
-                color: #FFFFFF;
-                background-color: #1B80CF;
+                padding: var(--space-sm) var(--space-md);
+                background: var(--gradient-primary);
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                background-clip: text;
+                transition: all 0.3s ease;
             }
 
-            .content {
-                line-height: 1.8vmax;
-                font-size: 1.2vmax;
-                font-family: 'Arial';
-                margin-top: 15vh;
-                width: 90%;
+            .site-name:hover {
+                transform: translateY(-2px);
             }
 
-            .content h2,
+            .breadcrumb {
+                display: flex;
+                list-style: none;
+                gap: var(--space-sm);
+                flex-wrap: wrap;
+                align-items: center;
+            }
+
+            .breadcrumb li {
+                display: flex;
+                align-items: center;
+                gap: var(--space-sm);
+            }
+
+            .breadcrumb li:not(:last-child)::after {
+                content: '→';
+                color: var(--color-base-text-muted);
+                font-size: var(--text-sm);
+            }
+
+            .breadcrumb a {
+                color: var(--color-base-text-muted);
+                text-decoration: none;
+                font-size: var(--text-sm);
+                transition: color 0.3s ease;
+            }
+
+            .breadcrumb a:hover {
+                color: var(--color-accent-1);
+            }
+
+            /* ===== HERO SECTION ===== */
+            .hero {
+                margin-top: 80px;
+                padding: var(--space-4xl) var(--space-xl) var(--space-3xl);
+                background: var(--gradient-hero);
+                background-size: 200% 200%;
+                animation: gradientShift 12s ease infinite;
+                position: relative;
+                overflow: hidden;
+            }
+
+            @keyframes gradientShift {
+
+                0%,
+                100% {
+                    background-position: 0% 50%;
+                }
+
+                50% {
+                    background-position: 100% 50%;
+                }
+            }
+
+            .hero::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background-image:
+                    radial-gradient(circle at 20% 30%, rgba(255, 255, 255, 0.1) 0%, transparent 50%),
+                    radial-gradient(circle at 80% 70%, rgba(255, 255, 255, 0.08) 0%, transparent 50%);
+                pointer-events: none;
+            }
+
+            .hero-content {
+                max-width: 1400px;
+                margin: 0 auto;
+                position: relative;
+                z-index: 1;
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: var(--space-3xl);
+                align-items: center;
+            }
+
+            .hero-text h1 {
+                font-size: var(--text-4xl);
+                font-weight: var(--weight-bold);
+                color: white;
+                margin-bottom: var(--space-lg);
+                letter-spacing: -0.03em;
+                line-height: 1.2;
+            }
+
+            .hero-text .subtitle {
+                font-size: var(--text-lg);
+                color: rgba(255, 255, 255, 0.9);
+                margin-bottom: var(--space-md);
+            }
+
+            .hero-text .author {
+                font-size: var(--text-base);
+                color: rgba(255, 255, 255, 0.8);
+            }
+
+            .hero-text .author a {
+                color: white;
+                text-decoration: none;
+                border-bottom: 2px solid rgba(255, 255, 255, 0.4);
+                transition: border-color 0.3s ease;
+            }
+
+            .hero-text .author a:hover {
+                border-color: white;
+            }
+
+            .hero-svg {
+                display: flex;
+                justify-content: center;
+                align-items: center;
+            }
+
+            /* ===== MAIN CONTENT ===== */
+            .container {
+                max-width: 1400px;
+                margin: 0 auto;
+                padding: var(--space-3xl) var(--space-xl);
+            }
+
+            /* Context Banner */
+            .context-banner {
+                background: linear-gradient(135deg, rgba(245, 158, 11, 0.1) 0%, rgba(249, 115, 22, 0.1) 100%);
+                border-left: 4px solid var(--color-accent-1);
+                padding: var(--space-lg);
+                border-radius: var(--radius-lg);
+                margin-bottom: var(--space-3xl);
+                box-shadow: var(--shadow-md);
+            }
+
+            .context-banner strong {
+                color: var(--color-accent-2);
+                font-weight: var(--weight-semibold);
+            }
+
+            .context-banner a {
+                color: var(--color-accent-1);
+                text-decoration: none;
+                border-bottom: 2px solid transparent;
+                transition: border-color 0.3s ease;
+            }
+
+            .context-banner a:hover {
+                border-color: var(--color-accent-1);
+            }
+
+            /* Article Sections */
+            article {
+                background: white;
+                border-radius: var(--radius-2xl);
+                padding: var(--space-3xl);
+                box-shadow: var(--shadow-theme);
+                margin-bottom: var(--space-2xl);
+            }
+
+            h2,
             h3,
             h4 {
-                color: #1B80CF;
+                color: var(--color-accent-2);
+                font-weight: var(--weight-bold);
+                margin-top: var(--space-2xl);
+                margin-bottom: var(--space-lg);
+                position: relative;
             }
 
-            .content a:link,
-            .content a:visited {
-                color: #1B80CF;
+            h2 {
+                font-size: var(--text-3xl);
+                letter-spacing: -0.02em;
+                padding-bottom: var(--space-md);
+                border-bottom: 2px solid var(--color-accent-light);
             }
 
-            .content h3 {
-                color: #1B80CF;
+            h2::after {
+                content: '';
+                position: absolute;
+                bottom: -2px;
+                left: 0;
+                width: 100px;
+                height: 2px;
+                background: var(--gradient-primary);
+                border-radius: var(--radius-full);
             }
 
-            .content h2::before,
-            .content h3::before {
-                display: block;
-                content: " ";
-                visibility: hidden;
-                height: 50px;
-                margin-top: -50px;
-                pointer-events: none;
-                background-color: #FFFFFF;
+            h3 {
+                font-size: var(--text-2xl);
+                letter-spacing: -0.01em;
             }
 
-            .content a:link,
-            .content a:visited {
-                color: #1B80CF;
+            h4 {
+                font-size: var(--text-xl);
             }
 
-            .content li {
-                margin: 5px;
+            section {
+                margin-bottom: var(--space-3xl);
             }
 
-            .page {
-                width: 65vw;
-                height: 100%;
-                margin-left: 30vw;
-                overflow: hidden;
-                padding: 0 1em;
-                font-family: 'Arial';
+            p {
+                margin-bottom: var(--space-lg);
+                line-height: 1.8;
+                color: var(--color-base-text);
             }
 
-            .page img {
-                max-width: 100%;
-                max-height: 100%;
+            /* Lists */
+            ol,
+            ul {
+                margin: var(--space-lg) 0;
+                padding-left: var(--space-2xl);
             }
 
-            @media (max-width: 640px),
-            screen and (orientation: portrait) {
-                body {
-                    max-width: 100%;
-                    max-height: 100%;
+            li {
+                margin-bottom: var(--space-md);
+                line-height: 1.8;
+                color: var(--color-base-text);
+            }
+
+            li strong,
+            li em {
+                color: var(--color-accent-2);
+                font-weight: var(--weight-semibold);
+                font-style: normal;
+            }
+
+            code {
+                background: var(--color-accent-light);
+                color: var(--color-accent-2);
+                padding: var(--space-xs) var(--space-sm);
+                border-radius: var(--radius-sm);
+                font-family: 'Courier New', monospace;
+                font-size: 0.9em;
+            }
+
+            /* Links */
+            a {
+                color: var(--color-accent-1);
+                text-decoration: none;
+                transition: all 0.3s ease;
+            }
+
+            a:hover {
+                color: var(--color-accent-2);
+            }
+
+            /* Footer */
+            footer {
+                background: white;
+                border-radius: var(--radius-2xl);
+                padding: var(--space-2xl) var(--space-3xl);
+                box-shadow: var(--shadow-theme);
+            }
+
+            footer h2 {
+                margin-top: 0;
+                margin-bottom: var(--space-lg);
+                color: var(--color-accent-2);
+            }
+
+            /* Language Selector */
+            .language-selector {
+                margin-top: var(--space-3xl);
+                padding-top: var(--space-2xl);
+                border-top: 2px solid var(--color-accent-light);
+            }
+
+            .language-selector h4 {
+                font-size: var(--text-base);
+                color: var(--color-base-text-muted);
+                margin-bottom: var(--space-md);
+                font-weight: var(--weight-medium);
+                text-transform: uppercase;
+                letter-spacing: 0.05em;
+            }
+
+            .language-links {
+                display: flex;
+                gap: var(--space-md);
+                flex-wrap: wrap;
+            }
+
+            .language-links a {
+                display: inline-block;
+                padding: var(--space-sm) var(--space-lg);
+                background: var(--color-accent-light);
+                color: var(--color-accent-1);
+                border-radius: var(--radius-full);
+                font-size: var(--text-sm);
+                font-weight: var(--weight-medium);
+                transition: all 0.3s ease;
+            }
+
+            .language-links a:hover {
+                background: var(--color-accent-1);
+                color: white;
+                transform: translateY(-2px);
+                box-shadow: var(--shadow-md);
+            }
+
+            /* ===== RESPONSIVE DESIGN ===== */
+            @media (max-width: 768px) {
+                .navbar {
+                    padding: var(--space-md);
                 }
 
-                #sidebar {
-                    position: fixed;
-                    background-color: #1B80CF;
-                    top: 0;
-                    left: 0;
-                    bottom: 80vh;
-                    width: 100vw;
+                .navbar-content {
+                    flex-direction: column;
+                    gap: var(--space-md);
+                    align-items: flex-start;
                 }
 
-                #sidebar .title {
-                    text-align: center;
-                    position: fixed;
-                    margin-top: 6vh;
-                    left: 0px;
-                    right: 0px;
-                    line-height: 3.5vmax;
-                    font-size: 1.5vmax;
-                    font-family: 'Arial';
+                .hero {
+                    padding: var(--space-3xl) var(--space-md) var(--space-2xl);
+                    margin-top: 120px;
                 }
 
-                #sidebar .subtitle {
-                    text-align: center;
-                    top: 5vh;
-                    left: 0px;
-                    right: 0px;
-                    position: fixed;
-                    margin-top: 10vh;
-                    font-size: 1.5vmax;
+                .hero-content {
+                    grid-template-columns: 1fr;
+                    gap: var(--space-2xl);
                 }
 
-                #sidebar .title a:link,
-                #sidebar .title a:visited {
-                    text-align: center;
-                    color: #FFFFFF;
+                .hero-svg {
+                    order: -1;
                 }
 
-                #sidebar .subtitle a:link,
-                #sidebar .subtitle a:visited {
-                    text-align: center;
-                    color: #FFFFFF;
+                .container {
+                    padding: var(--space-2xl) var(--space-md);
                 }
 
-                .home {
-                    z-index: 100;
-                    width: 100%;
-                    background-color: #1B80CF;
-                    font-size: 1.5vmax;
+                article {
+                    padding: var(--space-xl) var(--space-lg);
                 }
 
-                .home a:link,
-                .home a:visited {
-                    text-decoration: none;
-                    color: #FFFFFF;
+                footer {
+                    padding: var(--space-xl) var(--space-lg);
+                }
+            }
+
+            /* ===== ACCESSIBILITY ===== */
+            @media (prefers-reduced-motion: reduce) {
+
+                *,
+                *::before,
+                *::after {
+                    animation-duration: 0.01ms !important;
+                    animation-iteration-count: 1 !important;
+                    transition-duration: 0.01ms !important;
+                }
+            }
+
+            /* Focus Styles */
+            a:focus,
+            button:focus {
+                outline: 3px solid var(--color-accent-1);
+                outline-offset: 2px;
+                border-radius: var(--radius-sm);
+            }
+
+            /* ===== SVG ANIMATIONS ===== */
+            .chart-bar {
+                animation: barGrow 2s ease-in-out infinite;
+            }
+
+            .chart-bar:nth-child(1) {
+                animation-delay: 0s;
+            }
+
+            .chart-bar:nth-child(2) {
+                animation-delay: 0.2s;
+            }
+
+            .chart-bar:nth-child(3) {
+                animation-delay: 0.4s;
+            }
+
+            .chart-bar:nth-child(4) {
+                animation-delay: 0.6s;
+            }
+
+            @keyframes barGrow {
+
+                0%,
+                100% {
+                    transform: scaleY(1);
+                    opacity: 0.8;
                 }
 
-                .content {
-                    line-height: 3.8vmax;
-                    font-size: 1.8vmax;
-                    font-family: 'Arial';
-                    margin-top: 22vh;
+                50% {
+                    transform: scaleY(1.1);
+                    opacity: 1;
+                }
+            }
+
+            .line-path {
+                stroke-dasharray: 400;
+                stroke-dashoffset: 400;
+                animation: drawLine 4s ease-in-out infinite;
+            }
+
+            @keyframes drawLine {
+                0% {
+                    stroke-dashoffset: 400;
                 }
 
-                .content a:link,
-                .content a:visited {
-                    color: #1B80CF;
+                50%,
+                100% {
+                    stroke-dashoffset: 0;
+                }
+            }
+
+            .data-point {
+                animation: pointPulse 2s ease-in-out infinite;
+            }
+
+            .data-point:nth-child(1) {
+                animation-delay: 0s;
+            }
+
+            .data-point:nth-child(2) {
+                animation-delay: 0.3s;
+            }
+
+            .data-point:nth-child(3) {
+                animation-delay: 0.6s;
+            }
+
+            @keyframes pointPulse {
+
+                0%,
+                100% {
+                    r: 5;
+                    opacity: 0.7;
                 }
 
-                .page {
-                    top: 40vh;
-                    width: 95%;
-                    margin-left: 0vw;
+                50% {
+                    r: 7;
+                    opacity: 1;
+                }
+            }
+
+            .pie-slice {
+                animation: sliceRotate 8s linear infinite;
+                transform-origin: 200px 200px;
+            }
+
+            @keyframes sliceRotate {
+                from {
+                    transform: rotate(0deg);
                 }
 
-                .page img {
-                    max-width: 100%;
-                    max-height: 100%;
-                    border: 0;
+                to {
+                    transform: rotate(360deg);
+                }
+            }
+
+            .viz-grid {
+                animation: gridFade 3s ease-in-out infinite;
+            }
+
+            @keyframes gridFade {
+
+                0%,
+                100% {
+                    opacity: 0.2;
+                }
+
+                50% {
+                    opacity: 0.4;
                 }
             }
         </style>
     </head>
 
     <body vocab="http://schema.org/">
-        <div class="page">
-            <div class="home">
-                <ul typeof="BreadcrumbList">
+
+        <!-- Navigation Bar -->
+        <nav class="navbar" role="navigation" aria-label="Main navigation">
+            <div class="navbar-content">
+                <a href="../about.html" class="site-name">John Samuel</a>
+                <ul class="breadcrumb" typeof="BreadcrumbList">
                     <li property="itemListElement" typeof="ListItem">
                         <a property="item" typeof="WebPage" href="../index.html">
                             <span property="name">Home</span>
@@ -269,23 +636,133 @@
                         </a>
                     </li>
                 </ul>
-
             </div>
-            <div id="sidebar">
-                <div class="title">
-                    <h1><a href="./visualization.html">Data Visualization</a></h1>
+        </nav>
+
+        <!-- Hero Section -->
+        <header class="hero">
+            <div class="hero-content">
+                <div class="hero-text">
+                    <h1>Data Visualization</h1>
+                    <p class="subtitle">Transforming Data into Visual Insights</p>
+                    <p class="author">by <a href="../about.html">John Samuel</a></p>
                 </div>
-                <div class="subtitle">
-                    <h3><a href="../about.html">John Samuel</a></h3>
+                <div class="hero-svg">
+                    <svg width="400" height="400" viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg"
+                        aria-hidden="true">
+                        <defs>
+                            <linearGradient id="vizGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" style="stop-color:rgba(255,255,255,0.9);stop-opacity:1" />
+                                <stop offset="100%" style="stop-color:rgba(255,255,255,0.6);stop-opacity:1" />
+                            </linearGradient>
+                            <filter id="glow">
+                                <feGaussianBlur stdDeviation="3" result="coloredBlur" />
+                                <feMerge>
+                                    <feMergeNode in="coloredBlur" />
+                                    <feMergeNode in="SourceGraphic" />
+                                </feMerge>
+                            </filter>
+                        </defs>
+
+                        <!-- Data Visualization Dashboard Concept -->
+                        <g filter="url(#glow)">
+                            <!-- Background grid -->
+                            <g class="viz-grid">
+                                <line x1="50" y1="100" x2="350" y2="100" stroke="rgba(255,255,255,0.3)"
+                                    stroke-width="1" />
+                                <line x1="50" y1="150" x2="350" y2="150" stroke="rgba(255,255,255,0.3)"
+                                    stroke-width="1" />
+                                <line x1="50" y1="200" x2="350" y2="200" stroke="rgba(255,255,255,0.3)"
+                                    stroke-width="1" />
+                                <line x1="50" y1="250" x2="350" y2="250" stroke="rgba(255,255,255,0.3)"
+                                    stroke-width="1" />
+                                <line x1="50" y1="300" x2="350" y2="300" stroke="rgba(255,255,255,0.3)"
+                                    stroke-width="1" />
+                            </g>
+
+                            <!-- Bar Chart Visualization -->
+                            <g class="chart-bar" transform-origin="80 250">
+                                <rect x="65" y="190" width="30" height="110" rx="3" fill="rgba(59,130,246,0.7)"
+                                    stroke="rgba(255,255,255,0.8)" stroke-width="2" />
+                            </g>
+                            <g class="chart-bar" transform-origin="130 250">
+                                <rect x="115" y="150" width="30" height="150" rx="3" fill="rgba(16,185,129,0.7)"
+                                    stroke="rgba(255,255,255,0.8)" stroke-width="2" />
+                            </g>
+                            <g class="chart-bar" transform-origin="180 250">
+                                <rect x="165" y="170" width="30" height="130" rx="3" fill="rgba(245,158,11,0.7)"
+                                    stroke="rgba(255,255,255,0.8)" stroke-width="2" />
+                            </g>
+                            <g class="chart-bar" transform-origin="230 250">
+                                <rect x="215" y="130" width="30" height="170" rx="3" fill="rgba(139,92,246,0.7)"
+                                    stroke="rgba(255,255,255,0.8)" stroke-width="2" />
+                            </g>
+
+                            <!-- Line Graph Overlay -->
+                            <path class="line-path" d="M 80 220 L 130 180 L 180 200 L 230 150" fill="none"
+                                stroke="rgba(255,255,255,0.9)" stroke-width="3" stroke-linecap="round" />
+
+                            <!-- Data Points on Line -->
+                            <circle class="data-point" cx="80" cy="220" r="5" fill="rgba(255,255,255,0.9)" />
+                            <circle class="data-point" cx="130" cy="180" r="5" fill="rgba(255,255,255,0.9)" />
+                            <circle class="data-point" cx="180" cy="200" r="5" fill="rgba(255,255,255,0.9)" />
+                            <circle class="data-point" cx="230" cy="150" r="5" fill="rgba(255,255,255,0.9)" />
+
+                            <!-- Pie Chart Section (right side) -->
+                            <circle cx="310" cy="130" r="45" fill="none" stroke="rgba(255,255,255,0.3)"
+                                stroke-width="2" />
+
+                            <!-- Pie slices -->
+                            <path d="M 310 130 L 310 85 A 45 45 0 0 1 340 105 Z" fill="rgba(59,130,246,0.6)"
+                                stroke="rgba(255,255,255,0.8)" stroke-width="1.5" />
+                            <path d="M 310 130 L 340 105 A 45 45 0 0 1 348 140 Z" fill="rgba(16,185,129,0.6)"
+                                stroke="rgba(255,255,255,0.8)" stroke-width="1.5" />
+                            <path d="M 310 130 L 348 140 A 45 45 0 0 1 325 170 Z" fill="rgba(245,158,11,0.6)"
+                                stroke="rgba(255,255,255,0.8)" stroke-width="1.5" />
+                            <path d="M 310 130 L 325 170 A 45 45 0 0 1 270 150 Z" fill="rgba(139,92,246,0.6)"
+                                stroke="rgba(255,255,255,0.8)" stroke-width="1.5" />
+                            <path d="M 310 130 L 270 150 A 45 45 0 0 1 310 85 Z" fill="rgba(239,68,68,0.6)"
+                                stroke="rgba(255,255,255,0.8)" stroke-width="1.5" />
+
+                            <!-- Scatter Plot Section (bottom right) -->
+                            <circle cx="285" cy="260" r="6" fill="rgba(59,130,246,0.7)" />
+                            <circle cx="300" cy="245" r="8" fill="rgba(16,185,129,0.7)" />
+                            <circle cx="320" cy="270" r="5" fill="rgba(245,158,11,0.7)" />
+                            <circle cx="305" cy="285" r="7" fill="rgba(139,92,246,0.7)" />
+                            <circle cx="335" cy="255" r="6" fill="rgba(239,68,68,0.7)" />
+                            <circle cx="315" cy="240" r="9" fill="rgba(59,130,246,0.7)" />
+                            <circle cx="295" cy="275" r="5" fill="rgba(16,185,129,0.7)" />
+                            <circle cx="340" cy="285" r="7" fill="rgba(245,158,11,0.7)" />
+
+                            <!-- Axis lines -->
+                            <line x1="50" y1="310" x2="250" y2="310" stroke="rgba(255,255,255,0.6)" stroke-width="2" />
+                            <line x1="50" y1="100" x2="50" y2="310" stroke="rgba(255,255,255,0.6)" stroke-width="2" />
+
+                            <!-- Decorative elements -->
+                            <rect x="280" y="320" width="15" height="15" rx="2" fill="rgba(59,130,246,0.6)" />
+                            <text x="300" y="332" fill="rgba(255,255,255,0.8)" font-size="10"
+                                font-family="Arial">Charts</text>
+
+                            <rect x="280" y="345" width="15" height="15" rx="2" fill="rgba(16,185,129,0.6)" />
+                            <text x="300" y="357" fill="rgba(255,255,255,0.8)" font-size="10"
+                                font-family="Arial">Graphs</text>
+
+                            <!-- Title text -->
+                            <text x="150" y="70" fill="rgba(255,255,255,0.9)" font-size="16" text-anchor="middle"
+                                font-family="Arial" font-weight="bold">Visual Analytics</text>
+                        </g>
+                    </svg>
                 </div>
             </div>
+        </header>
 
-            <div class="content">
-                <div
-                    style="background-color: #f0f8ff; border-left: 4px solid #1e90ff; padding: 1em; margin-bottom: 1.5em;">
-                    <strong>This article is part of a series on <a href="./data-science.html">Data
-                            Science</a>.</strong>
-                </div>
+        <!-- Main Content -->
+        <main id="main-content" class="container">
+            <div class="context-banner">
+                <strong>This article is part of a series on <a href="./data-science.html">Data Science</a>.</strong>
+            </div>
+
+            <article>
                 <p>Data visualization is the art and science of representing data graphically to communicate information
                     clearly and efficiently. By leveraging visual elements such as charts, graphs, maps, and interactive
                     dashboards, visualization transforms raw data into a form that is more accessible and understandable
@@ -322,7 +799,7 @@
                         time. Lines connect data points sequentially, making it easier to observe upward or downward
                         trends, seasonality, and fluctuations.</li>
                     <li><strong>Pie Charts:</strong> Used to illustrate proportions or percentages of a whole. Each
-                        “slice” represents a category’s contribution to the total. However, pie charts can be difficult
+                        "slice" represents a category's contribution to the total. However, pie charts can be difficult
                         to interpret when there are many categories or similar-sized segments.</li>
                     <li><strong>Histograms:</strong> Display the distribution of a numerical variable by grouping data
                         into bins or intervals. Histograms help reveal the shape, central tendency, spread, and presence
@@ -356,19 +833,20 @@
                 <p>In addition to these, there are specialized visualization methods such as network graphs to show
                     relationships between entities, time series visualizations for detailed temporal analysis, and
                     interactive visualizations that allow users to explore data dynamically.</p>
-                <h2>Jacques Bertin’s Visual Variables</h2>
+
+                <h2>Jacques Bertin's Visual Variables</h2>
 
                 <p>Jacques Bertin, a seminal figure in the field of cartography and data visualization, identified a set
                     of fundamental visual variables that form the building blocks for graphical representation of data.
                     These variables determine how visual elements encode information and help viewers interpret
                     visualizations effectively.</p>
 
-                <p>Bertin’s visual variables include:</p>
+                <p>Bertin's visual variables include:</p>
 
                 <ol>
                     <li><strong>Position:</strong> The spatial location of elements within a graphic. Position is the
                         most precise visual variable and is often used to encode quantitative data, as humans excel at
-                        perceiving spatial differences. For example, in a scatter plot, each point’s x and y coordinates
+                        perceiving spatial differences. For example, in a scatter plot, each point's x and y coordinates
                         correspond to variable values.</li>
                     <li><strong>Size:</strong> The relative dimensions of graphical elements, such as the length of a
                         bar or the area of a circle, to represent magnitude or quantity. Larger elements generally
@@ -391,9 +869,10 @@
                 </ol>
 
                 <p>Understanding and applying these visual variables allows designers and data scientists to create
-                    clear, effective, and interpretable visualizations. Bertin’s work laid the conceptual groundwork for
-                    later theories such as Leland Wilkinson’s Grammar of Graphics, which systematizes the construction
+                    clear, effective, and interpretable visualizations. Bertin's work laid the conceptual groundwork for
+                    later theories such as Leland Wilkinson's Grammar of Graphics, which systematizes the construction
                     of complex visualizations.</p>
+
                 <h2>Visualization Examples by Analytical Purpose</h2>
 
                 <p>Data visualizations serve different analytical goals, and selecting the appropriate type depends on
@@ -435,10 +914,9 @@
                         data.</li>
                 </ol>
 
-
                 <p>Choosing the right visualization type is critical to effectively convey insights, avoid
-                    misinterpretation, and engage the audience. Understanding each type’s strengths and limitations
-                    enables data scientists to tailor their visual communication to the data’s story.</p>
+                    misinterpretation, and engage the audience. Understanding each type's strengths and limitations
+                    enables data scientists to tailor their visual communication to the data's story.</p>
 
                 <h2>2D vs. 3D Visualization: Comparative Analysis and Use Cases</h2>
 
@@ -497,13 +975,14 @@
                     line graphs, 3D heatmaps, and globe-based geographic visualizations.</p>
 
                 <h3>Choosing Between 2D and 3D Visualization</h3>
-                <p>The choice between 2D and 3D depends on the dataset, the message to be conveyed, and the audience’s
+                <p>The choice between 2D and 3D depends on the dataset, the message to be conveyed, and the audience's
                     familiarity with complex visual forms. For exploratory data analysis and most business applications,
                     2D visualizations generally suffice and are preferred for clarity and precision.</p>
 
                 <p>3D visualizations are advantageous when the data inherently involves three spatial dimensions or when
                     interactive exploration can uncover insights not visible in 2D. However, designers must carefully
                     weigh the cognitive and technical costs before opting for 3D representations.</p>
+
                 <h2>Grammar of Graphics and Visualization Design</h2>
 
                 <p>The <strong>Grammar of Graphics</strong>, first formalized by Leland Wilkinson, provides a systematic
@@ -511,7 +990,7 @@
                     isolated types, this grammar decomposes visualizations into fundamental components, allowing
                     flexible composition and deeper insight into how graphical representations encode data.</p>
 
-                <p>According to Wilkinson’s grammar, a graphic is composed of layers that include:</p>
+                <p>According to Wilkinson's grammar, a graphic is composed of layers that include:</p>
 
                 <ul>
                     <li><strong>Data:</strong> The dataset or variables being visualized.</li>
@@ -538,7 +1017,7 @@
                     specify how data should be mapped to visual properties and supports layering of geometric objects
                     and statistical summaries seamlessly.</p>
 
-                <p>Other tools and libraries, such as Python’s <code>plotnine</code> (a ggplot2-inspired library), also
+                <p>Other tools and libraries, such as Python's <code>plotnine</code> (a ggplot2-inspired library), also
                     adopt this grammar, enabling expressive and elegant visualization construction.</p>
 
                 <p>Fundamental graphical elements in the grammar include:</p>
@@ -555,8 +1034,9 @@
                 <p>Understanding and applying the Grammar of Graphics framework enables data scientists and
                     visualization designers to create clear, precise, and effective visual representations that can be
                     tailored to diverse analytical needs.</p>
+            </article>
 
-
+            <footer>
                 <h2>References</h2>
                 <ol>
                     <li><a href="https://en.wikipedia.org/wiki/Data_and_information_visualization">Data and information
@@ -564,8 +1044,8 @@
                     <li><a href="https://en.wikipedia.org/wiki/Jacques_Bertin">Jacques Bertin — Wikipedia</a></li>
                     <li><a href="https://textvis.lnu.se/">Text Visualization Browser</a></li>
                     <li>Kucher, K., and A. Kerren. <a href="https://ieeexplore.ieee.org/document/7156366">Text
-                            Visualization Techniques: Taxonomy, Visual Survey, and
-                            Community Insights.</a> 2015 IEEE Pacific Visualization Symposium (PacificVis), 2015.</li>
+                            Visualization Techniques: Taxonomy, Visual Survey, and Community Insights.</a> 2015 IEEE
+                        Pacific Visualization Symposium (PacificVis), 2015.</li>
                     <li><a href="https://trustmlvis.lnu.se/">TrustMLVis Browser</a></li>
                     <li><a href="https://ggplot2.tidyverse.org/">ggplot2 Documentation</a></li>
                     <li><a href="https://matplotlib.org/">Matplotlib Documentation</a></li>
@@ -574,23 +1054,28 @@
                     <li>Bertin, J. (1983). <em>Semiology of Graphics: Diagrams, Networks, Maps</em>. University of
                         Wisconsin Press. A foundational text introducing visual variables in data visualization.</li>
                     <li>Wilkinson, L. (2005). <em><a href="https://link.springer.com/book/10.1007/0-387-28695-0">Grammar
-                                of Graphics</a></em>. Springer. This book formalizes the
-                        systematic approach to creating statistical graphics.</li>
+                                of Graphics</a></em>. Springer. This book formalizes the systematic approach to creating
+                        statistical graphics.</li>
                     <li>Wickham, H. (2016). <em><a
                                 href="https://link.springer.com/book/10.1007/978-3-319-24277-4">ggplot2: Elegant
-                                Graphics for Data Analysis</a></em>. Springer-Verlag New
-                        York. A practical guide to the widely-used R package based on the Grammar of Graphics.</li>
+                                Graphics for Data Analysis</a></em>. Springer-Verlag New York. A practical guide to the
+                        widely-used R package based on the Grammar of Graphics.</li>
                     <li>Heer, J., Bostock, M., &amp; Ogievetsky, V. (2010). <a
                             href="https://dl.acm.org/doi/10.1145/1743546.1743567">A Tour Through the Visualization
-                            Zoo.</a>
-                        <em>Communications of the ACM, 53</em>(6), 59–67. <a
+                            Zoo.</a> <em>Communications of the ACM, 53</em>(6), 59–67. <a
                             href="https://doi.org/10.1145/1743546.1743567">Link</a> An accessible overview of a wide
-                        variety of visualization types.
-                    </li>
+                        variety of visualization types.</li>
                     <li><a href="https://jeroenjanssens.com/plotnine/">Plotnine: Grammar of Graphics for Python</a></li>
                 </ol>
-            </div>
-        </div>
+
+                <div class="language-selector">
+                    <h4>Languages</h4>
+                    <div class="language-links">
+                        <a href="./visualization.html" hreflang="en">English</a>
+                    </div>
+                </div>
+            </footer>
+        </main>
     </body>
 
 </html>
