@@ -2,262 +2,1035 @@
 <html lang="en">
 
     <head>
-        <meta charset="utf-8" />
-        <meta http-equiv="Content-Language" content="en" />
-        <link rel="shortcut icon" href="../../images/logo/favicon.png" />
-        <title>Multimodal Artificial Intelligence Models: John Samuel</title>
-        <style type="text/css">
-            body {
-                background-color: #FFFFFF;
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta http-equiv="Content-Language" content="en">
+        <link rel="shortcut icon" href="../../images/logo/favicon.png">
+        <title>Multimodal Artificial Intelligence Models: Beyond LLMs | John Samuel</title>
+        <style>
+            /* ===== DESIGN TOKENS ===== */
+            :root {
+                /* Multimodal/Integration Theme Color Palette */
+                --color-base-bg: #f7f9fc;
+                --color-base-surface: #ffffff;
+                --color-base-text: #1e293b;
+                --color-base-text-muted: #64748b;
+
+                /* Theme Accents - Multiple Modalities */
+                --color-accent-text: #3b82f6;
+                --color-accent-image: #10b981;
+                --color-accent-audio: #f59e0b;
+                --color-accent-video: #ec4899;
+                --color-accent-spatial: #8b5cf6;
+                --color-accent-light: rgba(59, 130, 246, 0.08);
+
+                /* Functional Colors */
+                --color-shadow: rgba(59, 130, 246, 0.12);
+                --color-border: rgba(59, 130, 246, 0.15);
+                --color-hover: rgba(59, 130, 246, 0.08);
+
+                /* Gradients */
+                --gradient-primary: linear-gradient(135deg, #3b82f6 0%, #10b981 25%, #f59e0b 50%, #ec4899 75%, #8b5cf6 100%);
+                --gradient-surface: linear-gradient(145deg, rgba(255, 255, 255, 1), rgba(247, 249, 252, 0.98));
+                --gradient-hero: linear-gradient(180deg, rgba(59, 130, 246, 0.03) 0%, rgba(247, 249, 252, 1) 100%);
+
+                /* Spacing Scale */
+                --space-xs: 0.25rem;
+                --space-sm: 0.5rem;
+                --space-md: 1rem;
+                --space-lg: 1.5rem;
+                --space-xl: 2rem;
+                --space-2xl: 3rem;
+                --space-3xl: 4rem;
+                --space-4xl: 6rem;
+
+                /* Border Radius */
+                --radius-sm: 4px;
+                --radius-md: 8px;
+                --radius-lg: 12px;
+                --radius-xl: 16px;
+                --radius-2xl: 24px;
+                --radius-full: 9999px;
+
+                /* Typography Scale */
+                --text-xs: clamp(0.75rem, 0.7rem + 0.25vw, 0.875rem);
+                --text-sm: clamp(0.875rem, 0.8rem + 0.35vw, 1rem);
+                --text-base: clamp(1rem, 0.95rem + 0.25vw, 1.125rem);
+                --text-lg: clamp(1.125rem, 1.05rem + 0.35vw, 1.25rem);
+                --text-xl: clamp(1.25rem, 1.15rem + 0.5vw, 1.5rem);
+                --text-2xl: clamp(1.5rem, 1.3rem + 1vw, 2rem);
+                --text-3xl: clamp(2rem, 1.6rem + 2vw, 2.5rem);
+                --text-4xl: clamp(2.5rem, 2rem + 2.5vw, 3.5rem);
+
+                /* Shadows */
+                --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.04), 0 1px 3px rgba(0, 0, 0, 0.06);
+                --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.05), 0 2px 4px rgba(0, 0, 0, 0.06);
+                --shadow-lg: 0 10px 24px rgba(0, 0, 0, 0.08), 0 4px 8px rgba(0, 0, 0, 0.06);
+                --shadow-theme: 0 10px 30px var(--color-shadow), 0 4px 10px rgba(0, 0, 0, 0.06);
+
+                /* Font Stack */
+                --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+                --font-mono: 'SF Mono', Monaco, 'Cascadia Code', 'Consolas', 'Courier New', monospace;
             }
 
-            #sidebar {
-                position: fixed;
-                background-color: #1B80CF;
-                top: 0;
-                left: 0;
-                bottom: 0;
-                width: 30vw;
-            }
-
-            #sidebar .title {
-                position: relative;
-                text-align: center;
-                line-height: 4vmax;
-                font-size: 1.4vmax;
-                font-family: 'Arial';
-                margin-top: 25vh;
-            }
-
-            #sidebar .title a:link,
-            #sidebar .title a:visited {
-                color: #FFFFFF;
-                text-decoration: none;
-            }
-
-            .subtitle {
-                top: 50vh;
-                text-align: center;
-                line-height: 1.3vmax;
-                font-family: 'Arial';
-                font-size: 1.5vmax;
-                color: #FFFFFF;
-            }
-
-            .subtitle a:link,
-            .subtitle a:visited {
-                color: #FFFFFF;
-                text-decoration: none;
-            }
-
-            .licence {
-                position: fixed;
-                text-align: right;
-                bottom: 0;
-                right: 0;
-            }
-
-            .home {
-                position: fixed;
-                text-align: left;
-                font-family: 'Arial';
-                color: #D3D3D3;
-                z-index: 100;
-                width: 100%;
-                background-color: #FFFFFF;
-                top: 0px;
-                margin-bottom: 10px;
-                padding-bottom: 10px;
-            }
-
-            .home a:link,
-            .home a:visited {
-                text-decoration: none;
-                color: #D3D3D3;
-            }
-
-            .home ul {
+            /* ===== RESET & BASE STYLES ===== */
+            * {
                 margin: 0;
                 padding: 0;
-                text-align: left;
+                box-sizing: border-box;
+            }
+
+            html {
+                scroll-behavior: smooth;
+                scroll-padding-top: 100px;
+            }
+
+            body {
+                font-family: var(--font-sans);
+                font-size: var(--text-base);
+                line-height: 1.7;
+                color: var(--color-base-text);
+                background: var(--color-base-bg);
+                overflow-x: hidden;
+                letter-spacing: -0.005em;
+            }
+
+            /* ===== SKIP LINK ===== */
+            .skip-link {
+                position: absolute;
+                top: -40px;
+                left: 0;
+                background: var(--color-accent-text);
+                color: white;
+                padding: var(--space-md);
+                text-decoration: none;
+                z-index: 100;
+                border-radius: 0 0 var(--radius-md) 0;
+            }
+
+            .skip-link:focus {
+                top: 0;
+            }
+
+            /* ===== ANIMATED BACKGROUND ===== */
+            .bg-modalities {
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                pointer-events: none;
+                z-index: 0;
+                overflow: hidden;
+            }
+
+            .modality-pulse {
+                position: absolute;
+                border-radius: 50%;
+                opacity: 0.1;
+                animation: pulse 8s ease-in-out infinite;
+            }
+
+            .modality-pulse:nth-child(1) {
+                top: 10%;
+                left: 15%;
+                width: 200px;
+                height: 200px;
+                background: radial-gradient(circle, var(--color-accent-text), transparent);
+                animation-delay: 0s;
+            }
+
+            .modality-pulse:nth-child(2) {
+                top: 30%;
+                right: 10%;
+                width: 250px;
+                height: 250px;
+                background: radial-gradient(circle, var(--color-accent-image), transparent);
+                animation-delay: 1s;
+            }
+
+            .modality-pulse:nth-child(3) {
+                bottom: 20%;
+                left: 10%;
+                width: 180px;
+                height: 180px;
+                background: radial-gradient(circle, var(--color-accent-audio), transparent);
+                animation-delay: 2s;
+            }
+
+            .modality-pulse:nth-child(4) {
+                bottom: 30%;
+                right: 20%;
+                width: 220px;
+                height: 220px;
+                background: radial-gradient(circle, var(--color-accent-video), transparent);
+                animation-delay: 3s;
+            }
+
+            @keyframes pulse {
+
+                0%,
+                100% {
+                    transform: scale(1);
+                    opacity: 0.1;
+                }
+
+                50% {
+                    transform: scale(1.2);
+                    opacity: 0.15;
+                }
+            }
+
+            /* ===== NAVIGATION ===== */
+            .nav-wrapper {
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                z-index: 1000;
+                background: rgba(255, 255, 255, 0.95);
+                -webkit-backdrop-filter: blur(12px) saturate(180%);
+                backdrop-filter: blur(12px) saturate(180%);
+                border-bottom: 1px solid var(--color-border);
+                box-shadow: var(--shadow-sm);
+            }
+
+            .nav {
+                max-width: 1400px;
+                margin: 0 auto;
+                padding: var(--space-lg) var(--space-xl);
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                gap: var(--space-xl);
+            }
+
+            .nav-brand {
+                font-size: var(--text-xl);
+                font-weight: 700;
+                color: var(--color-base-text);
+                text-decoration: none;
+                letter-spacing: -0.02em;
+                position: relative;
+                padding: var(--space-sm) var(--space-lg);
+                background: var(--gradient-primary);
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                background-clip: text;
+                background-size: 200% 200%;
+                animation: gradientShift 8s ease infinite;
+                transition: all 0.3s ease;
+            }
+
+            @keyframes gradientShift {
+
+                0%,
+                100% {
+                    background-position: 0% 50%;
+                }
+
+                50% {
+                    background-position: 100% 50%;
+                }
+            }
+
+            .nav-brand:hover {
+                transform: scale(1.05);
+            }
+
+            .nav-brand::after {
+                content: '';
+                position: absolute;
+                bottom: 0;
+                left: var(--space-lg);
+                right: var(--space-lg);
+                height: 2px;
+                background: var(--gradient-primary);
+                transform: scaleX(0);
+                transition: transform 0.3s ease;
+            }
+
+            .nav-brand:hover::after {
+                transform: scaleX(1);
+            }
+
+            .breadcrumb {
+                display: flex;
+                list-style: none;
+                gap: var(--space-sm);
+                flex-wrap: wrap;
+            }
+
+            .breadcrumb li {
+                color: var(--color-base-text-muted);
+                font-size: var(--text-sm);
+            }
+
+            .breadcrumb li:not(:last-child)::after {
+                content: '/';
+                margin-left: var(--space-sm);
+                color: var(--color-border);
+            }
+
+            .breadcrumb a {
+                color: var(--color-base-text-muted);
+                text-decoration: none;
+                transition: all 0.3s ease;
+                padding: var(--space-xs) var(--space-sm);
+                border-radius: var(--radius-sm);
+            }
+
+            .breadcrumb a:hover {
+                color: var(--color-accent-text);
+                background: var(--color-hover);
+            }
+
+            /* ===== HERO SECTION ===== */
+            .hero {
+                position: relative;
+                margin-top: 80px;
+                padding: var(--space-4xl) var(--space-xl);
+                max-width: 1400px;
+                margin-left: auto;
+                margin-right: auto;
+                background: var(--gradient-hero);
+                display: grid;
+                grid-template-columns: 1.2fr 1fr;
+                gap: var(--space-4xl);
+                align-items: center;
+                min-height: 65vh;
+            }
+
+            .series-badge {
+                display: inline-flex;
+                align-items: center;
+                gap: var(--space-sm);
+                padding: var(--space-md) var(--space-lg);
+                background: rgba(59, 130, 246, 0.1);
+                border: 1px solid rgba(59, 130, 246, 0.2);
+                border-radius: var(--radius-xl);
+                font-size: var(--text-sm);
+                color: var(--color-accent-text);
+                font-weight: 600;
+                margin-bottom: var(--space-xl);
+                animation: fadeIn 0.8s ease-out;
+            }
+
+            .series-badge::before {
+                content: '📚';
+                font-size: var(--text-lg);
+            }
+
+            .series-badge a {
+                color: var(--color-accent-text);
+                text-decoration: none;
+                border-bottom: 1px solid transparent;
+                transition: border-color 0.3s ease;
+            }
+
+            .series-badge a:hover {
+                border-bottom-color: var(--color-accent-text);
+            }
+
+            @keyframes fadeIn {
+                from {
+                    opacity: 0;
+                }
+
+                to {
+                    opacity: 1;
+                }
+            }
+
+            .hero-content {
+                animation: fadeInUp 0.8s ease-out;
+            }
+
+            .hero-content h1 {
+                font-size: var(--text-4xl);
+                font-weight: 700;
+                line-height: 1.2;
+                letter-spacing: -0.03em;
+                margin-bottom: var(--space-lg);
+                color: var(--color-base-text);
+            }
+
+            .hero-subtitle {
+                font-size: var(--text-lg);
+                color: var(--color-base-text-muted);
+                line-height: 1.6;
+            }
+
+            @keyframes fadeInUp {
+                from {
+                    opacity: 0;
+                    transform: translateY(30px);
+                }
+
+                to {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            }
+
+            /* ===== MULTIMODAL VISUALIZATION ===== */
+            .hero-visual {
+                position: relative;
+                animation: fadeIn 1s ease-out 0.4s both;
+            }
+
+            .svg-container {
+                width: 100%;
+                max-width: 450px;
+                margin: 0 auto;
+            }
+
+            /* Modality Icons Animation */
+            .modality-icon {
+                animation: float 5s ease-in-out infinite;
+            }
+
+            .modality-icon:nth-child(1) {
+                animation-delay: 0s;
+            }
+
+            .modality-icon:nth-child(2) {
+                animation-delay: 0.5s;
+            }
+
+            .modality-icon:nth-child(3) {
+                animation-delay: 1s;
+            }
+
+            .modality-icon:nth-child(4) {
+                animation-delay: 1.5s;
+            }
+
+            .modality-icon:nth-child(5) {
+                animation-delay: 2s;
+            }
+
+            @keyframes float {
+
+                0%,
+                100% {
+                    transform: translateY(0) scale(1);
+                }
+
+                50% {
+                    transform: translateY(-10px) scale(1.05);
+                }
+            }
+
+            .convergence-line {
+                stroke-dasharray: 300;
+                stroke-dashoffset: 300;
+                animation: draw 3s ease-in-out infinite;
+            }
+
+            @keyframes draw {
+                0% {
+                    stroke-dashoffset: 300;
+                    opacity: 0.3;
+                }
+
+                50% {
+                    stroke-dashoffset: 0;
+                    opacity: 1;
+                }
+
+                100% {
+                    stroke-dashoffset: -300;
+                    opacity: 0.3;
+                }
+            }
+
+            .center-core {
+                animation: glow 2s ease-in-out infinite;
+            }
+
+            @keyframes glow {
+
+                0%,
+                100% {
+                    opacity: 0.6;
+                    filter: drop-shadow(0 0 8px rgba(59, 130, 246, 0.5));
+                }
+
+                50% {
+                    opacity: 1;
+                    filter: drop-shadow(0 0 16px rgba(59, 130, 246, 0.8));
+                }
+            }
+
+            /* ===== MAIN CONTENT ===== */
+            .container {
+                max-width: 1400px;
+                margin: 0 auto;
+                padding: 0 var(--space-xl);
+                position: relative;
+                z-index: 1;
+            }
+
+            .content-section {
+                padding: var(--space-4xl) 0;
+            }
+
+            /* ===== INTRO SECTION ===== */
+            .intro-section {
+                background: var(--gradient-surface);
+                border: 1px solid var(--color-border);
+                border-radius: var(--radius-2xl);
+                padding: var(--space-3xl);
+                margin-bottom: var(--space-4xl);
+                box-shadow: var(--shadow-theme);
+                position: relative;
+                overflow: hidden;
+            }
+
+            .intro-section::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                height: 4px;
+                background: var(--gradient-primary);
+            }
+
+            .intro-section p {
+                font-size: var(--text-lg);
+                line-height: 1.8;
+                color: var(--color-base-text);
+            }
+
+            /* ===== HEADINGS ===== */
+            h2 {
+                font-size: var(--text-3xl);
+                font-weight: 700;
+                letter-spacing: -0.02em;
+                margin-top: var(--space-4xl);
+                margin-bottom: var(--space-xl);
+                color: var(--color-base-text);
+                position: relative;
+                padding-bottom: var(--space-md);
+            }
+
+            h2::after {
+                content: '';
+                position: absolute;
+                bottom: 0;
+                left: 0;
+                width: 80px;
+                height: 4px;
+                background: var(--gradient-primary);
+                border-radius: var(--radius-sm);
+            }
+
+            h3 {
+                font-size: var(--text-2xl);
+                font-weight: 600;
+                letter-spacing: -0.01em;
+                margin-top: var(--space-3xl);
+                margin-bottom: var(--space-lg);
+                color: var(--color-accent-text);
+                display: flex;
+                align-items: center;
+                gap: var(--space-md);
+            }
+
+            h3::before {
+                content: '';
+                width: 6px;
+                height: 6px;
+                background: var(--color-accent-spatial);
+                border-radius: 50%;
+                box-shadow: 0 0 12px var(--color-accent-spatial);
+            }
+
+            h4 {
+                font-size: var(--text-xl);
+                font-weight: 600;
+                letter-spacing: -0.01em;
+                margin-top: var(--space-2xl);
+                margin-bottom: var(--space-md);
+                color: var(--color-accent-text);
+            }
+
+            /* ===== LISTS ===== */
+            p,
+            ul,
+            ol {
+                margin-bottom: var(--space-lg);
+            }
+
+            ul,
+            ol {
+                margin-left: var(--space-xl);
+            }
+
+            ul li,
+            ol li {
+                font-size: var(--text-base);
+                line-height: 1.8;
+                color: var(--color-base-text);
+                margin-bottom: var(--space-md);
+                padding-left: var(--space-sm);
+            }
+
+            ul li strong,
+            ol li strong,
+            p strong {
+                color: var(--color-accent-text);
+                font-weight: 600;
+            }
+
+            ul li a,
+            ol li a,
+            p a {
+                color: var(--color-accent-text);
+                text-decoration: none;
+                border-bottom: 1px solid transparent;
+                transition: all 0.3s ease;
+            }
+
+            ul li a:hover,
+            ol li a:hover,
+            p a:hover {
+                color: var(--color-accent-image);
+                border-bottom-color: var(--color-accent-image);
+            }
+
+            /* ===== MODALITY CARDS ===== */
+            .modality-grid {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+                gap: var(--space-lg);
+                margin: var(--space-2xl) 0;
+            }
+
+            .modality-card {
+                background: var(--gradient-surface);
+                border: 2px solid var(--color-border);
+                border-radius: var(--radius-xl);
+                padding: var(--space-xl);
+                transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+                box-shadow: var(--shadow-md);
+                position: relative;
+                overflow: hidden;
+            }
+
+            .modality-card::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                height: 4px;
+                transition: all 0.4s ease;
+            }
+
+            .modality-card:nth-child(1)::before {
+                background: var(--color-accent-text);
+            }
+
+            .modality-card:nth-child(2)::before {
+                background: var(--color-accent-image);
+            }
+
+            .modality-card:nth-child(3)::before {
+                background: var(--color-accent-audio);
+            }
+
+            .modality-card:nth-child(4)::before {
+                background: var(--color-accent-video);
+            }
+
+            .modality-card:nth-child(5)::before {
+                background: var(--color-accent-spatial);
+            }
+
+            .modality-card:nth-child(6)::before {
+                background: var(--gradient-primary);
+            }
+
+            .modality-card:hover {
+                transform: translateY(-8px) scale(1.02);
+                box-shadow: var(--shadow-theme);
+            }
+
+            .modality-card:hover::before {
+                height: 100%;
+                opacity: 0.05;
+            }
+
+            .modality-card strong {
+                display: block;
+                font-size: var(--text-lg);
+                margin-bottom: var(--space-sm);
+                font-weight: 600;
+            }
+
+            .modality-card:nth-child(1) strong {
+                color: var(--color-accent-text);
+            }
+
+            .modality-card:nth-child(2) strong {
+                color: var(--color-accent-image);
+            }
+
+            .modality-card:nth-child(3) strong {
+                color: var(--color-accent-audio);
+            }
+
+            .modality-card:nth-child(4) strong {
+                color: var(--color-accent-video);
+            }
+
+            .modality-card:nth-child(5) strong {
+                color: var(--color-accent-spatial);
+            }
+
+            .modality-card:nth-child(6) strong {
+                color: var(--color-accent-spatial);
+            }
+
+            /* ===== MILESTONE CARDS ===== */
+            .milestone-list {
+                list-style: none;
+                margin: var(--space-2xl) 0;
+                padding: 0;
+            }
+
+            .milestone-list li {
+                background: var(--gradient-surface);
+                border: 1px solid var(--color-border);
+                border-left: 4px solid var(--color-accent-text);
+                border-radius: var(--radius-lg);
+                padding: var(--space-lg);
+                margin-bottom: var(--space-lg);
+                transition: all 0.3s ease;
+                box-shadow: var(--shadow-sm);
+            }
+
+            .milestone-list li:hover {
+                transform: translateX(8px);
+                box-shadow: var(--shadow-md);
+                border-left-color: var(--color-accent-image);
+            }
+
+            /* ===== NOTE BOX ===== */
+            aside {
+                background: rgba(59, 130, 246, 0.05);
+                border-left: 4px solid var(--color-accent-text);
+                border-radius: var(--radius-lg);
+                padding: var(--space-lg);
+                margin: var(--space-2xl) 0;
+            }
+
+            aside p {
+                margin: 0;
+                font-size: var(--text-base);
+                line-height: 1.7;
+            }
+
+            aside strong {
+                color: var(--color-accent-text);
+            }
+
+            /* ===== MODEL CARDS ===== */
+            .model-card {
+                background: var(--gradient-surface);
+                border: 1px solid var(--color-border);
+                border-radius: var(--radius-xl);
+                padding: var(--space-xl);
+                margin-bottom: var(--space-xl);
+                box-shadow: var(--shadow-md);
+                transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            }
+
+            .model-card:hover {
+                transform: translateY(-4px);
+                box-shadow: var(--shadow-theme);
+                border-color: var(--color-accent-text);
+            }
+
+            .model-card h4 {
+                margin-top: 0;
+                margin-bottom: var(--space-md);
+            }
+
+            .model-card p {
+                margin-bottom: 0;
+            }
+
+            /* ===== DECORATIVE DIVIDERS ===== */
+            .section-divider {
+                margin: var(--space-4xl) 0;
+                height: 2px;
+                background: var(--gradient-primary);
+                opacity: 0.2;
+                position: relative;
+            }
+
+            .section-divider::after {
+                content: '';
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                width: 12px;
+                height: 12px;
+                background: var(--gradient-primary);
+                border-radius: 50%;
+                box-shadow: 0 0 16px rgba(59, 130, 246, 0.5);
+            }
+
+            /* ===== RELATED & REFERENCES SECTIONS ===== */
+            .related-section,
+            .references-section {
+                margin-top: var(--space-4xl);
+                padding: var(--space-3xl);
+                background: var(--gradient-surface);
+                border: 1px solid var(--color-border);
+                border-radius: var(--radius-2xl);
+                box-shadow: var(--shadow-lg);
+            }
+
+            .related-section h3,
+            .references-section h2 {
+                font-size: var(--text-2xl);
+                font-weight: 600;
+                margin-top: 0;
+                margin-bottom: var(--space-xl);
+                color: var(--color-accent-text);
+            }
+
+            .related-section ul {
+                list-style: none;
+                padding: 0;
+                margin: 0;
+            }
+
+            .related-section li {
+                margin-bottom: var(--space-md);
+                padding-left: var(--space-2xl);
+                position: relative;
+            }
+
+            .related-section li::before {
+                content: '→';
+                position: absolute;
+                left: 0;
+                color: var(--color-accent-text);
+                font-weight: 700;
+                font-size: var(--text-lg);
+            }
+
+            .references-section ol {
+                list-style: none;
+                counter-reset: reference-counter;
+                padding: 0;
+                margin: 0;
+            }
+
+            .references-section li {
+                counter-increment: reference-counter;
+                margin-bottom: var(--space-lg);
+                padding-left: var(--space-3xl);
+                position: relative;
+                line-height: 1.7;
+            }
+
+            .references-section li::before {
+                content: counter(reference-counter);
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 32px;
+                height: 32px;
+                background: var(--gradient-primary);
+                border-radius: 50%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: var(--text-sm);
+                font-weight: 600;
+                color: white;
+                box-shadow: var(--shadow-md);
+            }
+
+            /* ===== FOOTER ===== */
+            .footer {
+                margin-top: var(--space-4xl);
+                padding: var(--space-3xl) var(--space-xl);
+                background: white;
+                border-top: 1px solid var(--color-border);
+            }
+
+            .footer-content {
+                max-width: 1400px;
+                margin: 0 auto;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                gap: var(--space-xl);
+                flex-wrap: wrap;
+            }
+
+            .footer-brand {
+                font-size: var(--text-base);
+                font-weight: 600;
+                color: var(--color-base-text);
+            }
+
+            .footer-links {
+                display: flex;
+                gap: var(--space-xl);
                 list-style: none;
             }
 
-            .home li {
-                position: relative;
-                float: left;
-                padding-top: 15px;
-                margin-right: 1em;
-                font-family: 'Arial';
-            }
-
-            .home li:hover {
-                display: block;
-            }
-
-            .home a:link,
-            .home a:visited {
-                color: #D3D3D3;
-            }
-
-            .home li:hover a:link,
-            .home li:hover a:visited {
+            .footer-links a {
+                color: var(--color-base-text-muted);
                 text-decoration: none;
-                padding: 15px;
-                color: #FFFFFF;
-                background-color: #1B80CF;
+                font-size: var(--text-sm);
+                transition: all 0.3s ease;
+                padding: var(--space-xs) var(--space-sm);
+                border-radius: var(--radius-sm);
             }
 
-            .content {
-                line-height: 1.8vmax;
-                font-size: 1.2vmax;
-                font-family: 'Arial';
-                margin-top: 15vh;
-                width: 90%;
+            .footer-links a:hover {
+                color: var(--color-accent-text);
+                background: var(--color-hover);
             }
 
-            .content h2,
-            h3,
-            h4 {
-                color: #1B80CF;
-            }
-
-            .content a:link,
-            .content a:visited {
-                color: #1B80CF;
-            }
-
-            .content h3 {
-                color: #1B80CF;
-            }
-
-            .content h2::before,
-            .content h3::before {
-                display: block;
-                content: " ";
-                visibility: hidden;
-                height: 50px;
-                margin-top: -50px;
-                pointer-events: none;
-                background-color: #FFFFFF;
-            }
-
-            .content a:link,
-            .content a:visited {
-                color: #1B80CF;
-            }
-
-            .content li {
-                margin: 5px;
-            }
-
-            .page {
-                width: 65vw;
-                height: 100%;
-                margin-left: 30vw;
-                overflow: hidden;
-                padding: 0 1em;
-                font-family: 'Arial';
-            }
-
-            .page img {
-                max-width: 100%;
-                max-height: 100%;
-            }
-
-            @media (max-width: 640px),
-            screen and (orientation: portrait) {
-                body {
-                    max-width: 100%;
-                    max-height: 100%;
+            /* ===== RESPONSIVE DESIGN ===== */
+            @media (max-width: 1024px) {
+                .hero {
+                    grid-template-columns: 1fr;
+                    gap: var(--space-2xl);
                 }
 
-                #sidebar {
-                    position: fixed;
-                    background-color: #1B80CF;
-                    top: 0;
-                    left: 0;
-                    bottom: 80vh;
-                    width: 100vw;
+                .hero-visual {
+                    order: -1;
                 }
 
-                #sidebar .title {
+                .svg-container {
+                    max-width: 350px;
+                }
+
+                .modality-grid {
+                    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+                }
+            }
+
+            @media (max-width: 768px) {
+                .nav {
+                    flex-direction: column;
+                    gap: var(--space-md);
+                    padding: var(--space-md) var(--space-lg);
+                }
+
+                .breadcrumb {
+                    justify-content: center;
+                }
+
+                .hero {
+                    padding: var(--space-3xl) var(--space-lg);
+                    margin-top: 140px;
+                    min-height: auto;
+                }
+
+                .container {
+                    padding: 0 var(--space-lg);
+                }
+
+                .content-section {
+                    padding: var(--space-2xl) 0;
+                }
+
+                .intro-section,
+                .model-card,
+                .related-section,
+                .references-section {
+                    padding: var(--space-xl);
+                }
+
+                .modality-grid {
+                    grid-template-columns: 1fr;
+                }
+
+                .footer-content {
+                    flex-direction: column;
                     text-align: center;
-                    position: fixed;
-                    margin-top: 6vh;
-                    left: 0px;
-                    right: 0px;
-                    line-height: 3.5vmax;
-                    font-size: 1.5vmax;
-                    font-family: 'Arial';
                 }
 
-                #sidebar .subtitle {
-                    text-align: center;
-                    top: 5vh;
-                    left: 0px;
-                    right: 0px;
-                    position: fixed;
-                    margin-top: 10vh;
-                    font-size: 1.5vmax;
+                .footer-links {
+                    flex-direction: column;
+                    gap: var(--space-sm);
+                    align-items: center;
+                }
+            }
+
+            @media (max-width: 480px) {
+                .hero {
+                    padding: var(--space-2xl) var(--space-md);
                 }
 
-                #sidebar .title a:link,
-                #sidebar .title a:visited {
-                    text-align: center;
-                    color: #FFFFFF;
+                .container {
+                    padding: 0 var(--space-md);
                 }
 
-                #sidebar .subtitle a:link,
-                #sidebar .subtitle a:visited {
-                    text-align: center;
-                    color: #FFFFFF;
+                h2 {
+                    font-size: var(--text-2xl);
                 }
 
-                .home {
-                    z-index: 100;
-                    width: 100%;
-                    background-color: #1B80CF;
-                    font-size: 1.5vmax;
+                h3 {
+                    font-size: var(--text-xl);
                 }
+            }
 
-                .home a:link,
-                .home a:visited {
-                    text-decoration: none;
-                    color: #FFFFFF;
-                }
+            /* ===== ACCESSIBILITY ===== */
+            @media (prefers-reduced-motion: reduce) {
 
-                .content {
-                    line-height: 3.8vmax;
-                    font-size: 1.8vmax;
-                    font-family: 'Arial';
-                    margin-top: 22vh;
+                *,
+                *::before,
+                *::after {
+                    animation-duration: 0.01ms !important;
+                    animation-iteration-count: 1 !important;
+                    transition-duration: 0.01ms !important;
                 }
+            }
 
-                .content a:link,
-                .content a:visited {
-                    color: #1B80CF;
-                }
+            :focus {
+                outline: 2px solid var(--color-accent-text);
+                outline-offset: 2px;
+            }
 
-                .page {
-                    top: 40vh;
-                    width: 95%;
-                    margin-left: 0vw;
-                }
-
-                .page img {
-                    max-width: 100%;
-                    max-height: 100%;
-                    border: 0;
-                }
+            :focus:not(:focus-visible) {
+                outline: none;
             }
         </style>
     </head>
 
-    <body vocab="http://schema.org/">
-        <div class="page">
-            <div class="home">
-                <ul typeof="BreadcrumbList">
+    <body vocab="http://schema.org/" typeof="Website">
+        <a href="#main-content" class="skip-link">Skip to main content</a>
+
+        <!-- Background Modality Pulses -->
+        <div class="bg-modalities" aria-hidden="true">
+            <div class="modality-pulse"></div>
+            <div class="modality-pulse"></div>
+            <div class="modality-pulse"></div>
+            <div class="modality-pulse"></div>
+        </div>
+
+        <!-- Navigation -->
+        <div class="nav-wrapper">
+            <nav class="nav" role="navigation" aria-label="Main navigation">
+                <a href="../../index.html" class="nav-brand" property="url" typeof="WebPage">
+                    <span property="name">John Samuel</span>
+                </a>
+                <ul class="breadcrumb" typeof="BreadcrumbList">
                     <li property="itemListElement" typeof="ListItem">
                         <a property="item" typeof="WebPage" href="../index.html">
                             <span property="name">Home</span>
@@ -268,195 +1041,324 @@
                             <span property="name">Research</span>
                         </a>
                     </li>
+                    <li property="itemListElement" typeof="ListItem">
+                        <span property="name">Multimodal AI</span>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+
+        <!-- Hero Section -->
+        <section class="hero">
+            <div class="hero-content">
+                <div class="series-badge">
+                    Part of the series on <a href="./artificial-intelligence.html">Artificial Intelligence</a>
+                </div>
+                <h1>Beyond LLMs: The Rise of Multimodal AI</h1>
+                <p class="hero-subtitle">Exploring how artificial intelligence systems are evolving to understand,
+                    generate, and reason across multiple types of input—text, images, audio, video, and 3D spatial
+                    data—approximating human-like perception and cognition.</p>
+            </div>
+
+            <!-- Multimodal Convergence Visualization -->
+            <div class="hero-visual">
+                <div class="svg-container">
+                    <svg viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                        <!-- Gradient Definitions -->
+                        <defs>
+                            <radialGradient id="coreGlow" cx="50%" cy="50%">
+                                <stop offset="0%" style="stop-color:#3b82f6;stop-opacity:0.8" />
+                                <stop offset="100%" style="stop-color:#3b82f6;stop-opacity:0" />
+                            </radialGradient>
+                        </defs>
+
+                        <!-- Central Core (Multimodal AI) -->
+                        <g class="center-core">
+                            <circle cx="200" cy="200" r="40" fill="url(#coreGlow)" />
+                            <circle cx="200" cy="200" r="30" fill="none" stroke="#3b82f6" stroke-width="3" />
+                            <text x="200" y="205" text-anchor="middle" font-size="12" fill="#3b82f6" font-weight="bold"
+                                font-family="Arial">AI</text>
+                        </g>
+
+                        <!-- Modality Icons Orbiting -->
+                        <!-- Text -->
+                        <g class="modality-icon" transform="translate(200, 80)">
+                            <circle cx="0" cy="0" r="35" fill="rgba(59, 130, 246, 0.1)" stroke="#3b82f6"
+                                stroke-width="2" />
+                            <text x="0" y="-8" text-anchor="middle" font-size="24" fill="#3b82f6">T</text>
+                            <text x="0" y="15" text-anchor="middle" font-size="10" fill="#3b82f6"
+                                font-family="Arial">Text</text>
+                        </g>
+
+                        <!-- Image -->
+                        <g class="modality-icon" transform="translate(310, 140)">
+                            <circle cx="0" cy="0" r="35" fill="rgba(16, 185, 129, 0.1)" stroke="#10b981"
+                                stroke-width="2" />
+                            <rect x="-12" y="-12" width="24" height="24" fill="none" stroke="#10b981" stroke-width="2"
+                                rx="2" />
+                            <circle cx="-6" cy="-6" r="3" fill="#10b981" />
+                            <polyline points="-12,8 -4,0 4,8 12,0" fill="none" stroke="#10b981" stroke-width="2" />
+                            <text x="0" y="22" text-anchor="middle" font-size="10" fill="#10b981"
+                                font-family="Arial">Image</text>
+                        </g>
+
+                        <!-- Audio -->
+                        <g class="modality-icon" transform="translate(310, 260)">
+                            <circle cx="0" cy="0" r="35" fill="rgba(245, 158, 11, 0.1)" stroke="#f59e0b"
+                                stroke-width="2" />
+                            <path d="M -8,-10 L -8,10 L 2,10 L 10,16 L 10,-16 L 2,-10 Z" fill="none" stroke="#f59e0b"
+                                stroke-width="2" />
+                            <path d="M 14,-8 Q 20,-4 20,0 Q 20,4 14,8" fill="none" stroke="#f59e0b" stroke-width="2" />
+                            <text x="0" y="22" text-anchor="middle" font-size="10" fill="#f59e0b"
+                                font-family="Arial">Audio</text>
+                        </g>
+
+                        <!-- Video -->
+                        <g class="modality-icon" transform="translate(90, 260)">
+                            <circle cx="0" cy="0" r="35" fill="rgba(236, 72, 153, 0.1)" stroke="#ec4899"
+                                stroke-width="2" />
+                            <rect x="-12" y="-10" width="24" height="20" fill="none" stroke="#ec4899" stroke-width="2"
+                                rx="2" />
+                            <polygon points="0,-6 8,0 0,6" fill="#ec4899" />
+                            <text x="0" y="22" text-anchor="middle" font-size="10" fill="#ec4899"
+                                font-family="Arial">Video</text>
+                        </g>
+
+                        <!-- 3D/Spatial -->
+                        <g class="modality-icon" transform="translate(90, 140)">
+                            <circle cx="0" cy="0" r="35" fill="rgba(139, 92, 246, 0.1)" stroke="#8b5cf6"
+                                stroke-width="2" />
+                            <path d="M 0,-12 L 8,-6 L 8,6 L 0,12 L -8,6 L -8,-6 Z" fill="none" stroke="#8b5cf6"
+                                stroke-width="2" />
+                            <line x1="0" y1="-12" x2="0" y2="12" stroke="#8b5cf6" stroke-width="1" />
+                            <line x1="-8" y1="-6" x2="8" y2="6" stroke="#8b5cf6" stroke-width="1" />
+                            <text x="0" y="22" text-anchor="middle" font-size="10" fill="#8b5cf6"
+                                font-family="Arial">3D</text>
+                        </g>
+
+                        <!-- Convergence Lines -->
+                        <line class="convergence-line" x1="200" y1="115" x2="200" y2="170" stroke="#3b82f6"
+                            stroke-width="2" />
+                        <line class="convergence-line" x1="280" y1="165" x2="235" y2="190" stroke="#10b981"
+                            stroke-width="2" />
+                        <line class="convergence-line" x1="280" y1="235" x2="235" y2="210" stroke="#f59e0b"
+                            stroke-width="2" />
+                        <line class="convergence-line" x1="120" y1="235" x2="165" y2="210" stroke="#ec4899"
+                            stroke-width="2" />
+                        <line class="convergence-line" x1="120" y1="165" x2="165" y2="190" stroke="#8b5cf6"
+                            stroke-width="2" />
+
+                        <!-- Orbital Circles -->
+                        <circle cx="200" cy="200" r="120" fill="none" stroke="rgba(59, 130, 246, 0.15)" stroke-width="1"
+                            stroke-dasharray="5,5" />
+                        <circle cx="200" cy="200" r="140" fill="none" stroke="rgba(59, 130, 246, 0.1)" stroke-width="1"
+                            stroke-dasharray="5,5" />
+                    </svg>
+                </div>
+            </div>
+        </section>
+
+        <!-- Main Content -->
+        <main id="main-content" class="container">
+            <article class="content-section">
+                <section class="intro-section">
+                    <p>Multimodal artificial intelligence (AI) refers to models that can understand, generate, and
+                        reason across multiple types of input and output—such as text, images, video, audio, 2D
+                        diagrams, and even 3D spatial environments. This evolution marks a critical step beyond large
+                        language models (LLMs), which are typically limited to processing only text. By integrating
+                        various sensory modalities, multimodal models aim to approximate human-like perception and
+                        cognition more closely.</p>
+                </section>
+
+                <h2>What is Multimodal AI?</h2>
+                <p>Multimodal AI enables machines to interact with and learn from the world the way humans do—by
+                    processing multiple types of data simultaneously. This includes:</p>
+
+                <div class="modality-grid">
+                    <div class="modality-card">
+                        <strong>Text</strong>
+                        <p>Natural language in the form of written or spoken words.</p>
+                    </div>
+                    <div class="modality-card">
+                        <strong>Images</strong>
+                        <p>Photographs, medical scans, illustrations, etc.</p>
+                    </div>
+                    <div class="modality-card">
+                        <strong>Audio</strong>
+                        <p>Speech, music, ambient sounds.</p>
+                    </div>
+                    <div class="modality-card">
+                        <strong>Video</strong>
+                        <p>Dynamic sequences combining visual and audio cues.</p>
+                    </div>
+                    <div class="modality-card">
+                        <strong>2D Data</strong>
+                        <p>Schematics, charts, and diagrams.</p>
+                    </div>
+                    <div class="modality-card">
+                        <strong>3D Data</strong>
+                        <p>Spatial environments, LIDAR point clouds, 3D models.</p>
+                    </div>
+                </div>
+
+                <div class="section-divider" aria-hidden="true"></div>
+
+                <h2>Historical Context and Milestones</h2>
+                <p>Early work on multimodal AI can be traced to models like IBM Watson (2011), which combined text and
+                    structured data for question-answering. However, modern deep learning frameworks expanded the field
+                    significantly. Some milestones include:</p>
+
+                <ul class="milestone-list">
+                    <li><strong>CLIP (Contrastive Language–Image Pretraining)</strong> by OpenAI (2021) connected vision
+                        and language using paired image-text data.</li>
+                    <li><strong>DALL·E</strong> introduced image generation from textual prompts, pioneering
+                        text-to-image synthesis.</li>
+                    <li><strong>Flamingo</strong> by DeepMind (2022) enabled visual question answering and image
+                        captioning using few-shot learning.</li>
+                    <li><strong>Gato</strong> by DeepMind attempted a generalist agent that could handle 600+ tasks
+                        across modalities.</li>
+                    <li><strong>PaLM-E</strong> by Google (2023) fused vision, robotics, and language for embodied
+                        reasoning.</li>
                 </ul>
 
-            </div>
-            <div id="sidebar">
-                <div class="title">
-                    <h1><a href="./multimodal-artificial-intelligence-models.html">Multimodal Artificial Intelligence
-                            Models</a></h1>
+                <aside>
+                    <p><strong>Note:</strong> Many of these systems use transformer-based backbones, originally designed
+                        for NLP but extended to image, audio, and video modalities with modifications such as Vision
+                        Transformers (ViTs) and audio encoders.</p>
+                </aside>
+
+                <div class="section-divider" aria-hidden="true"></div>
+
+                <h3>Next-Generation Multimodal Models</h3>
+                <p>Recent breakthroughs represent a leap toward more coherent, interactive, and embodied AI systems.
+                    These include:</p>
+
+                <div class="model-card">
+                    <h4>GPT-4o (OpenAI, 2024)</h4>
+                    <p>GPT-4o is OpenAI's first "omnimodal" model, natively capable of processing text, image, and audio
+                        inputs simultaneously. Unlike earlier systems that used modular pipelines, GPT-4o uses a unified
+                        architecture to achieve real-time multimodal interaction <a
+                            href="https://platform.openai.com/docs/models/gpt-4o" target="_blank"
+                            rel="noopener">[OpenAI, 2024]</a>.</p>
                 </div>
-                <div class="subtitle">
-                    <h3><a href="../about.html">John Samuel</a></h3>
+
+                <div class="model-card">
+                    <h4>Gemini 1.5 (Google DeepMind, 2024)</h4>
+                    <p>Gemini models integrate text, images, audio, and video with a strong emphasis on code
+                        understanding and long-context reasoning. Gemini 1.5 introduced improvements in memory and
+                        inference alignment, enabling deeper multimodal comprehension <a
+                            href="https://deepmind.google/technologies/gemini" target="_blank" rel="noopener">[DeepMind,
+                            2024]</a>.</p>
                 </div>
-            </div>
 
-            <div class="content">
-                <div <article>
-                    <header>
-                        <h2>Beyond LLMs: The Rise of Multimodal AI</h2>
-                        <div style="background-color: #f0f8ff; border-left: 4px solid #1e90ff; padding: 1em; margin-bottom:
-                        1.5em;">
-                            <strong>This article is part of a series on <a
-                                    href="./artificial-intelligence.html">Artificial
-                                    Intelligence</a>.</strong>
-                        </div>
-                    </header>
-
-                    <section>
-                        <h2>1. Introduction</h2>
-                        <p>Multimodal artificial intelligence (AI) refers to models that can understand,
-                            generate, and reason across multiple types of input and output—such as text, images,
-                            video, audio, 2D diagrams, and even 3D spatial environments. This evolution marks a
-                            critical step beyond large language models (LLMs), which are typically limited to
-                            processing only text. By integrating various sensory modalities, multimodal models
-                            aim to approximate human-like perception and cognition more closely.</p>
-                    </section>
-
-                    <section>
-                        <h2>2. What is Multimodal AI?</h2>
-                        <p>Multimodal AI enables machines to interact with and learn from the world the way
-                            humans do—by processing multiple types of data simultaneously. This includes:</p>
-                        <ul>
-                            <li><strong>Text:</strong> Natural language in the form of written or spoken words.
-                            </li>
-                            <li><strong>Images:</strong> Photographs, medical scans, illustrations, etc.</li>
-                            <li><strong>Audio:</strong> Speech, music, ambient sounds.</li>
-                            <li><strong>Video:</strong> Dynamic sequences combining visual and audio cues.</li>
-                            <li><strong>2D Data:</strong> Schematics, charts, and diagrams.</li>
-                            <li><strong>3D Data:</strong> Spatial environments, LIDAR point clouds, 3D models.
-                            </li>
-                        </ul>
-                    </section>
-
-                    <section>
-                        <h2>3. Historical Context and Milestones</h2>
-                        <p>Early work on multimodal AI can be traced to models like IBM Watson (2011), which
-                            combined text and structured data for question-answering. However, modern deep
-                            learning frameworks expanded the field significantly. Some milestones include:</p>
-
-                        <ul>
-                            <li><strong>CLIP (Contrastive Language–Image Pretraining)</strong> by OpenAI (2021)
-                                connected vision and language using paired image-text data.</li>
-                            <li><strong>DALL·E</strong> introduced image generation from textual prompts,
-                                pioneering text-to-image synthesis.</li>
-                            <li><strong>Flamingo</strong> by DeepMind (2022) enabled visual question answering
-                                and image captioning using few-shot learning.</li>
-                            <li><strong>Gato</strong> by DeepMind attempted a generalist agent that could handle
-                                600+ tasks across modalities.</li>
-                            <li><strong>PaLM-E</strong> by Google (2023) fused vision, robotics, and language
-                                for embodied reasoning.</li>
-                        </ul>
-
-                        <aside>
-                            <p><strong>Note:</strong> Many of these systems use transformer-based backbones,
-                                originally designed for NLP but extended to image, audio, and video modalities
-                                with modifications such as Vision Transformers (ViTs) and audio encoders.</p>
-                        </aside>
-                    </section>
-
-                    <section>
-                        <h3>4. Next-Generation Multimodal Models</h3>
-                        <p>Recent breakthroughs represent a leap toward more coherent, interactive, and embodied
-                            AI systems. These include:</p>
-
-                        <h4>4.1 GPT-4o (OpenAI, 2024)</h4>
-                        <p>GPT-4o is OpenAI's first "omnimodal" model, natively capable of processing text,
-                            image, and audio inputs simultaneously. Unlike earlier systems that used modular
-                            pipelines, GPT-4o uses a unified architecture to achieve real-time multimodal
-                            interaction <a href="https://platform.openai.com/docs/models/gpt-4o">[OpenAI, 2024]</a>.</p>
-
-                        <h4>4.2 Gemini 1.5 (Google DeepMind, 2024)</h4>
-                        <p>Gemini models integrate text, images, audio, and video with a strong emphasis on code
-                            understanding and long-context reasoning. Gemini 1.5 introduced improvements in
-                            memory and inference alignment, enabling deeper multimodal comprehension <a
-                                href="https://deepmind.google/technologies/gemini">[DeepMind, 2024]</a>.</p>
-
-                        <h4>4.3 Claude 3 (Anthropic, 2024)</h4>
-                        <p>Claude 3 models incorporate document-level image understanding and long-range context
-                            processing while maintaining safety via constitutional AI principles <a
-                                href="https://www.anthropic.com/news/claude-3-family">[Anthropic, 2024]</a>.</p>
-
-                        <h4>4.4 Kosmos (Microsoft, 2023)</h4>
-                        <p>Kosmos-1 and Kosmos-2 introduced multimodal perception grounded in image-text
-                            reasoning and embodied AI capabilities, such as referring expression comprehension
-                            and grounding in robotics <a
-                                href="https://www.microsoft.com/en-us/research/publication/kosmos-2-grounding-multimodal-large-language-models-to-the-world/">[Microsoft
-                                Research]</a>.</p>
-                    </section>
-
-                    <section>
-                        <h2>5. Applications of Multimodal AI</h2>
-                        <ul>
-                            <li><strong>Education:</strong> Multimodal tutors that can read, listen, and show
-                                demonstrations (e.g., virtual science experiments in 3D).</li>
-                            <li><strong>Healthcare:</strong> Models that interpret medical images, clinical
-                                text, and patient voice data simultaneously.</li>
-                            <li><strong>Accessibility:</strong> AI that describes surroundings via audio for
-                                visually impaired users or transcribes speech into sign language avatars.</li>
-                            <li><strong>Robotics:</strong> Embodied AI agents that perceive the world through
-                                cameras and microphones and respond through natural language or physical
-                                movement.</li>
-                            <li><strong>Entertainment and Art:</strong> Music and video generation from prompts;
-                                interactive storytelling with real-time visuals and audio.</li>
-                        </ul>
-                    </section>
-
-                    <section>
-                        <h2>6. Challenges and Open Questions</h2>
-                        <ul>
-                            <li><strong>Alignment:</strong> How do we ensure safety, fairness, and
-                                intent-alignment across modalities?</li>
-                            <li><strong>Data scarcity:</strong> Large-scale, high-quality multimodal datasets
-                                remain difficult to obtain and standardize.</li>
-                            <li><strong>Computational cost:</strong> Multimodal models are resource-intensive
-                                and require optimization for sustainable deployment.</li>
-                            <li><strong>Evaluation:</strong> Metrics for cross-modal reasoning and coherence
-                                remain underdeveloped.</li>
-                            <li><strong>Bias and representation:</strong> Modalities may encode different types
-                                of bias (e.g., visual stereotypes) that need independent mitigation strategies.
-                            </li>
-                        </ul>
-                    </section>
-
-                    <section>
-                        <h2>7. Conclusion</h2>
-                        <p>Multimodal AI represents the next frontier in artificial intelligence—one that moves
-                            beyond language to embrace perception, reasoning, and expression in ways more akin
-                            to human cognition. While the progress has been extraordinary, ongoing research is
-                            needed to ensure these systems are interpretable, efficient, inclusive, and safe for
-                            real-world deployment.</p>
-                    </section>
-
-                    <section>
-                        <h3>Related Articles</h3>
-                        <ul>
-                            <li><a href="./large-language-models-language-communities.html">Large language
-                                    models versus
-                                    language communities</a></li>
-                            <li><a href="./large-language-models-energy.html">Large language models- Energy
-                                    Consumption</a></li>
-                            <li><a href="./large-language-models-search-engine-optimization.html">Large language
-                                    models based
-                                    search engine optimization</a></li>
-                            <li><a href="./nogenai-nofilter.html">NoGenAI is the new NoFilter</a></li>
-                        </ul>
-                        <h2>References</h2>
-                        <ol>
-                            <li><a href="https://en.wikipedia.org/wiki/Multimodal_learning">Wikipedia:
-                                    Multimodal Learning</a></li>
-                            <li><a href="https://platform.openai.com/docs/models/gpt-4o">OpenAI GPT-4o Release</a></li>
-                            <li><a href="https://deepmind.google/technologies/gemini">Google DeepMind Gemini</a>
-                            </li>
-                            <li><a href="https://www.anthropic.com/news/claude-3-family">Claude 3 Overview
-                                    (Anthropic)</a></li>
-                            <li><a
-                                    href="hhttps://www.microsoft.com/en-us/research/publication/kosmos-2-grounding-multimodal-large-language-models-to-the-world/">Kosmos
-                                    by
-                                    Microsoft Research</a></li>
-                            <li><a href="https://openai.com/research/clip">CLIP by OpenAI</a></li>
-                            <li><a href="https://openai.com/research/dall-e">DALL·E by OpenAI</a></li>
-                            <li><a
-                                    href="https://deepmind.google/discover/blog/tackling-multiple-tasks-with-a-single-visual-language-model/">DeepMind:
-                                    Tackling multiple tasks with a single visual language model</a></li>
-                            <li><a href="https://www.deepmind.com/blog/a-generalist-agent">DeepMind: Gato</a>
-                            </li>
-                            <li><a href="https://palm-e.github.io/">Google PaLM-E</a></li>
-                        </ol>
-                    </section>
-                    </article>
+                <div class="model-card">
+                    <h4>Claude 3 (Anthropic, 2024)</h4>
+                    <p>Claude 3 models incorporate document-level image understanding and long-range context processing
+                        while maintaining safety via constitutional AI principles <a
+                            href="https://www.anthropic.com/news/claude-3-family" target="_blank"
+                            rel="noopener">[Anthropic, 2024]</a>.</p>
                 </div>
+
+                <div class="model-card">
+                    <h4>Kosmos (Microsoft, 2023)</h4>
+                    <p>Kosmos-1 and Kosmos-2 introduced multimodal perception grounded in image-text reasoning and
+                        embodied AI capabilities, such as referring expression comprehension and grounding in robotics
+                        <a href="https://www.microsoft.com/en-us/research/publication/kosmos-2-grounding-multimodal-large-language-models-to-the-world/"
+                            target="_blank" rel="noopener">[Microsoft Research]</a>.
+                    </p>
+                </div>
+
+                <div class="section-divider" aria-hidden="true"></div>
+
+                <h2>Applications of Multimodal AI</h2>
+                <ul>
+                    <li><strong>Education:</strong> Multimodal tutors that can read, listen, and show demonstrations
+                        (e.g., virtual science experiments in 3D).</li>
+                    <li><strong>Healthcare:</strong> Models that interpret medical images, clinical text, and patient
+                        voice data simultaneously.</li>
+                    <li><strong>Accessibility:</strong> AI that describes surroundings via audio for visually impaired
+                        users or transcribes speech into sign language avatars.</li>
+                    <li><strong>Robotics:</strong> Embodied AI agents that perceive the world through cameras and
+                        microphones and respond through natural language or physical movement.</li>
+                    <li><strong>Entertainment and Art:</strong> Music and video generation from prompts; interactive
+                        storytelling with real-time visuals and audio.</li>
+                </ul>
+
+                <div class="section-divider" aria-hidden="true"></div>
+
+                <h2>Challenges and Open Questions</h2>
+                <ul>
+                    <li><strong>Alignment:</strong> How do we ensure safety, fairness, and intent-alignment across
+                        modalities?</li>
+                    <li><strong>Data scarcity:</strong> Large-scale, high-quality multimodal datasets remain difficult
+                        to obtain and standardize.</li>
+                    <li><strong>Computational cost:</strong> Multimodal models are resource-intensive and require
+                        optimization for sustainable deployment.</li>
+                    <li><strong>Evaluation:</strong> Metrics for cross-modal reasoning and coherence remain
+                        underdeveloped.</li>
+                    <li><strong>Bias and representation:</strong> Modalities may encode different types of bias (e.g.,
+                        visual stereotypes) that need independent mitigation strategies.</li>
+                </ul>
+
+                <div class="section-divider" aria-hidden="true"></div>
+
+                <h2>Conclusion</h2>
+                <p>Multimodal AI represents the next frontier in artificial intelligence—one that moves beyond language
+                    to embrace perception, reasoning, and expression in ways more akin to human cognition. While the
+                    progress has been extraordinary, ongoing research is needed to ensure these systems are
+                    interpretable, efficient, inclusive, and safe for real-world deployment.</p>
+
+                <section class="related-section">
+                    <h3>Related Articles</h3>
+                    <ul>
+                        <li><a href="./large-language-models-language-communities.html">Large language models versus
+                                language communities</a></li>
+                        <li><a href="./large-language-models-energy.html">Large language models - Energy Consumption</a>
+                        </li>
+                        <li><a href="./large-language-models-search-engine-optimization.html">Large language models
+                                based search engine optimization</a></li>
+                        <li><a href="./nogenai-nofilter.html">NoGenAI is the new NoFilter</a></li>
+                    </ul>
+                </section>
+
+                <section class="references-section">
+                    <h2>References</h2>
+                    <ol>
+                        <li><a href="https://en.wikipedia.org/wiki/Multimodal_learning" target="_blank"
+                                rel="noopener">Wikipedia: Multimodal Learning</a></li>
+                        <li><a href="https://platform.openai.com/docs/models/gpt-4o" target="_blank"
+                                rel="noopener">OpenAI GPT-4o Release</a></li>
+                        <li><a href="https://deepmind.google/technologies/gemini" target="_blank" rel="noopener">Google
+                                DeepMind Gemini</a></li>
+                        <li><a href="https://www.anthropic.com/news/claude-3-family" target="_blank"
+                                rel="noopener">Claude 3 Overview (Anthropic)</a></li>
+                        <li><a href="https://www.microsoft.com/en-us/research/publication/kosmos-2-grounding-multimodal-large-language-models-to-the-world/"
+                                target="_blank" rel="noopener">Kosmos by Microsoft Research</a></li>
+                        <li><a href="https://openai.com/research/clip" target="_blank" rel="noopener">CLIP by OpenAI</a>
+                        </li>
+                        <li><a href="https://openai.com/research/dall-e" target="_blank" rel="noopener">DALL·E by
+                                OpenAI</a></li>
+                        <li><a href="https://deepmind.google/discover/blog/tackling-multiple-tasks-with-a-single-visual-language-model/"
+                                target="_blank" rel="noopener">DeepMind: Tackling multiple tasks with a single visual
+                                language model</a></li>
+                        <li><a href="https://www.deepmind.com/blog/a-generalist-agent" target="_blank"
+                                rel="noopener">DeepMind: Gato</a></li>
+                        <li><a href="https://palm-e.github.io/" target="_blank" rel="noopener">Google PaLM-E</a></li>
+                    </ol>
+                </section>
+            </article>
+        </main>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <div class="footer-content">
+                <div class="footer-brand">© 2024 John Samuel</div>
+                <ul class="footer-links">
+                    <li><a href="../../index.html">Home</a></li>
+                    <li><a href="../research/research.html">Research</a></li>
+                </ul>
             </div>
+        </footer>
     </body>
 
 </html>
