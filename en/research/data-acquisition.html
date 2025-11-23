@@ -3,275 +3,629 @@
 
     <head>
         <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <meta http-equiv="Content-Language" content="en" />
         <link rel="shortcut icon" href="../../images/logo/favicon.png" />
         <title>Data Acquisition: John Samuel</title>
         <style type="text/css">
-            body {
-                background-color: #FFFFFF;
+            /* ===== CSS Custom Properties (Design Tokens) ===== */
+            :root {
+                /* Base Colors - Light Theme */
+                --color-base-bg: #f5f8fa;
+                --color-base-surface: #ffffff;
+                --color-base-text: #1a202c;
+                --color-base-text-muted: #4a5568;
+
+                /* Theme Accents - Data Science/Technology */
+                --color-accent-1: #4a90e2;
+                --color-accent-2: #2d5f8d;
+                --color-accent-3: #7b68ee;
+                --color-accent-light: #e8f3fc;
+                --color-accent-gradient-1: #667eea;
+                --color-accent-gradient-2: #764ba2;
+
+                /* Functional Colors */
+                --color-shadow: rgba(74, 144, 226, 0.12);
+                --color-border: rgba(74, 144, 226, 0.15);
+                --color-hover: rgba(74, 144, 226, 0.08);
+
+                /* Gradients */
+                --gradient-primary: linear-gradient(135deg, var(--color-accent-1) 0%, var(--color-accent-3) 100%);
+                --gradient-hero: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #4a90e2 100%);
+                --gradient-subtle: linear-gradient(180deg, var(--color-base-bg), var(--color-accent-light));
+
+                /* Spacing Scale */
+                --space-xs: 0.25rem;
+                --space-sm: 0.5rem;
+                --space-md: 1rem;
+                --space-lg: 1.5rem;
+                --space-xl: 2rem;
+                --space-2xl: 3rem;
+                --space-3xl: 4rem;
+                --space-4xl: 6rem;
+
+                /* Border Radius */
+                --radius-sm: 4px;
+                --radius-md: 8px;
+                --radius-lg: 12px;
+                --radius-xl: 16px;
+                --radius-2xl: 24px;
+                --radius-full: 9999px;
+
+                /* Shadows */
+                --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.04), 0 1px 3px rgba(0, 0, 0, 0.06);
+                --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.05), 0 2px 4px rgba(0, 0, 0, 0.06);
+                --shadow-lg: 0 10px 24px rgba(0, 0, 0, 0.08), 0 4px 8px rgba(0, 0, 0, 0.06);
+                --shadow-xl: 0 20px 40px rgba(0, 0, 0, 0.12), 0 8px 16px rgba(0, 0, 0, 0.08);
+                --shadow-theme: 0 10px 30px var(--color-shadow), 0 4px 10px rgba(0, 0, 0, 0.06);
+
+                /* Typography */
+                --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+                --text-xs: clamp(0.75rem, 0.7rem + 0.25vw, 0.875rem);
+                --text-sm: clamp(0.875rem, 0.8rem + 0.35vw, 1rem);
+                --text-base: clamp(1rem, 0.95rem + 0.25vw, 1.125rem);
+                --text-lg: clamp(1.125rem, 1.05rem + 0.35vw, 1.25rem);
+                --text-xl: clamp(1.25rem, 1.15rem + 0.5vw, 1.5rem);
+                --text-2xl: clamp(1.5rem, 1.3rem + 1vw, 2rem);
+                --text-3xl: clamp(2rem, 1.6rem + 2vw, 2.5rem);
+                --text-4xl: clamp(2.5rem, 2rem + 2.5vw, 3.5rem);
+
+                /* Font Weights */
+                --weight-normal: 400;
+                --weight-medium: 500;
+                --weight-semibold: 600;
+                --weight-bold: 700;
+                --weight-extrabold: 800;
             }
 
-            #sidebar {
-                position: fixed;
-                background-color: #1B80CF;
-                top: 0;
-                left: 0;
-                bottom: 0;
-                width: 30vw;
-            }
-
-            #sidebar .title {
-                position: relative;
-                text-align: center;
-                line-height: 4vmax;
-                font-size: 1.8vmax;
-                font-family: 'Arial';
-                margin-top: 25vh;
-            }
-
-            #sidebar .title a:link,
-            #sidebar .title a:visited {
-                color: #FFFFFF;
-                text-decoration: none;
-            }
-
-            .subtitle {
-                top: 50vh;
-                text-align: center;
-                line-height: 1.3vmax;
-                font-family: 'Arial';
-                font-size: 1.5vmax;
-                color: #FFFFFF;
-            }
-
-            .subtitle a:link,
-            .subtitle a:visited {
-                color: #FFFFFF;
-                text-decoration: none;
-            }
-
-            .licence {
-                position: fixed;
-                text-align: right;
-                bottom: 0;
-                right: 0;
-            }
-
-            .home {
-                position: fixed;
-                text-align: left;
-                font-family: 'Arial';
-                color: #D3D3D3;
-                z-index: 100;
-                width: 100%;
-                background-color: #FFFFFF;
-                top: 0px;
-                margin-bottom: 10px;
-                padding-bottom: 10px;
-            }
-
-            .home a:link,
-            .home a:visited {
-                text-decoration: none;
-                color: #D3D3D3;
-            }
-
-            .home ul {
+            /* ===== Reset & Base Styles ===== */
+            * {
                 margin: 0;
                 padding: 0;
-                text-align: left;
-                list-style: none;
+                box-sizing: border-box;
             }
 
-            .home li {
-                position: relative;
-                float: left;
-                padding-top: 15px;
-                margin-right: 1em;
-                font-family: 'Arial';
+            html {
+                scroll-behavior: smooth;
+                scroll-padding-top: 80px;
             }
 
-            .home li:hover {
-                display: block;
+            body {
+                font-family: var(--font-sans);
+                font-size: var(--text-base);
+                line-height: 1.6;
+                color: var(--color-base-text);
+                background: var(--color-base-bg);
+                background-image:
+                    radial-gradient(circle at 20% 30%, rgba(102, 126, 234, 0.03) 0%, transparent 50%),
+                    radial-gradient(circle at 80% 70%, rgba(118, 75, 162, 0.03) 0%, transparent 50%);
+                background-attachment: fixed;
+                overflow-x: hidden;
             }
 
-            .home a:link,
-            .home a:visited {
-                color: #D3D3D3;
+            /* ===== Navigation ===== */
+            .nav-header {
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                z-index: 1000;
+                background: rgba(255, 255, 255, 0.85);
+                -webkit-backdrop-filter: blur(12px) saturate(180%);
+                backdrop-filter: blur(12px) saturate(180%);
+                border-bottom: 1px solid var(--color-border);
+                box-shadow: var(--shadow-sm);
             }
 
-            .home li:hover a:link,
-            .home li:hover a:visited {
+            .nav-container {
+                max-width: 1400px;
+                margin: 0 auto;
+                padding: var(--space-md) var(--space-xl);
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                flex-wrap: wrap;
+                gap: var(--space-md);
+            }
+
+            .site-name {
+                font-size: var(--text-xl);
+                font-weight: var(--weight-bold);
+                background: var(--gradient-primary);
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                background-clip: text;
                 text-decoration: none;
-                padding: 15px;
-                color: #FFFFFF;
-                background-color: #1B80CF;
+                letter-spacing: -0.02em;
+                transition: transform 0.3s ease;
             }
 
-            .content {
-                line-height: 1.8vmax;
-                font-size: 1.2vmax;
-                font-family: 'Arial';
-                margin-top: 15vh;
-                width: 90%;
+            .site-name:hover {
+                transform: scale(1.05);
             }
 
-            .content h2,
-            h3,
-            h4 {
-                color: #1B80CF;
+            .breadcrumb {
+                display: flex;
+                align-items: center;
+                gap: var(--space-sm);
+                list-style: none;
+                flex-wrap: wrap;
             }
 
-            .content a:link,
-            .content a:visited {
-                color: #1B80CF;
+            .breadcrumb li {
+                display: flex;
+                align-items: center;
+                gap: var(--space-sm);
             }
 
-            .content h3 {
-                color: #1B80CF;
+            .breadcrumb li:not(:last-child)::after {
+                content: '→';
+                color: var(--color-base-text-muted);
+                opacity: 0.5;
             }
 
-            .content h2::before,
-            .content h3::before {
-                display: block;
-                content: " ";
-                visibility: hidden;
-                height: 50px;
-                margin-top: -50px;
-                pointer-events: none;
-                background-color: #FFFFFF;
+            .breadcrumb a {
+                color: var(--color-base-text-muted);
+                text-decoration: none;
+                font-size: var(--text-sm);
+                transition: color 0.3s ease;
             }
 
-            .content a:link,
-            .content a:visited {
-                color: #1B80CF;
+            .breadcrumb a:hover {
+                color: var(--color-accent-1);
             }
 
-            .content li {
-                margin: 5px;
+            /* ===== Main Container ===== */
+            .main-container {
+                max-width: 1400px;
+                margin: 0 auto;
+                padding: var(--space-4xl) var(--space-xl) var(--space-3xl);
+                margin-top: 80px;
             }
 
-            .page {
-                width: 65vw;
-                height: 100%;
-                margin-left: 30vw;
+            /* ===== Hero Section ===== */
+            .hero-section {
+                position: relative;
+                background: var(--gradient-hero);
+                background-size: 200% 200%;
+                animation: gradientShift 12s ease infinite;
+                border-radius: var(--radius-2xl);
+                padding: var(--space-4xl) var(--space-2xl);
+                margin-bottom: var(--space-4xl);
                 overflow: hidden;
-                padding: 0 1em;
-                font-family: 'Arial';
+                box-shadow: var(--shadow-xl);
             }
 
-            .page img {
-                max-width: 100%;
-                max-height: 100%;
+            @keyframes gradientShift {
+
+                0%,
+                100% {
+                    background-position: 0% 50%;
+                }
+
+                50% {
+                    background-position: 100% 50%;
+                }
             }
 
-            @media (max-width: 640px),
-            screen and (orientation: portrait) {
+            .hero-content {
+                position: relative;
+                z-index: 2;
+                max-width: 800px;
+            }
+
+            .hero-title {
+                font-size: var(--text-4xl);
+                font-weight: var(--weight-extrabold);
+                color: white;
+                margin-bottom: var(--space-lg);
+                letter-spacing: -0.03em;
+                line-height: 1.2;
+                text-shadow: 0 2px 20px rgba(0, 0, 0, 0.2);
+            }
+
+            .hero-subtitle {
+                font-size: var(--text-xl);
+                color: rgba(255, 255, 255, 0.95);
+                font-weight: var(--weight-normal);
+                line-height: 1.6;
+                text-shadow: 0 1px 10px rgba(0, 0, 0, 0.1);
+            }
+
+            .hero-svg {
+                position: absolute;
+                top: 50%;
+                right: 5%;
+                transform: translateY(-50%);
+                width: 300px;
+                height: 300px;
+                opacity: 0.25;
+            }
+
+            /* ===== Series Notice ===== */
+            .series-notice {
+                background: linear-gradient(135deg, rgba(102, 126, 234, 0.08), rgba(118, 75, 162, 0.08));
+                border-left: 4px solid var(--color-accent-1);
+                border-radius: var(--radius-lg);
+                padding: var(--space-lg) var(--space-xl);
+                margin-bottom: var(--space-3xl);
+                box-shadow: var(--shadow-sm);
+            }
+
+            .series-notice strong {
+                color: var(--color-accent-2);
+            }
+
+            .series-notice a {
+                color: var(--color-accent-1);
+                text-decoration: none;
+                font-weight: var(--weight-semibold);
+                transition: color 0.3s ease;
+            }
+
+            .series-notice a:hover {
+                color: var(--color-accent-3);
+                text-decoration: underline;
+            }
+
+            /* ===== Content Sections ===== */
+            .content-section {
+                margin-bottom: var(--space-4xl);
+            }
+
+            .content-section h3 {
+                font-size: var(--text-3xl);
+                font-weight: var(--weight-bold);
+                color: var(--color-accent-2);
+                margin-bottom: var(--space-xl);
+                letter-spacing: -0.02em;
+                position: relative;
+                padding-bottom: var(--space-md);
+            }
+
+            .content-section h3::after {
+                content: '';
+                position: absolute;
+                bottom: 0;
+                left: 0;
+                width: 60px;
+                height: 4px;
+                background: var(--gradient-primary);
+                border-radius: var(--radius-full);
+            }
+
+            .content-section h4 {
+                font-size: var(--text-2xl);
+                font-weight: var(--weight-semibold);
+                color: var(--color-accent-1);
+                margin: var(--space-2xl) 0 var(--space-lg);
+                letter-spacing: -0.01em;
+            }
+
+            .content-section p {
+                margin-bottom: var(--space-lg);
+                line-height: 1.8;
+                color: var(--color-base-text);
+            }
+
+            .content-section ul,
+            .content-section ol {
+                margin: var(--space-lg) 0 var(--space-xl) var(--space-xl);
+                line-height: 1.8;
+            }
+
+            .content-section li {
+                margin: var(--space-sm) 0;
+                padding-left: var(--space-sm);
+            }
+
+            .content-section ul li {
+                list-style: none;
+                position: relative;
+                padding-left: var(--space-xl);
+            }
+
+            .content-section ul li::before {
+                content: '';
+                position: absolute;
+                left: 0;
+                top: 0.65em;
+                width: 8px;
+                height: 8px;
+                background: var(--gradient-primary);
+                border-radius: 50%;
+            }
+
+            .content-section b {
+                font-weight: var(--weight-semibold);
+                color: var(--color-accent-2);
+            }
+
+            .content-section a {
+                color: var(--color-accent-1);
+                text-decoration: none;
+                font-weight: var(--weight-medium);
+                transition: all 0.3s ease;
+                border-bottom: 1px solid transparent;
+            }
+
+            .content-section a:hover {
+                color: var(--color-accent-3);
+                border-bottom-color: var(--color-accent-3);
+            }
+
+            /* ===== Cards Layout ===== */
+            .cards-grid {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+                gap: var(--space-xl);
+                margin: var(--space-2xl) 0;
+            }
+
+            .card {
+                background: var(--color-base-surface);
+                border-radius: var(--radius-xl);
+                padding: var(--space-xl);
+                box-shadow: var(--shadow-theme);
+                border: 1px solid var(--color-border);
+                transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+                position: relative;
+                overflow: hidden;
+            }
+
+            .card::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                height: 4px;
+                background: var(--gradient-primary);
+                transform: scaleX(0);
+                transition: transform 0.4s ease;
+            }
+
+            .card:hover {
+                transform: translateY(-8px) scale(1.02);
+                box-shadow: var(--shadow-xl);
+            }
+
+            .card:hover::before {
+                transform: scaleX(1);
+            }
+
+            .card h4 {
+                margin-top: 0;
+                margin-bottom: var(--space-md);
+            }
+
+            /* ===== References Section ===== */
+            .references-section {
+                background: rgba(255, 255, 255, 0.7);
+                -webkit-backdrop-filter: blur(12px) saturate(180%);
+                backdrop-filter: blur(12px) saturate(180%);
+                border: 1px solid var(--color-border);
+                border-radius: var(--radius-xl);
+                padding: var(--space-2xl);
+                margin-top: var(--space-4xl);
+                box-shadow: var(--shadow-md);
+            }
+
+            .references-section h3 {
+                color: var(--color-accent-2);
+                margin-bottom: var(--space-xl);
+            }
+
+            .references-section ol {
+                counter-reset: reference-counter;
+                list-style: none;
+                margin-left: 0;
+            }
+
+            .references-section li {
+                counter-increment: reference-counter;
+                padding-left: var(--space-2xl);
+                margin-bottom: var(--space-lg);
+                position: relative;
+            }
+
+            .references-section li::before {
+                content: '[' counter(reference-counter) ']';
+                position: absolute;
+                left: 0;
+                color: var(--color-accent-1);
+                font-weight: var(--weight-semibold);
+            }
+
+            /* ===== Footer ===== */
+            .footer {
+                margin-top: var(--space-4xl);
+                padding: var(--space-3xl) var(--space-xl) var(--space-xl);
+                background: linear-gradient(135deg, rgba(102, 126, 234, 0.05), rgba(118, 75, 162, 0.05));
+                border-top: 1px solid var(--color-border);
+                border-radius: var(--radius-2xl) var(--radius-2xl) 0 0;
+            }
+
+            .footer-content {
+                max-width: 1400px;
+                margin: 0 auto;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                flex-wrap: wrap;
+                gap: var(--space-lg);
+            }
+
+            .copyright {
+                color: var(--color-base-text-muted);
+                font-size: var(--text-sm);
+            }
+
+            .language-selector {
+                display: flex;
+                gap: var(--space-md);
+                align-items: center;
+            }
+
+            .language-selector span {
+                color: var(--color-base-text-muted);
+                font-size: var(--text-sm);
+                font-weight: var(--weight-medium);
+            }
+
+            /* ===== SVG Animations ===== */
+            @keyframes float {
+
+                0%,
+                100% {
+                    transform: translateY(0) rotate(0deg);
+                }
+
+                50% {
+                    transform: translateY(-20px) rotate(5deg);
+                }
+            }
+
+            @keyframes pulse {
+
+                0%,
+                100% {
+                    opacity: 0.6;
+                }
+
+                50% {
+                    opacity: 1;
+                }
+            }
+
+            @keyframes spin {
+                from {
+                    transform: rotate(0deg);
+                }
+
+                to {
+                    transform: rotate(360deg);
+                }
+            }
+
+            @keyframes wave {
+
+                0%,
+                100% {
+                    transform: translateX(0);
+                }
+
+                50% {
+                    transform: translateX(10px);
+                }
+            }
+
+            .svg-element-1 {
+                animation: float 4s ease-in-out infinite;
+            }
+
+            .svg-element-2 {
+                animation: pulse 3s ease-in-out infinite;
+            }
+
+            .svg-element-3 {
+                animation: spin 8s linear infinite;
+            }
+
+            .svg-element-4 {
+                animation: wave 5s ease-in-out infinite;
+            }
+
+            /* ===== Responsive Design ===== */
+            @media (max-width: 768px) {
+                .nav-container {
+                    flex-direction: column;
+                    align-items: flex-start;
+                    padding: var(--space-md);
+                }
+
+                .main-container {
+                    padding: var(--space-2xl) var(--space-md) var(--space-xl);
+                    margin-top: 120px;
+                }
+
+                .hero-section {
+                    padding: var(--space-2xl) var(--space-lg);
+                }
+
+                .hero-svg {
+                    display: none;
+                }
+
+                .cards-grid {
+                    grid-template-columns: 1fr;
+                    gap: var(--space-lg);
+                }
+
+                .footer-content {
+                    flex-direction: column;
+                    align-items: flex-start;
+                }
+            }
+
+            @media (max-width: 480px) {
+                .main-container {
+                    padding: var(--space-xl) var(--space-sm) var(--space-md);
+                }
+
+                .hero-section {
+                    padding: var(--space-xl) var(--space-md);
+                }
+
+                .content-section ul,
+                .content-section ol {
+                    margin-left: var(--space-md);
+                }
+            }
+
+            /* ===== Reduced Motion Support ===== */
+            @media (prefers-reduced-motion: reduce) {
+
+                *,
+                *::before,
+                *::after {
+                    animation-duration: 0.01ms !important;
+                    animation-iteration-count: 1 !important;
+                    transition-duration: 0.01ms !important;
+                }
+
+                html {
+                    scroll-behavior: auto;
+                }
+            }
+
+            /* ===== Print Styles ===== */
+            @media print {
+
+                .nav-header,
+                .hero-svg,
+                .footer {
+                    display: none;
+                }
+
                 body {
-                    max-width: 100%;
-                    max-height: 100%;
+                    background: white;
                 }
 
-                #sidebar {
-                    position: fixed;
-                    background-color: #1B80CF;
-                    top: 0;
-                    left: 0;
-                    bottom: 80vh;
-                    width: 100vw;
-                }
-
-                #sidebar .title {
-                    text-align: center;
-                    position: fixed;
-                    margin-top: 6vh;
-                    left: 0px;
-                    right: 0px;
-                    line-height: 3.5vmax;
-                    font-size: 1.5vmax;
-                    font-family: 'Arial';
-                }
-
-                #sidebar .subtitle {
-                    text-align: center;
-                    top: 5vh;
-                    left: 0px;
-                    right: 0px;
-                    position: fixed;
-                    margin-top: 10vh;
-                    font-size: 1.5vmax;
-                }
-
-                #sidebar .title a:link,
-                #sidebar .title a:visited {
-                    text-align: center;
-                    color: #FFFFFF;
-                }
-
-                #sidebar .subtitle a:link,
-                #sidebar .subtitle a:visited {
-                    text-align: center;
-                    color: #FFFFFF;
-                }
-
-                .home {
-                    z-index: 100;
-                    width: 100%;
-                    background-color: #1B80CF;
-                    font-size: 1.5vmax;
-                }
-
-                .home a:link,
-                .home a:visited {
-                    text-decoration: none;
-                    color: #FFFFFF;
-                }
-
-                .content {
-                    line-height: 3.8vmax;
-                    font-size: 1.8vmax;
-                    font-family: 'Arial';
-                    margin-top: 22vh;
-                }
-
-                .content a:link,
-                .content a:visited {
-                    color: #1B80CF;
-                }
-
-                .page {
-                    top: 40vh;
-                    width: 95%;
-                    margin-left: 0vw;
-                }
-
-                .page img {
-                    max-width: 100%;
-                    max-height: 100%;
-                    border: 0;
+                .hero-section {
+                    background: none;
+                    color: black;
                 }
             }
         </style>
     </head>
 
     <body vocab="http://schema.org/" typeof="Website">
-        <div id="sidebar">
-            <div id="sidebar">
-                <div class="title">
-                    <h2 lang="en"><a href="./data-acquisition.html" property="url" typeof="WebPage"><span
-                                typeof="WebPage">Data
-                                Acquisition</span></a></h2>
-                </div>
-                <div class="subtitle">
-                    <h3 lang="en"><a href="../about.html" property="url" typeof="WebPage"><span typeof="WebPage"
-                                property="author">John Samuel</span></a></h3>
-                </div>
-            </div>
-        </div>
-
-        <div class="page" typeof="WebPage">
-            <div class="home">
-                <ul typeof="BreadcrumbList">
+        <!-- Navigation Header -->
+        <nav class="nav-header" role="navigation" aria-label="Main navigation">
+            <div class="nav-container">
+                <a href="../index.html" class="site-name" aria-label="John Samuel - Home">John Samuel</a>
+                <ul class="breadcrumb" typeof="BreadcrumbList">
                     <li property="itemListElement" typeof="ListItem">
                         <a property="item" typeof="WebPage" href="../index.html">
                             <span property="name">Home</span>
@@ -282,16 +636,62 @@
                             <span property="name">Research</span>
                         </a>
                     </li>
+                    <li property="itemListElement" typeof="ListItem">
+                        <span property="name">Data Acquisition</span>
+                    </li>
                 </ul>
-
             </div>
-            <div class="content">
-                <div
-                    style="background-color: #f0f8ff; border-left: 4px solid #1e90ff; padding: 1em; margin-bottom: 1.5em;">
-                    <strong>This article is part of a series on <a href="./data-science.html">Data
-                            Science</a>.</strong>
+        </nav>
+
+        <!-- Main Content -->
+        <main id="main-content" class="main-container" typeof="WebPage">
+
+            <!-- Hero Section -->
+            <section class="hero-section" aria-labelledby="hero-title">
+                <div class="hero-content">
+                    <h1 id="hero-title" class="hero-title">Data Acquisition</h1>
+                    <p class="hero-subtitle">Navigating Surveys, Sensors, and Beyond</p>
                 </div>
-                <h3>Data Acquisition: Navigating Surveys, Sensors, and Beyond</h3>
+
+                <!-- Hero SVG Illustration -->
+                <svg class="hero-svg" viewBox="0 0 300 300" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                    <!-- Data Flow Network -->
+                    <g class="svg-element-1">
+                        <circle cx="150" cy="150" r="40" fill="none" stroke="rgba(255,255,255,0.4)" stroke-width="2" />
+                        <circle cx="150" cy="150" r="8" fill="rgba(255,255,255,0.8)" />
+                    </g>
+
+                    <!-- Sensor Nodes -->
+                    <g class="svg-element-2">
+                        <circle cx="80" cy="80" r="12" fill="rgba(255,255,255,0.6)" />
+                        <circle cx="220" cy="80" r="12" fill="rgba(255,255,255,0.6)" />
+                        <circle cx="80" cy="220" r="12" fill="rgba(255,255,255,0.6)" />
+                        <circle cx="220" cy="220" r="12" fill="rgba(255,255,255,0.6)" />
+                    </g>
+
+                    <!-- Connection Lines -->
+                    <g class="svg-element-4" opacity="0.3">
+                        <line x1="80" y1="80" x2="150" y2="150" stroke="white" stroke-width="1.5" />
+                        <line x1="220" y1="80" x2="150" y2="150" stroke="white" stroke-width="1.5" />
+                        <line x1="80" y1="220" x2="150" y2="150" stroke="white" stroke-width="1.5" />
+                        <line x1="220" y1="220" x2="150" y2="150" stroke="white" stroke-width="1.5" />
+                    </g>
+
+                    <!-- Rotating Data Ring -->
+                    <g class="svg-element-3">
+                        <circle cx="150" cy="150" r="70" fill="none" stroke="rgba(255,255,255,0.3)" stroke-width="1.5"
+                            stroke-dasharray="5,10" />
+                    </g>
+                </svg>
+            </section>
+
+            <!-- Series Notice -->
+            <aside class="series-notice" role="complementary">
+                <strong>This article is part of a series on <a href="./data-science.html">Data Science</a>.</strong>
+            </aside>
+
+            <!-- Introduction -->
+            <article class="content-section">
                 <p>
                     Depending on the domain, acquiring data can pose a significant challenge. Even in the internet age,
                     automated mechanisms appear to be the predominant method for data acquisition, but there are various
@@ -302,21 +702,33 @@
                     socio-economic reasons. It is crucial to comprehend the characteristics and limitations of data
                     acquisition tools before their utilization.
                 </p>
-                <h3>Data availability</h3>
-                <p>We usually encounter the following situations in the field of data science:
-                </p>
-                <ul>
-                    <li>Data <b>available</b>: Here, the required data is readily accessible, presenting an opportunity
-                        for
-                        analysis without constraints.</li>
-                    <li>Data <b>not available</b>: In this case, the necessary data is entirely unavailable, posing a
-                        challenge to the data science process. Strategies such as alternative data sources or data
-                        generation may need to be considered</li>
-                    <li>Data <b>partially available</b>: This situation unfolds when only a portion of the required data
-                        is
-                        accessible. It demands a meticulous evaluation of the available data's quality and relevance.
-                        Strategies must be devised to address gaps or manage missing information effectively.</li>
-                </ul>
+            </article>
+
+            <!-- Data Availability Section -->
+            <section class="content-section">
+                <h3>Data Availability</h3>
+                <p>We usually encounter the following situations in the field of data science:</p>
+                <div class="cards-grid">
+                    <div class="card">
+                        <h4>Data Available</h4>
+                        <p>Here, the required data is readily accessible, presenting an opportunity for
+                            analysis without constraints.</p>
+                    </div>
+                    <div class="card">
+                        <h4>Data Not Available</h4>
+                        <p>In this case, the necessary data is entirely unavailable, posing a
+                            challenge to the data science process. Strategies such as alternative data sources or data
+                            generation may need to be considered.</p>
+                    </div>
+                    <div class="card">
+                        <h4>Data Partially Available</h4>
+                        <p>This situation unfolds when only a portion of the required data
+                            is accessible. It demands a meticulous evaluation of the available data's quality and
+                            relevance.
+                            Strategies must be devised to address gaps or manage missing information effectively.</p>
+                    </div>
+                </div>
+
                 <p>
                     In the first scenario, we are aware that the data already exists, though access may or may not be
                     readily available to us. In essence, we are aware of the <b>data sources</b> but need to explore
@@ -335,30 +747,35 @@
                     available data that needs supplementation from additional sources. In both of these cases, data
                     acquisition plays a pivotal role in obtaining the necessary information.
                 </p>
-                <h3>Common approaches</h3>
+            </section>
+
+            <!-- Common Approaches Section -->
+            <section class="content-section">
+                <h3>Common Approaches</h3>
                 <p>In the field of data science, some of the most commonly used approaches for data acquisition include
                     the
-                    following:
-                </p>
+                    following:</p>
                 <ol>
-                    <li><b>Surveys</b> : </li>
-                    <ul>
-                        <li><b>Manual surveys</b>: Traditional, in-person data collection through questionnaires or
-                            interviews.</li>
-                        <li><b>Online surveys</b>: Utilizing digital platforms to gather responses, enhancing
-                            accessibility
-                            and reach.</li>
-                    </ul>
+                    <li><b>Surveys</b>:
+                        <ul>
+                            <li><b>Manual surveys</b>: Traditional, in-person data collection through questionnaires or
+                                interviews.</li>
+                            <li><b>Online surveys</b>: Utilizing digital platforms to gather responses, enhancing
+                                accessibility
+                                and reach.</li>
+                        </ul>
+                    </li>
                     <li><b>Sensors</b>: Deploying various sensors to capture real-time data, whether it be in scientific
                         research or industrial applications.</li>
                     <li><b>Social networks</b>: Tapping into the vast reservoirs of social media platforms to extract
                         valuable insights and trends from user-generated content.</li>
-                    <li><b>Video surveillance cameras</b> : Employing cameras for monitoring and recording visual
+                    <li><b>Video surveillance cameras</b>: Employing cameras for monitoring and recording visual
                         information, widely utilized in security, retail, and traffic management.</li>
                     <li><b>Web</b>: Extracting data from online sources, ranging from websites and APIs to diverse
                         digital
                         platforms, for comprehensive and dynamic datasets.</li>
                 </ol>
+
                 <h4>Surveys</h4>
                 <p>
                     Manual surveys represent a traditional and personal approach to data collection. Conducted in
@@ -382,6 +799,7 @@
                     access to online platforms. Ensuring the security and privacy of online survey responses is also
                     crucial.
                 </p>
+
                 <h4>Sensors</h4>
                 <p>
                     Sensors play a crucial role in automated data collection, particularly in scientific research and
@@ -404,7 +822,7 @@
                     In these areas, they periodically transmit measurement values to data centers, ensuring a continuous
                     flow of real-time data.
                 </p>
-                <p>Some examples of sensors are given below: </p>
+                <p>Some examples of sensors are given below:</p>
                 <ul>
                     <li><b>Temperature, pressure, humidity, rainfall</b>: Essential for climate and weather monitoring.
                     </li>
@@ -435,6 +853,7 @@
                     consideration
                     of ethical practices, compliance with regulations, and transparency in data usage.
                 </p>
+
                 <h4>Web</h4>
                 <p>
                     Extracting data from online sources, including websites, APIs, and diverse digital platforms,
@@ -448,10 +867,14 @@
                     critical
                     for meaningful analysis and decision-making.
                 </p>
-                <h3>Privacy, licence and ethics</h3>
+            </section>
+
+            <!-- Privacy Section -->
+            <section class="content-section">
+                <h3>Privacy, Licence and Ethics</h3>
                 <p>
                     Addressing critical aspects such as privacy, licensing, and ethical considerations is crucial during
-                    data acquisition. Privacy regulations, notably GDPR and CCPA (California’s Consumer Privacy Act),
+                    data acquisition. Privacy regulations, notably GDPR and CCPA (California's Consumer Privacy Act),
                     emphasize the necessity for responsible data handling. Ethical considerations also encompass the
                     persistent challenge of de-anonymization and re-identification.
                 </p>
@@ -481,6 +904,10 @@
                     govern the use of datasets is essential for ensuring compliance and ethical data utilization in the
                     ever-evolving landscape of data science.
                 </p>
+            </section>
+
+            <!-- Conclusion Section -->
+            <section class="content-section">
                 <h3>Conclusion</h3>
                 <p>
                     The balance between traditional and modern methods, ethical considerations, and the adaptability to
@@ -489,13 +916,17 @@
                     collected;
                     it's acquired with purpose and respect for the individuals and contexts it represents.
                 </p>
+            </section>
+
+            <!-- References Section -->
+            <section class="references-section">
                 <h3>References</h3>
                 <ol>
                     <li id="acquisition"><a href="https://en.wikipedia.org/wiki/Data_acquisition">Data acquisition</a>
                     </li>
                     <li id="anonymous"><a
                             href="https://techcrunch.com/2019/07/24/researchers-spotlight-the-lie-of-anonymous-data/">Researchers
-                            spotlight the lie of ‘anonymous’ data</a></li>
+                            spotlight the lie of 'anonymous' data</a></li>
                     <li id="generativemodels">Rocher, Luc, et al. <b>Estimating the Success of Re-Identifications in
                             Incomplete Datasets Using Generative Models</b>. Nature Communications, vol. 10, no 1,
                         juillet
@@ -516,8 +947,23 @@
                             href="https://en.wikipedia.org/wiki/Privacy-enhancing_technologies">Privacy-enhancing
                             technologies</a></li>
                 </ol>
+            </section>
+        </main>
+
+        <!-- Footer -->
+        <footer class="footer" role="contentinfo">
+            <div class="footer-content">
+                <div class="copyright">
+                    <p>&copy; 2025 John Samuel. All rights reserved.</p>
+                </div>
+                <div class="language-selector">
+                    <span>Languages:</span>
+                    <a href="./data-acquisition.html" hreflang="en">English</a>
+
+                </div>
             </div>
-        </div>
+        </footer>
+
     </body>
 
 </html>
