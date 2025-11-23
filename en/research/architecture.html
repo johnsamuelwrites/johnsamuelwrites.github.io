@@ -2,756 +2,1335 @@
 <html lang="en">
 
     <head>
-        <meta charset="utf-8" />
-        <meta http-equiv="Content-Language" content="en" />
-        <link rel="shortcut icon" href="../../images/logo/favicon.png" />
-        <title>Architecture: John Samuel</title>
-        <style type="text/css">
-            body {
-                background-color: #FFFFFF;
-                font-family: 'Georgia', serif;
-                line-height: 1.6;
-                color: #333;
-                background-color: #fafafa;
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta http-equiv="Content-Language" content="en">
+        <link rel="shortcut icon" href="../../images/logo/favicon.png">
+        <title>Digital Modeling in Architecture - John Samuel</title>
+        <style>
+            /* ============================================
+           DESIGN TOKENS & CSS CUSTOM PROPERTIES
+           ============================================ */
+            :root {
+                /* Architectural Blueprint Theme - Construction & Heritage */
+                --color-base-bg: #0f1419;
+                --color-base-surface: #1a1f2e;
+                --color-base-text: #e6edf3;
+                --color-base-text-muted: #8b99ac;
+
+                /* Architectural Accent Colors - Material Palette */
+                --color-accent-1: #4db8ff;
+                /* Blueprint cyan */
+                --color-accent-2: #ff6b35;
+                /* Terracotta/brick */
+                --color-accent-3: #ffd700;
+                /* Golden ratio/brass */
+                --color-accent-4: #7ed957;
+                /* Sustainable green */
+                --color-accent-5: #a78bfa;
+                /* Modern violet */
+                --color-accent-light: rgba(77, 184, 255, 0.1);
+
+                /* Gradients - Architectural Transitions */
+                --gradient-primary: linear-gradient(135deg, #4db8ff 0%, #a78bfa 50%, #ff6b35 100%);
+                --gradient-secondary: linear-gradient(225deg, #ff6b35 0%, #ffd700 50%, #7ed957 100%);
+                --gradient-tertiary: linear-gradient(135deg, #7ed957 0%, #4db8ff 50%, #a78bfa 100%);
+                --gradient-blueprint: linear-gradient(180deg, rgba(77, 184, 255, 0.05), rgba(26, 31, 46, 0.8));
+
+                /* Spacing Scale */
+                --space-xs: 0.25rem;
+                --space-sm: 0.5rem;
+                --space-md: 1rem;
+                --space-lg: 1.5rem;
+                --space-xl: 2rem;
+                --space-2xl: 3rem;
+                --space-3xl: 4rem;
+                --space-4xl: 6rem;
+
+                /* Typography */
+                --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+                --text-xs: clamp(0.75rem, 0.7rem + 0.25vw, 0.875rem);
+                --text-sm: clamp(0.875rem, 0.8rem + 0.35vw, 1rem);
+                --text-base: clamp(1rem, 0.95rem + 0.25vw, 1.125rem);
+                --text-lg: clamp(1.125rem, 1.05rem + 0.35vw, 1.25rem);
+                --text-xl: clamp(1.25rem, 1.15rem + 0.5vw, 1.5rem);
+                --text-2xl: clamp(1.5rem, 1.3rem + 1vw, 2rem);
+                --text-3xl: clamp(2rem, 1.6rem + 2vw, 2.5rem);
+                --text-4xl: clamp(2.5rem, 2rem + 2.5vw, 3.5rem);
+
+                /* Shadows - Architectural Depth */
+                --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.5), 0 1px 3px rgba(0, 0, 0, 0.6);
+                --shadow-md: 0 4px 6px rgba(77, 184, 255, 0.2), 0 2px 4px rgba(167, 139, 250, 0.15);
+                --shadow-lg: 0 10px 24px rgba(77, 184, 255, 0.25), 0 4px 8px rgba(255, 107, 53, 0.2);
+                --shadow-xl: 0 20px 40px rgba(167, 139, 250, 0.3), 0 8px 16px rgba(77, 184, 255, 0.25);
+
+                /* Border Radius */
+                --radius-sm: 4px;
+                --radius-md: 8px;
+                --radius-lg: 12px;
+                --radius-xl: 16px;
+                --radius-2xl: 24px;
             }
 
-            #sidebar {
-                position: fixed;
-                background-color: #1B80CF;
-                top: 0;
-                left: 0;
-                bottom: 0;
-                width: 30vw;
-            }
-
-            #sidebar .title {
-                position: relative;
-                text-align: center;
-                line-height: 4vmax;
-                font-size: 1.4vmax;
-                font-family: 'Arial';
-                margin-top: 25vh;
-            }
-
-            #sidebar .title a:link,
-            #sidebar .title a:visited {
-                color: #FFFFFF;
-                text-decoration: none;
-            }
-
-            .subtitle {
-                top: 50vh;
-                text-align: center;
-                line-height: 1.3vmax;
-                font-family: 'Arial';
-                font-size: 1.5vmax;
-                color: #FFFFFF;
-            }
-
-            .subtitle a:link,
-            .subtitle a:visited {
-                color: #FFFFFF;
-                text-decoration: none;
-            }
-
-            .licence {
-                position: fixed;
-                text-align: right;
-                bottom: 0;
-                right: 0;
-            }
-
-            .home {
-                position: fixed;
-                text-align: left;
-                font-family: 'Arial';
-                color: #D3D3D3;
-                z-index: 100;
-                width: 100%;
-                background-color: #FFFFFF;
-                top: 0px;
-                margin-bottom: 10px;
-                padding-bottom: 10px;
-            }
-
-            .home a:link,
-            .home a:visited {
-                text-decoration: none;
-                color: #D3D3D3;
-            }
-
-            .home ul {
+            /* ============================================
+           RESET & BASE STYLES
+           ============================================ */
+            * {
                 margin: 0;
                 padding: 0;
-                text-align: left;
-                list-style: none;
+                box-sizing: border-box;
             }
 
-            .home li {
+            html {
+                scroll-behavior: smooth;
+                scroll-padding-top: 100px;
+            }
+
+            body {
+                font-family: var(--font-sans);
+                font-size: var(--text-base);
+                line-height: 1.7;
+                color: var(--color-base-text);
+                background: var(--color-base-bg);
+                overflow-x: hidden;
                 position: relative;
-                float: left;
-                padding-top: 15px;
-                margin-right: 1em;
-                font-family: 'Arial';
             }
 
-            .home li:hover {
-                display: block;
-            }
-
-            .home a:link,
-            .home a:visited {
-                color: #D3D3D3;
-            }
-
-            .home li:hover a:link,
-            .home li:hover a:visited {
-                text-decoration: none;
-                padding: 15px;
-                color: #FFFFFF;
-                background-color: #1B80CF;
-            }
-
-            .content {
-                line-height: 2.3rem;
-                font-size: 1.2vmax;
-                font-family: 'Arial';
-                margin-top: 15vh;
-                width: 90%;
-            }
-
-            .content h2,
-            h3,
-            h4 {
-                color: #1B80CF;
-            }
-
-            .content a:link,
-            .content a:visited {
-                color: #1B80CF;
-            }
-
-            .content h3 {
-                color: #1B80CF;
-            }
-
-            .content h2::before,
-            .content h3::before {
-                display: block;
-                content: " ";
-                visibility: hidden;
-                height: 50px;
-                margin-top: -50px;
-                pointer-events: none;
-                background-color: #FFFFFF;
-            }
-
-            .content a:link,
-            .content a:visited {
-                color: #1B80CF;
-            }
-
-            .content li {
-                margin: 5px;
-            }
-
-            .page {
-                width: 65vw;
+            /* Blueprint Grid Background */
+            body::before {
+                content: '';
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
                 height: 100%;
-                margin-left: 30vw;
+                background:
+                    radial-gradient(circle at 15% 20%, rgba(77, 184, 255, 0.12) 0%, transparent 50%),
+                    radial-gradient(circle at 85% 80%, rgba(167, 139, 250, 0.12) 0%, transparent 50%),
+                    radial-gradient(circle at 50% 50%, rgba(255, 107, 53, 0.08) 0%, transparent 60%);
+                animation: blueprintPulse 12s ease-in-out infinite;
+                z-index: 0;
+                pointer-events: none;
+            }
+
+            @keyframes blueprintPulse {
+
+                0%,
+                100% {
+                    opacity: 0.6;
+                    transform: scale(1);
+                }
+
+                50% {
+                    opacity: 0.9;
+                    transform: scale(1.05);
+                }
+            }
+
+            /* Technical Grid Pattern */
+            body::after {
+                content: '';
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background-image:
+                    linear-gradient(rgba(77, 184, 255, 0.04) 1px, transparent 1px),
+                    linear-gradient(90deg, rgba(77, 184, 255, 0.04) 1px, transparent 1px),
+                    linear-gradient(rgba(255, 107, 53, 0.02) 1px, transparent 1px),
+                    linear-gradient(90deg, rgba(255, 107, 53, 0.02) 1px, transparent 1px);
+                background-size: 100px 100px, 100px 100px, 20px 20px, 20px 20px;
+                z-index: 0;
+                pointer-events: none;
+            }
+
+            /* ============================================
+           NAVIGATION BAR
+           ============================================ */
+            .nav-container {
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                z-index: 1000;
+                background: rgba(15, 20, 25, 0.85);
+                -webkit-backdrop-filter: blur(20px) saturate(180%);
+                backdrop-filter: blur(20px) saturate(180%);
+                border-bottom: 1px solid rgba(77, 184, 255, 0.25);
+                box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+            }
+
+            .breadcrumb-nav {
+                max-width: 1400px;
+                margin: 0 auto;
+                padding: var(--space-md) var(--space-xl);
+                display: flex;
+                align-items: center;
+                flex-wrap: wrap;
+                gap: var(--space-sm);
+            }
+
+            .breadcrumb-nav a {
+                color: var(--color-base-text-muted);
+                text-decoration: none;
+                font-size: var(--text-sm);
+                font-weight: 500;
+                padding: var(--space-sm) var(--space-md);
+                border-radius: var(--radius-md);
+                transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+                position: relative;
+            }
+
+            .breadcrumb-nav a::after {
+                content: '';
+                position: absolute;
+                bottom: 0;
+                left: 50%;
+                transform: translateX(-50%);
+                width: 0;
+                height: 2px;
+                background: var(--gradient-primary);
+                transition: width 0.3s ease;
+            }
+
+            .breadcrumb-nav a:hover {
+                color: var(--color-accent-1);
+                background: rgba(77, 184, 255, 0.1);
+            }
+
+            .breadcrumb-nav a:hover::after {
+                width: 80%;
+            }
+
+            /* Highlight John Samuel */
+            .breadcrumb-nav a[href*="about.html"] {
+                background: var(--gradient-primary);
+                color: white;
+                font-weight: 600;
+                padding: var(--space-sm) var(--space-lg);
+            }
+
+            .breadcrumb-nav a[href*="about.html"]::after {
+                display: none;
+            }
+
+            .breadcrumb-nav a[href*="about.html"]:hover {
+                transform: translateY(-2px);
+                box-shadow: var(--shadow-md);
+            }
+
+            .breadcrumb-separator {
+                color: var(--color-base-text-muted);
+                opacity: 0.4;
+                margin: 0 var(--space-xs);
+            }
+
+            /* ============================================
+           HERO SECTION
+           ============================================ */
+            .hero {
+                position: relative;
+                margin-top: 80px;
+                padding: var(--space-4xl) var(--space-xl);
+                text-align: center;
                 overflow: hidden;
-                padding: 0 1em;
-                font-family: 'Arial';
             }
 
-            .page img {
-                max-width: 100%;
-                max-height: 100%;
+            .hero::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: radial-gradient(ellipse at center, rgba(77, 184, 255, 0.08), transparent 70%);
+                pointer-events: none;
             }
 
-            h1 {
-                color: #2c3e50;
-                padding-bottom: 10px;
-                font-size: 2.5em;
-                line-height: 2.4rem;
-                margin-bottom: 30px;
+            .hero-title {
+                font-size: var(--text-4xl);
+                font-weight: 800;
+                letter-spacing: -0.03em;
+                background: var(--gradient-primary);
+                background-size: 200% 200%;
+                -webkit-background-clip: text;
+                background-clip: text;
+                -webkit-text-fill-color: transparent;
+                animation: gradientShift 8s ease infinite;
+                margin-bottom: var(--space-lg);
+                position: relative;
+                z-index: 1;
             }
 
-            h2 {
-                color: #34495e;
-                margin-top: 40px;
-                margin-bottom: 20px;
-                font-size: 1.8em;
-                border-left: 5px solid #3498db;
-                padding-left: 15px;
+            @keyframes gradientShift {
+
+                0%,
+                100% {
+                    background-position: 0% 50%;
+                }
+
+                50% {
+                    background-position: 100% 50%;
+                }
             }
 
-            h3 {
-                color: #2c3e50;
-                margin-top: 30px;
-                margin-bottom: 15px;
-                font-size: 1.3em;
+            .hero-subtitle {
+                font-size: var(--text-lg);
+                color: var(--color-base-text-muted);
+                max-width: 900px;
+                margin: 0 auto var(--space-3xl);
+                line-height: 1.7;
+                font-style: italic;
+                position: relative;
+                z-index: 1;
             }
 
-            p {
-                margin-bottom: 15px;
+            /* SVG Illustration Container */
+            .hero-illustration {
+                max-width: 700px;
+                margin: 0 auto;
+                position: relative;
+                z-index: 1;
+            }
+
+            /* ============================================
+           MAIN CONTENT CONTAINER
+           ============================================ */
+            .main-content {
+                max-width: 1200px;
+                margin: 0 auto;
+                padding: 0 var(--space-xl) var(--space-4xl);
+                position: relative;
+                z-index: 1;
+            }
+
+            /* ============================================
+           CONTENT SECTIONS
+           ============================================ */
+            .content-section {
+                margin-bottom: var(--space-4xl);
+            }
+
+            .section-header {
+                margin-bottom: var(--space-2xl);
+                position: relative;
+            }
+
+            .section-title {
+                font-size: var(--text-3xl);
+                font-weight: 800;
+                background: var(--gradient-secondary);
+                background-size: 200% 200%;
+                -webkit-background-clip: text;
+                background-clip: text;
+                -webkit-text-fill-color: transparent;
+                animation: gradientShift 10s ease infinite;
+                margin-bottom: var(--space-lg);
+                position: relative;
+                padding-bottom: var(--space-md);
+            }
+
+            .section-title::after {
+                content: '';
+                position: absolute;
+                bottom: 0;
+                left: 0;
+                width: 80px;
+                height: 4px;
+                background: var(--gradient-primary);
+                border-radius: var(--radius-sm);
+                animation: expandLine 3s ease-in-out infinite;
+            }
+
+            @keyframes expandLine {
+
+                0%,
+                100% {
+                    width: 80px;
+                    opacity: 1;
+                }
+
+                50% {
+                    width: 120px;
+                    opacity: 0.7;
+                }
+            }
+
+            .subsection-title {
+                font-size: var(--text-2xl);
+                font-weight: 700;
+                color: var(--color-accent-1);
+                margin: var(--space-3xl) 0 var(--space-lg);
+                position: relative;
+                padding-left: var(--space-lg);
+            }
+
+            .subsection-title::before {
+                content: '';
+                position: absolute;
+                left: 0;
+                top: 50%;
+                transform: translateY(-50%);
+                width: 5px;
+                height: 70%;
+                background: var(--gradient-tertiary);
+                border-radius: var(--radius-sm);
+            }
+
+            .minor-title {
+                font-size: var(--text-xl);
+                font-weight: 600;
+                color: var(--color-accent-4);
+                margin: var(--space-2xl) 0 var(--space-md);
+            }
+
+            /* ============================================
+           TEXT CONTENT
+           ============================================ */
+            .content-section p {
+                margin-bottom: var(--space-lg);
+                line-height: 1.8;
                 text-align: justify;
             }
 
-            .highlight {
-                background-color: #ecf0f1;
-                padding: 15px;
-                border-left: 4px solid #3498db;
-                margin: 20px 0;
+            .intro-text {
+                font-size: var(--text-lg);
                 font-style: italic;
+                color: var(--color-base-text-muted);
+                margin-bottom: var(--space-2xl);
+                padding: var(--space-xl);
+                background: linear-gradient(135deg, rgba(77, 184, 255, 0.08), rgba(167, 139, 250, 0.08));
+                border-left: 4px solid var(--color-accent-1);
+                border-radius: var(--radius-lg);
             }
 
+            /* ============================================
+           SPECIAL CONTENT BOXES
+           ============================================ */
             .tech-box {
-                background-color: #e8f4f8;
-                border: 1px solid #3498db;
-                border-radius: 8px;
-                padding: 20px;
-                margin: 20px 0;
+                background: linear-gradient(135deg, rgba(77, 184, 255, 0.1), rgba(126, 217, 87, 0.1));
+                border: 1px solid rgba(77, 184, 255, 0.3);
+                border-radius: var(--radius-xl);
+                padding: var(--space-2xl);
+                margin: var(--space-xl) 0;
+                position: relative;
+                overflow: hidden;
             }
 
-            .reference {
-                color: #3498db;
-                text-decoration: none;
-                font-weight: bold;
+            .tech-box::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                right: 0;
+                width: 150px;
+                height: 150px;
+                background: radial-gradient(circle, rgba(77, 184, 255, 0.15), transparent);
+                border-radius: 50%;
+                transform: translate(30%, -30%);
             }
 
-            .reference:hover {
-                text-decoration: underline;
+            .tech-box h3 {
+                font-size: var(--text-xl);
+                font-weight: 700;
+                color: var(--color-accent-1);
+                margin-bottom: var(--space-lg);
             }
 
-            .intro {
-                font-size: 1.1em;
-                color: #2c3e50;
+            .tech-box ul {
+                list-style: none;
+                padding-left: 0;
+            }
+
+            .tech-box li {
+                padding-left: var(--space-xl);
+                margin-bottom: var(--space-md);
+                position: relative;
+                line-height: 1.7;
+            }
+
+            .tech-box li::before {
+                content: '▸';
+                position: absolute;
+                left: 0;
+                color: var(--color-accent-4);
+                font-weight: 700;
+            }
+
+            .tech-box strong {
+                color: var(--color-accent-3);
+            }
+
+            .highlight-box {
+                background: linear-gradient(135deg, rgba(255, 215, 0, 0.12), rgba(255, 107, 53, 0.12));
+                border-left: 4px solid var(--color-accent-3);
+                border-radius: var(--radius-lg);
+                padding: var(--space-xl);
+                margin: var(--space-xl) 0;
                 font-style: italic;
-                margin-bottom: 30px;
+                position: relative;
             }
 
-            ul {
-                margin: 15px 0;
-                padding-left: 30px;
+            .highlight-box::before {
+                content: '"';
+                position: absolute;
+                top: -10px;
+                left: 15px;
+                font-size: 4rem;
+                color: rgba(255, 215, 0, 0.3);
+                font-family: Georgia, serif;
+                line-height: 1;
             }
 
-            li {
-                margin-bottom: 8px;
+            .highlight-box p {
+                position: relative;
+                z-index: 1;
             }
 
-            @media (max-width: 640px),
-            screen and (orientation: portrait) {
-                body {
-                    max-width: 100%;
-                    max-height: 100%;
+            /* ============================================
+           LISTS
+           ============================================ */
+            .content-section ul {
+                list-style: none;
+                padding-left: 0;
+                margin: var(--space-lg) 0;
+            }
+
+            .content-section li {
+                padding-left: var(--space-xl);
+                margin-bottom: var(--space-md);
+                position: relative;
+                line-height: 1.7;
+            }
+
+            .content-section li::before {
+                content: '◆';
+                position: absolute;
+                left: 0;
+                color: var(--color-accent-2);
+                font-size: 0.8em;
+            }
+
+            /* ============================================
+           LINKS
+           ============================================ */
+            .content-section a {
+                color: var(--color-accent-1);
+                text-decoration: none;
+                font-weight: 600;
+                border-bottom: 1px solid transparent;
+                transition: all 0.3s ease;
+                position: relative;
+            }
+
+            .content-section a:hover {
+                color: var(--color-accent-3);
+                border-bottom-color: var(--color-accent-3);
+            }
+
+            /* ============================================
+           REFERENCES SECTION
+           ============================================ */
+            .references {
+                background: rgba(26, 31, 46, 0.6);
+                -webkit-backdrop-filter: blur(12px) saturate(180%);
+                backdrop-filter: blur(12px) saturate(180%);
+                border: 1px solid rgba(167, 139, 250, 0.25);
+                border-radius: var(--radius-2xl);
+                padding: var(--space-3xl);
+                margin-top: var(--space-4xl);
+            }
+
+            .references h2 {
+                font-size: var(--text-2xl);
+                font-weight: 700;
+                color: var(--color-accent-1);
+                margin-bottom: var(--space-xl);
+                text-align: center;
+            }
+
+            .references ol {
+                list-style: none;
+                counter-reset: reference-counter;
+                padding-left: 0;
+            }
+
+            .references li {
+                counter-increment: reference-counter;
+                margin-bottom: var(--space-lg);
+                padding-left: var(--space-3xl);
+                position: relative;
+                line-height: 1.7;
+            }
+
+            .references li::before {
+                content: counter(reference-counter);
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 36px;
+                height: 36px;
+                background: var(--gradient-primary);
+                border-radius: 50%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-weight: 700;
+                font-size: var(--text-sm);
+                color: white;
+            }
+
+            .references a {
+                color: var(--color-accent-1);
+                text-decoration: none;
+                border-bottom: 1px solid transparent;
+                transition: all 0.3s ease;
+            }
+
+            .references a:hover {
+                color: var(--color-accent-3);
+                border-bottom-color: var(--color-accent-3);
+            }
+
+            .references em {
+                color: var(--color-base-text-muted);
+            }
+
+            /* ============================================
+           FOOTER
+           ============================================ */
+            .footer {
+                background: rgba(15, 20, 25, 0.95);
+                -webkit-backdrop-filter: blur(20px) saturate(180%);
+                backdrop-filter: blur(20px) saturate(180%);
+                border-top: 1px solid rgba(77, 184, 255, 0.25);
+                padding: var(--space-3xl) var(--space-xl);
+                margin-top: var(--space-4xl);
+                text-align: center;
+            }
+
+            .footer-content {
+                max-width: 1400px;
+                margin: 0 auto;
+            }
+
+            .footer-copyright {
+                color: var(--color-base-text-muted);
+                font-size: var(--text-sm);
+                margin-bottom: var(--space-lg);
+            }
+
+            .footer-links {
+                display: flex;
+                justify-content: center;
+                gap: var(--space-xl);
+                flex-wrap: wrap;
+            }
+
+            .footer-links a {
+                color: var(--color-base-text-muted);
+                text-decoration: none;
+                font-size: var(--text-sm);
+                transition: all 0.3s ease;
+                padding: var(--space-sm) var(--space-md);
+                border-radius: var(--radius-md);
+            }
+
+            .footer-links a:hover {
+                color: var(--color-accent-1);
+                background: rgba(77, 184, 255, 0.1);
+            }
+
+            /* ============================================
+           RESPONSIVE DESIGN
+           ============================================ */
+            @media (max-width: 768px) {
+                .hero {
+                    padding: var(--space-3xl) var(--space-lg);
                 }
 
-                #sidebar {
-                    position: fixed;
-                    background-color: #1B80CF;
-                    top: 0;
-                    left: 0;
-                    bottom: 80vh;
-                    width: 100vw;
+                .main-content {
+                    padding: 0 var(--space-lg) var(--space-3xl);
                 }
 
-                #sidebar .title {
-                    text-align: center;
-                    position: fixed;
-                    margin-top: 6vh;
-                    left: 0px;
-                    right: 0px;
-                    line-height: 3.5vmax;
-                    font-size: 1.5vmax;
-                    font-family: 'Arial';
+                .breadcrumb-nav {
+                    padding: var(--space-md);
                 }
 
-                #sidebar .subtitle {
-                    text-align: center;
-                    top: 5vh;
-                    left: 0px;
-                    right: 0px;
-                    position: fixed;
-                    margin-top: 10vh;
-                    font-size: 1.5vmax;
+                .breadcrumb-nav a {
+                    font-size: var(--text-xs);
+                    padding: var(--space-xs) var(--space-sm);
                 }
 
-                #sidebar .title a:link,
-                #sidebar .title a:visited {
-                    text-align: center;
-                    color: #FFFFFF;
+                .tech-box,
+                .highlight-box {
+                    padding: var(--space-lg);
+                }
+            }
+
+            /* ============================================
+           ACCESSIBILITY - REDUCED MOTION
+           ============================================ */
+            @media (prefers-reduced-motion: reduce) {
+
+                *,
+                *::before,
+                *::after {
+                    animation-duration: 0.01ms !important;
+                    animation-iteration-count: 1 !important;
+                    transition-duration: 0.01ms !important;
+                }
+            }
+
+            /* ============================================
+           CUSTOM SVG ANIMATIONS
+           ============================================ */
+            .building-rise {
+                animation: riseUp 2s ease-out forwards;
+                opacity: 0;
+            }
+
+            @keyframes riseUp {
+                from {
+                    opacity: 0;
+                    transform: translateY(50px);
                 }
 
-                #sidebar .subtitle a:link,
-                #sidebar .subtitle a:visited {
-                    text-align: center;
-                    color: #FFFFFF;
+                to {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            }
+
+            .rotate-slow {
+                animation: rotateSlow 20s linear infinite;
+                transform-origin: center;
+            }
+
+            @keyframes rotateSlow {
+                from {
+                    transform: rotate(0deg);
                 }
 
-                .home {
-                    z-index: 100;
-                    width: 100%;
-                    background-color: #1B80CF;
-                    font-size: 1.5vmax;
+                to {
+                    transform: rotate(360deg);
+                }
+            }
+
+            .pulse-glow {
+                animation: pulseGlow 3s ease-in-out infinite;
+            }
+
+            @keyframes pulseGlow {
+
+                0%,
+                100% {
+                    opacity: 0.6;
                 }
 
-                .home a:link,
-                .home a:visited {
-                    text-decoration: none;
-                    color: #FFFFFF;
+                50% {
+                    opacity: 1;
+                }
+            }
+
+            .draw-line {
+                stroke-dasharray: 1000;
+                stroke-dashoffset: 1000;
+                animation: drawLine 4s ease-in-out forwards;
+            }
+
+            @keyframes drawLine {
+                to {
+                    stroke-dashoffset: 0;
+                }
+            }
+
+            .float-building {
+                animation: floatBuilding 6s ease-in-out infinite;
+            }
+
+            @keyframes floatBuilding {
+
+                0%,
+                100% {
+                    transform: translateY(0);
                 }
 
-                .content {
-                    line-height: 3.8vmax;
-                    font-size: 1.8vmax;
-                    font-family: 'Arial';
-                    margin-top: 22vh;
-                }
-
-                .content a:link,
-                .content a:visited {
-                    color: #1B80CF;
-                }
-
-                .page {
-                    top: 40vh;
-                    width: 95%;
-                    margin-left: 0vw;
-                }
-
-                .page img {
-                    max-width: 100%;
-                    max-height: 100%;
-                    border: 0;
+                50% {
+                    transform: translateY(-15px);
                 }
             }
         </style>
     </head>
 
     <body vocab="http://schema.org/">
-        <div class="page">
-            <div class="home">
-                <ul typeof="BreadcrumbList">
-                    <li property="itemListElement" typeof="ListItem">
-                        <a property="item" typeof="WebPage" href="../index.html">
-                            <span property="name">Home</span>
-                        </a>
-                    </li>
-                    <li property="itemListElement" typeof="ListItem">
-                        <a property="item" typeof="WebPage" href="../research/research.html">
-                            <span property="name">Research</span>
-                        </a>
-                    </li>
-                </ul>
 
+        <!-- Navigation Bar -->
+        <nav class="nav-container" role="navigation" aria-label="Breadcrumb">
+            <div class="breadcrumb-nav" typeof="BreadcrumbList">
+                <a property="itemListElement" typeof="ListItem" href="../index.html">
+                    <span property="name">Home</span>
+                </a>
+                <span class="breadcrumb-separator">→</span>
+                <a property="itemListElement" typeof="ListItem" href="../about.html">
+                    <span property="name">John Samuel</span>
+                </a>
+                <span class="breadcrumb-separator">→</span>
+                <a property="itemListElement" typeof="ListItem" href="../research/research.html">
+                    <span property="name">Research</span>
+                </a>
             </div>
-            <div id="sidebar">
-                <div class="title">
-                    <h1><a href="./architecture.html">Architecture</a></h1>
-                </div>
-                <div class="subtitle">
-                    <h3><a href="../about.html">John Samuel</a></h3>
-                </div>
+        </nav>
+
+        <!-- Hero Section -->
+        <header class="hero">
+            <h1 class="hero-title">Digital Modeling in Architecture</h1>
+            <p class="hero-subtitle">From ancient caves to complex algorithmic structures rendered in virtual reality,
+                architectural representation has undergone a remarkable transformation</p>
+
+            <!-- SVG Illustration -->
+            <div class="hero-illustration" aria-hidden="true">
+                <svg viewBox="0 0 700 450" xmlns="http://www.w3.org/2000/svg">
+                    <defs>
+                        <linearGradient id="gradBlueprint" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" style="stop-color:#4db8ff;stop-opacity:1" />
+                            <stop offset="50%" style="stop-color:#a78bfa;stop-opacity:1" />
+                            <stop offset="100%" style="stop-color:#ff6b35;stop-opacity:1" />
+                        </linearGradient>
+                        <linearGradient id="gradGreen" x1="0%" y1="0%" x2="100%" y2="0%">
+                            <stop offset="0%" style="stop-color:#7ed957;stop-opacity:1" />
+                            <stop offset="100%" style="stop-color:#4db8ff;stop-opacity:1" />
+                        </linearGradient>
+                        <linearGradient id="gradGold" x1="100%" y1="0%" x2="0%" y2="100%">
+                            <stop offset="0%" style="stop-color:#ffd700;stop-opacity:1" />
+                            <stop offset="100%" style="stop-color:#ff6b35;stop-opacity:1" />
+                        </linearGradient>
+                        <filter id="glow">
+                            <feGaussianBlur stdDeviation="3" result="coloredBlur" />
+                            <feMerge>
+                                <feMergeNode in="coloredBlur" />
+                                <feMergeNode in="SourceGraphic" />
+                            </feMerge>
+                        </filter>
+                    </defs>
+
+                    <!-- Blueprint Grid Lines -->
+                    <g opacity="0.2" class="draw-line">
+                        <line x1="50" y1="0" x2="50" y2="450" stroke="#4db8ff" stroke-width="0.5" />
+                        <line x1="150" y1="0" x2="150" y2="450" stroke="#4db8ff" stroke-width="0.5" />
+                        <line x1="250" y1="0" x2="250" y2="450" stroke="#4db8ff" stroke-width="0.5" />
+                        <line x1="350" y1="0" x2="350" y2="450" stroke="#4db8ff" stroke-width="0.5" />
+                        <line x1="450" y1="0" x2="450" y2="450" stroke="#4db8ff" stroke-width="0.5" />
+                        <line x1="550" y1="0" x2="550" y2="450" stroke="#4db8ff" stroke-width="0.5" />
+                        <line x1="650" y1="0" x2="650" y2="450" stroke="#4db8ff" stroke-width="0.5" />
+                    </g>
+
+                    <!-- Central Modern Building -->
+                    <g class="float-building" filter="url(#glow)">
+                        <!-- Base/Foundation -->
+                        <rect x="280" y="320" width="140" height="20" fill="rgba(77,184,255,0.2)"
+                            stroke="url(#gradBlueprint)" stroke-width="2" />
+
+                        <!-- Main Structure -->
+                        <rect x="290" y="220" width="120" height="100" fill="rgba(26,31,46,0.6)"
+                            stroke="url(#gradBlueprint)" stroke-width="2.5" class="building-rise" />
+
+                        <!-- Windows Grid -->
+                        <g opacity="0.8">
+                            <rect x="300" y="235" width="15" height="15" fill="#4db8ff" />
+                            <rect x="320" y="235" width="15" height="15" fill="#4db8ff" />
+                            <rect x="340" y="235" width="15" height="15" fill="#4db8ff" />
+                            <rect x="360" y="235" width="15" height="15" fill="#4db8ff" />
+                            <rect x="380" y="235" width="15" height="15" fill="#4db8ff" />
+
+                            <rect x="300" y="260" width="15" height="15" fill="#a78bfa" />
+                            <rect x="320" y="260" width="15" height="15" fill="#a78bfa" />
+                            <rect x="340" y="260" width="15" height="15" fill="#a78bfa" />
+                            <rect x="360" y="260" width="15" height="15" fill="#a78bfa" />
+                            <rect x="380" y="260" width="15" height="15" fill="#a78bfa" />
+
+                            <rect x="300" y="285" width="15" height="15" fill="#7ed957" />
+                            <rect x="320" y="285" width="15" height="15" fill="#7ed957" />
+                            <rect x="340" y="285" width="15" height="15" fill="#7ed957" />
+                            <rect x="360" y="285" width="15" height="15" fill="#7ed957" />
+                            <rect x="380" y="285" width="15" height="15" fill="#7ed957" />
+                        </g>
+
+                        <!-- Roof/Top -->
+                        <polygon points="280,220 350,180 420,220" fill="rgba(167,139,250,0.3)"
+                            stroke="url(#gradBlueprint)" stroke-width="2" />
+                    </g>
+
+                    <!-- Traditional Hut (Left) -->
+                    <g class="building-rise" style="animation-delay: 0.3s;">
+                        <!-- Circular base -->
+                        <ellipse cx="130" cy="340" rx="50" ry="15" fill="rgba(255,107,53,0.2)" stroke="url(#gradGold)"
+                            stroke-width="2" />
+                        <!-- Walls -->
+                        <rect x="80" y="280" width="100" height="60" rx="5" fill="rgba(26,31,46,0.5)"
+                            stroke="url(#gradGold)" stroke-width="2" />
+                        <!-- Conical roof -->
+                        <path d="M 70,280 L 130,240 L 190,280 Z" fill="rgba(255,215,0,0.3)" stroke="url(#gradGold)"
+                            stroke-width="2" />
+                        <!-- Door -->
+                        <rect x="115" y="310" width="30" height="30" fill="rgba(255,107,53,0.4)" stroke="#ff6b35"
+                            stroke-width="1.5" />
+                    </g>
+
+                    <!-- Castle (Right) -->
+                    <g class="building-rise" style="animation-delay: 0.6s;">
+                        <!-- Main tower -->
+                        <rect x="520" y="260" width="70" height="80" fill="rgba(26,31,46,0.5)" stroke="url(#gradGreen)"
+                            stroke-width="2.5" />
+                        <!-- Battlements -->
+                        <rect x="520" y="255" width="15" height="10" fill="rgba(126,217,87,0.4)" />
+                        <rect x="545" y="255" width="15" height="10" fill="rgba(126,217,87,0.4)" />
+                        <rect x="570" y="255" width="15" height="10" fill="rgba(126,217,87,0.4)" />
+                        <!-- Side turret -->
+                        <rect x="490" y="280" width="30" height="60" fill="rgba(26,31,46,0.5)" stroke="url(#gradGreen)"
+                            stroke-width="2" />
+                        <polygon points="490,280 505,265 520,280" fill="rgba(126,217,87,0.3)" stroke="#7ed957"
+                            stroke-width="1.5" />
+                        <!-- Gate -->
+                        <rect x="540" y="310" width="30" height="30" fill="rgba(77,184,255,0.3)" stroke="#4db8ff"
+                            stroke-width="1.5" />
+                    </g>
+
+                    <!-- Orbiting Digital Elements -->
+                    <g class="rotate-slow" transform-origin="350 280">
+                        <circle cx="350" cy="180" r="5" fill="#4db8ff" opacity="0.7" />
+                        <circle cx="470" cy="280" r="4" fill="#a78bfa" opacity="0.7" />
+                        <circle cx="350" cy="380" r="5" fill="#ff6b35" opacity="0.7" />
+                        <circle cx="230" cy="280" r="4" fill="#7ed957" opacity="0.7" />
+                    </g>
+
+                    <!-- Connection Lines (representing digital network) -->
+                    <g opacity="0.3" class="pulse-glow">
+                        <line x1="130" y1="300" x2="280" y2="270" stroke="#4db8ff" stroke-width="1" />
+                        <line x1="420" y1="270" x2="520" y2="300" stroke="#7ed957" stroke-width="1" />
+                        <line x1="130" y1="300" x2="555" y2="300" stroke="#a78bfa" stroke-width="0.5" />
+                    </g>
+
+                    <!-- Data Points -->
+                    <circle cx="200" cy="200" r="3" fill="#ffd700" class="pulse-glow" />
+                    <circle cx="500" cy="220" r="3" fill="#ff6b35" class="pulse-glow" style="animation-delay: 1s;" />
+                    <circle cx="350" cy="150" r="3" fill="#4db8ff" class="pulse-glow" style="animation-delay: 2s;" />
+
+                    <!-- Text Labels (Blueprint Style) -->
+                    <text x="130" y="370" fill="#4db8ff" font-size="12" text-anchor="middle"
+                        opacity="0.6">TRADITIONAL</text>
+                    <text x="350" y="360" fill="#a78bfa" font-size="12" text-anchor="middle" opacity="0.6">MODERN</text>
+                    <text x="555" y="370" fill="#7ed957" font-size="12" text-anchor="middle"
+                        opacity="0.6">HISTORICAL</text>
+                </svg>
             </div>
+        </header>
 
-            <div class="content">
-                <h1>Digital Modeling in Architecture: Evolution and Comparative Analysis</h1>
+        <!-- Main Content -->
+        <main id="main-content" class="main-content">
+            <!-- Introduction -->
+            <section class="content-section">
+                <div class="intro-text">
+                    <p>Architecture has always been about visualization—the ability to conceive three-dimensional spaces
+                        before they exist. While traditional methods relied on drawings, physical models, and
+                        mathematical calculations, digital modeling has transformed architecture into a dynamic,
+                        interactive discipline. This technological evolution has democratized architectural design
+                        through open-source tools, enabling architects, historians, and enthusiasts worldwide to create,
+                        analyze, and preserve architectural heritage with unprecedented accuracy and accessibility.</p>
+                </div>
 
-                <p class="intro">From ancient caves to complex algorithmic structures
-                    rendered in virtual reality, architectural representation has undergone a remarkable
-                    transformation. Today's digital modeling revolution represents not just a change in tools,
-                    but a fundamental shift in how we conceive, design, and preserve our built environment.</p>
+                <div class="section-header">
+                    <h2 class="section-title">Introduction: The Digital Architecture Revolution</h2>
+                </div>
 
-                <h2>Introduction: The Digital Architecture Revolution</h2>
+                <p>The transition from pencil and paper to pixels and polygons represents more than technological
+                    advancement; it reflects a fundamental change in architectural thinking. <a
+                        href="https://en.wikipedia.org/wiki/Computer-aided_design">Computer-aided design (CAD)</a> has
+                    evolved from simple 2D drafting tools to sophisticated 3D modeling environments that can simulate
+                    physics, lighting, and environmental conditions. This evolution has enabled architects to work with
+                    complex geometries previously impossible to conceive or construct.</p>
+            </section>
 
-                <p>Architecture has always been about visualization—the ability to conceive three-dimensional
-                    spaces before they exist. While traditional methods relied on drawings, physical models, and
-                    mathematical calculations, digital modeling has transformed architecture into a dynamic,
-                    interactive discipline. This technological evolution has democratized architectural design
-                    through open-source tools, enabling architects, historians, and enthusiasts worldwide to
-                    create, analyze, and preserve architectural heritage with unprecedented accuracy and
-                    accessibility.</p>
+            <!-- Historical Evolution -->
+            <section class="content-section">
+                <div class="section-header">
+                    <h2 class="section-title">Historical Evolution of Digital Architectural Modeling</h2>
+                </div>
 
-                <p>The transition from pencil and paper to pixels and polygons represents more than
-                    technological advancement; it reflects a fundamental change in architectural thinking. <a
-                        href="https://en.wikipedia.org/wiki/Computer-aided_design" class="reference">Computer-aided
-                        design (CAD)</a> has evolved from simple 2D drafting
-                    tools to sophisticated 3D modeling environments that can simulate physics, lighting, and
-                    environmental conditions. This evolution has enabled architects to work with complex
-                    geometries previously impossible to conceive or construct.</p>
-
-                <h2>Historical Evolution of Digital Architectural Modeling</h2>
-                <h3>The Dawn of Digital Architecture (1960s-1980s)</h3>
+                <h3 class="subsection-title">The Dawn of Digital Architecture (1960s-1980s)</h3>
 
                 <p>The 1960s marked the beginning of computer-aided design with Ivan Sutherland's <a
-                        href="https://en.wikipedia.org/wiki/Sketchpad" class="reference">Sketchpad</a> program,
-                    often considered the first CAD system. Early adopters in aerospace and automotive industries
-                    paved the way for architectural applications. However, these systems were expensive,
-                    complex, and required specialized hardware accessible only to large institutions.</p>
+                        href="https://en.wikipedia.org/wiki/Sketchpad">Sketchpad</a> program, often considered the first
+                    CAD system. Early adopters in aerospace and automotive industries paved the way for architectural
+                    applications. However, these systems were expensive, complex, and required specialized hardware
+                    accessible only to large institutions.</p>
 
-                <p>During this period, architectural firms began experimenting with basic 2D drafting systems.
-                    The focus was primarily on replacing traditional drafting tables with digital equivalents,
-                    with limited 3D visualization capabilities. Buildings and urban planning remained largely
-                    two-dimensional in the digital realm, though physical models continued to play crucial roles
-                    in design development.</p>
+                <p>During this period, architectural firms began experimenting with basic 2D drafting systems. The focus
+                    was primarily on replacing traditional drafting tables with digital equivalents, with limited 3D
+                    visualization capabilities. Buildings and urban planning remained largely two-dimensional in the
+                    digital realm, though physical models continued to play crucial roles in design development.</p>
 
-                <h3>The Personal Computer Revolution (1980s-2000s)</h3>
+                <h3 class="subsection-title">The Personal Computer Revolution (1980s-2000s)</h3>
 
                 <p>The introduction of personal computers revolutionized digital modeling. <a
-                        href="https://en.wikipedia.org/wiki/AutoCAD" class="reference">AutoCAD</a>, launched in
-                    1982, became the industry standard for 2D drafting and gradually introduced 3D capabilities.
-                    This period saw the emergence of specialized architectural software and the first attempts
-                    at Building Information Modeling (BIM).</p>
+                        href="https://en.wikipedia.org/wiki/AutoCAD">AutoCAD</a>, launched in 1982, became the industry
+                    standard for 2D drafting and gradually introduced 3D capabilities. This period saw the emergence of
+                    specialized architectural software and the first attempts at Building Information Modeling (BIM).
+                </p>
 
-                <p>During this era, castle reconstruction projects began utilizing digital tools for
-                    archaeological purposes. Researchers could now create detailed 3D models of ruined
-                    structures, combining archaeological evidence with historical records. Similarly,
-                    traditional building documentation projects started using early 3D modeling to preserve
-                    architectural heritage.</p>
+                <p>During this era, castle reconstruction projects began utilizing digital tools for archaeological
+                    purposes. Researchers could now create detailed 3D models of ruined structures, combining
+                    archaeological evidence with historical records. Similarly, traditional building documentation
+                    projects started using early 3D modeling to preserve architectural heritage.</p>
 
                 <div class="tech-box">
                     <h3>Key Technological Milestones</h3>
                     <ul>
                         <li><strong>1982:</strong> AutoCAD introduces affordable CAD to personal computers</li>
-                        <li><strong>1987:</strong> ArchiCAD launches as first BIM software for personal
-                            computers</li>
+                        <li><strong>1987:</strong> ArchiCAD launches as first BIM software for personal computers</li>
                         <li><strong>1990s:</strong> 3D Studio and early rendering engines emerge</li>
                         <li><strong>1998:</strong> Blender begins development as in-house tool</li>
                         <li><strong>2002:</strong> Blender becomes open-source</li>
                     </ul>
                 </div>
+            </section>
 
-                <h2>The Open-Source Revolution in Architectural Modeling</h2>
+            <!-- Open-Source Revolution -->
+            <section class="content-section">
+                <div class="section-header">
+                    <h2 class="section-title">The Open-Source Revolution in Architectural Modeling</h2>
+                </div>
 
-                <h3>Blender for 3D Modeling</h3>
+                <h3 class="subsection-title">Blender for 3D Modeling</h3>
 
-                <p><a href="https://www.blender.org/" class="reference">Blender</a> represents one of the most
-                    significant developments in democratizing 3D modeling. Originally developed by NeoGeo and
-                    Not a Number Technologies, Blender became open-source in 2002 following a successful
-                    crowdfunding campaign. Today, Blender continues to evolve with multi-stage compositing and
-                    new EEVEE features, making it increasingly relevant for architectural visualization.</p>
+                <p><a href="https://www.blender.org/">Blender</a> represents one of the most significant developments in
+                    democratizing 3D modeling. Originally developed by NeoGeo and Not a Number Technologies, Blender
+                    became open-source in 2002 following a successful crowdfunding campaign. Today, Blender continues to
+                    evolve with multi-stage compositing and new EEVEE features, making it increasingly relevant for
+                    architectural visualization.</p>
 
-                <h3>FreeCAD: Precision in Parametric Design</h3>
+                <h3 class="subsection-title">FreeCAD: Precision in Parametric Design</h3>
 
-                <p><a href="https://www.freecadweb.org/" class="reference">FreeCAD</a> offers a different
-                    approach to architectural modeling, emphasizing parametric design and engineering precision.
-                    Unlike Blender's artist-friendly interface, FreeCAD caters to architects and engineers who
-                    require exact measurements and parametric relationships between elements.</p>
+                <p><a href="https://www.freecadweb.org/">FreeCAD</a> offers a different approach to architectural
+                    modeling, emphasizing parametric design and engineering precision. Unlike Blender's artist-friendly
+                    interface, FreeCAD caters to architects and engineers who require exact measurements and parametric
+                    relationships between elements.</p>
 
                 <p>The parametric nature of FreeCAD makes it particularly suitable for documenting traditional
                     architecture where proportional relationships are crucial. A well's circular structure, for
-                    instance, can be defined by parametric relationships between radius, depth, and wall
-                    thickness. Similarly, castle fortifications can be modeled using parametric constraints that
-                    ensure structural integrity while allowing design variations.</p>
+                    instance, can be defined by parametric relationships between radius, depth, and wall thickness.
+                    Similarly, castle fortifications can be modeled using parametric constraints that ensure structural
+                    integrity while allowing design variations.</p>
 
-                <h3>QGIS and Urban Scale Modeling</h3>
+                <h3 class="subsection-title">QGIS and Urban Scale Modeling</h3>
 
                 <p>While individual buildings require detailed modeling, cities and villages demand different
-                    approaches. <a href="https://qgis.org/" class="reference">QGIS (Quantum GIS)</a> provides
-                    open-source Geographic Information System capabilities essential for urban-scale modeling.
-                    This tool enables architects and planners to work with real-world geographic data, satellite
-                    imagery, and topographical information.</p>
-
-                <p>Traditional villages and historical cities often developed organically, following natural
-                    topography and existing infrastructure. QGIS allows researchers to analyze these patterns,
-                    understanding how settlements evolved around water sources like wells, defensive positions
-                    like castles, or along trade routes. The software can integrate elevation data, historical
-                    maps, and modern satellite imagery to create comprehensive urban models.</p>
-
-                <h2>Comparative Analysis of Architectural Modeling Approaches</h2>
-
-                <h3>Traditional Huts: Simplicity Meets Sophistication</h3>
-
-                <p>The modeling of traditional huts reveals fascinating insights into the relationship between
-                    simple forms and complex cultural significance. Round huts, prevalent in African, Celtic,
-                    and Native American traditions, present interesting modeling challenges despite their
-                    apparent simplicity.</p>
-
-                <p>In Blender, a circular hut can be created using basic geometric primitives—a cylinder for
-                    walls and a cone for the roof. However, accurate cultural representation requires
-                    understanding construction techniques, material properties, and proportional systems. The
-                    Ndebele houses of South Africa, for example, feature complex geometric patterns that require
-                    procedural modeling techniques to recreate accurately.</p>
-
-                <p>Cuboid-shaped huts, common in many agricultural societies, offer different modeling
-                    opportunities. These structures often feature additive construction, with rooms added over
-                    generations. FreeCAD's parametric approach excels in modeling these evolutionary building
-                    processes, allowing researchers to simulate how structures developed over time.</p>
-
-                <p>Digital modeling has revealed surprising sophistication in traditional hut design. Thermal
-                    analysis using modern computational fluid dynamics shows that traditional circular forms
-                    optimize heat distribution, while elevated floors and specific roof angles manage moisture
-                    and ventilation. These insights, impossible to discover through traditional analysis
-                    methods, demonstrate the value of digital modeling in understanding vernacular architecture.
+                    approaches. <a href="https://qgis.org/">QGIS (Quantum GIS)</a> provides open-source Geographic
+                    Information System capabilities essential for urban-scale modeling. This tool enables architects and
+                    planners to work with real-world geographic data, satellite imagery, and topographical information.
                 </p>
 
-                <h3>Castles: Fortification Modeling and Historical Reconstruction</h3>
+                <p>Traditional villages and historical cities often developed organically, following natural topography
+                    and existing infrastructure. QGIS allows researchers to analyze these patterns, understanding how
+                    settlements evolved around water sources like wells, defensive positions like castles, or along
+                    trade routes. The software can integrate elevation data, historical maps, and modern satellite
+                    imagery to create comprehensive urban models.</p>
+            </section>
 
-                <p>Medieval castles represent some of the most complex modeling challenges in architectural
-                    history. These structures combined military engineering, residential functionality, and
-                    symbolic representation in sophisticated integrated designs. Digital modeling has
-                    transformed castle studies, enabling researchers to test historical theories about
-                    construction sequences, defensive strategies, and daily life.</p>
+            <!-- Comparative Analysis -->
+            <section class="content-section">
+                <div class="section-header">
+                    <h2 class="section-title">Comparative Analysis of Architectural Modeling Approaches</h2>
+                </div>
 
-                <p>The modeling process typically begins with archaeological evidence—foundation remains,
-                    surviving walls, and historical descriptions. Tools like Blender excel in creating detailed
-                    reconstructions that combine archaeological data with informed speculation about missing
-                    elements. The process requires understanding medieval construction techniques, available
-                    materials, and the strategic thinking that guided fortress design.</p>
+                <h3 class="subsection-title">Traditional Huts: Simplicity Meets Sophistication</h3>
 
-                <p>Castle modeling reveals the sophisticated geometric knowledge of medieval builders. The
-                    concentric castle design of <a href="https://en.wikipedia.org/wiki/Beaumaris_Castle"
-                        class="reference">Beaumaris Castle</a> in Wales demonstrates advanced understanding of
-                    interlocking defensive systems. Digital models can simulate siege scenarios, testing the
-                    effectiveness of different defensive arrangements and revealing the strategic thinking
-                    behind architectural decisions.</p>
+                <p>The modeling of traditional huts reveals fascinating insights into the relationship between simple
+                    forms and complex cultural significance. Round huts, prevalent in African, Celtic, and Native
+                    American traditions, present interesting modeling challenges despite their apparent simplicity.</p>
 
-                <p>Parametric modeling proves particularly valuable for castle studies because it allows
-                    researchers to explore variations in design. How would different wall thicknesses affect
-                    defensive capability? What if towers were positioned differently? These questions,
-                    impossible to answer through traditional methods, become explorable through digital
-                    modeling.</p>
+                <p>In Blender, a circular hut can be created using basic geometric primitives—a cylinder for walls and a
+                    cone for the roof. However, accurate cultural representation requires understanding construction
+                    techniques, material properties, and proportional systems. The <a
+                        href="https://en.wikipedia.org/wiki/Ndebele_house_painting">Ndebele houses</a> of South Africa,
+                    for example, feature complex geometric patterns that require procedural modeling techniques to
+                    recreate accurately.</p>
 
-                <h3>Modern Buildings: Integration and Innovation</h3>
+                <p>Cuboid-shaped huts, common in many agricultural societies, offer different modeling opportunities.
+                    These structures often feature additive construction, with rooms added over generations. FreeCAD's
+                    parametric approach excels in modeling these evolutionary building processes, allowing researchers
+                    to simulate how structures developed over time.</p>
 
-                <p>Contemporary architectural modeling represents the culmination of digital evolution,
-                    integrating lessons learned from historical projects with cutting-edge technology. Modern
-                    buildings require modeling approaches that consider not just form and structure, but
-                    environmental performance, energy efficiency, and integration with smart building systems.
-                </p>
+                <p>Digital modeling has revealed surprising sophistication in traditional hut design. Thermal analysis
+                    using modern computational fluid dynamics shows that traditional circular forms optimize heat
+                    distribution, while elevated floors and specific roof angles manage moisture and ventilation. These
+                    insights, impossible to discover through traditional analysis methods, demonstrate the value of
+                    digital modeling in understanding vernacular architecture.</p>
 
-                <p>Building Information Modeling (BIM) has transformed how architects approach contemporary
-                    projects. While proprietary BIM software dominates professional practice, open-source
-                    alternatives are emerging. </p>
+                <h3 class="subsection-title">Castles: Fortification Modeling and Historical Reconstruction</h3>
 
-                <p>The modeling of contemporary buildings increasingly incorporates environmental simulation.
-                    Solar analysis, wind flow modeling, and thermal performance analysis have become standard
-                    parts of the design process. Open-source tools like <a href="https://www.ladybug.tools/"
-                        class="reference">Ladybug Tools</a> integrate with Blender and other platforms to
-                    provide sophisticated environmental analysis capabilities.</p>
+                <p>Medieval castles represent some of the most complex modeling challenges in architectural history.
+                    These structures combined military engineering, residential functionality, and symbolic
+                    representation in sophisticated integrated designs. Digital modeling has transformed castle studies,
+                    enabling researchers to test historical theories about construction sequences, defensive strategies,
+                    and daily life.</p>
 
-                <h3>Cities and Villages: Urban Scale Modeling</h3>
+                <p>The modeling process typically begins with archaeological evidence—foundation remains, surviving
+                    walls, and historical descriptions. Tools like Blender excel in creating detailed reconstructions
+                    that combine archaeological data with informed speculation about missing elements. The process
+                    requires understanding medieval construction techniques, available materials, and the strategic
+                    thinking that guided fortress design.</p>
 
-                <p>Urban modeling represents the largest scale of architectural modeling, requiring integration
-                    of individual buildings into comprehensive city models. This scale demands different
-                    approaches, balancing detail with computational efficiency while managing vast amounts of
-                    data.</p>
+                <p>Castle modeling reveals the sophisticated geometric knowledge of medieval builders. The concentric
+                    castle design of <a href="https://en.wikipedia.org/wiki/Beaumaris_Castle">Beaumaris Castle</a> in
+                    Wales demonstrates advanced understanding of interlocking defensive systems. Digital models can
+                    simulate siege scenarios, testing the effectiveness of different defensive arrangements and
+                    revealing the strategic thinking behind architectural decisions.</p>
 
-                <p>Procedural modeling techniques prove essential for urban-scale projects. <a
-                        href="https://www.esri.com/en-us/arcgis/products/arcgis-cityengine/overview"
-                        class="reference">CityEngine</a> pioneered rule-based city generation, and open-source
-                    alternatives like <a href="https://github.com/esri/cityengine-sdk" class="reference">CityEngine
-                        SDK</a> provide programmatic access to similar
+                <p>Parametric modeling proves particularly valuable for castle studies because it allows researchers to
+                    explore variations in design. How would different wall thicknesses affect defensive capability? What
+                    if towers were positioned differently? These questions, impossible to answer through traditional
+                    methods, become explorable through digital modeling.</p>
+
+                <h3 class="subsection-title">Modern Buildings: Integration and Innovation</h3>
+
+                <p>Contemporary architectural modeling represents the culmination of digital evolution, integrating
+                    lessons learned from historical projects with cutting-edge technology. Modern buildings require
+                    modeling approaches that consider not just form and structure, but environmental performance, energy
+                    efficiency, and integration with smart building systems.</p>
+
+                <p>Building Information Modeling (BIM) has transformed how architects approach contemporary projects.
+                    While proprietary BIM software dominates professional practice, open-source alternatives are
+                    emerging.</p>
+
+                <p>The modeling of contemporary buildings increasingly incorporates environmental simulation. Solar
+                    analysis, wind flow modeling, and thermal performance analysis have become standard parts of the
+                    design process. Open-source tools like <a href="https://www.ladybug.tools/">Ladybug Tools</a>
+                    integrate with Blender and other platforms to provide sophisticated environmental analysis
                     capabilities.</p>
 
-                <p>Traditional village modeling reveals organic growth patterns that contrast sharply with
-                    planned urban development. Medieval European villages typically developed along single roads
-                    with houses positioned to maximize agricultural access while minimizing travel to common
-                    resources like wells and mills. Digital modeling helps researchers understand these
-                    settlement patterns and their relationship to geography, economy, and social structure.</p>
+                <h3 class="subsection-title">Cities and Villages: Urban Scale Modeling</h3>
 
-                <h2>Next-Generation Techniques and Emerging Technologies</h2>
+                <p>Urban modeling represents the largest scale of architectural modeling, requiring integration of
+                    individual buildings into comprehensive city models. This scale demands different approaches,
+                    balancing detail with computational efficiency while managing vast amounts of data.</p>
 
-                <h3>Artificial Intelligence and Machine Learning</h3>
+                <p>Procedural modeling techniques prove essential for urban-scale projects. <a
+                        href="https://www.esri.com/en-us/arcgis/products/arcgis-cityengine/overview">CityEngine</a>
+                    pioneered rule-based city generation, and open-source alternatives like <a
+                        href="https://github.com/esri/cityengine-sdk">CityEngine SDK</a> provide programmatic access to
+                    similar capabilities.</p>
 
-                <p>Artificial intelligence is beginning to transform architectural modeling in profound ways.
-                    Machine learning algorithms can now generate architectural designs based on training data
-                    from historical buildings, suggesting new forms while respecting traditional proportions and
-                    relationships.</p>
+                <p>Traditional village modeling reveals organic growth patterns that contrast sharply with planned urban
+                    development. Medieval European villages typically developed along single roads with houses
+                    positioned to maximize agricultural access while minimizing travel to common resources like wells
+                    and mills. Digital modeling helps researchers understand these settlement patterns and their
+                    relationship to geography, economy, and social structure.</p>
+            </section>
 
-                <p>AI-assisted modeling proves particularly valuable for restoration projects where historical
-                    evidence is incomplete. Machine learning models trained on similar architectural styles can
-                    suggest probable forms for missing elements, providing researchers with evidence-based
-                    hypotheses for reconstruction. This approach has proven valuable in castle reconstruction
-                    projects where only foundations remain, and in traditional building documentation where
-                    structures have been modified over time.</p>
+            <!-- Next-Generation Techniques -->
+            <section class="content-section">
+                <div class="section-header">
+                    <h2 class="section-title">Next-Generation Techniques and Emerging Technologies</h2>
+                </div>
+
+                <h3 class="subsection-title">Artificial Intelligence and Machine Learning</h3>
+
+                <p>Artificial intelligence is beginning to transform architectural modeling in profound ways. Machine
+                    learning algorithms can now generate architectural designs based on training data from historical
+                    buildings, suggesting new forms while respecting traditional proportions and relationships.</p>
+
+                <p>AI-assisted modeling proves particularly valuable for restoration projects where historical evidence
+                    is incomplete. Machine learning models trained on similar architectural styles can suggest probable
+                    forms for missing elements, providing researchers with evidence-based hypotheses for reconstruction.
+                    This approach has proven valuable in castle reconstruction projects where only foundations remain,
+                    and in traditional building documentation where structures have been modified over time.</p>
 
                 <p>Generative design algorithms can explore vast design spaces impossible for human designers to
-                    investigate manually. These systems can generate thousands of variations on traditional hut
-                    designs, testing how different proportions, materials, and construction techniques might
-                    affect structural performance, environmental comfort, or construction efficiency.</p>
+                    investigate manually. These systems can generate thousands of variations on traditional hut designs,
+                    testing how different proportions, materials, and construction techniques might affect structural
+                    performance, environmental comfort, or construction efficiency.</p>
 
-                <h3>Photogrammetry and LiDAR Integration</h3>
+                <h3 class="subsection-title">Photogrammetry and LiDAR Integration</h3>
 
-                <p>Photogrammetry, also called 3D photo scanning, uses images from various angles combined with
-                    smart software to produce accurate 3D models of real-world objects. This technology has
-                    revolutionized architectural documentation, enabling rapid, accurate capture of existing
-                    structures.</p>
+                <p>Photogrammetry, also called 3D photo scanning, uses images from various angles combined with smart
+                    software to produce accurate 3D models of real-world objects. This technology has revolutionized
+                    architectural documentation, enabling rapid, accurate capture of existing structures.</p>
 
-                <p>The integration of photogrammetry with traditional modeling tools creates powerful workflows
-                    for architectural analysis. Existing structures can be captured using photogrammetry, then
-                    analyzed and modified using conventional modeling tools. This hybrid approach proves
-                    particularly valuable for renovation projects where architects must integrate new designs
-                    with existing structures.</p>
+                <p>The integration of photogrammetry with traditional modeling tools creates powerful workflows for
+                    architectural analysis. Existing structures can be captured using photogrammetry, then analyzed and
+                    modified using conventional modeling tools. This hybrid approach proves particularly valuable for
+                    renovation projects where architects must integrate new designs with existing structures.</p>
 
-                <p>LiDAR (Light Detection and Ranging) technology provides complementary capabilities,
-                    particularly for large-scale documentation projects. Archaeological sites can be rapidly
-                    mapped using drone-mounted LiDAR systems, providing accurate terrain models that inform
-                    building placement and design decisions. Modern systems can generate customizable 2D floor
-                    plans and expansive 3D models from drone footage, dramatically reducing the time required
-                    for site documentation.</p>
+                <p>LiDAR (Light Detection and Ranging) technology provides complementary capabilities, particularly for
+                    large-scale documentation projects. Archaeological sites can be rapidly mapped using drone-mounted
+                    LiDAR systems, providing accurate terrain models that inform building placement and design
+                    decisions. Modern systems can generate customizable 2D floor plans and expansive 3D models from
+                    drone footage, dramatically reducing the time required for site documentation.</p>
 
-                <h3>Virtual and Augmented Reality Integration</h3>
+                <h3 class="subsection-title">Virtual and Augmented Reality Integration</h3>
 
-                <p>Virtual Reality (VR) and Augmented Reality (AR) technologies are transforming how architects
-                    and clients experience modeled spaces. These technologies enable immersive exploration of
-                    architectural designs before construction, revealing spatial relationships and design issues
-                    impossible to identify through traditional visualization methods.</p>
+                <p>Virtual Reality (VR) and Augmented Reality (AR) technologies are transforming how architects and
+                    clients experience modeled spaces. These technologies enable immersive exploration of architectural
+                    designs before construction, revealing spatial relationships and design issues impossible to
+                    identify through traditional visualization methods.</p>
 
                 <p>For historical reconstruction projects, VR provides unprecedented opportunities for public
-                    engagement. Visitors can walk through reconstructed castles, experience traditional huts as
-                    their inhabitants would have, or explore ancient cities at their historical peak. These
-                    experiences transform architectural models from professional tools into powerful educational
-                    resources.</p>
+                    engagement. Visitors can walk through reconstructed castles, experience traditional huts as their
+                    inhabitants would have, or explore ancient cities at their historical peak. These experiences
+                    transform architectural models from professional tools into powerful educational resources.</p>
 
-                <p>AR applications overlay digital models onto real-world environments, enabling architects to
-                    visualize proposed buildings in their actual contexts. Construction workers can use AR to
-                    visualize building plans directly on construction sites, reducing errors and improving
-                    construction quality.</p>
+                <p>AR applications overlay digital models onto real-world environments, enabling architects to visualize
+                    proposed buildings in their actual contexts. Construction workers can use AR to visualize building
+                    plans directly on construction sites, reducing errors and improving construction quality.</p>
 
-                <h3>Digital Twins and Smart Building Integration</h3>
+                <h3 class="subsection-title">Digital Twins and Smart Building Integration</h3>
 
-                <p>Digital twins represent the next evolution in architectural modeling—dynamic models that
-                    remain connected to their physical counterparts throughout the building lifecycle. These
-                    models integrate real-time sensor data, enabling continuous monitoring of building
-                    performance and predictive maintenance.</p>
+                <p>Digital twins represent the next evolution in architectural modeling—dynamic models that remain
+                    connected to their physical counterparts throughout the building lifecycle. These models integrate
+                    real-time sensor data, enabling continuous monitoring of building performance and predictive
+                    maintenance.</p>
 
                 <p>For historical buildings, digital twins enable continuous monitoring of structural health,
-                    environmental conditions, and visitor impact. Traditional structures like castles or
-                    historic wells can be monitored for signs of deterioration, enabling proactive conservation
-                    efforts based on data-driven insights.</p>
+                    environmental conditions, and visitor impact. Traditional structures like castles or historic wells
+                    can be monitored for signs of deterioration, enabling proactive conservation efforts based on
+                    data-driven insights.</p>
 
-                <p>Smart city initiatives increasingly rely on comprehensive digital models that integrate
-                    individual building models into city-scale simulations. These models can simulate traffic
-                    patterns, energy consumption, and emergency response scenarios, informing urban planning
-                    decisions with unprecedented accuracy.</p>
+                <p>Smart city initiatives increasingly rely on comprehensive digital models that integrate individual
+                    building models into city-scale simulations. These models can simulate traffic patterns, energy
+                    consumption, and emergency response scenarios, informing urban planning decisions with unprecedented
+                    accuracy.</p>
+            </section>
 
-                <h2>Challenges and Future Directions</h2>
+            <!-- Challenges -->
+            <section class="content-section">
+                <div class="section-header">
+                    <h2 class="section-title">Challenges and Future Directions</h2>
+                </div>
 
-                <h3>Technical Challenges</h3>
+                <h3 class="subsection-title">Technical Challenges</h3>
 
-                <p>Despite significant advances, digital architectural modeling faces several ongoing
-                    challenges. Computational complexity remains a significant issue, particularly for
-                    large-scale urban models that require real-time interaction. Balancing model detail with
-                    computational performance requires ongoing optimization and innovative rendering techniques.
-                </p>
+                <p>Despite significant advances, digital architectural modeling faces several ongoing challenges.
+                    Computational complexity remains a significant issue, particularly for large-scale urban models that
+                    require real-time interaction. Balancing model detail with computational performance requires
+                    ongoing optimization and innovative rendering techniques.</p>
 
-                <p>Data integration presents another significant challenge. Modern architectural projects
-                    generate vast amounts of data from multiple sources—geometric models, material
-                    specifications, environmental sensors, and construction schedules. Integrating this
-                    information into coherent, actionable models requires sophisticated data management
-                    approaches.</p>
+                <p>Data integration presents another significant challenge. Modern architectural projects generate vast
+                    amounts of data from multiple sources—geometric models, material specifications, environmental
+                    sensors, and construction schedules. Integrating this information into coherent, actionable models
+                    requires sophisticated data management approaches.</p>
 
-                <p>Interoperability between different modeling platforms remains problematic. While standards
-                    like <a href="https://en.wikipedia.org/wiki/Industry_Foundation_Classes" class="reference">Industry
-                        Foundation Classes (IFC)</a> provide common data exchange
-                    formats, significant information is often lost during translation between different software
-                    platforms. This issue particularly affects collaborative projects involving multiple
-                    consultants using different tools.</p>
+                <p>Interoperability between different modeling platforms remains problematic. While standards like <a
+                        href="https://en.wikipedia.org/wiki/Industry_Foundation_Classes">Industry Foundation Classes
+                        (IFC)</a> provide common data exchange formats, significant information is often lost during
+                    translation between different software platforms. This issue particularly affects collaborative
+                    projects involving multiple consultants using different tools.</p>
 
-                <h3>Cultural and Social Considerations</h3>
+                <h3 class="subsection-title">Cultural and Social Considerations</h3>
 
-                <p>Digital modeling of traditional architecture raises important cultural questions about
-                    representation and ownership. Who has the right to model and distribute digital
-                    representations of indigenous architectural traditions? How can digital models respectfully
-                    represent cultural knowledge while making it accessible for educational purposes?</p>
+                <p>Digital modeling of traditional architecture raises important cultural questions about representation
+                    and ownership. Who has the right to model and distribute digital representations of indigenous
+                    architectural traditions? How can digital models respectfully represent cultural knowledge while
+                    making it accessible for educational purposes?</p>
 
                 <p>The democratization of modeling tools creates opportunities for community involvement in
-                    architectural documentation and design. Local communities can participate in documenting
-                    their own architectural heritage, ensuring that cultural knowledge is preserved and
-                    transmitted accurately. However, this participation requires training and support that may
-                    not be available in all communities.</p>
+                    architectural documentation and design. Local communities can participate in documenting their own
+                    architectural heritage, ensuring that cultural knowledge is preserved and transmitted accurately.
+                    However, this participation requires training and support that may not be available in all
+                    communities.</p>
 
-                <h3>Educational Transformation</h3>
+                <h3 class="subsection-title">Educational Transformation</h3>
 
-                <p>Architectural education is being transformed by digital modeling tools. Students can now
-                    explore historical buildings through virtual reality, analyze structural systems using
-                    computational tools, and experiment with designs impossible to build physically. This
-                    technological integration requires fundamental changes in curriculum design and teaching
-                    methods.</p>
+                <p>Architectural education is being transformed by digital modeling tools. Students can now explore
+                    historical buildings through virtual reality, analyze structural systems using computational tools,
+                    and experiment with designs impossible to build physically. This technological integration requires
+                    fundamental changes in curriculum design and teaching methods.</p>
 
                 <p>The availability of open-source tools democratizes architectural education, enabling students
-                    worldwide to access sophisticated modeling capabilities regardless of economic
-                    circumstances. However, this accessibility requires corresponding changes in educational
-                    support and curriculum development to ensure effective learning.</p>
+                    worldwide to access sophisticated modeling capabilities regardless of economic circumstances.
+                    However, this accessibility requires corresponding changes in educational support and curriculum
+                    development to ensure effective learning.</p>
+            </section>
 
-                <h2>Conclusion: The Future of Digital Architectural Modeling</h2>
+            <!-- Conclusion -->
+            <section class="content-section">
+                <div class="section-header">
+                    <h2 class="section-title">Conclusion: The Future of Digital Architectural Modeling</h2>
+                </div>
 
-                <p>The evolution of digital architectural modeling represents more than technological
-                    progress—it reflects a fundamental transformation in how we understand, create, and preserve
-                    our built environment. From simple huts to complex urban systems, digital tools have
-                    revealed hidden sophistication in traditional architecture while enabling new forms of
-                    contemporary design.</p>
+                <p>The evolution of digital architectural modeling represents more than technological progress—it
+                    reflects a fundamental transformation in how we understand, create, and preserve our built
+                    environment. From simple huts to complex urban systems, digital tools have revealed hidden
+                    sophistication in traditional architecture while enabling new forms of contemporary design.</p>
 
-                <p>Open-source tools have democratized this revolution, making sophisticated modeling
-                    capabilities accessible to architects, researchers, and enthusiasts worldwide. The
-                    combination of tools like Blender, FreeCAD, and QGIS provides comprehensive capabilities for
-                    architectural modeling at all scales, from individual buildings to entire cities.</p>
+                <p>Open-source tools have democratized this revolution, making sophisticated modeling capabilities
+                    accessible to architects, researchers, and enthusiasts worldwide. The combination of tools like
+                    Blender, FreeCAD, and QGIS provides comprehensive capabilities for architectural modeling at all
+                    scales, from individual buildings to entire cities.</p>
 
                 <p>Emerging technologies—artificial intelligence, photogrammetry, virtual reality, and digital
                     twins—promise to further transform the field. These technologies will enable more accurate
                     historical reconstructions, more efficient contemporary design processes, and more effective
                     building performance optimization.</p>
 
-                <p>Perhaps most importantly, digital modeling is changing our relationship with architectural
-                    heritage. Virtual reconstructions enable us to experience lost buildings, understand
-                    historical construction techniques, and preserve architectural knowledge for future
-                    generations. Traditional wells, ancient castles, and vernacular buildings become accessible
-                    to global audiences while remaining physically preserved in their original locations.</p>
+                <p>Perhaps most importantly, digital modeling is changing our relationship with architectural heritage.
+                    Virtual reconstructions enable us to experience lost buildings, understand historical construction
+                    techniques, and preserve architectural knowledge for future generations. Traditional wells, ancient
+                    castles, and vernacular buildings become accessible to global audiences while remaining physically
+                    preserved in their original locations.</p>
 
-                <p>The future of digital architectural modeling lies not just in more sophisticated tools, but
-                    in more inclusive and collaborative approaches to architectural knowledge. As these
-                    technologies continue to evolve, they promise to make architectural understanding more
-                    accessible, more accurate, and more engaging for all participants in our built environment.
-                </p>
+                <p>The future of digital architectural modeling lies not just in more sophisticated tools, but in more
+                    inclusive and collaborative approaches to architectural knowledge. As these technologies continue to
+                    evolve, they promise to make architectural understanding more accessible, more accurate, and more
+                    engaging for all participants in our built environment.</p>
 
-                <div class="highlight">
-                    <p>The journey from cave paintings to virtual reality represents humanity's persistent drive
-                        to visualize and share spatial ideas. Digital modeling tools continue this ancient
-                        tradition while opening new possibilities for understanding, creating, and preserving
-                        the architecture that shapes our world.</p>
+                <div class="highlight-box">
+                    <p>The journey from cave paintings to virtual reality represents humanity's persistent drive to
+                        visualize and share spatial ideas. Digital modeling tools continue this ancient tradition while
+                        opening new possibilities for understanding, creating, and preserving the architecture that
+                        shapes our world.</p>
                 </div>
+            </section>
 
+            <!-- References -->
+            <section class="references">
                 <h2>References and Further Reading</h2>
-
                 <ol>
-                    <li><a href="https://en.wikipedia.org/wiki/Architecture" class="reference">Architecture</a>
-                    </li>
-                    <li><a href="https://en.wikipedia.org/wiki/Ndebele_house_painting" class="reference">Ndebele house
-                            painting</a>
-                    </li>
-                    <li><a href="https://designdash.com/art/miniature-marvels-art-architecture-of-ancient-egyptian-models/"
-                            class="reference">Miniature
-                            Marvels: Art & Architecture of Ancient Egyptian Models</a>
-                    </li>
-                    <li><a href="https://en.wikipedia.org/wiki/Computer-aided_design" class="reference">Computer-aided
-                            design - Wikipedia</a></li>
-                    <li><a href="https://en.wikipedia.org/wiki/Building_information_modeling" class="reference">Building
-                            Information Modeling - Wikipedia</a></li>
-                    <li><a href="https://www.blender.org/" class="reference">Blender Foundation - Official
-                            Website</a></li>
-                    <li><a href="https://www.freecadweb.org/" class="reference">FreeCAD - Open Source Parametric
-                            3D CAD Modeler</a></li>
-                    <li><a href="https://qgis.org/" class="reference">QGIS - Free and Open Source Geographic
-                            Information System</a></li>
-                    <li><a href="https://en.wikipedia.org/wiki/Photogrammetry" class="reference">Photogrammetry
-                            - Wikipedia</a></li>
-                    <li><a href="https://en.wikipedia.org/wiki/Digital_twin" class="reference">Digital Twin -
+                    <li><a href="https://en.wikipedia.org/wiki/Architecture">Architecture</a></li>
+                    <li><a href="https://en.wikipedia.org/wiki/Ndebele_house_painting">Ndebele house painting</a></li>
+                    <li><a
+                            href="https://designdash.com/art/miniature-marvels-art-architecture-of-ancient-egyptian-models/">Miniature
+                            Marvels: Art & Architecture of Ancient Egyptian Models</a></li>
+                    <li><a href="https://en.wikipedia.org/wiki/Computer-aided_design">Computer-aided design -
                             Wikipedia</a></li>
-                    <li><a href="https://en.wikipedia.org/wiki/Industry_Foundation_Classes" class="reference">Industry
-                            Foundation Classes - Wikipedia</a></li>
-                    <li><a href="https://wiki.osarch.org/" class="reference">OSArch - Open Source Architecture
-                            Community</a></li>
-                    <li>Mitchell, W. J. (1990). <em>The Logic of Architecture: Design, Computation, and
-                            Cognition</em>. MIT Press.</li>
+                    <li><a href="https://en.wikipedia.org/wiki/Building_information_modeling">Building Information
+                            Modeling - Wikipedia</a></li>
+                    <li><a href="https://www.blender.org/">Blender Foundation - Official Website</a></li>
+                    <li><a href="https://www.freecadweb.org/">FreeCAD - Open Source Parametric 3D CAD Modeler</a></li>
+                    <li><a href="https://qgis.org/">QGIS - Free and Open Source Geographic Information System</a></li>
+                    <li><a href="https://en.wikipedia.org/wiki/Photogrammetry">Photogrammetry - Wikipedia</a></li>
+                    <li><a href="https://en.wikipedia.org/wiki/Digital_twin">Digital Twin - Wikipedia</a></li>
+                    <li><a href="https://en.wikipedia.org/wiki/Industry_Foundation_Classes">Industry Foundation Classes
+                            - Wikipedia</a></li>
+                    <li><a href="https://wiki.osarch.org/">OSArch - Open Source Architecture Community</a></li>
+                    <li>Mitchell, W. J. (1990). <em>The Logic of Architecture: Design, Computation, and Cognition</em>.
+                        MIT Press.</li>
                     <li>Picon, A. (2010). <em>Digital Culture in Architecture: An Introduction for the Design
                             Professions</em>. Birkhäuser.</li>
-
                 </ol>
-            </div>
+            </section>
+        </main>
 
-        </div>
+        <!-- Footer -->
+        <footer class="footer">
+            <div class="footer-content">
+                <p class="footer-copyright">© 2025 John Samuel. All content licensed under Creative Commons CC-BY-SA.
+                </p>
+                <nav class="footer-links" aria-label="Footer navigation">
+                    <a href="./architecture.html">English</a>
+                </nav>
+            </div>
+        </footer>
     </body>
 
 </html>

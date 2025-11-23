@@ -2,797 +2,1474 @@
 <html lang="en">
 
     <head>
-        <meta charset="utf-8" />
-        <meta http-equiv="Content-Language" content="en" />
-        <link rel="shortcut icon" href="../../images/logo/favicon.png" />
-        <title>Geometry: John Samuel</title>
-        <style type="text/css">
-            body {
-                background-color: #FFFFFF;
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta http-equiv="Content-Language" content="en">
+        <link rel="shortcut icon" href="../../images/logo/favicon.png">
+        <title>Geometry: The Mathematics of Space - John Samuel</title>
+        <style>
+            /* ============================================
+           DESIGN TOKENS & CSS CUSTOM PROPERTIES
+           ============================================ */
+            :root {
+                /* Hypercolor Gradient Theme - Mathematical Beauty */
+                --color-base-bg: #0a0e27;
+                --color-base-surface: #131829;
+                --color-base-text: #e8edf4;
+                --color-base-text-muted: #9ca9c0;
+
+                /* Vibrant Accent Colors - Geometric Spectrum */
+                --color-accent-1: #00d4ff;
+                /* Cyan - primary geometric */
+                --color-accent-2: #7c3aed;
+                /* Purple - spatial depth */
+                --color-accent-3: #ec4899;
+                /* Pink - topology */
+                --color-accent-4: #f59e0b;
+                /* Amber - golden ratio */
+                --color-accent-5: #10b981;
+                /* Emerald - natural geometry */
+                --color-accent-light: rgba(0, 212, 255, 0.1);
+
+                /* Gradients */
+                --gradient-primary: linear-gradient(135deg, #00d4ff 0%, #7c3aed 50%, #ec4899 100%);
+                --gradient-secondary: linear-gradient(225deg, #7c3aed 0%, #ec4899 50%, #f59e0b 100%);
+                --gradient-tertiary: linear-gradient(135deg, #10b981 0%, #00d4ff 50%, #7c3aed 100%);
+                --gradient-subtle: linear-gradient(180deg, var(--color-base-bg), var(--color-base-surface));
+
+                /* Spacing Scale */
+                --space-xs: 0.25rem;
+                --space-sm: 0.5rem;
+                --space-md: 1rem;
+                --space-lg: 1.5rem;
+                --space-xl: 2rem;
+                --space-2xl: 3rem;
+                --space-3xl: 4rem;
+                --space-4xl: 6rem;
+
+                /* Typography */
+                --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+                --text-xs: clamp(0.75rem, 0.7rem + 0.25vw, 0.875rem);
+                --text-sm: clamp(0.875rem, 0.8rem + 0.35vw, 1rem);
+                --text-base: clamp(1rem, 0.95rem + 0.25vw, 1.125rem);
+                --text-lg: clamp(1.125rem, 1.05rem + 0.35vw, 1.25rem);
+                --text-xl: clamp(1.25rem, 1.15rem + 0.5vw, 1.5rem);
+                --text-2xl: clamp(1.5rem, 1.3rem + 1vw, 2rem);
+                --text-3xl: clamp(2rem, 1.6rem + 2vw, 2.5rem);
+                --text-4xl: clamp(2.5rem, 2rem + 2.5vw, 3.5rem);
+
+                /* Shadows */
+                --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4), 0 1px 3px rgba(0, 0, 0, 0.5);
+                --shadow-md: 0 4px 6px rgba(0, 212, 255, 0.15), 0 2px 4px rgba(124, 58, 237, 0.1);
+                --shadow-lg: 0 10px 24px rgba(0, 212, 255, 0.2), 0 4px 8px rgba(124, 58, 237, 0.15);
+                --shadow-xl: 0 20px 40px rgba(236, 72, 153, 0.25), 0 8px 16px rgba(0, 212, 255, 0.2);
+
+                /* Border Radius */
+                --radius-sm: 4px;
+                --radius-md: 8px;
+                --radius-lg: 12px;
+                --radius-xl: 16px;
+                --radius-2xl: 24px;
+                --radius-organic: 63% 37% 54% 46% / 45% 62% 38% 55%;
             }
 
-            #sidebar {
-                position: fixed;
-                background-color: #1B80CF;
-                top: 0;
-                left: 0;
-                bottom: 0;
-                width: 30vw;
-            }
-
-            #sidebar .title {
-                position: relative;
-                text-align: center;
-                line-height: 4vmax;
-                font-size: 1.4vmax;
-                font-family: 'Arial';
-                margin-top: 25vh;
-            }
-
-            #sidebar .title a:link,
-            #sidebar .title a:visited {
-                color: #FFFFFF;
-                text-decoration: none;
-            }
-
-            .subtitle {
-                top: 50vh;
-                text-align: center;
-                line-height: 1.3vmax;
-                font-family: 'Arial';
-                font-size: 1.5vmax;
-                color: #FFFFFF;
-            }
-
-            .subtitle a:link,
-            .subtitle a:visited {
-                color: #FFFFFF;
-                text-decoration: none;
-            }
-
-            .licence {
-                position: fixed;
-                text-align: right;
-                bottom: 0;
-                right: 0;
-            }
-
-            .home {
-                position: fixed;
-                text-align: left;
-                font-family: 'Arial';
-                color: #D3D3D3;
-                z-index: 100;
-                width: 100%;
-                background-color: #FFFFFF;
-                top: 0px;
-                margin-bottom: 10px;
-                padding-bottom: 10px;
-            }
-
-            .home a:link,
-            .home a:visited {
-                text-decoration: none;
-                color: #D3D3D3;
-            }
-
-            .home ul {
+            /* ============================================
+           RESET & BASE STYLES
+           ============================================ */
+            * {
                 margin: 0;
                 padding: 0;
-                text-align: left;
-                list-style: none;
+                box-sizing: border-box;
             }
 
-            .home li {
+            html {
+                scroll-behavior: smooth;
+                scroll-padding-top: 100px;
+            }
+
+            body {
+                font-family: var(--font-sans);
+                font-size: var(--text-base);
+                line-height: 1.7;
+                color: var(--color-base-text);
+                background: var(--color-base-bg);
+                overflow-x: hidden;
                 position: relative;
-                float: left;
-                padding-top: 15px;
-                margin-right: 1em;
-                font-family: 'Arial';
             }
 
-            .home li:hover {
-                display: block;
-            }
-
-            .home a:link,
-            .home a:visited {
-                color: #D3D3D3;
-            }
-
-            .home li:hover a:link,
-            .home li:hover a:visited {
-                text-decoration: none;
-                padding: 15px;
-                color: #FFFFFF;
-                background-color: #1B80CF;
-            }
-
-            .content {
-                text-align: justify;
-                line-height: 1.8vmax;
-                font-size: 1.2vmax;
-                font-family: 'Arial';
-                margin-top: 15vh;
-                width: 90%;
-            }
-
-            .content h2,
-            h3,
-            h4 {
-                color: #1B80CF;
-            }
-
-            .content a:link,
-            .content a:visited {
-                color: #1B80CF;
-            }
-
-            .content h3 {
-                color: #1B80CF;
-            }
-
-            .content h2::before,
-            .content h3::before {
-                display: block;
-                content: " ";
-                visibility: hidden;
-                height: 50px;
-                margin-top: -50px;
-                pointer-events: none;
-                background-color: #FFFFFF;
-            }
-
-            .content a:link,
-            .content a:visited {
-                color: #1B80CF;
-            }
-
-            .content li {
-                margin: 5px;
-            }
-
-            .page {
-                width: 65vw;
+            /* Animated Background */
+            body::before {
+                content: '';
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
                 height: 100%;
-                margin-left: 30vw;
+                background:
+                    radial-gradient(circle at 20% 30%, rgba(0, 212, 255, 0.15) 0%, transparent 50%),
+                    radial-gradient(circle at 80% 70%, rgba(124, 58, 237, 0.15) 0%, transparent 50%),
+                    radial-gradient(circle at 40% 80%, rgba(236, 72, 153, 0.1) 0%, transparent 50%);
+                animation: backgroundPulse 15s ease-in-out infinite;
+                z-index: 0;
+                pointer-events: none;
+            }
+
+            @keyframes backgroundPulse {
+
+                0%,
+                100% {
+                    opacity: 0.5;
+                    transform: scale(1);
+                }
+
+                50% {
+                    opacity: 0.8;
+                    transform: scale(1.1);
+                }
+            }
+
+            /* Geometric Grid Pattern */
+            body::after {
+                content: '';
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background-image:
+                    linear-gradient(rgba(0, 212, 255, 0.03) 1px, transparent 1px),
+                    linear-gradient(90deg, rgba(124, 58, 237, 0.03) 1px, transparent 1px);
+                background-size: 50px 50px;
+                z-index: 0;
+                pointer-events: none;
+            }
+
+            /* ============================================
+           NAVIGATION BAR
+           ============================================ */
+            .nav-container {
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                z-index: 1000;
+                background: rgba(10, 14, 39, 0.8);
+                -webkit-backdrop-filter: blur(20px) saturate(180%);
+                backdrop-filter: blur(20px) saturate(180%);
+                border-bottom: 1px solid rgba(0, 212, 255, 0.2);
+                box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+            }
+
+            .breadcrumb-nav {
+                max-width: 1400px;
+                margin: 0 auto;
+                padding: var(--space-md) var(--space-xl);
+                display: flex;
+                align-items: center;
+                flex-wrap: wrap;
+                gap: var(--space-sm);
+            }
+
+            .breadcrumb-nav a {
+                color: var(--color-base-text-muted);
+                text-decoration: none;
+                font-size: var(--text-sm);
+                font-weight: 500;
+                padding: var(--space-sm) var(--space-md);
+                border-radius: var(--radius-md);
+                transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+                position: relative;
+            }
+
+            .breadcrumb-nav a::after {
+                content: '';
+                position: absolute;
+                bottom: 0;
+                left: 50%;
+                transform: translateX(-50%);
+                width: 0;
+                height: 2px;
+                background: var(--gradient-primary);
+                transition: width 0.3s ease;
+            }
+
+            .breadcrumb-nav a:hover {
+                color: var(--color-accent-1);
+                background: rgba(0, 212, 255, 0.1);
+            }
+
+            .breadcrumb-nav a:hover::after {
+                width: 80%;
+            }
+
+            /* Highlight John Samuel */
+            .breadcrumb-nav a[href*="about.html"] {
+                background: var(--gradient-primary);
+                color: white;
+                font-weight: 600;
+                padding: var(--space-sm) var(--space-lg);
+            }
+
+            .breadcrumb-nav a[href*="about.html"]::after {
+                display: none;
+            }
+
+            .breadcrumb-nav a[href*="about.html"]:hover {
+                transform: translateY(-2px);
+                box-shadow: var(--shadow-md);
+            }
+
+            .breadcrumb-separator {
+                color: var(--color-base-text-muted);
+                opacity: 0.4;
+                margin: 0 var(--space-xs);
+            }
+
+            /* ============================================
+           HERO SECTION
+           ============================================ */
+            .hero {
+                position: relative;
+                margin-top: 80px;
+                padding: var(--space-4xl) var(--space-xl);
+                text-align: center;
                 overflow: hidden;
-                padding: 0 1em;
-                font-family: 'Arial';
             }
 
-            .page img {
-                max-width: 100%;
-                max-height: 100%;
+            .hero-title {
+                font-size: var(--text-4xl);
+                font-weight: 800;
+                letter-spacing: -0.03em;
+                background: var(--gradient-primary);
+                background-size: 200% 200%;
+                -webkit-background-clip: text;
+                background-clip: text;
+                -webkit-text-fill-color: transparent;
+                animation: gradientShift 6s ease infinite;
+                margin-bottom: var(--space-lg);
             }
 
+            @keyframes gradientShift {
 
-            .key-concepts {
-                background-color: #ecf0f1;
-                padding: 15px;
-                border-left: 4px solid #3498db;
-                margin: 20px 0;
+                0%,
+                100% {
+                    background-position: 0% 50%;
+                }
+
+                50% {
+                    background-position: 100% 50%;
+                }
             }
 
-            .highlight {
-                background-color: #fff3cd;
-                padding: 10px;
-                border-radius: 5px;
-                margin: 10px 0;
+            .hero-subtitle {
+                font-size: var(--text-xl);
+                color: var(--color-base-text-muted);
+                max-width: 800px;
+                margin: 0 auto var(--space-3xl);
+                line-height: 1.6;
             }
 
-            .modern-concepts {
-                background-color: #d1ecf1;
-                padding: 15px;
-                border-left: 4px solid #17a2b8;
-                margin: 20px 0;
+            /* SVG Illustration Container */
+            .hero-illustration {
+                max-width: 600px;
+                margin: 0 auto;
+                position: relative;
+                z-index: 1;
             }
 
-            .reference-list {
-                background-color: #f8f9fa;
-                padding: 20px;
-                border-radius: 5px;
-                margin-top: 30px;
+            /* ============================================
+           CHAPTER NAVIGATION
+           ============================================ */
+            .chapter-nav {
+                max-width: 1400px;
+                margin: 0 auto var(--space-4xl);
+                padding: 0 var(--space-xl);
             }
 
-            @media (max-width: 640px),
-            screen and (orientation: portrait) {
-                body {
-                    max-width: 100%;
-                    max-height: 100%;
+            .chapter-nav-title {
+                font-size: var(--text-2xl);
+                font-weight: 700;
+                color: var(--color-accent-1);
+                margin-bottom: var(--space-xl);
+                text-align: center;
+            }
+
+            .chapter-grid {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+                gap: var(--space-lg);
+            }
+
+            .chapter-card {
+                background: rgba(19, 24, 41, 0.6);
+                -webkit-backdrop-filter: blur(12px) saturate(180%);
+                backdrop-filter: blur(12px) saturate(180%);
+                border: 1px solid rgba(0, 212, 255, 0.2);
+                border-radius: var(--radius-xl);
+                padding: var(--space-xl);
+                text-decoration: none;
+                color: var(--color-base-text);
+                transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+                position: relative;
+                overflow: hidden;
+            }
+
+            .chapter-card::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 4px;
+                background: var(--gradient-primary);
+                transform: scaleX(0);
+                transform-origin: left;
+                transition: transform 0.4s ease;
+            }
+
+            .chapter-card:hover {
+                transform: translateY(-8px);
+                border-color: var(--color-accent-1);
+                box-shadow: var(--shadow-lg);
+            }
+
+            .chapter-card:hover::before {
+                transform: scaleX(1);
+            }
+
+            .chapter-number {
+                font-size: var(--text-sm);
+                font-weight: 700;
+                color: var(--color-accent-2);
+                margin-bottom: var(--space-sm);
+                text-transform: uppercase;
+                letter-spacing: 0.1em;
+            }
+
+            .chapter-title {
+                font-size: var(--text-xl);
+                font-weight: 700;
+                margin-bottom: var(--space-sm);
+                color: var(--color-base-text);
+            }
+
+            .chapter-description {
+                font-size: var(--text-sm);
+                color: var(--color-base-text-muted);
+                line-height: 1.6;
+            }
+
+            /* ============================================
+           MAIN CONTENT CONTAINER
+           ============================================ */
+            .main-content {
+                max-width: 1400px;
+                margin: 0 auto;
+                padding: 0 var(--space-xl) var(--space-4xl);
+                position: relative;
+                z-index: 1;
+            }
+
+            /* ============================================
+           CHAPTER SECTIONS
+           ============================================ */
+            .chapter-section {
+                margin-bottom: var(--space-4xl);
+                scroll-margin-top: 100px;
+            }
+
+            .chapter-section-header {
+                text-align: center;
+                margin-bottom: var(--space-3xl);
+                position: relative;
+            }
+
+            .chapter-section-number {
+                font-size: var(--text-lg);
+                font-weight: 700;
+                color: var(--color-accent-2);
+                margin-bottom: var(--space-sm);
+                text-transform: uppercase;
+                letter-spacing: 0.15em;
+            }
+
+            .chapter-section-title {
+                font-size: var(--text-3xl);
+                font-weight: 800;
+                background: var(--gradient-secondary);
+                background-size: 200% 200%;
+                -webkit-background-clip: text;
+                background-clip: text;
+                -webkit-text-fill-color: transparent;
+                animation: gradientShift 8s ease infinite;
+                margin-bottom: var(--space-md);
+            }
+
+            /* Decorative underline */
+            .chapter-section-title::after {
+                content: '';
+                display: block;
+                width: 100px;
+                height: 4px;
+                background: var(--gradient-primary);
+                margin: var(--space-lg) auto 0;
+                border-radius: var(--radius-sm);
+                animation: shimmer 3s ease-in-out infinite;
+            }
+
+            @keyframes shimmer {
+
+                0%,
+                100% {
+                    opacity: 1;
+                    transform: scaleX(1);
                 }
 
-                #sidebar {
-                    position: fixed;
-                    background-color: #1B80CF;
-                    top: 0;
-                    left: 0;
-                    bottom: 80vh;
-                    width: 100vw;
+                50% {
+                    opacity: 0.6;
+                    transform: scaleX(1.5);
+                }
+            }
+
+            /* ============================================
+           CONTENT CARDS
+           ============================================ */
+            .content-intro {
+                background: rgba(19, 24, 41, 0.5);
+                -webkit-backdrop-filter: blur(12px) saturate(180%);
+                backdrop-filter: blur(12px) saturate(180%);
+                border: 1px solid rgba(0, 212, 255, 0.15);
+                border-radius: var(--radius-2xl);
+                padding: var(--space-2xl);
+                margin-bottom: var(--space-3xl);
+                box-shadow: var(--shadow-md);
+            }
+
+            .content-intro p {
+                margin-bottom: var(--space-lg);
+                line-height: 1.8;
+            }
+
+            .content-intro p:last-child {
+                margin-bottom: 0;
+            }
+
+            .info-box {
+                background: linear-gradient(135deg, rgba(0, 212, 255, 0.1), rgba(124, 58, 237, 0.1));
+                border-left: 4px solid var(--color-accent-1);
+                border-radius: var(--radius-lg);
+                padding: var(--space-xl);
+                margin: var(--space-xl) 0;
+                position: relative;
+            }
+
+            .info-box::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: radial-gradient(circle at top right, rgba(236, 72, 153, 0.1), transparent);
+                border-radius: var(--radius-lg);
+                pointer-events: none;
+            }
+
+            .info-box strong {
+                color: var(--color-accent-1);
+                font-size: var(--text-lg);
+                display: block;
+                margin-bottom: var(--space-md);
+            }
+
+            .info-box ul {
+                list-style: none;
+                padding-left: 0;
+            }
+
+            .info-box li {
+                padding-left: var(--space-xl);
+                margin-bottom: var(--space-md);
+                position: relative;
+            }
+
+            .info-box li::before {
+                content: '▸';
+                position: absolute;
+                left: 0;
+                color: var(--color-accent-1);
+                font-weight: 700;
+            }
+
+            .highlight-box {
+                background: linear-gradient(135deg, rgba(245, 158, 11, 0.15), rgba(236, 72, 153, 0.15));
+                border-left: 4px solid var(--color-accent-4);
+                border-radius: var(--radius-lg);
+                padding: var(--space-xl);
+                margin: var(--space-xl) 0;
+            }
+
+            .highlight-box strong {
+                color: var(--color-accent-4);
+                font-size: var(--text-lg);
+                display: block;
+                margin-bottom: var(--space-md);
+            }
+
+            .modern-box {
+                background: linear-gradient(135deg, rgba(16, 185, 129, 0.15), rgba(0, 212, 255, 0.15));
+                border-left: 4px solid var(--color-accent-5);
+                border-radius: var(--radius-lg);
+                padding: var(--space-xl);
+                margin: var(--space-xl) 0;
+            }
+
+            .modern-box strong {
+                color: var(--color-accent-5);
+                font-size: var(--text-lg);
+                display: block;
+                margin-bottom: var(--space-md);
+            }
+
+            /* ============================================
+           SUBSECTIONS
+           ============================================ */
+            .subsection {
+                margin-bottom: var(--space-3xl);
+            }
+
+            .subsection h4 {
+                font-size: var(--text-xl);
+                font-weight: 700;
+                color: var(--color-accent-1);
+                margin-bottom: var(--space-lg);
+                position: relative;
+                padding-left: var(--space-lg);
+            }
+
+            .subsection h4::before {
+                content: '';
+                position: absolute;
+                left: 0;
+                top: 50%;
+                transform: translateY(-50%);
+                width: 4px;
+                height: 80%;
+                background: var(--gradient-primary);
+                border-radius: var(--radius-sm);
+            }
+
+            .subsection p {
+                margin-bottom: var(--space-lg);
+                line-height: 1.8;
+            }
+
+            .subsection ul {
+                list-style: none;
+                padding-left: 0;
+                margin-bottom: var(--space-lg);
+            }
+
+            .subsection li {
+                padding-left: var(--space-xl);
+                margin-bottom: var(--space-md);
+                position: relative;
+                line-height: 1.7;
+            }
+
+            .subsection li::before {
+                content: '◆';
+                position: absolute;
+                left: 0;
+                color: var(--color-accent-2);
+                font-size: 0.8em;
+            }
+
+            .subsection strong {
+                color: var(--color-accent-3);
+                font-weight: 600;
+            }
+
+            /* ============================================
+           REFERENCES SECTION
+           ============================================ */
+            .references {
+                background: rgba(19, 24, 41, 0.5);
+                -webkit-backdrop-filter: blur(12px) saturate(180%);
+                backdrop-filter: blur(12px) saturate(180%);
+                border: 1px solid rgba(124, 58, 237, 0.2);
+                border-radius: var(--radius-2xl);
+                padding: var(--space-3xl);
+                margin-top: var(--space-4xl);
+            }
+
+            .references h3 {
+                font-size: var(--text-2xl);
+                font-weight: 700;
+                color: var(--color-accent-1);
+                margin-bottom: var(--space-xl);
+                text-align: center;
+            }
+
+            .references ol {
+                list-style: none;
+                counter-reset: reference-counter;
+                padding-left: 0;
+            }
+
+            .references li {
+                counter-increment: reference-counter;
+                margin-bottom: var(--space-lg);
+                padding-left: var(--space-3xl);
+                position: relative;
+                line-height: 1.7;
+            }
+
+            .references li::before {
+                content: counter(reference-counter);
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 32px;
+                height: 32px;
+                background: var(--gradient-primary);
+                border-radius: 50%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-weight: 700;
+                font-size: var(--text-sm);
+                color: white;
+            }
+
+            .references a {
+                color: var(--color-accent-1);
+                text-decoration: none;
+                border-bottom: 1px solid transparent;
+                transition: all 0.3s ease;
+            }
+
+            .references a:hover {
+                color: var(--color-accent-3);
+                border-bottom-color: var(--color-accent-3);
+            }
+
+            /* ============================================
+           FOOTER
+           ============================================ */
+            .footer {
+                background: rgba(10, 14, 39, 0.9);
+                -webkit-backdrop-filter: blur(20px) saturate(180%);
+                backdrop-filter: blur(20px) saturate(180%);
+                border-top: 1px solid rgba(0, 212, 255, 0.2);
+                padding: var(--space-3xl) var(--space-xl);
+                margin-top: var(--space-4xl);
+                text-align: center;
+            }
+
+            .footer-content {
+                max-width: 1400px;
+                margin: 0 auto;
+            }
+
+            .footer-copyright {
+                color: var(--color-base-text-muted);
+                font-size: var(--text-sm);
+                margin-bottom: var(--space-lg);
+            }
+
+            .footer-links {
+                display: flex;
+                justify-content: center;
+                gap: var(--space-xl);
+                flex-wrap: wrap;
+            }
+
+            .footer-links a {
+                color: var(--color-base-text-muted);
+                text-decoration: none;
+                font-size: var(--text-sm);
+                transition: all 0.3s ease;
+                padding: var(--space-sm) var(--space-md);
+                border-radius: var(--radius-md);
+            }
+
+            .footer-links a:hover {
+                color: var(--color-accent-1);
+                background: rgba(0, 212, 255, 0.1);
+            }
+
+            /* ============================================
+           RESPONSIVE DESIGN
+           ============================================ */
+            @media (max-width: 768px) {
+                .hero {
+                    padding: var(--space-3xl) var(--space-lg);
                 }
 
-                #sidebar .title {
-                    text-align: center;
-                    position: fixed;
-                    margin-top: 6vh;
-                    left: 0px;
-                    right: 0px;
-                    line-height: 3.5vmax;
-                    font-size: 1.5vmax;
-                    font-family: 'Arial';
+                .chapter-grid {
+                    grid-template-columns: 1fr;
                 }
 
-                #sidebar .subtitle {
-                    text-align: center;
-                    top: 5vh;
-                    left: 0px;
-                    right: 0px;
-                    position: fixed;
-                    margin-top: 10vh;
-                    font-size: 1.5vmax;
+                .main-content {
+                    padding: 0 var(--space-lg) var(--space-3xl);
                 }
 
-                #sidebar .title a:link,
-                #sidebar .title a:visited {
-                    text-align: center;
-                    color: #FFFFFF;
+                .breadcrumb-nav {
+                    padding: var(--space-md);
                 }
 
-                #sidebar .subtitle a:link,
-                #sidebar .subtitle a:visited {
-                    text-align: center;
-                    color: #FFFFFF;
+                .breadcrumb-nav a {
+                    font-size: var(--text-xs);
+                    padding: var(--space-xs) var(--space-sm);
+                }
+            }
+
+            /* ============================================
+           ACCESSIBILITY - REDUCED MOTION
+           ============================================ */
+            @media (prefers-reduced-motion: reduce) {
+
+                *,
+                *::before,
+                *::after {
+                    animation-duration: 0.01ms !important;
+                    animation-iteration-count: 1 !important;
+                    transition-duration: 0.01ms !important;
+                }
+            }
+
+            /* ============================================
+           CUSTOM SVG ANIMATIONS
+           ============================================ */
+            .geometric-shapes {
+                animation: float 6s ease-in-out infinite;
+            }
+
+            @keyframes float {
+
+                0%,
+                100% {
+                    transform: translateY(0);
                 }
 
-                .home {
-                    z-index: 100;
-                    width: 100%;
-                    background-color: #1B80CF;
-                    font-size: 1.5vmax;
+                50% {
+                    transform: translateY(-20px);
+                }
+            }
+
+            .shape-rotate {
+                animation: rotateShape 8s linear infinite;
+                transform-origin: center;
+            }
+
+            @keyframes rotateShape {
+                from {
+                    transform: rotate(0deg);
                 }
 
-                .home a:link,
-                .home a:visited {
-                    text-decoration: none;
-                    color: #FFFFFF;
+                to {
+                    transform: rotate(360deg);
+                }
+            }
+
+            .shape-pulse {
+                animation: pulse 4s ease-in-out infinite;
+            }
+
+            @keyframes pulse {
+
+                0%,
+                100% {
+                    opacity: 1;
+                    transform: scale(1);
                 }
 
-                .content {
-                    line-height: 3.8vmax;
-                    font-size: 1.8vmax;
-                    font-family: 'Arial';
-                    margin-top: 22vh;
+                50% {
+                    opacity: 0.7;
+                    transform: scale(1.05);
+                }
+            }
+
+            .shape-morph {
+                animation: morphPath 6s ease-in-out infinite;
+            }
+
+            @keyframes morphPath {
+
+                0%,
+                100% {
+                    d: path("M50,10 L90,90 L10,90 Z");
                 }
 
-                .content a:link,
-                .content a:visited {
-                    color: #1B80CF;
-                }
-
-                .page {
-                    top: 40vh;
-                    width: 95%;
-                    margin-left: 0vw;
-                }
-
-                .page img {
-                    max-width: 100%;
-                    max-height: 100%;
-                    border: 0;
+                50% {
+                    d: path("M50,20 L80,80 L20,80 Z");
                 }
             }
         </style>
     </head>
 
     <body vocab="http://schema.org/">
-        <div class="page">
-            <div class="home">
-                <ul typeof="BreadcrumbList">
-                    <li property="itemListElement" typeof="ListItem">
-                        <a property="item" typeof="WebPage" href="../index.html">
-                            <span property="name">Home</span>
-                        </a>
-                    </li>
-                    <li property="itemListElement" typeof="ListItem">
-                        <a property="item" typeof="WebPage" href="../research/research.html">
-                            <span property="name">Research</span>
-                        </a>
-                    </li>
-                    <li property="itemListElement" typeof="ListItem">
-                        <a property="item" typeof="WebPage" href="../research/universe.html">
-                            <span property="name">Universe</span>
-                        </a>
-                    </li>
-                </ul>
 
+        <!-- Navigation Bar -->
+        <nav class="nav-container" role="navigation" aria-label="Breadcrumb">
+            <div class="breadcrumb-nav" typeof="BreadcrumbList">
+                <a property="itemListElement" typeof="ListItem" href="../index.html">
+                    <span property="name">Home</span>
+                </a>
+                <span class="breadcrumb-separator">→</span>
+                <a property="itemListElement" typeof="ListItem" href="../about.html">
+                    <span property="name">John Samuel</span>
+                </a>
+                <span class="breadcrumb-separator">→</span>
+                <a property="itemListElement" typeof="ListItem" href="../research/research.html">
+                    <span property="name">Research</span>
+                </a>
+                <span class="breadcrumb-separator">→</span>
+                <a property="itemListElement" typeof="ListItem" href="../research/universe.html">
+                    <span property="name">Universe</span>
+                </a>
             </div>
-            <div id="sidebar">
-                <div class="title">
-                    <h1><a href="./geometry.html">Geometry</a></h1>
-                </div>
-                <div class="subtitle">
-                    <h4><a href="../about.html">John Samuel</a></h4>
-                </div>
+        </nav>
+
+        <!-- Hero Section -->
+        <header class="hero">
+            <h1 class="hero-title">Geometry: The Mathematics of Space</h1>
+            <p class="hero-subtitle">Journey through dimensions, from fundamental shapes to quantum realms, exploring
+                how geometry shapes our understanding of the universe</p>
+
+            <!-- SVG Illustration -->
+            <div class="hero-illustration" aria-hidden="true">
+                <svg viewBox="0 0 600 400" xmlns="http://www.w3.org/2000/svg">
+                    <defs>
+                        <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" style="stop-color:#00d4ff;stop-opacity:1" />
+                            <stop offset="50%" style="stop-color:#7c3aed;stop-opacity:1" />
+                            <stop offset="100%" style="stop-color:#ec4899;stop-opacity:1" />
+                        </linearGradient>
+                        <linearGradient id="grad2" x1="0%" y1="0%" x2="100%" y2="0%">
+                            <stop offset="0%" style="stop-color:#10b981;stop-opacity:1" />
+                            <stop offset="100%" style="stop-color:#00d4ff;stop-opacity:1" />
+                        </linearGradient>
+                        <linearGradient id="grad3" x1="100%" y1="0%" x2="0%" y2="100%">
+                            <stop offset="0%" style="stop-color:#f59e0b;stop-opacity:1" />
+                            <stop offset="100%" style="stop-color:#ec4899;stop-opacity:1" />
+                        </linearGradient>
+                        <filter id="glow">
+                            <feGaussianBlur stdDeviation="4" result="coloredBlur" />
+                            <feMerge>
+                                <feMergeNode in="coloredBlur" />
+                                <feMergeNode in="SourceGraphic" />
+                            </feMerge>
+                        </filter>
+                    </defs>
+
+                    <!-- Central Platonic Solid (Icosahedron representation) -->
+                    <g class="geometric-shapes" filter="url(#glow)">
+                        <polygon points="300,100 350,150 325,200 275,200 250,150" fill="none" stroke="url(#grad1)"
+                            stroke-width="2" class="shape-pulse" />
+                        <polygon points="300,100 350,150 350,200 300,250 250,200 250,150" fill="rgba(0,212,255,0.1)"
+                            stroke="url(#grad1)" stroke-width="2" />
+                        <polygon points="300,250 350,200 400,220 380,280 320,300 280,280" fill="rgba(124,58,237,0.1)"
+                            stroke="url(#grad2)" stroke-width="2" />
+                    </g>
+
+                    <!-- Rotating Circles (representing dimensions) -->
+                    <g class="shape-rotate" transform-origin="300 200">
+                        <circle cx="300" cy="200" r="120" fill="none" stroke="url(#grad1)" stroke-width="1.5"
+                            opacity="0.4" />
+                        <circle cx="300" cy="200" r="100" fill="none" stroke="url(#grad2)" stroke-width="1.5"
+                            opacity="0.5" />
+                        <circle cx="300" cy="200" r="80" fill="none" stroke="url(#grad3)" stroke-width="1.5"
+                            opacity="0.6" />
+                    </g>
+
+                    <!-- Floating Geometric Elements -->
+                    <g class="shape-pulse">
+                        <!-- Triangle -->
+                        <polygon points="100,80 130,140 70,140" fill="none" stroke="#00d4ff" stroke-width="2"
+                            opacity="0.7" />
+
+                        <!-- Pentagon -->
+                        <path d="M500,100 L520,120 L510,145 L490,145 L480,120 Z" fill="none" stroke="#ec4899"
+                            stroke-width="2" opacity="0.7" />
+
+                        <!-- Square -->
+                        <rect x="80" y="320" width="40" height="40" fill="none" stroke="#10b981" stroke-width="2"
+                            opacity="0.7" transform="rotate(20 100 340)" />
+
+                        <!-- Hexagon -->
+                        <path d="M480,320 L500,310 L520,320 L520,340 L500,350 L480,340 Z" fill="none" stroke="#7c3aed"
+                            stroke-width="2" opacity="0.7" />
+                    </g>
+
+                    <!-- Connection Lines (representing relationships) -->
+                    <g opacity="0.3">
+                        <line x1="100" y1="110" x2="250" y2="150" stroke="#00d4ff" stroke-width="1" />
+                        <line x1="510" y1="122" x2="350" y2="150" stroke="#ec4899" stroke-width="1" />
+                        <line x1="100" y1="340" x2="250" y2="250" stroke="#10b981" stroke-width="1" />
+                        <line x1="500" y1="330" x2="350" y2="250" stroke="#7c3aed" stroke-width="1" />
+                    </g>
+
+                    <!-- Small dots representing infinite points -->
+                    <circle cx="150" cy="150" r="3" fill="#00d4ff" opacity="0.8" />
+                    <circle cx="450" cy="180" r="3" fill="#ec4899" opacity="0.8" />
+                    <circle cx="180" cy="280" r="3" fill="#10b981" opacity="0.8" />
+                    <circle cx="420" cy="290" r="3" fill="#f59e0b" opacity="0.8" />
+                    <circle cx="300" cy="80" r="3" fill="#7c3aed" opacity="0.8" />
+                </svg>
             </div>
+        </header>
 
-            <div class="content">
-                <h2>Geometry: From Fundamentals to Cutting-Edge Research</h2>
-
-                <div class="section">
-                    <p>Geometry, derived from the Greek words "geo" (earth) and "metron" (measure), is one of
-                        the oldest mathematical sciences, initially developed to solve practical problems in
-                        surveying, construction, and astronomy. Today, geometry encompasses a vast and evolving
-                        field that extends from classical Euclidean principles to revolutionary concepts in
-                        quantum geometry, computational topology, and artificial intelligence
-                        applications.</p>
-
-                    <div class="key-concepts">
-                        <strong>Key Concepts Overview:</strong>
-                        <ul>
-                            <li>Basic geometric shapes and their properties</li>
-                            <li>Classical geometric systems (Euclidean and non-Euclidean)</li>
-                            <li>Advanced mathematical structures (topology, differential geometry)</li>
-                            <li>Modern applications in technology, physics, and computer science</li>
-                            <li>Cutting-edge theoretical developments and future directions</li>
-                        </ul>
-                    </div>
-                </div>
-
-                <div class="section">
-                    <h3>1. Fundamental Geometric Shapes</h3>
-
-                    <div class="subsection">
-                        <h4>1.1 Planar Curves</h4>
-                        <p><strong>Ellipses</strong> are closed curves defined as the locus of points where the
-                            sum of distances to two fixed points (foci) remains constant. Beyond their classical
-                            definition, ellipses appear in orbital mechanics, architectural design, and modern
-                            applications in medical imaging and antenna design.
-                        </p>
-
-                        <p><strong>Spirals</strong> represent a family of curves that wind around a central
-                            point or axis. Notable types include:</p>
-                        <ul>
-                            <li>Archimedean spiral: characterized by constant spacing between turns</li>
-                            <li>Logarithmic spiral: appearing frequently in nature (nautilus shells, galaxy
-                                arms)</li>
-                            <li>Fermat's spiral: related to the golden ratio and Fibonacci sequences</li>
-                            <li>Hyperbolic spiral: used in modern computational geometry algorithms</li>
-                        </ul>
-                        <p>Recent research has revealed spiral patterns in quantum vortices and their
-                            applications in quantum computing architectures.</p>
-                    </div>
-
-                    <div class="subsection">
-                        <h4>1.2 Polygons</h4>
-                        <p>Polygons are closed planar figures formed by straight line segments. While basic
-                            polygons (triangles, squares, pentagons) form the foundation of geometric
-                            understanding, modern research focuses on:</p>
-                        <ul>
-                            <li>Computational polygon decomposition for 3D printing and manufacturing</li>
-                            <li>Optimal polygon packing in materials science</li>
-                            <li>Polygon mesh generation for virtual reality and gaming</li>
-                            <li>Self-assembling polygonal structures in nanotechnology</li>
-                        </ul>
-
-                    </div>
-                </div>
-
-                <div class="section">
-                    <h3>2. Three-Dimensional Geometry</h3>
-
-                    <div class="subsection">
-                        <h4>2.1 Polyhedra</h4>
-                        <p>Polyhedra are three-dimensional shapes bounded by flat polygonal faces. These
-                            structures form the backbone of crystallography, molecular geometry, and
-                            architectural design.</p>
-                    </div>
-
-                    <div class="subsection">
-                        <h4>2.2 Platonic Solids</h4>
-                        <p>The five Platonic solids represent the most symmetric three-dimensional forms, where
-                            each face is a congruent regular polygon:</p>
-
-                        <ul>
-                            <li><strong>Tetrahedron:</strong> 4 triangular faces - fundamental in quantum
-                                chemistry and tetrahedral coordination compounds</li>
-                            <li><strong>Cube (Hexahedron):</strong> 6 square faces - basis for cubic crystal
-                                systems and voxel-based 3D modeling</li>
-                            <li><strong>Octahedron:</strong> 8 triangular faces - important in materials science
-                                for octahedral molecular geometry</li>
-                            <li><strong>Dodecahedron:</strong> 12 pentagonal faces - appears in viral capsid
-                                structures and fullerene chemistry</li>
-                            <li><strong>Icosahedron:</strong> 20 triangular faces - crucial in understanding
-                                virus structures and geodesic dome architecture</li>
-                        </ul>
-
-                    </div>
-                </div>
-
-                <div class="section">
-                    <h3>3. Classical Geometric Systems</h3>
-
-                    <div class="subsection">
-                        <h4>3.1 Euclidean Geometry</h4>
-                        <p>Euclidean geometry, based on Euclid's axioms from around 300 BCE, describes the
-                            properties of flat space and remains fundamental to engineering, architecture, and
-                            everyday spatial reasoning.</p>
-
-                        <ul>
-                            <li><strong>Euclidean Plane Geometry:</strong> Deals with two-dimensional figures,
-                                including triangles, circles, and polygons, forming the foundation for
-                                trigonometry and analytical geometry</li>
-                            <li><strong>Euclidean Solid Geometry:</strong> Extends to three-dimensional space,
-                                covering volumes, surface areas, and spatial relationships essential for physics
-                                and engineering applications</li>
-                        </ul>
-
-                        <p>Despite its ancient origins, Euclidean geometry continues to evolve with
-                            computational implementations, finding new applications in computer graphics,
-                            robotics, and artificial intelligence path planning.
-                        </p>
-                    </div>
-
-                    <div class="subsection">
-                        <h4>3.2 Non-Euclidean Geometries</h4>
-                        <p>Non-Euclidean geometries challenge the parallel postulate of Euclidean geometry,
-                            leading to revolutionary insights in mathematics and physics.</p>
-
-                        <h4>Hyperbolic Geometry</h4>
-                        <p>In hyperbolic geometry, multiple parallel lines can pass through a point not on a
-                            given line. This geometry describes surfaces with constant negative curvature, such
-                            as saddle surfaces. Modern applications include:</p>
-                        <ul>
-                            <li>Network analysis and social media mapping</li>
-                            <li>Machine learning algorithms for hierarchical data representation</li>
-                            <li>Modeling of space-time in certain cosmological theories</li>
-                        </ul>
-
-                        <h4>Elliptic Geometry</h4>
-                        <p>Elliptic geometry, where no parallel lines exist, describes surfaces with constant
-                            positive curvature. The sphere is the classic example, making this geometry
-                            essential for:</p>
-                        <ul>
-                            <li>Global positioning systems and navigation</li>
-                            <li>Climate modeling and atmospheric dynamics</li>
-                            <li>Understanding cosmic microwave background radiation patterns</li>
-                        </ul>
-                    </div>
-                </div>
-
-                <div class="section">
-                    <h3>4. Advanced Geometric Frameworks</h3>
-
-                    <div class="subsection">
-                        <h4>4.1 Projective Geometry</h4>
-                        <p>Projective geometry studies properties invariant under projection, eliminating the
-                            need for parallel postulates. This field has become crucial in computer vision,
-                            perspective drawing, and homogeneous coordinate systems used in 3D graphics and
-                            robotics.</p>
-                    </div>
-
-                    <div class="subsection">
-                        <h4>4.2 Affine Geometry</h4>
-                        <p>Affine geometry preserves parallelism and ratios of distances along parallel lines
-                            while allowing for transformations like scaling and shearing. Modern applications
-                            include:</p>
-                        <ul>
-                            <li>Computer-aided design (CAD) software</li>
-                            <li>Image transformation algorithms</li>
-                            <li>Crystallographic analysis</li>
-                            <li>Finite element analysis in engineering</li>
-                        </ul>
-                    </div>
-
-                    <div class="subsection">
-                        <h4>4.3 Fractal Geometry</h4>
-                        <p>Fractal geometry, pioneered by Benoit Mandelbrot, describes self-similar structures
-                            that repeat at different scales. This revolutionary field has applications in:</p>
-                        <ul>
-                            <li>Natural phenomena modeling (coastlines, clouds, mountain ranges)</li>
-                            <li>Financial market analysis and risk assessment</li>
-                            <li>Antenna design for improved signal reception</li>
-                            <li>Medical imaging for detecting irregular cellular structures</li>
-                            <li>Procedural generation in computer graphics and gaming</li>
-                        </ul>
-
-                        <div class="modern-concepts">
-                            <strong>Cutting-Edge Development:</strong> Recent advances include "quantum
-                            fractals" - structures that exhibit fractal properties at quantum scales,
-                            potentially leading to new materials with unprecedented properties and quantum
-                            computing applications.
-                        </div>
-                    </div>
-                </div>
-
-                <div class="section">
-                    <h3>5. Topology and Higher-Dimensional Geometry</h3>
-
-                    <div class="subsection">
-                        <h4>5.1 Topology</h4>
-                        <p>Topology studies properties of space that are preserved under continuous
-                            deformations, focusing on concepts like connectivity, compactness, and continuity
-                            rather than precise measurements.</p>
-
-                        <div class="key-concepts">
-                            <strong>Fundamental Topological Concepts:</strong>
-                            <ul>
-                                <li>Homeomorphisms and topological equivalence</li>
-                                <li>Euler characteristic and classification of surfaces</li>
-                                <li>Fundamental groups and homotopy theory</li>
-                                <li>Knot theory and link invariants</li>
-                                <li>Algebraic topology and homology theory</li>
-                            </ul>
-                        </div>
-
-                        <p>Modern topology applications include data analysis, network theory, and understanding
-                            protein folding patterns in biochemistry.</p>
-                    </div>
-
-                    <div class="subsection">
-                        <h4>5.2 Higher-Dimensional Objects</h4>
-                        <p>Understanding dimensional objects beyond our three-dimensional experience requires
-                            mathematical abstraction and has profound implications for physics and
-                            technology.</p>
-
-                        <ul>
-                            <li><strong>Four-dimensional objects:</strong> Tesseracts, 16-cells, and 120-cells
-                                challenge spatial intuition but appear in relativity theory and string theory
-                                models</li>
-                            <li><strong>n-dimensional manifolds:</strong> Essential for understanding phase
-                                spaces in statistical mechanics and configuration spaces in robotics</li>
-                            <li><strong>Calabi-Yau manifolds:</strong> Six-dimensional spaces crucial for string
-                                theory and theoretical physics</li>
-                        </ul>
-
-                        <div class="highlight">
-                            <strong>Time as a Dimension:</strong> Modern physics treats time as a fourth
-                            dimension, leading to four-dimensional spacetime geometry essential for
-                            understanding relativity, gravitation, and cosmology. Recent research explores how
-                            time's geometric properties might be manipulated in theoretical faster-than-light
-                            travel concepts.
-                        </div>
-                    </div>
-                </div>
-
-                <div class="section">
-                    <h3>6. Special Curves and Mathematical Functions</h3>
-
-                    <div class="subsection">
-                        <h4>6.1 Classical Special Curves</h4>
-                        <p>Several curves have gained prominence due to their unique mathematical properties and
-                            practical applications:</p>
-
-                        <ul>
-                            <li><strong>Brachistochrone Curve:</strong> The curve of fastest descent,
-                                fundamental to the calculus of variations and optimal control theory. Modern
-                                applications include spacecraft trajectory optimization and roller coaster
-                                design.</li>
-                            <li><strong>Catenary Curve:</strong> The shape assumed by a hanging chain or cable
-                                under its own weight. Essential for suspension bridge design, architectural
-                                arches, and power line engineering.</li>
-                            <li><strong>Weierstrass Function:</strong> A continuous but nowhere differentiable
-                                function that challenged traditional notions of smoothness and continuity,
-                                leading to modern fractal theory and non-smooth optimization.</li>
-                        </ul>
-                    </div>
-
-                    <div class="subsection">
-                        <h4>6.2 Modern Curve Applications</h4>
-                        <p>Contemporary research has revealed new applications for classical curves and
-                            developed entirely new curve families:</p>
-                        <ul>
-                            <li>Bézier curves and NURBS (Non-Uniform Rational B-Splines) in computer-aided
-                                design</li>
-                            <li>Elliptic curves in cryptography and blockchain technology</li>
-                            <li>Dragon curves and space-filling curves in algorithm optimization</li>
-                            <li>Parametric curves in 3D printing and CNC machining</li>
-                        </ul>
-                    </div>
-                </div>
-
-                <div class="section">
-                    <h3>7. Vector Calculus and Differential Geometry</h3>
-
-                    <div class="subsection">
-                        <h4>7.1 Divergence and Curl</h4>
-                        <p>Divergence and curl are fundamental vector operations that describe the behavior of
-                            vector fields in space, forming the mathematical language of Maxwell's equations,
-                            fluid dynamics, and electromagnetic theory.</p>
-
-                        <ul>
-                            <li><strong>Divergence:</strong> Measures the "outflow" of a vector field from a
-                                point, crucial for understanding conservation laws and fluid flow patterns</li>
-                            <li><strong>Curl:</strong> Measures the "rotation" or circulation of a vector field,
-                                essential for describing electromagnetic induction and vorticity in fluid
-                                mechanics</li>
-                        </ul>
-
-                        <div class="modern-concepts">
-                            <strong>Recent Applications:</strong> Advanced applications include computational
-                            fluid dynamics for climate modeling, electromagnetic field optimization for wireless
-                            communications, and plasma physics for fusion energy research.
-                        </div>
-                    </div>
-                </div>
-
-                <div class="section">
-                    <h3>8. Cutting-Edge Developments and Future Directions</h3>
-
-                    <div class="subsection">
-                        <h4>8.1 Computational Geometry</h4>
-                        <p>The intersection of computer science and geometry has produced revolutionary tools
-                            and algorithms:</p>
-                        <ul>
-                            <li><strong>Algorithmic geometry:</strong> Efficient algorithms for geometric
-                                problems in computer graphics, robotics, and manufacturing</li>
-                            <li><strong>Discrete geometry:</strong> Study of geometric properties of discrete
-                                objects, crucial for crystallography and materials science</li>
-                            <li><strong>Geometric machine learning:</strong> Integration of geometric principles
-                                with artificial intelligence for improved pattern recognition and data analysis
-                            </li>
-                        </ul>
-                    </div>
-
-                    <div class="subsection">
-                        <h4>8.2 Quantum Geometry</h4>
-                        <p>Emerging field combining quantum mechanics with geometric principles:</p>
-                        <ul>
-                            <li>Quantum geometric phases and Berry curvature in condensed matter physics</li>
-                            <li>Geometric quantum computing using topological quantum states</li>
-                            <li>Non-commutative geometry for quantum field theory</li>
-                            <li>Quantum error correction using geometric codes</li>
-                        </ul>
-                    </div>
-
-                    <div class="subsection">
-                        <h4>8.3 Biological and Bio-Inspired Geometry</h4>
-                        <p>Nature-inspired geometric research leading to new technologies:</p>
-                        <ul>
-                            <li>Biomimetic materials with hierarchical geometric structures</li>
-                            <li>Geometric analysis of protein folding and drug design</li>
-                            <li>Morphogenesis modeling using differential geometry</li>
-                            <li>Swarm intelligence and geometric optimization algorithms</li>
-                        </ul>
-                    </div>
-
-                    <div class="subsection">
-                        <h4>8.4 Metamaterial Geometry</h4>
-                        <p>Revolutionary materials with properties determined by geometric structure rather than
-                            chemical composition:</p>
-                        <ul>
-                            <li>Negative refractive index materials for invisibility cloaking</li>
-                            <li>Phononic crystals for sound manipulation</li>
-                            <li>Mechanical metamaterials with unusual elastic properties</li>
-                            <li>4D printing with time-dependent geometric transformations</li>
-                        </ul>
-                    </div>
-                </div>
-
-                <div class="section">
-                    <h3>9. Interdisciplinary Applications</h3>
-
-                    <div class="subsection">
-                        <h4>9.1 Architecture and Design</h4>
-                        <p>Modern architecture increasingly relies on advanced geometric principles:</p>
-                        <ul>
-                            <li>Parametric architecture using algorithmic design</li>
-                            <li>Biomimetic structures inspired by natural geometries</li>
-                            <li>Smart buildings with adaptive geometric elements</li>
-                            <li>Sustainable design using geometric optimization</li>
-                        </ul>
-                    </div>
-
-                    <div class="subsection">
-                        <h4>9.2 Medical Applications</h4>
-                        <p>Geometry plays crucial roles in modern medicine:</p>
-                        <ul>
-                            <li>Medical imaging reconstruction using geometric algorithms</li>
-                            <li>Surgical planning with 3D geometric modeling</li>
-                            <li>Drug delivery systems using geometric targeting</li>
-                            <li>Prosthetics design with biomechanical geometry</li>
-                        </ul>
-                    </div>
-
-                    <div class="subsection">
-                        <h4>9.3 Environmental and Climate Science</h4>
-                        <p>Geometric modeling for environmental understanding:</p>
-                        <ul>
-                            <li>Climate models using spherical harmonics</li>
-                            <li>Ocean current modeling with differential geometry</li>
-                            <li>Ecosystem modeling using network geometry</li>
-                            <li>Renewable energy optimization through geometric analysis</li>
-                        </ul>
-                    </div>
-                </div>
-
-                <div class="section">
-                    <h3>10. Future Perspectives</h3>
-
-                    <p>The future of geometry promises continued integration with emerging technologies and
-                        scientific discoveries. Key areas of development include:</p>
-
-                    <div class="modern-concepts">
-                        <strong>Emerging Trends:</strong>
-                        <ul>
-                            <li><strong>Artificial Intelligence Integration:</strong> AI-driven geometric
-                                discovery and automated theorem proving</li>
-                            <li><strong>Quantum Technologies:</strong> Geometric approaches to quantum computing
-                                and quantum materials</li>
-                            <li><strong>Space Exploration:</strong> Non-Euclidean navigation systems for
-                                interplanetary travel</li>
-                            <li><strong>Nanotechnology:</strong> Molecular geometric engineering for precise
-                                material properties</li>
-                            <li><strong>Virtual and Augmented Reality:</strong> Advanced geometric rendering for
-                                immersive experiences</li>
-                            <li><strong>Biotechnology:</strong> Geometric principles in synthetic biology and
-                                tissue engineering</li>
-                        </ul>
-                    </div>
-
-                    <p>As our understanding of geometry continues to evolve, it remains a fundamental tool for
-                        describing, analyzing, and manipulating the world around us, from the quantum scale to
-                        cosmic structures.</p>
-                </div>
-
-                <div class="reference-list">
-                    <h3>References</h3>
-                    <ol>
-                        <li><a href="https://en.wikipedia.org/wiki/Geometry">Geometry -
-                                Wikipedia</a></li>
-                        <li><a href="https://en.wikipedia.org/wiki/Ellipse">Ellipse -
-                                Wikipedia</a></li>
-                        <li> <a href="https://en.wikipedia.org/wiki/Spiral">Spiral -
-                                Wikipedia</a></li>
-                        <li><a href="https://en.wikipedia.org/wiki/Polygon">Polygon -
-                                Wikipedia</a></li>
-                        <li><a href="https://en.wikipedia.org/wiki/Platonic_solid">Platonic
-                                Solid - Wikipedia</a>
-                        </li>
-                        <li><a href="https://en.wikipedia.org/wiki/Polyhedron">Polyhedron -
-                                Wikipedia</a></li>
-                        <li><a href="https://en.wikipedia.org/wiki/Euclidean_geometry">Euclidean
-                                Geometry - Wikipedia</a></li>
-                        <li><a href="https://en.wikipedia.org/wiki/Projective_geometry">Projective
-                                Geometry - Wikipedia</a>
-                        </li>
-                        <li><a href="https://en.wikipedia.org/wiki/Fractal">Fractal
-                                - Wikipedia</a></li>
-                        <li><a href="https://en.wikipedia.org/wiki/Topology">Topology -
-                                Wikipedia</a></li>
-                        <li><a href="https://phy.princeton.edu/news/quantum-fractal-patterns-visualized">Quantum
-                                fractal
-                                patterns visualized </a></li>
-                        <li><a href="https://en.wikipedia.org/wiki/Dimension">Dimension -
-                                Wikipedia</a></li>
-                        <li><a href="https://en.wikipedia.org/wiki/Spacetime">Spacetime -
-                                Wikipedia</a></li>
-                        <li><a href="https://www.youtube.com/watch?v=3izFMB91K_Q">Curves
-                                we (mostly) don't learn in high school</a></li>
-                        <li><a href="https://www.youtube.com/watch?v=rB83DpBJQsE">Divergence
-                                and curl: The language of Maxwell's equations</a>
-                        </li>
-
-                        <li><a href="https://en.wikipedia.org/wiki/Weierstrass_function">Weierstrass
-                                function - Wikipedia</a></li>
-                        <li><a href="https://en.wikipedia.org/wiki/Brachistochrone_curve">Brachistochrone curve -
-                                Wikipedia</a></li>
-                        <li><a href="https://en.wikipedia.org/wiki/Catenary">Catenary -
-                                Wikipedia</a></li>
-                        <li><a href="https://en.wikipedia.org/wiki/Non-Euclidean_geometry">Non-Euclidean
-                                geometry - Wikipedia</a></li>
-                        <li><a href="https://en.wikipedia.org/wiki/Differential_geometry">Differential
-                                geometry - Wikipedia</a></li>
-                        <li><a href="https://en.wikipedia.org/wiki/Computational_geometry">Computational
-                                geometry - Wikipedia</a></li>
-
-                        <li><a href="https://www.youtube.com/watch?v=dr2sIoD7eeU">The things
-                                you'll find in higher dimensions</a></li>
-                        <li><a href="https://www.youtube.com/watch?v=2s4TqVAbfz4">Perfect Shapes
-                                in Higher Dimensions - Numberphile</a></li>
-                    </ol>
-                </div>
+        <!-- Chapter Navigation -->
+        <section class="chapter-nav">
+            <h2 class="chapter-nav-title">Explore the Chapters</h2>
+            <div class="chapter-grid">
+                <a href="#chapter1" class="chapter-card">
+                    <div class="chapter-number">Chapter 1</div>
+                    <div class="chapter-title">Fundamental Shapes</div>
+                    <p class="chapter-description">Discover the building blocks of geometry: planar curves, polygons,
+                        and their properties</p>
+                </a>
+                <a href="#chapter2" class="chapter-card">
+                    <div class="chapter-number">Chapter 2</div>
+                    <div class="chapter-title">Three-Dimensional Geometry</div>
+                    <p class="chapter-description">Explore polyhedra and the elegant Platonic solids</p>
+                </a>
+                <a href="#chapter3" class="chapter-card">
+                    <div class="chapter-number">Chapter 3</div>
+                    <div class="chapter-title">Classical Systems</div>
+                    <p class="chapter-description">Journey through Euclidean and non-Euclidean geometries</p>
+                </a>
+                <a href="#chapter4" class="chapter-card">
+                    <div class="chapter-number">Chapter 4</div>
+                    <div class="chapter-title">Advanced Frameworks</div>
+                    <p class="chapter-description">Delve into projective, affine, and fractal geometry</p>
+                </a>
+                <a href="#chapter5" class="chapter-card">
+                    <div class="chapter-number">Chapter 5</div>
+                    <div class="chapter-title">Topology & Higher Dimensions</div>
+                    <p class="chapter-description">Venture beyond our three-dimensional perception</p>
+                </a>
+                <a href="#chapter6" class="chapter-card">
+                    <div class="chapter-number">Chapter 6</div>
+                    <div class="chapter-title">Special Curves</div>
+                    <p class="chapter-description">Examine classical curves and their modern applications</p>
+                </a>
+                <a href="#chapter7" class="chapter-card">
+                    <div class="chapter-number">Chapter 7</div>
+                    <div class="chapter-title">Vector Calculus</div>
+                    <p class="chapter-description">Master divergence, curl, and differential geometry</p>
+                </a>
+                <a href="#chapter8" class="chapter-card">
+                    <div class="chapter-number">Chapter 8</div>
+                    <div class="chapter-title">Cutting-Edge Developments</div>
+                    <p class="chapter-description">Explore computational and quantum geometry</p>
+                </a>
+                <a href="#chapter9" class="chapter-card">
+                    <div class="chapter-number">Chapter 9</div>
+                    <div class="chapter-title">Interdisciplinary Applications</div>
+                    <p class="chapter-description">See geometry in action across sciences</p>
+                </a>
+                <a href="#chapter10" class="chapter-card">
+                    <div class="chapter-number">Chapter 10</div>
+                    <div class="chapter-title">Future Perspectives</div>
+                    <p class="chapter-description">Glimpse the future of geometric research</p>
+                </a>
             </div>
-        </div>
+        </section>
+
+        <!-- Main Content -->
+        <main id="main-content" class="main-content">
+            <!-- Introduction -->
+            <section class="content-intro">
+                <p>Geometry, derived from the Greek words "geo" (earth) and "metron" (measure), is one of the oldest
+                    mathematical sciences, initially developed to solve practical problems in surveying, construction,
+                    and astronomy. Today, geometry encompasses a vast and evolving field that extends from classical
+                    Euclidean principles to revolutionary concepts in quantum geometry, computational topology, and
+                    artificial intelligence applications.</p>
+
+                <div class="info-box">
+                    <strong>Key Concepts Overview:</strong>
+                    <ul>
+                        <li>Basic geometric shapes and their properties</li>
+                        <li>Classical geometric systems (Euclidean and non-Euclidean)</li>
+                        <li>Advanced mathematical structures (topology, differential geometry)</li>
+                        <li>Modern applications in technology, physics, and computer science</li>
+                        <li>Cutting-edge theoretical developments and future directions</li>
+                    </ul>
+                </div>
+            </section>
+
+            <!-- Chapter 1 -->
+            <article id="chapter1" class="chapter-section">
+                <header class="chapter-section-header">
+                    <div class="chapter-section-number">Chapter 1</div>
+                    <h2 class="chapter-section-title">Fundamental Geometric Shapes</h2>
+                </header>
+
+                <div class="subsection">
+                    <h4>Planar Curves</h4>
+                    <p><strong>Ellipses</strong> are closed curves defined as the locus of points where the sum of
+                        distances to two fixed points (foci) remains constant. Beyond their classical definition,
+                        ellipses appear in orbital mechanics, architectural design, and modern applications in medical
+                        imaging and antenna design.</p>
+
+                    <p><strong>Spirals</strong> represent a family of curves that wind around a central point or axis.
+                        Notable types include:</p>
+                    <ul>
+                        <li>Archimedean spiral: characterized by constant spacing between turns</li>
+                        <li>Logarithmic spiral: appearing frequently in nature (nautilus shells, galaxy arms)</li>
+                        <li>Fermat's spiral: related to the golden ratio and Fibonacci sequences</li>
+                        <li>Hyperbolic spiral: used in modern computational geometry algorithms</li>
+                    </ul>
+                    <p>Recent research has revealed spiral patterns in quantum vortices and their applications in
+                        quantum computing architectures.</p>
+                </div>
+
+                <div class="subsection">
+                    <h4>Polygons</h4>
+                    <p>Polygons are closed planar figures formed by straight line segments. While basic polygons
+                        (triangles, squares, pentagons) form the foundation of geometric understanding, modern research
+                        focuses on:</p>
+                    <ul>
+                        <li>Computational polygon decomposition for 3D printing and manufacturing</li>
+                        <li>Optimal polygon packing in materials science</li>
+                        <li>Polygon mesh generation for virtual reality and gaming</li>
+                        <li>Self-assembling polygonal structures in nanotechnology</li>
+                    </ul>
+                </div>
+            </article>
+
+            <!-- Chapter 2 -->
+            <article id="chapter2" class="chapter-section">
+                <header class="chapter-section-header">
+                    <div class="chapter-section-number">Chapter 2</div>
+                    <h2 class="chapter-section-title">Three-Dimensional Geometry</h2>
+                </header>
+
+                <div class="subsection">
+                    <h4>Polyhedra</h4>
+                    <p>Polyhedra are three-dimensional shapes bounded by flat polygonal faces. These structures form the
+                        backbone of crystallography, molecular geometry, and architectural design.</p>
+                </div>
+
+                <div class="subsection">
+                    <h4>Platonic Solids</h4>
+                    <p>The five Platonic solids represent the most symmetric three-dimensional forms, where each face is
+                        a congruent regular polygon:</p>
+
+                    <ul>
+                        <li><strong>Tetrahedron:</strong> 4 triangular faces - fundamental in quantum chemistry and
+                            tetrahedral coordination compounds</li>
+                        <li><strong>Cube (Hexahedron):</strong> 6 square faces - basis for cubic crystal systems and
+                            voxel-based 3D modeling</li>
+                        <li><strong>Octahedron:</strong> 8 triangular faces - important in materials science for
+                            octahedral molecular geometry</li>
+                        <li><strong>Dodecahedron:</strong> 12 pentagonal faces - appears in viral capsid structures and
+                            fullerene chemistry</li>
+                        <li><strong>Icosahedron:</strong> 20 triangular faces - crucial in understanding virus
+                            structures and geodesic dome architecture</li>
+                    </ul>
+                </div>
+            </article>
+
+            <!-- Chapter 3 -->
+            <article id="chapter3" class="chapter-section">
+                <header class="chapter-section-header">
+                    <div class="chapter-section-number">Chapter 3</div>
+                    <h2 class="chapter-section-title">Classical Geometric Systems</h2>
+                </header>
+
+                <div class="subsection">
+                    <h4>Euclidean Geometry</h4>
+                    <p>Euclidean geometry, based on Euclid's axioms from around 300 BCE, describes the properties of
+                        flat space and remains fundamental to engineering, architecture, and everyday spatial reasoning.
+                    </p>
+
+                    <ul>
+                        <li><strong>Euclidean Plane Geometry:</strong> Deals with two-dimensional figures, including
+                            triangles, circles, and polygons, forming the foundation for trigonometry and analytical
+                            geometry</li>
+                        <li><strong>Euclidean Solid Geometry:</strong> Extends to three-dimensional space, covering
+                            volumes, surface areas, and spatial relationships essential for physics and engineering
+                            applications</li>
+                    </ul>
+
+                    <p>Despite its ancient origins, Euclidean geometry continues to evolve with computational
+                        implementations, finding new applications in computer graphics, robotics, and artificial
+                        intelligence path planning.</p>
+                </div>
+
+                <div class="subsection">
+                    <h4>Non-Euclidean Geometries</h4>
+                    <p>Non-Euclidean geometries challenge the parallel postulate of Euclidean geometry, leading to
+                        revolutionary insights in mathematics and physics.</p>
+
+                    <p><strong>Hyperbolic Geometry:</strong> In hyperbolic geometry, multiple parallel lines can pass
+                        through a point not on a given line. This geometry describes surfaces with constant negative
+                        curvature, such as saddle surfaces. Modern applications include:</p>
+                    <ul>
+                        <li>Network analysis and social media mapping</li>
+                        <li>Machine learning algorithms for hierarchical data representation</li>
+                        <li>Modeling of space-time in certain cosmological theories</li>
+                    </ul>
+
+                    <p><strong>Elliptic Geometry:</strong> Elliptic geometry, where no parallel lines exist, describes
+                        surfaces with constant positive curvature. The sphere is the classic example, making this
+                        geometry essential for:</p>
+                    <ul>
+                        <li>Global positioning systems and navigation</li>
+                        <li>Climate modeling and atmospheric dynamics</li>
+                        <li>Understanding cosmic microwave background radiation patterns</li>
+                    </ul>
+                </div>
+            </article>
+
+            <!-- Chapter 4 -->
+            <article id="chapter4" class="chapter-section">
+                <header class="chapter-section-header">
+                    <div class="chapter-section-number">Chapter 4</div>
+                    <h2 class="chapter-section-title">Advanced Geometric Frameworks</h2>
+                </header>
+
+                <div class="subsection">
+                    <h4>Projective Geometry</h4>
+                    <p>Projective geometry studies properties invariant under projection, eliminating the need for
+                        parallel postulates. This field has become crucial in computer vision, perspective drawing, and
+                        homogeneous coordinate systems used in 3D graphics and robotics.</p>
+                </div>
+
+                <div class="subsection">
+                    <h4>Affine Geometry</h4>
+                    <p>Affine geometry preserves parallelism and ratios of distances along parallel lines while allowing
+                        for transformations like scaling and shearing. Modern applications include:</p>
+                    <ul>
+                        <li>Computer-aided design (CAD) software</li>
+                        <li>Image transformation algorithms</li>
+                        <li>Crystallographic analysis</li>
+                        <li>Finite element analysis in engineering</li>
+                    </ul>
+                </div>
+
+                <div class="subsection">
+                    <h4>Fractal Geometry</h4>
+                    <p>Fractal geometry, pioneered by Benoit Mandelbrot, describes self-similar structures that repeat
+                        at different scales. This revolutionary field has applications in:</p>
+                    <ul>
+                        <li>Natural phenomena modeling (coastlines, clouds, mountain ranges)</li>
+                        <li>Financial market analysis and risk assessment</li>
+                        <li>Antenna design for improved signal reception</li>
+                        <li>Medical imaging for detecting irregular cellular structures</li>
+                        <li>Procedural generation in computer graphics and gaming</li>
+                    </ul>
+
+                    <div class="modern-box">
+                        <strong>Cutting-Edge Development:</strong> Recent advances include "quantum fractals" -
+                        structures that exhibit fractal properties at quantum scales, potentially leading to new
+                        materials with unprecedented properties and quantum computing applications.
+                    </div>
+                </div>
+            </article>
+
+            <!-- Chapter 5 -->
+            <article id="chapter5" class="chapter-section">
+                <header class="chapter-section-header">
+                    <div class="chapter-section-number">Chapter 5</div>
+                    <h2 class="chapter-section-title">Topology and Higher-Dimensional Geometry</h2>
+                </header>
+
+                <div class="subsection">
+                    <h4>Topology</h4>
+                    <p>Topology studies properties of space that are preserved under continuous deformations, focusing
+                        on concepts like connectivity, compactness, and continuity rather than precise measurements.</p>
+
+                    <div class="info-box">
+                        <strong>Fundamental Topological Concepts:</strong>
+                        <ul>
+                            <li>Homeomorphisms and topological equivalence</li>
+                            <li>Euler characteristic and classification of surfaces</li>
+                            <li>Fundamental groups and homotopy theory</li>
+                            <li>Knot theory and link invariants</li>
+                            <li>Algebraic topology and homology theory</li>
+                        </ul>
+                    </div>
+
+                    <p>Modern topology applications include data analysis, network theory, and understanding protein
+                        folding patterns in biochemistry.</p>
+                </div>
+
+                <div class="subsection">
+                    <h4>Higher-Dimensional Objects</h4>
+                    <p>Understanding dimensional objects beyond our three-dimensional experience requires mathematical
+                        abstraction and has profound implications for physics and technology.</p>
+
+                    <ul>
+                        <li><strong>Four-dimensional objects:</strong> Tesseracts, 16-cells, and 120-cells challenge
+                            spatial intuition but appear in relativity theory and string theory models</li>
+                        <li><strong>n-dimensional manifolds:</strong> Essential for understanding phase spaces in
+                            statistical mechanics and configuration spaces in robotics</li>
+                        <li><strong>Calabi-Yau manifolds:</strong> Six-dimensional spaces crucial for string theory and
+                            theoretical physics</li>
+                    </ul>
+
+                    <div class="highlight-box">
+                        <strong>Time as a Dimension:</strong> Modern physics treats time as a fourth dimension, leading
+                        to four-dimensional spacetime geometry essential for understanding relativity, gravitation, and
+                        cosmology. Recent research explores how time's geometric properties might be manipulated in
+                        theoretical faster-than-light travel concepts.
+                    </div>
+                </div>
+            </article>
+
+            <!-- Chapter 6 -->
+            <article id="chapter6" class="chapter-section">
+                <header class="chapter-section-header">
+                    <div class="chapter-section-number">Chapter 6</div>
+                    <h2 class="chapter-section-title">Special Curves and Mathematical Functions</h2>
+                </header>
+
+                <div class="subsection">
+                    <h4>Classical Special Curves</h4>
+                    <p>Several curves have gained prominence due to their unique mathematical properties and practical
+                        applications:</p>
+
+                    <ul>
+                        <li><strong>Brachistochrone Curve:</strong> The curve of fastest descent, fundamental to the
+                            calculus of variations and optimal control theory. Modern applications include spacecraft
+                            trajectory optimization and roller coaster design.</li>
+                        <li><strong>Catenary Curve:</strong> The shape assumed by a hanging chain or cable under its own
+                            weight. Essential for suspension bridge design, architectural arches, and power line
+                            engineering.</li>
+                        <li><strong>Weierstrass Function:</strong> A continuous but nowhere differentiable function that
+                            challenged traditional notions of smoothness and continuity, leading to modern fractal
+                            theory and non-smooth optimization.</li>
+                    </ul>
+                </div>
+
+                <div class="subsection">
+                    <h4>Modern Curve Applications</h4>
+                    <p>Contemporary research has revealed new applications for classical curves and developed entirely
+                        new curve families:</p>
+                    <ul>
+                        <li>Bézier curves and NURBS (Non-Uniform Rational B-Splines) in computer-aided design</li>
+                        <li>Elliptic curves in cryptography and blockchain technology</li>
+                        <li>Dragon curves and space-filling curves in algorithm optimization</li>
+                        <li>Parametric curves in 3D printing and CNC machining</li>
+                    </ul>
+                </div>
+            </article>
+
+            <!-- Chapter 7 -->
+            <article id="chapter7" class="chapter-section">
+                <header class="chapter-section-header">
+                    <div class="chapter-section-number">Chapter 7</div>
+                    <h2 class="chapter-section-title">Vector Calculus and Differential Geometry</h2>
+                </header>
+
+                <div class="subsection">
+                    <h4>Divergence and Curl</h4>
+                    <p>Divergence and curl are fundamental vector operations that describe the behavior of vector fields
+                        in space, forming the mathematical language of Maxwell's equations, fluid dynamics, and
+                        electromagnetic theory.</p>
+
+                    <ul>
+                        <li><strong>Divergence:</strong> Measures the "outflow" of a vector field from a point, crucial
+                            for understanding conservation laws and fluid flow patterns</li>
+                        <li><strong>Curl:</strong> Measures the "rotation" or circulation of a vector field, essential
+                            for describing electromagnetic induction and vorticity in fluid mechanics</li>
+                    </ul>
+
+                    <div class="modern-box">
+                        <strong>Recent Applications:</strong> Advanced applications include computational fluid dynamics
+                        for climate modeling, electromagnetic field optimization for wireless communications, and plasma
+                        physics for fusion energy research.
+                    </div>
+                </div>
+            </article>
+
+            <!-- Chapter 8 -->
+            <article id="chapter8" class="chapter-section">
+                <header class="chapter-section-header">
+                    <div class="chapter-section-number">Chapter 8</div>
+                    <h2 class="chapter-section-title">Cutting-Edge Developments and Future Directions</h2>
+                </header>
+
+                <div class="subsection">
+                    <h4>Computational Geometry</h4>
+                    <p>The intersection of computer science and geometry has produced revolutionary tools and
+                        algorithms:</p>
+                    <ul>
+                        <li><strong>Algorithmic geometry:</strong> Efficient algorithms for geometric problems in
+                            computer graphics, robotics, and manufacturing</li>
+                        <li><strong>Discrete geometry:</strong> Study of geometric properties of discrete objects,
+                            crucial for crystallography and materials science</li>
+                        <li><strong>Geometric machine learning:</strong> Integration of geometric principles with
+                            artificial intelligence for improved pattern recognition and data analysis</li>
+                    </ul>
+                </div>
+
+                <div class="subsection">
+                    <h4>Quantum Geometry</h4>
+                    <p>Emerging field combining quantum mechanics with geometric principles:</p>
+                    <ul>
+                        <li>Quantum geometric phases and Berry curvature in condensed matter physics</li>
+                        <li>Geometric quantum computing using topological quantum states</li>
+                        <li>Non-commutative geometry for quantum field theory</li>
+                        <li>Quantum error correction using geometric codes</li>
+                    </ul>
+                </div>
+
+                <div class="subsection">
+                    <h4>Biological and Bio-Inspired Geometry</h4>
+                    <p>Nature-inspired geometric research leading to new technologies:</p>
+                    <ul>
+                        <li>Biomimetic materials with hierarchical geometric structures</li>
+                        <li>Geometric analysis of protein folding and drug design</li>
+                        <li>Morphogenesis modeling using differential geometry</li>
+                        <li>Swarm intelligence and geometric optimization algorithms</li>
+                    </ul>
+                </div>
+
+                <div class="subsection">
+                    <h4>Metamaterial Geometry</h4>
+                    <p>Revolutionary materials with properties determined by geometric structure rather than chemical
+                        composition:</p>
+                    <ul>
+                        <li>Negative refractive index materials for invisibility cloaking</li>
+                        <li>Phononic crystals for sound manipulation</li>
+                        <li>Mechanical metamaterials with unusual elastic properties</li>
+                        <li>4D printing with time-dependent geometric transformations</li>
+                    </ul>
+                </div>
+            </article>
+
+            <!-- Chapter 9 -->
+            <article id="chapter9" class="chapter-section">
+                <header class="chapter-section-header">
+                    <div class="chapter-section-number">Chapter 9</div>
+                    <h2 class="chapter-section-title">Interdisciplinary Applications</h2>
+                </header>
+
+                <div class="subsection">
+                    <h4>Architecture and Design</h4>
+                    <p>Modern architecture increasingly relies on advanced geometric principles:</p>
+                    <ul>
+                        <li>Parametric architecture using algorithmic design</li>
+                        <li>Biomimetic structures inspired by natural geometries</li>
+                        <li>Smart buildings with adaptive geometric elements</li>
+                        <li>Sustainable design using geometric optimization</li>
+                    </ul>
+                </div>
+
+                <div class="subsection">
+                    <h4>Medical Applications</h4>
+                    <p>Geometry plays crucial roles in modern medicine:</p>
+                    <ul>
+                        <li>Medical imaging reconstruction using geometric algorithms</li>
+                        <li>Surgical planning with 3D geometric modeling</li>
+                        <li>Drug delivery systems using geometric targeting</li>
+                        <li>Prosthetics design with biomechanical geometry</li>
+                    </ul>
+                </div>
+
+                <div class="subsection">
+                    <h4>Environmental and Climate Science</h4>
+                    <p>Geometric modeling for environmental understanding:</p>
+                    <ul>
+                        <li>Climate models using spherical harmonics</li>
+                        <li>Ocean current modeling with differential geometry</li>
+                        <li>Ecosystem modeling using network geometry</li>
+                        <li>Renewable energy optimization through geometric analysis</li>
+                    </ul>
+                </div>
+            </article>
+
+            <!-- Chapter 10 -->
+            <article id="chapter10" class="chapter-section">
+                <header class="chapter-section-header">
+                    <div class="chapter-section-number">Chapter 10</div>
+                    <h2 class="chapter-section-title">Future Perspectives</h2>
+                </header>
+
+                <p>The future of geometry promises continued integration with emerging technologies and scientific
+                    discoveries. Key areas of development include:</p>
+
+                <div class="modern-box">
+                    <strong>Emerging Trends:</strong>
+                    <ul>
+                        <li><strong>Artificial Intelligence Integration:</strong> AI-driven geometric discovery and
+                            automated theorem proving</li>
+                        <li><strong>Quantum Technologies:</strong> Geometric approaches to quantum computing and quantum
+                            materials</li>
+                        <li><strong>Space Exploration:</strong> Non-Euclidean navigation systems for interplanetary
+                            travel</li>
+                        <li><strong>Nanotechnology:</strong> Molecular geometric engineering for precise material
+                            properties</li>
+                        <li><strong>Virtual and Augmented Reality:</strong> Advanced geometric rendering for immersive
+                            experiences</li>
+                        <li><strong>Biotechnology:</strong> Geometric principles in synthetic biology and tissue
+                            engineering</li>
+                    </ul>
+                </div>
+
+                <p>As our understanding of geometry continues to evolve, it remains a fundamental tool for describing,
+                    analyzing, and manipulating the world around us, from the quantum scale to cosmic structures.</p>
+            </article>
+
+            <!-- References -->
+            <section class="references">
+                <h3>References</h3>
+                <ol>
+                    <li><a href="https://en.wikipedia.org/wiki/Geometry">Geometry - Wikipedia</a></li>
+                    <li><a href="https://en.wikipedia.org/wiki/Ellipse">Ellipse - Wikipedia</a></li>
+                    <li><a href="https://en.wikipedia.org/wiki/Spiral">Spiral - Wikipedia</a></li>
+                    <li><a href="https://en.wikipedia.org/wiki/Polygon">Polygon - Wikipedia</a></li>
+                    <li><a href="https://en.wikipedia.org/wiki/Platonic_solid">Platonic Solid - Wikipedia</a></li>
+                    <li><a href="https://en.wikipedia.org/wiki/Polyhedron">Polyhedron - Wikipedia</a></li>
+                    <li><a href="https://en.wikipedia.org/wiki/Euclidean_geometry">Euclidean Geometry - Wikipedia</a>
+                    </li>
+                    <li><a href="https://en.wikipedia.org/wiki/Projective_geometry">Projective Geometry - Wikipedia</a>
+                    </li>
+                    <li><a href="https://en.wikipedia.org/wiki/Fractal">Fractal - Wikipedia</a></li>
+                    <li><a href="https://en.wikipedia.org/wiki/Topology">Topology - Wikipedia</a></li>
+                    <li><a href="https://phy.princeton.edu/news/quantum-fractal-patterns-visualized">Quantum fractal
+                            patterns visualized</a></li>
+                    <li><a href="https://en.wikipedia.org/wiki/Dimension">Dimension - Wikipedia</a></li>
+                    <li><a href="https://en.wikipedia.org/wiki/Spacetime">Spacetime - Wikipedia</a></li>
+                    <li><a href="https://www.youtube.com/watch?v=3izFMB91K_Q">Curves we (mostly) don't learn in high
+                            school</a></li>
+                    <li><a href="https://www.youtube.com/watch?v=rB83DpBJQsE">Divergence and curl: The language of
+                            Maxwell's equations</a></li>
+                    <li><a href="https://en.wikipedia.org/wiki/Weierstrass_function">Weierstrass function -
+                            Wikipedia</a></li>
+                    <li><a href="https://en.wikipedia.org/wiki/Brachistochrone_curve">Brachistochrone curve -
+                            Wikipedia</a></li>
+                    <li><a href="https://en.wikipedia.org/wiki/Catenary">Catenary - Wikipedia</a></li>
+                    <li><a href="https://en.wikipedia.org/wiki/Non-Euclidean_geometry">Non-Euclidean geometry -
+                            Wikipedia</a></li>
+                    <li><a href="https://en.wikipedia.org/wiki/Differential_geometry">Differential geometry -
+                            Wikipedia</a></li>
+                    <li><a href="https://en.wikipedia.org/wiki/Computational_geometry">Computational geometry -
+                            Wikipedia</a></li>
+                    <li><a href="https://www.youtube.com/watch?v=dr2sIoD7eeU">The things you'll find in higher
+                            dimensions</a></li>
+                    <li><a href="https://www.youtube.com/watch?v=2s4TqVAbfz4">Perfect Shapes in Higher Dimensions -
+                            Numberphile</a></li>
+                </ol>
+            </section>
+        </main>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <div class="footer-content">
+                <p class="footer-copyright">© 2025 John Samuel. All content licensed under Creative Commons CC-BY-SA.
+                </p>
+                <nav class="footer-links" aria-label="Footer navigation">
+                    <a href="./geometry.html">English</a>
+                </nav>
+            </div>
+        </footer>
     </body>
 
 </html>
