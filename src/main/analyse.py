@@ -99,7 +99,6 @@ class WebsiteAnalysis:
         "en/teaching/courses/2024/DP",
         "en/teaching/courses/2024/MachineLearning",
         "en/teaching/courses/2024/MDP",
-        "en/teaching/courses/2024/DS4C",
         "en/slides/2017/Akademy/html",
         "en/slides/2017/CapitoleduLibre/html",
         "en/slides/2017/XLDB/html",
