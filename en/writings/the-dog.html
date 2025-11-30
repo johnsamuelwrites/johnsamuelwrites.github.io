@@ -3,329 +3,620 @@
 
     <head>
         <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <meta http-equiv="Content-Language" content="en" />
         <link rel="shortcut icon" href="../../images/logo/favicon.png" />
-        <title>The Dog who Stopped for a Moment: John Samuel</title>
+        <title>The Dog who Stopped for a Moment - John Samuel</title>
         <style type="text/css">
+            /* ===========================
+           Design Tokens
+           =========================== */
+            :root {
+                /* Urban Music-Inspired Palette */
+                --color-base-bg: #fafafa;
+                --color-base-surface: #ffffff;
+                --color-base-text: #2c3e50;
+                --color-base-text-muted: #5a6b7d;
+
+                /* Music & Movement Accents */
+                --color-accent-1: #5b7fa8;
+                /* River blue - flowing water */
+                --color-accent-2: #8b6f47;
+                /* Trombone brass - warm metal */
+                --color-accent-3: #7a5c8e;
+                /* Melodic purple - music notes */
+                --color-accent-light: #e8f0f7;
+                /* Pale sky tint */
+                --color-accent-glow: rgba(91, 127, 168, 0.15);
+
+                /* Functional Colors */
+                --color-shadow: rgba(91, 127, 168, 0.12);
+                --color-border: rgba(91, 127, 168, 0.15);
+                --color-hover: rgba(91, 127, 168, 0.08);
+
+                /* Gradients */
+                --gradient-primary: linear-gradient(135deg, #5b7fa8 0%, #7a5c8e 100%);
+                --gradient-hero: linear-gradient(165deg, #fafafa 0%, #e8f0f7 50%, #dce6f0 100%);
+                --gradient-accent: linear-gradient(135deg, #8b6f47 0%, #5b7fa8 50%, #7a5c8e 100%);
+                --gradient-story: linear-gradient(180deg, rgba(91, 127, 168, 0.05) 0%, rgba(122, 92, 142, 0.05) 100%);
+
+                /* Spacing Scale */
+                --space-xs: 0.25rem;
+                --space-sm: 0.5rem;
+                --space-md: 1rem;
+                --space-lg: 1.5rem;
+                --space-xl: 2rem;
+                --space-2xl: 3rem;
+                --space-3xl: 4rem;
+                --space-4xl: 6rem;
+
+                /* Typography */
+                --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+                --font-serif: Georgia, 'Times New Roman', serif;
+                --text-xs: clamp(0.75rem, 0.7rem + 0.25vw, 0.875rem);
+                --text-sm: clamp(0.875rem, 0.8rem + 0.35vw, 1rem);
+                --text-base: clamp(1rem, 0.95rem + 0.25vw, 1.125rem);
+                --text-lg: clamp(1.125rem, 1.05rem + 0.35vw, 1.25rem);
+                --text-xl: clamp(1.25rem, 1.15rem + 0.5vw, 1.5rem);
+                --text-2xl: clamp(1.5rem, 1.3rem + 1vw, 2rem);
+                --text-3xl: clamp(2rem, 1.6rem + 2vw, 2.5rem);
+                --text-4xl: clamp(2.5rem, 2rem + 2.5vw, 3.5rem);
+
+                /* Shadows */
+                --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.04), 0 1px 3px rgba(0, 0, 0, 0.06);
+                --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.05), 0 2px 4px rgba(0, 0, 0, 0.06);
+                --shadow-lg: 0 10px 24px rgba(0, 0, 0, 0.08), 0 4px 8px rgba(0, 0, 0, 0.06);
+                --shadow-theme: 0 10px 30px var(--color-shadow), 0 4px 10px rgba(0, 0, 0, 0.06);
+
+                /* Border Radius */
+                --radius-sm: 4px;
+                --radius-md: 8px;
+                --radius-lg: 12px;
+                --radius-xl: 16px;
+                --radius-2xl: 24px;
+                --radius-organic: 63% 37% 54% 46% / 45% 62% 38% 55%;
+            }
+
+            /* ===========================
+           Reset & Base Styles
+           =========================== */
+            * {
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
+            }
+
+            html {
+                scroll-behavior: smooth;
+                scroll-padding-top: 80px;
+            }
+
             body {
-                font-family: 'Georgia', serif;
-                line-height: 1.8;
-                background: #FFFFFF;
-                color: #2c3e50;
+                font-family: var(--font-sans);
+                font-size: var(--text-base);
+                line-height: 1.7;
+                color: var(--color-base-text);
+                background: var(--gradient-hero);
+                background-attachment: fixed;
+                overflow-x: hidden;
+                letter-spacing: -0.005em;
             }
 
-            header {
+            /* ===========================
+           Skip Link (Accessibility)
+           =========================== */
+            .skip-link {
+                position: absolute;
+                top: -100px;
+                left: 0;
+                background: var(--color-accent-1);
+                color: white;
+                padding: var(--space-md);
+                text-decoration: none;
+                z-index: 10000;
+            }
+
+            .skip-link:focus {
+                top: 0;
+            }
+
+            /* ===========================
+           Navigation
+           =========================== */
+            .nav-container {
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                z-index: 1000;
+                background: rgba(255, 255, 255, 0.85);
+                -webkit-backdrop-filter: blur(12px) saturate(180%);
+                backdrop-filter: blur(12px) saturate(180%);
+                border-bottom: 1px solid var(--color-border);
+                box-shadow: var(--shadow-sm);
+            }
+
+            nav {
+                max-width: 1400px;
+                margin: 0 auto;
+                padding: var(--space-lg) var(--space-xl);
+                display: flex;
+                align-items: center;
+                gap: var(--space-2xl);
+            }
+
+            .site-name {
+                font-weight: 700;
+                font-size: var(--text-xl);
+                color: var(--color-accent-1);
+                text-decoration: none;
+                letter-spacing: -0.02em;
+                transition: all 0.3s ease;
+                position: relative;
+            }
+
+            .site-name::after {
+                content: '';
+                position: absolute;
+                bottom: -4px;
+                left: 0;
+                width: 0;
+                height: 2px;
+                background: var(--gradient-primary);
+                transition: width 0.3s ease;
+            }
+
+            .site-name:hover::after {
+                width: 100%;
+            }
+
+            .breadcrumb {
+                display: flex;
+                list-style: none;
+                gap: var(--space-sm);
+                font-size: var(--text-sm);
+                flex-wrap: wrap;
+            }
+
+            .breadcrumb li {
+                display: flex;
+                align-items: center;
+                gap: var(--space-sm);
+            }
+
+            .breadcrumb li::after {
+                content: '→';
+                color: var(--color-base-text-muted);
+            }
+
+            .breadcrumb li:last-child::after {
+                content: '';
+            }
+
+            .breadcrumb a {
+                color: var(--color-base-text-muted);
+                text-decoration: none;
+                transition: color 0.3s ease;
+            }
+
+            .breadcrumb a:hover,
+            .breadcrumb a:focus {
+                color: var(--color-accent-1);
+            }
+
+            /* ===========================
+           Hero Section
+           =========================== */
+            .hero {
+                position: relative;
+                min-height: 65vh;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                padding: var(--space-4xl) var(--space-xl);
+                margin-top: 80px;
+                overflow: hidden;
+            }
+
+            .hero-background {
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                z-index: 0;
+            }
+
+            .hero-content {
+                position: relative;
+                z-index: 2;
+                max-width: 900px;
                 text-align: center;
-                margin-bottom: 40px;
-                border-bottom: 2px solid #34495e;
-                padding-bottom: 20px;
             }
 
-            h1 {
-                font-size: 2.5em;
-                color: #2c3e50;
-                margin-bottom: 10px;
-                text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+            .hero h1 {
+                font-size: var(--text-4xl);
+                font-weight: 800;
+                color: var(--color-accent-2);
+                letter-spacing: -0.03em;
+                line-height: 1.2;
+                margin-bottom: var(--space-lg);
+                animation: fadeInUp 1s ease 0.2s both;
             }
 
-            .subtitle {
-                font-style: italic;
-                color: #7f8c8d;
-                font-size: 1.1em;
+            .hero-subtitle {
+                font-size: var(--text-xl);
+                color: var(--color-base-text-muted);
+                font-weight: 500;
+                animation: fadeInUp 1s ease 0.4s both;
             }
 
+            .hero-subtitle a {
+                color: var(--color-accent-1);
+                text-decoration: none;
+                border-bottom: 2px solid var(--color-accent-light);
+                transition: border-color 0.3s ease;
+            }
+
+            .hero-subtitle a:hover {
+                border-color: var(--color-accent-1);
+            }
+
+            /* ===========================
+           Story Section Header
+           =========================== */
+            .story-header {
+                text-align: center;
+                padding: var(--space-2xl) var(--space-xl);
+                margin: var(--space-3xl) auto;
+                max-width: 800px;
+            }
+
+            .story-header h2 {
+                font-size: var(--text-3xl);
+                color: var(--color-accent-3);
+                font-weight: 700;
+                margin-bottom: var(--space-md);
+                letter-spacing: -0.02em;
+            }
+
+            /* ===========================
+           Featured Illustration
+           =========================== */
+            .featured-illustration {
+                max-width: 1000px;
+                margin: var(--space-4xl) auto;
+                padding: 0 var(--space-xl);
+                animation: fadeInUp 1s ease 0.6s both;
+            }
+
+            .featured-illustration svg {
+                width: 100%;
+                height: auto;
+                display: block;
+                border-radius: var(--radius-xl);
+                box-shadow: var(--shadow-theme);
+                background: white;
+            }
+
+            /* ===========================
+           Main Content - Story Sections
+           =========================== */
             main {
-                background: rgba(255, 255, 255, 0.9);
-                padding: 30px;
-                border-radius: 10px;
-                box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+                max-width: 900px;
+                margin: 0 auto;
+                padding: 0 var(--space-xl) var(--space-4xl);
             }
 
-            section {
-                margin-bottom: 25px;
+            .story-section {
+                background: var(--color-base-surface);
+                border-radius: var(--radius-xl);
+                padding: var(--space-3xl);
+                margin-bottom: var(--space-2xl);
+                box-shadow: var(--shadow-theme);
+                animation: fadeInUp 1s ease both;
+                position: relative;
+                overflow: hidden;
             }
 
-            p {
-                margin-bottom: 20px;
-                text-align: justify;
-                font-size: 1.1em;
+            .story-section::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                height: 4px;
+                background: var(--gradient-primary);
+                opacity: 0.3;
             }
 
             .opening-paragraph {
-                font-size: 1.2em;
+                font-size: var(--text-lg);
                 font-weight: 500;
-                color: #34495e;
+                color: var(--color-accent-2);
+                line-height: 1.8;
+                margin-bottom: var(--space-xl);
+                font-family: var(--font-serif);
             }
 
+            .story-section p {
+                margin-bottom: var(--space-xl);
+                line-height: 1.8;
+                color: var(--color-base-text);
+                font-family: var(--font-serif);
+                font-size: var(--text-lg);
+            }
+
+            .story-section p:last-child {
+                margin-bottom: 0;
+            }
+
+            /* ===========================
+           Climax Section - Special Styling
+           =========================== */
             .climax {
-                background: linear-gradient(90deg, rgba(52, 152, 219, 0.1) 0%, rgba(155, 89, 182, 0.1) 100%);
-                padding: 20px;
-                border-left: 4px solid #3498db;
-                border-radius: 5px;
-                margin: 25px 0;
+                background: var(--gradient-story);
+                border-left: 6px solid var(--color-accent-1);
+                position: relative;
             }
 
+            .climax::after {
+                content: '♪';
+                position: absolute;
+                top: var(--space-lg);
+                right: var(--space-lg);
+                font-size: 60px;
+                color: var(--color-accent-1);
+                opacity: 0.08;
+                animation: musicNote 4s ease-in-out infinite;
+            }
+
+            /* ===========================
+           Reflection Section
+           =========================== */
             .reflection {
-                font-style: italic;
+                background: var(--gradient-primary);
+                color: white;
+                padding: var(--space-3xl);
+                border-radius: var(--radius-xl);
                 text-align: center;
-                margin-top: 30px;
-                padding: 20px;
-                background: rgba(149, 165, 166, 0.1);
-                border-radius: 5px;
-            }
-
-            footer {
-                text-align: center;
-                margin-top: 40px;
-                padding-top: 20px;
-                border-top: 1px solid #bdc3c7;
-                color: #7f8c8d;
-                font-size: 0.9em;
-            }
-
-            #sidebar {
-                position: fixed;
-                background-color: #3c7546;
-                top: 0;
-                left: 0;
-                bottom: 0;
-                width: 30vw;
-            }
-
-            #sidebar .title {
+                margin: var(--space-3xl) 0;
+                box-shadow: var(--shadow-lg);
                 position: relative;
-                text-align: center;
-                line-height: 5vmax;
-                font-size: 1.4vmax;
-                font-family: 'Arial';
-                margin-top: 30vh;
-            }
-
-            #sidebar .title a:link,
-            #sidebar .title a:visited {
-                color: #FFFFFF;
-                text-decoration: none;
-            }
-
-            .subtitle {
-                top: 50vh;
-                text-align: center;
-                line-height: 1.3vmax;
-                font-family: 'Arial';
-                font-size: 1.5vmax;
-                color: #FFFFFF;
-            }
-
-            .subtitle a:link,
-            .subtitle a:visited {
-                color: #FFFFFF;
-                text-decoration: none;
-            }
-
-            .licence {
-                position: fixed;
-                text-align: right;
-                bottom: 0;
-                right: 0;
-            }
-
-            .home {
-                position: fixed;
-                text-align: left;
-                font-family: 'Arial';
-                color: #D3D3D3;
-                z-index: 100;
-                width: 100%;
-                background-color: #FFFFFF;
-                top: 0px;
-                margin-bottom: 10px;
-                padding-bottom: 10px;
-            }
-
-            .home a:link,
-            .home a:visited {
-                text-decoration: none;
-                color: #D3D3D3;
-            }
-
-            .home ul {
-                margin: 0;
-                padding: 0;
-                text-align: left;
-                list-style: none;
-            }
-
-            .home li {
-                position: relative;
-                float: left;
-                padding-top: 15px;
-                margin-right: 1em;
-                font-family: 'Arial';
-            }
-
-            .home li:hover {
-                display: block;
-            }
-
-            .home li:hover a:link,
-            .home li:hover a:visited {
-                text-decoration: none;
-                padding: 15px;
-                color: #FFFFFF;
-                background-color: #3c7546;
-            }
-
-            .content {
-                line-height: 1.8vmax;
-                font-size: 1.2vmax;
-                font-family: 'Arial';
-                margin-top: 15vh;
-                width: 90%;
-            }
-
-            .content h2,
-            h3,
-            h4 {
-                color: #3c7546;
-            }
-
-            .content a:link,
-            .content a:visited {
-                color: #3c7546;
-            }
-
-            .content h3 {
-                color: #3c7546;
-            }
-
-            .content h2::before,
-            .content h3::before {
-                display: block;
-                content: " ";
-                visibility: hidden;
-                height: 50px;
-                margin-top: -50px;
-                pointer-events: none;
-                background-color: #FFFFFF;
-            }
-
-            .content a:link,
-            .content a:visited {
-                color: #3c7546;
-            }
-
-            .home a:link,
-            .home a:visited {
-                color: #D3D3D3;
-            }
-
-            .page {
-                width: 65vw;
-                height: 100%;
-                margin-left: 30vw;
                 overflow: hidden;
-                padding: 0 1em;
-                font-family: 'Arial';
             }
 
-            .page img {
-                max-width: 100%;
-                max-height: 100%;
+            .reflection::before {
+                content: '"';
+                position: absolute;
+                top: -30px;
+                left: 20px;
+                font-size: 150px;
+                opacity: 0.1;
+                font-family: Georgia, serif;
             }
 
-            @media (max-width: 640px),
-            screen and (orientation: portrait) {
-                body {
-                    max-width: 100%;
-                    max-height: 100%;
+            .reflection p {
+                font-style: italic;
+                font-size: var(--text-xl);
+                line-height: 1.7;
+                position: relative;
+                z-index: 1;
+                font-family: var(--font-serif);
+                margin: 0;
+            }
+
+            /* ===========================
+           Footer
+           =========================== */
+            footer {
+                background: rgba(255, 255, 255, 0.7);
+                -webkit-backdrop-filter: blur(12px) saturate(180%);
+                backdrop-filter: blur(12px) saturate(180%);
+                border-top: 1px solid var(--color-border);
+                padding: var(--space-2xl) var(--space-xl);
+                margin-top: var(--space-4xl);
+            }
+
+            .footer-content {
+                max-width: 1400px;
+                margin: 0 auto;
+                display: flex;
+                flex-direction: column;
+                gap: var(--space-lg);
+                align-items: center;
+            }
+
+            .footer-note {
+                text-align: center;
+                color: var(--color-base-text-muted);
+                font-style: italic;
+                font-size: var(--text-sm);
+            }
+
+            .footer-links {
+                display: flex;
+                gap: var(--space-lg);
+                flex-wrap: wrap;
+            }
+
+            .footer-links a {
+                color: var(--color-base-text-muted);
+                text-decoration: none;
+                font-size: var(--text-sm);
+                transition: color 0.3s ease;
+            }
+
+            .footer-links a:hover {
+                color: var(--color-accent-1);
+            }
+
+            /* ===========================
+           Animations
+           =========================== */
+            @keyframes fadeInUp {
+                from {
+                    opacity: 0;
+                    transform: translateY(30px);
                 }
 
-                #sidebar {
-                    position: fixed;
-                    background-color: #3c7546;
-                    top: 0;
-                    left: 0;
-                    bottom: 80vh;
-                    width: 100vw;
+                to {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            }
+
+            @keyframes float {
+
+                0%,
+                100% {
+                    transform: translateY(0) rotate(0deg);
                 }
 
-                #sidebar .title {
-                    text-align: center;
-                    position: fixed;
-                    margin-top: 6vh;
-                    left: 0px;
-                    right: 0px;
-                    line-height: 3.5vmax;
-                    font-size: 1.5vmax;
-                    font-family: 'Arial';
+                50% {
+                    transform: translateY(-25px) rotate(8deg);
+                }
+            }
+
+            @keyframes sway {
+
+                0%,
+                100% {
+                    transform: translateX(0) rotate(0deg);
                 }
 
-                #sidebar .subtitle {
-                    text-align: center;
-                    top: 5vh;
-                    left: 0px;
-                    right: 0px;
-                    position: fixed;
-                    margin-top: 10vh;
-                    font-size: 1.5vmax;
+                25% {
+                    transform: translateX(-15px) rotate(-3deg);
                 }
 
-                #sidebar .title a:link,
-                #sidebar .title a:visited {
-                    text-align: center;
-                    color: #FFFFFF;
+                75% {
+                    transform: translateX(15px) rotate(3deg);
+                }
+            }
+
+            @keyframes musicNote {
+
+                0%,
+                100% {
+                    transform: translateY(0) scale(1);
+                    opacity: 0.08;
                 }
 
-                #sidebar .subtitle a:link,
-                #sidebar .subtitle a:visited {
-                    text-align: center;
-                    color: #FFFFFF;
+                50% {
+                    transform: translateY(-10px) scale(1.1);
+                    opacity: 0.12;
+                }
+            }
+
+            @keyframes ripple {
+                0% {
+                    transform: scale(0.8);
+                    opacity: 0.6;
                 }
 
-                .home {
-                    z-index: 100;
-                    width: 100%;
-                    background-color: #3c7546;
-                    font-size: 1.5vmax;
+                100% {
+                    transform: scale(2);
+                    opacity: 0;
+                }
+            }
+
+            @keyframes wave {
+
+                0%,
+                100% {
+                    d: path("M0,150 Q250,120 500,150 T1000,150 L1000,300 L0,300 Z");
                 }
 
-                .home a:link,
-                .home a:visited {
-                    text-decoration: none;
-                    color: #FFFFFF;
+                50% {
+                    d: path("M0,150 Q250,180 500,150 T1000,150 L1000,300 L0,300 Z");
+                }
+            }
+
+            /* Reduced motion for accessibility */
+            @media (prefers-reduced-motion: reduce) {
+
+                *,
+                *::before,
+                *::after {
+                    animation-duration: 0.01ms !important;
+                    animation-iteration-count: 1 !important;
+                    transition-duration: 0.01ms !important;
+                }
+            }
+
+            /* ===========================
+           Responsive Design
+           =========================== */
+            @media (max-width: 768px) {
+                nav {
+                    flex-direction: column;
+                    gap: var(--space-md);
+                    padding: var(--space-md);
+                    align-items: flex-start;
                 }
 
-                .content {
-                    line-height: 3.8vmax;
-                    font-size: 1.8vmax;
-                    font-family: 'Arial';
-                    margin-top: 22vh;
+                .hero {
+                    min-height: 50vh;
+                    margin-top: 120px;
+                    padding: var(--space-2xl) var(--space-md);
                 }
 
-                .content a:link,
-                .content a:visited {
-                    color: #3c7546;
+                main {
+                    padding: 0 var(--space-md) var(--space-3xl);
                 }
 
-                .page {
-                    top: 40vh;
-                    width: 95%;
-                    margin-left: 0vw;
+                .story-section {
+                    padding: var(--space-xl);
+                    margin-bottom: var(--space-xl);
                 }
 
-                .page img {
-                    max-width: 100%;
-                    max-height: 100%;
-                    border: 0;
+                .reflection {
+                    padding: var(--space-2xl);
                 }
+
+                .story-header {
+                    padding: var(--space-xl) var(--space-md);
+                }
+            }
+
+            /* ===========================
+           Focus States
+           =========================== */
+            a:focus,
+            button:focus {
+                outline: 2px solid var(--color-accent-1);
+                outline-offset: 2px;
+            }
+
+            /* ===========================
+           Section Numbering (Optional Visual Enhancement)
+           =========================== */
+            .story-section {
+                counter-increment: section;
+            }
+
+            .story-section:not(.reflection)::after {
+                content: '';
+                position: absolute;
+                bottom: var(--space-lg);
+                right: var(--space-lg);
+                width: 40px;
+                height: 40px;
+                border-radius: 50%;
+                background: var(--gradient-primary);
+                opacity: 0.1;
             }
         </style>
     </head>
 
     <body vocab="http://schema.org/">
-        <div class="page">
-            <div class="home">
-                <ul typeof="BreadcrumbList">
+        <a href="#main-content" class="skip-link">Skip to main content</a>
+
+        <!-- Navigation -->
+        <div class="nav-container">
+            <nav aria-label="Main navigation">
+                <a href="../index.html" class="site-name">John Samuel</a>
+                <ul class="breadcrumb" typeof="BreadcrumbList">
                     <li property="itemListElement" typeof="ListItem">
                         <a property="item" typeof="WebPage" href="../index.html">
                             <span property="name">Home</span>
@@ -336,121 +627,387 @@
                             <span property="name">Writings</span>
                         </a>
                     </li>
+                    <li property="itemListElement" typeof="ListItem">
+                        <span property="name">The Dog</span>
+                    </li>
                 </ul>
-
-            </div>
-            <div id="sidebar">
-                <div class="title">
-                    <h1><a href="./the-dog.html">The Dog who Stopped for a Moment</a></h1>
-                </div>
-                <div class="subtitle">
-                    <h3><a href="../about.html">John Samuel</a></h3>
-                </div>
-            </div>
-
-            <div class="content">
-                <header>
-                    <h1>A Winter Walk Along the Rhône</h1>
-                </header>
-
-                <main>
-                    <section class="opening">
-                        <p class="opening-paragraph">
-                            The winter days are not yet over in Lyon. The sun emerges, tentative but determined,
-                            and so do the people along the banks of the Rhône. In winter, one need not look at
-                            the sky to gauge whether the weather outside is favorable—just observe the number of
-                            people walking along the riverbanks. During harsh winter days, these paths remain
-                            utterly deserted, while on sunny winter afternoons, they become surprisingly
-                            crowded. One might wonder where all these people emerge from, as if the warmth
-                            summons them from hidden corners of the city.
-                        </p>
-                    </section>
-
-                    <section class="journey-begins">
-                        <p>
-                            I too left my apartment to capture what warmth the sun offered. But I didn't forget
-                            my headphones, loaded with familiar old melodies that had accompanied countless
-                            walks before. There were fewer people than I had expected—the reason was evident.
-                            Scattered clouds drifted across the sky, and a cool breeze swept along the river,
-                            carrying with it the promise that winter had not yet loosened its grip. Even though
-                            I was bundled from head to toe, I felt the crisp air against my exposed face. Still,
-                            I continued walking. It had been far too long since I'd allowed myself the luxury of
-                            an extended stroll.
-                        </p>
-                    </section>
-
-                    <section class="urban-theater">
-                        <p>
-                            The weekend had drawn its usual cast of characters to the riverbank. Despite the
-                            slight chill, the sunny weather had coaxed out joggers in their rhythmic stride, dog
-                            owners following their eager companions, and couples walking hand in hand. The
-                            majestic swans glided across the Rhône's surface with their characteristic grace,
-                            while a barge moved slowly upstream, its engine creating gentle ripples
-                            that caught the afternoon light. Near one of the riverside cafés, hardy patrons sat
-                            at outdoor tables, their hands wrapped around warm beverages, steam rising from
-                            their cups like small prayers to the sun.
-                        </p>
-                    </section>
-
-                    <section class="the-encounter climax">
-                        <p>
-                            As I made my way back, retracing my steps along the familiar path, a musician
-                            appeared ahead with a gleaming trombone. He had positioned himself strategically
-                            where the walkway widened, his instrument case open at his feet, waiting for
-                            contributions from passersby. Just as I approached, a woman walking her dog came
-                            from the opposite direction, her small terrier trotting dutifully beside her.
-                        </p>
-
-                        <p>
-                            The musician lifted his trombone and began to play—a soulful, melancholic tune that
-                            seemed to capture the very essence of this winter afternoon. But something
-                            extraordinary happened. The dog stopped abruptly, as if struck by an invisible
-                            force. Its ears perked up, and it turned its entire body toward the musician,
-                            staring with an intensity I had rarely witnessed in an animal. The slide of the
-                            trombone caught the light as it moved, and the dog's eyes followed every motion,
-                            mesmerized.
-                        </p>
-
-                        <p>
-                            Curious about this unexpected scene unfolding before me, I pulled off my headphones,
-                            allowing the music to wash over me directly. The melody was hauntingly beautiful,
-                            but what captivated me more was the dog's complete absorption. Its owner tugged
-                            gently at the leash, trying to encourage her pet to continue their walk, but the dog
-                            remained planted, as if roots had suddenly grown from its paws into the pavement.
-                            The animal seemed to understand something in that music that transcended the barrier
-                            between species—a recognition of beauty, perhaps, or simply the power of art to stop
-                            time.
-                        </p>
-                    </section>
-
-                    <section class="departure">
-                        <p>
-                            I walked past the musician, offering a small nod of appreciation, but found myself
-                            compelled to turn back for one more look. The dog was still there, still staring,
-                            still listening with every fiber of its being. Its owner had given up pulling and
-                            now stood patiently, perhaps beginning to understand that this was a moment that
-                            deserved respect. I replaced my headphones and continued toward home, but the image
-                            of that transfixed dog remained with me, a reminder that in our hurried urban lives,
-                            beauty still has the power to make us pause, to make us truly see and hear the world
-                            around us.
-                        </p>
-                    </section>
-
-                    <section class="reflection">
-                        <p>
-                            Sometimes it takes the pure, unguarded response of an animal to remind us what we've
-                            forgotten how to do—to stop, to listen, to be completely present in a moment of
-                            unexpected grace.
-                        </p>
-                    </section>
-                </main>
-
-                <footer>
-                    <p>A brief observation from the banks of the Rhône, Lyon</p>
-                </footer>
-
-            </div>
+            </nav>
         </div>
+
+        <!-- Hero Section -->
+        <header class="hero">
+            <div class="hero-background" aria-hidden="true">
+                <!-- SVG Music and River Illustration -->
+                <svg width="100%" height="100%" viewBox="0 0 1200 600" xmlns="http://www.w3.org/2000/svg">
+                    <defs>
+                        <linearGradient id="riverGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" style="stop-color:#5b7fa8;stop-opacity:0.2" />
+                            <stop offset="100%" style="stop-color:#7a5c8e;stop-opacity:0.1" />
+                        </linearGradient>
+                        <linearGradient id="musicGradient" x1="0%" y1="100%" x2="100%" y2="0%">
+                            <stop offset="0%" style="stop-color:#8b6f47;stop-opacity:0.15" />
+                            <stop offset="100%" style="stop-color:#5b7fa8;stop-opacity:0.1" />
+                        </linearGradient>
+                    </defs>
+
+                    <!-- Flowing river waves -->
+                    <g opacity="0.3">
+                        <path d="M0,200 Q300,180 600,200 T1200,200 L1200,250 L0,250 Z" fill="url(#riverGradient)">
+                            <animate attributeName="d" values="M0,200 Q300,180 600,200 T1200,200 L1200,250 L0,250 Z;
+                                         M0,200 Q300,220 600,200 T1200,200 L1200,250 L0,250 Z;
+                                         M0,200 Q300,180 600,200 T1200,200 L1200,250 L0,250 Z" dur="6s"
+                                repeatCount="indefinite" />
+                        </path>
+                        <path d="M0,240 Q300,220 600,240 T1200,240 L1200,280 L0,280 Z" fill="url(#riverGradient)"
+                            opacity="0.5">
+                            <animate attributeName="d" values="M0,240 Q300,220 600,240 T1200,240 L1200,280 L0,280 Z;
+                                         M0,240 Q300,260 600,240 T1200,240 L1200,280 L0,280 Z;
+                                         M0,240 Q300,220 600,240 T1200,240 L1200,280 L0,280 Z" dur="7s"
+                                repeatCount="indefinite" />
+                        </path>
+                    </g>
+
+                    <!-- Music notes floating -->
+                    <g opacity="0.25">
+                        <!-- Note 1 -->
+                        <circle cx="200" cy="150" r="8" fill="#8b6f47">
+                            <animate attributeName="cy" values="150;130;150" dur="3s" repeatCount="indefinite" />
+                            <animate attributeName="opacity" values="0.25;0.4;0.25" dur="3s" repeatCount="indefinite" />
+                        </circle>
+                        <path d="M208,150 L208,110" stroke="#8b6f47" stroke-width="2">
+                            <animate attributeName="d" values="M208,150 L208,110;M208,130 L208,90;M208,150 L208,110"
+                                dur="3s" repeatCount="indefinite" />
+                        </path>
+
+                        <!-- Note 2 -->
+                        <circle cx="350" cy="180" r="8" fill="#7a5c8e">
+                            <animate attributeName="cy" values="180;160;180" dur="4s" repeatCount="indefinite" />
+                            <animate attributeName="opacity" values="0.25;0.4;0.25" dur="4s" repeatCount="indefinite" />
+                        </circle>
+                        <path d="M358,180 L358,140" stroke="#7a5c8e" stroke-width="2">
+                            <animate attributeName="d" values="M358,180 L358,140;M358,160 L358,120;M358,180 L358,140"
+                                dur="4s" repeatCount="indefinite" />
+                        </path>
+
+                        <!-- Note 3 -->
+                        <circle cx="950" cy="160" r="8" fill="#5b7fa8">
+                            <animate attributeName="cy" values="160;140;160" dur="5s" repeatCount="indefinite" />
+                            <animate attributeName="opacity" values="0.25;0.4;0.25" dur="5s" repeatCount="indefinite" />
+                        </circle>
+                        <path d="M958,160 L958,120" stroke="#5b7fa8" stroke-width="2">
+                            <animate attributeName="d" values="M958,160 L958,120;M958,140 L958,100;M958,160 L958,120"
+                                dur="5s" repeatCount="indefinite" />
+                        </path>
+                    </g>
+
+                    <!-- Organic blob shapes -->
+                    <ellipse cx="600" cy="300" rx="80" ry="120" fill="url(#musicGradient)" opacity="0.12">
+                        <animate attributeName="ry" values="120;130;120" dur="6s" repeatCount="indefinite" />
+                    </ellipse>
+
+                    <!-- Ripple effect circles -->
+                    <g opacity="0.15">
+                        <circle cx="150" cy="400" r="30" fill="none" stroke="#5b7fa8" stroke-width="2">
+                            <animate attributeName="r" values="20;60;20" dur="4s" repeatCount="indefinite" />
+                            <animate attributeName="opacity" values="0.3;0;0.3" dur="4s" repeatCount="indefinite" />
+                        </circle>
+                        <circle cx="1050" cy="420" r="30" fill="none" stroke="#7a5c8e" stroke-width="2">
+                            <animate attributeName="r" values="20;60;20" dur="5s" repeatCount="indefinite" />
+                            <animate attributeName="opacity" values="0.3;0;0.3" dur="5s" repeatCount="indefinite" />
+                        </circle>
+                    </g>
+                </svg>
+            </div>
+
+            <div class="hero-content">
+                <h1>The Dog who Stopped for a Moment</h1>
+                <p class="hero-subtitle">A story by <a href="../about.html">John Samuel</a></p>
+            </div>
+        </header>
+
+        <!-- Story Header -->
+        <div class="story-header">
+            <h2>A Winter Walk Along the Rhône</h2>
+        </div>
+
+        <!-- Featured SVG Illustration -->
+        <div class="featured-illustration">
+            <svg viewBox="0 0 800 500" xmlns="http://www.w3.org/2000/svg" aria-labelledby="illustrationTitle">
+                <title id="illustrationTitle">A dog mesmerized by a trombone player on the Rhône riverbank</title>
+                <defs>
+                    <linearGradient id="skyGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+                        <stop offset="0%" style="stop-color:#e8f0f7;stop-opacity:1" />
+                        <stop offset="100%" style="stop-color:#dce6f0;stop-opacity:1" />
+                    </linearGradient>
+                    <linearGradient id="riverGradient2" x1="0%" y1="0%" x2="0%" y2="100%">
+                        <stop offset="0%" style="stop-color:#7a9bb8;stop-opacity:1" />
+                        <stop offset="100%" style="stop-color:#5b7fa8;stop-opacity:1" />
+                    </linearGradient>
+                    <linearGradient id="tromboneGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                        <stop offset="0%" style="stop-color:#b8935f;stop-opacity:1" />
+                        <stop offset="50%" style="stop-color:#8b6f47;stop-opacity:1" />
+                        <stop offset="100%" style="stop-color:#b8935f;stop-opacity:1" />
+                    </linearGradient>
+                    <radialGradient id="soundWave" cx="50%" cy="50%" r="50%">
+                        <stop offset="0%" style="stop-color:#7a5c8e;stop-opacity:0.3" />
+                        <stop offset="100%" style="stop-color:#7a5c8e;stop-opacity:0" />
+                    </radialGradient>
+                </defs>
+
+                <!-- Sky background -->
+                <rect width="800" height="300" fill="url(#skyGradient)" />
+
+                <!-- River -->
+                <path d="M 0 300 L 800 300 L 800 500 L 0 500 Z" fill="url(#riverGradient2)" />
+
+                <!-- River sparkles/reflections -->
+                <circle cx="150" cy="380" r="3" fill="#ffffff" opacity="0.6">
+                    <animate attributeName="opacity" values="0.6;0.2;0.6" dur="2s" repeatCount="indefinite" />
+                </circle>
+                <circle cx="320" cy="400" r="2" fill="#ffffff" opacity="0.5">
+                    <animate attributeName="opacity" values="0.5;0.1;0.5" dur="3s" repeatCount="indefinite" />
+                </circle>
+                <circle cx="580" cy="390" r="3" fill="#ffffff" opacity="0.6">
+                    <animate attributeName="opacity" values="0.6;0.2;0.6" dur="2.5s" repeatCount="indefinite" />
+                </circle>
+                <circle cx="720" cy="410" r="2" fill="#ffffff" opacity="0.5">
+                    <animate attributeName="opacity" values="0.5;0.1;0.5" dur="3.5s" repeatCount="indefinite" />
+                </circle>
+
+                <!-- Riverbank path -->
+                <path d="M 0 300 Q 200 295 400 300 T 800 300 L 800 320 Q 600 318 400 320 T 0 320 Z" fill="#a8b8c8"
+                    opacity="0.7" />
+
+                <!-- Distant trees (simple shapes) -->
+                <ellipse cx="100" cy="250" rx="40" ry="60" fill="#4a6b5e" opacity="0.3" />
+                <ellipse cx="700" cy="260" rx="50" ry="70" fill="#4a6b5e" opacity="0.3" />
+
+                <!-- Sound waves emanating from trombone -->
+                <g opacity="0.4">
+                    <ellipse cx="550" cy="220" rx="40" ry="30" fill="none" stroke="#7a5c8e" stroke-width="2">
+                        <animate attributeName="rx" values="20;60;20" dur="3s" repeatCount="indefinite" />
+                        <animate attributeName="ry" values="15;45;15" dur="3s" repeatCount="indefinite" />
+                        <animate attributeName="opacity" values="0.6;0;0.6" dur="3s" repeatCount="indefinite" />
+                    </ellipse>
+                    <ellipse cx="550" cy="220" rx="40" ry="30" fill="none" stroke="#8b6f47" stroke-width="2">
+                        <animate attributeName="rx" values="20;60;20" dur="3s" begin="1s" repeatCount="indefinite" />
+                        <animate attributeName="ry" values="15;45;15" dur="3s" begin="1s" repeatCount="indefinite" />
+                        <animate attributeName="opacity" values="0.6;0;0.6" dur="3s" begin="1s"
+                            repeatCount="indefinite" />
+                    </ellipse>
+                </g>
+
+                <!-- Musician (simplified figure) -->
+                <g id="musician">
+                    <!-- Body -->
+                    <ellipse cx="520" cy="260" rx="20" ry="35" fill="#2c3e50" />
+                    <!-- Head -->
+                    <circle cx="520" cy="215" r="15" fill="#d4a373" />
+                    <!-- Arms -->
+                    <path d="M 520 240 L 500 230" stroke="#2c3e50" stroke-width="6" stroke-linecap="round" />
+                    <path d="M 520 245 L 560 235" stroke="#2c3e50" stroke-width="6" stroke-linecap="round" />
+
+                    <!-- Trombone -->
+                    <g id="trombone">
+                        <!-- Bell of trombone -->
+                        <ellipse cx="580" cy="220" rx="18" ry="15" fill="url(#tromboneGradient)" opacity="0.9" />
+                        <!-- Main tube -->
+                        <rect x="520" y="217" width="60" height="6" fill="url(#tromboneGradient)" rx="3" />
+                        <!-- Slide -->
+                        <rect x="530" y="225" width="8" height="35" fill="#8b6f47" rx="2">
+                            <animate attributeName="height" values="35;45;35" dur="4s" repeatCount="indefinite" />
+                            <animate attributeName="y" values="225;215;225" dur="4s" repeatCount="indefinite" />
+                        </rect>
+                        <rect x="545" y="225" width="8" height="35" fill="#a0845a" rx="2">
+                            <animate attributeName="height" values="35;45;35" dur="4s" repeatCount="indefinite" />
+                            <animate attributeName="y" values="225;215;225" dur="4s" repeatCount="indefinite" />
+                        </rect>
+                        <!-- Highlight on bell -->
+                        <ellipse cx="585" cy="218" rx="6" ry="4" fill="#ffffff" opacity="0.4" />
+                    </g>
+
+                    <!-- Legs -->
+                    <line x1="515" y1="295" x2="515" y2="320" stroke="#2c3e50" stroke-width="6"
+                        stroke-linecap="round" />
+                    <line x1="525" y1="295" x2="525" y2="320" stroke="#2c3e50" stroke-width="6"
+                        stroke-linecap="round" />
+                </g>
+
+                <!-- Dog (simplified, mesmerized) -->
+                <g id="dog">
+                    <!-- Body -->
+                    <ellipse cx="250" cy="280" rx="30" ry="20" fill="#8b7355" />
+                    <!-- Head (turned toward musician) -->
+                    <ellipse cx="275" cy="270" rx="18" ry="16" fill="#8b7355" />
+                    <!-- Ears (perked up - important detail!) -->
+                    <ellipse cx="268" cy="260" rx="5" ry="12" fill="#6b5545" transform="rotate(-20 268 260)" />
+                    <ellipse cx="282" cy="259" rx="5" ry="12" fill="#6b5545" transform="rotate(20 282 259)" />
+                    <!-- Eyes (wide, focused) -->
+                    <circle cx="272" cy="270" r="3" fill="#2c3e50" />
+                    <circle cx="272" cy="270" r="1.5" fill="#ffffff" />
+                    <!-- Nose -->
+                    <ellipse cx="280" cy="273" rx="3" ry="2" fill="#2c3e50" />
+                    <!-- Tail (still, not wagging - showing focus) -->
+                    <path d="M 220 285 Q 210 280 215 270" stroke="#8b7355" stroke-width="6" stroke-linecap="round"
+                        fill="none" />
+                    <!-- Legs -->
+                    <line x1="235" y1="295" x2="235" y2="320" stroke="#8b7355" stroke-width="5"
+                        stroke-linecap="round" />
+                    <line x1="250" y1="295" x2="250" y2="320" stroke="#8b7355" stroke-width="5"
+                        stroke-linecap="round" />
+                    <line x1="260" y1="295" x2="260" y2="320" stroke="#8b7355" stroke-width="5"
+                        stroke-linecap="round" />
+                    <line x1="275" y1="295" x2="275" y2="320" stroke="#8b7355" stroke-width="5"
+                        stroke-linecap="round" />
+                </g>
+
+                <!-- Owner (simplified figure behind dog) -->
+                <g id="owner">
+                    <!-- Body -->
+                    <ellipse cx="210" cy="255" rx="15" ry="28" fill="#5a6b7d" />
+                    <!-- Head -->
+                    <circle cx="210" cy="220" r="12" fill="#d4a373" />
+                    <!-- Arm holding leash -->
+                    <path d="M 215 235 L 230 260" stroke="#5a6b7d" stroke-width="5" stroke-linecap="round" />
+                    <!-- Leash -->
+                    <path d="M 230 260 L 250 275" stroke="#4a5568" stroke-width="2" stroke-dasharray="3,2" />
+                    <!-- Legs -->
+                    <line x1="205" y1="283" x2="205" y2="320" stroke="#5a6b7d" stroke-width="5"
+                        stroke-linecap="round" />
+                    <line x1="215" y1="283" x2="215" y2="320" stroke="#5a6b7d" stroke-width="5"
+                        stroke-linecap="round" />
+                </g>
+
+                <!-- Musical notes floating between musician and dog -->
+                <g id="musical-notes" opacity="0.5">
+                    <text x="380" y="240" font-family="Arial" font-size="24" fill="#7a5c8e">♪</text>
+                    <text x="420" y="260" font-family="Arial" font-size="20" fill="#8b6f47">♫</text>
+                    <text x="340" y="250" font-family="Arial" font-size="22" fill="#5b7fa8">♪</text>
+
+                    <animateTransform attributeName="transform" type="translate" values="0,0; -5,-10; 0,0" dur="4s"
+                        repeatCount="indefinite" />
+                </g>
+
+                <!-- Attention lines from dog to musician (subtle) -->
+                <line x1="280" y1="270" x2="520" y2="220" stroke="#7a5c8e" stroke-width="1" opacity="0.2"
+                    stroke-dasharray="5,5">
+                    <animate attributeName="opacity" values="0.2;0.4;0.2" dur="3s" repeatCount="indefinite" />
+                </line>
+            </svg>
+        </div>
+
+        <!-- Main Content -->
+        <main id="main-content">
+            <article>
+                <!-- Opening Section -->
+                <section class="story-section opening">
+                    <p class="opening-paragraph">
+                        The winter days are not yet over in Lyon. The sun emerges, tentative but determined,
+                        and so do the people along the banks of the Rhône. In winter, one need not look at
+                        the sky to gauge whether the weather outside is favorable—just observe the number of
+                        people walking along the riverbanks. During harsh winter days, these paths remain
+                        utterly deserted, while on sunny winter afternoons, they become surprisingly
+                        crowded. One might wonder where all these people emerge from, as if the warmth
+                        summons them from hidden corners of the city.
+                    </p>
+                </section>
+
+                <!-- Journey Begins -->
+                <section class="story-section journey-begins">
+                    <p>
+                        I too left my apartment to capture what warmth the sun offered. But I didn't forget
+                        my headphones, loaded with familiar old melodies that had accompanied countless
+                        walks before. There were fewer people than I had expected—the reason was evident.
+                        Scattered clouds drifted across the sky, and a cool breeze swept along the river,
+                        carrying with it the promise that winter had not yet loosened its grip. Even though
+                        I was bundled from head to toe, I felt the crisp air against my exposed face. Still,
+                        I continued walking. It had been far too long since I'd allowed myself the luxury of
+                        an extended stroll.
+                    </p>
+                </section>
+
+                <!-- Urban Theater -->
+                <section class="story-section urban-theater">
+                    <p>
+                        The weekend had drawn its usual cast of characters to the riverbank. Despite the
+                        slight chill, the sunny weather had coaxed out joggers in their rhythmic stride, dog
+                        owners following their eager companions, and couples walking hand in hand. The
+                        majestic swans glided across the Rhône's surface with their characteristic grace,
+                        while a barge moved slowly upstream, its engine creating gentle ripples
+                        that caught the afternoon light. Near one of the riverside cafés, hardy patrons sat
+                        at outdoor tables, their hands wrapped around warm beverages, steam rising from
+                        their cups like small prayers to the sun.
+                    </p>
+                </section>
+
+                <!-- The Encounter - Climax -->
+                <section class="story-section climax">
+                    <p>
+                        As I made my way back, retracing my steps along the familiar path, a musician
+                        appeared ahead with a gleaming trombone. He had positioned himself strategically
+                        where the walkway widened, his instrument case open at his feet, waiting for
+                        contributions from passersby. Just as I approached, a woman walking her dog came
+                        from the opposite direction, her small terrier trotting dutifully beside her.
+                    </p>
+
+                    <p>
+                        The musician lifted his trombone and began to play—a soulful, melancholic tune that
+                        seemed to capture the very essence of this winter afternoon. But something
+                        extraordinary happened. The dog stopped abruptly, as if struck by an invisible
+                        force. Its ears perked up, and it turned its entire body toward the musician,
+                        staring with an intensity I had rarely witnessed in an animal. The slide of the
+                        trombone caught the light as it moved, and the dog's eyes followed every motion,
+                        mesmerized.
+                    </p>
+
+                    <p>
+                        Curious about this unexpected scene unfolding before me, I pulled off my headphones,
+                        allowing the music to wash over me directly. The melody was hauntingly beautiful,
+                        but what captivated me more was the dog's complete absorption. Its owner tugged
+                        gently at the leash, trying to encourage her pet to continue their walk, but the dog
+                        remained planted, as if roots had suddenly grown from its paws into the pavement.
+                        The animal seemed to understand something in that music that transcended the barrier
+                        between species—a recognition of beauty, perhaps, or simply the power of art to stop
+                        time.
+                    </p>
+                </section>
+
+                <!-- Departure -->
+                <section class="story-section departure">
+                    <p>
+                        I walked past the musician, offering a small nod of appreciation, but found myself
+                        compelled to turn back for one more look. The dog was still there, still staring,
+                        still listening with every fiber of its being. Its owner had given up pulling and
+                        now stood patiently, perhaps beginning to understand that this was a moment that
+                        deserved respect. I replaced my headphones and continued toward home, but the image
+                        of that transfixed dog remained with me, a reminder that in our hurried urban lives,
+                        beauty still has the power to make us pause, to make us truly see and hear the world
+                        around us.
+                    </p>
+                </section>
+
+                <!-- Reflection -->
+                <section class="reflection">
+                    <p>
+                        Sometimes it takes the pure, unguarded response of an animal to remind us what we've
+                        forgotten how to do—to stop, to listen, to be completely present in a moment of
+                        unexpected grace.
+                    </p>
+                </section>
+            </article>
+        </main>
+
+        <!-- Footer -->
+        <footer>
+            <div class="footer-content">
+                <p class="footer-note">A brief observation from the banks of the Rhône, Lyon</p>
+                <div class="footer-links">
+                    <a href="../index.html">Home</a>
+                    <a href="../writings/index.html">Writings</a>
+                    <a href="../about.html">About</a>
+                </div>
+            </div>
+        </footer>
     </body>
 
 </html>
