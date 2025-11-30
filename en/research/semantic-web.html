@@ -3,1010 +3,1619 @@
 
     <head>
         <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <meta http-equiv="Content-Language" content="en" />
         <link rel="shortcut icon" href="../../images/logo/favicon.png" />
         <title>Semantic Web: John Samuel</title>
-        <style type="text/css">
-            body {
-                background-color: #FFFFFF;
+        <style>
+            /* ===== Design Tokens ===== */
+            :root {
+                /* Semantic Web Theme - Knowledge & Logic Blues */
+                --color-base-bg: #f5f7fa;
+                --color-base-surface: #ffffff;
+                --color-base-text: #1a202c;
+                --color-base-text-muted: #4a5568;
+
+                /* Theme Accents */
+                --color-accent-1: #1B80CF;
+                --color-accent-2: #0d5a9e;
+                --color-accent-3: #6366f1;
+                --color-accent-light: #e8f2fc;
+                --color-accent-glow: rgba(27, 128, 207, 0.15);
+
+                /* Functional Colors */
+                --color-shadow: rgba(27, 128, 207, 0.12);
+                --color-border: rgba(27, 128, 207, 0.15);
+                --color-hover: rgba(27, 128, 207, 0.08);
+
+                /* Gradients */
+                --gradient-primary: linear-gradient(135deg, var(--color-accent-1), var(--color-accent-2), var(--color-accent-3));
+                --gradient-subtle: linear-gradient(180deg, var(--color-base-bg) 0%, var(--color-accent-light) 100%);
+                --gradient-hero: linear-gradient(135deg, #f5f7fa 0%, #e8f2fc 50%, #f0f0ff 100%);
+
+                /* Spacing */
+                --space-xs: 0.25rem;
+                --space-sm: 0.5rem;
+                --space-md: 1rem;
+                --space-lg: 1.5rem;
+                --space-xl: 2rem;
+                --space-2xl: 3rem;
+                --space-3xl: 4rem;
+                --space-4xl: 6rem;
+
+                /* Border Radius */
+                --radius-sm: 4px;
+                --radius-md: 8px;
+                --radius-lg: 12px;
+                --radius-xl: 16px;
+                --radius-2xl: 24px;
+                --radius-full: 9999px;
+
+                /* Shadows */
+                --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.04), 0 1px 3px rgba(0, 0, 0, 0.06);
+                --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.05), 0 2px 4px rgba(0, 0, 0, 0.06);
+                --shadow-lg: 0 10px 24px rgba(0, 0, 0, 0.08), 0 4px 8px rgba(0, 0, 0, 0.06);
+                --shadow-xl: 0 20px 40px rgba(0, 0, 0, 0.12), 0 8px 16px rgba(0, 0, 0, 0.08);
+                --shadow-theme: 0 10px 30px var(--color-shadow), 0 4px 10px rgba(0, 0, 0, 0.06);
+
+                /* Typography */
+                --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+                --font-mono: 'SF Mono', Monaco, 'Cascadia Code', 'Consolas', monospace;
+
+                --text-xs: clamp(0.75rem, 0.7rem + 0.25vw, 0.875rem);
+                --text-sm: clamp(0.875rem, 0.8rem + 0.35vw, 1rem);
+                --text-base: clamp(1rem, 0.95rem + 0.25vw, 1.125rem);
+                --text-lg: clamp(1.125rem, 1.05rem + 0.35vw, 1.25rem);
+                --text-xl: clamp(1.25rem, 1.15rem + 0.5vw, 1.5rem);
+                --text-2xl: clamp(1.5rem, 1.3rem + 1vw, 2rem);
+                --text-3xl: clamp(2rem, 1.6rem + 2vw, 2.5rem);
+                --text-4xl: clamp(2.5rem, 2rem + 2.5vw, 3.5rem);
             }
 
-            #sidebar {
-                position: fixed;
-                background-color: #1B80CF;
-                top: 0;
-                left: 0;
-                bottom: 0;
-                width: 30vw;
-            }
-
-            #sidebar .title {
-                position: relative;
-                text-align: center;
-                line-height: 4vmax;
-                font-size: 1.4vmax;
-                font-family: 'Arial';
-                margin-top: 25vh;
-            }
-
-            #sidebar .title a:link,
-            #sidebar .title a:visited {
-                color: #FFFFFF;
-                text-decoration: none;
-            }
-
-            .subtitle {
-                top: 50vh;
-                text-align: center;
-                line-height: 1.3vmax;
-                font-family: 'Arial';
-                font-size: 1.5vmax;
-                color: #FFFFFF;
-            }
-
-            .subtitle a:link,
-            .subtitle a:visited {
-                color: #FFFFFF;
-                text-decoration: none;
-            }
-
-            .licence {
-                position: fixed;
-                text-align: right;
-                bottom: 0;
-                right: 0;
-            }
-
-            .home {
-                position: fixed;
-                text-align: left;
-                font-family: 'Arial';
-                color: #D3D3D3;
-                z-index: 100;
-                width: 100%;
-                background-color: #FFFFFF;
-                top: 0px;
-                margin-bottom: 10px;
-                padding-bottom: 10px;
-            }
-
-            .home a:link,
-            .home a:visited {
-                text-decoration: none;
-                color: #D3D3D3;
-            }
-
-            .home ul {
+            /* ===== Reset & Base ===== */
+            *,
+            *::before,
+            *::after {
+                box-sizing: border-box;
                 margin: 0;
                 padding: 0;
-                text-align: left;
+            }
+
+            html {
+                scroll-behavior: smooth;
+                scroll-padding-top: 100px;
+            }
+
+            body {
+                font-family: var(--font-sans);
+                font-size: var(--text-base);
+                line-height: 1.75;
+                color: var(--color-base-text);
+                background: var(--color-base-bg);
+                letter-spacing: -0.005em;
+                min-height: 100vh;
+            }
+
+            /* ===== Skip Link ===== */
+            .skip-link {
+                position: absolute;
+                top: -50px;
+                left: var(--space-md);
+                background: var(--color-accent-1);
+                color: white;
+                padding: var(--space-sm) var(--space-md);
+                text-decoration: none;
+                border-radius: var(--radius-sm);
+                z-index: 10000;
+                transition: top 0.3s ease;
+            }
+
+            .skip-link:focus {
+                top: var(--space-md);
+            }
+
+            /* ===== Navigation ===== */
+            .navbar {
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                z-index: 1000;
+                background: rgba(255, 255, 255, 0.9);
+                -webkit-backdrop-filter: blur(16px) saturate(180%);
+                backdrop-filter: blur(16px) saturate(180%);
+                border-bottom: 1px solid var(--color-border);
+                padding: var(--space-md) var(--space-xl);
+            }
+
+            .navbar-inner {
+                max-width: 1400px;
+                margin: 0 auto;
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                gap: var(--space-lg);
+            }
+
+            .navbar-brand {
+                font-weight: 700;
+                font-size: var(--text-lg);
+                color: var(--color-accent-1);
+                text-decoration: none;
+                display: flex;
+                align-items: center;
+                gap: var(--space-sm);
+                transition: all 0.3s ease;
+            }
+
+            .navbar-brand::before {
+                content: '';
+                width: 10px;
+                height: 10px;
+                background: var(--gradient-primary);
+                border-radius: 50%;
+                animation: pulse 2s ease-in-out infinite;
+            }
+
+            .navbar-brand:hover {
+                color: var(--color-accent-2);
+            }
+
+            .navbar-nav {
+                display: flex;
+                align-items: center;
+                gap: var(--space-xs);
                 list-style: none;
             }
 
-            .home li {
-                position: relative;
-                float: left;
-                padding-top: 15px;
-                margin-right: 1em;
-                font-family: 'Arial';
-            }
-
-            .home li:hover {
-                display: block;
-            }
-
-            .home a:link,
-            .home a:visited {
-                color: #D3D3D3;
-            }
-
-            .home li:hover a:link,
-            .home li:hover a:visited {
+            .navbar-nav a {
+                color: var(--color-base-text-muted);
                 text-decoration: none;
-                padding: 15px;
-                color: #FFFFFF;
-                background-color: #1B80CF;
+                padding: var(--space-sm) var(--space-md);
+                border-radius: var(--radius-full);
+                font-size: var(--text-sm);
+                font-weight: 500;
+                transition: all 0.3s ease;
             }
 
-            .content {
-                line-height: 1.8vmax;
-                font-size: 1.2vmax;
-                font-family: 'Arial';
-                margin-top: 15vh;
-                width: 90%;
-                background: white;
-                padding: 40px;
-                border-radius: 10px;
-                box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            .navbar-nav a:hover {
+                color: var(--color-accent-1);
+                background: var(--color-hover);
             }
 
-            .content h1,
-            h2,
-            h3,
-            h4 {
-                color: #1B80CF;
-                line-height: 3rem;
+            .navbar-nav .divider {
+                color: var(--color-border);
+                font-weight: 300;
             }
 
-            .content a:link,
-            .content a:visited {
-                color: #1B80CF;
-            }
-
-            .content h3 {
-                color: #1B80CF;
-            }
-
-            .content h2::before,
-            .content h3::before {
-                display: block;
-                content: " ";
-                visibility: hidden;
-                height: 50px;
-                margin-top: -50px;
-                pointer-events: none;
-                background-color: #FFFFFF;
-            }
-
-            .content a:link,
-            .content a:visited {
-                color: #1B80CF;
-            }
-
-            .content li {
-                margin: 5px;
-            }
-
-            .page {
-                width: 65vw;
-                height: 100%;
-                margin-left: 30vw;
+            /* ===== Hero Section ===== */
+            .hero {
+                min-height: 70vh;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                padding: calc(var(--space-4xl) + 60px) var(--space-xl) var(--space-3xl);
+                background: var(--gradient-hero);
+                position: relative;
                 overflow: hidden;
-                padding: 0 1em;
-                font-family: 'Arial';
             }
 
-            .page img {
-                max-width: 100%;
-                max-height: 100%;
+            .hero::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background-image:
+                    radial-gradient(circle at 20% 80%, var(--color-accent-glow) 0%, transparent 50%),
+                    radial-gradient(circle at 80% 20%, rgba(99, 102, 241, 0.1) 0%, transparent 50%);
+                pointer-events: none;
             }
 
-            .container {
+            /* Animated Hexagon Grid */
+            .hero-pattern {
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M30 5L55 17.5V42.5L30 55L5 42.5V17.5L30 5Z' fill='none' stroke='%231B80CF' stroke-opacity='0.05' stroke-width='1'/%3E%3C/svg%3E");
+                background-size: 60px 60px;
+                animation: patternDrift 30s linear infinite;
+                pointer-events: none;
+            }
+
+            @keyframes patternDrift {
+                0% {
+                    transform: translate(0, 0);
+                }
+
+                100% {
+                    transform: translate(60px, 60px);
+                }
+            }
+
+            .hero-content {
+                position: relative;
+                z-index: 1;
+                text-align: center;
+                max-width: 900px;
+                animation: fadeInUp 0.8s ease-out;
+            }
+
+            /* Custom SVG - Semantic Web Layers */
+            .hero-svg {
+                width: 300px;
+                height: 300px;
+                margin-bottom: var(--space-2xl);
+            }
+
+            .hero-title {
+                font-size: var(--text-4xl);
+                font-weight: 800;
+                letter-spacing: -0.03em;
+                line-height: 1.2;
+                margin-bottom: var(--space-lg);
+                background: var(--gradient-primary);
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                background-clip: text;
+            }
+
+            .hero-subtitle {
+                font-size: var(--text-lg);
+                color: var(--color-base-text-muted);
+                max-width: 650px;
+                margin: 0 auto var(--space-xl);
+            }
+
+            .series-badge {
+                display: inline-flex;
+                align-items: center;
+                gap: var(--space-sm);
+                padding: var(--space-sm) var(--space-lg);
+                background: rgba(255, 255, 255, 0.8);
+                -webkit-backdrop-filter: blur(12px);
+                backdrop-filter: blur(12px);
+                border: 1px solid var(--color-border);
+                border-radius: var(--radius-full);
+                font-size: var(--text-sm);
+                color: var(--color-base-text-muted);
+                margin-bottom: var(--space-xl);
+                transition: all 0.3s ease;
+            }
+
+            .series-badge:hover {
                 background: white;
-                padding: 40px;
-                border-radius: 10px;
-                box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+                box-shadow: var(--shadow-md);
             }
 
-            h1 {
-                color: #2c3e50;
-                border-bottom: 3px solid #3498db;
-                padding-bottom: 10px;
-                margin-bottom: 30px;
-            }
-
-            h2 {
-                color: #34495e;
-                margin-top: 40px;
-                margin-bottom: 20px;
-                border-left: 4px solid #3498db;
-                padding-left: 15px;
-            }
-
-            h3 {
-                color: #2c3e50;
-                margin-top: 30px;
-                margin-bottom: 15px;
-            }
-
-            h4 {
-                color: #34495e;
-                margin-top: 25px;
-                margin-bottom: 10px;
+            .series-badge a {
+                color: var(--color-accent-1);
+                text-decoration: none;
                 font-weight: 600;
             }
 
-            pre {
-                background: #f4f4f4;
-                border: 1px solid #ddd;
-                border-radius: 5px;
-                padding: 15px;
-                overflow-x: auto;
-                margin: 15px 0;
-                font-size: 14px;
-                line-height: 1.4;
+            /* ===== Layout ===== */
+            .page-layout {
+                display: grid;
+                grid-template-columns: 280px 1fr;
+                gap: var(--space-2xl);
+                max-width: 1400px;
+                margin: 0 auto;
+                padding: var(--space-3xl) var(--space-xl);
             }
 
-            code {
-                background: #f8f8f8;
-                padding: 2px 4px;
-                border-radius: 3px;
-                font-family: 'Courier New', monospace;
-                font-size: 0.9em;
+            /* ===== Sticky TOC Sidebar ===== */
+            .toc-sidebar {
+                position: sticky;
+                top: 100px;
+                height: fit-content;
+                max-height: calc(100vh - 120px);
+                overflow-y: auto;
             }
 
-            pre code {
-                background: none;
-                padding: 0;
+            .toc-card {
+                background: rgba(255, 255, 255, 0.8);
+                -webkit-backdrop-filter: blur(12px) saturate(180%);
+                backdrop-filter: blur(12px) saturate(180%);
+                border: 1px solid var(--color-border);
+                border-radius: var(--radius-xl);
+                padding: var(--space-xl);
+                box-shadow: var(--shadow-md);
             }
 
-            ul,
-            ol {
-                margin-bottom: 15px;
+            .toc-title {
+                font-size: var(--text-sm);
+                font-weight: 700;
+                text-transform: uppercase;
+                letter-spacing: 0.05em;
+                color: var(--color-accent-1);
+                margin-bottom: var(--space-lg);
+                display: flex;
+                align-items: center;
+                gap: var(--space-sm);
             }
 
-            li {
-                margin-bottom: 8px;
+            .toc-title::before {
+                content: '';
+                width: 4px;
+                height: 16px;
+                background: var(--gradient-primary);
+                border-radius: var(--radius-full);
             }
 
-            p {
-                margin-bottom: 15px;
+            .toc-nav {
+                list-style: none;
+            }
+
+            .toc-nav li {
+                margin-bottom: var(--space-xs);
+            }
+
+            .toc-nav a {
+                display: block;
+                padding: var(--space-sm) var(--space-md);
+                color: var(--color-base-text-muted);
+                text-decoration: none;
+                font-size: var(--text-sm);
+                border-radius: var(--radius-md);
+                transition: all 0.3s ease;
+                border-left: 2px solid transparent;
+            }
+
+            .toc-nav a:hover {
+                color: var(--color-accent-1);
+                background: var(--color-hover);
+                border-left-color: var(--color-accent-1);
+            }
+
+            .toc-nav a.active {
+                color: var(--color-accent-1);
+                background: var(--color-accent-light);
+                border-left-color: var(--color-accent-1);
+                font-weight: 600;
+            }
+
+            .toc-nav .toc-sub {
+                padding-left: var(--space-md);
+                margin-top: var(--space-xs);
+            }
+
+            .toc-nav .toc-sub a {
+                font-size: var(--text-xs);
+                padding: var(--space-xs) var(--space-md);
+            }
+
+            /* Progress indicator */
+            .toc-progress {
+                height: 3px;
+                background: var(--color-border);
+                border-radius: var(--radius-full);
+                margin-bottom: var(--space-lg);
+                overflow: hidden;
+            }
+
+            .toc-progress-bar {
+                height: 100%;
+                background: var(--gradient-primary);
+                width: 0%;
+                transition: width 0.3s ease;
+            }
+
+            /* ===== Main Content ===== */
+            .main-content {
+                min-width: 0;
+            }
+
+            .content-section {
+                margin-bottom: var(--space-3xl);
+                scroll-margin-top: 100px;
+            }
+
+            .content-section p {
+                margin-bottom: var(--space-lg);
+                color: var(--color-base-text);
                 text-align: justify;
             }
 
-            .toc {
-                background: #ecf0f1;
-                padding: 20px;
-                border-radius: 5px;
-                margin-bottom: 30px;
-            }
-
-            .toc h3 {
-                margin-top: 0;
-                color: #2c3e50;
-            }
-
-            .toc ul {
-                list-style-type: none;
-                padding-left: 0;
-            }
-
-            .toc li {
-                margin-bottom: 5px;
-            }
-
-            .toc a {
-                color: #3498db;
+            .content-section a {
+                color: var(--color-accent-1);
                 text-decoration: none;
+                font-weight: 500;
+                transition: all 0.3s ease;
             }
 
-            .toc a:hover {
+            .content-section a:hover {
+                color: var(--color-accent-2);
                 text-decoration: underline;
             }
 
-            .references {
-                background: #f9f9f9;
-                padding: 20px;
-                border-radius: 5px;
-                margin-top: 40px;
-            }
-
-            .references ol {
-                padding-left: 20px;
-            }
-
-            .references li {
-                margin-bottom: 10px;
-                font-size: 0.9em;
-            }
-
-            .highlight {
-                background: #fff3cd;
-                padding: 15px;
-                border-left: 4px solid #ffc107;
-                margin: 20px 0;
-            }
-
-            .note {
-                background: #d4edda;
-                padding: 15px;
-                border-left: 4px solid #28a745;
-                margin: 20px 0;
-            }
-
-            .code-block {
+            /* Section Headers */
+            .section-header {
+                margin-bottom: var(--space-xl);
+                padding-bottom: var(--space-md);
+                border-bottom: 2px solid var(--color-border);
                 position: relative;
             }
 
+            .section-header::after {
+                content: '';
+                position: absolute;
+                bottom: -2px;
+                left: 0;
+                width: 80px;
+                height: 2px;
+                background: var(--gradient-primary);
+            }
+
+            .section-header h2 {
+                font-size: var(--text-2xl);
+                font-weight: 700;
+                color: var(--color-accent-1);
+                letter-spacing: -0.02em;
+            }
+
+            .section-header h3 {
+                font-size: var(--text-xl);
+                font-weight: 600;
+                color: var(--color-accent-2);
+                margin-top: var(--space-2xl);
+            }
+
+            h3 {
+                font-size: var(--text-xl);
+                font-weight: 600;
+                color: var(--color-accent-2);
+                margin-top: var(--space-2xl);
+                margin-bottom: var(--space-lg);
+                scroll-margin-top: 100px;
+            }
+
+            h4 {
+                font-size: var(--text-lg);
+                font-weight: 600;
+                color: var(--color-base-text);
+                margin-top: var(--space-xl);
+                margin-bottom: var(--space-md);
+            }
+
+            /* Lists */
+            ul,
+            ol {
+                margin-bottom: var(--space-lg);
+                padding-left: var(--space-xl);
+            }
+
+            li {
+                margin-bottom: var(--space-sm);
+            }
+
+            li strong {
+                color: var(--color-accent-2);
+            }
+
+            /* Code Blocks */
+            .code-block {
+                margin: var(--space-xl) 0;
+                border-radius: var(--radius-xl);
+                overflow: hidden;
+                box-shadow: var(--shadow-lg);
+            }
+
             .code-title {
-                background: #34495e;
-                color: white;
-                padding: 8px 15px;
+                background: linear-gradient(135deg, #2d3748 0%, #1a202c 100%);
+                color: #a0aec0;
+                padding: var(--space-sm) var(--space-lg);
+                font-size: var(--text-sm);
+                font-weight: 600;
+                font-family: var(--font-mono);
+                display: flex;
+                align-items: center;
+                gap: var(--space-sm);
+            }
+
+            .code-title::before {
+                content: '';
+                display: flex;
+                gap: 6px;
+            }
+
+            .code-title .dots {
+                display: flex;
+                gap: 6px;
+                margin-right: var(--space-sm);
+            }
+
+            .code-title .dot {
+                width: 12px;
+                height: 12px;
+                border-radius: 50%;
+            }
+
+            .code-title .dot:nth-child(1) {
+                background: #fc8181;
+            }
+
+            .code-title .dot:nth-child(2) {
+                background: #f6e05e;
+            }
+
+            .code-title .dot:nth-child(3) {
+                background: #68d391;
+            }
+
+            pre {
+                background: linear-gradient(135deg, #1a202c 0%, #2d3748 100%);
+                color: #e2e8f0;
+                padding: var(--space-xl);
+                overflow-x: auto;
+                font-family: var(--font-mono);
+                font-size: var(--text-sm);
+                line-height: 1.6;
+                margin: 0;
+            }
+
+            .code-block pre {
+                border-radius: 0 0 var(--radius-xl) var(--radius-xl);
+            }
+
+            code {
+                font-family: var(--font-mono);
                 font-size: 0.9em;
-                font-weight: bold;
+                background: var(--color-accent-light);
+                color: var(--color-accent-2);
+                padding: 0.15em 0.4em;
+                border-radius: var(--radius-sm);
+            }
+
+            pre code {
+                background: transparent;
+                color: inherit;
+                padding: 0;
+            }
+
+            /* Highlight Boxes */
+            .highlight-box {
+                background: rgba(255, 255, 255, 0.7);
+                -webkit-backdrop-filter: blur(8px);
+                backdrop-filter: blur(8px);
+                border-radius: var(--radius-lg);
+                padding: var(--space-lg);
+                margin: var(--space-lg) 0;
+                border-left: 4px solid var(--color-accent-1);
+                transition: all 0.3s ease;
+            }
+
+            .highlight-box:hover {
+                box-shadow: var(--shadow-md);
+                transform: translateX(4px);
+            }
+
+            .highlight-box p {
+                margin-bottom: var(--space-sm);
+            }
+
+            .highlight-box p:last-child {
                 margin-bottom: 0;
-                border-radius: 5px 5px 0 0;
             }
 
-            .code-title+pre {
-                margin-top: 0;
-                border-radius: 0 0 5px 5px;
+            .highlight-box ul {
+                margin-bottom: 0;
             }
 
-            a {
-                color: #3498db;
+            /* Note Box */
+            .note-box {
+                background: linear-gradient(135deg, rgba(104, 211, 145, 0.1) 0%, rgba(104, 211, 145, 0.05) 100%);
+                border-left-color: #68d391;
+            }
+
+            /* Warning Box */
+            .warning-box {
+                background: linear-gradient(135deg, rgba(246, 224, 94, 0.1) 0%, rgba(246, 224, 94, 0.05) 100%);
+                border-left-color: #f6e05e;
+            }
+
+            /* References Section */
+            .references-section {
+                background: rgba(255, 255, 255, 0.6);
+                -webkit-backdrop-filter: blur(12px);
+                backdrop-filter: blur(12px);
+                border-radius: var(--radius-xl);
+                padding: var(--space-2xl);
+                margin-top: var(--space-3xl);
+                border: 1px solid var(--color-border);
+            }
+
+            .references-section h2 {
+                font-size: var(--text-xl);
+                color: var(--color-accent-1);
+                margin-bottom: var(--space-lg);
+            }
+
+            .references-section ol {
+                list-style-position: outside;
+                padding-left: var(--space-xl);
+            }
+
+            .references-section li {
+                margin-bottom: var(--space-md);
+                font-size: var(--text-sm);
+                color: var(--color-base-text-muted);
+                line-height: 1.6;
+            }
+
+            .references-section li em {
+                color: var(--color-base-text);
+            }
+
+            .references-section a {
+                color: var(--color-accent-1);
+                word-break: break-all;
+            }
+
+            /* ===== Footer ===== */
+            footer {
+                background: linear-gradient(180deg, var(--color-base-bg) 0%, var(--color-accent-light) 100%);
+                padding: var(--space-3xl) var(--space-xl);
+                border-top: 1px solid var(--color-border);
+                text-align: center;
+            }
+
+            .footer-inner {
+                max-width: 1400px;
+                margin: 0 auto;
+            }
+
+            .language-selector {
+                display: flex;
+                gap: var(--space-sm);
+                justify-content: center;
+                flex-wrap: wrap;
+                margin-bottom: var(--space-xl);
+            }
+
+            .language-link {
+                padding: var(--space-sm) var(--space-md);
+                border-radius: var(--radius-full);
+                background: rgba(255, 255, 255, 0.7);
+                -webkit-backdrop-filter: blur(8px);
+                backdrop-filter: blur(8px);
+                border: 1px solid var(--color-border);
+                color: var(--color-base-text-muted);
+                text-decoration: none;
+                font-size: var(--text-sm);
+                font-weight: 500;
+                transition: all 0.3s ease;
+            }
+
+            .language-link:hover,
+            .language-link.active {
+                background: var(--gradient-primary);
+                color: white;
+                border-color: transparent;
+                transform: translateY(-2px);
+                box-shadow: var(--shadow-md);
+            }
+
+            .footer-copyright {
+                font-size: var(--text-sm);
+                color: var(--color-base-text-muted);
+            }
+
+            /* ===== Back to Top Button ===== */
+            .back-to-top {
+                position: fixed;
+                bottom: var(--space-xl);
+                right: var(--space-xl);
+                width: 48px;
+                height: 48px;
+                background: var(--gradient-primary);
+                color: white;
+                border: none;
+                border-radius: 50%;
+                cursor: pointer;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                box-shadow: var(--shadow-lg);
+                transition: all 0.3s ease;
+                z-index: 100;
                 text-decoration: none;
             }
 
-            a:hover {
-                text-decoration: underline;
+            .back-to-top:hover {
+                transform: translateY(-4px);
+                box-shadow: var(--shadow-xl);
             }
 
-            .formula {
-                text-align: center;
-                font-style: italic;
-                margin: 20px 0;
-                padding: 10px;
-                background: #f8f9fa;
-                border-radius: 5px;
+            .back-to-top svg {
+                width: 24px;
+                height: 24px;
             }
 
-            @media (max-width: 640px),
-            screen and (orientation: portrait) {
-                body {
-                    max-width: 100%;
-                    max-height: 100%;
+            /* ===== Animations ===== */
+            @keyframes pulse {
+
+                0%,
+                100% {
+                    opacity: 1;
+                    transform: scale(1);
                 }
 
-                #sidebar {
-                    position: fixed;
-                    background-color: #1B80CF;
+                50% {
+                    opacity: 0.7;
+                    transform: scale(1.2);
+                }
+            }
+
+            @keyframes float {
+
+                0%,
+                100% {
+                    transform: translateY(0);
+                }
+
+                50% {
+                    transform: translateY(-10px);
+                }
+            }
+
+            @keyframes rotate {
+                from {
+                    transform: rotate(0deg);
+                }
+
+                to {
+                    transform: rotate(360deg);
+                }
+            }
+
+            @keyframes fadeInUp {
+                from {
+                    opacity: 0;
+                    transform: translateY(30px);
+                }
+
+                to {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            }
+
+            @keyframes layerPulse {
+
+                0%,
+                100% {
+                    opacity: 0.8;
+                }
+
+                50% {
+                    opacity: 1;
+                }
+            }
+
+            /* ===== Responsive ===== */
+            @media (max-width: 1024px) {
+                .page-layout {
+                    grid-template-columns: 1fr;
+                }
+
+                .toc-sidebar {
+                    position: relative;
                     top: 0;
-                    left: 0;
-                    bottom: 80vh;
-                    width: 100vw;
+                    max-height: none;
+                    margin-bottom: var(--space-2xl);
                 }
 
-                #sidebar .title {
-                    text-align: center;
-                    position: fixed;
-                    margin-top: 6vh;
-                    left: 0px;
-                    right: 0px;
-                    line-height: 3.5vmax;
-                    font-size: 1.5vmax;
-                    font-family: 'Arial';
+                .toc-card {
+                    max-height: 300px;
+                    overflow-y: auto;
+                }
+            }
+
+            @media (max-width: 768px) {
+                .navbar-inner {
+                    flex-direction: column;
+                    gap: var(--space-sm);
                 }
 
-                #sidebar .subtitle {
-                    text-align: center;
-                    top: 5vh;
-                    left: 0px;
-                    right: 0px;
-                    position: fixed;
-                    margin-top: 10vh;
-                    font-size: 1.5vmax;
+                .navbar-nav {
+                    flex-wrap: wrap;
+                    justify-content: center;
                 }
 
-                #sidebar .title a:link,
-                #sidebar .title a:visited {
-                    text-align: center;
-                    color: #FFFFFF;
+                .hero {
+                    min-height: 60vh;
+                    padding-top: 140px;
                 }
 
-                #sidebar .subtitle a:link,
-                #sidebar .subtitle a:visited {
-                    text-align: center;
-                    color: #FFFFFF;
+                .hero-svg {
+                    width: 220px;
+                    height: 220px;
                 }
 
-                .home {
-                    z-index: 100;
-                    width: 100%;
-                    background-color: #1B80CF;
-                    font-size: 1.5vmax;
+                .hero-title {
+                    font-size: var(--text-3xl);
                 }
 
-                .home a:link,
-                .home a:visited {
-                    text-decoration: none;
-                    color: #FFFFFF;
+                .page-layout {
+                    padding: var(--space-xl) var(--space-md);
                 }
 
-                .content {
-                    line-height: 3.8vmax;
-                    font-size: 1.8vmax;
-                    font-family: 'Arial';
-                    margin-top: 22vh;
+                pre {
+                    padding: var(--space-md);
+                    font-size: var(--text-xs);
                 }
 
-                .content a:link,
-                .content a:visited {
-                    color: #1B80CF;
+                .back-to-top {
+                    bottom: var(--space-md);
+                    right: var(--space-md);
+                    width: 40px;
+                    height: 40px;
                 }
+            }
 
-                .page {
-                    top: 40vh;
-                    width: 95%;
-                    margin-left: 0vw;
-                }
+            /* ===== Accessibility ===== */
+            @media (prefers-reduced-motion: reduce) {
 
-                .page img {
-                    max-width: 100%;
-                    max-height: 100%;
-                    border: 0;
+                *,
+                *::before,
+                *::after {
+                    animation-duration: 0.01ms !important;
+                    animation-iteration-count: 1 !important;
+                    transition-duration: 0.01ms !important;
                 }
+            }
+
+            :focus-visible {
+                outline: 3px solid var(--color-accent-1);
+                outline-offset: 2px;
+                border-radius: var(--radius-sm);
+            }
+
+            /* Floating decorations */
+            .floating-shape {
+                position: absolute;
+                opacity: 0.1;
+                pointer-events: none;
+            }
+
+            .floating-shape.hex1 {
+                top: 10%;
+                left: 5%;
+                width: 80px;
+                height: 80px;
+                animation: float 8s ease-in-out infinite;
+            }
+
+            .floating-shape.hex2 {
+                bottom: 15%;
+                right: 8%;
+                width: 60px;
+                height: 60px;
+                animation: float 6s ease-in-out infinite 1s;
             }
         </style>
     </head>
 
-    <body vocab="http://schema.org/">
-        <div class="page">
-            <div class="home">
-                <ul typeof="BreadcrumbList">
-                    <li property="itemListElement" typeof="ListItem">
-                        <a property="item" typeof="WebPage" href="../index.html">
-                            <span property="name">Home</span>
-                        </a>
-                    </li>
-                    <li property="itemListElement" typeof="ListItem">
-                        <a property="item" typeof="WebPage" href="../research/research.html">
-                            <span property="name">Research</span>
-                        </a>
-                    </li>
+    <body>
+        <a href="#main-content" class="skip-link">Skip to main content</a>
+
+        <!-- Navigation -->
+        <nav class="navbar" aria-label="Main navigation">
+            <div class="navbar-inner">
+                <a href="../index.html" class="navbar-brand">
+                    John Samuel
+                </a>
+                <ul class="navbar-nav">
+                    <li><a href="../index.html">Home</a></li>
+                    <li><span class="divider">/</span></li>
+                    <li><a href="../research/research.html">Research</a></li>
                 </ul>
-
             </div>
-            <div id="sidebar">
-                <div class="title">
-                    <h1><a href="./semantic-web.html">Semantic Web</a></h1>
+        </nav>
+
+        <!-- Hero Section -->
+        <header class="hero">
+            <div class="hero-pattern" aria-hidden="true"></div>
+
+            <!-- Floating Hexagons -->
+            <svg class="floating-shape hex1" viewBox="0 0 100 100" aria-hidden="true">
+                <path d="M50 5L93 27.5V72.5L50 95L7 72.5V27.5L50 5Z" fill="none" stroke="#1B80CF" stroke-width="2" />
+            </svg>
+            <svg class="floating-shape hex2" viewBox="0 0 100 100" aria-hidden="true">
+                <path d="M50 5L93 27.5V72.5L50 95L7 72.5V27.5L50 5Z" fill="none" stroke="#6366f1" stroke-width="2" />
+            </svg>
+
+            <div class="hero-content">
+                <!-- Custom SVG: Semantic Web Layer Stack -->
+                <svg class="hero-svg" viewBox="0 0 400 400" aria-hidden="true">
+                    <defs>
+                        <linearGradient id="layer1" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" stop-color="#1B80CF" />
+                            <stop offset="100%" stop-color="#0d5a9e" />
+                        </linearGradient>
+                        <linearGradient id="layer2" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" stop-color="#6366f1" />
+                            <stop offset="100%" stop-color="#4f46e5" />
+                        </linearGradient>
+                        <linearGradient id="layer3" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" stop-color="#10b981" />
+                            <stop offset="100%" stop-color="#059669" />
+                        </linearGradient>
+                        <linearGradient id="layer4" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" stop-color="#f59e0b" />
+                            <stop offset="100%" stop-color="#d97706" />
+                        </linearGradient>
+                        <filter id="layerShadow">
+                            <feDropShadow dx="0" dy="4" stdDeviation="4" flood-opacity="0.2" />
+                        </filter>
+                        <filter id="glow">
+                            <feGaussianBlur stdDeviation="2" result="coloredBlur" />
+                            <feMerge>
+                                <feMergeNode in="coloredBlur" />
+                                <feMergeNode in="SourceGraphic" />
+                            </feMerge>
+                        </filter>
+                    </defs>
+
+                    <!-- Connection Lines -->
+                    <g stroke="#1B80CF" stroke-width="1" stroke-dasharray="4 4" opacity="0.3">
+                        <line x1="200" y1="80" x2="200" y2="320" />
+                        <line x1="100" y1="200" x2="300" y2="200" />
+                    </g>
+
+                    <!-- Layer 4: Trust (Top) -->
+                    <g style="animation: float 6s ease-in-out infinite" filter="url(#layerShadow)">
+                        <path d="M200 50 L280 90 L280 130 L200 170 L120 130 L120 90 Z" fill="url(#layer4)"
+                            opacity="0.9" />
+                        <text x="200" y="115" text-anchor="middle" fill="white" font-size="12"
+                            font-weight="600">TRUST</text>
+                    </g>
+
+                    <!-- Layer 3: Logic/Proof -->
+                    <g style="animation: float 5s ease-in-out infinite 0.5s" filter="url(#layerShadow)">
+                        <path d="M200 120 L290 165 L290 210 L200 255 L110 210 L110 165 Z" fill="url(#layer3)"
+                            opacity="0.9" />
+                        <text x="200" y="192" text-anchor="middle" fill="white" font-size="12" font-weight="600">OWL /
+                            RULES</text>
+                    </g>
+
+                    <!-- Layer 2: Ontology -->
+                    <g style="animation: float 5.5s ease-in-out infinite 1s" filter="url(#layerShadow)">
+                        <path d="M200 195 L300 245 L300 295 L200 345 L100 295 L100 245 Z" fill="url(#layer2)"
+                            opacity="0.9" />
+                        <text x="200" y="275" text-anchor="middle" fill="white" font-size="12" font-weight="600">RDFS /
+                            SPARQL</text>
+                    </g>
+
+                    <!-- Layer 1: RDF (Bottom) -->
+                    <g style="animation: float 6.5s ease-in-out infinite 1.5s" filter="url(#layerShadow)">
+                        <path d="M200 275 L310 330 L310 385 L200 440 L90 385 L90 330 Z" fill="url(#layer1)"
+                            opacity="0.9" transform="translate(0, -80)" />
+                        <text x="200" y="330" text-anchor="middle" fill="white" font-size="14"
+                            font-weight="700">RDF</text>
+                    </g>
+
+                    <!-- Orbiting Data Nodes -->
+                    <g filter="url(#glow)">
+                        <circle cx="200" cy="200" r="3" fill="#1B80CF">
+                            <animateMotion dur="8s" repeatCount="indefinite">
+                                <mpath href="#orbitPath1" />
+                            </animateMotion>
+                        </circle>
+                        <circle cx="200" cy="200" r="3" fill="#6366f1">
+                            <animateMotion dur="10s" repeatCount="indefinite">
+                                <mpath href="#orbitPath2" />
+                            </animateMotion>
+                        </circle>
+                    </g>
+
+                    <path id="orbitPath1" d="M200 60 Q350 200 200 340 Q50 200 200 60" fill="none" stroke="none" />
+                    <path id="orbitPath2" d="M60 200 Q200 50 340 200 Q200 350 60 200" fill="none" stroke="none" />
+
+                    <!-- Decorative Rings -->
+                    <circle cx="200" cy="200" r="160" fill="none" stroke="#1B80CF" stroke-width="0.5"
+                        stroke-dasharray="2 6" opacity="0.2">
+                        <animateTransform attributeName="transform" type="rotate" from="0 200 200" to="360 200 200"
+                            dur="60s" repeatCount="indefinite" />
+                    </circle>
+                </svg>
+
+                <div class="series-badge">
+                    <span>Part of the series on</span>
+                    <a href="../research/knowledge-representation.html">Knowledge Representation and Semantic Web</a>
                 </div>
-                <div class="subtitle">
-                    <h3><a href="../about.html">John Samuel</a></h3>
-                </div>
+
+                <h1 class="hero-title">The Semantic Web</h1>
+                <p class="hero-subtitle">
+                    Technologies, Standards, and Applications for transforming the web
+                    from documents into machine-readable, semantically rich data.
+                </p>
             </div>
+        </header>
 
-            <div class="content">
-
-                <header>
-                    <h1>The Semantic Web: Technologies, Standards, and Applications</h1>
-                    <div
-                        style="background-color: #f0f8ff; border-left: 4px solid #009AA6; padding: 1em; margin-bottom: 1.5em;">
-                        <strong>This article is part of a series on <a
-                                href="../research/knowledge-representation.html">Knowledge Representation and Semantic
-                                Web</a>.</strong>
+        <!-- Main Layout with TOC Sidebar -->
+        <div class="page-layout">
+            <!-- Sticky Table of Contents -->
+            <aside class="toc-sidebar" aria-label="Table of contents">
+                <div class="toc-card">
+                    <div class="toc-progress">
+                        <div class="toc-progress-bar" style="width: 0%"></div>
                     </div>
-                </header>
-                <div class="toc">
-                    <h3>Table of Contents</h3>
-                    <ul>
-                        <li><a href="#introduction">1. Introduction</a></li>
-                        <li><a href="#formal-foundations">2. Formal Foundations and Theoretical
-                                Background</a>
-                            <ul>
-                                <li><a href="#description-logic">2.1 Description Logic and Knowledge
-                                        Representation</a></li>
-                                <li><a href="#logical-framework">2.2 Logical Framework and Inference</a>
-                                </li>
-                            </ul>
-                        </li>
-                        <li><a href="#core-technologies">3. Core Technologies and Standards</a>
-                            <ul>
-                                <li><a href="#rdf">3.1 Resource Description Framework (RDF)</a></li>
-                                <li><a href="#owl">3.2 Web Ontology Language (OWL)</a></li>
-                                <li><a href="#sparql">3.3 SPARQL Protocol and RDF Query Language</a></li>
-                            </ul>
-                        </li>
-                        <li><a href="#applications">4. Applications and Use Cases</a></li>
-                        <li><a href="#challenges">5. Challenges and Future Directions</a></li>
-                        <li><a href="#related-technologies">6. Related Technologies</a></li>
-                        <li><a href="#conclusion">7. Conclusion</a></li>
-                        <li><a href="#references">8. References</a></li>
-                    </ul>
+                    <h2 class="toc-title">Contents</h2>
+                    <nav>
+                        <ul class="toc-nav">
+                            <li><a href="#introduction">1. Introduction</a></li>
+                            <li>
+                                <a href="#formal-foundations">2. Formal Foundations</a>
+                                <ul class="toc-sub">
+                                    <li><a href="#description-logic">2.1 Description Logic</a></li>
+                                    <li><a href="#logical-framework">2.2 Logical Framework</a></li>
+                                </ul>
+                            </li>
+                            <li>
+                                <a href="#core-technologies">3. Core Technologies</a>
+                                <ul class="toc-sub">
+                                    <li><a href="#rdf">3.1 RDF</a></li>
+                                    <li><a href="#owl">3.2 OWL</a></li>
+                                    <li><a href="#sparql">3.3 SPARQL</a></li>
+                                </ul>
+                            </li>
+                            <li><a href="#applications">4. Applications</a></li>
+                            <li><a href="#challenges">5. Challenges</a></li>
+                            <li><a href="#related-technologies">6. Related Tech</a></li>
+                            <li><a href="#conclusion">7. Conclusion</a></li>
+                            <li><a href="#references">8. References</a></li>
+                        </ul>
+                    </nav>
                 </div>
+            </aside>
 
-                <main>
-                    <section id="introduction">
+            <!-- Main Content -->
+            <main id="main-content" class="main-content">
+                <!-- Section 1: Introduction -->
+                <section id="introduction" class="content-section">
+                    <div class="section-header">
                         <h2>1. Introduction</h2>
-                        <p>The Semantic Web represents a fundamental evolution of the World Wide Web,
-                            transforming it from a web of documents into a web of data that can be
-                            processed, understood, and reasoned about by machines. Originally conceived by
-                            Tim Berners-Lee in 2001, the Semantic Web extends the traditional web by adding
-                            machine-readable metadata to web resources, enabling automated agents to access
-                            and process information with semantic understanding rather than merely syntactic
-                            manipulation.</p>
+                    </div>
+                    <p>The Semantic Web represents a fundamental evolution of the World Wide Web, transforming it from a
+                        web of documents into a web of data that can be processed, understood, and reasoned about by
+                        machines. Originally conceived by Tim Berners-Lee in 2001, the Semantic Web extends the
+                        traditional web by adding machine-readable metadata to web resources, enabling automated agents
+                        to access and process information with semantic understanding rather than merely syntactic
+                        manipulation.</p>
+                    <p>Unlike the traditional web, where information is primarily designed for human consumption and
+                        machines can only process the syntactic structure of documents, the Semantic Web provides a
+                        framework where data has explicit meaning that can be processed by computers. This
+                        transformation enables new possibilities for automated reasoning, intelligent search, data
+                        integration, and knowledge discovery across distributed systems.</p>
+                </section>
 
-                        <p>Unlike the traditional web, where information is primarily designed for human
-                            consumption and machines can only process the syntactic structure of documents,
-                            the Semantic Web provides a framework where data has explicit meaning that can
-                            be processed by computers. This transformation enables new possibilities for
-                            automated reasoning, intelligent search, data integration, and knowledge
-                            discovery across distributed systems.</p>
-                    </section>
-
-                    <section id="formal-foundations">
+                <!-- Section 2: Formal Foundations -->
+                <section id="formal-foundations" class="content-section">
+                    <div class="section-header">
                         <h2>2. Formal Foundations and Theoretical Background</h2>
+                    </div>
 
-                        <section id="description-logic">
-                            <h3>2.1 Description Logic and Knowledge Representation</h3>
-                            <p>Description Logic (DL) serves as one of the primary mathematical foundations
-                                underlying several Semantic Web technologies, particularly the Web Ontology
-                                Language (OWL). Description logics are decidable fragments of first-order
-                                logic specifically designed for knowledge representation and automated
-                                reasoning about concepts, roles (relationships), and individuals.</p>
+                    <h3 id="description-logic">2.1 Description Logic and Knowledge Representation</h3>
+                    <p>Description Logic (DL) serves as one of the primary mathematical foundations underlying several
+                        Semantic Web technologies, particularly the Web Ontology Language (OWL). Description logics are
+                        decidable fragments of first-order logic specifically designed for knowledge representation and
+                        automated reasoning about concepts, roles (relationships), and individuals.</p>
+                    <p>The fundamental modeling constructs in description logic include:</p>
+                    <ul>
+                        <li><strong>Concepts (Classes)</strong>: Representing sets of individuals with shared properties
+                        </li>
+                        <li><strong>Roles (Properties)</strong>: Representing binary relationships between individuals
+                        </li>
+                        <li><strong>Individuals</strong>: Representing specific entities in the domain</li>
+                        <li><strong>Axioms</strong>: Logical statements that constrain the interpretation of concepts
+                            and roles</li>
+                    </ul>
+                    <p>Description logic provides the theoretical foundation for OWL's "Direct Semantics," enabling
+                        automated reasoning capabilities such as:</p>
+                    <ul>
+                        <li><strong>Subsumption</strong>: Determining whether one concept is more general than another
+                        </li>
+                        <li><strong>Satisfiability</strong>: Checking whether a concept can have instances</li>
+                        <li><strong>Classification</strong>: Organizing concepts into taxonomic hierarchies</li>
+                        <li><strong>Instance checking</strong>: Verifying whether an individual belongs to a particular
+                            concept</li>
+                    </ul>
 
-                            <p>The fundamental modeling constructs in description logic include:</p>
-                            <ul>
-                                <li><strong>Concepts (Classes)</strong>: Representing sets of individuals
-                                    with shared properties</li>
-                                <li><strong>Roles (Properties)</strong>: Representing binary relationships
-                                    between individuals</li>
-                                <li><strong>Individuals</strong>: Representing specific entities in the
-                                    domain</li>
-                                <li><strong>Axioms</strong>: Logical statements that constrain the
-                                    interpretation of concepts and roles</li>
-                            </ul>
+                    <h3 id="logical-framework">2.2 Logical Framework and Inference</h3>
+                    <p>The Semantic Web stack is built upon a layered architecture of logical formalism:</p>
+                    <ol>
+                        <li><strong>Syntactic Layer</strong>: Provides standard formats for data representation (RDF,
+                            XML)</li>
+                        <li><strong>Semantic Layer</strong>: Defines meaning through vocabularies and ontologies (RDF
+                            Schema, OWL)</li>
+                        <li><strong>Logical Layer</strong>: Enables reasoning and inference (Description Logic, Rules)
+                        </li>
+                        <li><strong>Proof Layer</strong>: Provides mechanisms for validating conclusions</li>
+                        <li><strong>Trust Layer</strong>: Establishes confidence in information sources</li>
+                    </ol>
+                    <p>This logical framework enables machines to perform automated reasoning, allowing them to derive
+                        new knowledge from existing facts and rules. The inference capabilities are crucial for
+                        applications requiring intelligent data processing and knowledge discovery.</p>
+                </section>
 
-                            <p>Description logic provides the theoretical foundation for OWL's "Direct
-                                Semantics," enabling automated reasoning capabilities such as:</p>
-                            <ul>
-                                <li><strong>Subsumption</strong>: Determining whether one concept is more
-                                    general than another</li>
-                                <li><strong>Satisfiability</strong>: Checking whether a concept can have
-                                    instances</li>
-                                <li><strong>Classification</strong>: Organizing concepts into taxonomic
-                                    hierarchies</li>
-                                <li><strong>Instance checking</strong>: Verifying whether an individual
-                                    belongs to a particular concept</li>
-                            </ul>
-                        </section>
-
-                        <section id="logical-framework">
-                            <h3>2.2 Logical Framework and Inference</h3>
-                            <p>The Semantic Web stack is built upon a layered architecture of logical
-                                formalism:</p>
-                            <ol>
-                                <li><strong>Syntactic Layer</strong>: Provides standard formats for data
-                                    representation (RDF, XML)</li>
-                                <li><strong>Semantic Layer</strong>: Defines meaning through vocabularies
-                                    and ontologies (RDF Schema, OWL)</li>
-                                <li><strong>Logical Layer</strong>: Enables reasoning and inference
-                                    (Description Logic, Rules)</li>
-                                <li><strong>Proof Layer</strong>: Provides mechanisms for validating
-                                    conclusions</li>
-                                <li><strong>Trust Layer</strong>: Establishes confidence in information
-                                    sources</li>
-                            </ol>
-
-                            <p>This logical framework enables machines to perform automated reasoning,
-                                allowing them to derive new knowledge from existing facts and rules. The
-                                inference capabilities are crucial for applications requiring intelligent
-                                data processing and knowledge discovery.</p>
-                        </section>
-                    </section>
-
-                    <section id="core-technologies">
+                <!-- Section 3: Core Technologies -->
+                <section id="core-technologies" class="content-section">
+                    <div class="section-header">
                         <h2>3. Core Technologies and Standards</h2>
+                    </div>
 
-                        <section id="rdf">
-                            <h3>3.1 Resource Description Framework (RDF)</h3>
-                            <p>The Resource Description Framework (RDF) constitutes the foundational data
-                                model of the Semantic Web. RDF 1.1, published as a W3C Recommendation in
-                                2014, provides a standard method for describing resources and their
-                                relationships using a simple triple-based structure.</p>
+                    <h3 id="rdf">3.1 Resource Description Framework (RDF)</h3>
+                    <p>The Resource Description Framework (RDF) constitutes the foundational data model of the Semantic
+                        Web. RDF 1.1, published as a W3C Recommendation in 2014, provides a standard method for
+                        describing resources and their relationships using a simple triple-based structure.</p>
 
-                            <h4>3.1.1 RDF Data Model</h4>
-                            <p>RDF expresses information as a collection of statements, each represented as
-                                a triple consisting of:</p>
-                            <ul>
-                                <li><strong>Subject</strong>: The resource being described</li>
-                                <li><strong>Predicate</strong>: The property or relationship</li>
-                                <li><strong>Object</strong>: The value or related resource</li>
-                            </ul>
+                    <h4>3.1.1 RDF Data Model</h4>
+                    <p>RDF expresses information as a collection of statements, each represented as a triple consisting
+                        of:</p>
+                    <ul>
+                        <li><strong>Subject</strong>: The resource being described</li>
+                        <li><strong>Predicate</strong>: The property or relationship</li>
+                        <li><strong>Object</strong>: The value or related resource</li>
+                    </ul>
 
-                            <div class="code-block">
-                                <div class="code-title">Turtle Syntax</div>
-                                <pre><code>@prefix foaf: &lt;http://xmlns.com/foaf/0.1/&gt; .
-                @prefix ex: &lt;http://example.org/&gt; .
-                
-                ex:john foaf:name "John Smith" .
-                ex:john foaf:age 30 .
-                ex:john foaf:knows ex:mary .</code></pre>
-                            </div>
+                    <div class="code-block">
+                        <div class="code-title">
+                            <span class="dots"><span class="dot"></span><span class="dot"></span><span
+                                    class="dot"></span></span>
+                            Turtle Syntax
+                        </div>
+                        <pre><code>@prefix foaf: &lt;http://xmlns.com/foaf/0.1/&gt; .
+@prefix ex: &lt;http://example.org/&gt; .
 
-                            <h4>3.1.2 RDF Serialization Formats</h4>
-                            <p>RDF can be serialized in multiple formats:</p>
+ex:john foaf:name "John Smith" .
+ex:john foaf:age 30 .
+ex:john foaf:knows ex:mary .</code></pre>
+                    </div>
 
-                            <div class="code-block">
-                                <div class="code-title">RDF/XML</div>
-                                <pre><code>&lt;?xml version="1.0"?&gt;
-                &lt;rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
-                         xmlns:foaf="http://xmlns.com/foaf/0.1/"
-                         xmlns:ex="http://example.org/"&gt;
-                  &lt;rdf:Description rdf:about="http://example.org/john"&gt;
-                    &lt;foaf:name&gt;John Smith&lt;/foaf:name&gt;
-                    &lt;foaf:age rdf:datatype="http://www.w3.org/2001/XMLSchema#integer"&gt;30&lt;/foaf:age&gt;
-                  &lt;/rdf:Description&gt;
-                &lt;/rdf:RDF&gt;</code></pre>
-                            </div>
+                    <h4>3.1.2 RDF Serialization Formats</h4>
+                    <p>RDF can be serialized in multiple formats:</p>
 
-                            <div class="code-block">
-                                <div class="code-title">JSON-LD</div>
-                                <pre><code>{
-                  "@context": {
-                    "foaf": "http://xmlns.com/foaf/0.1/",
-                    "ex": "http://example.org/"
-                  },
-                  "@id": "ex:john",
-                  "foaf:name": "John Smith",
-                  "foaf:age": 30
-                }</code></pre>
-                            </div>
+                    <div class="code-block">
+                        <div class="code-title">
+                            <span class="dots"><span class="dot"></span><span class="dot"></span><span
+                                    class="dot"></span></span>
+                            RDF/XML
+                        </div>
+                        <pre><code>&lt;?xml version="1.0"?&gt;
+&lt;rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+         xmlns:foaf="http://xmlns.com/foaf/0.1/"
+         xmlns:ex="http://example.org/"&gt;
+  &lt;rdf:Description rdf:about="http://example.org/john"&gt;
+    &lt;foaf:name&gt;John Smith&lt;/foaf:name&gt;
+    &lt;foaf:age rdf:datatype="http://www.w3.org/2001/XMLSchema#integer"&gt;30&lt;/foaf:age&gt;
+  &lt;/rdf:Description&gt;
+&lt;/rdf:RDF&gt;</code></pre>
+                    </div>
 
-                            <h4>3.1.3 RDF Schema (RDFS)</h4>
-                            <p>RDF Schema extends RDF by providing a vocabulary for describing classes,
-                                properties, and hierarchical relationships:</p>
+                    <div class="code-block">
+                        <div class="code-title">
+                            <span class="dots"><span class="dot"></span><span class="dot"></span><span
+                                    class="dot"></span></span>
+                            JSON-LD
+                        </div>
+                        <pre><code>{
+  "@context": {
+    "foaf": "http://xmlns.com/foaf/0.1/",
+    "ex": "http://example.org/"
+  },
+  "@id": "ex:john",
+  "foaf:name": "John Smith",
+  "foaf:age": 30
+}</code></pre>
+                    </div>
 
-                            <div class="code-block">
-                                <div class="code-title">RDFS Example</div>
-                                <pre><code>@prefix rdfs: &lt;http://www.w3.org/2000/01/rdf-schema#&gt; .
-                @prefix ex: &lt;http://example.org/&gt; .
-                
-                ex:Person rdf:type rdfs:Class .
-                ex:Student rdfs:subClassOf ex:Person .
-                ex:name rdf:type rdf:Property .
-                ex:name rdfs:domain ex:Person .
-                ex:name rdfs:range rdfs:Literal .</code></pre>
-                            </div>
-                        </section>
+                    <h4>3.1.3 RDF Schema (RDFS)</h4>
+                    <p>RDF Schema extends RDF by providing a vocabulary for describing classes, properties, and
+                        hierarchical relationships:</p>
 
-                        <section id="owl">
-                            <h3>3.2 Web Ontology Language (OWL)</h3>
-                            <p>The Web Ontology Language (OWL) provides a rich vocabulary for defining
-                                complex ontologies and enabling sophisticated reasoning. OWL 2, the current
-                                standard, offers three sublanguages with different levels of expressiveness
-                                and computational complexity.</p>
+                    <div class="code-block">
+                        <div class="code-title">
+                            <span class="dots"><span class="dot"></span><span class="dot"></span><span
+                                    class="dot"></span></span>
+                            RDFS Example
+                        </div>
+                        <pre><code>@prefix rdfs: &lt;http://www.w3.org/2000/01/rdf-schema#&gt; .
+@prefix ex: &lt;http://example.org/&gt; .
 
-                            <h4>3.2.1 OWL 2 Sublanguages</h4>
-                            <div class="highlight">
-                                <p><strong>OWL 2 EL (Existential Language)</strong>:</p>
-                                <ul>
-                                    <li>Optimized for large-scale ontologies</li>
-                                    <li>Polynomial-time reasoning</li>
-                                    <li>Supports existential quantification and class hierarchies</li>
-                                </ul>
-                            </div>
+ex:Person rdf:type rdfs:Class .
+ex:Student rdfs:subClassOf ex:Person .
+ex:name rdf:type rdf:Property .
+ex:name rdfs:domain ex:Person .
+ex:name rdfs:range rdfs:Literal .</code></pre>
+                    </div>
 
-                            <div class="highlight">
-                                <p><strong>OWL 2 QL (Query Language)</strong>:</p>
-                                <ul>
-                                    <li>Designed for efficient query answering</li>
-                                    <li>Supports SPARQL queries over large datasets</li>
-                                    <li>Polynomial-time query answering</li>
-                                </ul>
-                            </div>
+                    <h3 id="owl">3.2 Web Ontology Language (OWL)</h3>
+                    <p>The Web Ontology Language (OWL) provides a rich vocabulary for defining complex ontologies and
+                        enabling sophisticated reasoning. OWL 2, the current standard, offers three sublanguages with
+                        different levels of expressiveness and computational complexity.</p>
 
-                            <div class="highlight">
-                                <p><strong>OWL 2 RL (Rule Language)</strong>:</p>
-                                <ul>
-                                    <li>Amenable to rule-based reasoning</li>
-                                    <li>Can be implemented using forward-chaining rules</li>
-                                    <li>Supports most common modeling constructs</li>
-                                </ul>
-                            </div>
+                    <h4>3.2.1 OWL 2 Sublanguages</h4>
 
-                            <h4>3.2.2 OWL Constructs and Examples</h4>
+                    <div class="highlight-box">
+                        <p><strong>OWL 2 EL (Existential Language)</strong>:</p>
+                        <ul>
+                            <li>Optimized for large-scale ontologies</li>
+                            <li>Polynomial-time reasoning</li>
+                            <li>Supports existential quantification and class hierarchies</li>
+                        </ul>
+                    </div>
 
-                            <div class="code-block">
-                                <div class="code-title">Class Definitions</div>
-                                <pre><code>@prefix owl: &lt;http://www.w3.org/2002/07/owl#&gt; .
-                @prefix ex: &lt;http://example.org/&gt; .
-                
-                ex:Professor owl:equivalentClass [
-                  owl:intersectionOf (
-                    ex:Person
-                    [owl:someValuesFrom ex:University ; owl:onProperty ex:worksAt]
-                  )
-                ] .</code></pre>
-                            </div>
+                    <div class="highlight-box">
+                        <p><strong>OWL 2 QL (Query Language)</strong>:</p>
+                        <ul>
+                            <li>Designed for efficient query answering</li>
+                            <li>Supports SPARQL queries over large datasets</li>
+                            <li>Polynomial-time query answering</li>
+                        </ul>
+                    </div>
 
-                            <div class="code-block">
-                                <div class="code-title">Property Restrictions</div>
-                                <pre><code>ex:Parent owl:equivalentClass [
-                  owl:someValuesFrom ex:Person ;
-                  owl:onProperty ex:hasChild
-                ] .
-                
-                ex:hasChild rdf:type owl:ObjectProperty .
-                ex:hasChild owl:inverseOf ex:hasParent .
-                ex:hasChild rdf:type owl:TransitiveProperty .</code></pre>
-                            </div>
+                    <div class="highlight-box">
+                        <p><strong>OWL 2 RL (Rule Language)</strong>:</p>
+                        <ul>
+                            <li>Amenable to rule-based reasoning</li>
+                            <li>Can be implemented using forward-chaining rules</li>
+                            <li>Supports most common modeling constructs</li>
+                        </ul>
+                    </div>
 
-                            <div class="code-block">
-                                <div class="code-title">Disjointness and Equivalence</div>
-                                <pre><code>ex:Student owl:disjointWith ex:Professor .
-                ex:Course owl:equivalentClass ex:Subject .</code></pre>
-                            </div>
-                        </section>
+                    <h4>3.2.2 OWL Constructs and Examples</h4>
 
-                        <section id="sparql">
-                            <h3>3.3 SPARQL Protocol and RDF Query Language</h3>
-                            <p>SPARQL 1.1, the current standard, provides a comprehensive query language for
-                                RDF data, supporting complex queries, updates, and federated access across
-                                multiple RDF stores.</p>
+                    <div class="code-block">
+                        <div class="code-title">
+                            <span class="dots"><span class="dot"></span><span class="dot"></span><span
+                                    class="dot"></span></span>
+                            Class Definitions
+                        </div>
+                        <pre><code>@prefix owl: &lt;http://www.w3.org/2002/07/owl#&gt; .
+@prefix ex: &lt;http://example.org/&gt; .
 
-                            <h4>3.3.1 SPARQL Query Forms</h4>
+ex:Professor owl:equivalentClass [
+  owl:intersectionOf (
+    ex:Person
+    [owl:someValuesFrom ex:University ; owl:onProperty ex:worksAt]
+  )
+] .</code></pre>
+                    </div>
 
-                            <div class="code-block">
-                                <div class="code-title">SELECT Queries</div>
-                                <pre><code>PREFIX foaf: &lt;http://xmlns.com/foaf/0.1/&gt;
-                PREFIX ex: &lt;http://example.org/&gt;
-                
-                SELECT ?name ?age
-                WHERE {
-                  ?person foaf:name ?name .
-                  ?person foaf:age ?age .
-                  FILTER (?age &gt; 25)
-                }
-                ORDER BY ?age</code></pre>
-                            </div>
+                    <div class="code-block">
+                        <div class="code-title">
+                            <span class="dots"><span class="dot"></span><span class="dot"></span><span
+                                    class="dot"></span></span>
+                            Property Restrictions
+                        </div>
+                        <pre><code>ex:Parent owl:equivalentClass [
+  owl:someValuesFrom ex:Person ;
+  owl:onProperty ex:hasChild
+] .
 
-                            <div class="code-block">
-                                <div class="code-title">CONSTRUCT Queries</div>
-                                <pre><code>PREFIX foaf: &lt;http://xmlns.com/foaf/0.1/&gt;
-                PREFIX ex: &lt;http://example.org/&gt;
-                
-                CONSTRUCT {
-                  ?person ex:isAdult true .
-                }
-                WHERE {
-                  ?person foaf:age ?age .
-                  FILTER (?age &gt;= 18)
-                }</code></pre>
-                            </div>
+ex:hasChild rdf:type owl:ObjectProperty .
+ex:hasChild owl:inverseOf ex:hasParent .
+ex:hasChild rdf:type owl:TransitiveProperty .</code></pre>
+                    </div>
 
-                            <div class="code-block">
-                                <div class="code-title">ASK Queries</div>
-                                <pre><code>PREFIX foaf: &lt;http://xmlns.com/foaf/0.1/&gt;
-                
-                ASK {
-                  ?person foaf:name "John Smith" .
-                  ?person foaf:age ?age .
-                  FILTER (?age &gt; 30)
-                }</code></pre>
-                            </div>
+                    <div class="code-block">
+                        <div class="code-title">
+                            <span class="dots"><span class="dot"></span><span class="dot"></span><span
+                                    class="dot"></span></span>
+                            Disjointness and Equivalence
+                        </div>
+                        <pre><code>ex:Student owl:disjointWith ex:Professor .
+ex:Course owl:equivalentClass ex:Subject .</code></pre>
+                    </div>
 
-                            <h4>3.3.2 Advanced SPARQL Features</h4>
+                    <h3 id="sparql">3.3 SPARQL Protocol and RDF Query Language</h3>
+                    <p>SPARQL 1.1, the current standard, provides a comprehensive query language for RDF data,
+                        supporting complex queries, updates, and federated access across multiple RDF stores.</p>
 
-                            <div class="code-block">
-                                <div class="code-title">Federated Queries</div>
-                                <pre><code>PREFIX foaf: &lt;http://xmlns.com/foaf/0.1/&gt;
-                
-                SELECT ?name ?interest
-                WHERE {
-                  ?person foaf:name ?name .
-                  SERVICE &lt;http://remote.example.org/sparql&gt; {
-                    ?person foaf:interest ?interest .
-                  }
-                }</code></pre>
-                            </div>
+                    <h4>3.3.1 SPARQL Query Forms</h4>
 
-                            <div class="code-block">
-                                <div class="code-title">Aggregation and Grouping</div>
-                                <pre><code>PREFIX foaf: &lt;http://xmlns.com/foaf/0.1/&gt;
-                PREFIX ex: &lt;http://example.org/&gt;
-                
-                SELECT ?department (AVG(?age) as ?avgAge) (COUNT(?person) as ?count)
-                WHERE {
-                  ?person ex:department ?department .
-                  ?person foaf:age ?age .
-                }
-                GROUP BY ?department
-                HAVING (?count &gt; 5)</code></pre>
-                            </div>
+                    <div class="code-block">
+                        <div class="code-title">
+                            <span class="dots"><span class="dot"></span><span class="dot"></span><span
+                                    class="dot"></span></span>
+                            SELECT Queries
+                        </div>
+                        <pre><code>PREFIX foaf: &lt;http://xmlns.com/foaf/0.1/&gt;
+PREFIX ex: &lt;http://example.org/&gt;
 
-                            <div class="code-block">
-                                <div class="code-title">SPARQL Update</div>
-                                <pre><code>PREFIX foaf: &lt;http://xmlns.com/foaf/0.1/&gt;
-                PREFIX ex: &lt;http://example.org/&gt;
-                
-                INSERT DATA {
-                  ex:alice foaf:name "Alice Johnson" .
-                  ex:alice foaf:age 28 .
-                }</code></pre>
-                            </div>
-                        </section>
-                    </section>
+SELECT ?name ?age
+WHERE {
+  ?person foaf:name ?name .
+  ?person foaf:age ?age .
+  FILTER (?age &gt; 25)
+}
+ORDER BY ?age</code></pre>
+                    </div>
 
-                    <section id="applications">
+                    <div class="code-block">
+                        <div class="code-title">
+                            <span class="dots"><span class="dot"></span><span class="dot"></span><span
+                                    class="dot"></span></span>
+                            CONSTRUCT Queries
+                        </div>
+                        <pre><code>PREFIX foaf: &lt;http://xmlns.com/foaf/0.1/&gt;
+PREFIX ex: &lt;http://example.org/&gt;
+
+CONSTRUCT {
+  ?person ex:isAdult true .
+}
+WHERE {
+  ?person foaf:age ?age .
+  FILTER (?age &gt;= 18)
+}</code></pre>
+                    </div>
+
+                    <div class="code-block">
+                        <div class="code-title">
+                            <span class="dots"><span class="dot"></span><span class="dot"></span><span
+                                    class="dot"></span></span>
+                            ASK Queries
+                        </div>
+                        <pre><code>PREFIX foaf: &lt;http://xmlns.com/foaf/0.1/&gt;
+
+ASK {
+  ?person foaf:name "John Smith" .
+  ?person foaf:age ?age .
+  FILTER (?age &gt; 30)
+}</code></pre>
+                    </div>
+
+                    <h4>3.3.2 Advanced SPARQL Features</h4>
+
+                    <div class="code-block">
+                        <div class="code-title">
+                            <span class="dots"><span class="dot"></span><span class="dot"></span><span
+                                    class="dot"></span></span>
+                            Federated Queries
+                        </div>
+                        <pre><code>PREFIX foaf: &lt;http://xmlns.com/foaf/0.1/&gt;
+
+SELECT ?name ?interest
+WHERE {
+  ?person foaf:name ?name .
+  SERVICE &lt;http://remote.example.org/sparql&gt; {
+    ?person foaf:interest ?interest .
+  }
+}</code></pre>
+                    </div>
+
+                    <div class="code-block">
+                        <div class="code-title">
+                            <span class="dots"><span class="dot"></span><span class="dot"></span><span
+                                    class="dot"></span></span>
+                            Aggregation and Grouping
+                        </div>
+                        <pre><code>PREFIX foaf: &lt;http://xmlns.com/foaf/0.1/&gt;
+PREFIX ex: &lt;http://example.org/&gt;
+
+SELECT ?department (AVG(?age) as ?avgAge) (COUNT(?person) as ?count)
+WHERE {
+  ?person ex:department ?department .
+  ?person foaf:age ?age .
+}
+GROUP BY ?department
+HAVING (?count &gt; 5)</code></pre>
+                    </div>
+
+                    <div class="code-block">
+                        <div class="code-title">
+                            <span class="dots"><span class="dot"></span><span class="dot"></span><span
+                                    class="dot"></span></span>
+                            SPARQL Update
+                        </div>
+                        <pre><code>PREFIX foaf: &lt;http://xmlns.com/foaf/0.1/&gt;
+PREFIX ex: &lt;http://example.org/&gt;
+
+INSERT DATA {
+  ex:alice foaf:name "Alice Johnson" .
+  ex:alice foaf:age 28 .
+}</code></pre>
+                    </div>
+                </section>
+
+                <!-- Section 4: Applications -->
+                <section id="applications" class="content-section">
+                    <div class="section-header">
                         <h2>4. Applications and Use Cases</h2>
+                    </div>
 
-                        <h3>4.1 Knowledge Graphs and Linked Data</h3>
-                        <p>The Semantic Web has enabled the creation of large-scale knowledge graphs that
-                            connect diverse datasets across the web. Notable examples include:</p>
-                        <ul>
-                            <li><strong>DBpedia</strong>: Structured information extracted from Wikipedia
-                            </li>
-                            <li><strong>Wikidata</strong>: Collaborative knowledge base with
-                                machine-readable data</li>
-                            <li><strong>Google Knowledge Graph</strong>: Enhances search results with
-                                semantic information</li>
-                            <li><strong>Schema.org</strong>: Vocabulary for structured data markup</li>
-                        </ul>
+                    <h3>4.1 Knowledge Graphs and Linked Data</h3>
+                    <p>The Semantic Web has enabled the creation of large-scale knowledge graphs that connect diverse
+                        datasets across the web. Notable examples include:</p>
+                    <ul>
+                        <li><strong>DBpedia</strong>: Structured information extracted from Wikipedia</li>
+                        <li><strong>Wikidata</strong>: Collaborative knowledge base with machine-readable data</li>
+                        <li><strong>Google Knowledge Graph</strong>: Enhances search results with semantic information
+                        </li>
+                        <li><strong>Schema.org</strong>: Vocabulary for structured data markup</li>
+                    </ul>
 
-                        <h3>4.2 Biomedical Informatics</h3>
-                        <p>The healthcare and life sciences domain has extensively adopted Semantic Web
-                            technologies:</p>
-                        <ul>
-                            <li><strong>Gene Ontology (GO)</strong>: Standardized vocabulary for gene and
-                                protein functions</li>
-                            <li><strong>SNOMED CT</strong>: Comprehensive clinical terminology</li>
-                            <li><strong>UMLS</strong>: Unified Medical Language System for biomedical
-                                terminologies</li>
-                            <li><strong>Bio2RDF</strong>: Linked data network for life sciences</li>
-                        </ul>
+                    <h3>4.2 Biomedical Informatics</h3>
+                    <p>The healthcare and life sciences domain has extensively adopted Semantic Web technologies:</p>
+                    <ul>
+                        <li><strong>Gene Ontology (GO)</strong>: Standardized vocabulary for gene and protein functions
+                        </li>
+                        <li><strong>SNOMED CT</strong>: Comprehensive clinical terminology</li>
+                        <li><strong>UMLS</strong>: Unified Medical Language System for biomedical terminologies</li>
+                        <li><strong>Bio2RDF</strong>: Linked data network for life sciences</li>
+                    </ul>
 
-                        <h3>4.3 Enterprise Knowledge Management</h3>
-                        <p>Organizations use Semantic Web technologies for:</p>
-                        <ul>
-                            <li><strong>Data Integration</strong>: Connecting disparate data sources using
-                                ontologies</li>
-                            <li><strong>Semantic Search</strong>: Enabling context-aware information
-                                retrieval</li>
-                            <li><strong>Business Intelligence</strong>: Automated analysis and reporting
-                            </li>
-                            <li><strong>Regulatory Compliance</strong>: Ensuring data governance and
-                                traceability</li>
-                        </ul>
-                    </section>
+                    <h3>4.3 Enterprise Knowledge Management</h3>
+                    <p>Organizations use Semantic Web technologies for:</p>
+                    <ul>
+                        <li><strong>Data Integration</strong>: Connecting disparate data sources using ontologies</li>
+                        <li><strong>Semantic Search</strong>: Enabling context-aware information retrieval</li>
+                        <li><strong>Business Intelligence</strong>: Automated analysis and reporting</li>
+                        <li><strong>Regulatory Compliance</strong>: Ensuring data governance and traceability</li>
+                    </ul>
+                </section>
 
-                    <section id="challenges">
+                <!-- Section 5: Challenges -->
+                <section id="challenges" class="content-section">
+                    <div class="section-header">
                         <h2>5. Challenges and Future Directions</h2>
+                    </div>
 
-                        <h3>5.1 Scalability and Performance</h3>
-                        <p>As RDF datasets grow to billions of triples, efficient storage and query
-                            processing become critical challenges. Modern triple stores employ various
-                            optimization techniques:</p>
-                        <ul>
-                            <li><strong>Indexing Strategies</strong>: Multiple indexes for different query
-                                patterns</li>
-                            <li><strong>Distributed Processing</strong>: Horizontal scaling across multiple
-                                nodes</li>
-                            <li><strong>Caching Mechanisms</strong>: Reducing query execution time</li>
-                            <li><strong>Query Optimization</strong>: Intelligent query planning and
-                                execution</li>
-                        </ul>
+                    <h3>5.1 Scalability and Performance</h3>
+                    <p>As RDF datasets grow to billions of triples, efficient storage and query processing become
+                        critical challenges. Modern triple stores employ various optimization techniques:</p>
+                    <ul>
+                        <li><strong>Indexing Strategies</strong>: Multiple indexes for different query patterns</li>
+                        <li><strong>Distributed Processing</strong>: Horizontal scaling across multiple nodes</li>
+                        <li><strong>Caching Mechanisms</strong>: Reducing query execution time</li>
+                        <li><strong>Query Optimization</strong>: Intelligent query planning and execution</li>
+                    </ul>
 
-                        <h3>5.2 Reasoning and Inference</h3>
-                        <p>Balancing expressiveness with computational tractability remains an ongoing
-                            challenge:</p>
-                        <ul>
-                            <li><strong>Approximate Reasoning</strong>: Trading precision for performance
-                            </li>
-                            <li><strong>Parallel Reasoning</strong>: Distributing inference across multiple
-                                processors</li>
-                            <li><strong>Stream Reasoning</strong>: Processing continuous data streams</li>
-                            <li><strong>Probabilistic Reasoning</strong>: Handling uncertainty and
-                                incomplete information</li>
-                        </ul>
+                    <h3>5.2 Reasoning and Inference</h3>
+                    <p>Balancing expressiveness with computational tractability remains an ongoing challenge:</p>
+                    <ul>
+                        <li><strong>Approximate Reasoning</strong>: Trading precision for performance</li>
+                        <li><strong>Parallel Reasoning</strong>: Distributing inference across multiple processors</li>
+                        <li><strong>Stream Reasoning</strong>: Processing continuous data streams</li>
+                        <li><strong>Probabilistic Reasoning</strong>: Handling uncertainty and incomplete information
+                        </li>
+                    </ul>
 
-                        <h3>5.3 Quality and Trust</h3>
-                        <p>Ensuring data quality and establishing trust in distributed semantic systems
-                            requires:</p>
-                        <ul>
-                            <li><strong>Provenance Tracking</strong>: Recording data lineage and
-                                transformation history</li>
-                            <li><strong>Validation Frameworks</strong>: Ensuring data conforms to specified
-                                constraints</li>
-                            <li><strong>Trust Metrics</strong>: Assessing reliability of information sources
-                            </li>
-                            <li><strong>Conflict Resolution</strong>: Handling contradictory information
-                                from multiple sources</li>
-                        </ul>
-                    </section>
+                    <h3>5.3 Quality and Trust</h3>
+                    <p>Ensuring data quality and establishing trust in distributed semantic systems requires:</p>
+                    <ul>
+                        <li><strong>Provenance Tracking</strong>: Recording data lineage and transformation history</li>
+                        <li><strong>Validation Frameworks</strong>: Ensuring data conforms to specified constraints</li>
+                        <li><strong>Trust Metrics</strong>: Assessing reliability of information sources</li>
+                        <li><strong>Conflict Resolution</strong>: Handling contradictory information from multiple
+                            sources</li>
+                    </ul>
+                </section>
 
-                    <section id="related-technologies">
+                <!-- Section 6: Related Technologies -->
+                <section id="related-technologies" class="content-section">
+                    <div class="section-header">
                         <h2>6. Related Technologies</h2>
+                    </div>
 
-                        <h3>6.1 JSON-LD and Microdata</h3>
-                        <p>JSON-LD provides a lightweight syntax for embedding linked data in JSON
-                            documents, making it easier for developers to adopt Semantic Web technologies
-                            without extensive RDF knowledge.</p>
+                    <h3>6.1 JSON-LD and Microdata</h3>
+                    <p>JSON-LD provides a lightweight syntax for embedding linked data in JSON documents, making it
+                        easier for developers to adopt Semantic Web technologies without extensive RDF knowledge.</p>
 
-                        <h3>6.2 SHACL (Shapes Constraint Language)</h3>
-                        <p>SHACL enables validation of RDF graphs against specified constraints, ensuring
-                            data quality and consistency in semantic applications.</p>
+                    <h3>6.2 SHACL (Shapes Constraint Language)</h3>
+                    <p>SHACL enables validation of RDF graphs against specified constraints, ensuring data quality and
+                        consistency in semantic applications.</p>
 
-                        <h3>6.3 Rule Interchange Format (RIF)</h3>
-                        <p>RIF provides a standard for exchanging rules between different rule systems,
-                            enabling interoperability in rule-based reasoning applications.</p>
-                    </section>
+                    <h3>6.3 Rule Interchange Format (RIF)</h3>
+                    <p>RIF provides a standard for exchanging rules between different rule systems, enabling
+                        interoperability in rule-based reasoning applications.</p>
+                </section>
 
-                    <section id="conclusion">
+                <!-- Section 7: Conclusion -->
+                <section id="conclusion" class="content-section">
+                    <div class="section-header">
                         <h2>7. Conclusion</h2>
-                        <p>The Semantic Web represents a paradigm shift from document-centric to
-                            data-centric web architecture, enabling machines to understand and process
-                            information with semantic awareness. Through the combination of foundational
-                            technologies like RDF, OWL, and SPARQL, along with formal grounding in
-                            description logic and knowledge representation, the Semantic Web provides a
-                            robust framework for building intelligent, interoperable systems.</p>
+                    </div>
+                    <p>The Semantic Web represents a paradigm shift from document-centric to data-centric web
+                        architecture, enabling machines to understand and process information with semantic awareness.
+                        Through the combination of foundational technologies like RDF, OWL, and SPARQL, along with
+                        formal grounding in description logic and knowledge representation, the Semantic Web provides a
+                        robust framework for building intelligent, interoperable systems.</p>
+                    <p>While challenges remain in scalability, reasoning efficiency, and widespread adoption, the
+                        continued development of standards and tools, combined with increasing recognition of the value
+                        of structured data, suggests a promising future for Semantic Web technologies. As organizations
+                        increasingly recognize the importance of data integration, knowledge management, and intelligent
+                        automation, the Semantic Web will likely play an increasingly central role in the evolution of
+                        information systems.</p>
+                    <p>The success of initiatives like linked data, knowledge graphs, and semantic markup in major web
+                        platforms demonstrates the practical value of Semantic Web technologies. As these technologies
+                        mature and become more accessible to developers and organizations, we can expect to see
+                        continued growth in applications that leverage the power of machine-readable, semantically-rich
+                        data.</p>
+                </section>
 
-                        <p>While challenges remain in scalability, reasoning efficiency, and widespread
-                            adoption, the continued development of standards and tools, combined with
-                            increasing recognition of the value of structured data, suggests a promising
-                            future for Semantic Web technologies. As organizations increasingly recognize
-                            the importance of data integration, knowledge management, and intelligent
-                            automation, the Semantic Web will likely play an increasingly central role in
-                            the evolution of information systems.</p>
-
-                        <p>The success of initiatives like linked data, knowledge graphs, and semantic
-                            markup in major web platforms demonstrates the practical value of Semantic Web
-                            technologies. As these technologies mature and become more accessible to
-                            developers and organizations, we can expect to see continued growth in
-                            applications that leverage the power of machine-readable, semantically-rich
-                            data.</p>
-                    </section>
-                </main>
-
-                <section id="references" class="references">
+                <!-- Section 8: References -->
+                <section id="references" class="references-section">
                     <h2>8. References</h2>
                     <ol>
-                        <li>Berners-Lee, T., Hendler, J., & Lassila, O. (2001). The Semantic Web.
-                            <em>Scientific American</em>, 284(5), 34-43.
-                        </li>
-
-                        <li>Hitzler, P., Krötzsch, M., Parsia, B., Patel-Schneider, P. F., & Rudolph, S.
-                            (2012). OWL 2 Web Ontology Language Primer (Second Edition). W3C Recommendation.
-                            <a href="https://www.w3.org/TR/owl2-primer/">https://www.w3.org/TR/owl2-primer/</a>
-                        </li>
-
-                        <li>Cyganiak, R., Wood, D., & Lanthaler, M. (2014). RDF 1.1 Concepts and Abstract
-                            Syntax. W3C Recommendation. <a
+                        <li>Berners-Lee, T., Hendler, J., & Lassila, O. (2001). The Semantic Web. <em>Scientific
+                                American</em>, 284(5), 34-43.</li>
+                        <li>Hitzler, P., Krötzsch, M., Parsia, B., Patel-Schneider, P. F., & Rudolph, S. (2012). OWL 2
+                            Web Ontology Language Primer (Second Edition). W3C Recommendation. <a
+                                href="https://www.w3.org/TR/owl2-primer/">https://www.w3.org/TR/owl2-primer/</a></li>
+                        <li>Cyganiak, R., Wood, D., & Lanthaler, M. (2014). RDF 1.1 Concepts and Abstract Syntax. W3C
+                            Recommendation. <a
                                 href="https://www.w3.org/TR/rdf11-concepts/">https://www.w3.org/TR/rdf11-concepts/</a>
                         </li>
-
-                        <li>Harris, S., Seaborne, A., & Prud'hommeaux, E. (2013). SPARQL 1.1 Query Language.
-                            W3C Recommendation. <a
+                        <li>Harris, S., Seaborne, A., & Prud'hommeaux, E. (2013). SPARQL 1.1 Query Language. W3C
+                            Recommendation. <a
                                 href="https://www.w3.org/TR/sparql11-query/">https://www.w3.org/TR/sparql11-query/</a>
                         </li>
-
                         <li>Brickley, D., & Guha, R. V. (2014). RDF Schema 1.1. W3C Recommendation. <a
-                                href="https://www.w3.org/TR/rdf-schema/">https://www.w3.org/TR/rdf-schema/</a>
-                        </li>
-
-                        <li>Baader, F., Calvanese, D., McGuinness, D. L., Nardi, D., & Patel-Schneider, P.
-                            F. (Eds.). (2003). <em>The description logic handbook: theory, implementation,
-                                and applications</em>. Cambridge University Press.</li>
-
+                                href="https://www.w3.org/TR/rdf-schema/">https://www.w3.org/TR/rdf-schema/</a></li>
+                        <li>Baader, F., Calvanese, D., McGuinness, D. L., Nardi, D., & Patel-Schneider, P. F. (Eds.).
+                            (2003). <em>The description logic handbook: theory, implementation, and applications</em>.
+                            Cambridge University Press.</li>
                         <li>Hitzler, P., Krötzsch, M., & Rudolph, S. (2009). <em>Foundations of Semantic Web
                                 Technologies</em>. Chapman and Hall/CRC.</li>
-
-                        <li>Allemang, D., & Hendler, J. (2011). <em>Semantic Web for the Working Ontologist:
-                                Effective Modeling in RDFS and OWL</em>. Morgan Kaufmann.</li>
-
-                        <li>Heath, T., & Bizer, C. (2011). <em>Linked Data: Evolving the Web into a Global
-                                Data Space</em>. Morgan & Claypool Publishers.</li>
-
-                        <li>Antoniou, G., & van Harmelen, F. (2008). <em>A Semantic Web Primer</em>. MIT
-                            Press.</li>
-
-                        <li>Staab, S., & Studer, R. (Eds.). (2009). <em>Handbook on Ontologies</em>.
-                            Springer.</li>
-
-                        <li>Grau, B. C., Horrocks, I., Motik, B., Parsia, B., Patel-Schneider, P., &
-                            Sattler, U. (2008). OWL 2: The next step for OWL. <em>Journal of Web
-                                Semantics</em>, 6(4), 309-322.</li>
-
-                        <li>Pérez, J., Arenas, M., & Gutierrez, C. (2009). Semantics and complexity of
-                            SPARQL. <em>ACM Transactions on Database Systems</em>, 34(3), 1-45.</li>
+                        <li>Allemang, D., & Hendler, J. (2011). <em>Semantic Web for the Working Ontologist: Effective
+                                Modeling in RDFS and OWL</em>. Morgan Kaufmann.</li>
+                        <li>Heath, T., & Bizer, C. (2011). <em>Linked Data: Evolving the Web into a Global Data
+                                Space</em>. Morgan & Claypool Publishers.</li>
+                        <li>Antoniou, G., & van Harmelen, F. (2008). <em>A Semantic Web Primer</em>. MIT Press.</li>
+                        <li>Staab, S., & Studer, R. (Eds.). (2009). <em>Handbook on Ontologies</em>. Springer.</li>
+                        <li>Grau, B. C., Horrocks, I., Motik, B., Parsia, B., Patel-Schneider, P., & Sattler, U. (2008).
+                            OWL 2: The next step for OWL. <em>Journal of Web Semantics</em>, 6(4), 309-322.</li>
+                        <li>Pérez, J., Arenas, M., & Gutierrez, C. (2009). Semantics and complexity of SPARQL. <em>ACM
+                                Transactions on Database Systems</em>, 34(3), 1-45.</li>
                         <li>Polleres, A., Scharffe, F., & Schindlauer, R. (2007). SPARQL++ for mapping between RDF
                             vocabularies. In OTM Confederated International Conferences (pp. 878-896).</li>
                         <li>Knublauch, H., & Kontokostas, D. (2017). Shapes Constraint Language (SHACL). W3C
-                            Recommendation. https://www.w3.org/TR/shacl/</li>
+                            Recommendation. <a href="https://www.w3.org/TR/shacl/">https://www.w3.org/TR/shacl/</a></li>
                         <li>Boley, H., Hallmark, G., Kifer, M., Paschke, A., Polleres, A., & Reynolds, D. (2013). RIF
-                            Core Dialect. W3C Recommendation. https://www.w3.org/TR/rif-core/</li>
+                            Core Dialect. W3C Recommendation. <a
+                                href="https://www.w3.org/TR/rif-core/">https://www.w3.org/TR/rif-core/</a></li>
                         <li>Sporny, M., Longley, D., Kellogg, G., Lanthaler, M., & Lindström, N. (2020). JSON-LD 1.1.
-                            W3C Recommendation. https://www.w3.org/TR/json-ld11/</li>
-                        <li>Bizer, C., Heath, T., & Berners-Lee, T. (2009). Linked data-the story so far. International
-                            Journal on Semantic Web and Information Systems, 5(3), 1-22.</li>
+                            W3C Recommendation. <a
+                                href="https://www.w3.org/TR/json-ld11/">https://www.w3.org/TR/json-ld11/</a></li>
+                        <li>Bizer, C., Heath, T., & Berners-Lee, T. (2009). Linked data-the story so far.
+                            <em>International Journal on Semantic Web and Information Systems</em>, 5(3), 1-22.
+                        </li>
                         <li>Suchanek, F. M., Kasneci, G., & Weikum, G. (2007). Yago: a core of semantic knowledge. In
                             Proceedings of the 16th International Conference on World Wide Web (pp. 697-706).</li>
                         <li>Vrandečić, D., & Krötzsch, M. (2014). Wikidata: a free collaborative knowledgebase.
-                            Communications of the ACM, 57(10), 78-85.</li>
+                            <em>Communications of the ACM</em>, 57(10), 78-85.
+                        </li>
                     </ol>
                 </section>
-            </div>
+            </main>
         </div>
+
+        <!-- Footer -->
+        <footer>
+            <div class="footer-inner">
+                <nav class="language-selector" aria-label="Language selection">
+                    <a href="./semantic-web.html" class="language-link active">English</a>
+                </nav>
+                <p class="footer-copyright">
+                    © 2025 John Samuel. Content licensed under Creative Commons.
+                </p>
+            </div>
+        </footer>
+
+        <!-- Back to Top -->
+        <a href="#" class="back-to-top" aria-label="Back to top">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                stroke-linejoin="round">
+                <polyline points="18 15 12 9 6 15"></polyline>
+            </svg>
+        </a>
     </body>
 
 </html>

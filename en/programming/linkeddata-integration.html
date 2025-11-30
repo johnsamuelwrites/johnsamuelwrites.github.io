@@ -3,412 +3,1292 @@
 
     <head>
         <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <meta http-equiv="Content-Language" content="en" />
         <link rel="shortcut icon" href="../../images/logo/favicon.png" />
-        <title>Integrating Linked Data : John Samuel</title>
-        <style type="text/css">
-            body {
-                background-color: #FFFFFF;
+        <title>Integrating Linked Data: John Samuel</title>
+        <script type="application/ld+json">
+    {
+        "@context": "http://schema.org",
+        "@type": "BlogPosting",
+        "mainEntityOfPage": {
+            "@type": "WebPage",
+            "@id": "https://johnsamuel.info"
+        },
+        "articleSection": "blog",
+        "name": "Integrating Linked Data",
+        "headline": "Integrating Linked Data",
+        "description": "Article by John Samuel",
+        "inLanguage": "en",
+        "author": "John Samuel",
+        "datePublished": "2020-05-03 19:04:28",
+        "dateModified": "2020-05-03 19:04:28",
+        "dateCreated": "2020-05-03 19:04:28",
+        "url": "https://johnsamuel.info/en/programming/linkeddata-integration.html",
+        "keywords": ["Blog", "Linked Data", "JSON-LD", "Semantic Web"]
+    }
+    </script>
+        <style>
+            /* ========================================
+           Design Tokens - Data Integration Theme
+           Emerald/Teal palette for connection/flow
+           ======================================== */
+            :root {
+                /* Base Colors - Warm Tech Light Theme */
+                --color-base-bg: #f6f9f8;
+                --color-base-surface: #ffffff;
+                --color-base-text: #1a2d2a;
+                --color-base-text-muted: #5a6e6a;
+
+                /* Theme Accents - Integration Green-Teal Palette */
+                --color-accent-1: #059669;
+                /* Primary - integration emerald */
+                --color-accent-2: #0d9488;
+                /* Secondary - connection teal */
+                --color-accent-3: #047857;
+                /* Tertiary - deep emerald */
+                --color-accent-4: #14b8a6;
+                /* Highlight - bright teal */
+                --color-accent-5: #5eead4;
+                /* Light accent - mint */
+                --color-accent-light: #ecfdf5;
+                /* Pale mint tint */
+                --color-code-bg: #1e293b;
+                /* Code block background */
+                --color-code-text: #e2e8f0;
+                /* Code text */
+                --color-code-keyword: #5eead4;
+                /* Code keywords */
+                --color-code-string: #fcd34d;
+                /* Code strings */
+
+                /* Functional Colors */
+                --color-shadow: rgba(5, 150, 105, 0.1);
+                --color-border: rgba(5, 150, 105, 0.12);
+                --color-hover: rgba(13, 148, 136, 0.08);
+
+                /* Gradients */
+                --gradient-primary: linear-gradient(135deg, #059669 0%, #0d9488 50%, #14b8a6 100%);
+                --gradient-hero: linear-gradient(160deg, #f6f9f8 0%, #ecfdf5 40%, #f0fdfa 100%);
+                --gradient-card: linear-gradient(180deg, rgba(255, 255, 255, 0.98) 0%, rgba(246, 249, 248, 0.95) 100%);
+                --gradient-flow: linear-gradient(90deg, #059669 0%, #0d9488 50%, #14b8a6 100%);
+
+                /* Spacing Scale */
+                --space-xs: 0.25rem;
+                --space-sm: 0.5rem;
+                --space-md: 1rem;
+                --space-lg: 1.5rem;
+                --space-xl: 2rem;
+                --space-2xl: 3rem;
+                --space-3xl: 4rem;
+                --space-4xl: 6rem;
+
+                /* Border Radius */
+                --radius-sm: 6px;
+                --radius-md: 10px;
+                --radius-lg: 16px;
+                --radius-xl: 24px;
+                --radius-full: 9999px;
+                --radius-organic: 60% 40% 55% 45% / 50% 55% 45% 50%;
+
+                /* Shadows */
+                --shadow-sm: 0 2px 8px rgba(5, 150, 105, 0.06);
+                --shadow-md: 0 8px 24px rgba(5, 150, 105, 0.1), 0 2px 8px rgba(13, 148, 136, 0.05);
+                --shadow-lg: 0 16px 48px rgba(5, 150, 105, 0.12), 0 8px 16px rgba(0, 0, 0, 0.03);
+                --shadow-code: 0 4px 24px rgba(30, 41, 59, 0.3);
+
+                /* Typography */
+                --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+                --font-mono: 'SF Mono', Monaco, 'Cascadia Code', 'Consolas', 'Courier New', monospace;
+
+                /* Fluid Type Scale */
+                --text-xs: clamp(0.75rem, 0.7rem + 0.25vw, 0.875rem);
+                --text-sm: clamp(0.875rem, 0.8rem + 0.35vw, 1rem);
+                --text-base: clamp(1rem, 0.95rem + 0.25vw, 1.1rem);
+                --text-lg: clamp(1.1rem, 1rem + 0.35vw, 1.25rem);
+                --text-xl: clamp(1.25rem, 1.1rem + 0.5vw, 1.5rem);
+                --text-2xl: clamp(1.5rem, 1.25rem + 1vw, 2rem);
+                --text-3xl: clamp(1.875rem, 1.5rem + 1.5vw, 2.5rem);
+                --text-4xl: clamp(2.25rem, 1.75rem + 2vw, 3.25rem);
             }
 
-            #sidebar {
-                position: fixed;
-                background-color: #009AA6;
-                top: 0;
-                left: 0;
-                bottom: 0;
-                width: 30vw;
-            }
-
-            #sidebar .title {
-                position: relative;
-                text-align: center;
-                line-height: 5vmax;
-                font-size: 1.4vmax;
-                font-family: 'Arial';
-                margin-top: 30vh;
-            }
-
-            #sidebar .title a:link,
-            #sidebar .title a:visited {
-                color: #FFFFFF;
-                text-decoration: none;
-            }
-
-            .subtitle {
-                top: 50vh;
-                text-align: center;
-                line-height: 1.3vmax;
-                font-family: 'Arial';
-                font-size: 1.2vmax;
-                color: #FFFFFF;
-            }
-
-            .subtitle a:link,
-            .subtitle a:visited {
-                color: #FFFFFF;
-                text-decoration: none;
-            }
-
-            .licence {
-                position: fixed;
-                text-align: right;
-                bottom: 0;
-                right: 0;
-            }
-
-            .home {
-                position: fixed;
-                text-align: left;
-                font-family: 'Arial';
-                color: #D3D3D3;
-                z-index: 100;
-                width: 100%;
-                background-color: #FFFFFF;
-                top: 0px;
-                margin-bottom: 10px;
-                padding-bottom: 10px;
-            }
-
-            .home a:link,
-            .home a:visited {
-                text-decoration: none;
-                color: #D3D3D3;
-            }
-
-            .home ul {
+            /* ========================================
+           Reset & Base Styles
+           ======================================== */
+            *,
+            *::before,
+            *::after {
+                box-sizing: border-box;
                 margin: 0;
                 padding: 0;
-                text-align: left;
+            }
+
+            html {
+                scroll-behavior: smooth;
+                scroll-padding-top: 100px;
+            }
+
+            body {
+                font-family: var(--font-sans);
+                font-size: var(--text-base);
+                line-height: 1.75;
+                color: var(--color-base-text);
+                background: var(--gradient-hero);
+                min-height: 100vh;
+                overflow-x: hidden;
+                letter-spacing: -0.01em;
+            }
+
+            /* Skip Link */
+            .skip-link {
+                position: absolute;
+                top: -100px;
+                left: 50%;
+                transform: translateX(-50%);
+                background: var(--color-accent-1);
+                color: white;
+                padding: var(--space-sm) var(--space-lg);
+                border-radius: var(--radius-full);
+                text-decoration: none;
+                font-weight: 600;
+                z-index: 9999;
+                transition: top 0.3s ease;
+            }
+
+            .skip-link:focus {
+                top: var(--space-md);
+            }
+
+            /* ========================================
+           Animated Background - Data Flow Lines
+           ======================================== */
+            .bg-flow {
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                pointer-events: none;
+                z-index: 0;
+                overflow: hidden;
+                opacity: 0.15;
+            }
+
+            /* ========================================
+           Navigation
+           ======================================== */
+            .nav-container {
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                z-index: 1000;
+                padding: var(--space-md) var(--space-xl);
+                background: rgba(255, 255, 255, 0.9);
+                -webkit-backdrop-filter: blur(20px) saturate(180%);
+                backdrop-filter: blur(20px) saturate(180%);
+                border-bottom: 1px solid var(--color-border);
+                transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            }
+
+            .nav-inner {
+                max-width: 1100px;
+                margin: 0 auto;
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                gap: var(--space-xl);
+            }
+
+            .nav-brand {
+                display: flex;
+                align-items: center;
+                gap: var(--space-md);
+            }
+
+            .nav-brand-link {
+                font-size: var(--text-lg);
+                font-weight: 700;
+                text-decoration: none;
+                padding: var(--space-sm) var(--space-md);
+                background: var(--gradient-primary);
+                background-clip: text;
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                position: relative;
+                transition: all 0.3s ease;
+            }
+
+            .nav-brand-link::before {
+                content: '';
+                position: absolute;
+                inset: 0;
+                background: var(--gradient-primary);
+                border-radius: var(--radius-md);
+                opacity: 0;
+                z-index: -1;
+                transition: opacity 0.3s ease;
+            }
+
+            .nav-brand-link:hover::before {
+                opacity: 0.1;
+            }
+
+            .nav-links {
+                display: flex;
+                align-items: center;
+                gap: var(--space-xs);
                 list-style: none;
             }
 
-            .home li {
-                position: relative;
-                float: left;
-                padding-top: 15px;
-                margin-right: 1em;
-                font-family: 'Arial';
-            }
-
-            .home li:hover {
+            .nav-links a {
                 display: block;
-            }
-
-            .home li:hover a:link,
-            .home li:hover a:visited {
+                padding: var(--space-sm) var(--space-md);
+                color: var(--color-base-text-muted);
                 text-decoration: none;
-                padding: 15px;
-                color: #FFFFFF;
-                background-color: #009AA6;
+                font-size: var(--text-sm);
+                font-weight: 500;
+                border-radius: var(--radius-md);
+                transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             }
 
-            .content {
-                line-height: 1.8vmax;
-                font-size: 1.2vmax;
-                font-family: 'Arial';
-                margin-top: 15vh;
-                width: 90%;
+            .nav-links a:hover,
+            .nav-links a:focus {
+                color: var(--color-accent-1);
+                background: var(--color-hover);
+                outline: none;
             }
 
-            .content h2,
-            h3,
-            h4 {
-                color: #009AA6;
+            .nav-links a:focus-visible {
+                box-shadow: 0 0 0 2px var(--color-accent-1);
             }
 
-            .content a:link,
-            .content a:visited {
-                color: #009AA6;
+            .nav-separator {
+                color: var(--color-border);
+                font-size: var(--text-sm);
+                padding: 0 var(--space-xs);
             }
 
-            .content h3 {
-                color: #009AA6;
-            }
-
-            .content h2::before,
-            .content h3::before {
-                display: block;
-                content: " ";
-                visibility: hidden;
-                height: 50px;
-                margin-top: -50px;
-                pointer-events: none;
-                background-color: #FFFFFF;
-            }
-
-            .content a:link,
-            .content a:visited {
-                color: #009AA6;
-            }
-
-            .home a:link,
-            .home a:visited {
-                color: #D3D3D3;
-            }
-
-            .page {
-                width: 65vw;
-                height: 100%;
-                margin-left: 30vw;
+            /* ========================================
+           Hero Section
+           ======================================== */
+            .hero {
+                padding: calc(90px + var(--space-3xl)) var(--space-xl) var(--space-3xl);
+                position: relative;
                 overflow: hidden;
-                padding: 0 1em;
-                font-family: 'Arial';
             }
 
-            .page img {
-                max-width: 100%;
-                max-height: 100%;
+            .hero-inner {
+                max-width: 900px;
+                margin: 0 auto;
+                text-align: center;
+                position: relative;
+                z-index: 2;
             }
 
-            @media (max-width: 640px),
-            screen and (orientation: portrait) {
-                body {
-                    max-width: 100%;
-                    max-height: 100%;
+            .hero-series-badge {
+                display: inline-flex;
+                align-items: center;
+                gap: var(--space-sm);
+                padding: var(--space-sm) var(--space-lg);
+                background: linear-gradient(135deg, rgba(5, 150, 105, 0.1) 0%, rgba(13, 148, 136, 0.1) 100%);
+                border: 1px solid rgba(5, 150, 105, 0.2);
+                border-radius: var(--radius-full);
+                font-size: var(--text-sm);
+                font-weight: 500;
+                color: var(--color-accent-1);
+                margin-bottom: var(--space-lg);
+                animation: fadeInUp 0.8s ease-out;
+            }
+
+            .hero-series-badge a {
+                color: var(--color-accent-1);
+                text-decoration: none;
+                font-weight: 600;
+            }
+
+            .hero-series-badge a:hover {
+                text-decoration: underline;
+            }
+
+            .hero-badge-icon {
+                width: 16px;
+                height: 16px;
+            }
+
+            .hero-title {
+                font-size: var(--text-4xl);
+                font-weight: 800;
+                line-height: 1.15;
+                letter-spacing: -0.03em;
+                margin-bottom: var(--space-lg);
+                background: linear-gradient(135deg, var(--color-base-text) 0%, var(--color-accent-1) 50%, var(--color-accent-2) 100%);
+                background-clip: text;
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                animation: fadeInUp 0.8s ease-out 0.1s both;
+            }
+
+            .hero-subtitle {
+                font-size: var(--text-lg);
+                color: var(--color-base-text-muted);
+                max-width: 650px;
+                margin: 0 auto;
+                animation: fadeInUp 0.8s ease-out 0.2s both;
+            }
+
+            /* Hero SVG - Data Integration Visualization */
+            .hero-illustration {
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                width: 100%;
+                max-width: 1000px;
+                height: auto;
+                opacity: 0.12;
+                z-index: 1;
+                pointer-events: none;
+            }
+
+            /* ========================================
+           Main Content
+           ======================================== */
+            .main-content {
+                max-width: 900px;
+                margin: 0 auto;
+                padding: 0 var(--space-xl) var(--space-4xl);
+                position: relative;
+                z-index: 1;
+            }
+
+            .article-container {
+                background: var(--gradient-card);
+                -webkit-backdrop-filter: blur(12px);
+                backdrop-filter: blur(12px);
+                border: 1px solid rgba(255, 255, 255, 0.6);
+                border-radius: var(--radius-xl);
+                box-shadow: var(--shadow-lg);
+                padding: var(--space-3xl);
+                position: relative;
+                overflow: hidden;
+                animation: fadeInUp 0.8s ease-out 0.3s both;
+            }
+
+            /* Top gradient bar with animated flow */
+            .article-container::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                height: 4px;
+                background: var(--gradient-flow);
+                background-size: 200% 100%;
+                animation: flowGradient 3s ease infinite;
+                border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+            }
+
+            @keyframes flowGradient {
+
+                0%,
+                100% {
+                    background-position: 0% 50%;
                 }
 
-                #sidebar {
-                    position: fixed;
-                    background-color: #009AA6;
-                    top: 0;
-                    left: 0;
-                    bottom: 80vh;
-                    width: 100vw;
+                50% {
+                    background-position: 100% 50%;
+                }
+            }
+
+            /* Floating organic shapes */
+            .float-shape {
+                position: absolute;
+                border-radius: var(--radius-organic);
+                opacity: 0.5;
+                z-index: 0;
+                animation: floatMorph 10s ease-in-out infinite;
+            }
+
+            .float-shape-1 {
+                width: 180px;
+                height: 180px;
+                background: linear-gradient(135deg, rgba(5, 150, 105, 0.08) 0%, rgba(13, 148, 136, 0.05) 100%);
+                top: -40px;
+                right: -40px;
+            }
+
+            .float-shape-2 {
+                width: 120px;
+                height: 120px;
+                background: linear-gradient(225deg, rgba(20, 184, 166, 0.06) 0%, rgba(5, 150, 105, 0.04) 100%);
+                bottom: 80px;
+                left: -30px;
+                animation-delay: -4s;
+            }
+
+            @keyframes floatMorph {
+
+                0%,
+                100% {
+                    border-radius: 60% 40% 55% 45% / 50% 55% 45% 50%;
+                    transform: translate(0, 0) rotate(0deg);
                 }
 
-                #sidebar .title {
-                    text-align: center;
-                    position: fixed;
-                    margin-top: 6vh;
-                    left: 0px;
-                    right: 0px;
-                    line-height: 3.5vmax;
-                    font-size: 1.5vmax;
-                    font-family: 'Arial';
+                33% {
+                    border-radius: 45% 55% 40% 60% / 55% 45% 50% 50%;
                 }
 
-                #sidebar .subtitle {
-                    text-align: center;
-                    top: 5vh;
-                    left: 0px;
-                    right: 0px;
-                    position: fixed;
-                    margin-top: 10vh;
-                    font-size: 1.5vmax;
+                66% {
+                    border-radius: 55% 45% 60% 40% / 45% 50% 55% 45%;
+                    transform: translate(8px, -8px) rotate(3deg);
+                }
+            }
+
+            /* Article Content */
+            .article-body {
+                position: relative;
+                z-index: 1;
+            }
+
+            .article-body h2 {
+                font-size: var(--text-2xl);
+                font-weight: 700;
+                color: var(--color-accent-3);
+                margin: var(--space-3xl) 0 var(--space-lg);
+                letter-spacing: -0.02em;
+                position: relative;
+                padding-bottom: var(--space-sm);
+            }
+
+            .article-body h2:first-child {
+                margin-top: 0;
+            }
+
+            .article-body h2::after {
+                content: '';
+                position: absolute;
+                bottom: 0;
+                left: 0;
+                width: 60px;
+                height: 3px;
+                background: var(--gradient-primary);
+                border-radius: var(--radius-full);
+            }
+
+            .article-body h3 {
+                font-size: var(--text-xl);
+                font-weight: 600;
+                color: var(--color-accent-1);
+                margin: var(--space-2xl) 0 var(--space-md);
+                letter-spacing: -0.01em;
+            }
+
+            .article-body p {
+                margin-bottom: var(--space-lg);
+                color: var(--color-base-text);
+            }
+
+            .article-body a {
+                color: var(--color-accent-1);
+                text-decoration: none;
+                font-weight: 500;
+                border-bottom: 1px solid rgba(5, 150, 105, 0.3);
+                transition: all 0.2s ease;
+            }
+
+            .article-body a:hover {
+                color: var(--color-accent-2);
+                border-bottom-color: var(--color-accent-2);
+            }
+
+            .article-body sup a {
+                border-bottom: none;
+                font-weight: 600;
+            }
+
+            /* Code Styling */
+            .article-body code {
+                font-family: var(--font-mono);
+                font-size: 0.88em;
+                background: linear-gradient(135deg, rgba(5, 150, 105, 0.08) 0%, rgba(13, 148, 136, 0.08) 100%);
+                color: var(--color-accent-3);
+                padding: 0.15em 0.45em;
+                border-radius: var(--radius-sm);
+                border: 1px solid rgba(5, 150, 105, 0.12);
+            }
+
+            .article-body pre {
+                background: var(--color-code-bg);
+                color: var(--color-code-text);
+                padding: var(--space-xl);
+                border-radius: var(--radius-lg);
+                overflow-x: auto;
+                margin: var(--space-xl) 0;
+                font-family: var(--font-mono);
+                font-size: var(--text-sm);
+                line-height: 1.65;
+                box-shadow: var(--shadow-code);
+                border: 1px solid rgba(255, 255, 255, 0.05);
+                position: relative;
+            }
+
+            .article-body pre::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                height: 3px;
+                background: var(--gradient-primary);
+                border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+            }
+
+            /* Code window dots */
+            .article-body pre::after {
+                content: '● ● ●';
+                position: absolute;
+                top: 12px;
+                left: 16px;
+                font-size: 10px;
+                letter-spacing: 4px;
+                color: rgba(255, 255, 255, 0.3);
+            }
+
+            .article-body pre code {
+                background: none;
+                color: inherit;
+                padding: 0;
+                border: none;
+                font-size: inherit;
+                display: block;
+                margin-top: var(--space-md);
+            }
+
+            /* Lists */
+            .article-body ol {
+                margin: var(--space-lg) 0;
+                padding-left: 0;
+                counter-reset: list-counter;
+                list-style: none;
+            }
+
+            .article-body ol>li {
+                margin-bottom: var(--space-md);
+                padding-left: var(--space-2xl);
+                position: relative;
+                counter-increment: list-counter;
+            }
+
+            .article-body ol>li::before {
+                content: counter(list-counter);
+                position: absolute;
+                left: 0;
+                top: 2px;
+                width: 24px;
+                height: 24px;
+                background: var(--gradient-primary);
+                color: white;
+                font-size: var(--text-xs);
+                font-weight: 700;
+                border-radius: 50%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+
+            .article-body ol>li b,
+            .article-body ol>li strong {
+                color: var(--color-accent-3);
+            }
+
+            /* Info Box */
+            .info-box {
+                background: linear-gradient(135deg, rgba(5, 150, 105, 0.06) 0%, rgba(13, 148, 136, 0.04) 100%);
+                border: 1px solid rgba(5, 150, 105, 0.15);
+                border-left: 4px solid var(--color-accent-1);
+                border-radius: 0 var(--radius-md) var(--radius-md) 0;
+                padding: var(--space-lg);
+                margin-bottom: var(--space-2xl);
+                display: flex;
+                align-items: flex-start;
+                gap: var(--space-md);
+            }
+
+            .info-box-icon {
+                flex-shrink: 0;
+                width: 24px;
+                height: 24px;
+                color: var(--color-accent-1);
+            }
+
+            .info-box-content {
+                flex: 1;
+            }
+
+            .info-box a {
+                color: var(--color-accent-1);
+                font-weight: 600;
+            }
+
+            /* Python Libraries Card */
+            .tools-section {
+                background: linear-gradient(180deg, var(--color-accent-light) 0%, rgba(236, 253, 245, 0.5) 100%);
+                border-radius: var(--radius-lg);
+                padding: var(--space-xl);
+                margin: var(--space-xl) 0;
+                border: 1px solid rgba(5, 150, 105, 0.1);
+            }
+
+            .tools-section h4 {
+                font-size: var(--text-lg);
+                font-weight: 600;
+                color: var(--color-accent-3);
+                margin-bottom: var(--space-lg);
+                display: flex;
+                align-items: center;
+                gap: var(--space-sm);
+            }
+
+            .tools-section h4 svg {
+                width: 20px;
+                height: 20px;
+                color: var(--color-accent-1);
+            }
+
+            .tools-section ol {
+                margin: 0;
+            }
+
+            /* References Section */
+            .references {
+                background: linear-gradient(180deg, #f0fdf4 0%, rgba(240, 253, 244, 0.5) 100%);
+                border-radius: var(--radius-lg);
+                padding: var(--space-xl);
+                margin-top: var(--space-2xl);
+                border: 1px solid rgba(5, 150, 105, 0.1);
+            }
+
+            .references h3 {
+                margin-top: 0 !important;
+                margin-bottom: var(--space-lg) !important;
+            }
+
+            .references ol {
+                margin: 0;
+            }
+
+            .references li {
+                padding-left: var(--space-xl);
+            }
+
+            .references li::before {
+                width: 20px;
+                height: 20px;
+                font-size: 10px;
+            }
+
+            /* ========================================
+           Footer
+           ======================================== */
+            .footer {
+                background: rgba(255, 255, 255, 0.75);
+                -webkit-backdrop-filter: blur(16px);
+                backdrop-filter: blur(16px);
+                border-top: 1px solid var(--color-border);
+                padding: var(--space-2xl) var(--space-xl);
+                margin-top: var(--space-4xl);
+                position: relative;
+                z-index: 1;
+            }
+
+            .footer-inner {
+                max-width: 1100px;
+                margin: 0 auto;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                gap: var(--space-lg);
+            }
+
+            .footer-languages {
+                display: flex;
+                align-items: center;
+                gap: var(--space-md);
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+
+            .footer-languages-label {
+                font-size: var(--text-sm);
+                color: var(--color-base-text-muted);
+                font-weight: 500;
+            }
+
+            .language-links {
+                display: flex;
+                gap: var(--space-sm);
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+
+            .language-link {
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                padding: var(--space-xs) var(--space-md);
+                font-size: var(--text-xs);
+                font-weight: 500;
+                color: var(--color-base-text-muted);
+                text-decoration: none;
+                background: rgba(255, 255, 255, 0.8);
+                border: 1px solid var(--color-border);
+                border-radius: var(--radius-full);
+                transition: all 0.3s ease;
+            }
+
+            .language-link:hover,
+            .language-link:focus {
+                color: var(--color-accent-1);
+                background: var(--color-accent-light);
+                border-color: var(--color-accent-1);
+                transform: translateY(-2px);
+                box-shadow: var(--shadow-sm);
+            }
+
+            .language-link.active {
+                background: var(--gradient-primary);
+                color: white;
+                border-color: transparent;
+            }
+
+            .footer-copyright {
+                font-size: var(--text-xs);
+                color: var(--color-base-text-muted);
+                text-align: center;
+            }
+
+            .footer-copyright a {
+                color: var(--color-accent-1);
+                text-decoration: none;
+            }
+
+            .footer-copyright a:hover {
+                text-decoration: underline;
+            }
+
+            /* ========================================
+           Animations
+           ======================================== */
+            @keyframes fadeInUp {
+                from {
+                    opacity: 0;
+                    transform: translateY(30px);
                 }
 
-                #sidebar .title a:link,
-                #sidebar .title a:visited {
-                    text-align: center;
-                    color: #FFFFFF;
+                to {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            }
+
+            @keyframes dataStream {
+                0% {
+                    stroke-dashoffset: 100;
+                    opacity: 0;
                 }
 
-                #sidebar .subtitle a:link,
-                #sidebar .subtitle a:visited {
-                    text-align: center;
-                    color: #FFFFFF;
+                10% {
+                    opacity: 1;
                 }
 
-                .home {
-                    z-index: 100;
-                    width: 100%;
-                    background-color: #009AA6;
-                    font-size: 1.5vmax;
+                90% {
+                    opacity: 1;
                 }
 
-                .home a:link,
-                .home a:visited {
-                    text-decoration: none;
-                    color: #FFFFFF;
+                100% {
+                    stroke-dashoffset: 0;
+                    opacity: 0;
+                }
+            }
+
+            @keyframes nodeGlow {
+
+                0%,
+                100% {
+                    filter: drop-shadow(0 0 4px rgba(5, 150, 105, 0.3));
                 }
 
-                .content {
-                    line-height: 3.8vmax;
-                    font-size: 1.8vmax;
-                    font-family: 'Arial';
-                    margin-top: 22vh;
+                50% {
+                    filter: drop-shadow(0 0 12px rgba(5, 150, 105, 0.6));
+                }
+            }
+
+            @keyframes orbit {
+                from {
+                    transform: rotate(0deg) translateX(120px) rotate(0deg);
                 }
 
-                .content a:link,
-                .content a:visited {
-                    color: #009AA6;
+                to {
+                    transform: rotate(360deg) translateX(120px) rotate(-360deg);
+                }
+            }
+
+            /* Reduced Motion */
+            @media (prefers-reduced-motion: reduce) {
+
+                *,
+                *::before,
+                *::after {
+                    animation-duration: 0.01ms !important;
+                    animation-iteration-count: 1 !important;
+                    transition-duration: 0.01ms !important;
                 }
 
-                .page {
-                    top: 40vh;
-                    width: 95%;
-                    margin-left: 0vw;
+                html {
+                    scroll-behavior: auto;
+                }
+            }
+
+            /* ========================================
+           Responsive Design
+           ======================================== */
+            @media (max-width: 768px) {
+                .nav-container {
+                    padding: var(--space-sm) var(--space-md);
                 }
 
-                .page img {
-                    max-width: 100%;
-                    max-height: 100%;
-                    border: 0;
+                .nav-inner {
+                    flex-direction: column;
+                    gap: var(--space-sm);
+                }
+
+                .nav-links {
+                    flex-wrap: wrap;
+                    justify-content: center;
+                    gap: var(--space-xs);
+                }
+
+                .nav-separator {
+                    display: none;
+                }
+
+                .hero {
+                    padding: calc(130px + var(--space-xl)) var(--space-md) var(--space-xl);
+                }
+
+                .main-content {
+                    padding: 0 var(--space-md) var(--space-2xl);
+                }
+
+                .article-container {
+                    padding: var(--space-xl);
+                    border-radius: var(--radius-lg);
+                }
+
+                .article-body pre {
+                    padding: var(--space-lg);
+                    padding-top: var(--space-xl);
+                    font-size: var(--text-xs);
+                }
+
+                .article-body ol>li {
+                    padding-left: var(--space-xl);
+                }
+
+                .article-body ol>li::before {
+                    width: 20px;
+                    height: 20px;
+                    font-size: 10px;
+                }
+            }
+
+            @media (max-width: 480px) {
+                .hero-title {
+                    font-size: var(--text-3xl);
+                }
+
+                .article-body h2 {
+                    font-size: var(--text-xl);
+                }
+
+                .article-body h3 {
+                    font-size: var(--text-lg);
+                }
+
+                .info-box {
+                    flex-direction: column;
+                }
+
+                .tools-section,
+                .references {
+                    padding: var(--space-lg);
                 }
             }
         </style>
-        <script type="application/ld+json">
-        {
-            "@context": "http://schema.org",
-            "@type": "BlogPosting",
-            "mainEntityOfPage": {
-                "@type": "WebPage",
-                "@id": "https://johnsamuel.info"
-            },
-            "articleSection": "blog",
-            "name": "Integrating Linked Data",
-            "headline": "Integrating Linked Data",
-            "description": "Article by John Samuel",
-            "inLanguage": "en",
-            "author": "John Samuel",
-            "datePublished": "2020-05-03 19:04:28",
-            "dateModified": "2020-05-03 19:04:28",
-            "dateCreated": "2020-05-03 19:04:28",
-            "url": "https://johnsamuel.info/en/programming/linkeddata-integration.html",
-            "keywords": ["Blog"]
-        }
-    </script>
     </head>
 
     <body vocab="http://schema.org/">
-        <div id="sidebar">
-            <div class="title">
-                <h1><a href="./linkeddata-integration.html">Integrating Linked Data</a></h1>
-            </div>
-            <div class="subtitle">
-                <h3><a href="../about.html">John Samuel</a></h3>
-            </div>
-        </div>
-        <div class="page">
-            <div class="home">
-                <ul typeof="BreadcrumbList">
+        <a href="#main-content" class="skip-link">Skip to main content</a>
+
+        <!-- Background Flow Animation -->
+        <svg class="bg-flow" viewBox="0 0 1200 800" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"
+            preserveAspectRatio="xMidYMid slice">
+            <defs>
+                <linearGradient id="flowLine" x1="0%" y1="0%" x2="100%" y2="0%">
+                    <stop offset="0%" style="stop-color:#059669;stop-opacity:0" />
+                    <stop offset="50%" style="stop-color:#0d9488;stop-opacity:1" />
+                    <stop offset="100%" style="stop-color:#14b8a6;stop-opacity:0" />
+                </linearGradient>
+            </defs>
+            <!-- Flowing data lines -->
+            <path d="M0 200 Q300 150 600 200 T1200 180" stroke="url(#flowLine)" stroke-width="2" fill="none"
+                stroke-dasharray="20,10" opacity="0.4">
+                <animate attributeName="stroke-dashoffset" values="0;-30" dur="2s" repeatCount="indefinite" />
+            </path>
+            <path d="M0 400 Q400 350 700 420 T1200 380" stroke="url(#flowLine)" stroke-width="1.5" fill="none"
+                stroke-dasharray="15,15" opacity="0.3">
+                <animate attributeName="stroke-dashoffset" values="0;-30" dur="3s" repeatCount="indefinite" />
+            </path>
+            <path d="M0 600 Q350 550 650 620 T1200 580" stroke="url(#flowLine)" stroke-width="1" fill="none"
+                stroke-dasharray="10,20" opacity="0.25">
+                <animate attributeName="stroke-dashoffset" values="0;-30" dur="4s" repeatCount="indefinite" />
+            </path>
+        </svg>
+
+        <!-- Hero Illustration - Data Integration Network -->
+        <svg class="hero-illustration" viewBox="0 0 1000 500" fill="none" xmlns="http://www.w3.org/2000/svg"
+            aria-hidden="true">
+            <defs>
+                <linearGradient id="nodeGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" style="stop-color:#059669" />
+                    <stop offset="100%" style="stop-color:#0d9488" />
+                </linearGradient>
+                <linearGradient id="linkGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                    <stop offset="0%" style="stop-color:#059669;stop-opacity:0.5" />
+                    <stop offset="50%" style="stop-color:#14b8a6;stop-opacity:0.8" />
+                    <stop offset="100%" style="stop-color:#0d9488;stop-opacity:0.5" />
+                </linearGradient>
+                <filter id="glow">
+                    <feGaussianBlur stdDeviation="2.5" result="coloredBlur" />
+                    <feMerge>
+                        <feMergeNode in="coloredBlur" />
+                        <feMergeNode in="SourceGraphic" />
+                    </feMerge>
+                </filter>
+            </defs>
+
+            <!-- Central Hub - Integration Point -->
+            <g filter="url(#glow)">
+                <circle cx="500" cy="250" r="50" fill="none" stroke="url(#nodeGradient)" stroke-width="3">
+                    <animate attributeName="r" values="50;55;50" dur="3s" repeatCount="indefinite" />
+                </circle>
+                <circle cx="500" cy="250" r="35" fill="none" stroke="url(#nodeGradient)" stroke-width="2" opacity="0.5">
+                    <animate attributeName="r" values="35;40;35" dur="3s" repeatCount="indefinite" begin="0.5s" />
+                </circle>
+                <text x="500" y="255" text-anchor="middle" fill="#059669" font-size="11"
+                    font-weight="600">JSON-LD</text>
+            </g>
+
+            <!-- Orbiting data sources -->
+            <g>
+                <!-- HTML Source -->
+                <g>
+                    <circle cx="300" cy="150" r="30" fill="none" stroke="#0d9488" stroke-width="2">
+                        <animate attributeName="cy" values="150;140;150" dur="4s" repeatCount="indefinite" />
+                    </circle>
+                    <text x="300" y="154" text-anchor="middle" fill="#0d9488" font-size="10"
+                        font-weight="500">HTML</text>
+                </g>
+
+                <!-- Schema.org -->
+                <g>
+                    <circle cx="700" cy="150" r="30" fill="none" stroke="#0d9488" stroke-width="2">
+                        <animate attributeName="cy" values="150;140;150" dur="5s" repeatCount="indefinite" />
+                    </circle>
+                    <text x="700" y="154" text-anchor="middle" fill="#0d9488" font-size="9"
+                        font-weight="500">Schema</text>
+                </g>
+
+                <!-- RDFa Source -->
+                <g>
+                    <circle cx="250" cy="320" r="28" fill="none" stroke="#14b8a6" stroke-width="2">
+                        <animate attributeName="cy" values="320;310;320" dur="4.5s" repeatCount="indefinite" />
+                    </circle>
+                    <text x="250" y="324" text-anchor="middle" fill="#14b8a6" font-size="10"
+                        font-weight="500">RDFa</text>
+                </g>
+
+                <!-- Git/Version Control -->
+                <g>
+                    <circle cx="750" cy="320" r="28" fill="none" stroke="#14b8a6" stroke-width="2">
+                        <animate attributeName="cy" values="320;310;320" dur="5.5s" repeatCount="indefinite" />
+                    </circle>
+                    <text x="750" y="324" text-anchor="middle" fill="#14b8a6" font-size="10"
+                        font-weight="500">Git</text>
+                </g>
+
+                <!-- Python Tools -->
+                <g>
+                    <circle cx="400" cy="400" r="25" fill="none" stroke="#5eead4" stroke-width="2">
+                        <animate attributeName="cy" values="400;390;400" dur="4s" repeatCount="indefinite" />
+                    </circle>
+                    <text x="400" y="404" text-anchor="middle" fill="#0d9488" font-size="9"
+                        font-weight="500">Python</text>
+                </g>
+
+                <!-- Knowledge Graph Output -->
+                <g>
+                    <circle cx="600" cy="400" r="25" fill="none" stroke="#5eead4" stroke-width="2">
+                        <animate attributeName="cy" values="400;390;400" dur="4.8s" repeatCount="indefinite" />
+                    </circle>
+                    <text x="600" y="404" text-anchor="middle" fill="#0d9488" font-size="8"
+                        font-weight="500">Graph</text>
+                </g>
+            </g>
+
+            <!-- Connection Lines with Data Flow -->
+            <g stroke="url(#linkGradient)" stroke-width="2" fill="none">
+                <path d="M330 165 Q400 200 450 235" stroke-dasharray="8,4">
+                    <animate attributeName="stroke-dashoffset" values="12;0" dur="1.5s" repeatCount="indefinite" />
+                </path>
+                <path d="M670 165 Q600 200 550 235" stroke-dasharray="8,4">
+                    <animate attributeName="stroke-dashoffset" values="12;0" dur="1.8s" repeatCount="indefinite" />
+                </path>
+                <path d="M278 310 Q350 280 455 260" stroke-dasharray="8,4">
+                    <animate attributeName="stroke-dashoffset" values="12;0" dur="2s" repeatCount="indefinite" />
+                </path>
+                <path d="M722 310 Q650 280 545 260" stroke-dasharray="8,4">
+                    <animate attributeName="stroke-dashoffset" values="12;0" dur="2.2s" repeatCount="indefinite" />
+                </path>
+                <path d="M420 385 Q460 340 485 295" stroke-dasharray="6,6">
+                    <animate attributeName="stroke-dashoffset" values="12;0" dur="2.5s" repeatCount="indefinite" />
+                </path>
+                <path d="M580 385 Q540 340 515 295" stroke-dasharray="6,6">
+                    <animate attributeName="stroke-dashoffset" values="12;0" dur="2.3s" repeatCount="indefinite" />
+                </path>
+            </g>
+
+            <!-- Data Packets flowing -->
+            <g fill="#059669">
+                <circle r="4">
+                    <animateMotion dur="2s" repeatCount="indefinite" path="M330 165 Q400 200 450 235" />
+                    <animate attributeName="opacity" values="0;1;1;0" dur="2s" repeatCount="indefinite" />
+                </circle>
+                <circle r="3">
+                    <animateMotion dur="2.5s" repeatCount="indefinite" path="M670 165 Q600 200 550 235" />
+                    <animate attributeName="opacity" values="0;1;1;0" dur="2.5s" repeatCount="indefinite" />
+                </circle>
+            </g>
+
+            <!-- 5-Star Badge -->
+            <g transform="translate(500, 70)">
+                <text x="0" y="0" text-anchor="middle" fill="#059669" font-size="10" font-weight="600" opacity="0.6">★ ★
+                    ★ ★ ★</text>
+                <text x="0" y="15" text-anchor="middle" fill="#0d9488" font-size="8" opacity="0.5">Linked Data</text>
+            </g>
+        </svg>
+
+        <!-- Navigation -->
+        <header class="nav-container" role="banner">
+            <nav class="nav-inner" aria-label="Main navigation">
+                <div class="nav-brand">
+                    <a href="../about.html" class="nav-brand-link">John Samuel</a>
+                </div>
+                <ul class="nav-links" typeof="BreadcrumbList">
                     <li property="itemListElement" typeof="ListItem">
                         <a property="item" typeof="WebPage" href="../index.html">
                             <span property="name">Home</span>
                         </a>
                     </li>
+                    <li class="nav-separator" aria-hidden="true">/</li>
                     <li property="itemListElement" typeof="ListItem">
                         <a property="item" typeof="WebPage" href="../programming/index.html">
                             <span property="name">Programming</span>
                         </a>
                     </li>
+                    <li class="nav-separator" aria-hidden="true">/</li>
                     <li property="itemListElement" typeof="ListItem">
                         <a property="item" typeof="WebPage" href="../research/research.html">
                             <span property="name">Research</span>
                         </a>
                     </li>
                 </ul>
-            </div>
-            <div class="content">
-                <div
-                    style="background-color: #f0f8ff; border-left: 4px solid #009AA6; padding: 1em; margin-bottom: 1.5em;">
-                    <strong>This article is part of a series on <a
-                            href="../research/knowledge-representation.html">Knowledge Representation and Semantic
-                            Web</a>.</strong>
+            </nav>
+        </header>
+
+        <!-- Hero Section -->
+        <section class="hero" aria-labelledby="hero-title">
+            <div class="hero-inner">
+                <div class="hero-series-badge">
+                    <svg class="hero-badge-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" />
+                        <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" />
+                    </svg>
+                    Part of <a href="../research/knowledge-representation.html">Knowledge Representation and Semantic
+                        Web</a> series
                 </div>
-                <p>When I started blogging, one of my visions was to ensure the <a
-                        href="./building-this-site.html">machine-readability</a> of the articles. Years have passed, I
-                    am still far from completely achieving it. No doubt, there are technical limitations
-                    to achieve full machine readability. But a certain amount of machine readability can still be
-                    achieved. There are a several advantages to use <a href="./structured-content.html">structured
-                        data</a>, the major one being for the findability
-                    of relevant information. I have been blogging for quite a long time and the number of articles,
-                    notes that I have been documenting is increasing every month. A simple search for keywords,
-                    sometimes do not give me the information that I
-                    have been looking for.
-                </p>
-                <p>
-                    I have been using a limited amount of structured data in the form of RDFa<sup><a
-                            href="#rdfa">1</a>,<a href="#rdfaprimer">2</a></sup> since the beginning for the different
-                    sections of the article like
-                    <code>WebPage</code>, <code>BreadcrumbList</code>, <code>ListItem</code>, etc. from
-                    Schema.org<sup><a href="#schemaorg">3</a></sup>. However, this was quite limited. More data can be
-                    added, take, for example, the author name, date of creation, date of publication, date of last
-                    modification, the title of the article, etc. The following information
-                    can be easily obtained for any published article and does not require a lot of effort.
-                </p>
-                <pre>
-	 <code>
-   {
-      "@context": "http://schema.org",
-      "@type": "BlogPosting",
-      "mainEntityOfPage": {
-	       "@type": "WebPage",
-         "@id": "https://johnsamuel.info"
-      },
-      "articleSection": "blog",
-      "name": "Integrating Linked Data",
-      "headline": "Integrating Linked Data",
-      "description": "Article by John Samuel",
-      "inLanguage": "en",
-      "author": "John Samuel",
-      "datePublished": "2020-05-03 19:04:28",
-      "dateModified": "2020-05-03 19:04:28",
-      "dateCreated": "2020-05-03 19:04:28",
-      "url": "https://johnsamuel.info/en/programming/linkeddata-integration.html",
-      "keywords": ["Blog"]
-   }
-	 </code>
-	</pre>
-                <p>
-                    As you may have observed, I am using JSON-LD<sup><a href="#jsonld">4</a>,<a
-                            href="#jsonldofficial">5</a></sup> (JSON for Linked Data) for this purpose, mainly because
-                    of the ease of generation of this code. The above information can be
-                    easily embedded using the following <code>script</code> tag.
-                </p>
-                <pre>
-	 <code>
-      &lt;script type="application/ld+json"&gt;
-		 ....
-      &lt;/script&gt;
-	 </code>
-	</pre>
-                <p>
-                    From a programming point of view, the main challenge was to correctly represent this information.
-                    Example snippets can easily be found on Schema.org<sup><a href="#schemaorg">3</a></sup>. Other
-                    authors have previously documented about their
-                    choice of properties<sup><a href="#json2skos">6</a></sup>. As I am using version control systems, I
-                    can easily obtain the creation date and the last modification date of the article. With HTML parser
-                    like <code>BeautifulSoup</code>, I
-                    obtain the title of the article. I used the following Python libraries for generating and supporting
-                    JSON-LD on this blog, like the above example for a given blog posting.
-                </p>
-                <ol>
-                    <li><b>extruct</b>: for extracting metadata (RDFa, JSON-LD, Microdata) from a web page. It can also
-                        be used to extract and verify the newly added JSON-LD and RDFa information.</li>
-                    <li><b>argparse</b>: for parsing command line arguments, especially to work with one or more files
-                        and to support options for extraction or addition of metadata.</li>
-                    <li><b>w3lib</b>: for obtaining the base URL</li>
-                    <li><b>pygit2</b>: for obtaining the creation date, the last modification date of a blog post</li>
-                    <li><b>bs4 (BeautifulSoup)</b>: for parsing HTML file and obtaining information like the title of
-                        the article
-                    </li>
-                </ol>
-                <p>
-                    My next goal will be to go beyond just annotating the metadata of the article to its actual content.
-                    Considering the 5 Star deployment scheme for Linked Data<sup><a
-                            href="#fivestarlinkeddata">7</a></sup> proposed by Tim Berners-Lee, there
-                    is still a lot of work to do for this site. The articles contain unstructured data. Though written
-                    in HTML, the article content could be made machine-readable, if annotated with open standards like
-                    RDFa and linked with other linked open
-                    data sources.
-                </p>
-                <h3>References</h3>
-                <ol>
-                    <li id="rdfa"><a href="https://en.wikipedia.org/wiki/RDFa">RDFa</a></li>
-                    <li id="rdfaprimer"><a href="https://www.w3.org/TR/rdfa-primer/">RDFa 1.1 Primer-Third Edition</a>
-                    </li>
-                    <li id="schemaorg"><a href="https://schema.org/">Schema.org</a></li>
-                    <li id="jsonld"><a href="https://en.wikipedia.org/wiki/JSON-LD">JSON-LD</a></li>
-                    <li id="jsonldofficial"><a href="https://json-ld.org/">JSON for Linking Data</a></li>
-                    <li id="json2skos"><a href="http://www.bobdc.com/blog/json2skos/">Converting JSON-LD schema.org RDF
-                            to other</a></li>
-                    <li id="fivestarlinkeddata"><a href="https://www.w3.org/2011/gld/wiki/5_Star_Linked_Data">5 Star
-                            Linked Data</a></li>
-                </ol>
+                <h1 id="hero-title" class="hero-title">Integrating Linked Data</h1>
+                <p class="hero-subtitle">Building machine-readable web content with JSON-LD and semantic annotations</p>
             </div>
-        </div>
+        </section>
+
+        <!-- Main Content -->
+        <main id="main-content" class="main-content">
+            <article class="article-container">
+                <div class="float-shape float-shape-1" aria-hidden="true"></div>
+                <div class="float-shape float-shape-2" aria-hidden="true"></div>
+
+                <div class="article-body">
+                    <div class="info-box">
+                        <svg class="info-box-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <circle cx="12" cy="12" r="10" />
+                            <path d="M12 16v-4" />
+                            <path d="M12 8h.01" />
+                        </svg>
+                        <div class="info-box-content">
+                            <strong>This article is part of a series on <a
+                                    href="../research/knowledge-representation.html">Knowledge Representation and
+                                    Semantic Web</a>.</strong>
+                        </div>
+                    </div>
+
+                    <p>
+                        When I started blogging, one of my visions was to ensure the <a
+                            href="./building-this-site.html">machine-readability</a> of the articles. Years have passed,
+                        I am still far from completely achieving it. No doubt, there are technical limitations to
+                        achieve full machine readability. But a certain amount of machine readability can still be
+                        achieved. There are several advantages to use <a href="./structured-content.html">structured
+                            data</a>, the major one being for the findability of relevant information. I have been
+                        blogging for quite a long time and the number of articles, notes that I have been documenting is
+                        increasing every month. A simple search for keywords, sometimes do not give me the information
+                        that I have been looking for.
+                    </p>
+
+                    <p>
+                        I have been using a limited amount of structured data in the form of RDFa<sup><a
+                                href="#rdfa">1</a>,<a href="#rdfaprimer">2</a></sup> since the beginning for the
+                        different sections of the article like <code>WebPage</code>, <code>BreadcrumbList</code>,
+                        <code>ListItem</code>, etc. from Schema.org<sup><a href="#schemaorg">3</a></sup>. However, this
+                        was quite limited. More data can be added, take, for example, the author name, date of creation,
+                        date of publication, date of last modification, the title of the article, etc. The following
+                        information can be easily obtained for any published article and does not require a lot of
+                        effort.
+                    </p>
+
+                    <pre><code>{
+  "@context": "http://schema.org",
+  "@type": "BlogPosting",
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https://johnsamuel.info"
+  },
+  "articleSection": "blog",
+  "name": "Integrating Linked Data",
+  "headline": "Integrating Linked Data",
+  "description": "Article by John Samuel",
+  "inLanguage": "en",
+  "author": "John Samuel",
+  "datePublished": "2020-05-03 19:04:28",
+  "dateModified": "2020-05-03 19:04:28",
+  "dateCreated": "2020-05-03 19:04:28",
+  "url": "https://johnsamuel.info/en/programming/linkeddata-integration.html",
+  "keywords": ["Blog"]
+}</code></pre>
+
+                    <p>
+                        As you may have observed, I am using JSON-LD<sup><a href="#jsonld">4</a>,<a
+                                href="#jsonldofficial">5</a></sup> (JSON for Linked Data) for this purpose, mainly
+                        because of the ease of generation of this code. The above information can be easily embedded
+                        using the following <code>script</code> tag.
+                    </p>
+
+                    <pre><code>&lt;script type="application/ld+json"&gt;
+  ....
+&lt;/script&gt;</code></pre>
+
+                    <p>
+                        From a programming point of view, the main challenge was to correctly represent this
+                        information. Example snippets can easily be found on Schema.org<sup><a
+                                href="#schemaorg">3</a></sup>. Other authors have previously documented about their
+                        choice of properties<sup><a href="#json2skos">6</a></sup>. As I am using version control
+                        systems, I can easily obtain the creation date and the last modification date of the article.
+                        With HTML parser like <code>BeautifulSoup</code>, I obtain the title of the article. I used the
+                        following Python libraries for generating and supporting JSON-LD on this blog, like the above
+                        example for a given blog posting.
+                    </p>
+
+                    <div class="tools-section">
+                        <h4>
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M12 2L2 7l10 5 10-5-10-5z" />
+                                <path d="M2 17l10 5 10-5" />
+                                <path d="M2 12l10 5 10-5" />
+                            </svg>
+                            Python Libraries Used
+                        </h4>
+                        <ol>
+                            <li><b>extruct</b>: for extracting metadata (RDFa, JSON-LD, Microdata) from a web page. It
+                                can also be used to extract and verify the newly added JSON-LD and RDFa information.
+                            </li>
+                            <li><b>argparse</b>: for parsing command line arguments, especially to work with one or more
+                                files and to support options for extraction or addition of metadata.</li>
+                            <li><b>w3lib</b>: for obtaining the base URL</li>
+                            <li><b>pygit2</b>: for obtaining the creation date, the last modification date of a blog
+                                post</li>
+                            <li><b>bs4 (BeautifulSoup)</b>: for parsing HTML file and obtaining information like the
+                                title of the article</li>
+                        </ol>
+                    </div>
+
+                    <p>
+                        My next goal will be to go beyond just annotating the metadata of the article to its actual
+                        content. Considering the 5 Star deployment scheme for Linked Data<sup><a
+                                href="#fivestarlinkeddata">7</a></sup> proposed by Tim Berners-Lee, there is still a lot
+                        of work to do for this site. The articles contain unstructured data. Though written in HTML, the
+                        article content could be made machine-readable, if annotated with open standards like RDFa and
+                        linked with other linked open data sources.
+                    </p>
+
+                    <div class="references">
+                        <h3>References</h3>
+                        <ol>
+                            <li id="rdfa"><a href="https://en.wikipedia.org/wiki/RDFa">RDFa</a></li>
+                            <li id="rdfaprimer"><a href="https://www.w3.org/TR/rdfa-primer/">RDFa 1.1 Primer - Third
+                                    Edition</a></li>
+                            <li id="schemaorg"><a href="https://schema.org/">Schema.org</a></li>
+                            <li id="jsonld"><a href="https://en.wikipedia.org/wiki/JSON-LD">JSON-LD</a></li>
+                            <li id="jsonldofficial"><a href="https://json-ld.org/">JSON for Linking Data</a></li>
+                            <li id="json2skos"><a href="http://www.bobdc.com/blog/json2skos/">Converting JSON-LD
+                                    schema.org RDF to other</a></li>
+                            <li id="fivestarlinkeddata"><a href="https://www.w3.org/2011/gld/wiki/5_Star_Linked_Data">5
+                                    Star Linked Data</a></li>
+                        </ol>
+                    </div>
+                </div>
+            </article>
+        </main>
+
+        <!-- Footer -->
+        <footer class="footer" role="contentinfo">
+            <div class="footer-inner">
+                <div class="footer-languages">
+                    <span class="footer-languages-label">Languages:</span>
+                    <div class="language-links">
+                        <a href="./linkeddata-integration.html" class="language-link active"
+                            aria-current="page">English</a>
+                        <a href="./linkeddata-integration-fr.html" class="language-link">Français</a>
+                        <a href="./linkeddata-integration-de.html" class="language-link">Deutsch</a>
+                        <a href="./linkeddata-integration-es.html" class="language-link">Español</a>
+                        <a href="./linkeddata-integration-ml.html" class="language-link">മലയാളം</a>
+                    </div>
+                </div>
+                <p class="footer-copyright">
+                    © 2020 <a href="../about.html">John Samuel</a>. All content licensed under CC BY-SA 4.0.
+                </p>
+            </div>
+        </footer>
     </body>
 
 </html>

@@ -3,310 +3,974 @@
 
     <head>
         <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <meta http-equiv="Content-Language" content="en" />
         <link rel="shortcut icon" href="../../images/logo/favicon.png" />
         <title>Identifying Linked Open Vocabularies for Personal Website: John Samuel</title>
-        <style type="text/css">
-            body {
-                background-color: #FFFFFF;
+        <style>
+            /* ===== Design Tokens ===== */
+            :root {
+                /* Technology/Research Theme - Semantic Web Colors */
+                --color-base-bg: #f0f4f8;
+                --color-base-surface: #ffffff;
+                --color-base-text: #1a202c;
+                --color-base-text-muted: #4a5568;
+
+                /* Theme Accents - Knowledge Graph Blues & Purples */
+                --color-accent-1: #009AA6;
+                --color-accent-2: #0077b6;
+                --color-accent-3: #7b68ee;
+                --color-accent-light: #e8f4f8;
+                --color-accent-glow: rgba(0, 154, 166, 0.15);
+
+                /* Functional Colors */
+                --color-shadow: rgba(0, 154, 166, 0.12);
+                --color-border: rgba(0, 154, 166, 0.15);
+                --color-hover: rgba(0, 154, 166, 0.08);
+
+                /* Gradients */
+                --gradient-primary: linear-gradient(135deg, var(--color-accent-1), var(--color-accent-2), var(--color-accent-3));
+                --gradient-subtle: linear-gradient(180deg, var(--color-base-bg) 0%, var(--color-accent-light) 100%);
+                --gradient-hero: linear-gradient(135deg, #f0f4f8 0%, #e8f4f8 50%, #f0f0ff 100%);
+
+                /* Spacing Scale */
+                --space-xs: 0.25rem;
+                --space-sm: 0.5rem;
+                --space-md: 1rem;
+                --space-lg: 1.5rem;
+                --space-xl: 2rem;
+                --space-2xl: 3rem;
+                --space-3xl: 4rem;
+                --space-4xl: 6rem;
+
+                /* Border Radius */
+                --radius-sm: 4px;
+                --radius-md: 8px;
+                --radius-lg: 12px;
+                --radius-xl: 16px;
+                --radius-2xl: 24px;
+                --radius-full: 9999px;
+
+                /* Shadows */
+                --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.04), 0 1px 3px rgba(0, 0, 0, 0.06);
+                --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.05), 0 2px 4px rgba(0, 0, 0, 0.06);
+                --shadow-lg: 0 10px 24px rgba(0, 0, 0, 0.08), 0 4px 8px rgba(0, 0, 0, 0.06);
+                --shadow-xl: 0 20px 40px rgba(0, 0, 0, 0.12), 0 8px 16px rgba(0, 0, 0, 0.08);
+                --shadow-theme: 0 10px 30px var(--color-shadow), 0 4px 10px rgba(0, 0, 0, 0.06);
+
+                /* Typography */
+                --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+                --font-mono: 'SF Mono', Monaco, 'Cascadia Code', 'Consolas', monospace;
+
+                --text-xs: clamp(0.75rem, 0.7rem + 0.25vw, 0.875rem);
+                --text-sm: clamp(0.875rem, 0.8rem + 0.35vw, 1rem);
+                --text-base: clamp(1rem, 0.95rem + 0.25vw, 1.125rem);
+                --text-lg: clamp(1.125rem, 1.05rem + 0.35vw, 1.25rem);
+                --text-xl: clamp(1.25rem, 1.15rem + 0.5vw, 1.5rem);
+                --text-2xl: clamp(1.5rem, 1.3rem + 1vw, 2rem);
+                --text-3xl: clamp(2rem, 1.6rem + 2vw, 2.5rem);
+                --text-4xl: clamp(2.5rem, 2rem + 2.5vw, 3.5rem);
             }
 
-            #sidebar {
-                position: fixed;
-                background-color: #009AA6;
-                top: 0;
-                left: 0;
-                bottom: 0;
-                width: 30vw;
-            }
-
-            #sidebar .title {
-                position: relative;
-                text-align: center;
-                line-height: 5vmax;
-                font-size: 1.4vmax;
-                font-family: 'Arial';
-                margin-top: 30vh;
-            }
-
-            #sidebar .title a:link,
-            #sidebar .title a:visited {
-                color: #FFFFFF;
-                text-decoration: none;
-            }
-
-            .subtitle {
-                top: 50vh;
-                text-align: center;
-                line-height: 1.3vmax;
-                font-family: 'Arial';
-                font-size: 1.2vmax;
-                color: #FFFFFF;
-            }
-
-            .subtitle a:link,
-            .subtitle a:visited {
-                color: #FFFFFF;
-                text-decoration: none;
-            }
-
-            .licence {
-                position: fixed;
-                text-align: right;
-                bottom: 0;
-                right: 0;
-            }
-
-            .home {
-                position: fixed;
-                text-align: left;
-                font-family: 'Arial';
-                color: #D3D3D3;
-                z-index: 100;
-                width: 100%;
-                background-color: #FFFFFF;
-                top: 0px;
-                margin-bottom: 10px;
-                padding-bottom: 10px;
-            }
-
-            .home a:link,
-            .home a:visited {
-                text-decoration: none;
-                color: #D3D3D3;
-            }
-
-            .home ul {
+            /* ===== Reset & Base ===== */
+            *,
+            *::before,
+            *::after {
+                box-sizing: border-box;
                 margin: 0;
                 padding: 0;
-                text-align: left;
+            }
+
+            html {
+                scroll-behavior: smooth;
+                scroll-padding-top: 80px;
+            }
+
+            body {
+                font-family: var(--font-sans);
+                font-size: var(--text-base);
+                line-height: 1.75;
+                color: var(--color-base-text);
+                background: var(--color-base-bg);
+                letter-spacing: -0.005em;
+                min-height: 100vh;
+            }
+
+            /* ===== Skip Link ===== */
+            .skip-link {
+                position: absolute;
+                top: -50px;
+                left: var(--space-md);
+                background: var(--color-accent-1);
+                color: white;
+                padding: var(--space-sm) var(--space-md);
+                text-decoration: none;
+                border-radius: var(--radius-sm);
+                z-index: 10000;
+                transition: top 0.3s ease;
+            }
+
+            .skip-link:focus {
+                top: var(--space-md);
+            }
+
+            /* ===== Navigation ===== */
+            .navbar {
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                z-index: 1000;
+                background: rgba(255, 255, 255, 0.85);
+                -webkit-backdrop-filter: blur(16px) saturate(180%);
+                backdrop-filter: blur(16px) saturate(180%);
+                border-bottom: 1px solid var(--color-border);
+                padding: var(--space-md) var(--space-xl);
+            }
+
+            .navbar-inner {
+                max-width: 1400px;
+                margin: 0 auto;
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                gap: var(--space-lg);
+            }
+
+            .navbar-brand {
+                font-weight: 700;
+                font-size: var(--text-lg);
+                color: var(--color-accent-1);
+                text-decoration: none;
+                display: flex;
+                align-items: center;
+                gap: var(--space-sm);
+                transition: all 0.3s ease;
+                position: relative;
+            }
+
+            .navbar-brand::before {
+                content: '';
+                width: 8px;
+                height: 8px;
+                background: var(--gradient-primary);
+                border-radius: 50%;
+                animation: pulse 2s ease-in-out infinite;
+            }
+
+            .navbar-brand:hover {
+                color: var(--color-accent-2);
+            }
+
+            .navbar-nav {
+                display: flex;
+                align-items: center;
+                gap: var(--space-xs);
                 list-style: none;
             }
 
-            .home li {
-                position: relative;
-                float: left;
-                padding-top: 15px;
-                margin-right: 1em;
-                font-family: 'Arial';
-            }
-
-            .home li:hover {
-                display: block;
-            }
-
-            .home li:hover a:link,
-            .home li:hover a:visited {
+            .navbar-nav a {
+                color: var(--color-base-text-muted);
                 text-decoration: none;
-                padding: 15px;
-                color: #FFFFFF;
-                background-color: #009AA6;
+                padding: var(--space-sm) var(--space-md);
+                border-radius: var(--radius-full);
+                font-size: var(--text-sm);
+                font-weight: 500;
+                transition: all 0.3s ease;
+                position: relative;
             }
 
-            .content {
-                line-height: 1.8vmax;
-                font-size: 1.2vmax;
-                font-family: 'Arial';
-                margin-top: 15vh;
-                width: 90%;
+            .navbar-nav a:hover {
+                color: var(--color-accent-1);
+                background: var(--color-hover);
             }
 
-            .content h2,
-            h3,
-            h4 {
-                color: #009AA6;
+            .navbar-nav .divider {
+                color: var(--color-border);
+                font-weight: 300;
             }
 
-            .content a:link,
-            .content a:visited {
-                color: #009AA6;
-            }
-
-            .content h3 {
-                color: #009AA6;
-            }
-
-            .content h2::before,
-            .content h3::before {
-                display: block;
-                content: " ";
-                visibility: hidden;
-                height: 50px;
-                margin-top: -50px;
-                pointer-events: none;
-                background-color: #FFFFFF;
-            }
-
-            .content a:link,
-            .content a:visited {
-                color: #009AA6;
-            }
-
-            .home a:link,
-            .home a:visited {
-                color: #D3D3D3;
-            }
-
-            .page {
-                width: 65vw;
-                height: 100%;
-                margin-left: 30vw;
+            /* ===== Hero Section ===== */
+            .hero {
+                min-height: 75vh;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                padding: calc(var(--space-4xl) + 60px) var(--space-xl) var(--space-4xl);
+                background: var(--gradient-hero);
+                position: relative;
                 overflow: hidden;
-                padding: 0 1em;
-                font-family: 'Arial';
             }
 
-            .page img {
-                max-width: 100%;
-                max-height: 100%;
+            .hero::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background-image:
+                    radial-gradient(circle at 20% 80%, var(--color-accent-glow) 0%, transparent 50%),
+                    radial-gradient(circle at 80% 20%, rgba(123, 104, 238, 0.1) 0%, transparent 50%);
+                pointer-events: none;
             }
 
-            @media (max-width: 640px),
-            screen and (orientation: portrait) {
-                body {
-                    max-width: 100%;
-                    max-height: 100%;
+            /* Animated Grid Pattern */
+            .hero-grid {
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background-image:
+                    linear-gradient(rgba(0, 154, 166, 0.03) 1px, transparent 1px),
+                    linear-gradient(90deg, rgba(0, 154, 166, 0.03) 1px, transparent 1px);
+                background-size: 60px 60px;
+                animation: gridMove 20s linear infinite;
+                pointer-events: none;
+            }
+
+            @keyframes gridMove {
+                0% {
+                    transform: translate(0, 0);
                 }
 
-                #sidebar {
-                    position: fixed;
-                    background-color: #009AA6;
-                    top: 0;
-                    left: 0;
-                    bottom: 80vh;
-                    width: 100vw;
+                100% {
+                    transform: translate(60px, 60px);
+                }
+            }
+
+            .hero-content {
+                position: relative;
+                z-index: 1;
+                text-align: center;
+                max-width: 900px;
+            }
+
+            /* Custom SVG - Linked Data Network */
+            .hero-svg {
+                width: 320px;
+                height: 320px;
+                margin-bottom: var(--space-2xl);
+            }
+
+            .hero-title {
+                font-size: var(--text-4xl);
+                font-weight: 800;
+                letter-spacing: -0.03em;
+                line-height: 1.2;
+                margin-bottom: var(--space-lg);
+                background: var(--gradient-primary);
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                background-clip: text;
+            }
+
+            .hero-subtitle {
+                font-size: var(--text-lg);
+                color: var(--color-base-text-muted);
+                max-width: 600px;
+                margin: 0 auto var(--space-xl);
+            }
+
+            /* Series Badge */
+            .series-badge {
+                display: inline-flex;
+                align-items: center;
+                gap: var(--space-sm);
+                padding: var(--space-sm) var(--space-lg);
+                background: rgba(255, 255, 255, 0.8);
+                -webkit-backdrop-filter: blur(12px);
+                backdrop-filter: blur(12px);
+                border: 1px solid var(--color-border);
+                border-radius: var(--radius-full);
+                font-size: var(--text-sm);
+                color: var(--color-base-text-muted);
+                margin-bottom: var(--space-2xl);
+                transition: all 0.3s ease;
+            }
+
+            .series-badge:hover {
+                background: white;
+                box-shadow: var(--shadow-md);
+            }
+
+            .series-badge a {
+                color: var(--color-accent-1);
+                text-decoration: none;
+                font-weight: 600;
+            }
+
+            .series-badge a:hover {
+                text-decoration: underline;
+            }
+
+            /* ===== Main Content ===== */
+            main {
+                max-width: 900px;
+                margin: 0 auto;
+                padding: var(--space-4xl) var(--space-xl);
+            }
+
+            .content-section {
+                margin-bottom: var(--space-3xl);
+            }
+
+            .content-section p {
+                margin-bottom: var(--space-lg);
+                color: var(--color-base-text);
+            }
+
+            .content-section a {
+                color: var(--color-accent-1);
+                text-decoration: none;
+                font-weight: 500;
+                transition: all 0.3s ease;
+                position: relative;
+            }
+
+            .content-section a::after {
+                content: '';
+                position: absolute;
+                bottom: -2px;
+                left: 0;
+                width: 0;
+                height: 2px;
+                background: var(--gradient-primary);
+                transition: width 0.3s ease;
+            }
+
+            .content-section a:hover::after {
+                width: 100%;
+            }
+
+            /* Section Headers with Decorative Line */
+            .section-header {
+                margin-bottom: var(--space-xl);
+                position: relative;
+            }
+
+            .section-header h2 {
+                font-size: var(--text-2xl);
+                font-weight: 700;
+                color: var(--color-accent-1);
+                letter-spacing: -0.02em;
+                display: inline-block;
+                padding-bottom: var(--space-sm);
+            }
+
+            .section-header::after {
+                content: '';
+                display: block;
+                width: 60px;
+                height: 4px;
+                background: var(--gradient-primary);
+                border-radius: var(--radius-full);
+                margin-top: var(--space-sm);
+            }
+
+            .section-header h3 {
+                font-size: var(--text-xl);
+                font-weight: 600;
+                color: var(--color-accent-2);
+                margin-top: var(--space-2xl);
+                margin-bottom: var(--space-lg);
+            }
+
+            /* Schema Types List - Glass Cards */
+            .schema-list {
+                display: grid;
+                gap: var(--space-md);
+                margin: var(--space-xl) 0;
+                list-style: none;
+            }
+
+            .schema-list li {
+                background: rgba(255, 255, 255, 0.7);
+                -webkit-backdrop-filter: blur(12px) saturate(180%);
+                backdrop-filter: blur(12px) saturate(180%);
+                border: 1px solid rgba(255, 255, 255, 0.3);
+                border-radius: var(--radius-lg);
+                padding: var(--space-lg);
+                transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+                position: relative;
+                overflow: hidden;
+            }
+
+            .schema-list li::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 4px;
+                height: 100%;
+                background: var(--gradient-primary);
+                transform: scaleY(0);
+                transform-origin: bottom;
+                transition: transform 0.4s ease;
+            }
+
+            .schema-list li:hover {
+                transform: translateX(8px);
+                box-shadow: var(--shadow-theme);
+            }
+
+            .schema-list li:hover::before {
+                transform: scaleY(1);
+            }
+
+            .schema-list li a {
+                font-weight: 600;
+                font-family: var(--font-mono);
+                font-size: var(--text-sm);
+            }
+
+            /* Code Blocks */
+            pre {
+                background: linear-gradient(135deg, #1a202c 0%, #2d3748 100%);
+                color: #e2e8f0;
+                padding: var(--space-xl);
+                border-radius: var(--radius-xl);
+                overflow-x: auto;
+                font-family: var(--font-mono);
+                font-size: var(--text-sm);
+                line-height: 1.6;
+                margin: var(--space-xl) 0;
+                box-shadow: var(--shadow-lg);
+                position: relative;
+            }
+
+            pre::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                height: 4px;
+                background: var(--gradient-primary);
+                border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+            }
+
+            code {
+                font-family: var(--font-mono);
+                font-size: 0.9em;
+                background: var(--color-accent-light);
+                color: var(--color-accent-2);
+                padding: 0.15em 0.4em;
+                border-radius: var(--radius-sm);
+            }
+
+            pre code {
+                background: transparent;
+                color: inherit;
+                padding: 0;
+            }
+
+            /* Vocabulary Table */
+            .vocab-table-wrapper {
+                margin: var(--space-xl) 0;
+                border-radius: var(--radius-xl);
+                overflow: hidden;
+                box-shadow: var(--shadow-lg);
+            }
+
+            table {
+                width: 100%;
+                border-collapse: collapse;
+                background: white;
+            }
+
+            thead {
+                background: var(--gradient-primary);
+                color: white;
+            }
+
+            th {
+                padding: var(--space-lg);
+                text-align: left;
+                font-weight: 600;
+                font-size: var(--text-sm);
+                text-transform: uppercase;
+                letter-spacing: 0.05em;
+            }
+
+            td {
+                padding: var(--space-md) var(--space-lg);
+                border-bottom: 1px solid var(--color-border);
+                font-size: var(--text-sm);
+            }
+
+            tbody tr {
+                transition: all 0.3s ease;
+            }
+
+            tbody tr:hover {
+                background: var(--color-accent-light);
+            }
+
+            tbody tr:last-child td {
+                border-bottom: none;
+            }
+
+            /* References Section */
+            .references {
+                background: rgba(255, 255, 255, 0.6);
+                -webkit-backdrop-filter: blur(12px);
+                backdrop-filter: blur(12px);
+                border-radius: var(--radius-xl);
+                padding: var(--space-2xl);
+                margin-top: var(--space-3xl);
+                border: 1px solid var(--color-border);
+            }
+
+            .references h3 {
+                font-size: var(--text-xl);
+                color: var(--color-accent-1);
+                margin-bottom: var(--space-lg);
+            }
+
+            .references ol {
+                list-style-position: inside;
+                padding-left: 0;
+            }
+
+            .references li {
+                margin-bottom: var(--space-md);
+                font-size: var(--text-sm);
+                color: var(--color-base-text-muted);
+            }
+
+            .references li a {
+                color: var(--color-accent-1);
+            }
+
+            /* ===== Footer ===== */
+            footer {
+                background: linear-gradient(180deg, var(--color-base-bg) 0%, var(--color-accent-light) 100%);
+                padding: var(--space-3xl) var(--space-xl);
+                border-top: 1px solid var(--color-border);
+                text-align: center;
+            }
+
+            .footer-inner {
+                max-width: 1400px;
+                margin: 0 auto;
+            }
+
+            .language-selector {
+                display: flex;
+                gap: var(--space-sm);
+                justify-content: center;
+                flex-wrap: wrap;
+                margin-bottom: var(--space-xl);
+            }
+
+            .language-link {
+                padding: var(--space-sm) var(--space-md);
+                border-radius: var(--radius-full);
+                background: rgba(255, 255, 255, 0.7);
+                -webkit-backdrop-filter: blur(8px);
+                backdrop-filter: blur(8px);
+                border: 1px solid var(--color-border);
+                color: var(--color-base-text-muted);
+                text-decoration: none;
+                font-size: var(--text-sm);
+                font-weight: 500;
+                transition: all 0.3s ease;
+            }
+
+            .language-link:hover,
+            .language-link.active {
+                background: var(--gradient-primary);
+                color: white;
+                border-color: transparent;
+                transform: translateY(-2px);
+                box-shadow: var(--shadow-md);
+            }
+
+            .footer-copyright {
+                font-size: var(--text-sm);
+                color: var(--color-base-text-muted);
+            }
+
+            /* ===== Animations ===== */
+            @keyframes pulse {
+
+                0%,
+                100% {
+                    opacity: 1;
+                    transform: scale(1);
                 }
 
-                #sidebar .title {
-                    text-align: center;
-                    position: fixed;
-                    margin-top: 6vh;
-                    left: 0px;
-                    right: 0px;
-                    line-height: 3.5vmax;
-                    font-size: 1.5vmax;
-                    font-family: 'Arial';
+                50% {
+                    opacity: 0.7;
+                    transform: scale(1.2);
+                }
+            }
+
+            @keyframes float {
+
+                0%,
+                100% {
+                    transform: translateY(0);
                 }
 
-                #sidebar .subtitle {
-                    text-align: center;
-                    top: 5vh;
-                    left: 0px;
-                    right: 0px;
-                    position: fixed;
-                    margin-top: 10vh;
-                    font-size: 1.5vmax;
+                50% {
+                    transform: translateY(-15px);
+                }
+            }
+
+            @keyframes rotate {
+                from {
+                    transform: rotate(0deg);
                 }
 
-                #sidebar .title a:link,
-                #sidebar .title a:visited {
-                    text-align: center;
-                    color: #FFFFFF;
+                to {
+                    transform: rotate(360deg);
+                }
+            }
+
+            @keyframes orbit {
+                from {
+                    transform: rotate(0deg) translateX(80px) rotate(0deg);
                 }
 
-                #sidebar .subtitle a:link,
-                #sidebar .subtitle a:visited {
-                    text-align: center;
-                    color: #FFFFFF;
+                to {
+                    transform: rotate(360deg) translateX(80px) rotate(-360deg);
+                }
+            }
+
+            @keyframes orbitReverse {
+                from {
+                    transform: rotate(0deg) translateX(120px) rotate(0deg);
                 }
 
-                .home {
-                    z-index: 100;
-                    width: 100%;
-                    background-color: #009AA6;
-                    font-size: 1.5vmax;
+                to {
+                    transform: rotate(-360deg) translateX(120px) rotate(360deg);
+                }
+            }
+
+            @keyframes nodeGlow {
+
+                0%,
+                100% {
+                    filter: drop-shadow(0 0 8px var(--color-accent-1));
                 }
 
-                .home a:link,
-                .home a:visited {
-                    text-decoration: none;
-                    color: #FFFFFF;
+                50% {
+                    filter: drop-shadow(0 0 20px var(--color-accent-1));
+                }
+            }
+
+            @keyframes dataFlow {
+                0% {
+                    stroke-dashoffset: 100;
+                    opacity: 0;
                 }
 
-                .content {
-                    line-height: 3.8vmax;
-                    font-size: 1.8vmax;
-                    font-family: 'Arial';
-                    margin-top: 22vh;
+                20% {
+                    opacity: 1;
                 }
 
-                .content a:link,
-                .content a:visited {
-                    color: #009AA6;
+                80% {
+                    opacity: 1;
                 }
 
-                .page {
-                    top: 40vh;
-                    width: 95%;
-                    margin-left: 0vw;
+                100% {
+                    stroke-dashoffset: 0;
+                    opacity: 0;
+                }
+            }
+
+            @keyframes fadeInUp {
+                from {
+                    opacity: 0;
+                    transform: translateY(30px);
                 }
 
-                .page img {
-                    max-width: 100%;
-                    max-height: 100%;
-                    border: 0;
+                to {
+                    opacity: 1;
+                    transform: translateY(0);
                 }
+            }
+
+            .hero-content {
+                animation: fadeInUp 0.8s ease-out;
+            }
+
+            /* ===== Responsive ===== */
+            @media (max-width: 768px) {
+                .navbar-inner {
+                    flex-direction: column;
+                    gap: var(--space-sm);
+                }
+
+                .navbar-nav {
+                    flex-wrap: wrap;
+                    justify-content: center;
+                }
+
+                .hero {
+                    min-height: 60vh;
+                    padding-top: 140px;
+                }
+
+                .hero-svg {
+                    width: 250px;
+                    height: 250px;
+                }
+
+                .hero-title {
+                    font-size: var(--text-3xl);
+                }
+
+                main {
+                    padding: var(--space-2xl) var(--space-md);
+                }
+
+                .schema-list {
+                    grid-template-columns: 1fr;
+                }
+
+                pre {
+                    padding: var(--space-md);
+                    font-size: var(--text-xs);
+                }
+            }
+
+            /* ===== Accessibility ===== */
+            @media (prefers-reduced-motion: reduce) {
+
+                *,
+                *::before,
+                *::after {
+                    animation-duration: 0.01ms !important;
+                    animation-iteration-count: 1 !important;
+                    transition-duration: 0.01ms !important;
+                }
+            }
+
+            :focus-visible {
+                outline: 3px solid var(--color-accent-1);
+                outline-offset: 2px;
+                border-radius: var(--radius-sm);
+            }
+
+            /* Floating decorative elements */
+            .floating-node {
+                position: absolute;
+                width: 12px;
+                height: 12px;
+                background: var(--gradient-primary);
+                border-radius: 50%;
+                opacity: 0.3;
+                animation: float 6s ease-in-out infinite;
+                pointer-events: none;
+            }
+
+            .floating-node:nth-child(1) {
+                top: 15%;
+                left: 10%;
+                animation-delay: 0s;
+            }
+
+            .floating-node:nth-child(2) {
+                top: 25%;
+                right: 15%;
+                animation-delay: 1s;
+            }
+
+            .floating-node:nth-child(3) {
+                bottom: 30%;
+                left: 8%;
+                animation-delay: 2s;
+            }
+
+            .floating-node:nth-child(4) {
+                bottom: 20%;
+                right: 10%;
+                animation-delay: 3s;
             }
         </style>
         <script type="application/ld+json">
-        {
-            "@context": "http://schema.org",
-            "@type": "BlogPosting",
-            "mainEntityOfPage": {
-                "@type": "WebPage",
-                "@id": "https://johnsamuel.info"
-            },
-            "articleSection": "blog",
-            "name": "Integrating Linked Data",
-            "headline": "Integrating Linked Data",
-            "description": "Article by John Samuel",
-            "inLanguage": "en",
-            "author": "John Samuel",
-            "datePublished": "2020-05-03 19:04:28",
-            "dateModified": "2020-05-03 19:04:28",
-            "dateCreated": "2020-05-03 19:04:28",
-            "url": "https://johnsamuel.info/en/programming/linkeddata-integration.html",
-            "keywords": ["Blog"]
-        }
+    {
+        "@context": "http://schema.org",
+        "@type": "BlogPosting",
+        "mainEntityOfPage": {
+            "@type": "WebPage",
+            "@id": "https://johnsamuel.info"
+        },
+        "articleSection": "blog",
+        "name": "Integrating Linked Data",
+        "headline": "Integrating Linked Data",
+        "description": "Article by John Samuel",
+        "inLanguage": "en",
+        "author": "John Samuel",
+        "datePublished": "2020-05-03 19:04:28",
+        "dateModified": "2020-05-03 19:04:28",
+        "dateCreated": "2020-05-03 19:04:28",
+        "url": "https://johnsamuel.info/en/programming/linkeddata-integration.html",
+        "keywords": ["Blog"]
+    }
     </script>
     </head>
 
-    <body vocab="http://schema.org/">
-        <div id="sidebar">
-            <div class="title">
-                <h1><a href="./linkeddata-integration.html">Identifying Linked Open Vocabularies</a></h1>
-            </div>
-            <div class="subtitle">
-                <h3><a href="../about.html">John Samuel</a></h3>
-            </div>
-        </div>
-        <div class="page">
-            <div class="home">
-                <ul typeof="BreadcrumbList">
-                    <li property="itemListElement" typeof="ListItem">
-                        <a property="item" typeof="WebPage" href="../index.html">
-                            <span property="name">Home</span>
-                        </a>
-                    </li>
-                    <li property="itemListElement" typeof="ListItem">
-                        <a property="item" typeof="WebPage" href="../programming/index.html">
-                            <span property="name">Programming</span>
-                        </a>
-                    </li>
-                    <li property="itemListElement" typeof="ListItem">
-                        <a property="item" typeof="WebPage" href="../research/research.html">
-                            <span property="name">Research</span>
-                        </a>
-                    </li>
+    <body>
+        <a href="#main-content" class="skip-link">Skip to main content</a>
+
+        <!-- Navigation -->
+        <nav class="navbar" aria-label="Main navigation">
+            <div class="navbar-inner">
+                <a href="../index.html" class="navbar-brand">
+                    John Samuel
+                </a>
+                <ul class="navbar-nav">
+                    <li><a href="../index.html">Home</a></li>
+                    <li><span class="divider">/</span></li>
+                    <li><a href="../programming/index.html">Programming</a></li>
+                    <li><span class="divider">/</span></li>
+                    <li><a href="../research/research.html">Research</a></li>
                 </ul>
             </div>
-            <div class="content">
-                <div
-                    style="background-color: #f0f8ff; border-left: 4px solid #009AA6; padding: 1em; margin-bottom: 1.5em;">
-                    <strong>This article is part of a series on <a
-                            href="../research/knowledge-representation.html">Knowledge Representation and Semantic
-                            Web</a>.</strong>
+        </nav>
+
+        <!-- Hero Section -->
+        <header class="hero">
+            <div class="hero-grid" aria-hidden="true"></div>
+            <div class="floating-node" aria-hidden="true"></div>
+            <div class="floating-node" aria-hidden="true"></div>
+            <div class="floating-node" aria-hidden="true"></div>
+            <div class="floating-node" aria-hidden="true"></div>
+
+            <div class="hero-content">
+                <!-- Custom SVG: Linked Data Network Graph -->
+                <svg class="hero-svg" viewBox="0 0 400 400" aria-hidden="true">
+                    <defs>
+                        <linearGradient id="nodeGradient1" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" stop-color="#009AA6" />
+                            <stop offset="100%" stop-color="#0077b6" />
+                        </linearGradient>
+                        <linearGradient id="nodeGradient2" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" stop-color="#7b68ee" />
+                            <stop offset="100%" stop-color="#009AA6" />
+                        </linearGradient>
+                        <linearGradient id="lineGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                            <stop offset="0%" stop-color="#009AA6" stop-opacity="0.3" />
+                            <stop offset="50%" stop-color="#0077b6" stop-opacity="0.6" />
+                            <stop offset="100%" stop-color="#7b68ee" stop-opacity="0.3" />
+                        </linearGradient>
+                        <filter id="glow">
+                            <feGaussianBlur stdDeviation="3" result="coloredBlur" />
+                            <feMerge>
+                                <feMergeNode in="coloredBlur" />
+                                <feMergeNode in="SourceGraphic" />
+                            </feMerge>
+                        </filter>
+                        <filter id="softGlow">
+                            <feGaussianBlur stdDeviation="2" />
+                        </filter>
+                    </defs>
+
+                    <!-- Background Circle Orbit -->
+                    <circle cx="200" cy="200" r="120" fill="none" stroke="url(#lineGradient)" stroke-width="1"
+                        stroke-dasharray="8 8" opacity="0.4">
+                        <animateTransform attributeName="transform" type="rotate" from="0 200 200" to="360 200 200"
+                            dur="40s" repeatCount="indefinite" />
+                    </circle>
+                    <circle cx="200" cy="200" r="80" fill="none" stroke="url(#lineGradient)" stroke-width="1"
+                        stroke-dasharray="5 5" opacity="0.3">
+                        <animateTransform attributeName="transform" type="rotate" from="360 200 200" to="0 200 200"
+                            dur="30s" repeatCount="indefinite" />
+                    </circle>
+
+                    <!-- Connection Lines -->
+                    <g stroke="url(#lineGradient)" stroke-width="2" fill="none">
+                        <line x1="200" y1="200" x2="200" y2="80" stroke-dasharray="100"
+                            style="animation: dataFlow 3s ease-in-out infinite" />
+                        <line x1="200" y1="200" x2="320" y2="200" stroke-dasharray="100"
+                            style="animation: dataFlow 3s ease-in-out infinite 0.5s" />
+                        <line x1="200" y1="200" x2="200" y2="320" stroke-dasharray="100"
+                            style="animation: dataFlow 3s ease-in-out infinite 1s" />
+                        <line x1="200" y1="200" x2="80" y2="200" stroke-dasharray="100"
+                            style="animation: dataFlow 3s ease-in-out infinite 1.5s" />
+                        <line x1="200" y1="200" x2="285" y2="115" stroke-dasharray="100"
+                            style="animation: dataFlow 3s ease-in-out infinite 2s" />
+                        <line x1="200" y1="200" x2="115" y2="285" stroke-dasharray="100"
+                            style="animation: dataFlow 3s ease-in-out infinite 2.5s" />
+                    </g>
+
+                    <!-- Outer Orbiting Nodes -->
+                    <g style="animation: orbit 12s linear infinite" filter="url(#glow)">
+                        <circle cx="200" cy="200" r="10" fill="url(#nodeGradient2)" />
+                    </g>
+                    <g style="animation: orbitReverse 16s linear infinite" filter="url(#glow)">
+                        <circle cx="200" cy="200" r="8" fill="url(#nodeGradient1)" />
+                    </g>
+
+                    <!-- Central Node -->
+                    <circle cx="200" cy="200" r="35" fill="url(#nodeGradient1)" filter="url(#glow)"
+                        style="animation: nodeGlow 4s ease-in-out infinite" />
+                    <circle cx="200" cy="200" r="25" fill="white" opacity="0.9" />
+                    <text x="200" y="205" text-anchor="middle" font-size="14" font-weight="bold"
+                        fill="#009AA6">LOV</text>
+
+                    <!-- Satellite Nodes - Schema.org -->
+                    <g style="animation: float 5s ease-in-out infinite">
+                        <circle cx="200" cy="80" r="22" fill="url(#nodeGradient1)" filter="url(#glow)" />
+                        <text x="200" y="85" text-anchor="middle" font-size="9" fill="white"
+                            font-weight="600">schema</text>
+                    </g>
+
+                    <!-- FOAF Node -->
+                    <g style="animation: float 6s ease-in-out infinite 1s">
+                        <circle cx="320" cy="200" r="20" fill="url(#nodeGradient2)" filter="url(#glow)" />
+                        <text x="320" y="205" text-anchor="middle" font-size="9" fill="white"
+                            font-weight="600">foaf</text>
+                    </g>
+
+                    <!-- SIOC Node -->
+                    <g style="animation: float 5.5s ease-in-out infinite 2s">
+                        <circle cx="200" cy="320" r="20" fill="url(#nodeGradient1)" filter="url(#glow)" />
+                        <text x="200" y="325" text-anchor="middle" font-size="9" fill="white"
+                            font-weight="600">sioc</text>
+                    </g>
+
+                    <!-- DCT Node -->
+                    <g style="animation: float 6.5s ease-in-out infinite 0.5s">
+                        <circle cx="80" cy="200" r="20" fill="url(#nodeGradient2)" filter="url(#glow)" />
+                        <text x="80" y="205" text-anchor="middle" font-size="9" fill="white"
+                            font-weight="600">dct</text>
+                    </g>
+
+                    <!-- Additional Nodes -->
+                    <g style="animation: float 5s ease-in-out infinite 1.5s">
+                        <circle cx="285" cy="115" r="15" fill="url(#nodeGradient1)" filter="url(#glow)" opacity="0.8" />
+                        <text x="285" y="120" text-anchor="middle" font-size="8" fill="white">xsd</text>
+                    </g>
+
+                    <g style="animation: float 6s ease-in-out infinite 2.5s">
+                        <circle cx="115" cy="285" r="15" fill="url(#nodeGradient2)" filter="url(#glow)" opacity="0.8" />
+                        <text x="115" y="290" text-anchor="middle" font-size="8" fill="white">rdf</text>
+                    </g>
+                </svg>
+
+                <div class="series-badge">
+                    <span>Part of the series on</span>
+                    <a href="../research/knowledge-representation.html">Knowledge Representation and Semantic Web</a>
                 </div>
+
+                <h1 class="hero-title">Identifying Linked Open Vocabularies</h1>
+                <p class="hero-subtitle">
+                    Exploring how to integrate Linked Data vocabularies into personal websites
+                    for enhanced semantic expressiveness and interoperability.
+                </p>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main id="main-content">
+            <article class="content-section">
                 <p>
                     Integrating Linked Data into websites enhances their semantic expressiveness, making content more
                     interoperable and machine-readable. While <a href="https://schema.org/">Schema.org</a> is among the
@@ -332,10 +996,14 @@
                     most commonly used for enriching web content. It is widely supported by major search engines and
                     offers a broad hierarchy of types and properties suitable for general-purpose content.
                 </p>
+
+                <div class="section-header">
+                    <h2>Schema.org Types for Blog Content</h2>
+                </div>
                 <p>
                     For blog-related content, Schema.org provides specific types that are particularly relevant:
                 </p>
-                <ul>
+                <ul class="schema-list">
                     <li><a href="https://schema.org/BlogPosting">schema:BlogPosting</a> – describes individual blog
                         posts, including headline, author, content body, and date metadata.</li>
                     <li><a href="https://schema.org/Article">schema:Article</a> – a general-purpose type for written
@@ -354,13 +1022,16 @@
                     <code>schema:Heading</code> or <code>schema:Section</code>, although these are more commonly
                     abstracted in properties such as <code>articleBody</code> or <code>mainEntityOfPage</code>.
                 </p>
+
+                <div class="section-header">
+                    <h2>JSON-LD Example with Schema.org</h2>
+                </div>
                 <p>
                     The following example illustrates a JSON-LD snippet using the <code>schema:BlogPosting</code> type
                     to annotate a blog article. This includes key metadata such as title, author, publisher, publication
                     date, and keywords.
                 </p>
-                <pre>
-{
+                <pre><code>{
     "@context": "https://schema.org",
     "@type": "BlogPosting",
     "headline": "Integrating Linked Data into a Blog",
@@ -397,8 +1068,11 @@
         "Linked Open Vocabularies"
     ],
     "image": "https://johnsamuel.info/images/blog/linkeddata-integration.jpg"
-}
-                </pre>
+}</code></pre>
+
+                <div class="section-header">
+                    <h2>Alternative Open Vocabularies</h2>
+                </div>
                 <p>
                     Alternative vocabularies such as
                     <strong>Dublin Core Terms</strong>, <strong>FOAF</strong>, and <strong>SIOC</strong> offer
@@ -409,52 +1083,58 @@
                 <p>
                     Below is a brief overview of these vocabularies:
                 </p>
-                <table border="1">
-                    <thead>
-                        <tr>
-                            <th>Prefix</th>
-                            <th>Vocabulary</th>
-                            <th>Purpose</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td><code>dct</code></td>
-                            <td><a href="http://purl.org/dc/terms/">Dublin Core Terms</a></td>
-                            <td>General-purpose metadata: <code>title</code>, <code>creator</code>, <code>date</code>,
-                                <code>subject</code>, etc.
-                            </td>
-                        </tr>
-                        <tr>
-                            <td><code>foaf</code></td>
-                            <td><a href="http://xmlns.com/foaf/0.1/">FOAF</a> (Friend of a Friend)</td>
-                            <td>Describes people, their profiles, online accounts, and social relationships.</td>
-                        </tr>
-                        <tr>
-                            <td><code>sioc</code></td>
-                            <td><a href="http://rdfs.org/sioc/ns#">SIOC</a> (Semantically-Interlinked Online
-                                Communities)</td>
-                            <td>Models online discussion forums, blogs, posts, and user interactions.</td>
-                        </tr>
-                        <tr>
-                            <td><code>xsd</code></td>
-                            <td><a href="http://www.w3.org/2001/XMLSchema#">XML Schema Datatypes</a></td>
-                            <td>Provides datatype specifications such as <code>xsd:dateTime</code>.</td>
-                        </tr>
-                    </tbody>
-                </table>
+                <div class="vocab-table-wrapper">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Prefix</th>
+                                <th>Vocabulary</th>
+                                <th>Purpose</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><code>dct</code></td>
+                                <td><a href="http://purl.org/dc/terms/">Dublin Core Terms</a></td>
+                                <td>General-purpose metadata: <code>title</code>, <code>creator</code>,
+                                    <code>date</code>,
+                                    <code>subject</code>, etc.
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><code>foaf</code></td>
+                                <td><a href="http://xmlns.com/foaf/0.1/">FOAF</a> (Friend of a Friend)</td>
+                                <td>Describes people, their profiles, online accounts, and social relationships.</td>
+                            </tr>
+                            <tr>
+                                <td><code>sioc</code></td>
+                                <td><a href="http://rdfs.org/sioc/ns#">SIOC</a> (Semantically-Interlinked Online
+                                    Communities)</td>
+                                <td>Models online discussion forums, blogs, posts, and user interactions.</td>
+                            </tr>
+                            <tr>
+                                <td><code>xsd</code></td>
+                                <td><a href="http://www.w3.org/2001/XMLSchema#">XML Schema Datatypes</a></td>
+                                <td>Provides datatype specifications such as <code>xsd:dateTime</code>.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
                 <p>
                     These vocabularies are especially valuable when content is intended to be indexed in academic
                     repositories, or knowledge graphs. They offer semantic
                     precision, open governance, and widespread compatibility with RDF tools.
                 </p>
+
+                <div class="section-header">
+                    <h2>JSON-LD with Open Vocabularies</h2>
+                </div>
                 <p>
                     The following JSON-LD example demonstrates how to annotate a blog post using these open
                     vocabularies. It models the post as a <code>sioc:Post</code>, provides general metadata via Dublin
                     Core, and uses FOAF to describe the author.
                 </p>
-                <pre>
-{
+                <pre><code>{
     "@context": {
         "dct": "http://purl.org/dc/terms/",
         "foaf": "http://xmlns.com/foaf/0.1/",
@@ -497,14 +1177,17 @@
         "SIOC",
         "Semantic Web"
     ]
-}
-                </pre>
+}</code></pre>
                 <p>
                     Using these vocabularies allows for a more modular and standards-compliant representation of
                     metadata, and supports integration into datasets beyond commercial search engines. Their use is
                     common in institutional repositories, digital preservation frameworks, and community-driven
                     publishing platforms.
                 </p>
+
+                <div class="section-header">
+                    <h2>Benefits of Semantic Annotations</h2>
+                </div>
                 <p>
                     By incorporating semantic annotations into blog content, web publishers can significantly enhance
                     both the <strong>discoverability</strong> and <strong>machine interpretability</strong> of their
@@ -531,27 +1214,42 @@
                     vocabularies relate to each other, track their adoption, and make informed decisions about which
                     ones to apply in a given context.
                 </p>
-                <h3>References</h3>
-                <ol>
-                    <li id="lov">
-                        <a href="https://lov.linkeddata.es/dataset/lov">Linked Open Vocabularies (LOV)</a>
-                    </li>
-                    <li id="lovdependency">
-                        <a href="https://ercim-news.ercim.eu/en96/special/linked-open-vocabularies">
-                            LOV: Managing Vocabulary Dependencies
-                        </a>
-                    </li>
-                    <li id="lovgateway">
-                        Vandenbussche, Pierre-Yves, et al. “Linked Open Vocabularies (LOV): A Gateway to Reusable
-                        Semantic Vocabularies on the Web.”
-                        <em>Semantic Web</em>, vol. 8, no. 3, Jan. 2017, pp. 437–52.
-                        <a href="https://content.iospress.com/articles/semantic-web/sw213">
-                            https://doi.org/10.3233/SW-160213
-                        </a>
-                    </li>
-                </ol>
+
+                <div class="references">
+                    <h3>References</h3>
+                    <ol>
+                        <li id="lovref">
+                            <a href="https://lov.linkeddata.es/dataset/lov">Linked Open Vocabularies (LOV)</a>
+                        </li>
+                        <li id="lovdependency">
+                            <a href="https://ercim-news.ercim.eu/en96/special/linked-open-vocabularies">
+                                LOV: Managing Vocabulary Dependencies
+                            </a>
+                        </li>
+                        <li id="lovgateway">
+                            Vandenbussche, Pierre-Yves, et al. "Linked Open Vocabularies (LOV): A Gateway to Reusable
+                            Semantic Vocabularies on the Web."
+                            <em>Semantic Web</em>, vol. 8, no. 3, Jan. 2017, pp. 437–52.
+                            <a href="https://content.iospress.com/articles/semantic-web/sw213">
+                                https://doi.org/10.3233/SW-160213
+                            </a>
+                        </li>
+                    </ol>
+                </div>
+            </article>
+        </main>
+
+        <!-- Footer with Language Links -->
+        <footer>
+            <div class="footer-inner">
+                <nav class="language-selector" aria-label="Language selection">
+                    <a href="./vocabulary-personal-website.html" class="language-link active">English</a>
+                </nav>
+                <p class="footer-copyright">
+                    © 2025 John Samuel. Content licensed under Creative Commons.
+                </p>
             </div>
-        </div>
+        </footer>
     </body>
 
 </html>
