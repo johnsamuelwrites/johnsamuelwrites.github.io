@@ -2,337 +2,715 @@
 <html lang="en">
 
     <head>
-        <meta charset="utf-8" />
-        <meta http-equiv="Content-Language" content="en" />
-        <link rel="shortcut icon" href="../../images/logo/favicon.png" />
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta http-equiv="Content-Language" content="en">
+        <link rel="shortcut icon" href="../../images/logo/favicon.png">
         <title>Building a Multilingual Command Line: John Samuel</title>
-        <style type="text/css">
-            body {
-                background-color: #FFFFFF;
+        <script type="application/ld+json">
+    {
+        "@context": "http://schema.org",
+        "@type": "BlogPosting",
+        "mainEntityOfPage": {
+            "@type": "WebPage",
+            "@id": "https://johnsamuel.info"
+        },
+        "articleSection": "blog",
+        "name": "Building a Multilingual Command Line",
+        "headline": "Building a Multilingual Command Line",
+        "description": "Article by John Samuel",
+        "inLanguage": "en",
+        "author": "John Samuel",
+        "datePublished": "2019-05-05 09:35:35",
+        "dateModified": "2020-08-14 22:43:37",
+        "dateCreated": "2019-05-05 09:35:35",
+        "url": "https://johnsamuel.info/en/research/multilingual-command-line.html",
+        "image": {
+            "@type": "imageObject",
+            "url": "https://johnsamuel.info/images/writings/coconut-trees-landscape.svg",
+            "height": "600",
+            "width": "800"
+        },
+        "publisher": {
+            "@type": "Organization",
+            "name": "John Samuel",
+            "logo": {
+                "@type": "imageObject",
+                "url": "https://johnsamuel.info/images/writings/coconut-trees-landscape.svg"
+            }
+        },
+        "keywords": ["Blog"]
+    }
+    </script>
+        <style>
+            /* Design Tokens - Terminal/CLI Theme */
+            :root {
+                /* Base Colors - Dark Terminal Aesthetic */
+                --color-base-bg: #0a0e1a;
+                --color-base-surface: #151b2d;
+                --color-base-text: #e4e7eb;
+                --color-base-text-muted: #9ca3af;
+
+                /* Theme Accents - Terminal Green & Cyan */
+                --color-accent-1: #00ff9f;
+                --color-accent-2: #00d4aa;
+                --color-accent-3: #00bcd4;
+                --color-accent-4: #64ffda;
+                --color-accent-purple: #c792ea;
+                --color-accent-orange: #ffab70;
+                --color-accent-light: rgba(0, 255, 159, 0.1);
+
+                /* Functional Colors */
+                --color-shadow: rgba(0, 255, 159, 0.15);
+                --color-border: rgba(0, 255, 159, 0.2);
+                --color-hover: rgba(0, 255, 159, 0.1);
+
+                /* Gradients */
+                --gradient-primary: linear-gradient(135deg, var(--color-accent-1), var(--color-accent-3));
+                --gradient-terminal: linear-gradient(180deg, #0a0e1a 0%, #151b2d 100%);
+                --gradient-hero: linear-gradient(135deg, #00ff9f 0%, #00bcd4 50%, #c792ea 100%);
+
+                /* Spacing Scale */
+                --space-xs: 0.25rem;
+                --space-sm: 0.5rem;
+                --space-md: 1rem;
+                --space-lg: 1.5rem;
+                --space-xl: 2rem;
+                --space-2xl: 3rem;
+                --space-3xl: 4rem;
+                --space-4xl: 6rem;
+
+                /* Typography Scale */
+                --text-xs: clamp(0.75rem, 0.7rem + 0.25vw, 0.875rem);
+                --text-sm: clamp(0.875rem, 0.8rem + 0.35vw, 1rem);
+                --text-base: clamp(1rem, 0.95rem + 0.25vw, 1.125rem);
+                --text-lg: clamp(1.125rem, 1.05rem + 0.35vw, 1.25rem);
+                --text-xl: clamp(1.25rem, 1.15rem + 0.5vw, 1.5rem);
+                --text-2xl: clamp(1.5rem, 1.3rem + 1vw, 2rem);
+                --text-3xl: clamp(2rem, 1.6rem + 2vw, 2.5rem);
+                --text-4xl: clamp(2.5rem, 2rem + 2.5vw, 3.5rem);
+
+                /* Font Stack */
+                --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+                --font-mono: 'SF Mono', Monaco, 'Cascadia Code', Consolas, 'Courier New', monospace;
+
+                /* Shadows */
+                --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3), 0 1px 3px rgba(0, 0, 0, 0.4);
+                --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.4), 0 2px 4px rgba(0, 0, 0, 0.5);
+                --shadow-lg: 0 10px 24px rgba(0, 0, 0, 0.5), 0 4px 8px rgba(0, 0, 0, 0.4);
+                --shadow-xl: 0 20px 40px rgba(0, 0, 0, 0.6), 0 8px 16px rgba(0, 0, 0, 0.5);
+                --shadow-glow: 0 0 20px var(--color-shadow), 0 0 40px rgba(0, 255, 159, 0.1);
+
+                /* Border Radius */
+                --radius-sm: 4px;
+                --radius-md: 8px;
+                --radius-lg: 12px;
+                --radius-xl: 16px;
+                --radius-2xl: 24px;
             }
 
-            #sidebar {
-                position: fixed;
-                background-color: #1B80CF;
-                top: 0;
-                left: 0;
-                bottom: 0;
-                width: 30vw;
-            }
-
-            #sidebar .title {
-                position: relative;
-                text-align: center;
-                line-height: 4vmax;
-                font-size: 1.4vmax;
-                font-family: 'Arial';
-                margin-top: 30vh;
-            }
-
-            #sidebar .title a:link,
-            #sidebar .title a:visited {
-                color: #FFFFFF;
-                text-decoration: none;
-            }
-
-            .subtitle {
-                top: 50vh;
-                text-align: center;
-                line-height: 1.3vmax;
-                font-family: 'Arial';
-                font-size: 1.5vmax;
-                color: #FFFFFF;
-            }
-
-            .subtitle a:link,
-            .subtitle a:visited {
-                color: #FFFFFF;
-                text-decoration: none;
-            }
-
-            .licence {
-                position: fixed;
-                text-align: right;
-                bottom: 0;
-                right: 0;
-            }
-
-            .home {
-                position: fixed;
-                text-align: left;
-                font-family: 'Arial';
-                color: #D3D3D3;
-                z-index: 100;
-                width: 100%;
-                background-color: #FFFFFF;
-                top: 0px;
-                margin-bottom: 10px;
-                padding-bottom: 10px;
-            }
-
-            .home a:link,
-            .home a:visited {
-                text-decoration: none;
-                color: #D3D3D3;
-            }
-
-            .home ul {
+            /* Reset & Base Styles */
+            *,
+            *::before,
+            *::after {
+                box-sizing: border-box;
                 margin: 0;
                 padding: 0;
-                text-align: left;
-                list-style: none;
             }
 
-            .home li {
-                position: relative;
-                float: left;
-                padding-top: 15px;
-                margin-right: 1em;
-                font-family: 'Arial';
+            html {
+                scroll-behavior: smooth;
+                scroll-padding-top: 100px;
             }
 
-            .home li:hover {
-                display: block;
+            body {
+                font-family: var(--font-sans);
+                font-size: var(--text-base);
+                line-height: 1.7;
+                color: var(--color-base-text);
+                background: var(--gradient-terminal);
+                min-height: 100vh;
+                letter-spacing: -0.005em;
+                overflow-x: hidden;
             }
 
-            .home a:link,
-            .home a:visited {
-                color: #D3D3D3;
-            }
-
-            .home li:hover a:link,
-            .home li:hover a:visited {
+            /* Skip Link */
+            .skip-link {
+                position: absolute;
+                top: -100px;
+                left: 0;
+                background: var(--color-accent-1);
+                color: var(--color-base-bg);
+                padding: var(--space-md);
                 text-decoration: none;
-                padding: 15px;
-                color: #FFFFFF;
-                background-color: #1B80CF;
+                border-radius: var(--radius-md);
+                z-index: 1000;
+                font-weight: 600;
             }
 
-            .content {
-                line-height: 1.9vmax;
-                font-size: 1.2vmax;
-                font-family: 'Arial';
-                margin-top: 15vh;
-                width: 90%;
+            .skip-link:focus {
+                top: var(--space-md);
+                left: var(--space-md);
             }
 
-            .content h2,
-            h3,
-            h4 {
-                color: #1B80CF;
-            }
-
-            .content a:link,
-            .content a:visited {
-                color: #1B80CF;
-            }
-
-            .content h3 {
-                color: #1B80CF;
-            }
-
-            .content h2::before,
-            .content h3::before {
-                display: block;
-                content: " ";
-                visibility: hidden;
-                height: 50px;
-                margin-top: -50px;
-                pointer-events: none;
-                background-color: #FFFFFF;
-            }
-
-            .content a:link,
-            .content a:visited {
-                color: #1B80CF;
-            }
-
-            .content li {
-                margin: 5px;
-            }
-
-            .page {
-                width: 65vw;
+            /* Animated Background Grid */
+            body::before {
+                content: '';
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
                 height: 100%;
-                margin-left: 30vw;
-                overflow: hidden;
-                padding: 0 1em;
-                font-family: 'Arial';
+                background-image:
+                    linear-gradient(rgba(0, 255, 159, 0.03) 1px, transparent 1px),
+                    linear-gradient(90deg, rgba(0, 255, 159, 0.03) 1px, transparent 1px);
+                background-size: 50px 50px;
+                pointer-events: none;
+                z-index: 0;
+                animation: gridPulse 20s ease-in-out infinite;
             }
 
-            .content figure img {
+            @keyframes gridPulse {
+
+                0%,
+                100% {
+                    opacity: 0.3;
+                }
+
+                50% {
+                    opacity: 0.6;
+                }
+            }
+
+            /* Terminal Cursor Effect */
+            body::after {
+                content: '';
+                position: fixed;
+                width: 10px;
+                height: 20px;
+                background: var(--color-accent-1);
+                top: 20px;
+                right: 20px;
+                opacity: 0;
+                animation: blink 1.5s infinite;
+                z-index: 0;
+            }
+
+            @keyframes blink {
+
+                0%,
+                49% {
+                    opacity: 1;
+                }
+
+                50%,
+                100% {
+                    opacity: 0;
+                }
+            }
+
+            /* Navigation */
+            .nav-container {
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                z-index: 100;
+                background: rgba(21, 27, 45, 0.95);
+                -webkit-backdrop-filter: blur(12px) saturate(180%);
+                backdrop-filter: blur(12px) saturate(180%);
+                border-bottom: 1px solid var(--color-border);
+                box-shadow: var(--shadow-md);
+            }
+
+            .nav-wrapper {
+                max-width: 1400px;
+                margin: 0 auto;
+                padding: var(--space-lg) var(--space-xl);
+                display: flex;
+                align-items: center;
+                gap: var(--space-xl);
+            }
+
+            .site-name {
+                font-size: var(--text-lg);
+                font-weight: 700;
+                background: var(--gradient-hero);
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                background-clip: text;
+                text-decoration: none;
+                letter-spacing: -0.02em;
                 margin-right: auto;
-                margin-left: auto;
-                width: 100%;
-                height: 400px;
+                transition: all 0.3s ease;
+                position: relative;
             }
 
-            .content figure {
-                margin-right: auto;
-                margin-left: auto;
-                width: 100%;
-                padding: 10vh;
+            .site-name::before {
+                content: '$ ';
+                color: var(--color-accent-1);
+                -webkit-text-fill-color: var(--color-accent-1);
             }
 
-            .page figure {
-                margin-right: auto;
-                margin-left: auto;
-                height: 400px;
-                width: 100%;
+            .site-name:hover {
+                transform: scale(1.05);
+                filter: brightness(1.2);
             }
 
-            .page figure>figcaption {
+            .breadcrumb {
+                list-style: none;
+                display: flex;
+                gap: var(--space-sm);
+                align-items: center;
+                font-size: var(--text-sm);
+            }
+
+            .breadcrumb li::after {
+                content: '>';
+                margin-left: var(--space-sm);
+                color: var(--color-accent-1);
+            }
+
+            .breadcrumb li:last-child::after {
+                content: '';
+            }
+
+            .breadcrumb a {
+                color: var(--color-base-text-muted);
+                text-decoration: none;
+                transition: color 0.3s ease;
+            }
+
+            .breadcrumb a:hover {
+                color: var(--color-accent-1);
+            }
+
+            /* Main Container */
+            .container {
+                max-width: 1200px;
+                margin: 0 auto;
+                padding: 120px var(--space-xl) var(--space-4xl);
+                position: relative;
+                z-index: 1;
+            }
+
+            /* Hero Section */
+            .hero {
+                margin-bottom: var(--space-4xl);
                 text-align: center;
-                font-weight: bold;
+                position: relative;
             }
 
-            .page img {
+            .hero-title {
+                font-size: var(--text-4xl);
+                font-weight: 800;
+                letter-spacing: -0.03em;
+                margin-bottom: var(--space-lg);
+                color: var(--color-accent-1);
+                text-shadow: 0 0 30px rgba(0, 255, 159, 0.5);
+                animation: fadeInUp 1s ease forwards;
+            }
+
+            .hero-subtitle {
+                font-size: var(--text-lg);
+                color: var(--color-base-text-muted);
+                max-width: 800px;
+                margin: 0 auto var(--space-2xl);
+                line-height: 1.8;
+            }
+
+            .series-badge {
+                display: inline-block;
+                padding: var(--space-sm) var(--space-lg);
+                background: rgba(0, 255, 159, 0.1);
+                border: 1px solid var(--color-accent-1);
+                border-radius: var(--radius-full);
+                color: var(--color-accent-1);
+                font-size: var(--text-sm);
+                margin-bottom: var(--space-xl);
+                text-decoration: none;
+                transition: all 0.3s ease;
+            }
+
+            .series-badge:hover {
+                background: rgba(0, 255, 159, 0.2);
+                transform: translateY(-2px);
+                box-shadow: var(--shadow-glow);
+            }
+
+            @keyframes fadeInUp {
+                from {
+                    opacity: 0;
+                    transform: translateY(30px);
+                }
+
+                to {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            }
+
+            /* SVG Illustration */
+            .hero-illustration {
+                max-width: 700px;
+                margin: var(--space-3xl) auto;
+                opacity: 0;
+                animation: fadeInUp 1s ease forwards 0.3s;
+            }
+
+            /* Abstract */
+            .abstract {
+                background: rgba(21, 27, 45, 0.8);
+                -webkit-backdrop-filter: blur(12px) saturate(180%);
+                backdrop-filter: blur(12px) saturate(180%);
+                border: 1px solid var(--color-border);
+                border-radius: var(--radius-2xl);
+                padding: var(--space-2xl);
+                margin-bottom: var(--space-4xl);
+                box-shadow: var(--shadow-glow);
+                position: relative;
+                overflow: hidden;
+            }
+
+            .abstract::before {
+                content: '//';
+                position: absolute;
+                top: var(--space-md);
+                left: var(--space-md);
+                color: var(--color-accent-1);
+                font-family: var(--font-mono);
+                font-size: var(--text-sm);
+                opacity: 0.5;
+            }
+
+            .abstract p {
+                font-style: italic;
+                color: var(--color-base-text-muted);
+                line-height: 1.9;
+                padding-left: var(--space-xl);
+            }
+
+            /* Content Sections */
+            .content-section {
+                margin-bottom: var(--space-4xl);
+            }
+
+            .content-section h3 {
+                font-size: var(--text-2xl);
+                font-weight: 700;
+                color: var(--color-accent-1);
+                margin-bottom: var(--space-xl);
+                letter-spacing: -0.02em;
+                position: relative;
+                padding-left: var(--space-lg);
+            }
+
+            .content-section h3::before {
+                content: '>';
+                position: absolute;
+                left: 0;
+                color: var(--color-accent-3);
+                animation: pulse 2s ease-in-out infinite;
+            }
+
+            @keyframes pulse {
+
+                0%,
+                100% {
+                    opacity: 1;
+                }
+
+                50% {
+                    opacity: 0.5;
+                }
+            }
+
+            .content-section p {
+                margin-bottom: var(--space-lg);
+                line-height: 1.9;
+                color: var(--color-base-text);
+            }
+
+            /* Solutions List */
+            .solutions-list {
+                list-style: none;
+                padding: 0;
+                margin: var(--space-2xl) 0;
+            }
+
+            .solutions-list li {
+                background: rgba(21, 27, 45, 0.8);
+                border: 1px solid var(--color-border);
+                border-left: 4px solid var(--color-accent-1);
+                border-radius: var(--radius-lg);
+                padding: var(--space-lg);
+                margin-bottom: var(--space-lg);
+                transition: all 0.3s ease;
+            }
+
+            .solutions-list li:hover {
+                background: rgba(21, 27, 45, 1);
+                border-left-width: 8px;
+                transform: translateX(4px);
+                box-shadow: var(--shadow-glow);
+            }
+
+            .solutions-list b {
+                color: var(--color-accent-1);
+                font-family: var(--font-mono);
+            }
+
+            /* Command Examples */
+            .command-examples {
+                list-style: none;
+                padding: 0;
+                margin: var(--space-lg) 0;
+            }
+
+            .command-examples li {
+                font-family: var(--font-mono);
+                font-size: var(--text-sm);
+                padding: var(--space-sm) var(--space-md);
+                margin-bottom: var(--space-sm);
+                background: rgba(0, 0, 0, 0.4);
+                border-left: 3px solid var(--color-accent-1);
+                border-radius: var(--radius-sm);
+                color: var(--color-accent-4);
+            }
+
+            .command-examples li::before {
+                content: '$ ';
+                color: var(--color-accent-1);
+                margin-right: var(--space-sm);
+            }
+
+            /* Code Blocks */
+            code {
+                display: block;
+                font-family: var(--font-mono);
+                font-size: var(--text-sm);
+                line-height: 1.8;
+                background: rgba(0, 0, 0, 0.6);
+                border: 1px solid var(--color-border);
+                border-radius: var(--radius-lg);
+                padding: var(--space-xl);
+                margin: var(--space-xl) 0;
+                overflow-x: auto;
+                position: relative;
+                box-shadow: var(--shadow-glow);
+            }
+
+            code::before {
+                content: '# bash';
+                position: absolute;
+                top: var(--space-sm);
+                right: var(--space-md);
+                font-size: var(--text-xs);
+                color: var(--color-base-text-muted);
+                opacity: 0.6;
+            }
+
+            code span[style*="color:brown"] {
+                color: var(--color-accent-orange) !important;
+                font-weight: 600;
+            }
+
+            code span[style*="color:red"] {
+                color: var(--color-accent-1) !important;
+            }
+
+            code span[style*="color:green"] {
+                color: var(--color-accent-3) !important;
+                font-weight: 600;
+            }
+
+            /* Figures */
+            figure {
+                margin: var(--space-3xl) 0;
+                text-align: center;
+            }
+
+            figure img {
                 max-width: 100%;
-                max-height: 100%;
+                height: auto;
+                border-radius: var(--radius-xl);
+                border: 1px solid var(--color-border);
+                box-shadow: var(--shadow-lg);
+                background: rgba(255, 255, 255, 0.05);
+                padding: var(--space-lg);
             }
 
-            @media (max-width: 640px),
-            screen and (orientation: portrait) {
-                body {
-                    max-width: 100%;
-                    max-height: 100%;
+            figcaption {
+                margin-top: var(--space-lg);
+                font-size: var(--text-sm);
+                color: var(--color-base-text-muted);
+                font-style: italic;
+            }
+
+            /* References */
+            .references-list {
+                list-style: none;
+                counter-reset: ref-counter;
+            }
+
+            .references-list li {
+                counter-increment: ref-counter;
+                margin-bottom: var(--space-lg);
+                padding-left: var(--space-2xl);
+                position: relative;
+            }
+
+            .references-list li::before {
+                content: '[' counter(ref-counter) ']';
+                position: absolute;
+                left: 0;
+                color: var(--color-accent-1);
+                font-weight: 600;
+                font-size: var(--text-sm);
+                font-family: var(--font-mono);
+            }
+
+            .references-list a {
+                color: var(--color-accent-3);
+                text-decoration: none;
+                border-bottom: 1px solid transparent;
+                transition: all 0.3s ease;
+            }
+
+            .references-list a:hover {
+                color: var(--color-accent-1);
+                border-bottom-color: var(--color-accent-1);
+            }
+
+            /* Links */
+            a {
+                color: var(--color-accent-3);
+                text-decoration: none;
+                transition: color 0.3s ease;
+            }
+
+            a:hover {
+                color: var(--color-accent-1);
+            }
+
+            sup a {
+                color: var(--color-accent-1);
+                font-weight: 600;
+            }
+
+            /* Footer */
+            .footer {
+                background: rgba(21, 27, 45, 0.95);
+                -webkit-backdrop-filter: blur(12px) saturate(180%);
+                backdrop-filter: blur(12px) saturate(180%);
+                border-top: 1px solid var(--color-border);
+                padding: var(--space-2xl) var(--space-xl);
+                margin-top: var(--space-4xl);
+            }
+
+            .footer-content {
+                max-width: 1200px;
+                margin: 0 auto;
+                display: flex;
+                flex-direction: column;
+                gap: var(--space-xl);
+                align-items: center;
+                text-align: center;
+            }
+
+            .language-links {
+                display: flex;
+                gap: var(--space-md);
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+
+            .language-links a {
+                color: var(--color-base-text-muted);
+                text-decoration: none;
+                padding: var(--space-sm) var(--space-md);
+                border: 1px solid var(--color-border);
+                border-radius: var(--radius-md);
+                transition: all 0.3s ease;
+                font-size: var(--text-sm);
+                font-family: var(--font-mono);
+            }
+
+            .language-links a:hover {
+                background: var(--color-hover);
+                color: var(--color-accent-1);
+                border-color: var(--color-accent-1);
+                box-shadow: var(--shadow-glow);
+            }
+
+            .footer-text {
+                font-size: var(--text-sm);
+                color: var(--color-base-text-muted);
+            }
+
+            /* Responsive Design */
+            @media (max-width: 768px) {
+                .nav-wrapper {
+                    flex-direction: column;
+                    gap: var(--space-md);
+                    padding: var(--space-md);
                 }
 
-                #sidebar {
-                    position: fixed;
-                    background-color: #1B80CF;
-                    top: 0;
-                    left: 0;
-                    bottom: 80vh;
-                    width: 100vw;
+                .site-name {
+                    margin-right: 0;
                 }
 
-                #sidebar .title {
-                    text-align: center;
-                    position: fixed;
-                    margin-top: 6vh;
-                    left: 0px;
-                    right: 0px;
-                    line-height: 3.5vmax;
-                    font-size: 1.5vmax;
-                    font-family: 'Arial';
+                .breadcrumb {
+                    font-size: var(--text-xs);
                 }
 
-                #sidebar .subtitle {
-                    text-align: center;
-                    top: 5vh;
-                    left: 0px;
-                    right: 0px;
-                    position: fixed;
-                    margin-top: 10vh;
-                    font-size: 1.5vmax;
+                .container {
+                    padding: 100px var(--space-md) var(--space-2xl);
                 }
 
-                #sidebar .title a:link,
-                #sidebar .title a:visited {
-                    text-align: center;
-                    color: #FFFFFF;
+                .hero-title {
+                    font-size: var(--text-3xl);
                 }
 
-                #sidebar .subtitle a:link,
-                #sidebar .subtitle a:visited {
-                    text-align: center;
-                    color: #FFFFFF;
+                code {
+                    padding: var(--space-md);
+                    font-size: var(--text-xs);
                 }
 
-                .home {
-                    z-index: 100;
-                    width: 100%;
-                    background-color: #1B80CF;
-                    font-size: 1.5vmax;
+                figure {
+                    margin: var(--space-2xl) 0;
                 }
+            }
 
-                .home a:link,
-                .home a:visited {
-                    text-decoration: none;
-                    color: #FFFFFF;
-                }
+            /* Accessibility - Reduced Motion */
+            @media (prefers-reduced-motion: reduce) {
 
-                .content {
-                    line-height: 3.8vmax;
-                    font-size: 1.8vmax;
-                    font-family: 'Arial';
-                    margin-top: 22vh;
+                *,
+                *::before,
+                *::after {
+                    animation-duration: 0.01ms !important;
+                    animation-iteration-count: 1 !important;
+                    transition-duration: 0.01ms !important;
                 }
+            }
 
-                .content a:link,
-                .content a:visited {
-                    color: #1B80CF;
-                }
-
-                .page {
-                    top: 40vh;
-                    width: 95%;
-                    margin-left: 0vw;
-                }
-
-                .page img {
-                    max-width: 100%;
-                    max-height: 100%;
-                    border: 0;
-                }
+            /* Focus States */
+            a:focus,
+            button:focus {
+                outline: 3px solid var(--color-accent-1);
+                outline-offset: 2px;
             }
         </style>
-        <script type="application/ld+json">
-        {
-            "@context": "http://schema.org",
-            "@type": "BlogPosting",
-            "mainEntityOfPage": {
-                "@type": "WebPage",
-                "@id": "https://johnsamuel.info"
-            },
-            "articleSection": "blog",
-            "name": "Building a Multilingual Command Line",
-            "headline": "Building a Multilingual Command Line",
-            "description": "Article by John Samuel",
-            "inLanguage": "en",
-            "author": "John Samuel",
-            "datePublished": "2019-05-05 09:35:35",
-            "dateModified": "2020-08-14 22:43:37",
-            "dateCreated": "2019-05-05 09:35:35",
-            "url": "https://johnsamuel.info/en/research/multilingual-command-line.html",
-            "image": {
-                "@type": "imageObject",
-                "url": "https://johnsamuel.info/images/writings/coconut-trees-landscape.svg",
-                "height": "600",
-                "width": "800"
-            },
-            "publisher": {
-                "@type": "Organization",
-                "name": "John Samuel",
-                "logo": {
-                    "@type": "imageObject",
-                    "url": "https://johnsamuel.info/images/writings/coconut-trees-landscape.svg"
-                }
-            },
-            "keywords": ["Blog"]
-        }
-    </script>
     </head>
 
     <body vocab="http://schema.org/" typeof="Website">
-        <div id="sidebar">
-            <div id="sidebar">
-                <div class="title">
-                    <h1 lang="en"><a href="./index.html" property="url" typeof="WebPage"><span typeof="WebPage">Building
-                                a
-                                Multilingual Command Line</span></a></h1>
-                </div>
-                <div class="subtitle">
-                    <h3 lang="en"><a href="../../index.html" property="url" typeof="WebPage"><span typeof="WebPage"
-                                property="author">John Samuel</span></a></h3>
-                </div>
-            </div>
-        </div>
+        <a href="#main-content" class="skip-link">Skip to main content</a>
 
-        <div class="page" typeof="WebPage">
-            <div class="home">
-                <ul typeof="BreadcrumbList">
+        <!-- Navigation -->
+        <nav class="nav-container" role="navigation" aria-label="Main navigation">
+            <div class="nav-wrapper">
+                <a href="../../index.html" class="site-name">John Samuel</a>
+                <ul class="breadcrumb" typeof="BreadcrumbList">
                     <li property="itemListElement" typeof="ListItem">
                         <a property="item" typeof="WebPage" href="../index.html">
                             <span property="name">Home</span>
@@ -344,331 +722,446 @@
                         </a>
                     </li>
                 </ul>
-
             </div>
-            <div class="content">
+        </nav>
+
+        <!-- Main Content -->
+        <main id="main-content" class="container" typeof="WebPage">
+            <!-- Hero Section -->
+            <header class="hero">
+                <a href="../programming/command-line-arguments.html" class="series-badge">← Part 2 of Multilingual
+                    Application Development Series</a>
+                <h1 class="hero-title">Building a Multilingual Command Line</h1>
+                <p class="hero-subtitle">Enabling non-English speakers to interact with computers in their native
+                    languages</p>
+
+                <!-- SVG Illustration -->
+                <svg class="hero-illustration" viewBox="0 0 700 400" xmlns="http://www.w3.org/2000/svg"
+                    aria-hidden="true">
+                    <!-- Definitions -->
+                    <defs>
+                        <linearGradient id="terminalGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" style="stop-color:#00ff9f;stop-opacity:1" />
+                            <stop offset="50%" style="stop-color:#00bcd4;stop-opacity:1" />
+                            <stop offset="100%" style="stop-color:#c792ea;stop-opacity:1" />
+                        </linearGradient>
+
+                        <filter id="terminalGlow">
+                            <feGaussianBlur stdDeviation="4" result="coloredBlur" />
+                            <feMerge>
+                                <feMergeNode in="coloredBlur" />
+                                <feMergeNode in="SourceGraphic" />
+                            </feMerge>
+                        </filter>
+
+                        <linearGradient id="screenGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+                            <stop offset="0%" style="stop-color:#151b2d;stop-opacity:1" />
+                            <stop offset="100%" style="stop-color:#0a0e1a;stop-opacity:1" />
+                        </linearGradient>
+                    </defs>
+
+                    <!-- Central Terminal Window -->
+                    <rect x="150" y="80" width="400" height="280" rx="12" fill="url(#screenGradient)"
+                        stroke="url(#terminalGradient)" stroke-width="2" filter="url(#terminalGlow)" />
+
+                    <!-- Terminal Header Bar -->
+                    <rect x="150" y="80" width="400" height="30" rx="12" fill="rgba(0, 255, 159, 0.1)" stroke="none" />
+                    <circle cx="170" cy="95" r="5" fill="#ff5f56" />
+                    <circle cx="190" cy="95" r="5" fill="#ffbd2e" />
+                    <circle cx="210" cy="95" r="5" fill="#27c93f" />
+
+                    <!-- Terminal Title -->
+                    <text x="350" y="100" text-anchor="middle" fill="#00ff9f" font-size="12"
+                        font-family="monospace">bash - multilingual</text>
+
+                    <!-- Command Lines with Blinking Effect -->
+                    <g font-family="monospace" font-size="14">
+                        <!-- English Command -->
+                        <text x="170" y="140" fill="#00ff9f">$ </text>
+                        <text x="185" y="140" fill="#00bcd4">list files</text>
+
+                        <!-- French Command -->
+                        <text x="170" y="170" fill="#00ff9f">$ </text>
+                        <text x="185" y="170" fill="#00bcd4">affiche fichiers</text>
+
+                        <!-- Malayalam Command -->
+                        <text x="170" y="200" fill="#00ff9f">$ </text>
+                        <text x="185" y="200" fill="#00bcd4">ഫയലുകൾ കാണിക്കുക</text>
+
+                        <!-- Cursor Animation -->
+                        <rect x="310" y="193" width="8" height="16" fill="#00ff9f">
+                            <animate attributeName="opacity" values="1;0;1" dur="1.5s" repeatCount="indefinite" />
+                        </rect>
+
+                        <!-- Output -->
+                        <text x="170" y="235" fill="#9ca3af" font-size="12">file1.txt</text>
+                        <text x="170" y="255" fill="#9ca3af" font-size="12">file2.txt</text>
+                        <text x="170" y="275" fill="#9ca3af" font-size="12">directory1/</text>
+
+                        <!-- Next Prompt -->
+                        <text x="170" y="310" fill="#00ff9f">$ </text>
+                        <rect x="185" y="303" width="8" height="16" fill="#00ff9f" opacity="0.3">
+                            <animate attributeName="opacity" values="0.3;1;0.3" dur="2s" repeatCount="indefinite" />
+                        </rect>
+                    </g>
+
+                    <!-- Language Nodes Around Terminal -->
+                    <g id="languageNodes">
+                        <!-- English Node -->
+                        <circle cx="100" cy="120" r="15" fill="#00ff9f" opacity="0.3" filter="url(#terminalGlow)">
+                            <animate attributeName="r" values="15;18;15" dur="3s" repeatCount="indefinite" />
+                        </circle>
+                        <text x="100" y="125" text-anchor="middle" fill="#00ff9f" font-size="14"
+                            font-weight="bold">EN</text>
+
+                        <!-- French Node -->
+                        <circle cx="600" cy="160" r="15" fill="#00bcd4" opacity="0.3" filter="url(#terminalGlow)">
+                            <animate attributeName="r" values="15;18;15" dur="3.2s" repeatCount="indefinite" />
+                        </circle>
+                        <text x="600" y="165" text-anchor="middle" fill="#00bcd4" font-size="14"
+                            font-weight="bold">FR</text>
+
+                        <!-- Malayalam Node -->
+                        <circle cx="120" cy="300" r="15" fill="#c792ea" opacity="0.3" filter="url(#terminalGlow)">
+                            <animate attributeName="r" values="15;18;15" dur="3.5s" repeatCount="indefinite" />
+                        </circle>
+                        <text x="120" y="305" text-anchor="middle" fill="#c792ea" font-size="14"
+                            font-weight="bold">ML</text>
+
+                        <!-- German Node -->
+                        <circle cx="580" cy="300" r="15" fill="#64ffda" opacity="0.3" filter="url(#terminalGlow)">
+                            <animate attributeName="r" values="15;18;15" dur="3.8s" repeatCount="indefinite" />
+                        </circle>
+                        <text x="580" y="305" text-anchor="middle" fill="#64ffda" font-size="14"
+                            font-weight="bold">DE</text>
+                    </g>
+
+                    <!-- Connection Lines to Terminal -->
+                    <g opacity="0.2">
+                        <line x1="115" y1="120" x2="150" y2="150" stroke="#00ff9f" stroke-width="1"
+                            stroke-dasharray="3,3">
+                            <animate attributeName="stroke-dashoffset" from="0" to="6" dur="2s"
+                                repeatCount="indefinite" />
+                        </line>
+                        <line x1="585" y1="160" x2="550" y2="180" stroke="#00bcd4" stroke-width="1"
+                            stroke-dasharray="3,3">
+                            <animate attributeName="stroke-dashoffset" from="0" to="6" dur="2s"
+                                repeatCount="indefinite" />
+                        </line>
+                        <line x1="135" y1="300" x2="150" y2="280" stroke="#c792ea" stroke-width="1"
+                            stroke-dasharray="3,3">
+                            <animate attributeName="stroke-dashoffset" from="0" to="6" dur="2s"
+                                repeatCount="indefinite" />
+                        </line>
+                        <line x1="565" y1="300" x2="550" y2="280" stroke="#64ffda" stroke-width="1"
+                            stroke-dasharray="3,3">
+                            <animate attributeName="stroke-dashoffset" from="0" to="6" dur="2s"
+                                repeatCount="indefinite" />
+                        </line>
+                    </g>
+
+                    <!-- Floating Code Symbols -->
+                    <g opacity="0.4" font-family="monospace" font-size="18" fill="#00ff9f">
+                        <text x="80" y="60">&lt;/&gt;</text>
+                        <text x="610" y="70">{ }</text>
+                        <text x="90" y="360">[ ]</text>
+                        <text x="600" y="350">( )</text>
+                    </g>
+                </svg>
+            </header>
+
+            <!-- Abstract -->
+            <section class="abstract">
                 <p>
-                    <i>A multilingual command-line allows the users to interact with the computers from the command-line
-                        in
-                        multiple languages.
-                        Up until now, the command-line interface mostly had commands that are more or less English-like
-                        or
-                        have mnemonics made out of English words.
-                        This makes it difficult for new command-line users, who are also non-English speakers to use
-                        this
-                        interface.
-                        Thus the major question is how to help non-English speakers to work with the command-line
-                        interface
-                        in their native lanugages.
-                        Is there really a need to rewrite the command-line emulators so that they can support multiple
-                        human
-                        languages?
-                        This article takes a look into the different ways to extend them for supporting multiple
-                        languages.
-                    </i>
+                    A multilingual command-line allows the users to interact with the computers from the command-line in
+                    multiple languages. Up until now, the command-line interface mostly had commands that are more or
+                    less English-like or have mnemonics made out of English words. This makes it difficult for new
+                    command-line users, who are also non-English speakers to use this interface. Thus the major question
+                    is how to help non-English speakers to work with the command-line interface in their native
+                    lanugages. Is there really a need to rewrite the command-line emulators so that they can support
+                    multiple human languages? This article takes a look into the different ways to extend them for
+                    supporting multiple languages.
                 </p>
-                <p>
-                    <i>This is part 2 of the series on multilingual application development. Part 1 of the series
-                        proposed a
-                        <a href="../programming/command-line-arguments.html">rethinking of the command-line.</a></i>
-                </p>
+            </section>
+
+            <!-- Introduction -->
+            <section class="content-section">
                 <h3>Introduction</h3>
                 <p>
                     A recent article on Wired<sup><a href="#coding">1</a></sup> talked about how most of the programming
                     languages are suited for English speakers and do not help non-English speakers. The keywords used in
-                    programming languages make use of
-                    the English (Latin) alphabet and are more or less derived from the English words. Take for example,
-                    if
-                    you wish to define a function in a programming language like Python, you need to make use of the
-                    keyword
-                    <code>def</code> (derived from
-                    the word 'define'). Similarly, if you want to define a class, you make use of the keyword
-                    <code>class</code>, another English word. Imagine a non-English speaker who decides to learn
-                    programming. Unlike mathematics, the person has to learn
-                    these English(-like) keywords. It becomes more challenging if the speaker is of a language that does
-                    not
-                    use English (Latin) alphabet. One may say that most developers know or speak a little bit of
-                    English.
-                    This has been a valid argument
-                    for quite a long time, but as internet use is increasing across the world, it is indeed time to
-                    rethink
-                    developer's interaction with the computers.
+                    programming languages make use of the English (Latin) alphabet and are more or less derived from the
+                    English words. Take for example, if you wish to define a function in a programming language like
+                    Python, you need to make use of the keyword <code
+                        style="display: inline; padding: 2px 6px; background: rgba(0, 0, 0, 0.4); border-radius: 3px; font-size: 0.9em;">def</code>
+                    (derived from the word 'define'). Similarly, if you want to define a class, you make use of the
+                    keyword <code
+                        style="display: inline; padding: 2px 6px; background: rgba(0, 0, 0, 0.4); border-radius: 3px; font-size: 0.9em;">class</code>,
+                    another English word. Imagine a non-English speaker who decides to learn programming. Unlike
+                    mathematics, the person has to learn these English(-like) keywords. It becomes more challenging if
+                    the speaker is of a language that does not use English (Latin) alphabet. One may say that most
+                    developers know or speak a little bit of English. This has been a valid argument for quite a long
+                    time, but as internet use is increasing across the world, it is indeed time to rethink developer's
+                    interaction with the computers.
                 </p>
                 <p>
                     Most developers, if not using Integrated Development Environment (IDE) do come across the
-                    command-line
-                    interface. The command-line interface lets user type commands<sup><a
-                            href="#command-line">2</a></sup> to
-                    perform a given task on the
-                    computer. Examples include <code>mkdir</code> to create a directory, <code>cd</code> to change a
-                    directory etc, <code>ps</code> to list all the processes. These commands, including the above ones
-                    are
-                    abbreviations or short form of English
-                    words or phrases, similar to the case of the programming languages, discussed above. It will be
-                    interesting to have a detailed study on the learning curve of non-English speakers, when they start
-                    using the command-line. However, one could
-                    ask another question here: "What if native-language support is brought to the command-line, where
-                    people
-                    can write commands in their native languages?".
+                    command-line interface. The command-line interface lets user type commands<sup><a
+                            href="#command-line">2</a></sup> to perform a given task on the computer. Examples include
+                    <code
+                        style="display: inline; padding: 2px 6px; background: rgba(0, 0, 0, 0.4); border-radius: 3px; font-size: 0.9em;">mkdir</code>
+                    to create a directory, <code
+                        style="display: inline; padding: 2px 6px; background: rgba(0, 0, 0, 0.4); border-radius: 3px; font-size: 0.9em;">cd</code>
+                    to change a directory etc, <code
+                        style="display: inline; padding: 2px 6px; background: rgba(0, 0, 0, 0.4); border-radius: 3px; font-size: 0.9em;">ps</code>
+                    to list all the processes. These commands, including the above ones are abbreviations or short form
+                    of English words or phrases, similar to the case of the programming languages, discussed above. It
+                    will be interesting to have a detailed study on the learning curve of non-English speakers, when
+                    they start using the command-line. However, one could ask another question here: "What if
+                    native-language support is brought to the command-line, where people can write commands in their
+                    native languages?".
                 </p>
                 <p>
                     Taking the example of Bash<sup><a href="#bash">3</a></sup>, a shell and command language for
-                    Unix/Linux
-                    based systems, let's explore how a shell can be extended to give a multilingual interface. The idea
-                    is
-                    to let speakers of any language
-                    interact with the computers using commands in their native languages in the most transparent way
-                    possible. These commands have been developed from developers across the world
+                    Unix/Linux based systems, let's explore how a shell can be extended to give a multilingual
+                    interface. The idea is to let speakers of any language interact with the computers using commands in
+                    their native languages in the most transparent way possible. These commands have been developed from
+                    developers across the world.
                 </p>
-                <ol>
+            </section>
+
+            <!-- Solutions -->
+            <section class="content-section">
+                <h3>Three Possible Solutions</h3>
+                <ol class="solutions-list">
                     <li><b>Solution 1</b>: Ask the developers and maintainers to support their tools, applications or
                         commands in multiple languages and release executables in multiple languages.</li>
                     <li><b>Solution 2</b>: Modify the shell (e.g., Bash) source code to allow accepting translations of
                         existing commands, in such a manner that when a user types a command in their native language,
-                        the
-                        shell searches for this command in all the
-                        translations and if it finds one, checks whether the translation is mapped to any existing
-                        command.
-                    </li>
+                        the shell searches for this command in all the translations and if it finds one, checks whether
+                        the translation is mapped to any existing command.</li>
                     <li><b>Solution 3</b>: Extend the shell (e.g., Bash) in a transparent manner, similar to the
-                        approach
-                        taken by Ubiquity<sup><a href="#mozilla-ubiquity">4</a>,<a href="#ubiquity">5</a></sup> that
-                        does
-                        not require any modification to the shell
-                        (like browser in the case of Ubiquity) nor to the individual applications.</li>
+                        approach taken by Ubiquity<sup><a href="#mozilla-ubiquity">4</a>,<a href="#ubiquity">5</a></sup>
+                        that does not require any modification to the shell (like browser in the case of Ubiquity) nor
+                        to the individual applications.</li>
                 </ol>
                 <p>
                     Solutions 1 and 2 require a tremendous amount of work for translating all the existing commands,
-                    their
-                    arguments (or options), etc. In real-life, however, we do not use all the available commands. Why
-                    not
-                    take a look at these regularly-used commands and
-                    build a transparent multilingual solution using these commands. And this is what brings us to the
-                    Solution 3.
+                    their arguments (or options), etc. In real-life, however, we do not use all the available commands.
+                    Why not take a look at these regularly-used commands and build a transparent multilingual solution
+                    using these commands. And this is what brings us to the Solution 3.
                 </p>
+            </section>
+
+            <!-- Word Order -->
+            <section class="content-section">
+                <h3>Understanding Word Order</h3>
                 <p>
                     Ubiquity<sup><a href="#mozilla-ubiquity">4</a>,<a href="#ubiquity">5</a></sup>, for example, opted
-                    for
-                    solution 3 considering several languages for their study. One interesting contribution from this
-                    work
-                    was that one cannot assume a generic
-                    word order. In case of English, imperatives (or commands) are of the form <i>Verb + Subject +
-                        Object</i>, <i>Verb + Object</i> or just <i>Verb</i><sup><a href="#imperative">6</a>,<a
-                            href="#imperative-mood">7</a></sup>. Take for example,
-                    some imperative sentences from English, from the perspective of command-line.
+                    for solution 3 considering several languages for their study. One interesting contribution from this
+                    work was that one cannot assume a generic word order. In case of English, imperatives (or commands)
+                    are of the form <i>Verb + Subject + Object</i>, <i>Verb + Object</i> or just <i>Verb</i><sup><a
+                            href="#imperative">6</a>,<a href="#imperative-mood">7</a></sup>. Take for example, some
+                    imperative sentences from English, from the perspective of command-line.
                 </p>
-                <ul>
+                <ul class="command-examples">
                     <li>list all processes</li>
                     <li>create a file</li>
                     <li>delete a file</li>
                 </ul>
-                If it were French, the above imperative sentences may look like
-                <ul>
+                <p>If it were French, the above imperative sentences may look like</p>
+                <ul class="command-examples">
                     <li>affiche tous les processus</li>
                     <li>crée un fichier</li>
                     <li>supprime un fichier</li>
                 </ul>
-                However, these imperative sentences follow a different order in languages like Malayalam, where the
-                object
-                comes before the verb.
-                <ul>
+                <p>However, these imperative sentences follow a different order in languages like Malayalam, where the
+                    object comes before the verb.</p>
+                <ul class="command-examples">
                     <li>പ്രക്രിയകൾ കാണിക്കുക</li>
                     <li>ഫയൽ സൃഷ്ടിക്കുക</li>
                     <li>ഫയൽ ഇല്ലാതാക്കുക</li>
                 </ul>
-                Thus, the word order cannot be assumed, and it's important to be flexible. Figure 1 shows the first
-                possibility, where the verb comes first and the object(s) come at the second place.
+                <p>Thus, the word order cannot be assumed, and it's important to be flexible. Figure 1 shows the first
+                    possibility, where the verb comes first and the object(s) come at the second place.</p>
+
                 <figure>
                     <img src="../../images/research/command-action.svg" alt="commands and actions" />
                     <figcaption>Fig 1: Command to list files, directories, processes or network connections</figcaption>
                 </figure>
-                Other possibility of commands is shown in Figure 2, where the object comes at the first place.
+
+                <p>Other possibility of commands is shown in Figure 2, where the object comes at the first place.</p>
+
                 <figure>
                     <img src="../../images/research/action-command.svg" alt="commands and actions" />
                     <figcaption>Fig 2: Command to create, show, delete and list files. Object comes at the first
-                        position.
-                    </figcaption>
+                        position.</figcaption>
                 </figure>
+
                 <p>While working with the command-line, taking a look at some of the commands that people normally use,
-                    we
-                    can obtain some possible objects and the actions on them as shown in Figure 3.</p>
+                    we can obtain some possible objects and the actions on them as shown in Figure 3.</p>
+
                 <figure>
                     <img src="../../images/research/object-action-command.svg" alt="commands and actions" />
                     <figcaption>Fig 3: Command to list files, directories, processes or network connections. Object
-                        comes at
-                        the first position.</figcaption>
+                        comes at the first position.</figcaption>
                 </figure>
+            </section>
+
+            <!-- Development -->
+            <section class="content-section">
                 <h3>Development</h3>
                 <p>Let's explore a very simple way to implement this idea. We want to implement commands as shown in
-                    Figure
-                    1, i.e., the action verb comes first and the object comes in the second place. For testing these
-                    commands, we want to add these commands
-                    in <i>.bashrc</i><sup><a href="#bashrc">8</a>,<a href="#bashrcfiles">9</a></sup> file in the home
-                    directory. The idea is to create a new word combining action word and object. So, the next time, the
-                    user has to use these new combinations
-                    of words.
-                </p>
-                <code>
-        <span style="color:brown">alias</span> listfile=<span style="color:red">"ls"</span><br/>
-        <span style="color:brown">alias</span> createfile=<span style="color:red">"touch"</span><br/>
-        <span style="color:brown">alias</span> deletefile=<span style="color:red">"rm"</span><br/>
-        <span style="color:brown">alias</span> showfile=<span style="color:red">"cat"</span><br/>
-<br/>
-        <span style="color:brown">alias</span> listdirectory=<span style="color:red">"ls"</span><br/>
-        <span style="color:brown">alias</span> createdirectory=<span style="color:red">"mkdir"</span><br/>
-        <span style="color:brown">alias</span> deletedirectory=<span style="color:red">"rmdir"</span><br/>
-        <span style="color:brown">alias</span> showdirectory=<span style="color:red">"ls"</span><br/>
+                    Figure 1, i.e., the action verb comes first and the object comes in the second place. For testing
+                    these commands, we want to add these commands in <i>.bashrc</i><sup><a href="#bashrc">8</a>,<a
+                            href="#bashrcfiles">9</a></sup> file in the home directory. The idea is to create a new word
+                    combining action word and object. So, the next time, the user has to use these new combinations of
+                    words.</p>
 
-        </code>
+                <code><span style="color:brown">alias</span> listfile=<span style="color:red">"ls"</span>
+<span style="color:brown">alias</span> createfile=<span style="color:red">"touch"</span>
+<span style="color:brown">alias</span> deletefile=<span style="color:red">"rm"</span>
+<span style="color:brown">alias</span> showfile=<span style="color:red">"cat"</span>
+
+<span style="color:brown">alias</span> listdirectory=<span style="color:red">"ls"</span>
+<span style="color:brown">alias</span> createdirectory=<span style="color:red">"mkdir"</span>
+<span style="color:brown">alias</span> deletedirectory=<span style="color:red">"rmdir"</span>
+<span style="color:brown">alias</span> showdirectory=<span style="color:red">"ls"</span></code>
+
                 <p>This approach is simple and can be used to create any number of commands. The user has to remember
-                    the
-                    four action words <i>create, show, delete</i> and <i>list</i> as well as the objects <i>file</i> and
-                    <i>directory</i>.
-                </p>
-                <p>
-                    However, some may see that the presence of big commands like <i>listdirectory, createfile</i> as not
-                    a
-                    very interesting approach since these words do not exist in the dictionary. We wish to create
-                    commands
-                    very close to human language.
-                </p>
-                <p>
-                    So, the second approach is to separate action words and objects, so that the user can run the
-                    following
-                    type of commands.
-                </p>
-                <ul>
-                    <li><i>create directory dir1</i></li>
-                    <li><i>show directory dir1</i></li>
-                    <li><i>delete directory dir1</i></li>
-                    <li><i>create file file1</i></li>
-                    <li><i>show file file1</i></li>
-                    <li><i>...</i></li>
+                    the four action words <i>create, show, delete</i> and <i>list</i> as well as the objects <i>file</i>
+                    and <i>directory</i>.</p>
+
+                <p>However, some may see that the presence of big commands like <i>listdirectory, createfile</i> as not
+                    a very interesting approach since these words do not exist in the dictionary. We wish to create
+                    commands very close to human language.</p>
+
+                <p>So, the second approach is to separate action words and objects, so that the user can run the
+                    following type of commands.</p>
+
+                <ul class="command-examples">
+                    <li>create directory dir1</li>
+                    <li>show directory dir1</li>
+                    <li>delete directory dir1</li>
+                    <li>create file file1</li>
+                    <li>show file file1</li>
                 </ul>
-                <p>
-                    For this purpose, we may use bash functions and aliases.
-                </p>
-                <code>
-          <span style="color:green">function</span> deleteaction() {<br/>
-          &nbsp;&nbsp;count=$#<br/>
-          &nbsp;&nbsp;<span style="color:green">if</span> [[ $1 == <span style="color:red">"file"</span> ]]<br/>
-          &nbsp;&nbsp;<span style="color:green">then</span><br/>
-          &nbsp;&nbsp;&nbsp;&nbsp;<span style="color:green">shift</span><br/>
-          &nbsp;&nbsp;&nbsp;&nbsp;rm $@<br/>
-          &nbsp;&nbsp;<span style="color:green">elif</span> [[ $1 == <span style="color:red">"directory"</span> ]]<br/>
-          &nbsp;&nbsp;<span style="color:green">then</span><br/>
-          &nbsp;&nbsp;&nbsp;&nbsp;<span style="color:green">shift</span><br/>
-          &nbsp;&nbsp;&nbsp;&nbsp;rmdir $@<br/>
-          &nbsp;&nbsp;<span style="color:green">fi</span><br/>
-          }<br/>
-         <br/>
-         <span style="color:brown">alias</span> delete=<span style="color:red">"deleteaction"</span><br/>
-        </code>
-                <p>
-                    The above code shows how <span style="color:brown">alias</span> has been used to call a function.
-                    Though
-                    it shows a way to delete files and directories, it can be used in a similar manner for working with
-                    network connections, processes
-                    etc. But what if we want to repeat this for French language?
-                </p>
-                <code>
-          <span style="color:green">function</span> supprimeraction() {<br/>
-          &nbsp;&nbsp;count=$#<br/>
-          &nbsp;&nbsp;<span style="color:green">if</span> [[ $1 == <span style="color:red">"fichier"</span> ]]<br/>
-          &nbsp;&nbsp;<span style="color:green">then</span><br/>
-          &nbsp;&nbsp;&nbsp;&nbsp;<span style="color:green">shift</span><br/>
-          &nbsp;&nbsp;&nbsp;&nbsp;rm $@<br/>
-          &nbsp;&nbsp;<span style="color:green">elif</span> [[ $1 == <span style="color:red">"répertoire"</span> ]]<br/>
-          &nbsp;&nbsp;<span style="color:green">then</span><br/>
-          &nbsp;&nbsp;&nbsp;&nbsp;<span style="color:green">shift</span><br/>
-          &nbsp;&nbsp;&nbsp;&nbsp;rmdir $@<br/>
-          &nbsp;&nbsp;<span style="color:green">fi</span><br/>
-          }<br/>
-         <br/>
-         <span style="color:brown">alias</span> supprimer=<span style="color:red">"supprimer"</span><br/>
-        </code>
-                <p>
-                    As you can see that the code is similar to that in the English language and we have replaced the
-                    action
-                    words and objects by their translations in French language. Now we can run the following commands in
-                    the
-                    French language.
-                </p>
-                <ul>
-                    <li><i>supprimer répertoire rép1</i></li>
-                    <li><i>supprimer fichier f1</i></li>
+
+                <p>For this purpose, we may use bash functions and aliases.</p>
+
+                <code><span style="color:green">function</span> deleteaction() {
+  count=$#
+  <span style="color:green">if</span> [[ $1 == <span style="color:red">"file"</span> ]]
+  <span style="color:green">then</span>
+    <span style="color:green">shift</span>
+    rm $@
+  <span style="color:green">elif</span> [[ $1 == <span style="color:red">"directory"</span> ]]
+  <span style="color:green">then</span>
+    <span style="color:green">shift</span>
+    rmdir $@
+  <span style="color:green">fi</span>
+}
+
+<span style="color:brown">alias</span> delete=<span style="color:red">"deleteaction"</span></code>
+
+                <p>The above code shows how <span style="color:brown">alias</span> has been used to call a function.
+                    Though it shows a way to delete files and directories, it can be used in a similar manner for
+                    working with network connections, processes etc. But what if we want to repeat this for French
+                    language?</p>
+
+                <code><span style="color:green">function</span> supprimeraction() {
+  count=$#
+  <span style="color:green">if</span> [[ $1 == <span style="color:red">"fichier"</span> ]]
+  <span style="color:green">then</span>
+    <span style="color:green">shift</span>
+    rm $@
+  <span style="color:green">elif</span> [[ $1 == <span style="color:red">"répertoire"</span> ]]
+  <span style="color:green">then</span>
+    <span style="color:green">shift</span>
+    rmdir $@
+  <span style="color:green">fi</span>
+}
+
+<span style="color:brown">alias</span> supprimer=<span style="color:red">"supprimeraction"</span></code>
+
+                <p>As you can see that the code is similar to that in the English language and we have replaced the
+                    action words and objects by their translations in French language. Now we can run the following
+                    commands in the French language.</p>
+
+                <ul class="command-examples">
+                    <li>supprimer répertoire rép1</li>
+                    <li>supprimer fichier f1</li>
                 </ul>
-                <p>
-                    One may ask what's the need to write the complete word, why not just commands in the following way.
+
+                <p>One may ask what's the need to write the complete word, why not just commands in the following way.
                 </p>
-                <ul>
-                    <li><i>s r rép1</i></li>
-                    <li><i>s f f1</i></li>
+
+                <ul class="command-examples">
+                    <li>s r rép1</li>
+                    <li>s f f1</li>
                 </ul>
+
                 <p>The above code can be easily modified to obtain these commands.</p>
-                <p>
-                    Finally, how about the commands in Figure 2, where the object comes first. For this purpose, let's
-                    check
-                    these commands in the Malayalam language, where the object comes first and the action word comes
-                    later.
-                    For example, we want to have the following
-                    commands for creating and deleting directories.
-                </p>
-                <ul>
-                    <li><i>ഡയറക്ടറി സൃഷ്ടിക്കുക ഡ1</i></li>
-                    <li><i>ഡയറക്ടറി ഇല്ലാതാക്കുക ഡ1</i></li>
+
+                <p>Finally, how about the commands in Figure 2, where the object comes first. For this purpose, let's
+                    check these commands in the Malayalam language, where the object comes first and the action word
+                    comes later. For example, we want to have the following commands for creating and deleting
+                    directories.</p>
+
+                <ul class="command-examples">
+                    <li>ഡയറക്ടറി സൃഷ്ടിക്കുക ഡ1</li>
+                    <li>ഡയറക്ടറി ഇല്ലാതാക്കുക ഡ1</li>
                 </ul>
+
                 <p>To be able to run the above commands, the above code has been modified. As can be seen, all relevant
-                    operations related to directory have been grouped under a single function.
-                </p>
-                <code>
-          <span style="color:green">function</span> ഡയറക്ടറിപ്രവർത്തനങ്ങൾ() {<br/>
-          &nbsp;&nbsp;count=$#<br/>
-          &nbsp;&nbsp;<span style="color:green">if</span> [[ $1 == <span style="color:red">"സൃഷ്ടിക്കുക"</span> ]]<br/>
-          &nbsp;&nbsp;<span style="color:green">then</span><br/>
-          &nbsp;&nbsp;&nbsp;&nbsp;<span style="color:green">shift</span><br/>
-          &nbsp;&nbsp;&nbsp;&nbsp;mkdir $@<br/>
-          &nbsp;&nbsp;<span style="color:green">elif</span> [[ $1 == <span style="color:red">"ഇല്ലാതാക്കുക"</span> ]]<br/>
-          &nbsp;&nbsp;<span style="color:green">then</span><br/>
-          &nbsp;&nbsp;&nbsp;&nbsp;<span style="color:green">shift</span><br/>
-          &nbsp;&nbsp;&nbsp;&nbsp;rmdir $@<br/>
-          &nbsp;&nbsp;<span style="color:green">fi</span><br/>
-          }<br/>
-         <br/>
-         <span style="color:brown">alias</span> ഡയറക്ടറി=<span style="color:red">"ഡയറക്ടറിപ്രവർത്തനങ്ങൾ"</span><br/>
-        </code>
-                <p>
-                    Another question that remains answering is how to ensure that even the arguments (options) to the
+                    operations related to directory have been grouped under a single function.</p>
+
+                <code><span style="color:green">function</span> ഡയറക്ടറിപ്രവർത്തനങ്ങൾ() {
+  count=$#
+  <span style="color:green">if</span> [[ $1 == <span style="color:red">"സൃഷ്ടിക്കുക"</span> ]]
+  <span style="color:green">then</span>
+    <span style="color:green">shift</span>
+    mkdir $@
+  <span style="color:green">elif</span> [[ $1 == <span style="color:red">"ഇല്ലാതാക്കുക"</span> ]]
+  <span style="color:green">then</span>
+    <span style="color:green">shift</span>
+    rmdir $@
+  <span style="color:green">fi</span>
+}
+
+<span style="color:brown">alias</span> ഡയറക്ടറി=<span style="color:red">"ഡയറക്ടറിപ്രവർത്തനങ്ങൾ"</span></code>
+
+                <p>Another question that remains answering is how to ensure that even the arguments (options) to the
                     commands are also taken into consideration. For example, a person wants to pass -R (recursive) for
-                    recursively navigating a directory. These options may
-                    still work with the newly created aliases, but may need some modifications to the above functions,
-                    if we
-                    want to support translations of options as well.
-                </p>
+                    recursively navigating a directory. These options may still work with the newly created aliases, but
+                    may need some modifications to the above functions, if we want to support translations of options as
+                    well.</p>
+            </section>
+
+            <!-- Conclusion -->
+            <section class="content-section">
                 <h3>Conclusion</h3>
                 <p>
                     There are several possible ways by which a multilingual command-line can be built. This article
                     presented the various possible solutions, but focused in detail a solution, where existing commands
-                    need
-                    not be modified or translated. This possible transparent
-                    solution may be helpful to reduce the learning curve of students who are very new to the
-                    command-line
-                    and may have just started their studies in computer science. However, a detailed user evaluation is
-                    still required to understand whether
-                    these changes are indeed helpful to non-English speaking terminal users.
+                    need not be modified or translated. This possible transparent solution may be helpful to reduce the
+                    learning curve of students who are very new to the command-line and may have just started their
+                    studies in computer science. However, a detailed user evaluation is still required to understand
+                    whether these changes are indeed helpful to non-English speaking terminal users.
                 </p>
                 <p>
                     Another major challenge is to encourage application developers to think <i>multilingual by
-                        design</i>,
-                    so that users do not face language barriers for using their applications.
+                        design</i>, so that users do not face language barriers for using their applications.
                 </p>
+            </section>
+
+            <!-- References -->
+            <section class="content-section">
                 <h3>References</h3>
-                <p>
-                <ol>
+                <ol class="references-list">
                     <li id="coding"><a
                             href="https://www.wired.com/story/coding-is-for-everyoneas-long-as-you-speak-english/">Coding
-                            Is
-                            for Everyone—as Long as You Speak English</a></li>
+                            Is for Everyone—as Long as You Speak English</a></li>
                     <li id="command-line"><a href="../programming/command-line-arguments.html">Rethinking the
                             command-line</a></li>
                     <li id="bash"><a href="https://en.wikipedia.org/wiki/Bash_(Unix_shell)">Bash</a></li>
@@ -682,12 +1175,22 @@
                     <li id="bashrc"><a href="https://linux.die.net/man/1/bash">.bashrc</a></li>
                     <li id="bashrcfiles"><a
                             href="http://www.gnu.org/software/bash/manual/html_node/Bash-Startup-Files.html">Bash
-                            Startup
-                            Files</a></li>
+                            Startup Files</a></li>
                 </ol>
+            </section>
+        </main>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <div class="footer-content">
+                <nav class="language-links" aria-label="Language selection">
+                    <a href="./multilingual-command-line.html" hreflang="en">English</a>
+                </nav>
+                <p class="footer-text">
+                    &copy; 2024 John Samuel. All rights reserved.
                 </p>
             </div>
-        </div>
+        </footer>
     </body>
 
 </html>
