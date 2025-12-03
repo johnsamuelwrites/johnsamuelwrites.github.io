@@ -2,266 +2,598 @@
 <html lang="en">
 
     <head>
-        <meta charset="utf-8" />
-        <meta http-equiv="Content-Language" content="en" />
-        <link rel="shortcut icon" href="../../images/logo/favicon.png" />
-        <title>Rethinking the command-line: John Samuel</title>
-        <style type="text/css">
-            body {
-                background-color: #FFFFFF;
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta http-equiv="Content-Language" content="en">
+        <link rel="shortcut icon" href="../../images/logo/favicon.png">
+        <title>Rethinking the Command-Line | John Samuel</title>
+        <style>
+            /* Design Tokens */
+            :root {
+                /* Terminal & CLI Theme - Code & Command Interface */
+                --color-base-bg: #f5f7f9;
+                --color-base-surface: #ffffff;
+                --color-base-text: #1a202c;
+                --color-base-text-muted: #4a5568;
+
+                /* Accent Colors - Terminal Green meets Modern Cyan */
+                --color-accent-1: #00a896;
+                --color-accent-2: #028090;
+                --color-accent-3: #05668d;
+                --color-accent-light: #e8f5f3;
+
+                /* Functional Colors */
+                --color-shadow: rgba(0, 168, 150, 0.12);
+                --color-border: rgba(0, 168, 150, 0.15);
+                --color-hover: rgba(0, 168, 150, 0.08);
+
+                /* Gradients */
+                --gradient-primary: linear-gradient(135deg, #00a896 0%, #05668d 100%);
+                --gradient-subtle: linear-gradient(180deg, #f5f7f9 0%, #e8f5f3 100%);
+                --gradient-hero: linear-gradient(135deg, #00a896 0%, #028090 50%, #05668d 100%);
+
+                /* Spacing Scale */
+                --space-xs: 0.25rem;
+                --space-sm: 0.5rem;
+                --space-md: 1rem;
+                --space-lg: 1.5rem;
+                --space-xl: 2rem;
+                --space-2xl: 3rem;
+                --space-3xl: 4rem;
+                --space-4xl: 6rem;
+
+                /* Typography */
+                --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+                --font-mono: 'SF Mono', Monaco, 'Cascadia Code', 'Consolas', 'Courier New', monospace;
+                --text-xs: clamp(0.75rem, 0.7rem + 0.25vw, 0.875rem);
+                --text-sm: clamp(0.875rem, 0.8rem + 0.35vw, 1rem);
+                --text-base: clamp(1rem, 0.95rem + 0.25vw, 1.125rem);
+                --text-lg: clamp(1.125rem, 1.05rem + 0.35vw, 1.25rem);
+                --text-xl: clamp(1.25rem, 1.15rem + 0.5vw, 1.5rem);
+                --text-2xl: clamp(1.5rem, 1.3rem + 1vw, 2rem);
+                --text-3xl: clamp(2rem, 1.6rem + 2vw, 2.75rem);
+
+                /* Border Radius */
+                --radius-sm: 4px;
+                --radius-md: 8px;
+                --radius-lg: 12px;
+                --radius-xl: 16px;
+                --radius-2xl: 24px;
+
+                /* Shadows */
+                --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.04), 0 1px 3px rgba(0, 0, 0, 0.06);
+                --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.05), 0 2px 4px rgba(0, 0, 0, 0.06);
+                --shadow-lg: 0 10px 24px rgba(0, 0, 0, 0.08), 0 4px 8px rgba(0, 0, 0, 0.06);
+                --shadow-theme: 0 10px 30px var(--color-shadow), 0 4px 10px rgba(0, 0, 0, 0.06);
             }
 
-            #sidebar {
-                position: fixed;
-                background-color: #009AA6;
-                top: 0;
-                left: 0;
-                bottom: 0;
-                width: 30vw;
-            }
-
-            #sidebar .title {
-                position: relative;
-                text-align: center;
-                line-height: 5vmax;
-                font-size: 1.4vmax;
-                font-family: 'Arial';
-                margin-top: 30vh;
-            }
-
-            #sidebar .title a:link,
-            #sidebar .title a:visited {
-                color: #FFFFFF;
-                text-decoration: none;
-            }
-
-            .subtitle {
-                top: 50vh;
-                text-align: center;
-                line-height: 1.3vmax;
-                font-family: 'Arial';
-                font-size: 1.2vmax;
-                color: #FFFFFF;
-            }
-
-            .subtitle a:link,
-            .subtitle a:visited {
-                color: #FFFFFF;
-                text-decoration: none;
-            }
-
-            .licence {
-                position: fixed;
-                text-align: right;
-                bottom: 0;
-                right: 0;
-            }
-
-            .home {
-                position: fixed;
-                text-align: left;
-                font-family: 'Arial';
-                color: #D3D3D3;
-                z-index: 100;
-                width: 100%;
-                background-color: #FFFFFF;
-                top: 0px;
-                margin-bottom: 10px;
-                padding-bottom: 10px;
-            }
-
-            .home a:link,
-            .home a:visited {
-                text-decoration: none;
-                color: #D3D3D3;
-            }
-
-            .home ul {
+            /* Reset & Base Styles */
+            * {
                 margin: 0;
                 padding: 0;
-                text-align: left;
+                box-sizing: border-box;
+            }
+
+            html {
+                scroll-behavior: smooth;
+                scroll-padding-top: 80px;
+            }
+
+            body {
+                font-family: var(--font-sans);
+                font-size: var(--text-base);
+                line-height: 1.7;
+                color: var(--color-base-text);
+                background: var(--color-base-bg);
+                overflow-x: hidden;
+            }
+
+            /* Skip Link for Accessibility */
+            .skip-link {
+                position: absolute;
+                top: -40px;
+                left: 0;
+                background: var(--color-accent-1);
+                color: white;
+                padding: 8px;
+                text-decoration: none;
+                z-index: 100;
+            }
+
+            .skip-link:focus {
+                top: 0;
+            }
+
+            /* Navigation */
+            .nav-container {
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                background: rgba(255, 255, 255, 0.85);
+                -webkit-backdrop-filter: blur(12px) saturate(180%);
+                backdrop-filter: blur(12px) saturate(180%);
+                border-bottom: 1px solid var(--color-border);
+                box-shadow: var(--shadow-sm);
+                z-index: 50;
+            }
+
+            .nav-content {
+                max-width: 1400px;
+                margin: 0 auto;
+                padding: var(--space-md) var(--space-xl);
+                display: flex;
+                align-items: center;
+                gap: var(--space-lg);
+            }
+
+            .nav-brand {
+                font-size: var(--text-lg);
+                font-weight: 600;
+                color: white;
+                text-decoration: none;
+                padding: var(--space-xs) var(--space-md);
+                border-radius: var(--radius-md);
+                background: var(--gradient-primary);
+                transition: all 0.3s ease;
+            }
+
+            .nav-brand:hover {
+                transform: translateY(-2px);
+                box-shadow: var(--shadow-md);
+            }
+
+            .breadcrumb {
+                list-style: none;
+                display: flex;
+                gap: var(--space-sm);
+                flex-wrap: wrap;
+                align-items: center;
+            }
+
+            .breadcrumb li {
+                display: flex;
+                align-items: center;
+                gap: var(--space-sm);
+            }
+
+            .breadcrumb li:not(:last-child)::after {
+                content: '/';
+                color: var(--color-base-text-muted);
+            }
+
+            .breadcrumb a {
+                color: var(--color-base-text-muted);
+                text-decoration: none;
+                padding: var(--space-xs) var(--space-sm);
+                border-radius: var(--radius-sm);
+                transition: all 0.3s ease;
+            }
+
+            .breadcrumb a:hover {
+                color: var(--color-accent-1);
+                background: var(--color-hover);
+            }
+
+            /* Hero Section */
+            .hero {
+                margin-top: 80px;
+                padding: var(--space-4xl) var(--space-xl) var(--space-3xl);
+                background: var(--gradient-hero);
+                position: relative;
+                overflow: hidden;
+            }
+
+            .hero::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background:
+                    repeating-linear-gradient(90deg,
+                        transparent 0px,
+                        transparent 39px,
+                        rgba(255, 255, 255, 0.03) 40px),
+                    repeating-linear-gradient(0deg,
+                        transparent 0px,
+                        transparent 39px,
+                        rgba(255, 255, 255, 0.03) 40px);
+                background-size: 40px 40px;
+                pointer-events: none;
+            }
+
+            .hero-content {
+                max-width: 1200px;
+                margin: 0 auto;
+                position: relative;
+                z-index: 1;
+            }
+
+            .hero h1 {
+                font-size: var(--text-3xl);
+                font-weight: 700;
+                color: white;
+                margin-bottom: var(--space-lg);
+                letter-spacing: -0.02em;
+                text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+            }
+
+            .hero-subtitle {
+                font-size: var(--text-sm);
+                color: rgba(255, 255, 255, 0.9);
+                text-transform: uppercase;
+                letter-spacing: 0.1em;
+                margin-bottom: var(--space-md);
+            }
+
+            /* SVG Illustration */
+            .hero-illustration {
+                width: 100%;
+                max-width: 800px;
+                height: auto;
+                margin: var(--space-2xl) auto 0;
+                display: block;
+            }
+
+            /* Main Content */
+            .main-content {
+                max-width: 1200px;
+                margin: 0 auto;
+                padding: var(--space-4xl) var(--space-xl);
+            }
+
+            /* Introduction Card */
+            .intro-section {
+                background: white;
+                border-radius: var(--radius-2xl);
+                padding: var(--space-3xl);
+                margin-bottom: var(--space-4xl);
+                box-shadow: var(--shadow-theme);
+                position: relative;
+                overflow: hidden;
+            }
+
+            .intro-section::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 4px;
+                background: var(--gradient-primary);
+            }
+
+            .intro-section p {
+                font-style: italic;
+                font-size: var(--text-lg);
+                line-height: 1.8;
+                color: var(--color-base-text-muted);
+            }
+
+            /* Content Sections */
+            .content-section {
+                margin-bottom: var(--space-4xl);
+            }
+
+            h2 {
+                font-size: var(--text-2xl);
+                font-weight: 700;
+                color: var(--color-accent-1);
+                margin-bottom: var(--space-xl);
+                margin-top: var(--space-3xl);
+                letter-spacing: -0.01em;
+                position: relative;
+                padding-bottom: var(--space-md);
+            }
+
+            h2::after {
+                content: '';
+                position: absolute;
+                bottom: 0;
+                left: 0;
+                width: 60px;
+                height: 3px;
+                background: var(--gradient-primary);
+                border-radius: 2px;
+            }
+
+            h3 {
+                font-size: var(--text-xl);
+                font-weight: 600;
+                color: var(--color-accent-2);
+                margin-top: var(--space-2xl);
+                margin-bottom: var(--space-lg);
+                letter-spacing: -0.01em;
+            }
+
+            p {
+                margin-bottom: var(--space-lg);
+                line-height: 1.8;
+            }
+
+            /* Code elements */
+            code {
+                font-family: var(--font-mono);
+                font-size: 0.9em;
+                background: rgba(0, 168, 150, 0.1);
+                color: var(--color-accent-2);
+                padding: 0.2em 0.4em;
+                border-radius: var(--radius-sm);
+                border: 1px solid var(--color-border);
+            }
+
+            /* Links */
+            a {
+                color: var(--color-accent-1);
+                text-decoration: none;
+                transition: all 0.3s ease;
+            }
+
+            a:hover {
+                color: var(--color-accent-3);
+            }
+
+            .content-section a:not(.button) {
+                border-bottom: 1px solid var(--color-border);
+                padding-bottom: 2px;
+            }
+
+            .content-section a:not(.button):hover {
+                border-bottom-color: var(--color-accent-3);
+            }
+
+            /* Superscript links */
+            sup a {
+                border: none;
+                font-weight: 600;
+            }
+
+            /* Bold text */
+            b,
+            strong {
+                color: var(--color-accent-2);
+                font-weight: 600;
+            }
+
+            /* Italic text */
+            em,
+            i {
+                color: var(--color-base-text-muted);
+            }
+
+            /* References List */
+            ol {
+                list-style: none;
+                counter-reset: reference-counter;
+                padding-left: 0;
+            }
+
+            ol li {
+                counter-increment: reference-counter;
+                margin-bottom: var(--space-lg);
+                padding-left: var(--space-3xl);
+                position: relative;
+                line-height: 1.7;
+            }
+
+            ol li::before {
+                content: counter(reference-counter);
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 32px;
+                height: 32px;
+                background: var(--gradient-primary);
+                color: white;
+                border-radius: 50%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-weight: 600;
+                font-size: var(--text-sm);
+            }
+
+            /* Note Card */
+            .note-card {
+                background: linear-gradient(135deg, var(--color-accent-light) 0%, white 100%);
+                border-radius: var(--radius-2xl);
+                padding: var(--space-2xl);
+                margin: var(--space-2xl) 0;
+                border-left: 4px solid var(--color-accent-1);
+                box-shadow: var(--shadow-md);
+            }
+
+            /* Footer */
+            footer {
+                background: linear-gradient(135deg, #1a202c 0%, #2d3748 100%);
+                color: rgba(255, 255, 255, 0.9);
+                padding: var(--space-3xl) var(--space-xl) var(--space-xl);
+                margin-top: var(--space-4xl);
+            }
+
+            .footer-content {
+                max-width: 1200px;
+                margin: 0 auto;
+            }
+
+            .footer-section {
+                margin-bottom: var(--space-2xl);
+            }
+
+            .footer-section h4 {
+                color: white;
+                font-size: var(--text-lg);
+                margin-bottom: var(--space-lg);
+                font-weight: 600;
+            }
+
+            .footer-links {
+                display: flex;
+                flex-wrap: wrap;
+                gap: var(--space-md);
                 list-style: none;
             }
 
-            .home li {
-                position: relative;
-                float: left;
-                padding-top: 15px;
-                margin-right: 1em;
-                font-family: 'Arial';
+            .footer-links a {
+                color: rgba(255, 255, 255, 0.8);
+                padding: var(--space-xs) var(--space-md);
+                border-radius: var(--radius-md);
+                transition: all 0.3s ease;
+                border: 1px solid rgba(255, 255, 255, 0.2);
             }
 
-            .home li:hover {
-                display: block;
+            .footer-links a:hover {
+                color: white;
+                background: rgba(0, 168, 150, 0.3);
+                border-color: rgba(0, 168, 150, 0.5);
+                transform: translateY(-2px);
             }
 
-            .home li:hover a:link,
-            .home li:hover a:visited {
-                text-decoration: none;
-                padding: 15px;
-                color: #FFFFFF;
-                background-color: #009AA6;
+            .footer-bottom {
+                padding-top: var(--space-xl);
+                border-top: 1px solid rgba(255, 255, 255, 0.1);
+                text-align: center;
+                font-size: var(--text-sm);
+                color: rgba(255, 255, 255, 0.7);
             }
 
-            .content {
-                line-height: 1.8vmax;
-                font-size: 1.2vmax;
-                font-family: 'Arial';
-                margin-top: 15vh;
-                width: 90%;
-            }
-
-            .content h2,
-            h3,
-            h4 {
-                color: #009AA6;
-            }
-
-            .content a:link,
-            .content a:visited {
-                color: #009AA6;
-            }
-
-            .content h3 {
-                color: #009AA6;
-            }
-
-            .content h2::before,
-            .content h3::before {
-                display: block;
-                content: " ";
-                visibility: hidden;
-                height: 50px;
-                margin-top: -50px;
-                pointer-events: none;
-                background-color: #FFFFFF;
-            }
-
-            .content a:link,
-            .content a:visited {
-                color: #009AA6;
-            }
-
-            .home a:link,
-            .home a:visited {
-                color: #D3D3D3;
-            }
-
-            .page {
-                width: 65vw;
-                height: 100%;
-                margin-left: 30vw;
-                overflow: hidden;
-                padding: 0 1em;
-                font-family: 'Arial';
-            }
-
-            .page img {
-                max-width: 100%;
-                max-height: 100%;
-            }
-
-            @media (max-width: 640px),
-            screen and (orientation: portrait) {
-                body {
-                    max-width: 100%;
-                    max-height: 100%;
+            /* Animations */
+            @keyframes fadeInUp {
+                from {
+                    opacity: 0;
+                    transform: translateY(30px);
                 }
 
-                #sidebar {
-                    position: fixed;
-                    background-color: #009AA6;
-                    top: 0;
-                    left: 0;
-                    bottom: 80vh;
-                    width: 100vw;
+                to {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            }
+
+            @keyframes gradientShift {
+
+                0%,
+                100% {
+                    background-position: 0% 50%;
                 }
 
-                #sidebar .title {
-                    text-align: center;
-                    position: fixed;
-                    margin-top: 6vh;
-                    left: 0px;
-                    right: 0px;
-                    line-height: 3.5vmax;
-                    font-size: 1.5vmax;
-                    font-family: 'Arial';
+                50% {
+                    background-position: 100% 50%;
+                }
+            }
+
+            @keyframes typewriter {
+                0% {
+                    stroke-dashoffset: 1000;
                 }
 
-                #sidebar .subtitle {
-                    text-align: center;
-                    top: 5vh;
-                    left: 0px;
-                    right: 0px;
-                    position: fixed;
-                    margin-top: 10vh;
-                    font-size: 1.5vmax;
+                100% {
+                    stroke-dashoffset: 0;
+                }
+            }
+
+            @keyframes blink {
+
+                0%,
+                50% {
+                    opacity: 1;
                 }
 
-                #sidebar .title a:link,
-                #sidebar .title a:visited {
-                    text-align: center;
-                    color: #FFFFFF;
+                51%,
+                100% {
+                    opacity: 0;
+                }
+            }
+
+            @keyframes float {
+
+                0%,
+                100% {
+                    transform: translateY(0);
                 }
 
-                #sidebar .subtitle a:link,
-                #sidebar .subtitle a:visited {
-                    text-align: center;
-                    color: #FFFFFF;
+                50% {
+                    transform: translateY(-10px);
+                }
+            }
+
+            .hero {
+                background-size: 200% 200%;
+                animation: gradientShift 10s ease infinite;
+            }
+
+            .intro-section {
+                animation: fadeInUp 0.8s ease-out;
+            }
+
+            /* SVG Animations */
+            .terminal-line {
+                stroke-dasharray: 1000;
+                stroke-dashoffset: 1000;
+                animation: typewriter 3s ease-out forwards;
+            }
+
+            .cursor {
+                animation: blink 1s step-end infinite;
+            }
+
+            .command-icon {
+                animation: float 4s ease-in-out infinite;
+            }
+
+            /* Responsive Design */
+            @media (max-width: 768px) {
+                .nav-content {
+                    flex-direction: column;
+                    align-items: flex-start;
+                    gap: var(--space-sm);
                 }
 
-                .home {
-                    z-index: 100;
-                    width: 100%;
-                    background-color: #009AA6;
-                    font-size: 1.5vmax;
+                .hero {
+                    padding: var(--space-3xl) var(--space-md) var(--space-2xl);
                 }
 
-                .home a:link,
-                .home a:visited {
-                    text-decoration: none;
-                    color: #FFFFFF;
+                .main-content {
+                    padding: var(--space-2xl) var(--space-md);
                 }
 
-                .content {
-                    line-height: 3.8vmax;
-                    font-size: 1.8vmax;
-                    font-family: 'Arial';
-                    margin-top: 22vh;
+                .intro-section {
+                    padding: var(--space-xl);
                 }
 
-                .content a:link,
-                .content a:visited {
-                    color: #009AA6;
+                h2 {
+                    font-size: var(--text-xl);
                 }
 
-                .page {
-                    top: 40vh;
-                    width: 95%;
-                    margin-left: 0vw;
+                ol li {
+                    padding-left: var(--space-2xl);
                 }
+            }
 
-                .page img {
-                    max-width: 100%;
-                    max-height: 100%;
-                    border: 0;
+            /* Reduced Motion */
+            @media (prefers-reduced-motion: reduce) {
+
+                *,
+                *::before,
+                *::after {
+                    animation-duration: 0.01ms !important;
+                    animation-iteration-count: 1 !important;
+                    transition-duration: 0.01ms !important;
                 }
             }
         </style>
     </head>
 
     <body vocab="http://schema.org/">
-        <div id="sidebar">
-            <div class="title">
-                <h1><a href="./command-line-arguments.html">Rethinking the command-line</a></h1>
-            </div>
-            <div class="subtitle">
-                <h3><a href="../about.html">John Samuel</a></h3>
-            </div>
-        </div>
-        <div class="page">
-            <div class="home">
-                <ul typeof="BreadcrumbList">
+        <a href="#main-content" class="skip-link">Skip to main content</a>
+
+        <!-- Navigation -->
+        <nav class="nav-container" role="navigation">
+            <div class="nav-content">
+                <a href="../about.html" class="nav-brand">John Samuel</a>
+                <ul class="breadcrumb" typeof="BreadcrumbList">
                     <li property="itemListElement" typeof="ListItem">
                         <a property="item" typeof="WebPage" href="../index.html">
                             <span property="name">Home</span>
@@ -278,26 +610,129 @@
                         </a>
                     </li>
                 </ul>
+            </div>
+        </nav>
 
+        <!-- Hero Section -->
+        <header class="hero">
+            <div class="hero-content">
+                <p class="hero-subtitle">Programming Research</p>
+                <h1>Rethinking the Command-Line</h1>
+
+                <!-- SVG Illustration -->
+                <svg class="hero-illustration" viewBox="0 0 800 280" xmlns="http://www.w3.org/2000/svg"
+                    aria-hidden="true">
+                    <defs>
+                        <linearGradient id="terminalGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" style="stop-color:#00a896;stop-opacity:1" />
+                            <stop offset="100%" style="stop-color:#05668d;stop-opacity:1" />
+                        </linearGradient>
+                        <filter id="glow">
+                            <feGaussianBlur stdDeviation="3" result="coloredBlur" />
+                            <feMerge>
+                                <feMergeNode in="coloredBlur" />
+                                <feMergeNode in="SourceGraphic" />
+                            </feMerge>
+                        </filter>
+                    </defs>
+
+                    <!-- Terminal Window -->
+                    <rect x="100" y="40" width="600" height="200" rx="12" fill="rgba(255, 255, 255, 0.15)"
+                        stroke="white" stroke-width="2" filter="url(#glow)" />
+
+                    <!-- Terminal Header -->
+                    <rect x="100" y="40" width="600" height="30" rx="12" fill="rgba(255, 255, 255, 0.2)" />
+                    <circle cx="120" cy="55" r="5" fill="rgba(255, 100, 100, 0.8)" />
+                    <circle cx="140" cy="55" r="5" fill="rgba(255, 200, 100, 0.8)" />
+                    <circle cx="160" cy="55" r="5" fill="rgba(100, 255, 100, 0.8)" />
+
+                    <!-- Command Prompt -->
+                    <text x="120" y="100" font-family="monospace" font-size="16" fill="white"
+                        font-weight="bold">$</text>
+
+                    <!-- Typed Command with animation -->
+                    <g class="terminal-line">
+                        <text x="140" y="100" font-family="monospace" font-size="16" fill="white">
+                            ls -la --color=auto
+                        </text>
+                    </g>
+
+                    <!-- Cursor -->
+                    <rect class="cursor" x="320" y="86" width="10" height="18" fill="white" opacity="0.8" />
+
+                    <!-- Command output simulation -->
+                    <text x="120" y="130" font-family="monospace" font-size="13" fill="rgba(255, 255, 255, 0.7)">
+                        drwxr-xr-x 5 user group 4096 Dec 03 10:30 .
+                    </text>
+                    <text x="120" y="150" font-family="monospace" font-size="13" fill="rgba(255, 255, 255, 0.7)">
+                        drwxr-xr-x 12 user group 4096 Dec 02 15:20 ..
+                    </text>
+                    <text x="120" y="170" font-family="monospace" font-size="13" fill="rgba(255, 255, 255, 0.7)">
+                        -rw-r--r-- 1 user group 8192 Dec 03 09:15 data.txt
+                    </text>
+                    <text x="120" y="190" font-family="monospace" font-size="13" fill="rgba(255, 255, 255, 0.7)">
+                        -rwxr-xr-x 1 user group 2048 Dec 01 14:45 script.sh
+                    </text>
+
+                    <!-- Floating command icons -->
+                    <g class="command-icon" style="animation-delay: 0s;">
+                        <circle cx="50" cy="100" r="20" fill="rgba(255, 255, 255, 0.2)" stroke="white"
+                            stroke-width="2" />
+                        <text x="50" y="107" font-family="monospace" font-size="16" fill="white"
+                            text-anchor="middle">cd</text>
+                    </g>
+
+                    <g class="command-icon" style="animation-delay: 0.5s;">
+                        <circle cx="750" cy="120" r="20" fill="rgba(255, 255, 255, 0.2)" stroke="white"
+                            stroke-width="2" />
+                        <text x="750" y="127" font-family="monospace" font-size="16" fill="white"
+                            text-anchor="middle">mv</text>
+                    </g>
+
+                    <g class="command-icon" style="animation-delay: 1s;">
+                        <circle cx="50" cy="180" r="20" fill="rgba(255, 255, 255, 0.2)" stroke="white"
+                            stroke-width="2" />
+                        <text x="50" y="187" font-family="monospace" font-size="16" fill="white"
+                            text-anchor="middle">rm</text>
+                    </g>
+
+                    <g class="command-icon" style="animation-delay: 1.5s;">
+                        <circle cx="750" cy="200" r="20" fill="rgba(255, 255, 255, 0.2)" stroke="white"
+                            stroke-width="2" />
+                        <text x="750" y="207" font-family="monospace" font-size="14" fill="white"
+                            text-anchor="middle">pwd</text>
+                    </g>
+
+                    <!-- Connection lines to terminal -->
+                    <line x1="70" y1="100" x2="100" y2="120" stroke="rgba(255, 255, 255, 0.3)" stroke-width="2"
+                        stroke-dasharray="4,4" />
+                    <line x1="730" y1="120" x2="700" y2="140" stroke="rgba(255, 255, 255, 0.3)" stroke-width="2"
+                        stroke-dasharray="4,4" />
+                </svg>
             </div>
-            <div class="separator" id="top">
-            </div>
-            <div class="content">
+        </header>
+
+        <!-- Main Content -->
+        <main id="main-content" class="main-content">
+            <!-- Introduction -->
+            <section class="intro-section">
                 <p>
-                    <i>
-                        Command-line interface is one of the oldest, yet commonly used human-computer interface, where
-                        users type textual commands with arguments to get desired results.
-                        Developers often provide command-line options for software applications along with graphical
-                        user interface.
-                        Several programming languages provide standard libraries to help programmers parse and handle
-                        command-line arguments.
-                        However, both CLI and libraries have evolved all these years, standardizing the way how commands
-                        are built and adding along with new functionalities like the use of colors, auto-completion,
-                        auto-correction etc.
-                        Yet there is a lot of scope for improvement, notably for creating a multilingual interface,
-                        obtaining the progress of a command, furthering the use of colors etc.
-                    </i>
+                    Command-line interface is one of the oldest, yet commonly used human-computer interface, where
+                    users type textual commands with arguments to get desired results.
+                    Developers often provide command-line options for software applications along with graphical
+                    user interface.
+                    Several programming languages provide standard libraries to help programmers parse and handle
+                    command-line arguments.
+                    However, both CLI and libraries have evolved all these years, standardizing the way how commands
+                    are built and adding along with new functionalities like the use of colors, auto-completion,
+                    auto-correction etc.
+                    Yet there is a lot of scope for improvement, notably for creating a multilingual interface,
+                    obtaining the progress of a command, furthering the use of colors etc.
                 </p>
+            </section>
+
+            <!-- Content Sections -->
+            <article class="content-section">
                 <h3>Introduction</h3>
                 <p>
                     Considering the recent advances in human-computer interfaces with graphical user interfaces,
@@ -337,8 +772,8 @@
                     Command-line or terminal commands, hereafter referred to as simply commands require to be memorized
                     and if you are a regular CLI user, it may not be difficult. The learning curve for a novice is
                     however hard, especially the users from non-English background.
-                    However, there are manuals and can even be accessed from the command line like <code> $ man </code>
-                    or <code> $ info </code>. Nevertheless, CLI requires memorization of commands and their arguments.
+                    However, there are manuals and can even be accessed from the command line like <code>$ man</code>
+                    or <code>$ info</code>. Nevertheless, CLI requires memorization of commands and their arguments.
                     Even then, this initial
                     curve does not stop new users and many recent programming and development tools have command line
                     options.
@@ -352,13 +787,16 @@
                     trend towards making
                     CLI human-friendly; auto-completion and auto-corrections have made their entry to several shells.
                     Search engines have raised the bar for textual-based applications.
-                    <code> $ man -k 'search term'</code> may suggest several commands related to the search term. It
+                    <code>$ man -k 'search term'</code> may suggest several commands related to the search term. It
                     still requires a lot of human effort to find the right set of commands and related arguments for a
                     given task. Therefore, CLI still needs
                     a lot of enhancements. In the debate between GUI icons and commands<sup><a
                             href="#feature">4</a></sup>, it is said that an image can speak thousand words, but it
                     cannot easily replace the word (or command).
                 </p>
+            </article>
+
+            <article class="content-section">
                 <h3>Understanding Command Line Arguments</h3>
                 <p>
                     Those familiar with C programming language may have heard about <code>getopt()</code>, a library
@@ -378,7 +816,7 @@
                     like an option may take one or more arguments, ability to specify the expected
                     data type of arguments (e.g. float, integer etc.), easier handling of help messages (e.g.,
                     <code>ls --help</code> for different options. Another interesting feature is the support for
-                    subcommands like <code>git</code><sup><a href="#next-ui">10</a></sup> has several subcommands
+                    subcommands like <code>git</code><sup><a href="#git">10</a></sup> has several subcommands
                     <code>push, pull, commit</code> etc, each having its own set of options sharing the same names (both
                     longer and shorter versions).
                     <code>argparse()</code> has also added the possibility to group arguments (by default, optional and
@@ -391,6 +829,9 @@
                     library functions is useful to both users and application developers. Nevertheless, command lines
                     can still be further enhanced.
                 </p>
+            </article>
+
+            <article class="content-section">
                 <h3>Enhancing Command Line</h3>
                 <p>
                     An important question is how to further <b>reduce the learning curve</b> of new users to command
@@ -478,6 +919,9 @@
                             href="#gnu-parallel">17</a></sup>). Indeed, the use of pipes can be further used to
                     recommend and create <i>command mashups</i>.
                 </p>
+            </article>
+
+            <article class="content-section">
                 <h3>Conclusion</h3>
                 <p>
                     With the growing number of human-computer interfaces, it is easy to question the relevance of
@@ -489,10 +933,16 @@
                     user experience based on past history of commands, adding additional support for natural language
                     and making use of colors.
                 </p>
-                <p><b>Note:</b> This article was first written as a proposition to an upcoming Linux distribution
-                    conference.</p>
+
+                <div class="note-card">
+                    <p><b>Note:</b> This article was first written as a proposition to an upcoming Linux distribution
+                        conference.</p>
+                </div>
+            </article>
+
+            <!-- References -->
+            <article class="content-section">
                 <h3>References</h3>
-                <p>
                 <ol>
                     <li id="command-line-interface"><a
                             href="https://en.wikipedia.org/wiki/Command-line_interface">Command Line Interface</a></li>
@@ -531,9 +981,23 @@
                             interactive shell</a></li>
                     <li id="gnu-parallel"><a href="https://www.gnu.org/software/parallel/">GNU Parallel</a></li>
                 </ol>
-                </p>
+            </article>
+        </main>
+
+        <!-- Footer -->
+        <footer>
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h4>Language Versions</h4>
+                    <ul class="footer-links">
+                        <li><a href="./command-line-arguments.html">English</a></li>
+                    </ul>
+                </div>
+                <div class="footer-bottom">
+                    <p>&copy; 2024 John Samuel. All content licensed under CC BY-SA 4.0.</p>
+                </div>
             </div>
-        </div>
+        </footer>
     </body>
 
 </html>
