@@ -2,271 +2,689 @@
 <html lang="en">
 
     <head>
-        <meta charset="utf-8" />
-        <meta http-equiv="Content-Language" content="en" />
-        <link rel="shortcut icon" href="../../images/logo/favicon.png" />
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta http-equiv="Content-Language" content="en">
+        <link rel="shortcut icon" href="../../images/logo/favicon.png">
         <title>Web Development: John Samuel</title>
-        <style type="text/css">
-            body {
-                background-color: #FFFFFF;
+        <style>
+            /* ============================================
+           DESIGN TOKENS & CUSTOM PROPERTIES
+           ============================================ */
+            :root {
+                /* Web Development Theme Color Palette */
+                --color-base-bg: #f8f9fb;
+                --color-base-surface: #ffffff;
+                --color-base-text: #1a202c;
+                --color-base-text-muted: #4a5568;
+
+                /* Theme Accents - Web/Frontend Theme */
+                --color-accent-1: #e74c3c;
+                /* HTML Red */
+                --color-accent-2: #3498db;
+                /* CSS Blue */
+                --color-accent-3: #f39c12;
+                /* JavaScript Orange */
+                --color-accent-4: #9b59b6;
+                /* Framework Purple */
+                --color-accent-light: rgba(231, 76, 60, 0.08);
+
+                /* Functional Colors */
+                --color-shadow: rgba(231, 76, 60, 0.12);
+                --color-border: rgba(231, 76, 60, 0.15);
+                --color-hover: rgba(231, 76, 60, 0.08);
+
+                /* Gradients */
+                --gradient-primary: linear-gradient(135deg, #e74c3c 0%, #f39c12 100%);
+                --gradient-secondary: linear-gradient(225deg, #3498db 0%, #9b59b6 100%);
+                --gradient-web: linear-gradient(135deg, #e74c3c 0%, #3498db 50%, #f39c12 100%);
+                --gradient-subtle: linear-gradient(180deg, #f8f9fb 0%, rgba(231, 76, 60, 0.03) 100%);
+
+                /* Typography */
+                --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+                --font-mono: 'SF Mono', Monaco, 'Cascadia Code', Consolas, 'Courier New', monospace;
+
+                /* Spacing Scale */
+                --space-xs: 0.25rem;
+                --space-sm: 0.5rem;
+                --space-md: 1rem;
+                --space-lg: 1.5rem;
+                --space-xl: 2rem;
+                --space-2xl: 3rem;
+                --space-3xl: 4rem;
+                --space-4xl: 6rem;
+
+                /* Border Radius */
+                --radius-sm: 4px;
+                --radius-md: 8px;
+                --radius-lg: 12px;
+                --radius-xl: 16px;
+                --radius-2xl: 24px;
+                --radius-organic: 63% 37% 54% 46% / 45% 62% 38% 55%;
+
+                /* Shadows */
+                --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.04), 0 1px 3px rgba(0, 0, 0, 0.06);
+                --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.05), 0 2px 4px rgba(0, 0, 0, 0.06);
+                --shadow-lg: 0 10px 24px rgba(0, 0, 0, 0.08), 0 4px 8px rgba(0, 0, 0, 0.06);
+                --shadow-theme: 0 10px 30px var(--color-shadow), 0 4px 10px rgba(0, 0, 0, 0.06);
+
+                /* Fluid Typography */
+                --text-xs: clamp(0.75rem, 0.7rem + 0.25vw, 0.875rem);
+                --text-sm: clamp(0.875rem, 0.8rem + 0.35vw, 1rem);
+                --text-base: clamp(1rem, 0.95rem + 0.25vw, 1.125rem);
+                --text-lg: clamp(1.125rem, 1.05rem + 0.35vw, 1.25rem);
+                --text-xl: clamp(1.25rem, 1.15rem + 0.5vw, 1.5rem);
+                --text-2xl: clamp(1.5rem, 1.3rem + 1vw, 2rem);
+                --text-3xl: clamp(2rem, 1.6rem + 2vw, 2.5rem);
+                --text-4xl: clamp(2.5rem, 2rem + 2.5vw, 3.5rem);
             }
 
-            #sidebar {
-                position: fixed;
-                background-color: #009AA6;
-                top: 0;
-                left: 0;
-                bottom: 0;
-                width: 30vw;
-            }
-
-            #sidebar .title {
-                position: relative;
-                text-align: center;
-                line-height: 5vmax;
-                font-size: 1.4vmax;
-                font-family: 'Arial';
-                margin-top: 30vh;
-            }
-
-            #sidebar .title a:link,
-            #sidebar .title a:visited {
-                color: #FFFFFF;
-                text-decoration: none;
-            }
-
-            .subtitle {
-                top: 50vh;
-                text-align: center;
-                line-height: 1.3vmax;
-                font-family: 'Arial';
-                font-size: 1.2vmax;
-                color: #FFFFFF;
-            }
-
-            .subtitle a:link,
-            .subtitle a:visited {
-                color: #FFFFFF;
-                text-decoration: none;
-            }
-
-            .licence {
-                position: fixed;
-                text-align: right;
-                bottom: 0;
-                right: 0;
-            }
-
-            .home {
-                position: fixed;
-                text-align: left;
-                font-family: 'Arial';
-                color: #D3D3D3;
-                z-index: 100;
-                width: 100%;
-                background-color: #FFFFFF;
-                top: 0px;
-                margin-bottom: 10px;
-                padding-bottom: 10px;
-            }
-
-            .home a:link,
-            .home a:visited {
-                text-decoration: none;
-                color: #D3D3D3;
-            }
-
-            .home ul {
+            /* ============================================
+           RESET & BASE STYLES
+           ============================================ */
+            * {
                 margin: 0;
                 padding: 0;
-                text-align: left;
+                box-sizing: border-box;
+            }
+
+            html {
+                scroll-behavior: smooth;
+                scroll-padding-top: 80px;
+            }
+
+            body {
+                font-family: var(--font-sans);
+                font-size: var(--text-base);
+                line-height: 1.7;
+                color: var(--color-base-text);
+                background: var(--gradient-subtle);
+                background-attachment: fixed;
+                -webkit-font-smoothing: antialiased;
+                -moz-osx-font-smoothing: grayscale;
+            }
+
+            /* ============================================
+           SKIP LINK (Accessibility)
+           ============================================ */
+            .skip-link {
+                position: absolute;
+                top: -40px;
+                left: 0;
+                background: var(--color-accent-1);
+                color: white;
+                padding: var(--space-sm) var(--space-md);
+                text-decoration: none;
+                border-radius: var(--radius-md);
+                z-index: 1000;
+            }
+
+            .skip-link:focus {
+                top: var(--space-sm);
+                left: var(--space-sm);
+            }
+
+            /* ============================================
+           NAVIGATION
+           ============================================ */
+            .navigation {
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                z-index: 100;
+                background: rgba(255, 255, 255, 0.9);
+                -webkit-backdrop-filter: blur(12px) saturate(180%);
+                backdrop-filter: blur(12px) saturate(180%);
+                border-bottom: 1px solid var(--color-border);
+                box-shadow: var(--shadow-sm);
+            }
+
+            .nav-container {
+                max-width: 1400px;
+                margin: 0 auto;
+                padding: var(--space-md) var(--space-xl);
+                display: flex;
+                align-items: center;
+                gap: var(--space-2xl);
+                flex-wrap: wrap;
+            }
+
+            .site-name {
+                font-size: var(--text-lg);
+                font-weight: 700;
+                letter-spacing: -0.02em;
+                background: var(--gradient-primary);
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                background-clip: text;
+                text-decoration: none;
+                transition: all 0.3s ease;
+            }
+
+            .site-name:hover {
+                transform: translateY(-2px);
+                filter: brightness(1.1);
+            }
+
+            .breadcrumb-nav {
+                display: flex;
+                list-style: none;
+                gap: var(--space-md);
+                flex-wrap: wrap;
+            }
+
+            .breadcrumb-nav li {
+                display: flex;
+                align-items: center;
+                gap: var(--space-sm);
+            }
+
+            .breadcrumb-nav li:not(:last-child)::after {
+                content: '›';
+                color: var(--color-base-text-muted);
+                opacity: 0.5;
+            }
+
+            .breadcrumb-nav a {
+                color: var(--color-base-text-muted);
+                text-decoration: none;
+                font-size: var(--text-sm);
+                padding: var(--space-xs) var(--space-sm);
+                border-radius: var(--radius-sm);
+                transition: all 0.3s ease;
+            }
+
+            .breadcrumb-nav a:hover {
+                color: var(--color-accent-1);
+                background: var(--color-hover);
+            }
+
+            /* ============================================
+           HERO SECTION
+           ============================================ */
+            .hero {
+                margin-top: 80px;
+                padding: var(--space-4xl) var(--space-xl);
+                position: relative;
+                overflow: hidden;
+            }
+
+            .hero-background {
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                z-index: -1;
+                opacity: 0.3;
+            }
+
+            .hero-container {
+                max-width: 1400px;
+                margin: 0 auto;
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: var(--space-3xl);
+                align-items: center;
+            }
+
+            .hero-content h1 {
+                font-size: var(--text-4xl);
+                font-weight: 800;
+                line-height: 1.1;
+                letter-spacing: -0.03em;
+                margin-bottom: var(--space-lg);
+                background: var(--gradient-web);
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                background-clip: text;
+                animation: fadeInUp 0.8s ease-out;
+            }
+
+            .hero-subtitle {
+                font-size: var(--text-xl);
+                color: var(--color-base-text-muted);
+                margin-bottom: var(--space-xl);
+                animation: fadeInUp 0.8s ease-out 0.2s both;
+            }
+
+            .hero-author {
+                font-size: var(--text-lg);
+                color: var(--color-accent-2);
+                font-weight: 600;
+                animation: fadeInUp 0.8s ease-out 0.4s both;
+            }
+
+            .hero-author a {
+                color: var(--color-accent-1);
+                text-decoration: none;
+                position: relative;
+            }
+
+            .hero-author a::after {
+                content: '';
+                position: absolute;
+                bottom: -2px;
+                left: 0;
+                width: 0;
+                height: 2px;
+                background: var(--gradient-primary);
+                transition: width 0.3s ease;
+            }
+
+            .hero-author a:hover::after {
+                width: 100%;
+            }
+
+            /* ============================================
+           SVG ILLUSTRATION - Web Tech Network
+           ============================================ */
+            .hero-visual {
+                position: relative;
+                animation: fadeIn 1s ease-out 0.6s both;
+            }
+
+            /* ============================================
+           MAIN CONTENT
+           ============================================ */
+            .main-content {
+                max-width: 1400px;
+                margin: 0 auto;
+                padding: var(--space-3xl) var(--space-xl);
+            }
+
+            .intro-text {
+                font-size: var(--text-lg);
+                color: var(--color-base-text-muted);
+                margin-bottom: var(--space-3xl);
+                text-align: center;
+                animation: fadeInUp 0.8s ease-out 0.2s both;
+            }
+
+            /* ============================================
+           FRAMEWORK GRID
+           ============================================ */
+            .frameworks-section {
+                margin-bottom: var(--space-4xl);
+            }
+
+            .section-title {
+                font-size: var(--text-2xl);
+                font-weight: 700;
+                letter-spacing: -0.02em;
+                color: var(--color-accent-1);
+                margin-bottom: var(--space-2xl);
+                position: relative;
+                padding-bottom: var(--space-md);
+                text-align: center;
+            }
+
+            .section-title::after {
+                content: '';
+                position: absolute;
+                bottom: 0;
+                left: 50%;
+                transform: translateX(-50%);
+                width: 80px;
+                height: 3px;
+                background: var(--gradient-web);
+                border-radius: 2px;
+            }
+
+            .frameworks-grid {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+                gap: var(--space-xl);
+                animation: fadeInUp 0.8s ease-out 0.4s both;
+            }
+
+            .framework-card {
+                background: var(--color-base-surface);
+                border-radius: var(--radius-xl);
+                padding: var(--space-xl);
+                box-shadow: var(--shadow-theme);
+                transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+                position: relative;
+                overflow: hidden;
+            }
+
+            .framework-card::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                height: 4px;
+                background: var(--gradient-web);
+                transform: scaleX(0);
+                transform-origin: left;
+                transition: transform 0.4s ease;
+            }
+
+            .framework-card:hover {
+                transform: translateY(-12px) scale(1.02);
+                box-shadow: 0 20px 40px rgba(231, 76, 60, 0.2);
+            }
+
+            .framework-card:hover::before {
+                transform: scaleX(1);
+            }
+
+            .framework-icon {
+                width: 60px;
+                height: 60px;
+                border-radius: var(--radius-lg);
+                background: var(--gradient-web);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                margin-bottom: var(--space-lg);
+                font-size: var(--text-2xl);
+                font-weight: 700;
+                color: white;
+                font-family: var(--font-mono);
+            }
+
+            .framework-name {
+                font-size: var(--text-xl);
+                font-weight: 700;
+                color: var(--color-base-text);
+                margin-bottom: var(--space-md);
+                letter-spacing: -0.01em;
+            }
+
+            .framework-links {
                 list-style: none;
             }
 
-            .home li {
-                position: relative;
-                float: left;
-                padding-top: 15px;
-                margin-right: 1em;
-                font-family: 'Arial';
+            .framework-links li {
+                margin-bottom: var(--space-sm);
             }
 
-            .home li:hover {
-                display: block;
-            }
-
-            .home li:hover a:link,
-            .home li:hover a:visited {
+            .framework-links a {
+                color: var(--color-accent-2);
                 text-decoration: none;
-                padding: 15px;
-                color: #FFFFFF;
-                background-color: #009AA6;
+                font-size: var(--text-sm);
+                display: inline-flex;
+                align-items: center;
+                gap: var(--space-xs);
+                transition: all 0.3s ease;
+                position: relative;
+                padding: var(--space-xs) 0;
             }
 
-            .content {
-                line-height: 1.8vmax;
-                font-size: 1.2vmax;
-                font-family: 'Arial';
-                margin-top: 15vh;
-                width: 90%;
+            .framework-links a::before {
+                content: '→';
+                opacity: 0;
+                transform: translateX(-10px);
+                transition: all 0.3s ease;
             }
 
-            .content h1,
-            h2,
-            h3,
-            h4 {
-                color: #009AA6;
+            .framework-links a:hover {
+                color: var(--color-accent-1);
+                padding-left: var(--space-md);
             }
 
-            .content a:link,
-            .content a:visited {
-                color: #009AA6;
+            .framework-links a:hover::before {
+                opacity: 1;
+                transform: translateX(0);
             }
 
-            .content h3 {
-                color: #009AA6;
+            /* ============================================
+           REFERENCES SECTION
+           ============================================ */
+            .references-section {
+                background: var(--color-base-surface);
+                border-radius: var(--radius-2xl);
+                padding: var(--space-2xl);
+                box-shadow: var(--shadow-lg);
+                margin-top: var(--space-4xl);
+                animation: fadeInUp 0.8s ease-out 0.6s both;
             }
 
-            .content h2::before,
-            .content h3::before {
-                display: block;
-                content: " ";
-                visibility: hidden;
-                height: 50px;
-                margin-top: -50px;
-                pointer-events: none;
-                background-color: #FFFFFF;
+            .references-title {
+                font-size: var(--text-2xl);
+                font-weight: 700;
+                color: var(--color-accent-2);
+                margin-bottom: var(--space-lg);
+                text-align: center;
             }
 
-            .content a:link,
-            .content a:visited {
-                color: #009AA6;
+            .references-list {
+                list-style: none;
+                display: grid;
+                gap: var(--space-md);
             }
 
-            .home a:link,
-            .home a:visited {
-                color: #D3D3D3;
+            .references-list li {
+                padding: var(--space-md);
+                background: var(--color-accent-light);
+                border-radius: var(--radius-md);
+                border-left: 4px solid var(--color-accent-1);
+                transition: all 0.3s ease;
             }
 
-            .content li {
-                line-height: 2em;
+            .references-list li:hover {
+                transform: translateX(8px);
+                border-left-width: 8px;
             }
 
-            .page {
-                width: 65vw;
-                height: 100%;
-                margin-left: 30vw;
-                overflow: hidden;
-                padding: 0 1em;
-                font-family: 'Arial';
+            .references-list a {
+                color: var(--color-accent-2);
+                text-decoration: none;
+                font-weight: 500;
+                transition: color 0.3s ease;
             }
 
-            .page img {
-                max-width: 100%;
-                max-height: 100%;
+            .references-list a:hover {
+                color: var(--color-accent-1);
             }
 
-            @media (max-width: 640px),
-            screen and (orientation: portrait) {
-                body {
-                    max-width: 100%;
-                    max-height: 100%;
+            /* ============================================
+           FOOTER
+           ============================================ */
+            .footer {
+                background: var(--color-base-surface);
+                border-top: 1px solid var(--color-border);
+                margin-top: var(--space-4xl);
+                padding: var(--space-2xl) var(--space-xl);
+            }
+
+            .footer-container {
+                max-width: 1400px;
+                margin: 0 auto;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                flex-wrap: wrap;
+                gap: var(--space-lg);
+            }
+
+            .footer-copyright {
+                color: var(--color-base-text-muted);
+                font-size: var(--text-sm);
+            }
+
+            .language-selector {
+                display: flex;
+                gap: var(--space-md);
+                align-items: center;
+            }
+
+            .language-selector span {
+                color: var(--color-base-text-muted);
+                font-size: var(--text-sm);
+                font-weight: 600;
+            }
+
+            /* ============================================
+           ANIMATIONS
+           ============================================ */
+            @keyframes fadeIn {
+                from {
+                    opacity: 0;
                 }
 
-                #sidebar {
-                    position: fixed;
-                    background-color: #009AA6;
-                    top: 0;
-                    left: 0;
-                    bottom: 80vh;
-                    width: 100vw;
+                to {
+                    opacity: 1;
+                }
+            }
+
+            @keyframes fadeInUp {
+                from {
+                    opacity: 0;
+                    transform: translateY(30px);
                 }
 
-                #sidebar .title {
+                to {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            }
+
+            @keyframes float {
+
+                0%,
+                100% {
+                    transform: translateY(0) rotate(0deg);
+                }
+
+                50% {
+                    transform: translateY(-20px) rotate(5deg);
+                }
+            }
+
+            @keyframes pulse {
+
+                0%,
+                100% {
+                    opacity: 0.6;
+                }
+
+                50% {
+                    opacity: 1;
+                }
+            }
+
+            @keyframes spin {
+                from {
+                    transform: rotate(0deg);
+                }
+
+                to {
+                    transform: rotate(360deg);
+                }
+            }
+
+            @keyframes webFlow {
+                0% {
+                    stroke-dashoffset: 1000;
+                }
+
+                100% {
+                    stroke-dashoffset: 0;
+                }
+            }
+
+            @keyframes morphBlob {
+
+                0%,
+                100% {
+                    border-radius: 63% 37% 54% 46% / 45% 62% 38% 55%;
+                }
+
+                50% {
+                    border-radius: 37% 63% 46% 54% / 62% 45% 55% 38%;
+                }
+            }
+
+            /* ============================================
+           RESPONSIVE DESIGN
+           ============================================ */
+            @media (max-width: 1024px) {
+                .hero-container {
+                    grid-template-columns: 1fr;
+                }
+
+                .hero-visual {
+                    max-width: 500px;
+                    margin: 0 auto;
+                }
+
+                .frameworks-grid {
+                    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+                }
+            }
+
+            @media (max-width: 768px) {
+                .nav-container {
+                    padding: var(--space-md);
+                    gap: var(--space-md);
+                }
+
+                .hero {
+                    padding: var(--space-2xl) var(--space-md);
+                }
+
+                .main-content {
+                    padding: var(--space-2xl) var(--space-md);
+                }
+
+                .frameworks-grid {
+                    grid-template-columns: 1fr;
+                }
+
+                .references-section {
+                    padding: var(--space-lg);
+                }
+
+                .footer-container {
+                    flex-direction: column;
                     text-align: center;
-                    position: fixed;
-                    margin-top: 6vh;
-                    left: 0px;
-                    right: 0px;
-                    line-height: 3.5vmax;
-                    font-size: 1.5vmax;
-                    font-family: 'Arial';
+                }
+            }
+
+            @media (max-width: 480px) {
+                .breadcrumb-nav {
+                    gap: var(--space-sm);
                 }
 
-                #sidebar .subtitle {
-                    text-align: center;
-                    top: 5vh;
-                    left: 0px;
-                    right: 0px;
-                    position: fixed;
-                    margin-top: 10vh;
-                    font-size: 1.5vmax;
+                .breadcrumb-nav a {
+                    font-size: var(--text-xs);
+                    padding: var(--space-xs);
                 }
 
-                #sidebar .title a:link,
-                #sidebar .title a:visited {
-                    text-align: center;
-                    color: #FFFFFF;
+                .framework-card {
+                    padding: var(--space-lg);
                 }
+            }
 
-                #sidebar .subtitle a:link,
-                #sidebar .subtitle a:visited {
-                    text-align: center;
-                    color: #FFFFFF;
-                }
+            /* ============================================
+           REDUCED MOTION PREFERENCE
+           ============================================ */
+            @media (prefers-reduced-motion: reduce) {
 
-                .home {
-                    z-index: 100;
-                    width: 100%;
-                    background-color: #009AA6;
-                    font-size: 1.5vmax;
-                }
-
-                .home a:link,
-                .home a:visited {
-                    text-decoration: none;
-                    color: #FFFFFF;
-                }
-
-                .content {
-                    line-height: 3.8vmax;
-                    font-size: 1.8vmax;
-                    font-family: 'Arial';
-                    margin-top: 22vh;
-                }
-
-                .content a:link,
-                .content a:visited {
-                    color: #009AA6;
-                }
-
-                .page {
-                    top: 40vh;
-                    width: 95%;
-                    margin-left: 0vw;
-                }
-
-                .page img {
-                    max-width: 100%;
-                    max-height: 100%;
-                    border: 0;
+                *,
+                *::before,
+                *::after {
+                    animation-duration: 0.01ms !important;
+                    animation-iteration-count: 1 !important;
+                    transition-duration: 0.01ms !important;
                 }
             }
         </style>
     </head>
 
     <body vocab="http://schema.org/">
-        <div id="sidebar">
-            <div class="title">
-                <h1><a href="./web-development.html">Web Development</a></h1>
-            </div>
-            <div class="subtitle">
-                <h2><a href="../about.html">John Samuel</a></h2>
-            </div>
-        </div>
-        <div class="page">
-            <div class="home">
-                <ul typeof="BreadcrumbList">
+        <!-- Skip Link for Accessibility -->
+        <a href="#main-content" class="skip-link">Skip to main content</a>
+
+        <!-- Navigation -->
+        <nav class="navigation" role="navigation" aria-label="Main navigation">
+            <div class="nav-container">
+                <a href="../index.html" class="site-name">John Samuel</a>
+                <ul class="breadcrumb-nav" typeof="BreadcrumbList">
                     <li property="itemListElement" typeof="ListItem">
                         <a property="item" typeof="WebPage" href="../index.html">
                             <span property="name">Home</span>
@@ -284,61 +702,260 @@
                     </li>
                 </ul>
             </div>
-            <div class="content">
-                <p>A non-exhaustive list of frameworks and tools for Web development</p>
-                <h3>Javascript</h3>
-                <ul>
-                    <li>Angular
-                        <ul>
+        </nav>
 
+        <!-- Hero Section -->
+        <header class="hero">
+            <div class="hero-background" aria-hidden="true">
+                <svg viewBox="0 0 1400 600" xmlns="http://www.w3.org/2000/svg" style="width: 100%; height: 100%;">
+                    <defs>
+                        <linearGradient id="webGrad1" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" style="stop-color:#e74c3c;stop-opacity:0.4" />
+                            <stop offset="50%" style="stop-color:#3498db;stop-opacity:0.4" />
+                            <stop offset="100%" style="stop-color:#f39c12;stop-opacity:0.4" />
+                        </linearGradient>
+                        <filter id="webGlow">
+                            <feGaussianBlur stdDeviation="5" result="coloredBlur" />
+                            <feMerge>
+                                <feMergeNode in="coloredBlur" />
+                                <feMergeNode in="SourceGraphic" />
+                            </feMerge>
+                        </filter>
+                    </defs>
+
+                    <!-- Browser window frames -->
+                    <g opacity="0.2">
+                        <rect x="100" y="100" width="400" height="250" rx="12" fill="none" stroke="#e74c3c"
+                            stroke-width="3" />
+                        <line x1="100" y1="130" x2="500" y2="130" stroke="#e74c3c" stroke-width="3" />
+                        <circle cx="120" cy="115" r="5" fill="#e74c3c" />
+                        <circle cx="140" cy="115" r="5" fill="#f39c12" />
+                        <circle cx="160" cy="115" r="5" fill="#3498db" />
+
+                        <rect x="900" y="150" width="350" height="200" rx="12" fill="none" stroke="#3498db"
+                            stroke-width="3" />
+                        <line x1="900" y1="180" x2="1250" y2="180" stroke="#3498db" stroke-width="3" />
+                        <circle cx="920" cy="165" r="5" fill="#e74c3c" />
+                        <circle cx="940" cy="165" r="5" fill="#f39c12" />
+                        <circle cx="960" cy="165" r="5" fill="#3498db" />
+                    </g>
+
+                    <!-- Web connection lines -->
+                    <g opacity="0.3">
+                        <line x1="300" y1="225" x2="600" y2="300" stroke="url(#webGrad1)" stroke-width="2"
+                            stroke-dasharray="5,5">
+                            <animate attributeName="stroke-dashoffset" from="0" to="10" dur="1s"
+                                repeatCount="indefinite" />
+                        </line>
+                        <line x1="600" y1="300" x2="1075" y2="250" stroke="url(#webGrad1)" stroke-width="2"
+                            stroke-dasharray="5,5">
+                            <animate attributeName="stroke-dashoffset" from="0" to="10" dur="1.2s"
+                                repeatCount="indefinite" />
+                        </line>
+                    </g>
+
+                    <!-- Floating code tags -->
+                    <g style="animation: float 5s ease-in-out infinite;">
+                        <text x="250" y="450" font-family="monospace" font-size="24" fill="#e74c3c"
+                            opacity="0.6">&lt;html&gt;</text>
+                    </g>
+
+                    <g style="animation: float 6s ease-in-out infinite 1s;">
+                        <text x="600" y="350" font-family="monospace" font-size="20" fill="#3498db"
+                            opacity="0.6">{css}</text>
+                    </g>
+
+                    <g style="animation: float 7s ease-in-out infinite 2s;">
+                        <text x="1000" y="480" font-family="monospace" font-size="22" fill="#f39c12"
+                            opacity="0.6">fn()</text>
+                    </g>
+
+                    <!-- Central hub -->
+                    <circle cx="700" cy="300" r="80" fill="url(#webGrad1)" opacity="0.3" filter="url(#webGlow)"
+                        style="animation: pulse 3s ease-in-out infinite;" />
+                </svg>
+            </div>
+
+            <div class="hero-container">
+                <div class="hero-content">
+                    <h1>Web Development</h1>
+                    <p class="hero-subtitle">Frameworks & Tools for Modern Web Development</p>
+                    <p class="hero-author">by <a href="../about.html">John Samuel</a></p>
+                </div>
+                <div class="hero-visual" aria-hidden="true">
+                    <svg viewBox="0 0 500 500" xmlns="http://www.w3.org/2000/svg">
+                        <defs>
+                            <linearGradient id="htmlGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" style="stop-color:#e74c3c;stop-opacity:1" />
+                                <stop offset="100%" style="stop-color:#c0392b;stop-opacity:1" />
+                            </linearGradient>
+                            <linearGradient id="cssGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" style="stop-color:#3498db;stop-opacity:1" />
+                                <stop offset="100%" style="stop-color:#2980b9;stop-opacity:1" />
+                            </linearGradient>
+                            <linearGradient id="jsGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" style="stop-color:#f39c12;stop-opacity:1" />
+                                <stop offset="100%" style="stop-color:#e67e22;stop-opacity:1" />
+                            </linearGradient>
+                            <filter id="techGlow">
+                                <feGaussianBlur stdDeviation="4" result="coloredBlur" />
+                                <feMerge>
+                                    <feMergeNode in="coloredBlur" />
+                                    <feMergeNode in="SourceGraphic" />
+                                </feMerge>
+                            </filter>
+                        </defs>
+
+                        <!-- Central browser window -->
+                        <rect x="150" y="150" width="200" height="200" rx="16" fill="white" opacity="0.9"
+                            stroke="url(#htmlGrad)" stroke-width="3" filter="url(#techGlow)" />
+
+                        <!-- Browser chrome -->
+                        <rect x="150" y="150" width="200" height="30" rx="16" fill="url(#htmlGrad)" />
+                        <circle cx="170" cy="165" r="4" fill="white" opacity="0.8" />
+                        <circle cx="185" cy="165" r="4" fill="white" opacity="0.8" />
+                        <circle cx="200" cy="165" r="4" fill="white" opacity="0.8" />
+
+                        <!-- HTML Layer -->
+                        <g style="animation: float 4s ease-in-out infinite;">
+                            <circle cx="250" cy="100" r="45" fill="url(#htmlGrad)" filter="url(#techGlow)"
+                                opacity="0.9" />
+                            <text x="250" y="110" text-anchor="middle" font-family="monospace" font-size="20"
+                                fill="white" font-weight="bold">HTML</text>
+                            <line x1="250" y1="145" x2="250" y2="180" stroke="#e74c3c" stroke-width="3" />
+                        </g>
+
+                        <!-- CSS Layer -->
+                        <g style="animation: float 5s ease-in-out infinite 1s;">
+                            <circle cx="380" cy="250" r="45" fill="url(#cssGrad)" filter="url(#techGlow)"
+                                opacity="0.9" />
+                            <text x="380" y="260" text-anchor="middle" font-family="monospace" font-size="20"
+                                fill="white" font-weight="bold">CSS</text>
+                            <line x1="350" y1="250" x2="335" y2="250" stroke="#3498db" stroke-width="3" />
+                        </g>
+
+                        <!-- JS Layer -->
+                        <g style="animation: float 6s ease-in-out infinite 2s;">
+                            <circle cx="120" cy="250" r="45" fill="url(#jsGrad)" filter="url(#techGlow)"
+                                opacity="0.9" />
+                            <text x="120" y="258" text-anchor="middle" font-family="monospace" font-size="22"
+                                fill="white" font-weight="bold">JS</text>
+                            <line x1="165" y1="250" x2="165" y2="250" stroke="#f39c12" stroke-width="3" />
+                        </g>
+
+                        <!-- Framework icons floating -->
+                        <g style="animation: spin 20s linear infinite; transform-origin: 250px 250px;">
+                            <circle cx="250" cy="400" r="20" fill="#9b59b6" opacity="0.7" />
+                            <text x="250" y="407" text-anchor="middle" font-size="14" fill="white"
+                                font-weight="bold">Fw</text>
+                        </g>
+
+                        <!-- Connecting particles -->
+                        <circle cx="200" cy="230" r="3" fill="#e74c3c" opacity="0.6"
+                            style="animation: pulse 2s ease-in-out infinite;" />
+                        <circle cx="300" cy="230" r="3" fill="#3498db" opacity="0.6"
+                            style="animation: pulse 2.5s ease-in-out infinite;" />
+                        <circle cx="250" cy="300" r="3" fill="#f39c12" opacity="0.6"
+                            style="animation: pulse 3s ease-in-out infinite;" />
+                    </svg>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main id="main-content" class="main-content" role="main">
+            <p class="intro-text">A non-exhaustive list of frameworks and tools for Web development</p>
+
+            <section class="frameworks-section">
+                <h2 class="section-title">JavaScript Frameworks & Tools</h2>
+                <div class="frameworks-grid">
+                    <!-- Angular -->
+                    <article class="framework-card">
+                        <div class="framework-icon">Ng</div>
+                        <h3 class="framework-name">Angular</h3>
+                        <ul class="framework-links">
                             <li><a href="https://angular.io/">Official Website</a></li>
                         </ul>
-                    </li>
-                    <li>Flutter
-                        <ul>
+                    </article>
 
+                    <!-- Flutter -->
+                    <article class="framework-card">
+                        <div class="framework-icon">Fl</div>
+                        <h3 class="framework-name">Flutter</h3>
+                        <ul class="framework-links">
                             <li><a href="https://flutter.dev/">Official Website</a></li>
                         </ul>
-                    </li>
-                    <li>React
-                        <ul>
+                    </article>
 
+                    <!-- React -->
+                    <article class="framework-card">
+                        <div class="framework-icon">⚛</div>
+                        <h3 class="framework-name">React</h3>
+                        <ul class="framework-links">
                             <li><a href="https://react.dev/">Official Website</a></li>
                         </ul>
-                    </li>
-                    <li>Svelte
-                        <ul>
+                    </article>
 
+                    <!-- Svelte -->
+                    <article class="framework-card">
+                        <div class="framework-icon">Sv</div>
+                        <h3 class="framework-name">Svelte</h3>
+                        <ul class="framework-links">
                             <li><a href="https://svelte.dev/">Official Website</a></li>
-
                             <li><a href="https://svelte.dev/blog/write-less-code">Write less code</a></li>
-
                             <li><a href="https://www.wired.com/story/javascript-framework-puts-web-pages-diet/">The
                                     JavaScript Framework That Puts Web Pages on a Diet</a></li>
                         </ul>
-                    </li>
-                    <li>Vue
-                        <ul>
+                    </article>
 
+                    <!-- Vue -->
+                    <article class="framework-card">
+                        <div class="framework-icon">V</div>
+                        <h3 class="framework-name">Vue</h3>
+                        <ul class="framework-links">
                             <li><a href="https://vuejs.org/">Official Website</a></li>
                         </ul>
-                    </li>
-                    <li>WebAssembly
-                        <ul>
+                    </article>
 
+                    <!-- WebAssembly -->
+                    <article class="framework-card">
+                        <div class="framework-icon">Wa</div>
+                        <h3 class="framework-name">WebAssembly</h3>
+                        <ul class="framework-links">
                             <li><a href="https://webassembly.org/">Official Website</a></li>
                         </ul>
+                    </article>
+                </div>
+            </section>
+
+            <!-- References Section -->
+            <section class="references-section">
+                <h2 class="references-title">References</h2>
+                <ul class="references-list">
+                    <li>
+                        <a href="https://en.wikipedia.org/wiki/Category:JavaScript_web_frameworks">Category: JavaScript
+                            web frameworks</a>
+                    </li>
+                    <li>
+                        <a href="https://en.wikipedia.org/wiki/Comparison_of_JavaScript-based_web_frameworks">Comparison
+                            of JavaScript-based web frameworks</a>
                     </li>
                 </ul>
-                <h3>References</h3>
-                <ul>
-                    <li> <a href="https://en.wikipedia.org/wiki/Category:JavaScript_web_frameworks">Category:JavaScript
-                            web frameworks</a></li>
-                    <li> <a href="https://en.wikipedia.org/wiki/Comparison_of_JavaScript-based_web_frameworks">Comparison
-                            of JavaScript-based web frameworks</a></li>
-                </ul>
+            </section>
+        </main>
+
+        <!-- Footer -->
+        <footer class="footer" role="contentinfo">
+            <div class="footer-container">
+                <div class="footer-copyright">
+                    <p>&copy; 2025 John Samuel. All content licensed under Creative Commons CC BY-SA 4.0.</p>
+                </div>
+                <div class="language-selector">
+                    <span>Languages:</span>
+                    <span><a href="./web-development.html">English</a></span>
+                </div>
             </div>
-        </div>
+        </footer>
     </body>
 
 </html>

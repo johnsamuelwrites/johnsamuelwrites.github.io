@@ -2,266 +2,643 @@
 <html lang="en">
 
     <head>
-        <meta charset="utf-8" />
-        <meta http-equiv="Content-Language" content="en" />
-        <link rel="shortcut icon" href="../../images/logo/favicon.png" />
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta http-equiv="Content-Language" content="en">
+        <link rel="shortcut icon" href="../../images/logo/favicon.png">
         <title>Programming Paradigms: John Samuel</title>
-        <style type="text/css">
-            body {
-                background-color: #FFFFFF;
+        <style>
+            /* ============================================
+           DESIGN TOKENS & CUSTOM PROPERTIES
+           ============================================ */
+            :root {
+                /* Technology Theme Color Palette */
+                --color-base-bg: #f5f8fa;
+                --color-base-surface: #ffffff;
+                --color-base-text: #1a202c;
+                --color-base-text-muted: #4a5568;
+
+                /* Theme Accents - Computing/Code Theme */
+                --color-accent-1: #4a90e2;
+                /* Primary blue */
+                --color-accent-2: #2d5f8d;
+                /* Deep blue */
+                --color-accent-3: #7b68ee;
+                /* Molecular purple */
+                --color-accent-4: #56c9d4;
+                /* Cyan highlight */
+                --color-accent-light: rgba(74, 144, 226, 0.08);
+
+                /* Functional Colors */
+                --color-shadow: rgba(74, 144, 226, 0.12);
+                --color-border: rgba(74, 144, 226, 0.15);
+                --color-hover: rgba(74, 144, 226, 0.08);
+
+                /* Gradients */
+                --gradient-primary: linear-gradient(135deg, #4a90e2 0%, #7b68ee 100%);
+                --gradient-secondary: linear-gradient(225deg, #2d5f8d 0%, #56c9d4 100%);
+                --gradient-subtle: linear-gradient(180deg, #f5f8fa 0%, rgba(74, 144, 226, 0.05) 100%);
+
+                /* Typography */
+                --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+                --font-mono: 'SF Mono', Monaco, 'Cascadia Code', Consolas, 'Courier New', monospace;
+
+                /* Spacing Scale */
+                --space-xs: 0.25rem;
+                --space-sm: 0.5rem;
+                --space-md: 1rem;
+                --space-lg: 1.5rem;
+                --space-xl: 2rem;
+                --space-2xl: 3rem;
+                --space-3xl: 4rem;
+                --space-4xl: 6rem;
+
+                /* Border Radius */
+                --radius-sm: 4px;
+                --radius-md: 8px;
+                --radius-lg: 12px;
+                --radius-xl: 16px;
+                --radius-2xl: 24px;
+                --radius-organic: 63% 37% 54% 46% / 45% 62% 38% 55%;
+
+                /* Shadows */
+                --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.04), 0 1px 3px rgba(0, 0, 0, 0.06);
+                --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.05), 0 2px 4px rgba(0, 0, 0, 0.06);
+                --shadow-lg: 0 10px 24px rgba(0, 0, 0, 0.08), 0 4px 8px rgba(0, 0, 0, 0.06);
+                --shadow-theme: 0 10px 30px var(--color-shadow), 0 4px 10px rgba(0, 0, 0, 0.06);
+
+                /* Fluid Typography */
+                --text-xs: clamp(0.75rem, 0.7rem + 0.25vw, 0.875rem);
+                --text-sm: clamp(0.875rem, 0.8rem + 0.35vw, 1rem);
+                --text-base: clamp(1rem, 0.95rem + 0.25vw, 1.125rem);
+                --text-lg: clamp(1.125rem, 1.05rem + 0.35vw, 1.25rem);
+                --text-xl: clamp(1.25rem, 1.15rem + 0.5vw, 1.5rem);
+                --text-2xl: clamp(1.5rem, 1.3rem + 1vw, 2rem);
+                --text-3xl: clamp(2rem, 1.6rem + 2vw, 2.5rem);
+                --text-4xl: clamp(2.5rem, 2rem + 2.5vw, 3.5rem);
             }
 
-            #sidebar {
-                position: fixed;
-                background-color: #009AA6;
-                top: 0;
-                left: 0;
-                bottom: 0;
-                width: 30vw;
-            }
-
-            #sidebar .title {
-                position: relative;
-                text-align: center;
-                line-height: 5vmax;
-                font-size: 1.4vmax;
-                font-family: 'Arial';
-                margin-top: 30vh;
-            }
-
-            #sidebar .title a:link,
-            #sidebar .title a:visited {
-                color: #FFFFFF;
-                text-decoration: none;
-            }
-
-            .subtitle {
-                top: 50vh;
-                text-align: center;
-                line-height: 1.3vmax;
-                font-family: 'Arial';
-                font-size: 1.2vmax;
-                color: #FFFFFF;
-            }
-
-            .subtitle a:link,
-            .subtitle a:visited {
-                color: #FFFFFF;
-                text-decoration: none;
-            }
-
-            .licence {
-                position: fixed;
-                text-align: right;
-                bottom: 0;
-                right: 0;
-            }
-
-            .home {
-                position: fixed;
-                text-align: left;
-                font-family: 'Arial';
-                color: #D3D3D3;
-                z-index: 100;
-                width: 100%;
-                background-color: #FFFFFF;
-                top: 0px;
-                margin-bottom: 10px;
-                padding-bottom: 10px;
-            }
-
-            .home a:link,
-            .home a:visited {
-                text-decoration: none;
-                color: #D3D3D3;
-            }
-
-            .home ul {
+            /* ============================================
+           RESET & BASE STYLES
+           ============================================ */
+            * {
                 margin: 0;
                 padding: 0;
-                text-align: left;
-                list-style: none;
+                box-sizing: border-box;
             }
 
-            .home li {
-                position: relative;
-                float: left;
-                padding-top: 15px;
-                margin-right: 1em;
-                font-family: 'Arial';
+            html {
+                scroll-behavior: smooth;
+                scroll-padding-top: 80px;
             }
 
-            .home li:hover {
-                display: block;
+            body {
+                font-family: var(--font-sans);
+                font-size: var(--text-base);
+                line-height: 1.7;
+                color: var(--color-base-text);
+                background: var(--gradient-subtle);
+                background-attachment: fixed;
+                -webkit-font-smoothing: antialiased;
+                -moz-osx-font-smoothing: grayscale;
             }
 
-            .home li:hover a:link,
-            .home li:hover a:visited {
+            /* ============================================
+           SKIP LINK (Accessibility)
+           ============================================ */
+            .skip-link {
+                position: absolute;
+                top: -40px;
+                left: 0;
+                background: var(--color-accent-1);
+                color: white;
+                padding: var(--space-sm) var(--space-md);
                 text-decoration: none;
-                padding: 15px;
-                color: #FFFFFF;
-                background-color: #009AA6;
+                border-radius: var(--radius-md);
+                z-index: 1000;
             }
 
-            .content {
-                line-height: 1.8vmax;
-                font-size: 1.2vmax;
-                font-family: 'Arial';
-                margin-top: 15vh;
-                width: 90%;
+            .skip-link:focus {
+                top: var(--space-sm);
+                left: var(--space-sm);
             }
 
-            .content h2,
-            h3,
-            h4 {
-                color: #009AA6;
+            /* ============================================
+           NAVIGATION
+           ============================================ */
+            .navigation {
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                z-index: 100;
+                background: rgba(255, 255, 255, 0.9);
+                -webkit-backdrop-filter: blur(12px) saturate(180%);
+                backdrop-filter: blur(12px) saturate(180%);
+                border-bottom: 1px solid var(--color-border);
+                box-shadow: var(--shadow-sm);
             }
 
-            .content a:link,
-            .content a:visited {
-                color: #009AA6;
+            .nav-container {
+                max-width: 1400px;
+                margin: 0 auto;
+                padding: var(--space-md) var(--space-xl);
+                display: flex;
+                align-items: center;
+                gap: var(--space-2xl);
+                flex-wrap: wrap;
             }
 
-            .content h3 {
-                color: #009AA6;
+            .site-name {
+                font-size: var(--text-lg);
+                font-weight: 700;
+                letter-spacing: -0.02em;
+                background: var(--gradient-primary);
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                background-clip: text;
+                text-decoration: none;
+                transition: all 0.3s ease;
             }
 
-            .content h2::before,
-            .content h3::before {
-                display: block;
-                content: " ";
-                visibility: hidden;
-                height: 50px;
-                margin-top: -50px;
-                pointer-events: none;
-                background-color: #FFFFFF;
+            .site-name:hover {
+                transform: translateY(-2px);
+                filter: brightness(1.1);
             }
 
-            .content a:link,
-            .content a:visited {
-                color: #009AA6;
+            .breadcrumb-nav {
+                display: flex;
+                list-style: none;
+                gap: var(--space-md);
+                flex-wrap: wrap;
             }
 
-            .home a:link,
-            .home a:visited {
-                color: #D3D3D3;
+            .breadcrumb-nav li {
+                display: flex;
+                align-items: center;
+                gap: var(--space-sm);
             }
 
-            .page {
-                width: 65vw;
-                height: 100%;
-                margin-left: 30vw;
+            .breadcrumb-nav li:not(:last-child)::after {
+                content: '›';
+                color: var(--color-base-text-muted);
+                opacity: 0.5;
+            }
+
+            .breadcrumb-nav a {
+                color: var(--color-base-text-muted);
+                text-decoration: none;
+                font-size: var(--text-sm);
+                padding: var(--space-xs) var(--space-sm);
+                border-radius: var(--radius-sm);
+                transition: all 0.3s ease;
+            }
+
+            .breadcrumb-nav a:hover {
+                color: var(--color-accent-1);
+                background: var(--color-hover);
+            }
+
+            /* ============================================
+           HERO SECTION
+           ============================================ */
+            .hero {
+                margin-top: 80px;
+                padding: var(--space-4xl) var(--space-xl);
+                position: relative;
                 overflow: hidden;
-                padding: 0 1em;
-                font-family: 'Arial';
             }
 
-            .page img {
-                max-width: 100%;
-                max-height: 100%;
+            .hero-background {
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                z-index: -1;
+                opacity: 0.4;
             }
 
-            @media (max-width: 640px),
-            screen and (orientation: portrait) {
-                body {
-                    max-width: 100%;
-                    max-height: 100%;
+            .hero-container {
+                max-width: 1400px;
+                margin: 0 auto;
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: var(--space-3xl);
+                align-items: center;
+            }
+
+            .hero-content h1 {
+                font-size: var(--text-4xl);
+                font-weight: 800;
+                line-height: 1.1;
+                letter-spacing: -0.03em;
+                margin-bottom: var(--space-lg);
+                background: var(--gradient-primary);
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                background-clip: text;
+                animation: fadeInUp 0.8s ease-out;
+            }
+
+            .hero-subtitle {
+                font-size: var(--text-xl);
+                color: var(--color-base-text-muted);
+                margin-bottom: var(--space-xl);
+                animation: fadeInUp 0.8s ease-out 0.2s both;
+            }
+
+            .hero-author {
+                font-size: var(--text-lg);
+                color: var(--color-accent-2);
+                font-weight: 600;
+                animation: fadeInUp 0.8s ease-out 0.4s both;
+            }
+
+            .hero-author a {
+                color: var(--color-accent-1);
+                text-decoration: none;
+                position: relative;
+            }
+
+            .hero-author a::after {
+                content: '';
+                position: absolute;
+                bottom: -2px;
+                left: 0;
+                width: 0;
+                height: 2px;
+                background: var(--gradient-primary);
+                transition: width 0.3s ease;
+            }
+
+            .hero-author a:hover::after {
+                width: 100%;
+            }
+
+            /* ============================================
+           SVG ILLUSTRATION - Code/Programming Theme
+           ============================================ */
+            .hero-visual {
+                position: relative;
+                animation: fadeIn 1s ease-out 0.6s both;
+            }
+
+            /* ============================================
+           MAIN CONTENT
+           ============================================ */
+            .main-content {
+                max-width: 1400px;
+                margin: 0 auto;
+                padding: var(--space-3xl) var(--space-xl);
+            }
+
+            .content-section {
+                margin-bottom: var(--space-4xl);
+                animation: fadeInUp 0.8s ease-out both;
+            }
+
+            .content-section:nth-child(1) {
+                animation-delay: 0.1s;
+            }
+
+            .content-section:nth-child(2) {
+                animation-delay: 0.2s;
+            }
+
+            .content-section:nth-child(3) {
+                animation-delay: 0.3s;
+            }
+
+            .section-title {
+                font-size: var(--text-2xl);
+                font-weight: 700;
+                letter-spacing: -0.02em;
+                color: var(--color-accent-2);
+                margin-bottom: var(--space-lg);
+                position: relative;
+                padding-bottom: var(--space-md);
+            }
+
+            .section-title::after {
+                content: '';
+                position: absolute;
+                bottom: 0;
+                left: 0;
+                width: 60px;
+                height: 3px;
+                background: var(--gradient-primary);
+                border-radius: 2px;
+            }
+
+            .content-section p {
+                margin-bottom: var(--space-lg);
+                color: var(--color-base-text);
+                line-height: 1.8;
+            }
+
+            .content-section a {
+                color: var(--color-accent-1);
+                text-decoration: none;
+                font-weight: 500;
+                position: relative;
+                transition: color 0.3s ease;
+            }
+
+            .content-section a:hover {
+                color: var(--color-accent-3);
+            }
+
+            /* ============================================
+           TABLE STYLING
+           ============================================ */
+            .paradigm-table-wrapper {
+                background: var(--color-base-surface);
+                border-radius: var(--radius-xl);
+                padding: var(--space-xl);
+                box-shadow: var(--shadow-theme);
+                margin: var(--space-2xl) 0;
+                overflow-x: auto;
+            }
+
+            .paradigm-table {
+                width: 100%;
+                border-collapse: separate;
+                border-spacing: 0;
+            }
+
+            .paradigm-table thead {
+                background: var(--gradient-primary);
+            }
+
+            .paradigm-table th {
+                padding: var(--space-md) var(--space-lg);
+                text-align: left;
+                color: white;
+                font-weight: 600;
+                font-size: var(--text-sm);
+                text-transform: uppercase;
+                letter-spacing: 0.05em;
+            }
+
+            .paradigm-table th:first-child {
+                border-radius: var(--radius-md) 0 0 0;
+            }
+
+            .paradigm-table th:last-child {
+                border-radius: 0 var(--radius-md) 0 0;
+            }
+
+            .paradigm-table tbody tr {
+                transition: all 0.3s ease;
+            }
+
+            .paradigm-table tbody tr:hover {
+                background: var(--color-accent-light);
+                transform: scale(1.01);
+            }
+
+            .paradigm-table td {
+                padding: var(--space-md) var(--space-lg);
+                border-bottom: 1px solid var(--color-border);
+                color: var(--color-base-text);
+                line-height: 1.6;
+            }
+
+            .paradigm-table td:first-child {
+                font-weight: 600;
+                color: var(--color-accent-2);
+                font-family: var(--font-mono);
+                font-size: var(--text-sm);
+            }
+
+            /* ============================================
+           REFERENCES SECTION
+           ============================================ */
+            .references-list {
+                list-style: none;
+                counter-reset: ref-counter;
+            }
+
+            .references-list li {
+                counter-increment: ref-counter;
+                margin-bottom: var(--space-md);
+                padding-left: var(--space-2xl);
+                position: relative;
+            }
+
+            .references-list li::before {
+                content: '[' counter(ref-counter) ']';
+                position: absolute;
+                left: 0;
+                color: var(--color-accent-1);
+                font-weight: 600;
+                font-family: var(--font-mono);
+            }
+
+            .references-list a {
+                color: var(--color-accent-1);
+                text-decoration: none;
+                transition: color 0.3s ease;
+            }
+
+            .references-list a:hover {
+                color: var(--color-accent-3);
+                text-decoration: underline;
+            }
+
+            /* ============================================
+           FOOTER
+           ============================================ */
+            .footer {
+                background: var(--color-base-surface);
+                border-top: 1px solid var(--color-border);
+                margin-top: var(--space-4xl);
+                padding: var(--space-2xl) var(--space-xl);
+            }
+
+            .footer-container {
+                max-width: 1400px;
+                margin: 0 auto;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                flex-wrap: wrap;
+                gap: var(--space-lg);
+            }
+
+            .footer-copyright {
+                color: var(--color-base-text-muted);
+                font-size: var(--text-sm);
+            }
+
+            .language-selector {
+                display: flex;
+                gap: var(--space-md);
+                align-items: center;
+            }
+
+            .language-selector span {
+                color: var(--color-base-text-muted);
+                font-size: var(--text-sm);
+                font-weight: 600;
+            }
+
+            /* ============================================
+           ANIMATIONS
+           ============================================ */
+            @keyframes fadeIn {
+                from {
+                    opacity: 0;
                 }
 
-                #sidebar {
-                    position: fixed;
-                    background-color: #009AA6;
-                    top: 0;
-                    left: 0;
-                    bottom: 80vh;
-                    width: 100vw;
+                to {
+                    opacity: 1;
+                }
+            }
+
+            @keyframes fadeInUp {
+                from {
+                    opacity: 0;
+                    transform: translateY(30px);
                 }
 
-                #sidebar .title {
+                to {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            }
+
+            @keyframes float {
+
+                0%,
+                100% {
+                    transform: translateY(0) rotate(0deg);
+                }
+
+                50% {
+                    transform: translateY(-20px) rotate(5deg);
+                }
+            }
+
+            @keyframes pulse {
+
+                0%,
+                100% {
+                    opacity: 0.6;
+                }
+
+                50% {
+                    opacity: 1;
+                }
+            }
+
+            @keyframes rotateGlow {
+                from {
+                    transform: rotate(0deg);
+                }
+
+                to {
+                    transform: rotate(360deg);
+                }
+            }
+
+            @keyframes codeFlow {
+                0% {
+                    transform: translateX(-100%);
+                    opacity: 0;
+                }
+
+                50% {
+                    opacity: 1;
+                }
+
+                100% {
+                    transform: translateX(100%);
+                    opacity: 0;
+                }
+            }
+
+            /* ============================================
+           RESPONSIVE DESIGN
+           ============================================ */
+            @media (max-width: 1024px) {
+                .hero-container {
+                    grid-template-columns: 1fr;
+                }
+
+                .hero-visual {
+                    max-width: 500px;
+                    margin: 0 auto;
+                }
+            }
+
+            @media (max-width: 768px) {
+                .nav-container {
+                    padding: var(--space-md);
+                    gap: var(--space-md);
+                }
+
+                .hero {
+                    padding: var(--space-2xl) var(--space-md);
+                }
+
+                .main-content {
+                    padding: var(--space-2xl) var(--space-md);
+                }
+
+                .paradigm-table-wrapper {
+                    padding: var(--space-md);
+                }
+
+                .paradigm-table th,
+                .paradigm-table td {
+                    padding: var(--space-sm) var(--space-md);
+                    font-size: var(--text-sm);
+                }
+
+                .footer-container {
+                    flex-direction: column;
                     text-align: center;
-                    position: fixed;
-                    margin-top: 6vh;
-                    left: 0px;
-                    right: 0px;
-                    line-height: 3.5vmax;
-                    font-size: 1.5vmax;
-                    font-family: 'Arial';
+                }
+            }
+
+            @media (max-width: 480px) {
+                .breadcrumb-nav {
+                    gap: var(--space-sm);
                 }
 
-                #sidebar .subtitle {
-                    text-align: center;
-                    top: 5vh;
-                    left: 0px;
-                    right: 0px;
-                    position: fixed;
-                    margin-top: 10vh;
-                    font-size: 1.5vmax;
+                .breadcrumb-nav a {
+                    font-size: var(--text-xs);
+                    padding: var(--space-xs);
                 }
+            }
 
-                #sidebar .title a:link,
-                #sidebar .title a:visited {
-                    text-align: center;
-                    color: #FFFFFF;
-                }
+            /* ============================================
+           REDUCED MOTION PREFERENCE
+           ============================================ */
+            @media (prefers-reduced-motion: reduce) {
 
-                #sidebar .subtitle a:link,
-                #sidebar .subtitle a:visited {
-                    text-align: center;
-                    color: #FFFFFF;
-                }
-
-                .home {
-                    z-index: 100;
-                    width: 100%;
-                    background-color: #009AA6;
-                    font-size: 1.5vmax;
-                }
-
-                .home a:link,
-                .home a:visited {
-                    text-decoration: none;
-                    color: #FFFFFF;
-                }
-
-                .content {
-                    line-height: 3.8vmax;
-                    font-size: 1.8vmax;
-                    font-family: 'Arial';
-                    margin-top: 22vh;
-                }
-
-                .content a:link,
-                .content a:visited {
-                    color: #009AA6;
-                }
-
-                .page {
-                    top: 40vh;
-                    width: 95%;
-                    margin-left: 0vw;
-                }
-
-                .page img {
-                    max-width: 100%;
-                    max-height: 100%;
-                    border: 0;
+                *,
+                *::before,
+                *::after {
+                    animation-duration: 0.01ms !important;
+                    animation-iteration-count: 1 !important;
+                    transition-duration: 0.01ms !important;
                 }
             }
         </style>
     </head>
 
     <body vocab="http://schema.org/">
-        <div id="sidebar">
-            <div class="title">
-                <h1><a href="./programming-paradigms.html">Experimental Analysis of Programming Languages</a></h1>
-            </div>
-            <div class="subtitle">
-                <h2><a href="../about.html">John Samuel</a></h2>
-            </div>
-        </div>
-        <div class="page">
-            <div class="home">
-                <ul typeof="BreadcrumbList">
+        <!-- Skip Link for Accessibility -->
+        <a href="#main-content" class="skip-link">Skip to main content</a>
+
+        <!-- Navigation -->
+        <nav class="navigation" role="navigation" aria-label="Main navigation">
+            <div class="nav-container">
+                <a href="../index.html" class="site-name">John Samuel</a>
+                <ul class="breadcrumb-nav" typeof="BreadcrumbList">
                     <li property="itemListElement" typeof="ListItem">
                         <a property="item" typeof="WebPage" href="../index.html">
                             <span property="name">Home</span>
@@ -279,374 +656,567 @@
                     </li>
                 </ul>
             </div>
-            <div class="content">
-                <h3>The Ever-Evolving Landscape of Programming Paradigms</h3>
-                <p>
-                    Since the inception of the first programming languages [1], a remarkable transformation has occurred
-                    in
-                    our interactions with machines and computers. We've journeyed from the era of electronic punched
-                    cards
-                    to grappling with intricate assembly code, all while dealing with the complexities of the infamous
-                    "goto" statement. To address these challenges, we've introduced concepts such as procedures and
-                    functions, among others.
-                </p>
-                <p>
-                    What's truly astounding is that at each step along this journey, our goal has remained consistent:
-                    to
-                    foster fresh perspectives for achieving seamless communication with machines. This ongoing evolution
-                    within the field of programming languages is known as a "programming paradigm." [2,3,4] Each
-                    paradigm
-                    brings forth its own set of unique features, rules, constraints, and distinctive approaches to
-                    programming.
-                </p>
-                <p>
-                    It's captivating to observe that, unlike the progression of programming languages, finding a direct
-                    parallel shift in the development of human languages has proven to be a quest full of enigmas. While
-                    some may attempt comparisons, like the momentous shift from pictorial representations to the
-                    adoption of
-                    alphabets in written communication, it's evident that the invention of the alphabet marked a
-                    momentous
-                    milestone in human evolution. Nevertheless, drawing such an analogy with the relatively brief
-                    history of
-                    programming languages presents a formidable challenge.
-                </p>
-                <p>
-                    The past seven to eight decades have witnessed remarkable innovations aimed at simplifying our
-                    interactions with machines. We now stand on the precipice of a tantalizing aspiration: the ability
-                    to
-                    converse with machines using our <a href="human-languages-programming-languages.html">native human
-                        languages</a>.
-                </p>
-                <h3>The Multifaceted Nature of Programming</h3>
-                <p>
-                    Programming is a multidimensional art, extending well beyond mere machine interaction. We harness
-                    these
-                    machines as tools to address human problems, and in this pursuit, programming languages serve as our
-                    means to articulate and resolve these challenges. At times, we share our programs with the world,
-                    aspiring for lasting solutions and finding analogies with the world.
-                </p>
-                <p>
-                    Let's consider the Object-Oriented Programming paradigm as an illustration. Here, we employ classes,
-                    objects, and hierarchies to construct our software solutions. However, problem-solving is not always
-                    neatly encapsulated by classes alone. There are instances where alternative representations are
-                    needed
-                    to mirror the complexities of our world.
-                </p>
-                <p>
-                    In computer science, a myriad of programming paradigms exists: declarative programming, procedural
-                    programming, functional programming, aspect-oriented programming, object-oriented programming,
-                    visual
-                    programming, and more. Each paradigm contributes a unique stroke to this ever-evolving canvas.
-                </p>
-                <p>
-                    One may pause to reflect on whether Kuhn's concept of a scientific revolution [5] truly applies to
-                    the
-                    domain of programming paradigms. Kuhn argued that a genuine scientific revolution occurs with a
-                    paradigm
-                    shift [3,4]. However, it's debatable from my perspective whether programming paradigms have led to a
-                    profound upheaval in how we construct software. Nevertheless, for the sake of clarity and
-                    consistency, I
-                    will adhere to the term "programming paradigms" throughout this article.
-                </p>
-                <h3>Unveiling the Commonalities and Turing Completeness</h3>
-                <p>
-                    Upon meticulous scrutiny of the diverse programming language landscape, common threads come to
-                    light.
-                    Programmers can readily identify shared characteristics, including support for pattern recognition,
-                    the
-                    ability to manage functions, procedures, and modules, the flexibility to utilize standard libraries,
-                    the
-                    creative freedom to craft custom libraries, the capability to effortlessly import files, and more.
-                </p>
-                <p>
-                    Programming paradigms find their foundation in mathematical theories and sets of guiding principles.
-                    They encompass a rich array of elements, ranging from variables and control statements that dictate
-                    program flow, choices, and repetitions to a wide spectrum of operators, loops, recursion, and
-                    aggregation. These fundamental elements serve as the building blocks of the diverse programming
-                    paradigms in computer science.
-                </p>
-                <p>
-                    In the discourse concerning programming languages, the mention of the Turing machine holds paramount
-                    significance. The Turing machine stands as a potent concept, capable of representing any problem
-                    amenable to algorithmic solutions. It serves as a yardstick by which we measure the expressiveness
-                    of
-                    programming languages – a language attains Turing completeness when [3] it can encompass the full
-                    spectrum of computable problems.
-                </p>
-                <p>
-                    Notably, the majority of modern programming languages proudly bear the badge of Turing completeness.
-                    This hallmark signifies that a program created in one Turing-complete language possesses the
-                    remarkable
-                    trait of seamless transposability into another. The concept of Turing completeness and the idea of
-                    expressiveness are intricately intertwined, highlighting the interchangeable nature of these
-                    languages.
-                </p>
-                <h3>The Symbiosis of Programming Languages and Technological Progress</h3>
-                <p>
-                    A dynamic correlation unfolds right before our eyes, linking the evolution of our computing
-                    machinery
-                    with the wax and wane of popularity among different programming languages. We witness an ongoing
-                    metamorphosis within programming languages, as they frequently incorporate pivotal features from
-                    their
-                    popular contemporaries, even after their initial release. This adaptive nature closely mirrors the
-                    ever-shifting landscape of technology.
-                </p>
-                <p>
-                    In recent decades, rapid advancements in powerful multicore machines and server architectures have
-                    propelled the programming world into interesting territory. Concepts like parallelism, concurrency,
-                    and
-                    distributed systems have taken the forefront, reshaping our perception of software. At the core of
-                    many
-                    programming languages lies the pivotal concept of abstraction, which continues to serve as a
-                    cornerstone
-                    for managing complexity and optimizing efficiency. In this context, programming languages act as a
-                    potent abstraction layer, shielding programmers from the intricacies of underlying machines and
-                    systems.
-                </p>
-                <h3>Exploring the World of Domain-Specific Languages and Mathematical Insights</h3>
-                <p>
-                    Within the intricate world of programming languages, we encounter a distinct category known as
-                    Domain-Specific Languages (DSLs) [6]. This unique domain raises an intriguing question: should
-                    students
-                    [7] invest their efforts in creating domain-specific languages? These specialized programming
-                    languages are
-                    tailor-made to address specific domains, providing a powerful means to tackle domain-specific
-                    requirements.
-                </p>
-                <p>
-                    In certain situations, an intriguing dilemma emerges: does a newly conceived domain-specific
-                    language
-                    necessitate full Turing completeness? Here, a delicate equilibrium often arises, where decisions
-                    must be
-                    made regarding the language's expressiveness and its Turing completeness. These choices not only
-                    shape
-                    the domain-specific language but also influence problem-solving within specialized domains.
-                </p>
-                <p>
-                    The indispensable role of mathematics should not be underestimated. Many computer scientists seek to
-                    formalize the capabilities offered by programming languages. This formalization is crucial for
-                    understanding
-                    the expressiveness and limitations of a programming language when dealing with complex problems.
-                    Mathematics, serves as a guiding beacon, providing a formal basis for comprehending the intricacies
-                    of
-                    functions and their relationships within programming paradigms.
-                </p>
-                <p>
-                    Functions, the fundamental building blocks of software, are the means through which we express
-                    computations and manipulate data. Grasping their mathematical foundations opens the door to enhanced
-                    problem-solving and creativity in programming. More recently, attention has turned to category
-                    theory, a
-                    branch of abstract algebra, offering profound insights into the structure and composition of
-                    functions,
-                    enabling programmers to create more elegant and efficient code.
-                </p>
-                <h3>Embracing the Evolution and Multi-Paradigm Nature of Programming Languages</h3>
-                <p>
-                    Programming languages that once held the spotlight [8] just a decade or two ago have now receded
-                    into
-                    the relative obscurity of history. A compelling trend becomes apparent:
-                    programming languages are rapidly incorporating features from various paradigms. This observation
-                    prompts us to contemplate a fundamental principle — programming languages should embody versatility
-                    and
-                    possess a multi-paradigm nature [9]. Such languages should exude flexibility, empowering programmers
-                    to
-                    harness the strengths of different paradigms as the need arises. In this context, given below is a
-                    selection of some examples [10-19] that vividly illustrate this dynamic evolution using data from
-                    Wikidata.
-                </p>
-                <table>
-                    <tr>
-                        <th>Programming Language</th>
-                        <th>Programming Paradigms</th>
-                    </tr>
-                    <tr>
-                        <td>Ada</td>
-                        <td>Multi-paradigm, structured, statically typed, imperative, wide-spectrum, object-oriented
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>Algol</td>
-                        <td>Procedural, Imperative, Structured</td>
-                    </tr>
-                    <tr>
-                        <td>C</td>
-                        <td>Imperative (procedural), Structured</td>
-                    </tr>
-                    <tr>
-                        <td>C++</td>
-                        <td>Multi-paradigm: Procedural, Functional, Object-oriented, Generic</td>
-                    </tr>
-                    <tr>
-                        <td>Clojure</td>
-                        <td>Functional</td>
-                    </tr>
-                    <tr>
-                        <td>Cobol</td>
-                        <td>procedural, imperative, object-oriented</td>
-                    </tr>
-                    <tr>
-                        <td>D</td>
-                        <td>Multi-paradigm, Procedural, Object-oriented, Functional, Generic, Concurrent</td>
-                    </tr>
-                    <tr>
-                        <td>Dart</td>
-                        <td>Multi-paradigm: scripting, object-oriented, imperative, reflective, functional</td>
-                    </tr>
-                    <tr>
-                        <td>Erlang</td>
-                        <td> multi-paradigm: concurrent, functional </td>
-                    </tr>
-                    <tr>
-                        <td>Fortran</td>
-                        <td>multi-paradigm: structured, imperative (procedural, object-oriented), generic </td>
-                    </tr>
-                    <tr>
-                        <td>Go</td>
-                        <td> compiled, concurrent, imperative, structured </td>
-                    </tr>
-                    <tr>
-                        <td>Groovy</td>
-                        <td> Object-oriented, imperative, scripting</td>
-                    </tr>
-                    <tr>
-                        <td>Haskell</td>
-                        <td>functional, lazy/non-strict, modular</td>
-                    </tr>
-                    <tr>
-                        <td>Java</td>
-                        <td>Multi-paradigm: Object-oriented (class-based), structured, imperative, generic, reflective,
-                            concurrent</td>
-                    </tr>
-                    <tr>
-                        <td>Javascript</td>
-                        <td> Multi-paradigm: scripting, object-oriented (prototype-based), imperative, functional,
-                            event-driven </td>
-                    </tr>
-                    <tr>
-                        <td>Lisp</td>
-                        <td> Multi-paradigm: functional, procedural, reflective, meta</td>
-                    </tr>
-                    <tr>
-                        <td>Lua</td>
-                        <td>object-oriented programming, prototype-based programming, functional programming, imperative
-                            programming, procedural programming, multi-paradigm programming</td>
-                    </tr>
-                    <tr>
-                        <td>ML</td>
-                        <td>functional programming, imperative programming, procedural programming</td>
-                    </tr>
-                    <tr>
-                        <td>Objective-C</td>
-                        <td>object-oriented programming, reflective programming, multi-paradigm programming, class-based
-                            programming</td>
-                    </tr>
-                    <tr>
-                        <td>OCaml</td>
-                        <td>object-oriented programming, functional programming, modular programming, imperative
-                            programming
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>Pascal</td>
-                        <td>structured programming, imperative programming</td>
-                    </tr>
-                    <tr>
-                        <td>Perl</td>
-                        <td>multi-paradigm programming</td>
-                    </tr>
-                    <tr>
-                        <td>PHP</td>
-                        <td>object-oriented programming, imperative programming, functional programming, reflective
-                            programming, procedural programming</td>
-                    </tr>
-                    <tr>
-                        <td>Prolog</td>
-                        <td>logic programming, declarative programming, modular programming</td>
-                    </tr>
-                    <tr>
-                        <td>Python</td>
-                        <td>object-oriented programming, functional programming, imperative programming, dynamic
-                            programming, multi-paradigm programming</td>
-                    </tr>
-                    <tr>
-                        <td>Ruby</td>
-                        <td>functional programming, object-oriented programming, imperative programming, reflective
-                            programming</td>
-                    </tr>
-                    <tr>
-                        <td>Scala</td>
-                        <td>object-oriented programming, concurrent computing, functional programming, imperative
-                            programming</td>
-                    </tr>
-                    <tr>
-                        <td>Scheme</td>
-                        <td>functional programming, imperative programming, procedural programming, metaprogramming</td>
-                    </tr>
-                    <tr>
-                        <td>Smalltalk</td>
-                        <td>object-oriented programming, class-based programming</td>
-                    </tr>
-                    <tr>
-                        <td>Wyvern</td>
-                        <td>object-oriented programming, functional programming</td>
-                    </tr>
-                </table>
-                <h3>Conclusion</h3>
-                <p>Programming languages have undergone a remarkable journey, shaped by the diverse paradigms that have
-                    emerged over time. This evolution reflects the ongoing quest for effective communication with
-                    machines,
-                    spurring innovation and adaptability. The interplay of paradigms, the embrace of Turing
-                    completeness,
-                    and the ever-present need for versatility mark this dynamic landscape. As we move forward, the world
-                    of
-                    programming languages remains a compelling and ever-evolving field, where the interplay of paradigms
-                    continues to drive progress and shape the future of technology. It signals a future where humans may
-                    communicate with machines using our native human languages, a tantalizing prospect that continues to
-                    drive innovation in the world of programming languages.</p>
-                <h3>References</h3>
-                <ol>
-                    <li id="history"><a href="https://en.wikipedia.org/wiki/History_of_programming_languages">History of
-                            programming languages</a></li>
-                    <li id="programming-paradigms"><a
-                            href="https://en.wikipedia.org/wiki/Programming_paradigm">Programming
-                            Paradigm</a></li>
-                    <li id="paradigms">Michaelson, Greg. “Programming Paradigms, Turing Completeness and Computational
-                        Thinking.” The Art, Science, and Engineering of Programming, vol. 4, no. 3, Feb. 2020, p. 4.
-                    </li>
-                    <li id="programming">Van Roy, Peter. Programming paradigms for dummies: what every programmer should
-                        know. In: Edited by Gérard Assayag and Andrew Gerzso, New computational paradigms for computer
-                        music, Éditions DELATOUR FRANCE : Le vallier 2009, p. 9-47,
-                        https://dial.uclouvain.be/pr/boreal/object/boreal:89561.</li>
-                    <li id="paradigm-shift"><a href="https://en.wikipedia.org/wiki/Paradigm_shift">Paradigm Shift</a>
-                    </li>
-                    <li id="domain-specific"><a
-                            href="https://en.wikipedia.org/wiki/Domain-specific_language">Domain-specific language</a>
-                    </li>
-                    <li id="teaching-paradigms">Krishnamurthi, Shriram. “Teaching Programming Languages in a
-                        Post-Linnaean
-                        Age.” ACM SIGPLAN Notices, vol. 43, no. 11, Nov. 2008, pp. 81–83. November 2008</li>
-                    <li id="cobol"><a
-                            href="https://www.inputmag.com/tech/ibm-will-offer-free-cobol-training-to-address-overloaded-unemployment-systems">IBM
-                            will offer free COBOL training to address overloaded unemployment systems</a></li>
-                    <li id="multiparadigm"><a
-                            href="https://www.oreilly.com/radar/multi-paradigm-languages/">Multi-Paradigm
-                            Languages</a></li>
-                    <li id="dart"><a href="https://en.wikipedia.org/wiki/Dart_(programming_language)">Dart</a></li>
-                    <li id="Erlang"><a href="https://en.wikipedia.org/wiki/Erlang_(programming_language)">Erlang</a>
-                    </li>
-                    <li id="Fortran"><a href="https://en.wikipedia.org/wiki/Fortran">Fortran</a></li>
-                    <li id="Go"><a href="https://en.wikipedia.org/wiki/Go_(programming_language)">Go</a></li>
-                    <li id="Groovy"><a href="https://en.wikipedia.org/wiki/Groovy_(programming_language)">Groovy</a>
-                    </li>
-                    <li id="Haskell"><a href="https://en.wikipedia.org/wiki/Haskell_(programming_language)">Haskell</a>
-                    </li>
-                    <li id="Java"><a href="https://en.wikipedia.org/wiki/Java_(programming_language)">Java</a></li>
-                    <li id="Javascript"><a href="https://en.wikipedia.org/wiki/JavaScript">JavaScript</a></li>
-                    <li id="Lisp"><a href="https://en.wikipedia.org/wiki/Lisp_(programming_language)">Lisp</a></li>
-                    <li id="Lua"><a href="https://en.wikipedia.org/wiki/Lua_(programming_language)">Lua</a></li>
-                </ol>
+        </nav>
+
+        <!-- Hero Section -->
+        <header class="hero">
+            <div class="hero-background" aria-hidden="true">
+                <svg viewBox="0 0 1400 600" xmlns="http://www.w3.org/2000/svg" style="width: 100%; height: 100%;">
+                    <defs>
+                        <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" style="stop-color:#4a90e2;stop-opacity:0.3" />
+                            <stop offset="100%" style="stop-color:#7b68ee;stop-opacity:0.3" />
+                        </linearGradient>
+                        <filter id="glow">
+                            <feGaussianBlur stdDeviation="4" result="coloredBlur" />
+                            <feMerge>
+                                <feMergeNode in="coloredBlur" />
+                                <feMergeNode in="SourceGraphic" />
+                            </feMerge>
+                        </filter>
+                    </defs>
+
+                    <!-- Circuit board pattern -->
+                    <g opacity="0.15">
+                        <line x1="100" y1="50" x2="300" y2="50" stroke="#4a90e2" stroke-width="2" />
+                        <line x1="300" y1="50" x2="300" y2="150" stroke="#4a90e2" stroke-width="2" />
+                        <line x1="300" y1="150" x2="500" y2="150" stroke="#4a90e2" stroke-width="2" />
+                        <circle cx="300" cy="50" r="5" fill="#7b68ee" />
+                        <circle cx="300" cy="150" r="5" fill="#56c9d4" />
+
+                        <line x1="700" y1="100" x2="900" y2="100" stroke="#4a90e2" stroke-width="2" />
+                        <line x1="900" y1="100" x2="900" y2="200" stroke="#4a90e2" stroke-width="2" />
+                        <line x1="900" y1="200" x2="1100" y2="200" stroke="#4a90e2" stroke-width="2" />
+                        <circle cx="900" cy="100" r="5" fill="#7b68ee" />
+                        <circle cx="900" cy="200" r="5" fill="#56c9d4" />
+                    </g>
+
+                    <!-- Floating code blocks -->
+                    <g style="animation: float 6s ease-in-out infinite;">
+                        <rect x="200" y="250" width="120" height="80" rx="8" fill="url(#grad1)" opacity="0.5"
+                            filter="url(#glow)" />
+                        <text x="220" y="285" font-family="monospace" font-size="14" fill="#4a90e2"
+                            opacity="0.8">function</text>
+                        <text x="220" y="305" font-family="monospace" font-size="14" fill="#7b68ee"
+                            opacity="0.8">paradigm</text>
+                    </g>
+
+                    <g style="animation: float 8s ease-in-out infinite 1s;">
+                        <rect x="1000" y="300" width="140" height="90" rx="8" fill="url(#grad1)" opacity="0.5"
+                            filter="url(#glow)" />
+                        <text x="1020" y="340" font-family="monospace" font-size="14" fill="#4a90e2"
+                            opacity="0.8">class</text>
+                        <text x="1020" y="360" font-family="monospace" font-size="14" fill="#7b68ee"
+                            opacity="0.8">Object</text>
+                    </g>
+
+                    <!-- Binary flow -->
+                    <g style="animation: codeFlow 10s linear infinite;" opacity="0.3">
+                        <text x="0" y="450" font-family="monospace" font-size="12" fill="#4a90e2">01001000 01100101
+                            01101100 01101100 01101111</text>
+                    </g>
+
+                    <!-- Rotating glow orb -->
+                    <circle cx="700" cy="300" r="100" fill="url(#grad1)" opacity="0.2" filter="url(#glow)"
+                        style="animation: pulse 4s ease-in-out infinite;" />
+                </svg>
             </div>
-        </div>
+
+            <div class="hero-container">
+                <div class="hero-content">
+                    <h1>Experimental Analysis of Programming Languages</h1>
+                    <p class="hero-subtitle">Exploring the Ever-Evolving Landscape of Programming Paradigms</p>
+                    <p class="hero-author">by <a href="../about.html">John Samuel</a></p>
+                </div>
+                <div class="hero-visual" aria-hidden="true">
+                    <svg viewBox="0 0 500 500" xmlns="http://www.w3.org/2000/svg">
+                        <defs>
+                            <linearGradient id="codeGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" style="stop-color:#4a90e2;stop-opacity:1" />
+                                <stop offset="50%" style="stop-color:#7b68ee;stop-opacity:1" />
+                                <stop offset="100%" style="stop-color:#56c9d4;stop-opacity:1" />
+                            </linearGradient>
+                            <filter id="softGlow">
+                                <feGaussianBlur stdDeviation="3" result="coloredBlur" />
+                                <feMerge>
+                                    <feMergeNode in="coloredBlur" />
+                                    <feMergeNode in="SourceGraphic" />
+                                </feMerge>
+                            </filter>
+                        </defs>
+
+                        <!-- Central node - hub -->
+                        <circle cx="250" cy="250" r="60" fill="url(#codeGrad)" filter="url(#softGlow)" opacity="0.9"
+                            style="animation: pulse 3s ease-in-out infinite;" />
+                        <text x="250" y="255" text-anchor="middle" font-family="monospace" font-size="18" fill="white"
+                            font-weight="bold">CODE</text>
+
+                        <!-- Orbiting paradigm nodes -->
+                        <g style="animation: rotateGlow 20s linear infinite; transform-origin: 250px 250px;">
+                            <!-- OOP Node -->
+                            <circle cx="250" cy="100" r="40" fill="#4a90e2" opacity="0.8" filter="url(#softGlow)" />
+                            <text x="250" y="105" text-anchor="middle" font-family="monospace" font-size="12"
+                                fill="white">OOP</text>
+                            <line x1="250" y1="140" x2="250" y2="190" stroke="#4a90e2" stroke-width="2" opacity="0.6" />
+                        </g>
+
+                        <g style="animation: rotateGlow 25s linear infinite; transform-origin: 250px 250px;">
+                            <!-- Functional Node -->
+                            <circle cx="400" cy="250" r="40" fill="#7b68ee" opacity="0.8" filter="url(#softGlow)" />
+                            <text x="400" y="250" text-anchor="middle" font-family="monospace" font-size="11"
+                                fill="white">Func</text>
+                            <line x1="360" y1="250" x2="310" y2="250" stroke="#7b68ee" stroke-width="2" opacity="0.6" />
+                        </g>
+
+                        <g style="animation: rotateGlow 30s linear infinite; transform-origin: 250px 250px;">
+                            <!-- Procedural Node -->
+                            <circle cx="100" cy="250" r="40" fill="#56c9d4" opacity="0.8" filter="url(#softGlow)" />
+                            <text x="100" y="250" text-anchor="middle" font-family="monospace" font-size="11"
+                                fill="white">Proc</text>
+                            <line x1="140" y1="250" x2="190" y2="250" stroke="#56c9d4" stroke-width="2" opacity="0.6" />
+                        </g>
+
+                        <g style="animation: rotateGlow 22s linear infinite reverse; transform-origin: 250px 250px;">
+                            <!-- Logic Node -->
+                            <circle cx="250" cy="400" r="40" fill="#2d5f8d" opacity="0.8" filter="url(#softGlow)" />
+                            <text x="250" y="405" text-anchor="middle" font-family="monospace" font-size="11"
+                                fill="white">Logic</text>
+                            <line x1="250" y1="360" x2="250" y2="310" stroke="#2d5f8d" stroke-width="2" opacity="0.6" />
+                        </g>
+
+                        <!-- Code flow particles -->
+                        <circle cx="300" cy="150" r="3" fill="#4a90e2"
+                            style="animation: float 4s ease-in-out infinite;" />
+                        <circle cx="350" cy="300" r="3" fill="#7b68ee"
+                            style="animation: float 5s ease-in-out infinite 1s;" />
+                        <circle cx="150" cy="300" r="3" fill="#56c9d4"
+                            style="animation: float 6s ease-in-out infinite 2s;" />
+                    </svg>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main id="main-content" class="main-content" role="main">
+            <article>
+                <section class="content-section">
+                    <h2 class="section-title">The Ever-Evolving Landscape of Programming Paradigms</h2>
+                    <p>
+                        Since the inception of the first programming languages <a
+                            href="https://en.wikipedia.org/wiki/History_of_programming_languages">[1]</a>, a remarkable
+                        transformation has occurred in our interactions with machines and computers. We've journeyed
+                        from the era of electronic punched cards to grappling with intricate assembly code, all while
+                        dealing with the complexities of the infamous "goto" statement. To address these challenges,
+                        we've introduced concepts such as procedures and functions, among others.
+                    </p>
+                    <p>
+                        What's truly astounding is that at each step along this journey, our goal has remained
+                        consistent: to foster fresh perspectives for achieving seamless communication with machines.
+                        This ongoing evolution within the field of programming languages is known as a "programming
+                        paradigm." [2,3,4] Each paradigm brings forth its own set of unique features, rules,
+                        constraints, and distinctive approaches to programming.
+                    </p>
+                    <p>
+                        It's captivating to observe that, unlike the progression of programming languages, finding a
+                        direct parallel shift in the development of human languages has proven to be a quest full of
+                        enigmas. While some may attempt comparisons, like the momentous shift from pictorial
+                        representations to the adoption of alphabets in written communication, it's evident that the
+                        invention of the alphabet marked a momentous milestone in human evolution. Nevertheless, drawing
+                        such an analogy with the relatively brief history of programming languages presents a formidable
+                        challenge.
+                    </p>
+                    <p>
+                        The past seven to eight decades have witnessed remarkable innovations aimed at simplifying our
+                        interactions with machines. We now stand on the precipice of a tantalizing aspiration: the
+                        ability to converse with machines using our <a
+                            href="human-languages-programming-languages.html">native human languages</a>.
+                    </p>
+                </section>
+
+                <section class="content-section">
+                    <h2 class="section-title">The Multifaceted Nature of Programming</h2>
+                    <p>
+                        Programming is a multidimensional art, extending well beyond mere machine interaction. We
+                        harness these machines as tools to address human problems, and in this pursuit, programming
+                        languages serve as our means to articulate and resolve these challenges. At times, we share our
+                        programs with the world, aspiring for lasting solutions and finding analogies with the world.
+                    </p>
+                    <p>
+                        Let's consider the Object-Oriented Programming paradigm as an illustration. Here, we employ
+                        classes, objects, and hierarchies to construct our software solutions. However, problem-solving
+                        is not always neatly encapsulated by classes alone. There are instances where alternative
+                        representations are needed to mirror the complexities of our world.
+                    </p>
+                    <p>
+                        In computer science, a myriad of programming paradigms exists: declarative programming,
+                        procedural programming, functional programming, aspect-oriented programming, object-oriented
+                        programming, visual programming, and more. Each paradigm contributes a unique stroke to this
+                        ever-evolving canvas.
+                    </p>
+                    <p>
+                        One may pause to reflect on whether Kuhn's concept of a scientific revolution <a
+                            href="https://en.wikipedia.org/wiki/Paradigm_shift">[5]</a> truly applies to the domain of
+                        programming paradigms. Kuhn argued that a genuine scientific revolution occurs with a paradigm
+                        shift [3,4]. However, it's debatable from my perspective whether programming paradigms have led
+                        to a profound upheaval in how we construct software. Nevertheless, for the sake of clarity and
+                        consistency, I will adhere to the term "programming paradigms" throughout this article.
+                    </p>
+                </section>
+
+                <section class="content-section">
+                    <h2 class="section-title">Unveiling the Commonalities and Turing Completeness</h2>
+                    <p>
+                        Upon meticulous scrutiny of the diverse programming language landscape, common threads come to
+                        light. Programmers can readily identify shared characteristics, including support for pattern
+                        recognition, the ability to manage functions, procedures, and modules, the flexibility to
+                        utilize standard libraries, the creative freedom to craft custom libraries, the capability to
+                        effortlessly import files, and more.
+                    </p>
+                    <p>
+                        Programming paradigms find their foundation in mathematical theories and sets of guiding
+                        principles. They encompass a rich array of elements, ranging from variables and control
+                        statements that dictate program flow, choices, and repetitions to a wide spectrum of operators,
+                        loops, recursion, and aggregation. These fundamental elements serve as the building blocks of
+                        the diverse programming paradigms in computer science.
+                    </p>
+                    <p>
+                        In the discourse concerning programming languages, the mention of the Turing machine holds
+                        paramount significance. The Turing machine stands as a potent concept, capable of representing
+                        any problem amenable to algorithmic solutions. It serves as a yardstick by which we measure the
+                        expressiveness of programming languages – a language attains Turing completeness when [3] it can
+                        encompass the full spectrum of computable problems.
+                    </p>
+                    <p>
+                        Notably, the majority of modern programming languages proudly bear the badge of Turing
+                        completeness. This hallmark signifies that a program created in one Turing-complete language
+                        possesses the remarkable trait of seamless transposability into another. The concept of Turing
+                        completeness and the idea of expressiveness are intricately intertwined, highlighting the
+                        interchangeable nature of these languages.
+                    </p>
+                </section>
+
+                <section class="content-section">
+                    <h2 class="section-title">The Symbiosis of Programming Languages and Technological Progress</h2>
+                    <p>
+                        A dynamic correlation unfolds right before our eyes, linking the evolution of our computing
+                        machinery with the wax and wane of popularity among different programming languages. We witness
+                        an ongoing metamorphosis within programming languages, as they frequently incorporate pivotal
+                        features from their popular contemporaries, even after their initial release. This adaptive
+                        nature closely mirrors the ever-shifting landscape of technology.
+                    </p>
+                    <p>
+                        In recent decades, rapid advancements in powerful multicore machines and server architectures
+                        have propelled the programming world into interesting territory. Concepts like parallelism,
+                        concurrency, and distributed systems have taken the forefront, reshaping our perception of
+                        software. At the core of many programming languages lies the pivotal concept of abstraction,
+                        which continues to serve as a cornerstone for managing complexity and optimizing efficiency. In
+                        this context, programming languages act as a potent abstraction layer, shielding programmers
+                        from the intricacies of underlying machines and systems.
+                    </p>
+                </section>
+
+                <section class="content-section">
+                    <h2 class="section-title">Exploring the World of Domain-Specific Languages and Mathematical Insights
+                    </h2>
+                    <p>
+                        Within the intricate world of programming languages, we encounter a distinct category known as
+                        Domain-Specific Languages (DSLs) <a
+                            href="https://en.wikipedia.org/wiki/Domain-specific_language">[6]</a>. This unique domain
+                        raises an intriguing question: should students [7] invest their efforts in creating
+                        domain-specific languages? These specialized programming languages are tailor-made to address
+                        specific domains, providing a powerful means to tackle domain-specific requirements.
+                    </p>
+                    <p>
+                        In certain situations, an intriguing dilemma emerges: does a newly conceived domain-specific
+                        language necessitate full Turing completeness? Here, a delicate equilibrium often arises, where
+                        decisions must be made regarding the language's expressiveness and its Turing completeness.
+                        These choices not only shape the domain-specific language but also influence problem-solving
+                        within specialized domains.
+                    </p>
+                    <p>
+                        The indispensable role of mathematics should not be underestimated. Many computer scientists
+                        seek to formalize the capabilities offered by programming languages. This formalization is
+                        crucial for understanding the expressiveness and limitations of a programming language when
+                        dealing with complex problems. Mathematics, serves as a guiding beacon, providing a formal basis
+                        for comprehending the intricacies of functions and their relationships within programming
+                        paradigms.
+                    </p>
+                    <p>
+                        Functions, the fundamental building blocks of software, are the means through which we express
+                        computations and manipulate data. Grasping their mathematical foundations opens the door to
+                        enhanced problem-solving and creativity in programming. More recently, attention has turned to
+                        category theory, a branch of abstract algebra, offering profound insights into the structure and
+                        composition of functions, enabling programmers to create more elegant and efficient code.
+                    </p>
+                </section>
+
+                <section class="content-section">
+                    <h2 class="section-title">Embracing the Evolution and Multi-Paradigm Nature of Programming Languages
+                    </h2>
+                    <p>
+                        Programming languages that once held the spotlight <a
+                            href="https://www.inputmag.com/tech/ibm-will-offer-free-cobol-training-to-address-overloaded-unemployment-systems">[8]</a>
+                        just a decade or two ago have now receded into the relative obscurity of history. A compelling
+                        trend becomes apparent: programming languages are rapidly incorporating features from various
+                        paradigms. This observation prompts us to contemplate a fundamental principle — programming
+                        languages should embody versatility and possess a multi-paradigm nature <a
+                            href="https://www.oreilly.com/radar/multi-paradigm-languages/">[9]</a>. Such languages
+                        should exude flexibility, empowering programmers to harness the strengths of different paradigms
+                        as the need arises. In this context, given below is a selection of some examples [10-19] that
+                        vividly illustrate this dynamic evolution using data from Wikidata.
+                    </p>
+
+                    <div class="paradigm-table-wrapper">
+                        <table class="paradigm-table">
+                            <thead>
+                                <tr>
+                                    <th>Programming Language</th>
+                                    <th>Programming Paradigms</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Ada</td>
+                                    <td>Multi-paradigm, structured, statically typed, imperative, wide-spectrum,
+                                        object-oriented</td>
+                                </tr>
+                                <tr>
+                                    <td>Algol</td>
+                                    <td>Procedural, Imperative, Structured</td>
+                                </tr>
+                                <tr>
+                                    <td>C</td>
+                                    <td>Imperative (procedural), Structured</td>
+                                </tr>
+                                <tr>
+                                    <td>C++</td>
+                                    <td>Multi-paradigm: Procedural, Functional, Object-oriented, Generic</td>
+                                </tr>
+                                <tr>
+                                    <td>Clojure</td>
+                                    <td>Functional</td>
+                                </tr>
+                                <tr>
+                                    <td>Cobol</td>
+                                    <td>procedural, imperative, object-oriented</td>
+                                </tr>
+                                <tr>
+                                    <td>D</td>
+                                    <td>Multi-paradigm, Procedural, Object-oriented, Functional, Generic, Concurrent
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Dart</td>
+                                    <td>Multi-paradigm: scripting, object-oriented, imperative, reflective, functional
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Erlang</td>
+                                    <td>multi-paradigm: concurrent, functional</td>
+                                </tr>
+                                <tr>
+                                    <td>Fortran</td>
+                                    <td>multi-paradigm: structured, imperative (procedural, object-oriented), generic
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Go</td>
+                                    <td>compiled, concurrent, imperative, structured</td>
+                                </tr>
+                                <tr>
+                                    <td>Groovy</td>
+                                    <td>Object-oriented, imperative, scripting</td>
+                                </tr>
+                                <tr>
+                                    <td>Haskell</td>
+                                    <td>functional, lazy/non-strict, modular</td>
+                                </tr>
+                                <tr>
+                                    <td>Java</td>
+                                    <td>Multi-paradigm: Object-oriented (class-based), structured, imperative, generic,
+                                        reflective, concurrent</td>
+                                </tr>
+                                <tr>
+                                    <td>Javascript</td>
+                                    <td>Multi-paradigm: scripting, object-oriented (prototype-based), imperative,
+                                        functional, event-driven</td>
+                                </tr>
+                                <tr>
+                                    <td>Lisp</td>
+                                    <td>Multi-paradigm: functional, procedural, reflective, meta</td>
+                                </tr>
+                                <tr>
+                                    <td>Lua</td>
+                                    <td>object-oriented programming, prototype-based programming, functional
+                                        programming, imperative programming, procedural programming, multi-paradigm
+                                        programming</td>
+                                </tr>
+                                <tr>
+                                    <td>ML</td>
+                                    <td>functional programming, imperative programming, procedural programming</td>
+                                </tr>
+                                <tr>
+                                    <td>Objective-C</td>
+                                    <td>object-oriented programming, reflective programming, multi-paradigm programming,
+                                        class-based programming</td>
+                                </tr>
+                                <tr>
+                                    <td>OCaml</td>
+                                    <td>object-oriented programming, functional programming, modular programming,
+                                        imperative programming</td>
+                                </tr>
+                                <tr>
+                                    <td>Pascal</td>
+                                    <td>structured programming, imperative programming</td>
+                                </tr>
+                                <tr>
+                                    <td>Perl</td>
+                                    <td>multi-paradigm programming</td>
+                                </tr>
+                                <tr>
+                                    <td>PHP</td>
+                                    <td>object-oriented programming, imperative programming, functional programming,
+                                        reflective programming, procedural programming</td>
+                                </tr>
+                                <tr>
+                                    <td>Prolog</td>
+                                    <td>logic programming, declarative programming, modular programming</td>
+                                </tr>
+                                <tr>
+                                    <td>Python</td>
+                                    <td>object-oriented programming, functional programming, imperative programming,
+                                        dynamic programming, multi-paradigm programming</td>
+                                </tr>
+                                <tr>
+                                    <td>Ruby</td>
+                                    <td>functional programming, object-oriented programming, imperative programming,
+                                        reflective programming</td>
+                                </tr>
+                                <tr>
+                                    <td>Scala</td>
+                                    <td>object-oriented programming, concurrent computing, functional programming,
+                                        imperative programming</td>
+                                </tr>
+                                <tr>
+                                    <td>Scheme</td>
+                                    <td>functional programming, imperative programming, procedural programming,
+                                        metaprogramming</td>
+                                </tr>
+                                <tr>
+                                    <td>Smalltalk</td>
+                                    <td>object-oriented programming, class-based programming</td>
+                                </tr>
+                                <tr>
+                                    <td>Wyvern</td>
+                                    <td>object-oriented programming, functional programming</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h2 class="section-title">Conclusion</h2>
+                    <p>
+                        Programming languages have undergone a remarkable journey, shaped by the diverse paradigms that
+                        have emerged over time. This evolution reflects the ongoing quest for effective communication
+                        with machines, spurring innovation and adaptability. The interplay of paradigms, the embrace of
+                        Turing completeness, and the ever-present need for versatility mark this dynamic landscape. As
+                        we move forward, the world of programming languages remains a compelling and ever-evolving
+                        field, where the interplay of paradigms continues to drive progress and shape the future of
+                        technology. It signals a future where humans may communicate with machines using our native
+                        human languages, a tantalizing prospect that continues to drive innovation in the world of
+                        programming languages.
+                    </p>
+                </section>
+
+                <section class="content-section">
+                    <h2 class="section-title">References</h2>
+                    <ol class="references-list">
+                        <li>
+                            <a href="https://en.wikipedia.org/wiki/History_of_programming_languages">History of
+                                programming languages</a>
+                        </li>
+                        <li>
+                            <a href="https://en.wikipedia.org/wiki/Programming_paradigm">Programming Paradigm</a>
+                        </li>
+                        <li>
+                            Michaelson, Greg. "Programming Paradigms, Turing Completeness and Computational Thinking."
+                            The Art, Science, and Engineering of Programming, vol. 4, no. 3, Feb. 2020, p. 4.
+                        </li>
+                        <li>
+                            Van Roy, Peter. Programming paradigms for dummies: what every programmer should know. In:
+                            Edited by Gérard Assayag and Andrew Gerzso, New computational paradigms for computer music,
+                            Éditions DELATOUR FRANCE : Le vallier 2009, p. 9-47,
+                            https://dial.uclouvain.be/pr/boreal/object/boreal:89561.
+                        </li>
+                        <li>
+                            <a href="https://en.wikipedia.org/wiki/Paradigm_shift">Paradigm Shift</a>
+                        </li>
+                        <li>
+                            <a href="https://en.wikipedia.org/wiki/Domain-specific_language">Domain-specific
+                                language</a>
+                        </li>
+                        <li>
+                            Krishnamurthi, Shriram. "Teaching Programming Languages in a Post-Linnaean Age." ACM SIGPLAN
+                            Notices, vol. 43, no. 11, Nov. 2008, pp. 81–83. November 2008
+                        </li>
+                        <li>
+                            <a
+                                href="https://www.inputmag.com/tech/ibm-will-offer-free-cobol-training-to-address-overloaded-unemployment-systems">IBM
+                                will offer free COBOL training to address overloaded unemployment systems</a>
+                        </li>
+                        <li>
+                            <a href="https://www.oreilly.com/radar/multi-paradigm-languages/">Multi-Paradigm
+                                Languages</a>
+                        </li>
+                        <li>
+                            <a href="https://en.wikipedia.org/wiki/Dart_(programming_language)">Dart</a>
+                        </li>
+                        <li>
+                            <a href="https://en.wikipedia.org/wiki/Erlang_(programming_language)">Erlang</a>
+                        </li>
+                        <li>
+                            <a href="https://en.wikipedia.org/wiki/Fortran">Fortran</a>
+                        </li>
+                        <li>
+                            <a href="https://en.wikipedia.org/wiki/Go_(programming_language)">Go</a>
+                        </li>
+                        <li>
+                            <a href="https://en.wikipedia.org/wiki/Groovy_(programming_language)">Groovy</a>
+                        </li>
+                        <li>
+                            <a href="https://en.wikipedia.org/wiki/Haskell_(programming_language)">Haskell</a>
+                        </li>
+                        <li>
+                            <a href="https://en.wikipedia.org/wiki/Java_(programming_language)">Java</a>
+                        </li>
+                        <li>
+                            <a href="https://en.wikipedia.org/wiki/JavaScript">JavaScript</a>
+                        </li>
+                        <li>
+                            <a href="https://en.wikipedia.org/wiki/Lisp_(programming_language)">Lisp</a>
+                        </li>
+                        <li>
+                            <a href="https://en.wikipedia.org/wiki/Lua_(programming_language)">Lua</a>
+                        </li>
+                    </ol>
+                </section>
+            </article>
+        </main>
+
+        <!-- Footer -->
+        <footer class="footer" role="contentinfo">
+            <div class="footer-container">
+                <div class="footer-copyright">
+                    <p>&copy; 2025 John Samuel. All content licensed under Creative Commons CC BY-SA 4.0.</p>
+                </div>
+                <div class="language-selector">
+                    <span>Languages:</span>
+                    <span><a href="./programming-paradigms.html">English</a></span>
+                </div>
+            </div>
+        </footer>
     </body>
 
 </html>

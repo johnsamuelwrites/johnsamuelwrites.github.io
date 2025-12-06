@@ -2,270 +2,664 @@
 <html lang="en">
 
     <head>
-        <meta charset="utf-8" />
-        <meta http-equiv="Content-Language" content="en" />
-        <link rel="shortcut icon" href="../../images/logo/favicon.png" />
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta http-equiv="Content-Language" content="en">
+        <link rel="shortcut icon" href="../../images/logo/favicon.png">
         <title>Working with Wikimedia Projects: John Samuel</title>
-        <style type="text/css">
-            body {
-                background-color: #FFFFFF;
+        <style>
+            /* ============================================
+           DESIGN TOKENS & CUSTOM PROPERTIES
+           ============================================ */
+            :root {
+                /* Wikimedia/Knowledge Theme Color Palette */
+                --color-base-bg: #fafbfc;
+                --color-base-surface: #ffffff;
+                --color-base-text: #1a202c;
+                --color-base-text-muted: #4a5568;
+
+                /* Theme Accents - Wikimedia/Collaborative Knowledge */
+                --color-accent-1: #339966;
+                /* Wiki Green */
+                --color-accent-2: #0066cc;
+                /* Knowledge Blue */
+                --color-accent-3: #990000;
+                /* Wikidata Maroon */
+                --color-accent-4: #ff9900;
+                /* Commons Orange */
+                --color-accent-light: rgba(51, 153, 102, 0.08);
+
+                /* Functional Colors */
+                --color-shadow: rgba(51, 153, 102, 0.12);
+                --color-border: rgba(51, 153, 102, 0.15);
+                --color-hover: rgba(51, 153, 102, 0.08);
+
+                /* Gradients */
+                --gradient-primary: linear-gradient(135deg, #339966 0%, #0066cc 100%);
+                --gradient-secondary: linear-gradient(225deg, #990000 0%, #ff9900 100%);
+                --gradient-wiki: linear-gradient(135deg, #339966 0%, #0066cc 50%, #990000 100%);
+                --gradient-subtle: linear-gradient(180deg, #fafbfc 0%, rgba(51, 153, 102, 0.03) 100%);
+
+                /* Typography */
+                --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+                --font-mono: 'SF Mono', Monaco, 'Cascadia Code', Consolas, 'Courier New', monospace;
+
+                /* Spacing Scale */
+                --space-xs: 0.25rem;
+                --space-sm: 0.5rem;
+                --space-md: 1rem;
+                --space-lg: 1.5rem;
+                --space-xl: 2rem;
+                --space-2xl: 3rem;
+                --space-3xl: 4rem;
+                --space-4xl: 6rem;
+
+                /* Border Radius */
+                --radius-sm: 4px;
+                --radius-md: 8px;
+                --radius-lg: 12px;
+                --radius-xl: 16px;
+                --radius-2xl: 24px;
+                --radius-organic: 63% 37% 54% 46% / 45% 62% 38% 55%;
+
+                /* Shadows */
+                --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.04), 0 1px 3px rgba(0, 0, 0, 0.06);
+                --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.05), 0 2px 4px rgba(0, 0, 0, 0.06);
+                --shadow-lg: 0 10px 24px rgba(0, 0, 0, 0.08), 0 4px 8px rgba(0, 0, 0, 0.06);
+                --shadow-theme: 0 10px 30px var(--color-shadow), 0 4px 10px rgba(0, 0, 0, 0.06);
+
+                /* Fluid Typography */
+                --text-xs: clamp(0.75rem, 0.7rem + 0.25vw, 0.875rem);
+                --text-sm: clamp(0.875rem, 0.8rem + 0.35vw, 1rem);
+                --text-base: clamp(1rem, 0.95rem + 0.25vw, 1.125rem);
+                --text-lg: clamp(1.125rem, 1.05rem + 0.35vw, 1.25rem);
+                --text-xl: clamp(1.25rem, 1.15rem + 0.5vw, 1.5rem);
+                --text-2xl: clamp(1.5rem, 1.3rem + 1vw, 2rem);
+                --text-3xl: clamp(2rem, 1.6rem + 2vw, 2.5rem);
+                --text-4xl: clamp(2.5rem, 2rem + 2.5vw, 3.5rem);
             }
 
-            #sidebar {
+            /* ============================================
+           RESET & BASE STYLES
+           ============================================ */
+            * {
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
+            }
+
+            html {
+                scroll-behavior: smooth;
+                scroll-padding-top: 80px;
+            }
+
+            body {
+                font-family: var(--font-sans);
+                font-size: var(--text-base);
+                line-height: 1.7;
+                color: var(--color-base-text);
+                background: var(--gradient-subtle);
+                background-attachment: fixed;
+                -webkit-font-smoothing: antialiased;
+                -moz-osx-font-smoothing: grayscale;
+            }
+
+            /* ============================================
+           SKIP LINK (Accessibility)
+           ============================================ */
+            .skip-link {
+                position: absolute;
+                top: -40px;
+                left: 0;
+                background: var(--color-accent-1);
+                color: white;
+                padding: var(--space-sm) var(--space-md);
+                text-decoration: none;
+                border-radius: var(--radius-md);
+                z-index: 1000;
+            }
+
+            .skip-link:focus {
+                top: var(--space-sm);
+                left: var(--space-sm);
+            }
+
+            /* ============================================
+           NAVIGATION
+           ============================================ */
+            .navigation {
                 position: fixed;
-                background-color: #009AA6;
+                top: 0;
+                left: 0;
+                right: 0;
+                z-index: 100;
+                background: rgba(255, 255, 255, 0.9);
+                -webkit-backdrop-filter: blur(12px) saturate(180%);
+                backdrop-filter: blur(12px) saturate(180%);
+                border-bottom: 1px solid var(--color-border);
+                box-shadow: var(--shadow-sm);
+            }
+
+            .nav-container {
+                max-width: 1400px;
+                margin: 0 auto;
+                padding: var(--space-md) var(--space-xl);
+                display: flex;
+                align-items: center;
+                gap: var(--space-2xl);
+                flex-wrap: wrap;
+            }
+
+            .site-name {
+                font-size: var(--text-lg);
+                font-weight: 700;
+                letter-spacing: -0.02em;
+                background: var(--gradient-primary);
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                background-clip: text;
+                text-decoration: none;
+                transition: all 0.3s ease;
+            }
+
+            .site-name:hover {
+                transform: translateY(-2px);
+                filter: brightness(1.1);
+            }
+
+            .breadcrumb-nav {
+                display: flex;
+                list-style: none;
+                gap: var(--space-md);
+                flex-wrap: wrap;
+            }
+
+            .breadcrumb-nav li {
+                display: flex;
+                align-items: center;
+                gap: var(--space-sm);
+            }
+
+            .breadcrumb-nav li:not(:last-child)::after {
+                content: '›';
+                color: var(--color-base-text-muted);
+                opacity: 0.5;
+            }
+
+            .breadcrumb-nav a {
+                color: var(--color-base-text-muted);
+                text-decoration: none;
+                font-size: var(--text-sm);
+                padding: var(--space-xs) var(--space-sm);
+                border-radius: var(--radius-sm);
+                transition: all 0.3s ease;
+            }
+
+            .breadcrumb-nav a:hover {
+                color: var(--color-accent-1);
+                background: var(--color-hover);
+            }
+
+            /* ============================================
+           HERO SECTION
+           ============================================ */
+            .hero {
+                margin-top: 80px;
+                padding: var(--space-4xl) var(--space-xl);
+                position: relative;
+                overflow: hidden;
+            }
+
+            .hero-background {
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                z-index: -1;
+                opacity: 0.25;
+            }
+
+            .hero-container {
+                max-width: 1400px;
+                margin: 0 auto;
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: var(--space-3xl);
+                align-items: center;
+            }
+
+            .hero-content h1 {
+                font-size: var(--text-4xl);
+                font-weight: 800;
+                line-height: 1.1;
+                letter-spacing: -0.03em;
+                margin-bottom: var(--space-lg);
+                background: var(--gradient-wiki);
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                background-clip: text;
+                animation: fadeInUp 0.8s ease-out;
+            }
+
+            .hero-subtitle {
+                font-size: var(--text-xl);
+                color: var(--color-base-text-muted);
+                margin-bottom: var(--space-xl);
+                animation: fadeInUp 0.8s ease-out 0.2s both;
+            }
+
+            .hero-author {
+                font-size: var(--text-lg);
+                color: var(--color-accent-2);
+                font-weight: 600;
+                animation: fadeInUp 0.8s ease-out 0.4s both;
+            }
+
+            .hero-author a {
+                color: var(--color-accent-1);
+                text-decoration: none;
+                position: relative;
+            }
+
+            .hero-author a::after {
+                content: '';
+                position: absolute;
+                bottom: -2px;
+                left: 0;
+                width: 0;
+                height: 2px;
+                background: var(--gradient-primary);
+                transition: width 0.3s ease;
+            }
+
+            .hero-author a:hover::after {
+                width: 100%;
+            }
+
+            /* ============================================
+           SVG ILLUSTRATION - Wiki Network
+           ============================================ */
+            .hero-visual {
+                position: relative;
+                animation: fadeIn 1s ease-out 0.6s both;
+            }
+
+            /* ============================================
+           MAIN CONTENT
+           ============================================ */
+            .main-content {
+                max-width: 1400px;
+                margin: 0 auto;
+                padding: var(--space-3xl) var(--space-xl);
+            }
+
+            .intro-text {
+                font-size: var(--text-lg);
+                color: var(--color-base-text-muted);
+                margin-bottom: var(--space-3xl);
+                text-align: center;
+                line-height: 1.8;
+                animation: fadeInUp 0.8s ease-out 0.2s both;
+            }
+
+            /* ============================================
+           API SECTIONS
+           ============================================ */
+            .api-section {
+                margin-bottom: var(--space-4xl);
+                animation: fadeInUp 0.8s ease-out both;
+            }
+
+            .api-section:nth-child(2) {
+                animation-delay: 0.3s;
+            }
+
+            .api-section:nth-child(3) {
+                animation-delay: 0.4s;
+            }
+
+            .api-section:nth-child(4) {
+                animation-delay: 0.5s;
+            }
+
+            .api-section-header {
+                background: var(--gradient-primary);
+                padding: var(--space-lg) var(--space-xl);
+                border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+                margin-bottom: 0;
+            }
+
+            .api-section-title {
+                font-size: var(--text-2xl);
+                font-weight: 700;
+                letter-spacing: -0.02em;
+                color: white;
+                display: flex;
+                align-items: center;
+                gap: var(--space-md);
+            }
+
+            .api-icon {
+                width: 40px;
+                height: 40px;
+                background: rgba(255, 255, 255, 0.2);
+                border-radius: var(--radius-md);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: var(--text-xl);
+            }
+
+            .api-links-container {
+                background: var(--color-base-surface);
+                border-radius: 0 0 var(--radius-xl) var(--radius-xl);
+                padding: var(--space-xl);
+                box-shadow: var(--shadow-theme);
+            }
+
+            .api-links {
+                list-style: none;
+                display: grid;
+                gap: var(--space-md);
+            }
+
+            .api-link-item {
+                padding: var(--space-md) var(--space-lg);
+                background: var(--color-accent-light);
+                border-radius: var(--radius-md);
+                border-left: 4px solid var(--color-accent-1);
+                transition: all 0.3s ease;
+                position: relative;
+                overflow: hidden;
+            }
+
+            .api-link-item::before {
+                content: '';
+                position: absolute;
                 top: 0;
                 left: 0;
                 bottom: 0;
-                width: 30vw;
+                width: 0;
+                background: var(--gradient-primary);
+                opacity: 0.1;
+                transition: width 0.4s ease;
             }
 
-            #sidebar .title {
-                position: relative;
-                text-align: center;
-                line-height: 5vmax;
-                font-size: 1.4vmax;
-                font-family: 'Arial';
-                margin-top: 30vh;
+            .api-link-item:hover {
+                transform: translateX(8px);
+                border-left-width: 8px;
+                box-shadow: var(--shadow-md);
             }
 
-            #sidebar .title a:link,
-            #sidebar .title a:visited {
-                color: #FFFFFF;
-                text-decoration: none;
-            }
-
-            .subtitle {
-                top: 50vh;
-                text-align: center;
-                line-height: 1.3vmax;
-                font-family: 'Arial';
-                font-size: 1.2vmax;
-                color: #FFFFFF;
-            }
-
-            .subtitle a:link,
-            .subtitle a:visited {
-                color: #FFFFFF;
-                text-decoration: none;
-            }
-
-            .licence {
-                position: fixed;
-                text-align: right;
-                bottom: 0;
-                right: 0;
-            }
-
-            .home {
-                position: fixed;
-                text-align: left;
-                font-family: 'Arial';
-                color: #D3D3D3;
-                z-index: 100;
+            .api-link-item:hover::before {
                 width: 100%;
-                background-color: #FFFFFF;
-                top: 0px;
-                margin-bottom: 10px;
-                padding-bottom: 10px;
             }
 
-            .home a:link,
-            .home a:visited {
+            .api-link-item a {
+                color: var(--color-accent-2);
                 text-decoration: none;
-                color: #D3D3D3;
-            }
-
-            .home ul {
-                margin: 0;
-                padding: 0;
-                text-align: left;
-                list-style: none;
-            }
-
-            .home li {
+                font-weight: 500;
+                display: inline-flex;
+                align-items: center;
+                gap: var(--space-sm);
+                transition: color 0.3s ease;
                 position: relative;
-                float: left;
-                padding-top: 15px;
-                margin-right: 1em;
-                font-family: 'Arial';
+                z-index: 1;
             }
 
-            .home li:hover {
-                display: block;
+            .api-link-item a::after {
+                content: '→';
+                opacity: 0;
+                transform: translateX(-10px);
+                transition: all 0.3s ease;
             }
 
-            .home li:hover a:link,
-            .home li:hover a:visited {
-                text-decoration: none;
-                padding: 15px;
-                color: #FFFFFF;
-                background-color: #009AA6;
+            .api-link-item:hover a {
+                color: var(--color-accent-1);
             }
 
-            .content {
-                line-height: 1.8vmax;
-                font-size: 1.2vmax;
-                font-family: 'Arial';
-                margin-top: 15vh;
-                width: 90%;
+            .api-link-item:hover a::after {
+                opacity: 1;
+                transform: translateX(0);
             }
 
-            .content h2,
-            h3,
-            h4 {
-                color: #009AA6;
+            /* Special styling for different wiki projects */
+            .wikimedia-section .api-section-header {
+                background: linear-gradient(135deg, #339966 0%, #0066cc 100%);
             }
 
-            .content a:link,
-            .content a:visited {
-                color: #009AA6;
+            .wikimedia-section .api-link-item {
+                border-left-color: #339966;
             }
 
-            .content h3 {
-                color: #009AA6;
+            .wikidata-section .api-section-header {
+                background: linear-gradient(135deg, #990000 0%, #0066cc 100%);
             }
 
-            .content h2::before,
-            .content h3::before {
-                display: block;
-                content: " ";
-                visibility: hidden;
-                height: 50px;
-                margin-top: -50px;
-                pointer-events: none;
-                background-color: #FFFFFF;
+            .wikidata-section .api-link-item {
+                border-left-color: #990000;
             }
 
-            .content a:link,
-            .content a:visited {
-                color: #009AA6;
+            .commons-section .api-section-header {
+                background: linear-gradient(135deg, #ff9900 0%, #339966 100%);
             }
 
-            .home a:link,
-            .home a:visited {
-                color: #D3D3D3;
+            .commons-section .api-link-item {
+                border-left-color: #ff9900;
             }
 
-            .page {
-                width: 65vw;
-                height: 100%;
-                margin-left: 30vw;
-                overflow: hidden;
-                padding: 0 1em;
-                font-family: 'Arial';
+
+            /* ============================================
+           FOOTER
+           ============================================ */
+            .footer {
+                background: var(--color-base-surface);
+                border-top: 1px solid var(--color-border);
+                margin-top: var(--space-4xl);
+                padding: var(--space-2xl) var(--space-xl);
             }
 
-            .page img {
-                max-width: 100%;
-                max-height: 100%;
+            .footer-container {
+                max-width: 1400px;
+                margin: 0 auto;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                flex-wrap: wrap;
+                gap: var(--space-lg);
             }
 
-            @media (max-width: 640px),
-            screen and (orientation: portrait) {
-                body {
-                    max-width: 100%;
-                    max-height: 100%;
+            .footer-copyright {
+                color: var(--color-base-text-muted);
+                font-size: var(--text-sm);
+            }
+
+            .language-selector {
+                display: flex;
+                gap: var(--space-md);
+                align-items: center;
+            }
+
+            .language-selector span {
+                color: var(--color-base-text-muted);
+                font-size: var(--text-sm);
+                font-weight: 600;
+            }
+
+            /* ============================================
+           ANIMATIONS
+           ============================================ */
+            @keyframes fadeIn {
+                from {
+                    opacity: 0;
                 }
 
-                #sidebar {
-                    position: fixed;
-                    background-color: #009AA6;
-                    top: 0;
-                    left: 0;
-                    bottom: 80vh;
-                    width: 100vw;
+                to {
+                    opacity: 1;
+                }
+            }
+
+            @keyframes fadeInUp {
+                from {
+                    opacity: 0;
+                    transform: translateY(30px);
                 }
 
-                #sidebar .title {
+                to {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            }
+
+            @keyframes float {
+
+                0%,
+                100% {
+                    transform: translateY(0) rotate(0deg);
+                }
+
+                50% {
+                    transform: translateY(-20px) rotate(5deg);
+                }
+            }
+
+            @keyframes pulse {
+
+                0%,
+                100% {
+                    opacity: 0.5;
+                }
+
+                50% {
+                    opacity: 1;
+                }
+            }
+
+            @keyframes orbitSlow {
+                from {
+                    transform: rotate(0deg) translateX(120px) rotate(0deg);
+                }
+
+                to {
+                    transform: rotate(360deg) translateX(120px) rotate(-360deg);
+                }
+            }
+
+            @keyframes orbitFast {
+                from {
+                    transform: rotate(0deg) translateX(80px) rotate(0deg);
+                }
+
+                to {
+                    transform: rotate(360deg) translateX(80px) rotate(-360deg);
+                }
+            }
+
+            @keyframes dataFlow {
+                0% {
+                    stroke-dashoffset: 1000;
+                    opacity: 0.3;
+                }
+
+                50% {
+                    opacity: 1;
+                }
+
+                100% {
+                    stroke-dashoffset: 0;
+                    opacity: 0.3;
+                }
+            }
+
+            /* ============================================
+           RESPONSIVE DESIGN
+           ============================================ */
+            @media (max-width: 1024px) {
+                .hero-container {
+                    grid-template-columns: 1fr;
+                }
+
+                .hero-visual {
+                    max-width: 500px;
+                    margin: 0 auto;
+                }
+            }
+
+            @media (max-width: 768px) {
+                .nav-container {
+                    padding: var(--space-md);
+                    gap: var(--space-md);
+                }
+
+                .hero {
+                    padding: var(--space-2xl) var(--space-md);
+                }
+
+                .main-content {
+                    padding: var(--space-2xl) var(--space-md);
+                }
+
+                .api-section-header,
+                .api-links-container {
+                    padding: var(--space-md);
+                }
+
+                .license-badge {
+                    bottom: var(--space-sm);
+                    right: var(--space-sm);
+                }
+
+                .footer-container {
+                    flex-direction: column;
                     text-align: center;
-                    position: fixed;
-                    margin-top: 6vh;
-                    left: 0px;
-                    right: 0px;
-                    line-height: 3.5vmax;
-                    font-size: 1.5vmax;
-                    font-family: 'Arial';
+                }
+            }
+
+            @media (max-width: 480px) {
+                .breadcrumb-nav {
+                    gap: var(--space-sm);
                 }
 
-                #sidebar .subtitle {
-                    text-align: center;
-                    top: 5vh;
-                    left: 0px;
-                    right: 0px;
-                    position: fixed;
-                    margin-top: 10vh;
-                    font-size: 1.5vmax;
+                .breadcrumb-nav a {
+                    font-size: var(--text-xs);
+                    padding: var(--space-xs);
                 }
 
-                #sidebar .title a:link,
-                #sidebar .title a:visited {
-                    text-align: center;
-                    color: #FFFFFF;
+                .api-section-title {
+                    font-size: var(--text-lg);
                 }
 
-                #sidebar .subtitle a:link,
-                #sidebar .subtitle a:visited {
-                    text-align: center;
-                    color: #FFFFFF;
+                .license-badge img {
+                    height: 24px;
                 }
+            }
 
-                .home {
-                    z-index: 100;
-                    width: 100%;
-                    background-color: #009AA6;
-                    font-size: 1.5vmax;
-                }
+            /* ============================================
+           REDUCED MOTION PREFERENCE
+           ============================================ */
+            @media (prefers-reduced-motion: reduce) {
 
-                .home a:link,
-                .home a:visited {
-                    text-decoration: none;
-                    color: #FFFFFF;
-                }
-
-                .content {
-                    line-height: 3.8vmax;
-                    font-size: 1.8vmax;
-                    font-family: 'Arial';
-                    margin-top: 22vh;
-                }
-
-                .content a:link,
-                .content a:visited {
-                    color: #009AA6;
-                }
-
-                .page {
-                    top: 40vh;
-                    width: 95%;
-                    margin-left: 0vw;
-                }
-
-                .page img {
-                    max-width: 100%;
-                    max-height: 100%;
-                    border: 0;
+                *,
+                *::before,
+                *::after {
+                    animation-duration: 0.01ms !important;
+                    animation-iteration-count: 1 !important;
+                    transition-duration: 0.01ms !important;
                 }
             }
         </style>
     </head>
 
     <body vocab="http://schema.org/">
-        <div id="sidebar">
-            <div class="title">
-                <h1><a href="./working-wiki.html">Working with Wikimedia Projects</a></h1>
-            </div>
-            <div class="subtitle">
-                <h2><a href="../about.html">John Samuel</a></h2>
-            </div>
-        </div>
-        <div class="licence">
-            <a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/"><img alt="Creative Commons License"
-                    style="border-width:0" src="./../../images/license.png" /></a>
-        </div>
-        <div class="page">
-            <div class="home">
-                <ul typeof="BreadcrumbList">
+        <!-- Skip Link for Accessibility -->
+        <a href="#main-content" class="skip-link">Skip to main content</a>
+
+        <!-- Navigation -->
+        <nav class="navigation" role="navigation" aria-label="Main navigation">
+            <div class="nav-container">
+                <a href="../index.html" class="site-name">John Samuel</a>
+                <ul class="breadcrumb-nav" typeof="BreadcrumbList">
                     <li property="itemListElement" typeof="ListItem">
                         <a property="item" typeof="WebPage" href="../index.html">
                             <span property="name">Home</span>
@@ -282,36 +676,262 @@
                         </a>
                     </li>
                 </ul>
+            </div>
+        </nav>
 
+        <!-- Hero Section -->
+        <header class="hero">
+            <div class="hero-background" aria-hidden="true">
+                <svg viewBox="0 0 1400 600" xmlns="http://www.w3.org/2000/svg" style="width: 100%; height: 100%;">
+                    <defs>
+                        <linearGradient id="wikiGrad1" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" style="stop-color:#339966;stop-opacity:0.5" />
+                            <stop offset="50%" style="stop-color:#0066cc;stop-opacity:0.5" />
+                            <stop offset="100%" style="stop-color:#990000;stop-opacity:0.5" />
+                        </linearGradient>
+                        <filter id="wikiGlow">
+                            <feGaussianBlur stdDeviation="6" result="coloredBlur" />
+                            <feMerge>
+                                <feMergeNode in="coloredBlur" />
+                                <feMergeNode in="SourceGraphic" />
+                            </feMerge>
+                        </filter>
+                    </defs>
+
+                    <!-- Knowledge network connections -->
+                    <g opacity="0.4">
+                        <line x1="200" y1="150" x2="400" y2="250" stroke="#339966" stroke-width="2"
+                            stroke-dasharray="1000" style="animation: dataFlow 8s linear infinite;" />
+                        <line x1="400" y1="250" x2="700" y2="300" stroke="#0066cc" stroke-width="2"
+                            stroke-dasharray="1000" style="animation: dataFlow 10s linear infinite;" />
+                        <line x1="700" y1="300" x2="1000" y2="200" stroke="#990000" stroke-width="2"
+                            stroke-dasharray="1000" style="animation: dataFlow 12s linear infinite;" />
+                        <line x1="1000" y1="200" x2="1200" y2="350" stroke="#ff9900" stroke-width="2"
+                            stroke-dasharray="1000" style="animation: dataFlow 9s linear infinite;" />
+                    </g>
+
+                    <!-- Wiki nodes -->
+                    <g opacity="0.6">
+                        <circle cx="200" cy="150" r="30" fill="#339966" filter="url(#wikiGlow)"
+                            style="animation: pulse 3s ease-in-out infinite;" />
+                        <text x="200" y="155" text-anchor="middle" font-size="14" fill="white"
+                            font-weight="bold">W</text>
+
+                        <circle cx="400" cy="250" r="35" fill="#0066cc" filter="url(#wikiGlow)"
+                            style="animation: pulse 3.5s ease-in-out infinite;" />
+                        <text x="400" y="258" text-anchor="middle" font-size="16" fill="white"
+                            font-weight="bold">WD</text>
+
+                        <circle cx="700" cy="300" r="40" fill="#990000" filter="url(#wikiGlow)"
+                            style="animation: pulse 4s ease-in-out infinite;" />
+                        <text x="700" y="310" text-anchor="middle" font-size="18" fill="white"
+                            font-weight="bold">API</text>
+
+                        <circle cx="1000" cy="200" r="30" fill="#ff9900" filter="url(#wikiGlow)"
+                            style="animation: pulse 3.2s ease-in-out infinite;" />
+                        <text x="1000" y="205" text-anchor="middle" font-size="14" fill="white"
+                            font-weight="bold">C</text>
+
+                        <circle cx="1200" cy="350" r="28" fill="#339966" filter="url(#wikiGlow)"
+                            style="animation: pulse 3.8s ease-in-out infinite;" />
+                        <text x="1200" y="355" text-anchor="middle" font-size="13" fill="white"
+                            font-weight="bold">DB</text>
+                    </g>
+
+                    <!-- Floating data particles -->
+                    <g style="animation: float 5s ease-in-out infinite;">
+                        <circle cx="300" cy="400" r="4" fill="#339966" opacity="0.7" />
+                        <circle cx="320" cy="420" r="3" fill="#0066cc" opacity="0.7" />
+                    </g>
+
+                    <g style="animation: float 6s ease-in-out infinite 1s;">
+                        <circle cx="800" cy="450" r="5" fill="#990000" opacity="0.7" />
+                        <circle cx="820" cy="470" r="3" fill="#ff9900" opacity="0.7" />
+                    </g>
+                </svg>
             </div>
-            <div class="content">
-                <p>The following are some key data dumps and APIs for working with Wikimedia projects, such as Wikipedia
-                    and
-                    Wikidata.</p>
-                <h3>Wikimedia API</h3>
-                <ul>
-                    <li><a href="https://meta.wikimedia.org/wiki/Data_dumps">Data dumps</a></li>
-                    <li><a href="https://api.wikimedia.org/wiki/Main_Page">Wikimedia API Portal</a></li>
-                    <li><a href="https://api.wikimedia.org/wiki/API_catalog">API catalog</a></li>
-                    <li><a href="https://www.mediawiki.org/wiki/API:Main_page">MediaWiki Action API</a></li>
-                    <li><a href="https://www.mediawiki.org/wiki/API:REST_API">MediaWiki REST API</a></li>
-                    <li><a href="https://www.mediawiki.org/wiki/Wikimedia_REST_API">Wikimedia REST API</a></li>
-                </ul>
-                <h3>Wikidata API</h3>
-                <ul>
-                    <li><a href="https://www.wikidata.org/wiki/Wikidata:Database_download">Database download</a></li>
-                    <li><a href="https://www.wikidata.org/wiki/Wikidata:SPARQL_query_service">SPARQL query service</a>
-                    </li>
-                    <li><a href="https://www.wikidata.org/w/api.php">Wikimedia MediaWiki API</a></li>
-                    <li><a href="https://www.wikidata.org/wiki/Wikidata:REST_API">REST API</a></li>
-                </ul>
-                <h3>Wikimedia Commons API</h3>
-                <ul>
-                    <li><a href="https://commons.wikimedia.org/wiki/Commons:API/MediaWiki">Commons Wikimedia API</a>
-                    </li>
-                </ul>
+
+            <div class="hero-container">
+                <div class="hero-content">
+                    <h1>Working with Wikimedia Projects</h1>
+                    <p class="hero-subtitle">APIs and Data Dumps for Wikipedia, Wikidata, and More</p>
+                    <p class="hero-author">by <a href="../about.html">John Samuel</a></p>
+                </div>
+                <div class="hero-visual" aria-hidden="true">
+                    <svg viewBox="0 0 500 500" xmlns="http://www.w3.org/2000/svg">
+                        <defs>
+                            <linearGradient id="wikiCenterGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" style="stop-color:#339966;stop-opacity:1" />
+                                <stop offset="50%" style="stop-color:#0066cc;stop-opacity:1" />
+                                <stop offset="100%" style="stop-color:#990000;stop-opacity:1" />
+                            </linearGradient>
+                            <filter id="nodeGlow">
+                                <feGaussianBlur stdDeviation="4" result="coloredBlur" />
+                                <feMerge>
+                                    <feMergeNode in="coloredBlur" />
+                                    <feMergeNode in="SourceGraphic" />
+                                </feMerge>
+                            </filter>
+                        </defs>
+
+                        <!-- Central Wikimedia hub -->
+                        <circle cx="250" cy="250" r="70" fill="url(#wikiCenterGrad)" filter="url(#nodeGlow)"
+                            opacity="0.9" style="animation: pulse 4s ease-in-out infinite;" />
+                        <text x="250" y="260" text-anchor="middle" font-family="sans-serif" font-size="24" fill="white"
+                            font-weight="bold">WIKI</text>
+
+                        <!-- Orbiting Wikipedia node -->
+                        <g style="animation: orbitSlow 20s linear infinite; transform-origin: 250px 250px;">
+                            <circle cx="250" cy="130" r="40" fill="#339966" filter="url(#nodeGlow)" opacity="0.85" />
+                            <text x="250" y="138" text-anchor="middle" font-size="16" fill="white"
+                                font-weight="bold">Wiki</text>
+                        </g>
+
+                        <!-- Orbiting Wikidata node -->
+                        <g style="animation: orbitSlow 25s linear infinite; transform-origin: 250px 250px;">
+                            <circle cx="370" cy="250" r="40" fill="#990000" filter="url(#nodeGlow)" opacity="0.85" />
+                            <text x="370" y="258" text-anchor="middle" font-size="16" fill="white"
+                                font-weight="bold">Data</text>
+                        </g>
+
+                        <!-- Orbiting Commons node -->
+                        <g style="animation: orbitSlow 30s linear infinite; transform-origin: 250px 250px;">
+                            <circle cx="250" cy="370" r="40" fill="#ff9900" filter="url(#nodeGlow)" opacity="0.85" />
+                            <text x="250" y="378" text-anchor="middle" font-size="15" fill="white"
+                                font-weight="bold">Com</text>
+                        </g>
+
+                        <!-- Inner orbiting API nodes -->
+                        <g style="animation: orbitFast 15s linear infinite reverse; transform-origin: 250px 250px;">
+                            <circle cx="250" cy="170" r="20" fill="#0066cc" opacity="0.7" />
+                            <text x="250" y="177" text-anchor="middle" font-size="11" fill="white"
+                                font-weight="bold">API</text>
+                        </g>
+
+                        <g style="animation: orbitFast 18s linear infinite reverse; transform-origin: 250px 250px;">
+                            <circle cx="330" cy="250" r="20" fill="#339966" opacity="0.7" />
+                            <text x="330" y="257" text-anchor="middle" font-size="10" fill="white"
+                                font-weight="bold">REST</text>
+                        </g>
+
+                        <g style="animation: orbitFast 20s linear infinite reverse; transform-origin: 250px 250px;">
+                            <circle cx="250" cy="330" r="20" fill="#990000" opacity="0.7" />
+                            <text x="250" y="337" text-anchor="middle" font-size="10" fill="white"
+                                font-weight="bold">JSON</text>
+                        </g>
+
+                        <!-- Connection lines -->
+                        <line x1="250" y1="180" x2="250" y2="320" stroke="#339966" stroke-width="1" opacity="0.3" />
+                        <line x1="180" y1="250" x2="320" y2="250" stroke="#0066cc" stroke-width="1" opacity="0.3" />
+
+                        <!-- Data flow particles -->
+                        <circle cx="290" cy="200" r="3" fill="#339966"
+                            style="animation: pulse 2s ease-in-out infinite;" />
+                        <circle cx="210" cy="300" r="3" fill="#0066cc"
+                            style="animation: pulse 2.5s ease-in-out infinite;" />
+                        <circle cx="300" cy="280" r="3" fill="#990000"
+                            style="animation: pulse 3s ease-in-out infinite;" />
+                    </svg>
+                </div>
             </div>
-        </div>
+        </header>
+
+        <!-- Main Content -->
+        <main id="main-content" class="main-content" role="main">
+            <p class="intro-text">
+                The following are some key data dumps and APIs for working with Wikimedia projects, such as Wikipedia
+                and Wikidata.
+            </p>
+
+            <!-- Wikimedia API Section -->
+            <section class="api-section wikimedia-section">
+                <div class="api-section-header">
+                    <h2 class="api-section-title">
+                        <span class="api-icon">W</span>
+                        Wikimedia API
+                    </h2>
+                </div>
+                <div class="api-links-container">
+                    <ul class="api-links">
+                        <li class="api-link-item">
+                            <a href="https://meta.wikimedia.org/wiki/Data_dumps">Data dumps</a>
+                        </li>
+                        <li class="api-link-item">
+                            <a href="https://api.wikimedia.org/wiki/Main_Page">Wikimedia API Portal</a>
+                        </li>
+                        <li class="api-link-item">
+                            <a href="https://api.wikimedia.org/wiki/API_catalog">API catalog</a>
+                        </li>
+                        <li class="api-link-item">
+                            <a href="https://www.mediawiki.org/wiki/API:Main_page">MediaWiki Action API</a>
+                        </li>
+                        <li class="api-link-item">
+                            <a href="https://www.mediawiki.org/wiki/API:REST_API">MediaWiki REST API</a>
+                        </li>
+                        <li class="api-link-item">
+                            <a href="https://www.mediawiki.org/wiki/Wikimedia_REST_API">Wikimedia REST API</a>
+                        </li>
+                    </ul>
+                </div>
+            </section>
+
+            <!-- Wikidata API Section -->
+            <section class="api-section wikidata-section">
+                <div class="api-section-header">
+                    <h2 class="api-section-title">
+                        <span class="api-icon">WD</span>
+                        Wikidata API
+                    </h2>
+                </div>
+                <div class="api-links-container">
+                    <ul class="api-links">
+                        <li class="api-link-item">
+                            <a href="https://www.wikidata.org/wiki/Wikidata:Database_download">Database download</a>
+                        </li>
+                        <li class="api-link-item">
+                            <a href="https://www.wikidata.org/wiki/Wikidata:SPARQL_query_service">SPARQL query
+                                service</a>
+                        </li>
+                        <li class="api-link-item">
+                            <a href="https://www.wikidata.org/w/api.php">Wikimedia MediaWiki API</a>
+                        </li>
+                        <li class="api-link-item">
+                            <a href="https://www.wikidata.org/wiki/Wikidata:REST_API">REST API</a>
+                        </li>
+                    </ul>
+                </div>
+            </section>
+
+            <!-- Wikimedia Commons API Section -->
+            <section class="api-section commons-section">
+                <div class="api-section-header">
+                    <h2 class="api-section-title">
+                        <span class="api-icon">C</span>
+                        Wikimedia Commons API
+                    </h2>
+                </div>
+                <div class="api-links-container">
+                    <ul class="api-links">
+                        <li class="api-link-item">
+                            <a href="https://commons.wikimedia.org/wiki/Commons:API/MediaWiki">Commons Wikimedia API</a>
+                        </li>
+                    </ul>
+                </div>
+            </section>
+        </main>
+
+        <!-- Footer -->
+        <footer class="footer" role="contentinfo">
+            <div class="footer-container">
+                <div class="footer-copyright">
+                    <p>&copy; 2025 John Samuel. All content licensed under Creative Commons CC BY-SA 4.0.</p>
+                </div>
+                <div class="language-selector">
+                    <span>Languages:</span>
+                    <span><a href="./working-wiki.html">English</a></span>
+                </div>
+            </div>
+        </footer>
     </body>
 
 </html>
