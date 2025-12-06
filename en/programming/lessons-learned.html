@@ -2,287 +2,836 @@
 <html lang="en">
 
     <head>
-        <meta charset="utf-8" />
-        <meta http-equiv="Content-Language" content="en" />
-        <link rel="shortcut icon" href="../../images/logo/favicon.png" />
-        <title>Lessons Learned Building this Site : John Samuel</title>
-        <style type="text/css">
-            body {
-                background-color: #FFFFFF;
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta http-equiv="Content-Language" content="en">
+        <link rel="shortcut icon" href="../../images/logo/favicon.png">
+        <title>Lessons Learned Building this Site: John Samuel</title>
+        <style>
+            /* ═══════════════════════════════════════════════════════════════
+           DESIGN TOKENS - Iterative Learning & Evolution Theme
+           Growth through experimentation and continuous improvement
+        ═══════════════════════════════════════════════════════════════ */
+
+            :root {
+                /* Base Colors - Clean Learning Foundation */
+                --color-base-bg: #fafaf9;
+                --color-base-surface: #ffffff;
+                --color-base-text: #292524;
+                --color-base-text-muted: #57534e;
+
+                /* Theme Accents - Growth & Evolution */
+                --color-accent-1: #10b981;
+                /* Growth green */
+                --color-accent-2: #059669;
+                /* Deep forest */
+                --color-accent-3: #f59e0b;
+                /* Discovery amber */
+                --color-accent-light: #d1fae5;
+                --color-accent-purple: #8b5cf6;
+                /* Innovation purple */
+                --color-accent-teal: #14b8a6;
+                /* Fresh perspective */
+
+                /* Functional Colors */
+                --color-shadow: rgba(16, 185, 129, 0.12);
+                --color-border: rgba(16, 185, 129, 0.15);
+                --color-hover: rgba(16, 185, 129, 0.08);
+
+                /* Gradients */
+                --gradient-primary: linear-gradient(135deg, #10b981 0%, #059669 50%, #14b8a6 100%);
+                --gradient-subtle: linear-gradient(180deg, #fafaf9 0%, #d1fae5 100%);
+                --gradient-hero: linear-gradient(135deg, #059669 0%, #10b981 50%, #14b8a6 100%);
+                --gradient-warm: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+
+                /* Spacing Scale */
+                --space-xs: 0.25rem;
+                --space-sm: 0.5rem;
+                --space-md: 1rem;
+                --space-lg: 1.5rem;
+                --space-xl: 2rem;
+                --space-2xl: 3rem;
+                --space-3xl: 4rem;
+                --space-4xl: 6rem;
+
+                /* Border Radius */
+                --radius-sm: 4px;
+                --radius-md: 8px;
+                --radius-lg: 12px;
+                --radius-xl: 16px;
+                --radius-2xl: 24px;
+                --radius-organic: 60% 40% 55% 45% / 50% 60% 40% 50%;
+
+                /* Shadows */
+                --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.04), 0 1px 3px rgba(0, 0, 0, 0.06);
+                --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.05), 0 2px 4px rgba(0, 0, 0, 0.06);
+                --shadow-lg: 0 10px 24px rgba(0, 0, 0, 0.08), 0 4px 8px rgba(0, 0, 0, 0.06);
+                --shadow-theme: 0 10px 30px var(--color-shadow), 0 4px 10px rgba(0, 0, 0, 0.06);
+
+                /* Typography */
+                --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+                --text-xs: clamp(0.75rem, 0.7rem + 0.25vw, 0.875rem);
+                --text-sm: clamp(0.875rem, 0.8rem + 0.35vw, 1rem);
+                --text-base: clamp(1rem, 0.95rem + 0.25vw, 1.125rem);
+                --text-lg: clamp(1.125rem, 1.05rem + 0.35vw, 1.25rem);
+                --text-xl: clamp(1.25rem, 1.15rem + 0.5vw, 1.5rem);
+                --text-2xl: clamp(1.5rem, 1.3rem + 1vw, 2rem);
+                --text-3xl: clamp(2rem, 1.6rem + 2vw, 2.5rem);
+                --text-4xl: clamp(2.5rem, 2rem + 2.5vw, 3.5rem);
+
+                /* Weights */
+                --weight-normal: 400;
+                --weight-medium: 500;
+                --weight-semibold: 600;
+                --weight-bold: 700;
             }
 
-            #sidebar {
-                position: fixed;
-                background-color: #009AA6;
-                top: 0;
-                left: 0;
-                bottom: 0;
-                width: 30vw;
-            }
+            /* ═══════════════════════════════════════════════════════════════
+           RESET & BASE STYLES
+        ═══════════════════════════════════════════════════════════════ */
 
-            #sidebar .title {
-                position: relative;
-                text-align: center;
-                line-height: 5vmax;
-                font-size: 1.4vmax;
-                font-family: 'Arial';
-                margin-top: 30vh;
-            }
-
-            #sidebar .title a:link,
-            #sidebar .title a:visited {
-                color: #FFFFFF;
-                text-decoration: none;
-            }
-
-            .subtitle {
-                top: 50vh;
-                text-align: center;
-                line-height: 1.3vmax;
-                font-family: 'Arial';
-                font-size: 1.2vmax;
-                color: #FFFFFF;
-            }
-
-            .subtitle a:link,
-            .subtitle a:visited {
-                color: #FFFFFF;
-                text-decoration: none;
-            }
-
-            .licence {
-                position: fixed;
-                text-align: right;
-                bottom: 0;
-                right: 0;
-            }
-
-            .home {
-                position: fixed;
-                text-align: left;
-                font-family: 'Arial';
-                color: #D3D3D3;
-                z-index: 100;
-                width: 100%;
-                background-color: #FFFFFF;
-                top: 0px;
-                margin-bottom: 10px;
-                padding-bottom: 10px;
-            }
-
-            .home a:link,
-            .home a:visited {
-                text-decoration: none;
-                color: #D3D3D3;
-            }
-
-            .home ul {
+            *,
+            *::before,
+            *::after {
+                box-sizing: border-box;
                 margin: 0;
                 padding: 0;
-                text-align: left;
-                list-style: none;
             }
 
-            .home li {
-                position: relative;
-                float: left;
-                padding-top: 15px;
-                margin-right: 1em;
-                font-family: 'Arial';
+            html {
+                scroll-behavior: smooth;
+                scroll-padding-top: 100px;
             }
 
-            .home li:hover {
-                display: block;
+            body {
+                font-family: var(--font-sans);
+                font-size: var(--text-base);
+                line-height: 1.7;
+                color: var(--color-base-text);
+                background: var(--color-base-bg);
+                background-image:
+                    radial-gradient(circle at 10% 20%, rgba(16, 185, 129, 0.03) 0%, transparent 50%),
+                    radial-gradient(circle at 90% 80%, rgba(245, 158, 11, 0.03) 0%, transparent 50%);
+                -webkit-font-smoothing: antialiased;
+                -moz-osx-font-smoothing: grayscale;
             }
 
-            .home li:hover a:link,
-            .home li:hover a:visited {
+            /* Skip Link */
+            .skip-link {
+                position: absolute;
+                top: -100px;
+                left: var(--space-md);
+                z-index: 9999;
+                padding: var(--space-sm) var(--space-md);
+                background: var(--color-accent-1);
+                color: white;
                 text-decoration: none;
-                padding: 15px;
-                color: #FFFFFF;
-                background-color: #009AA6;
+                border-radius: var(--radius-md);
             }
 
-            .content {
-                line-height: 1.8vmax;
-                font-size: 1.2vmax;
-                font-family: 'Arial';
-                margin-top: 15vh;
-                width: 90%;
+            .skip-link:focus {
+                top: var(--space-md);
             }
 
-            .content h2,
-            h3,
-            h4 {
-                color: #009AA6;
+            /* ═══════════════════════════════════════════════════════════════
+           NAVIGATION
+        ═══════════════════════════════════════════════════════════════ */
+
+            .navigation {
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                z-index: 1000;
+                background: rgba(255, 255, 255, 0.85);
+                -webkit-backdrop-filter: blur(12px) saturate(180%);
+                backdrop-filter: blur(12px) saturate(180%);
+                border-bottom: 1px solid rgba(16, 185, 129, 0.1);
+                box-shadow: 0 4px 24px rgba(0, 0, 0, 0.06);
             }
 
-            .content a:link,
-            .content a:visited {
-                color: #009AA6;
+            .nav-container {
+                max-width: 1400px;
+                margin: 0 auto;
+                padding: var(--space-md) var(--space-xl);
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                gap: var(--space-lg);
             }
 
-            .content h3 {
-                color: #009AA6;
+            .nav-brand {
+                font-size: var(--text-lg);
+                font-weight: var(--weight-bold);
+                color: var(--color-accent-1);
+                text-decoration: none;
+                display: flex;
+                align-items: center;
+                gap: var(--space-sm);
+                transition: all 0.3s ease;
             }
 
-            .content h2::before,
-            .content h3::before {
-                display: block;
-                content: " ";
-                visibility: hidden;
-                height: 50px;
-                margin-top: -50px;
-                pointer-events: none;
-                background-color: #FFFFFF;
+            .nav-brand:hover {
+                color: var(--color-accent-2);
+                transform: translateX(4px);
             }
 
-            .content a:link,
-            .content a:visited {
-                color: #009AA6;
+            .nav-brand::before {
+                content: '◈';
+                font-size: var(--text-xl);
+                animation: pulse 3s ease-in-out infinite;
             }
 
-            .home a:link,
-            .home a:visited {
-                color: #D3D3D3;
+            .breadcrumb {
+                display: flex;
+                list-style: none;
+                flex-wrap: wrap;
+                gap: var(--space-sm);
+                align-items: center;
             }
 
-            .page {
-                width: 65vw;
-                height: 100%;
-                margin-left: 30vw;
+            .breadcrumb li {
+                display: flex;
+                align-items: center;
+                gap: var(--space-sm);
+                font-size: var(--text-sm);
+            }
+
+            .breadcrumb li:not(:last-child)::after {
+                content: '→';
+                color: var(--color-base-text-muted);
+                font-size: var(--text-xs);
+            }
+
+            .breadcrumb a {
+                color: var(--color-base-text-muted);
+                text-decoration: none;
+                transition: all 0.3s ease;
+                padding: var(--space-xs) var(--space-sm);
+                border-radius: var(--radius-sm);
+            }
+
+            .breadcrumb a:hover {
+                color: var(--color-accent-1);
+                background: var(--color-hover);
+            }
+
+            /* ═══════════════════════════════════════════════════════════════
+           HERO SECTION
+        ═══════════════════════════════════════════════════════════════ */
+
+            .hero {
+                position: relative;
+                padding: 140px var(--space-xl) var(--space-4xl);
+                background: var(--gradient-hero);
                 overflow: hidden;
-                padding: 0 1em;
-                font-family: 'Arial';
             }
 
-            .page img {
-                max-width: 100%;
-                max-height: 100%;
+            .hero::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background-image:
+                    radial-gradient(circle at 30% 20%, rgba(255, 255, 255, 0.1) 0%, transparent 50%),
+                    radial-gradient(circle at 70% 80%, rgba(245, 158, 11, 0.15) 0%, transparent 50%);
+                pointer-events: none;
             }
 
-            @media (max-width: 640px),
-            screen and (orientation: portrait) {
-                body {
-                    max-width: 100%;
-                    max-height: 100%;
+            .hero-pattern {
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                opacity: 0.05;
+                background-image:
+                    repeating-linear-gradient(45deg, transparent, transparent 20px, rgba(255, 255, 255, 0.5) 20px, rgba(255, 255, 255, 0.5) 21px);
+                pointer-events: none;
+            }
+
+            .hero-content {
+                position: relative;
+                max-width: 1200px;
+                margin: 0 auto;
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: var(--space-4xl);
+                align-items: center;
+            }
+
+            .hero-text h1 {
+                font-size: var(--text-4xl);
+                font-weight: var(--weight-bold);
+                color: white;
+                letter-spacing: -0.03em;
+                line-height: 1.2;
+                margin-bottom: var(--space-lg);
+                animation: fadeInUp 0.8s ease-out;
+            }
+
+            .hero-text p {
+                font-size: var(--text-lg);
+                color: rgba(255, 255, 255, 0.95);
+                line-height: 1.7;
+                animation: fadeInUp 0.8s ease-out 0.2s both;
+            }
+
+            .hero-visual {
+                animation: fadeInUp 0.8s ease-out 0.4s both;
+            }
+
+            /* ═══════════════════════════════════════════════════════════════
+           SVG ILLUSTRATION - Growth Cycle
+        ═══════════════════════════════════════════════════════════════ */
+
+            .growth-svg {
+                width: 100%;
+                height: auto;
+                filter: drop-shadow(0 10px 30px rgba(0, 0, 0, 0.2));
+            }
+
+            @keyframes grow {
+                from {
+                    transform: scale(0) translateY(20px);
+                    opacity: 0;
                 }
 
-                #sidebar {
-                    position: fixed;
-                    background-color: #009AA6;
-                    top: 0;
-                    left: 0;
-                    bottom: 80vh;
-                    width: 100vw;
+                to {
+                    transform: scale(1) translateY(0);
+                    opacity: 1;
+                }
+            }
+
+            @keyframes sprout {
+                0% {
+                    transform: scaleY(0);
+                    transform-origin: bottom;
                 }
 
-                #sidebar .title {
-                    text-align: center;
-                    position: fixed;
-                    margin-top: 6vh;
-                    left: 0px;
-                    right: 0px;
-                    line-height: 3.5vmax;
-                    font-size: 1.5vmax;
-                    font-family: 'Arial';
+                100% {
+                    transform: scaleY(1);
+                    transform-origin: bottom;
+                }
+            }
+
+            @keyframes bloom {
+                0% {
+                    transform: scale(0) rotate(-180deg);
+                    opacity: 0;
                 }
 
-                #sidebar .subtitle {
-                    text-align: center;
-                    top: 5vh;
-                    left: 0px;
-                    right: 0px;
-                    position: fixed;
-                    margin-top: 10vh;
-                    font-size: 1.5vmax;
+                100% {
+                    transform: scale(1) rotate(0deg);
+                    opacity: 1;
+                }
+            }
+
+            @keyframes rotate {
+                from {
+                    transform: rotate(0deg);
                 }
 
-                #sidebar .title a:link,
-                #sidebar .title a:visited {
-                    text-align: center;
-                    color: #FFFFFF;
+                to {
+                    transform: rotate(360deg);
+                }
+            }
+
+            @keyframes pulse {
+
+                0%,
+                100% {
+                    opacity: 1;
+                    transform: scale(1);
                 }
 
-                #sidebar .subtitle a:link,
-                #sidebar .subtitle a:visited {
-                    text-align: center;
-                    color: #FFFFFF;
+                50% {
+                    opacity: 0.7;
+                    transform: scale(0.95);
+                }
+            }
+
+            @keyframes float {
+
+                0%,
+                100% {
+                    transform: translateY(0px) rotate(0deg);
                 }
 
-                .home {
-                    z-index: 100;
-                    width: 100%;
-                    background-color: #009AA6;
-                    font-size: 1.5vmax;
+                50% {
+                    transform: translateY(-12px) rotate(3deg);
+                }
+            }
+
+            @keyframes fadeInUp {
+                from {
+                    opacity: 0;
+                    transform: translateY(30px);
                 }
 
-                .home a:link,
-                .home a:visited {
-                    text-decoration: none;
-                    color: #FFFFFF;
+                to {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            }
+
+            /* ═══════════════════════════════════════════════════════════════
+           MAIN CONTENT
+        ═══════════════════════════════════════════════════════════════ */
+
+            .main-content {
+                max-width: 1200px;
+                margin: 0 auto;
+                padding: var(--space-4xl) var(--space-xl);
+            }
+
+            .content-section {
+                margin-bottom: var(--space-3xl);
+                animation: fadeInUp 0.6s ease-out;
+            }
+
+            .section-decorator {
+                width: 80px;
+                height: 4px;
+                background: var(--gradient-primary);
+                border-radius: 2px;
+                margin-bottom: var(--space-xl);
+                animation: expandWidth 0.6s ease-out;
+            }
+
+            @keyframes expandWidth {
+                from {
+                    width: 0;
                 }
 
-                .content {
-                    line-height: 3.8vmax;
-                    font-size: 1.8vmax;
-                    font-family: 'Arial';
-                    margin-top: 22vh;
+                to {
+                    width: 80px;
+                }
+            }
+
+            /* Typography */
+            h2 {
+                font-size: var(--text-3xl);
+                font-weight: var(--weight-bold);
+                color: var(--color-accent-1);
+                margin-bottom: var(--space-lg);
+                letter-spacing: -0.02em;
+                line-height: 1.3;
+            }
+
+            h3 {
+                font-size: var(--text-2xl);
+                font-weight: var(--weight-semibold);
+                color: var(--color-accent-2);
+                margin: var(--space-2xl) 0 var(--space-lg);
+                letter-spacing: -0.01em;
+                display: flex;
+                align-items: center;
+                gap: var(--space-sm);
+            }
+
+            h3::before {
+                content: '▸';
+                color: var(--color-accent-3);
+                font-size: var(--text-xl);
+            }
+
+            p {
+                margin-bottom: var(--space-lg);
+                color: var(--color-base-text);
+                line-height: 1.8;
+            }
+
+            p b {
+                color: var(--color-accent-2);
+                font-weight: var(--weight-semibold);
+                position: relative;
+                padding: 0 var(--space-xs);
+            }
+
+            a {
+                color: var(--color-accent-1);
+                text-decoration: none;
+                transition: all 0.3s ease;
+                border-bottom: 1px solid transparent;
+            }
+
+            a:hover {
+                color: var(--color-accent-2);
+                border-bottom-color: var(--color-accent-2);
+            }
+
+            sup {
+                font-size: 0.75em;
+                font-weight: var(--weight-medium);
+            }
+
+            /* ═══════════════════════════════════════════════════════════════
+           LESSON CARDS - Key Takeaways
+        ═══════════════════════════════════════════════════════════════ */
+
+            .lessons-grid {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+                gap: var(--space-xl);
+                margin: var(--space-3xl) 0;
+            }
+
+            .lesson-card {
+                position: relative;
+                background: var(--color-base-surface);
+                border-radius: var(--radius-xl);
+                padding: var(--space-xl);
+                box-shadow: var(--shadow-theme);
+                border: 1px solid var(--color-border);
+                transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+                overflow: hidden;
+            }
+
+            .lesson-card::after {
+                content: '';
+                position: absolute;
+                bottom: 0;
+                left: 0;
+                right: 0;
+                height: 4px;
+                background: var(--gradient-primary);
+                transform: scaleX(0);
+                transform-origin: left;
+                transition: transform 0.5s ease;
+            }
+
+            .lesson-card:hover::after {
+                transform: scaleX(1);
+            }
+
+            .lesson-card:hover {
+                transform: translateY(-8px) scale(1.01);
+                box-shadow: 0 20px 40px rgba(16, 185, 129, 0.15), 0 8px 16px rgba(0, 0, 0, 0.08);
+            }
+
+            .lesson-number {
+                position: absolute;
+                top: var(--space-md);
+                right: var(--space-md);
+                width: 48px;
+                height: 48px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                background: var(--gradient-primary);
+                color: white;
+                font-size: var(--text-xl);
+                font-weight: var(--weight-bold);
+                border-radius: 50%;
+                box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+                animation: float 4s ease-in-out infinite;
+            }
+
+            .lesson-card:nth-child(2) .lesson-number {
+                animation-delay: 0.5s;
+            }
+
+            .lesson-card:nth-child(3) .lesson-number {
+                animation-delay: 1s;
+            }
+
+            .lesson-card:nth-child(4) .lesson-number {
+                animation-delay: 1.5s;
+            }
+
+            .lesson-card:nth-child(5) .lesson-number {
+                animation-delay: 2s;
+            }
+
+            .lesson-card:nth-child(6) .lesson-number {
+                animation-delay: 2.5s;
+            }
+
+            .lesson-card h3 {
+                margin-top: 0;
+                font-size: var(--text-xl);
+                color: var(--color-accent-1);
+            }
+
+            .lesson-card h3::before {
+                content: none;
+            }
+
+            .lesson-card p {
+                font-size: var(--text-sm);
+                color: var(--color-base-text-muted);
+                margin: 0;
+            }
+
+            /* ═══════════════════════════════════════════════════════════════
+           MORE INFO SECTION
+        ═══════════════════════════════════════════════════════════════ */
+
+            .more-info {
+                background: var(--color-base-surface);
+                border-radius: var(--radius-2xl);
+                padding: var(--space-3xl);
+                box-shadow: var(--shadow-lg);
+                border: 1px solid var(--color-border);
+                margin-top: var(--space-4xl);
+            }
+
+            .more-info h3 {
+                color: var(--color-accent-1);
+                margin-top: 0;
+                margin-bottom: var(--space-xl);
+            }
+
+            .more-info ul {
+                list-style: none;
+                padding: 0;
+            }
+
+            .more-info li {
+                position: relative;
+                padding-left: var(--space-xl);
+                margin-bottom: var(--space-md);
+                line-height: 1.7;
+            }
+
+            .more-info li::before {
+                content: '→';
+                position: absolute;
+                left: 0;
+                color: var(--color-accent-3);
+                font-weight: var(--weight-bold);
+                font-size: var(--text-lg);
+            }
+
+            .more-info a {
+                font-weight: var(--weight-medium);
+                font-size: var(--text-base);
+            }
+
+            /* ═══════════════════════════════════════════════════════════════
+           REFERENCES SECTION
+        ═══════════════════════════════════════════════════════════════ */
+
+            .references {
+                background: linear-gradient(135deg, rgba(16, 185, 129, 0.05) 0%, rgba(245, 158, 11, 0.05) 100%);
+                border-radius: var(--radius-2xl);
+                padding: var(--space-3xl);
+                box-shadow: var(--shadow-md);
+                border: 1px solid var(--color-border);
+                margin-top: var(--space-3xl);
+            }
+
+            .references h3 {
+                color: var(--color-accent-1);
+                margin-top: 0;
+                margin-bottom: var(--space-xl);
+            }
+
+            .references ol {
+                list-style: none;
+                counter-reset: reference-counter;
+                padding: 0;
+            }
+
+            .references li {
+                counter-increment: reference-counter;
+                position: relative;
+                padding-left: var(--space-3xl);
+                margin-bottom: var(--space-lg);
+                line-height: 1.7;
+            }
+
+            .references li::before {
+                content: counter(reference-counter);
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 32px;
+                height: 32px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                background: var(--gradient-primary);
+                color: white;
+                border-radius: 50%;
+                font-weight: var(--weight-bold);
+                font-size: var(--text-sm);
+                box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);
+            }
+
+            .references a {
+                font-weight: var(--weight-medium);
+            }
+
+            /* ═══════════════════════════════════════════════════════════════
+           FOOTER
+        ═══════════════════════════════════════════════════════════════ */
+
+            .footer {
+                background: linear-gradient(135deg, #1c1917 0%, #292524 100%);
+                color: rgba(255, 255, 255, 0.9);
+                padding: var(--space-3xl) var(--space-xl);
+                margin-top: var(--space-4xl);
+            }
+
+            .footer-content {
+                max-width: 1200px;
+                margin: 0 auto;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                gap: var(--space-xl);
+                flex-wrap: wrap;
+            }
+
+            .footer-left {
+                display: flex;
+                flex-direction: column;
+                gap: var(--space-sm);
+            }
+
+            .footer-brand {
+                font-size: var(--text-lg);
+                font-weight: var(--weight-bold);
+                color: white;
+            }
+
+            .footer-credit {
+                font-size: var(--text-sm);
+                color: rgba(255, 255, 255, 0.7);
+            }
+
+            /* ═══════════════════════════════════════════════════════════════
+           RESPONSIVE DESIGN
+        ═══════════════════════════════════════════════════════════════ */
+
+            @media (max-width: 1024px) {
+                .hero-content {
+                    grid-template-columns: 1fr;
+                    gap: var(--space-2xl);
                 }
 
-                .content a:link,
-                .content a:visited {
-                    color: #009AA6;
+                .hero-visual {
+                    max-width: 500px;
+                    margin: 0 auto;
+                }
+            }
+
+            @media (max-width: 768px) {
+                .nav-container {
+                    flex-direction: column;
+                    align-items: flex-start;
+                    gap: var(--space-md);
                 }
 
-                .page {
-                    top: 40vh;
-                    width: 95%;
-                    margin-left: 0vw;
+                .breadcrumb {
+                    font-size: var(--text-xs);
                 }
 
-                .page img {
-                    max-width: 100%;
-                    max-height: 100%;
-                    border: 0;
+                .hero {
+                    padding: 120px var(--space-lg) var(--space-2xl);
                 }
+
+                .main-content {
+                    padding: var(--space-2xl) var(--space-lg);
+                }
+
+                .lessons-grid {
+                    grid-template-columns: 1fr;
+                }
+
+                .more-info,
+                .references {
+                    padding: var(--space-xl);
+                }
+
+                .footer-content {
+                    flex-direction: column;
+                    align-items: flex-start;
+                }
+            }
+
+            @media (max-width: 480px) {
+                .hero-text h1 {
+                    font-size: var(--text-3xl);
+                }
+
+                .section-decorator {
+                    width: 60px;
+                }
+            }
+
+            /* ═══════════════════════════════════════════════════════════════
+           ACCESSIBILITY - REDUCED MOTION
+        ═══════════════════════════════════════════════════════════════ */
+
+            @media (prefers-reduced-motion: reduce) {
+
+                *,
+                *::before,
+                *::after {
+                    animation-duration: 0.01ms !important;
+                    animation-iteration-count: 1 !important;
+                    transition-duration: 0.01ms !important;
+                }
+
+                html {
+                    scroll-behavior: auto;
+                }
+            }
+
+            /* ═══════════════════════════════════════════════════════════════
+           FOCUS STYLES - KEYBOARD NAVIGATION
+        ═══════════════════════════════════════════════════════════════ */
+
+            *:focus {
+                outline: 3px solid var(--color-accent-1);
+                outline-offset: 2px;
+            }
+
+            *:focus:not(:focus-visible) {
+                outline: none;
+            }
+
+            *:focus-visible {
+                outline: 3px solid var(--color-accent-1);
+                outline-offset: 2px;
             }
         </style>
         <script type="application/ld+json">
-        {
-            "@context": "http://schema.org",
-            "@type": "BlogPosting",
-            "mainEntityOfPage": {
-                "@type": "WebPage",
-                "@id": "https://johnsamuel.info"
-            },
-            "articleSection": "blog",
-            "name": "Lessons Learned Building this Site",
-            "headline": "Lessons Learned Building this Site",
-            "description": "Article by John Samuel",
-            "inLanguage": "en",
-            "author": "John Samuel",
-            "datePublished": "2014-07-26 15:26:00",
-            "dateModified": "2020-05-03 19:39:36",
-            "dateCreated": "2014-07-26 15:26:00",
-            "url": "https://johnsamuel.info/en/programming/lessons-learned.html",
-            "keywords": ["Blog"]
-        }
+    {
+        "@context": "http://schema.org",
+        "@type": "BlogPosting",
+        "mainEntityOfPage": {
+            "@type": "WebPage",
+            "@id": "https://johnsamuel.info"
+        },
+        "articleSection": "blog",
+        "name": "Lessons Learned Building this Site",
+        "headline": "Lessons Learned Building this Site",
+        "description": "Article by John Samuel",
+        "inLanguage": "en",
+        "author": "John Samuel",
+        "datePublished": "2014-07-26 15:26:00",
+        "dateModified": "2020-05-03 19:39:36",
+        "dateCreated": "2014-07-26 15:26:00",
+        "url": "https://johnsamuel.info/en/programming/lessons-learned.html",
+        "keywords": ["Blog"]
+    }
     </script>
     </head>
 
     <body vocab="http://schema.org/">
-        <div id="sidebar">
-            <div class="title">
-                <h1><a href="./lessons-learned.html">Lessons Learned Building this Site</a></h1>
-            </div>
-            <div class="subtitle">
-                <h3><a href="../about.html">John Samuel</a></h3>
-            </div>
-        </div>
-        <div class="page">
-            <div class="home">
-                <ul typeof="BreadcrumbList">
+        <a href="#main-content" class="skip-link">Skip to main content</a>
+
+        <!-- Navigation -->
+        <nav class="navigation" role="navigation" aria-label="Main navigation">
+            <div class="nav-container">
+                <a href="../about.html" class="nav-brand">John Samuel</a>
+                <ul class="breadcrumb" typeof="BreadcrumbList">
                     <li property="itemListElement" typeof="ListItem">
                         <a property="item" typeof="WebPage" href="../index.html">
                             <span property="name">Home</span>
@@ -300,104 +849,281 @@
                     </li>
                 </ul>
             </div>
-            <div class="content">
+        </nav>
+
+        <!-- Hero Section -->
+        <header class="hero">
+            <div class="hero-pattern" aria-hidden="true"></div>
+            <div class="hero-content">
+                <div class="hero-text">
+                    <h1>Lessons Learned Building this Site</h1>
+                    <p>Insights from building a personal website from scratch: navigating challenges, embracing
+                        iteration, and discovering what works through continuous experimentation.</p>
+                </div>
+                <div class="hero-visual">
+                    <svg class="growth-svg" viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                        <!-- Background Circle -->
+                        <circle cx="200" cy="200" r="180" fill="rgba(255,255,255,0.1)" stroke="rgba(255,255,255,0.2)"
+                            stroke-width="2" />
+
+                        <!-- Growth Cycle Path -->
+                        <path
+                            d="M 200 80 Q 280 100, 300 180 Q 310 260, 230 310 Q 150 320, 100 250 Q 80 180, 140 120 Q 170 90, 200 80"
+                            fill="none" stroke="rgba(255,255,255,0.3)" stroke-width="3" stroke-dasharray="5,5"
+                            style="animation: pulse 4s ease-in-out infinite;" />
+
+                        <!-- Central Plant Stem -->
+                        <g style="animation: sprout 1.5s ease-out 0.5s both;">
+                            <line x1="200" y1="250" x2="200" y2="180" stroke="#10b981" stroke-width="6"
+                                stroke-linecap="round" />
+                            <line x1="200" y1="220" x2="170" y2="200" stroke="#10b981" stroke-width="4"
+                                stroke-linecap="round" />
+                            <line x1="200" y1="200" x2="230" y2="185" stroke="#10b981" stroke-width="4"
+                                stroke-linecap="round" />
+                        </g>
+
+                        <!-- Leaves -->
+                        <g style="animation: bloom 0.8s ease-out 2s both;">
+                            <ellipse cx="165" cy="195" rx="18" ry="28" fill="#059669" transform="rotate(-30 165 195)"
+                                opacity="0.9" />
+                        </g>
+                        <g style="animation: bloom 0.8s ease-out 2.2s both;">
+                            <ellipse cx="235" cy="180" rx="16" ry="26" fill="#059669" transform="rotate(25 235 180)"
+                                opacity="0.9" />
+                        </g>
+
+                        <!-- Main Flower -->
+                        <g style="animation: bloom 1s ease-out 2.5s both;">
+                            <!-- Petals -->
+                            <circle cx="200" cy="150" r="20" fill="#f59e0b" opacity="0.8" />
+                            <circle cx="220" cy="155" r="18" fill="#f59e0b" opacity="0.8" />
+                            <circle cx="223" cy="175" r="18" fill="#f59e0b" opacity="0.8" />
+                            <circle cx="210" cy="188" r="18" fill="#f59e0b" opacity="0.8" />
+                            <circle cx="190" cy="188" r="18" fill="#f59e0b" opacity="0.8" />
+                            <circle cx="177" cy="175" r="18" fill="#f59e0b" opacity="0.8" />
+                            <circle cx="180" cy="155" r="18" fill="#f59e0b" opacity="0.8" />
+
+                            <!-- Center -->
+                            <circle cx="200" cy="170" r="15" fill="#fbbf24" />
+                        </g>
+
+                        <!-- Growth Stages (Small plants around) -->
+                        <g style="animation: grow 0.8s ease-out 1s both;">
+                            <line x1="100" y1="270" x2="100" y2="250" stroke="#14b8a6" stroke-width="3"
+                                stroke-linecap="round" />
+                            <circle cx="100" cy="245" r="5" fill="#14b8a6" />
+                        </g>
+
+                        <g style="animation: grow 0.8s ease-out 1.3s both;">
+                            <line x1="300" y1="250" x2="300" y2="220" stroke="#14b8a6" stroke-width="4"
+                                stroke-linecap="round" />
+                            <circle cx="300" cy="215" r="7" fill="#14b8a6" />
+                            <circle cx="295" cy="225" r="4" fill="#059669" />
+                        </g>
+
+                        <g style="animation: grow 0.8s ease-out 1.6s both;">
+                            <line x1="130" y1="300" x2="130" y2="285" stroke="#10b981" stroke-width="3"
+                                stroke-linecap="round" />
+                            <ellipse cx="130" cy="282" rx="6" ry="8" fill="#10b981" />
+                        </g>
+
+                        <g style="animation: grow 0.8s ease-out 1.9s both;">
+                            <line x1="270" y1="290" x2="270" y2="270" stroke="#10b981" stroke-width="3"
+                                stroke-linecap="round" />
+                            <ellipse cx="270" cy="267" rx="5" ry="7" fill="#10b981" />
+                        </g>
+
+                        <!-- Floating particles (ideas/lessons) -->
+                        <g style="animation: float 3s ease-in-out infinite;">
+                            <circle cx="250" cy="120" r="4" fill="#8b5cf6" opacity="0.7" />
+                        </g>
+                        <g style="animation: float 3.5s ease-in-out 0.5s infinite;">
+                            <circle cx="160" cy="140" r="3" fill="#8b5cf6" opacity="0.7" />
+                        </g>
+                        <g style="animation: float 4s ease-in-out 1s infinite;">
+                            <circle cx="240" cy="100" r="3" fill="#f59e0b" opacity="0.7" />
+                        </g>
+                        <g style="animation: float 3.8s ease-in-out 1.5s infinite;">
+                            <circle cx="150" cy="110" r="4" fill="#14b8a6" opacity="0.7" />
+                        </g>
+
+                        <!-- Version control branches -->
+                        <g style="animation: grow 1s ease-out 3s both;">
+                            <path d="M 200 250 L 220 270 L 240 265" fill="none" stroke="rgba(245,158,11,0.5)"
+                                stroke-width="2" stroke-dasharray="3,3" />
+                            <circle cx="240" cy="265" r="5" fill="#f59e0b" opacity="0.6" />
+                        </g>
+
+                        <g style="animation: grow 1s ease-out 3.2s both;">
+                            <path d="M 200 250 L 180 275 L 165 280" fill="none" stroke="rgba(139,92,246,0.5)"
+                                stroke-width="2" stroke-dasharray="3,3" />
+                            <circle cx="165" cy="280" r="5" fill="#8b5cf6" opacity="0.6" />
+                        </g>
+
+                        <!-- Soil base -->
+                        <ellipse cx="200" cy="260" rx="90" ry="15" fill="rgba(245,158,11,0.2)" />
+                        <line x1="110" y1="260" x2="290" y2="260" stroke="rgba(245,158,11,0.3)" stroke-width="2" />
+                    </svg>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main id="main-content" class="main-content">
+            <article class="content-section">
+                <div class="section-decorator"></div>
+
                 <p>Building a <b>personal website from scratch</b> has several challenges, especially when you have
                     decided not to use any blogging platform. This means that you are starting with a bare skeleton HTML
-                    file and building every post from it. You
-                    have to decide every aspect of the blog since you are quite far from the comfort of using the
-                    blogging platforms. Choosing appropriate fonts, font size and color, background color, contents of
-                    the header and footer, page width is challenging.
-                    Though using different HTML and CSS for every web page or blog post seems to be a flexible option
-                    hearing it for the first time, it's not as easy to manage as it seems. Every important design lesson
-                    learned necessitates some or the other
-                    modification to a lot of web pages. Fortunately, since this site aims to have long, elaborative
-                    posts instead of multiple small posts, it's much easier to make these modifications than otherwise.
-                </p>
+                    file and building every post from it. You have to decide every aspect of the blog since you are
+                    quite far from the comfort of using the blogging platforms. Choosing appropriate fonts, font size
+                    and color, background color, contents of the header and footer, page width is challenging. Though
+                    using different HTML and CSS for every web page or blog post seems to be a flexible option hearing
+                    it for the first time, it's not as easy to manage as it seems. Every important design lesson learned
+                    necessitates some or the other modification to a lot of web pages. Fortunately, since this site aims
+                    to have long, elaborative posts instead of multiple small posts, it's much easier to make these
+                    modifications than otherwise.</p>
+
+                <div class="lessons-grid">
+                    <div class="lesson-card">
+                        <div class="lesson-number">1</div>
+                        <h3>Relative URLs</h3>
+                        <p>Using relative URLs instead of absolute ones makes the blog portable across domains. Scripts
+                            can update posts, but relative paths avoid the need for rewriting when moving content.</p>
+                    </div>
+
+                    <div class="lesson-card">
+                        <div class="lesson-number">2</div>
+                        <h3>Template Files</h3>
+                        <p>Creating template HTML files with inline CSS for various themes (programming, research,
+                            linguistics) helps manage evolving design changes while maintaining flexibility for
+                            individual stories.</p>
+                    </div>
+
+                    <div class="lesson-card">
+                        <div class="lesson-number">3</div>
+                        <h3>Distraction-Free Reading</h3>
+                        <p>No sidebars, minimal menu-bars, and enumerated references at the end create a focused reading
+                            experience. Bold text and SVG diagrams support speed-reading.</p>
+                    </div>
+
+                    <div class="lesson-card">
+                        <div class="lesson-number">4</div>
+                        <h3>Version Control</h3>
+                        <p>Tracking every change with timestamps simulates reading ancient manuscripts with side-notes
+                            and corrections. Frequent commits with messages document the thought process.</p>
+                    </div>
+
+                    <div class="lesson-card">
+                        <div class="lesson-number">5</div>
+                        <h3>Evolving Story Format</h3>
+                        <p>Posts work like book chapters that can evolve over time. Content is added, removed, or
+                            modified based on new developments, all tracked by version control.</p>
+                    </div>
+
+                    <div class="lesson-card">
+                        <div class="lesson-number">6</div>
+                        <h3>Basic Text Editor</h3>
+                        <p>Using a basic text editor instead of HTML-specific tools leads to interesting human errors
+                            and creative solutions, teaching valuable lessons about browser auto-correction.</p>
+                    </div>
+                </div>
+
                 <p>A general and natural tendency is to use absolute URLs for hyperlinking every other post written on a
                     blog. It becomes difficult while moving the blog posts from one domain to the other. All the URLs
-                    need to be rewritten to point to the new
-                    domain. Scripts can be written to update all the posts and dynamic approaches can also be made use
-                    of. Instead <b>relative URLs</b> have been used in the blog since the beginning. Thus the blog can
-                    be hosted on any domain supporting HTML
-                    pages.
-                </p>
+                    need to be rewritten to point to the new domain. Scripts can be written to update all the posts and
+                    dynamic approaches can also be made use of. Instead <b>relative URLs</b> have been used in the blog
+                    since the beginning. Thus the blog can be hosted on any domain supporting HTML pages.</p>
+
                 <p>Several of the design decisions are subjective and quite often momentarily-made. CSS styles, usage of
                     paragraphs or enumerated lists, use of identifiers for hyperlinking in reference section, color
-                    choices, font sizes are some such example
-                    design decisions to name a few.</p>
+                    choices, font sizes are some such example design decisions to name a few.</p>
+
                 <p>As briefly described above, although per-page styles seem to be a lot more flexibile than site-wide
                     uniform themes, it's comparatively ver hard for content management and therefore requires proper
-                    care. Any new important lesson learned amounts
-                    to changing the styles on a lot of web pages. Therefore to support this evolving design changes,
-                    (responsive<sup><a href="#responsive-web-design">1</a></sup> and minimalistic<sup><a
+                    care. Any new important lesson learned amounts to changing the styles on a lot of web pages.
+                    Therefore to support this evolving design changes, (responsive<sup><a
+                            href="#responsive-web-design">1</a></sup> and minimalistic<sup><a
                             href="#minimalism">2</a></sup>) <b>template HTML files</b> with inline CSS for various
                     themes like programming, research, linguistics have been created. These template files form the
                     basis for every article belonging to the specific category and the style is thereafter changed based
-                    on the need
-                    and the story of the post.</p>
+                    on the need and the story of the post.</p>
+
                 <p>Internet browsers have started offering reader view<sup><a href="#reader-view">3</a></sup> so that
                     the readers of a blog or website can concentrate on the main content of the site instead of being
-                    distracted by sidebars, menubars and other
-                    oft-ignored content. On one side it shifts the whole role of replacing the distracting content to
-                    internet browsers (or ultimately the end-users), this feature also shows the growing need on the
-                    part of content producers to produce web
-                    pages with non-distracting content. To achieve <b>distraction-free reading</b>, sidebars have not
-                    been used on this blog at all. The menu-bars are restricted to link pointing to the homepage as well
-                    as link pointing to the other articles
-                    belonging to the same category as that of the actual one. Concerning references, instead of
-                    hyperlinking articles in the main content, enumerated links are provided at the end and numeric
-                    hyperlinked superfixes are used to point to the
-                    associated links. In addition to this, certain paragraphs are highlighted with bold faced text to
-                    support speed-reading. Sometimes pictures speak more than a very long text. Pictorial diagrams
-                    (using SVG) are also used for quick reading
-                    in addition to the hightlighted text.</p>
+                    distracted by sidebars, menubars and other oft-ignored content. On one side it shifts the whole role
+                    of replacing the distracting content to internet browsers (or ultimately the end-users), this
+                    feature also shows the growing need on the part of content producers to produce web pages with
+                    non-distracting content. To achieve <b>distraction-free reading</b>, sidebars have not been used on
+                    this blog at all. The menu-bars are restricted to link pointing to the homepage as well as link
+                    pointing to the other articles belonging to the same category as that of the actual one. Concerning
+                    references, instead of hyperlinking articles in the main content, enumerated links are provided at
+                    the end and numeric hyperlinked superfixes are used to point to the associated links. In addition to
+                    this, certain paragraphs are highlighted with bold faced text to support speed-reading. Sometimes
+                    pictures speak more than a very long text. Pictorial diagrams (using SVG) are also used for quick
+                    reading in addition to the hightlighted text.</p>
+
                 <p>Blogs and websites have replaced manuscripts, journals, personal diaries, magazines and newspapers to
                     a very large extent. On examining ancient manuscripts, we often come across side-notes, notes
-                    crossed-over and color-highlighted text. Most
-                    of these characteristics are missing in the current generation websites. Through the use of version
-                    control, I am trying to achieve an experience similar to reading ancient books and manuscripts.
-                    <b>Version control</b> retains every change documented as well as timestamped. Frequent writing and
-                    commits with appropriate commit messages document the corrections as well as simulate side-notes.
-                </p>
+                    crossed-over and color-highlighted text. Most of these characteristics are missing in the current
+                    generation websites. Through the use of version control, I am trying to achieve an experience
+                    similar to reading ancient books and manuscripts. <b>Version control</b> retains every change
+                    documented as well as timestamped. Frequent writing and commits with appropriate commit messages
+                    document the corrections as well as simulate side-notes.</p>
+
                 <p>Books have become integral part of our everyday lives for the last couple of centuries. Everyone is
                     familiar with the terms associated to a book: books consisting of several chapters, every chapter
-                    consisting of several sections and subsections.
-                    Every (sub) section consisting of several paragraphs. Even though HTML doesn't have specific tags
-                    for specific tags for specifying books, chapters, sections and subsections, all of them have been
-                    simulated since the inception of HTML.
+                    consisting of several sections and subsections. Every (sub) section consisting of several
+                    paragraphs. Even though HTML doesn't have specific tags for specific tags for specifying books,
+                    chapters, sections and subsections, all of them have been simulated since the inception of HTML.
                     Paper-printed books are limited in nature since once published and sold, one cannot add new content
                     to it (to make it ulimately available to the purchaser) until a new edition is published with the
-                    desired content. Content has been created
-                    in this blog keeping a book-like format in mind. Every post (also referred to as a story) is like a
-                    chapter. Several chapters around a similar topic are coupled together to form a book. Both chapters
-                    and books can evolve. New chapters
-                    are added. Chapters or post form <b>evolving story format</b>, i.e., content is added, removed or
-                    modified based on the new developments of the story. All these changes are tracked by the version
-                    control.</p>
+                    desired content. Content has been created in this blog keeping a book-like format in mind. Every
+                    post (also referred to as a story) is like a chapter. Several chapters around a similar topic are
+                    coupled together to form a book. Both chapters and books can evolve. New chapters are added.
+                    Chapters or post form <b>evolving story format</b>, i.e., content is added, removed or modified
+                    based on the new developments of the story. All these changes are tracked by the version control.
+                </p>
+
                 <p>I am using basic text editor instead of HTML-specific editors that can auto-correct and auto-suggest
                     various HTML tags. Using just a <b>basic text editor</b> often gives surprising HTML pages arising
-                    out of human-errors usually taking place
-                    by omission of closing HTML tags. Sometimes these errors don't pop-up on the resulting page, thanks
-                    to the modern internet browsers that can auto-correct these errors.</p>
+                    out of human-errors usually taking place by omission of closing HTML tags. Sometimes these errors
+                    don't pop-up on the resulting page, thanks to the modern internet browsers that can auto-correct
+                    these errors.</p>
+
                 <p>Working on this site has been a very long ongoing lesson. A very great deal has been learned while
                     building the site primarily from the mistakes.</p>
-                <h3>More information</h3>
-                <ul>
-                    <li><a href="./linkeddata-integration.html">Integrating Linked Data</a></li>
-                    <li><a href="./vocabulary-personal-website.html">Identifying Linked Open Vocabularies</a></li>
-                    <li><a href="./embedding-rdfa.html">Embedding RDFa on Web Pages</a></li>
-                </ul>
-                <h3>References</h3>
-                <p>
-                <ol>
-                    <li id="responsive-web-design"><a
-                            href="https://en.wikipedia.org/wiki/Responsive_web_design">Responsive Web Design</a></li>
-                    <li id="minimalism"><a href="https://en.wikipedia.org/wiki/Minimalism">Minimalism</a></li>
-                    <li id="reader-view"><a href="https://wiki.mozilla.org/QA/Reader_view">Reader View</a></li>
-                </ol>
-                </p>
+
+                <div class="more-info">
+                    <h3>More information</h3>
+                    <ul>
+                        <li><a href="./linkeddata-integration.html">Integrating Linked Data</a></li>
+                        <li><a href="./vocabulary-personal-website.html">Identifying Linked Open Vocabularies</a></li>
+                        <li><a href="./embedding-rdfa.html">Embedding RDFa on Web Pages</a></li>
+                    </ul>
+                </div>
+
+                <div class="references">
+                    <h3>References</h3>
+                    <ol>
+                        <li id="responsive-web-design"><a
+                                href="https://en.wikipedia.org/wiki/Responsive_web_design">Responsive Web Design</a>
+                        </li>
+                        <li id="minimalism"><a href="https://en.wikipedia.org/wiki/Minimalism">Minimalism</a></li>
+                        <li id="reader-view"><a href="https://wiki.mozilla.org/QA/Reader_view">Reader View</a></li>
+                    </ol>
+                </div>
+            </article>
+        </main>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <div class="footer-content">
+                <div class="footer-left">
+                    <div class="footer-brand">John Samuel</div>
+                </div>
             </div>
-        </div>
+        </footer>
     </body>
 
 </html>
