@@ -2,266 +2,790 @@
 <html lang="en">
 
     <head>
-        <meta charset="utf-8" />
-        <meta http-equiv="Content-Language" content="en" />
-        <link rel="shortcut icon" href="../../images/logo/favicon.png" />
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta http-equiv="Content-Language" content="en">
+        <link rel="shortcut icon" href="../../images/logo/favicon.png">
         <title>Query Languages: John Samuel</title>
-        <style type="text/css">
-            body {
-                background-color: #FFFFFF;
+        <style>
+            /* ===== Design Tokens ===== */
+            :root {
+                /* Query Languages Theme - Database & Data Flow */
+                --color-base-bg: #f8f9fa;
+                --color-base-surface: #ffffff;
+                --color-base-text: #1a202c;
+                --color-base-text-muted: #4a5568;
+
+                /* Accent Colors - Database Operations */
+                --color-select: #10b981;
+                /* Green - SELECT/Read */
+                --color-insert: #3b82f6;
+                /* Blue - INSERT/Write */
+                --color-update: #f59e0b;
+                /* Amber - UPDATE/Modify */
+                --color-delete: #ef4444;
+                /* Red - DELETE/Remove */
+                --color-join: #8b5cf6;
+                /* Purple - JOIN/Connect */
+                --color-aggregate: #06b6d4;
+                /* Cyan - Aggregate/Analyze */
+
+                /* Primary Accent */
+                --color-accent-1: #0ea5e9;
+                --color-accent-2: #0284c7;
+                --color-accent-3: #0369a1;
+                --color-accent-light: #e0f2fe;
+
+                /* Gradients */
+                --gradient-primary: linear-gradient(135deg, #0ea5e9 0%, #8b5cf6 100%);
+                --gradient-hero: linear-gradient(135deg, #0369a1 0%, #0ea5e9 50%, #06b6d4 100%);
+                --gradient-subtle: linear-gradient(180deg, #f8f9fa 0%, #e0f2fe 100%);
+                --gradient-data: linear-gradient(90deg, #10b981 0%, #3b82f6 25%, #8b5cf6 50%, #f59e0b 75%, #ef4444 100%);
+
+                /* Functional Colors */
+                --color-shadow: rgba(14, 165, 233, 0.12);
+                --color-border: rgba(14, 165, 233, 0.15);
+                --color-hover: rgba(14, 165, 233, 0.08);
+
+                /* Spacing Scale */
+                --space-xs: 0.25rem;
+                --space-sm: 0.5rem;
+                --space-md: 1rem;
+                --space-lg: 1.5rem;
+                --space-xl: 2rem;
+                --space-2xl: 3rem;
+                --space-3xl: 4rem;
+                --space-4xl: 6rem;
+
+                /* Typography Scale */
+                --text-xs: clamp(0.75rem, 0.7rem + 0.25vw, 0.875rem);
+                --text-sm: clamp(0.875rem, 0.8rem + 0.35vw, 1rem);
+                --text-base: clamp(1rem, 0.95rem + 0.25vw, 1.125rem);
+                --text-lg: clamp(1.125rem, 1.05rem + 0.35vw, 1.25rem);
+                --text-xl: clamp(1.25rem, 1.15rem + 0.5vw, 1.5rem);
+                --text-2xl: clamp(1.5rem, 1.3rem + 1vw, 2rem);
+                --text-3xl: clamp(2rem, 1.6rem + 2vw, 2.5rem);
+                --text-4xl: clamp(2.5rem, 2rem + 2.5vw, 3.5rem);
+
+                /* Shadows */
+                --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.04), 0 1px 3px rgba(0, 0, 0, 0.06);
+                --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.05), 0 2px 4px rgba(0, 0, 0, 0.06);
+                --shadow-lg: 0 10px 24px rgba(0, 0, 0, 0.08), 0 4px 8px rgba(0, 0, 0, 0.06);
+                --shadow-theme: 0 10px 30px var(--color-shadow), 0 4px 10px rgba(0, 0, 0, 0.06);
+
+                /* Border Radius */
+                --radius-sm: 4px;
+                --radius-md: 8px;
+                --radius-lg: 12px;
+                --radius-xl: 16px;
+                --radius-2xl: 24px;
+                --radius-full: 9999px;
+
+                /* Font Stack */
+                --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+                --font-mono: 'SF Mono', Monaco, 'Cascadia Code', 'Consolas', 'Courier New', monospace;
             }
 
-            #sidebar {
-                position: fixed;
-                background-color: #009AA6;
-                top: 0;
-                left: 0;
-                bottom: 0;
-                width: 30vw;
-            }
-
-            #sidebar .title {
-                position: relative;
-                text-align: center;
-                line-height: 5vmax;
-                font-size: 1.4vmax;
-                font-family: 'Arial';
-                margin-top: 30vh;
-            }
-
-            #sidebar .title a:link,
-            #sidebar .title a:visited {
-                color: #FFFFFF;
-                text-decoration: none;
-            }
-
-            .subtitle {
-                top: 50vh;
-                text-align: center;
-                line-height: 1.3vmax;
-                font-family: 'Arial';
-                font-size: 1.2vmax;
-                color: #FFFFFF;
-            }
-
-            .subtitle a:link,
-            .subtitle a:visited {
-                color: #FFFFFF;
-                text-decoration: none;
-            }
-
-            .licence {
-                position: fixed;
-                text-align: right;
-                bottom: 0;
-                right: 0;
-            }
-
-            .home {
-                position: fixed;
-                text-align: left;
-                font-family: 'Arial';
-                color: #D3D3D3;
-                z-index: 100;
-                width: 100%;
-                background-color: #FFFFFF;
-                top: 0px;
-                margin-bottom: 10px;
-                padding-bottom: 10px;
-            }
-
-            .home a:link,
-            .home a:visited {
-                text-decoration: none;
-                color: #D3D3D3;
-            }
-
-            .home ul {
+            /* ===== Reset & Base Styles ===== */
+            * {
                 margin: 0;
                 padding: 0;
-                text-align: left;
-                list-style: none;
+                box-sizing: border-box;
             }
 
-            .home li {
-                position: relative;
-                float: left;
-                padding-top: 15px;
-                margin-right: 1em;
-                font-family: 'Arial';
+            html {
+                scroll-behavior: smooth;
+                scroll-padding-top: 80px;
             }
 
-            .home li:hover {
-                display: block;
+            body {
+                font-family: var(--font-sans);
+                font-size: var(--text-base);
+                line-height: 1.7;
+                color: var(--color-base-text);
+                background: var(--gradient-subtle);
+                background-attachment: fixed;
+                overflow-x: hidden;
             }
 
-            .home li:hover a:link,
-            .home li:hover a:visited {
+            /* ===== Skip Link ===== */
+            .skip-link {
+                position: absolute;
+                top: -40px;
+                left: 0;
+                background: var(--color-accent-1);
+                color: white;
+                padding: var(--space-sm) var(--space-md);
                 text-decoration: none;
-                padding: 15px;
-                color: #FFFFFF;
-                background-color: #009AA6;
+                z-index: 9999;
+                border-radius: 0 0 var(--radius-md) 0;
             }
 
-            .content {
-                line-height: 1.8vmax;
-                font-size: 1.2vmax;
-                font-family: 'Arial';
-                margin-top: 15vh;
-                width: 90%;
+            .skip-link:focus {
+                top: 0;
             }
 
-            .content h2,
-            h3,
-            h4 {
-                color: #009AA6;
-            }
-
-            .content a:link,
-            .content a:visited {
-                color: #009AA6;
-            }
-
-            .content h3 {
-                color: #009AA6;
-            }
-
-            .content h2::before,
-            .content h3::before {
-                display: block;
-                content: " ";
-                visibility: hidden;
-                height: 50px;
-                margin-top: -50px;
+            /* ===== Animated Background Pattern - Database Grid ===== */
+            body::before {
+                content: '';
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background-image:
+                    repeating-linear-gradient(0deg, transparent, transparent 49px, rgba(14, 165, 233, 0.03) 49px, rgba(14, 165, 233, 0.03) 50px),
+                    repeating-linear-gradient(90deg, transparent, transparent 49px, rgba(14, 165, 233, 0.03) 49px, rgba(14, 165, 233, 0.03) 50px),
+                    radial-gradient(circle at 20% 30%, rgba(16, 185, 129, 0.04) 0%, transparent 50%),
+                    radial-gradient(circle at 80% 70%, rgba(139, 92, 246, 0.04) 0%, transparent 50%);
                 pointer-events: none;
-                background-color: #FFFFFF;
+                z-index: 0;
+                animation: gridPulse 20s ease-in-out infinite;
             }
 
-            .content a:link,
-            .content a:visited {
-                color: #009AA6;
+            @keyframes gridPulse {
+
+                0%,
+                100% {
+                    opacity: 1;
+                }
+
+                50% {
+                    opacity: 0.6;
+                }
             }
 
-            .home a:link,
-            .home a:visited {
-                color: #D3D3D3;
+            /* ===== Navigation ===== */
+            .nav-wrapper {
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                z-index: 1000;
+                background: rgba(255, 255, 255, 0.85);
+                -webkit-backdrop-filter: blur(12px) saturate(180%);
+                backdrop-filter: blur(12px) saturate(180%);
+                border-bottom: 1px solid var(--color-border);
+                box-shadow: var(--shadow-sm);
             }
 
-            .page {
-                width: 65vw;
-                height: 100%;
-                margin-left: 30vw;
+            nav {
+                max-width: 1400px;
+                margin: 0 auto;
+                padding: var(--space-md) var(--space-xl);
+                display: flex;
+                align-items: center;
+                gap: var(--space-2xl);
+            }
+
+            .nav-brand {
+                font-size: var(--text-lg);
+                font-weight: 700;
+                color: var(--color-accent-1);
+                text-decoration: none;
+                letter-spacing: -0.02em;
+                position: relative;
+                padding: var(--space-sm) var(--space-md);
+                background: var(--gradient-primary);
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                background-clip: text;
+            }
+
+            .nav-brand::before {
+                content: '';
+                position: absolute;
+                inset: 0;
+                background: var(--color-accent-light);
+                border-radius: var(--radius-md);
+                z-index: -1;
+                opacity: 0;
+                transition: opacity 0.3s ease;
+            }
+
+            .nav-brand:hover::before {
+                opacity: 1;
+            }
+
+            .breadcrumb {
+                display: flex;
+                list-style: none;
+                gap: var(--space-sm);
+                flex: 1;
+                flex-wrap: wrap;
+                align-items: center;
+            }
+
+            .breadcrumb li {
+                display: flex;
+                align-items: center;
+                font-size: var(--text-sm);
+            }
+
+            .breadcrumb li:not(:last-child)::after {
+                content: '→';
+                margin-left: var(--space-sm);
+                color: var(--color-base-text-muted);
+            }
+
+            .breadcrumb a {
+                color: var(--color-base-text-muted);
+                text-decoration: none;
+                padding: var(--space-xs) var(--space-sm);
+                border-radius: var(--radius-sm);
+                transition: all 0.3s ease;
+            }
+
+            .breadcrumb a:hover {
+                color: var(--color-accent-1);
+                background: var(--color-hover);
+            }
+
+            /* ===== Hero Section ===== */
+            .hero {
+                position: relative;
+                margin-top: 80px;
+                padding: var(--space-4xl) var(--space-xl);
+                background: var(--gradient-hero);
                 overflow: hidden;
-                padding: 0 1em;
-                font-family: 'Arial';
             }
 
-            .page img {
-                max-width: 100%;
-                max-height: 100%;
+            /* Database table grid pattern */
+            .hero::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background-image:
+                    linear-gradient(90deg, rgba(255, 255, 255, 0.05) 1px, transparent 1px),
+                    linear-gradient(0deg, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+                background-size: 60px 40px;
+                animation: tableScroll 30s linear infinite;
             }
 
-            @media (max-width: 640px),
-            screen and (orientation: portrait) {
-                body {
-                    max-width: 100%;
-                    max-height: 100%;
+            @keyframes tableScroll {
+                from {
+                    transform: translateY(0);
                 }
 
-                #sidebar {
-                    position: fixed;
-                    background-color: #009AA6;
-                    top: 0;
-                    left: 0;
-                    bottom: 80vh;
-                    width: 100vw;
+                to {
+                    transform: translateY(40px);
+                }
+            }
+
+            .hero-content {
+                max-width: 1200px;
+                margin: 0 auto;
+                position: relative;
+                z-index: 1;
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: var(--space-3xl);
+                align-items: center;
+            }
+
+            .hero-text h1 {
+                font-size: var(--text-4xl);
+                font-weight: 800;
+                color: white;
+                line-height: 1.2;
+                letter-spacing: -0.03em;
+                margin-bottom: var(--space-lg);
+                text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+            }
+
+            .hero-text .subtitle {
+                font-size: var(--text-xl);
+                color: rgba(255, 255, 255, 0.95);
+                line-height: 1.6;
+                margin-bottom: var(--space-xl);
+            }
+
+            .hero-text .author {
+                display: inline-block;
+                padding: var(--space-sm) var(--space-lg);
+                background: rgba(255, 255, 255, 0.15);
+                -webkit-backdrop-filter: blur(8px);
+                backdrop-filter: blur(8px);
+                border-radius: var(--radius-full);
+                color: white;
+                text-decoration: none;
+                font-weight: 500;
+                transition: all 0.3s ease;
+                border: 1px solid rgba(255, 255, 255, 0.2);
+            }
+
+            .hero-text .author:hover {
+                background: rgba(255, 255, 255, 0.25);
+                transform: translateY(-2px);
+                box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+            }
+
+            /* ===== Hero SVG - Query & Database Visualization ===== */
+            .hero-svg {
+                position: relative;
+            }
+
+            .hero-svg svg {
+                width: 100%;
+                height: auto;
+                filter: drop-shadow(0 10px 30px rgba(0, 0, 0, 0.2));
+            }
+
+            @keyframes dataFlow {
+
+                0%,
+                100% {
+                    transform: translateX(0) translateY(0);
+                    opacity: 0.8;
                 }
 
-                #sidebar .title {
-                    text-align: center;
-                    position: fixed;
-                    margin-top: 6vh;
-                    left: 0px;
-                    right: 0px;
-                    line-height: 3.5vmax;
-                    font-size: 1.5vmax;
-                    font-family: 'Arial';
+                50% {
+                    transform: translateX(10px) translateY(-10px);
+                    opacity: 1;
+                }
+            }
+
+            @keyframes tableFloat {
+
+                0%,
+                100% {
+                    transform: translateY(0px);
                 }
 
-                #sidebar .subtitle {
-                    text-align: center;
-                    top: 5vh;
-                    left: 0px;
-                    right: 0px;
-                    position: fixed;
-                    margin-top: 10vh;
-                    font-size: 1.5vmax;
+                50% {
+                    transform: translateY(-8px);
+                }
+            }
+
+            @keyframes queryBlink {
+
+                0%,
+                100% {
+                    opacity: 0.6;
                 }
 
-                #sidebar .title a:link,
-                #sidebar .title a:visited {
-                    text-align: center;
-                    color: #FFFFFF;
+                50% {
+                    opacity: 1;
+                }
+            }
+
+            @keyframes resultPulse {
+
+                0%,
+                100% {
+                    transform: scale(1);
+                    opacity: 0.9;
                 }
 
-                #sidebar .subtitle a:link,
-                #sidebar .subtitle a:visited {
-                    text-align: center;
-                    color: #FFFFFF;
+                50% {
+                    transform: scale(1.05);
+                    opacity: 1;
+                }
+            }
+
+            /* ===== Main Content ===== */
+            .container {
+                max-width: 1200px;
+                margin: 0 auto;
+                padding: var(--space-4xl) var(--space-xl);
+                position: relative;
+                z-index: 1;
+            }
+
+            /* ===== Content Section - Table-like Cards ===== */
+            .content-section {
+                background: var(--color-base-surface);
+                border-radius: var(--radius-2xl);
+                padding: var(--space-3xl) var(--space-2xl);
+                margin-bottom: var(--space-3xl);
+                box-shadow: var(--shadow-theme);
+                position: relative;
+                overflow: hidden;
+                transition: transform 0.3s ease, box-shadow 0.3s ease;
+                border-top: 3px solid transparent;
+            }
+
+            /* SQL operation colored borders */
+            .content-section:nth-child(1) {
+                border-top-color: var(--color-select);
+            }
+
+            .content-section:nth-child(2) {
+                border-top-color: var(--color-insert);
+            }
+
+            .content-section:nth-child(3) {
+                border-top-color: var(--color-update);
+            }
+
+            .content-section:nth-child(4) {
+                border-top-color: var(--color-delete);
+            }
+
+            .content-section:nth-child(5) {
+                border-top-color: var(--color-join);
+            }
+
+            .content-section:nth-child(6) {
+                border-top-color: var(--color-aggregate);
+            }
+
+            /* Table header stripe effect */
+            .content-section::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                height: 8px;
+                background: linear-gradient(90deg,
+                        currentColor 0%,
+                        transparent 100%);
+                opacity: 0.1;
+            }
+
+            .content-section:nth-child(1)::before {
+                color: var(--color-select);
+            }
+
+            .content-section:nth-child(2)::before {
+                color: var(--color-insert);
+            }
+
+            .content-section:nth-child(3)::before {
+                color: var(--color-update);
+            }
+
+            .content-section:nth-child(4)::before {
+                color: var(--color-delete);
+            }
+
+            .content-section:nth-child(5)::before {
+                color: var(--color-join);
+            }
+
+            .content-section:nth-child(6)::before {
+                color: var(--color-aggregate);
+            }
+
+            .content-section:hover {
+                transform: translateY(-4px);
+                box-shadow: 0 20px 50px var(--color-shadow), 0 8px 20px rgba(0, 0, 0, 0.08);
+            }
+
+            .content-section h3 {
+                font-size: var(--text-2xl);
+                font-weight: 700;
+                margin-bottom: var(--space-xl);
+                line-height: 1.3;
+                letter-spacing: -0.02em;
+                position: relative;
+                padding-bottom: var(--space-md);
+            }
+
+            /* Color-coded section headers */
+            .content-section:nth-child(1) h3 {
+                color: var(--color-select);
+            }
+
+            .content-section:nth-child(2) h3 {
+                color: var(--color-insert);
+            }
+
+            .content-section:nth-child(3) h3 {
+                color: var(--color-update);
+            }
+
+            .content-section:nth-child(4) h3 {
+                color: var(--color-delete);
+            }
+
+            .content-section:nth-child(5) h3 {
+                color: var(--color-join);
+            }
+
+            .content-section:nth-child(6) h3 {
+                color: var(--color-aggregate);
+            }
+
+            /* Underline accent */
+            .content-section h3::after {
+                content: '';
+                position: absolute;
+                bottom: 0;
+                left: 0;
+                width: 80px;
+                height: 3px;
+                background: currentColor;
+                border-radius: var(--radius-full);
+            }
+
+            .content-section p {
+                color: var(--color-base-text);
+                line-height: 1.8;
+                margin-bottom: var(--space-lg);
+            }
+
+            .content-section p:last-child {
+                margin-bottom: 0;
+            }
+
+            .content-section a {
+                color: var(--color-accent-1);
+                text-decoration: none;
+                position: relative;
+                font-weight: 500;
+                transition: color 0.3s ease;
+            }
+
+            .content-section a::after {
+                content: '';
+                position: absolute;
+                bottom: -2px;
+                left: 0;
+                width: 100%;
+                height: 2px;
+                background: var(--gradient-primary);
+                transform: scaleX(0);
+                transform-origin: right;
+                transition: transform 0.3s ease;
+            }
+
+            .content-section a:hover {
+                color: var(--color-accent-2);
+            }
+
+            .content-section a:hover::after {
+                transform: scaleX(1);
+                transform-origin: left;
+            }
+
+            /* Code styling */
+            .content-section code {
+                font-family: var(--font-mono);
+                font-size: 0.9em;
+                padding: 2px 8px;
+                background: rgba(14, 165, 233, 0.08);
+                border: 1px solid rgba(14, 165, 233, 0.15);
+                border-radius: var(--radius-sm);
+                color: var(--color-accent-2);
+            }
+
+            /* ===== References Section ===== */
+            .references {
+                background: linear-gradient(135deg,
+                        rgba(16, 185, 129, 0.03) 0%,
+                        rgba(14, 165, 233, 0.03) 50%,
+                        rgba(139, 92, 246, 0.03) 100%);
+                border-radius: var(--radius-2xl);
+                padding: var(--space-3xl) var(--space-2xl);
+                margin-top: var(--space-4xl);
+                border: 2px solid var(--color-border);
+                position: relative;
+            }
+
+            .references::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                height: 4px;
+                background: var(--gradient-data);
+                border-radius: var(--radius-2xl) var(--radius-2xl) 0 0;
+            }
+
+            .references h3 {
+                font-size: var(--text-2xl);
+                font-weight: 700;
+                color: var(--color-accent-2);
+                margin-bottom: var(--space-xl);
+                display: flex;
+                align-items: center;
+                gap: var(--space-md);
+            }
+
+            .references h3::before {
+                content: '📊';
+                font-size: var(--text-3xl);
+            }
+
+            .references ol {
+                margin-left: var(--space-xl);
+                display: grid;
+                gap: var(--space-md);
+            }
+
+            .references li {
+                line-height: 1.7;
+                padding-left: var(--space-sm);
+                transition: transform 0.2s ease;
+            }
+
+            .references li:hover {
+                transform: translateX(4px);
+            }
+
+            .references li::marker {
+                color: var(--color-accent-1);
+                font-weight: 700;
+            }
+
+            .references a {
+                color: var(--color-accent-1);
+                text-decoration: none;
+                transition: all 0.3s ease;
+                border-bottom: 1px solid transparent;
+            }
+
+            .references a:hover {
+                color: var(--color-accent-2);
+                border-bottom-color: var(--color-accent-2);
+            }
+
+            /* ===== Footer ===== */
+            footer {
+                background: var(--gradient-hero);
+                color: white;
+                padding: var(--space-3xl) var(--space-xl) var(--space-2xl);
+                margin-top: var(--space-4xl);
+                position: relative;
+                overflow: hidden;
+            }
+
+            footer::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background: url('data:image/svg+xml,<svg width="80" height="80" xmlns="http://www.w3.org/2000/svg"><rect x="10" y="10" width="60" height="15" rx="2" fill="rgba(255,255,255,0.05)"/><rect x="10" y="35" width="60" height="15" rx="2" fill="rgba(255,255,255,0.03)"/><rect x="10" y="60" width="60" height="15" rx="2" fill="rgba(255,255,255,0.05)"/></svg>');
+                background-size: 80px 80px;
+                opacity: 0.3;
+            }
+
+            .footer-content {
+                max-width: 1200px;
+                margin: 0 auto;
+                position: relative;
+                z-index: 1;
+            }
+
+            .footer-links {
+                display: flex;
+                gap: var(--space-xl);
+                margin-bottom: var(--space-xl);
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+
+            .footer-links a {
+                color: rgba(255, 255, 255, 0.9);
+                text-decoration: none;
+                padding: var(--space-sm) var(--space-md);
+                border-radius: var(--radius-md);
+                transition: all 0.3s ease;
+                font-size: var(--text-sm);
+                background: rgba(255, 255, 255, 0.05);
+            }
+
+            .footer-links a:hover {
+                background: rgba(255, 255, 255, 0.15);
+                transform: translateY(-2px);
+            }
+
+            .copyright {
+                text-align: center;
+                color: rgba(255, 255, 255, 0.7);
+                font-size: var(--text-sm);
+                padding-top: var(--space-lg);
+                border-top: 1px solid rgba(255, 255, 255, 0.1);
+            }
+
+            /* ===== Responsive Design ===== */
+            @media (max-width: 1024px) {
+                .hero-content {
+                    grid-template-columns: 1fr;
+                    gap: var(--space-2xl);
                 }
 
-                .home {
-                    z-index: 100;
-                    width: 100%;
-                    background-color: #009AA6;
-                    font-size: 1.5vmax;
+                .hero-svg {
+                    order: -1;
+                }
+            }
+
+            @media (max-width: 768px) {
+                nav {
+                    flex-direction: column;
+                    gap: var(--space-md);
+                    padding: var(--space-md);
                 }
 
-                .home a:link,
-                .home a:visited {
-                    text-decoration: none;
-                    color: #FFFFFF;
+                .breadcrumb {
+                    justify-content: center;
                 }
 
-                .content {
-                    line-height: 3.8vmax;
-                    font-size: 1.8vmax;
-                    font-family: 'Arial';
-                    margin-top: 22vh;
+                .hero {
+                    padding: var(--space-3xl) var(--space-md);
                 }
 
-                .content a:link,
-                .content a:visited {
-                    color: #009AA6;
+                .container {
+                    padding: var(--space-2xl) var(--space-md);
                 }
 
-                .page {
-                    top: 40vh;
-                    width: 95%;
-                    margin-left: 0vw;
+                .content-section {
+                    padding: var(--space-2xl) var(--space-lg);
+                    margin-bottom: var(--space-2xl);
                 }
 
-                .page img {
-                    max-width: 100%;
-                    max-height: 100%;
-                    border: 0;
+                .references {
+                    padding: var(--space-2xl) var(--space-lg);
                 }
+
+                .references ol {
+                    margin-left: var(--space-lg);
+                }
+
+                .footer-links {
+                    flex-direction: column;
+                    align-items: center;
+                    gap: var(--space-sm);
+                }
+            }
+
+            /* ===== Reduced Motion ===== */
+            @media (prefers-reduced-motion: reduce) {
+
+                *,
+                *::before,
+                *::after {
+                    animation-duration: 0.01ms !important;
+                    animation-iteration-count: 1 !important;
+                    transition-duration: 0.01ms !important;
+                }
+            }
+
+            /* ===== Focus Styles ===== */
+            *:focus-visible {
+                outline: 3px solid var(--color-accent-1);
+                outline-offset: 2px;
+                border-radius: var(--radius-sm);
             }
         </style>
     </head>
 
     <body vocab="http://schema.org/">
-        <div id="sidebar">
-            <div class="title">
-                <h1><a href="./query-languages.html">Query Languages</a></h1>
-            </div>
-            <div class="subtitle">
-                <h2><a href="../about.html">John Samuel</a></h2>
-            </div>
-        </div>
-        <div class="page">
-            <div class="home">
-                <ul typeof="BreadcrumbList">
+        <a href="#main-content" class="skip-link">Skip to main content</a>
+
+        <!-- Navigation -->
+        <div class="nav-wrapper">
+            <nav>
+                <a href="../about.html" class="nav-brand">John Samuel</a>
+                <ul class="breadcrumb" typeof="BreadcrumbList">
                     <li property="itemListElement" typeof="ListItem">
                         <a property="item" typeof="WebPage" href="../index.html">
                             <span property="name">Home</span>
@@ -278,176 +802,329 @@
                         </a>
                     </li>
                 </ul>
-            </div>
-            <div class="content">
-                <h3>Unraveling Data Insights: A Journey Through Query Languages</h3>
-                <p>
-                    Query languages [1] serve as indispensable tools for addressing user inquiries regarding our data
-                    assets. In the
-                    ever-evolving fields of data science and generative AI, these query languages are in the midst of a
-                    transformation, adapting to seamlessly integrate with diverse data sources. This evolution not only
-                    broadens their capacity to offer profound insights but also extends their reach beyond the
-                    traditional
-                    relational databases and structured data. They now encompass a wide variety of data formats,
-                    including
-                    structured, unstructured, and semi-structured data, thereby opening up new horizons for data
-                    exploration
-                    and analysis. However, it's crucial to emphasize that this article primarily focuses on classical
-                    textual sources. It's worth noting that there exists a multitude of other media/document formats,
-                    such
-                    as binary
-                    data, images, videos, audios, and the novel vectors harnessed by AI models, which, although not
-                    explored
-                    here, represent a fascinating format of the ever-expanding AI models.
-                </p>
-                <h3>Query Languages in the World of Structured Data</h3>
-                <p>
-                    Databases [2] are renowned for their methodical, well-structured
-                    nature, characterized by a schema that delineates available relations or tables and their
-                    corresponding
-                    attributes. This structural foundation empowers a broad spectrum of data operations, encompassing
-                    tasks
-                    like data retrieval, sorting, filtering, and conditional searches, as well as executing aggregation
-                    analyses, including computations for count, maximum, minimum, and averages. To accomplish these
-                    tasks, a
-                    set of essential keywords in SQL [3], such as SELECT, FROM, WHERE, GROUP, ORDER BY, HAVING, COUNT,
-                    and
-                    more, come
-                    into play.
-                </p>
-                <p>
-                    However, the world of structured databases extends further than traditional relations. There exists
-                    another
-                    facet in the form of databases purpose-built for managing graph data. Graph databases [4] structure
-                    information
-                    into triples or utilize contemporary property graphs [5]. Query languages like SPARQL [6] and Cypher
-                    [7], influenced by
-                    SQL, go beyond basic data manipulation. They excel at tackling unique challenges posed by graph
-                    data,
-                    such
-                    as discovering the shortest path [8] or unraveling connections between various points within the
-                    graph.
-                </p>
-
-                <h3>Querying Semi-Structured Data: The XML Approach</h3>
-                <p>
-                    For those looking to bypass the complexities of traditional database management, an alternative
-                    route
-                    exists in the form of semi-structured data formats, with XML serving as a prominent example. These
-                    formats, known for their text-based nature, present a more straightforward approach, as they can be
-                    effectively managed using files, eliminating the necessity of traditional databases.
-                    Specialized languages like XQuery [9] and XPath [10] equip users with the tools to
-                    seamlessly query and extract precisely the information they desire. What distinguishes these
-                    languages
-                    is their exceptional ability to harness the inherent hierarchical structure of such data formats.
-                    This
-                    unique capability empowers users to navigate through the complex layers of data and uncover the
-                    insights they seek with remarkable ease.
-                </p>
-                <h3>JSON's Soaring Popularity</h3>
-                <p>
-                    JSON, a lightweight data format reminiscent of XML, has witnessed a remarkable surge in popularity
-                    within the data domain. Its inherent simplicity and adaptability have won over numerous data
-                    professionals. To navigate and unlock JSON's potential, query languages like JSONPath [11] and
-                    JMESPath
-                    [12] come
-                    into play, providing users with the means to precisely extract the desired information. These
-                    languages
-                    offer a structured approach to accessing and manipulating JSON data.
-                </p>
-                <p>
-                    Command-line tools like <code>jq</code> [13] have also ascended as invaluable assets. These tools
-                    empower users to
-                    efficiently query and reshape JSON structures, providing a streamlined path to data exploration.
-                    JSON's
-                    rise as a data format has brought transformative effects to the data analysis. Its user-friendly
-                    structure has facilitated smoother data exchange, particularly in web applications, APIs, and
-                    various
-                    data exchange scenarios.
-                </p>
-                <h3>The Timeless Appeal of CSV and TSV Formats in Data Handling</h3>
-                <p>
-                    Amidst the ever-expanding variety of data formats, the enduring simplicity of CSV (Comma-Separated
-                    Values) and TSV (Tab-Separated Values) formats remains a steadfast favorite in the data management.
-                    These structured textual formats have withstood the test of time, cherished for their approachable
-                    and
-                    user-friendly characteristics. Over the years, a cadre of command-line tools, featuring stalwarts
-                    such
-                    as <code>sed</code>, <code>cut</code>, and <code>awk</code>, have emerged as indispensable
-                    companions in
-                    the craft of working with such data.
-                </p>
-                <p>
-                    These tools empower users to execute a wide range of operations, spanning from fundamental text
-                    manipulation to data extraction, all within delimited text files. The accessibility of CSV and
-                    TSV, coupled with the versatility of these command-line tools, has contributed to their enduring
-                    presence in data science. They remain the preferred choice for numerous data professionals,
-                    providing
-                    efficiency and user-friendliness in managing and extracting insights from structured textual data.
-                </p>
-                <h3>Unstructured Data</h3>
-                <p>
-                    Unstructured data, often in the form of documents, poses a unique challenge in text analyses.
-                    Historically, command-line tools like <code>grep</code> have been instrumental in the formidable
-                    task of
-                    sorting through and extracting valuable insights.
-                    However, the data landscape is far from static; it is in a state of perpetual evolution. One
-                    significant
-                    catalyst for this transformation is the rise of document stores [14]. These specialized databases
-                    are
-                    reshaping the rules of engagement when it comes to handling and querying unstructured data.
-                </p>
-                <h3>Conclusion</h3>
-                <p>
-                    The world of query languages and their interaction with diverse data formats is a dynamic and
-                    ever-evolving field. These languages serve as the linchpin in enabling users to glean insights,
-                    manipulate data, and pose inquiries across a wide spectrum of data formats, whether structured,
-                    semi-structured, or unstructured.
-                </p>
-                <p>
-                    From the well-established domain of SQL, which governs relational databases, to the flexibility of
-                    languages like XQuery, SPARQL, and JSONPath, designed for XML, graph databases, and JSON, the
-                    adaptability of query languages continues to broaden its horizons. Their proficiency in navigating
-                    intricate data hierarchies, managing real-time streaming data, and harmonizing with various formats
-                    has
-                    ushered in a revolution in our approach to data analysis.
-                </p>
-                <p>
-                    Furthermore, the advent of specialized tools and document stores has democratized the process of
-                    querying unstructured data like never before. This evolutionary journey underscores the adaptability
-                    and
-                    resilience of query languages in the face of an ever-shifting field of (textual) data analysis.
-                </p>
-                <h3>References</h3>
-                <p>
-                <ol>
-                    <li id="querylanguage"><a href="https://en.wikipedia.org/wiki/Query_language">Query language</a>
-                    </li>
-                    <li id="db"><a href="https://en.wikipedia.org/wiki/Relational_database">Relational database</a></li>
-                    <li id="SQL"><a href="https://en.wikipedia.org/wiki/SQL">SQL</a></li>
-                    <li id="graphdb"><a href="https://en.wikipedia.org/wiki/Graph_database">Graph database</a></li>
-                    <li id="pg"><a
-                            href="https://neo4j.com/blog/rdf-triple-store-vs-labeled-property-graph-difference/">RDF
-                            Triple Stores vs. Labeled Property Graphs: What’s the Difference?</a></li>
-                    <li id="SPARQL"><a href="https://en.wikipedia.org/wiki/SPARQL">SPARQL</a></li>
-                    <li id="Cypher"><a href="https://neo4j.com/docs/cypher-manual/current/introduction/">Cypher
-                            Manual</a>
-                    </li>
-                    <li id="shortest"><a href="https://neo4j.com/blog/graph-algorithms-neo4j-shortest-path/">Graph
-                            Algorithms in Neo4j: Shortest Path</a></li>
-                    <li id="xquery"><a href="https://www.w3.org/XML/Query/">W3C XML Query (XQuery)</a></li>
-                    <li id="xpath"><a href="https://www.w3.org/TR/xpath-31/">XML Path Language (XPath) 3.1</a></li>
-                    <li id="jsonpath"><a href="https://goessner.net/articles/JsonPath/"> JSONPath - XPath for JSON</a>
-                    </li>
-                    <li id="jmespath"><a href="https://jmespath.org/">JMESPath</a></li>
-                    <li id="jq"><a href="https://stedolan.github.io/jq/manual/">jq Manual</a></li>
-                    <li id="documentdb"><a
-                            href="https://en.wikipedia.org/wiki/Document-oriented_database">Document-oriented
-                            database</a></li>
-                </ol>
-                </p>
-            </div>
+            </nav>
         </div>
+
+        <!-- Hero Section -->
+        <section class="hero">
+            <div class="hero-content">
+                <div class="hero-text">
+                    <h1>Query Languages</h1>
+                    <p class="subtitle">Unraveling Data Insights: A Journey Through Query Languages</p>
+                    <a href="../about.html" class="author">By John Samuel</a>
+                </div>
+                <div class="hero-svg">
+                    <svg viewBox="0 0 400 300" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                        <!-- Database tables visualization -->
+                        <defs>
+                            <filter id="tableGlow">
+                                <feGaussianBlur stdDeviation="3" result="coloredBlur" />
+                                <feMerge>
+                                    <feMergeNode in="coloredBlur" />
+                                    <feMergeNode in="SourceGraphic" />
+                                </feMerge>
+                            </filter>
+                        </defs>
+
+                        <!-- Main database table -->
+                        <g style="animation: tableFloat 5s ease-in-out infinite;">
+                            <rect x="60" y="60" width="140" height="120" rx="8" fill="rgba(255, 255, 255, 0.9)"
+                                stroke="rgba(14, 165, 233, 0.5)" stroke-width="2" />
+                            <!-- Table header -->
+                            <rect x="60" y="60" width="140" height="30" rx="8" fill="rgba(14, 165, 233, 0.2)" />
+                            <!-- Table rows -->
+                            <line x1="70" y1="100" x2="190" y2="100" stroke="rgba(14, 165, 233, 0.2)"
+                                stroke-width="1" />
+                            <line x1="70" y1="120" x2="190" y2="120" stroke="rgba(14, 165, 233, 0.2)"
+                                stroke-width="1" />
+                            <line x1="70" y1="140" x2="190" y2="140" stroke="rgba(14, 165, 233, 0.2)"
+                                stroke-width="1" />
+                            <line x1="70" y1="160" x2="190" y2="160" stroke="rgba(14, 165, 233, 0.2)"
+                                stroke-width="1" />
+                            <!-- Table columns -->
+                            <line x1="130" y1="90" x2="130" y2="175" stroke="rgba(14, 165, 233, 0.15)"
+                                stroke-width="1" />
+                        </g>
+
+                        <!-- Query symbol -->
+                        <g style="animation: queryBlink 3s ease-in-out infinite;">
+                            <text x="230" y="100" font-size="24" fill="rgba(255, 255, 255, 0.9)" font-family="monospace"
+                                font-weight="bold">SELECT</text>
+                            <text x="240" y="125" font-size="18" fill="rgba(255, 255, 255, 0.7)"
+                                font-family="monospace">*</text>
+                            <text x="230" y="145" font-size="20" fill="rgba(255, 255, 255, 0.9)" font-family="monospace"
+                                font-weight="bold">FROM</text>
+                        </g>
+
+                        <!-- Data flow arrows -->
+                        <g stroke="rgba(16, 185, 129, 0.6)" stroke-width="3" fill="none" stroke-linecap="round">
+                            <path d="M 205 120 L 225 120" style="animation: dataFlow 2s ease-in-out infinite;" />
+                            <polygon points="225,120 220,115 220,125" fill="rgba(16, 185, 129, 0.6)" />
+                        </g>
+
+                        <!-- Result set table -->
+                        <g style="animation: resultPulse 4s ease-in-out infinite; animation-delay: 1s;">
+                            <rect x="200" y="170" width="160" height="100" rx="8" fill="rgba(255, 255, 255, 0.9)"
+                                stroke="rgba(16, 185, 129, 0.5)" stroke-width="2" />
+                            <!-- Result header -->
+                            <rect x="200" y="170" width="160" height="25" rx="8" fill="rgba(16, 185, 129, 0.2)" />
+                            <!-- Result rows -->
+                            <line x1="210" y1="202" x2="350" y2="202" stroke="rgba(16, 185, 129, 0.2)"
+                                stroke-width="1" />
+                            <line x1="210" y1="220" x2="350" y2="220" stroke="rgba(16, 185, 129, 0.2)"
+                                stroke-width="1" />
+                            <line x1="210" y1="238" x2="350" y2="238" stroke="rgba(16, 185, 129, 0.2)"
+                                stroke-width="1" />
+                            <line x1="210" y1="256" x2="350" y2="256" stroke="rgba(16, 185, 129, 0.2)"
+                                stroke-width="1" />
+                        </g>
+
+                        <!-- Connection lines from query to result -->
+                        <g stroke="rgba(139, 92, 246, 0.4)" stroke-width="2" fill="none" stroke-dasharray="5,5">
+                            <path d="M 280 145 L 280 170"
+                                style="animation: dataFlow 2s ease-in-out infinite; animation-delay: 0.5s;" />
+                        </g>
+
+                        <!-- Data nodes -->
+                        <g style="animation: dataFlow 3s ease-in-out infinite;">
+                            <circle cx="80" cy="75" r="6" fill="rgba(59, 130, 246, 0.8)" />
+                            <circle cx="180" cy="75" r="6" fill="rgba(59, 130, 246, 0.8)" />
+                            <circle cx="220" cy="185" r="6" fill="rgba(16, 185, 129, 0.8)" />
+                            <circle cx="340" cy="185" r="6" fill="rgba(16, 185, 129, 0.8)" />
+                        </g>
+
+                        <!-- Graph database representation -->
+                        <g opacity="0.5" style="animation: tableFloat 6s ease-in-out infinite; animation-delay: 1s;">
+                            <circle cx="100" cy="220" r="20" fill="rgba(139, 92, 246, 0.15)"
+                                stroke="rgba(139, 92, 246, 0.5)" stroke-width="2" />
+                            <circle cx="150" cy="250" r="15" fill="rgba(139, 92, 246, 0.15)"
+                                stroke="rgba(139, 92, 246, 0.5)" stroke-width="2" />
+                            <line x1="115" y1="230" x2="140" y2="245" stroke="rgba(139, 92, 246, 0.5)"
+                                stroke-width="2" />
+                        </g>
+
+                        <!-- Decorative data stream -->
+                        <g opacity="0.3">
+                            <rect x="20" y="40" width="30" height="4" rx="2" fill="rgba(255, 255, 255, 0.5)"
+                                style="animation: dataFlow 2.5s ease-in-out infinite;" />
+                            <rect x="25" y="280" width="35" height="4" rx="2" fill="rgba(255, 255, 255, 0.5)"
+                                style="animation: dataFlow 3s ease-in-out infinite; animation-delay: 0.7s;" />
+                            <rect x="370" y="60" width="25" height="4" rx="2" fill="rgba(255, 255, 255, 0.5)"
+                                style="animation: dataFlow 2.8s ease-in-out infinite; animation-delay: 0.3s;" />
+                        </g>
+                    </svg>
+                </div>
+            </div>
+        </section>
+
+        <!-- Main Content -->
+        <main class="container" id="main-content">
+            <article>
+                <section class="content-section">
+                    <h3>The Evolution of Query Languages</h3>
+                    <p>
+                        Query languages <a href="#ref1">[1]</a> serve as indispensable tools for addressing user
+                        inquiries regarding our data
+                        assets. In the ever-evolving fields of data science and generative AI, these query languages are
+                        in the midst of a
+                        transformation, adapting to seamlessly integrate with diverse data sources. This evolution not
+                        only
+                        broadens their capacity to offer profound insights but also extends their reach beyond the
+                        traditional relational databases and structured data. They now encompass a wide variety of data
+                        formats,
+                        including structured, unstructured, and semi-structured data, thereby opening up new horizons
+                        for data
+                        exploration and analysis. However, it's crucial to emphasize that this article primarily focuses
+                        on classical
+                        textual sources. It's worth noting that there exists a multitude of other media/document
+                        formats,
+                        such as binary data, images, videos, audios, and the novel vectors harnessed by AI models,
+                        which, although not
+                        explored here, represent a fascinating format of the ever-expanding AI models.
+                    </p>
+                </section>
+
+                <section class="content-section">
+                    <h3>Query Languages in the World of Structured Data</h3>
+                    <p>
+                        Databases <a href="#ref2">[2]</a> are renowned for their methodical, well-structured
+                        nature, characterized by a schema that delineates available relations or tables and their
+                        corresponding attributes. This structural foundation empowers a broad spectrum of data
+                        operations, encompassing
+                        tasks like data retrieval, sorting, filtering, and conditional searches, as well as executing
+                        aggregation
+                        analyses, including computations for count, maximum, minimum, and averages. To accomplish these
+                        tasks, a set of essential keywords in SQL <a href="#ref3">[3]</a>, such as SELECT, FROM, WHERE,
+                        GROUP, ORDER BY, HAVING, COUNT,
+                        and more, come into play.
+                    </p>
+                    <p>
+                        However, the world of structured databases extends further than traditional relations. There
+                        exists
+                        another facet in the form of databases purpose-built for managing graph data. Graph databases <a
+                            href="#ref4">[4]</a> structure
+                        information into triples or utilize contemporary property graphs <a href="#ref5">[5]</a>. Query
+                        languages like SPARQL <a href="#ref6">[6]</a> and Cypher
+                        <a href="#ref7">[7]</a>, influenced by SQL, go beyond basic data manipulation. They excel at
+                        tackling unique challenges posed by graph
+                        data, such as discovering the shortest path <a href="#ref8">[8]</a> or unraveling connections
+                        between various points within the
+                        graph.
+                    </p>
+                </section>
+
+                <section class="content-section">
+                    <h3>Querying Semi-Structured Data: The XML Approach</h3>
+                    <p>
+                        For those looking to bypass the complexities of traditional database management, an alternative
+                        route exists in the form of semi-structured data formats, with XML serving as a prominent
+                        example. These
+                        formats, known for their text-based nature, present a more straightforward approach, as they can
+                        be
+                        effectively managed using files, eliminating the necessity of traditional databases.
+                        Specialized languages like XQuery <a href="#ref9">[9]</a> and XPath <a href="#ref10">[10]</a>
+                        equip users with the tools to
+                        seamlessly query and extract precisely the information they desire. What distinguishes these
+                        languages is their exceptional ability to harness the inherent hierarchical structure of such
+                        data formats.
+                        This unique capability empowers users to navigate through the complex layers of data and uncover
+                        the
+                        insights they seek with remarkable ease.
+                    </p>
+                </section>
+
+                <section class="content-section">
+                    <h3>JSON's Soaring Popularity</h3>
+                    <p>
+                        JSON, a lightweight data format reminiscent of XML, has witnessed a remarkable surge in
+                        popularity
+                        within the data domain. Its inherent simplicity and adaptability have won over numerous data
+                        professionals. To navigate and unlock JSON's potential, query languages like JSONPath <a
+                            href="#ref11">[11]</a> and
+                        JMESPath <a href="#ref12">[12]</a> come into play, providing users with the means to precisely
+                        extract the desired information. These
+                        languages offer a structured approach to accessing and manipulating JSON data.
+                    </p>
+                    <p>
+                        Command-line tools like <code>jq</code> <a href="#ref13">[13]</a> have also ascended as
+                        invaluable assets. These tools
+                        empower users to efficiently query and reshape JSON structures, providing a streamlined path to
+                        data exploration.
+                        JSON's rise as a data format has brought transformative effects to the data analysis. Its
+                        user-friendly
+                        structure has facilitated smoother data exchange, particularly in web applications, APIs, and
+                        various data exchange scenarios.
+                    </p>
+                </section>
+
+                <section class="content-section">
+                    <h3>The Timeless Appeal of CSV and TSV Formats in Data Handling</h3>
+                    <p>
+                        Amidst the ever-expanding variety of data formats, the enduring simplicity of CSV
+                        (Comma-Separated
+                        Values) and TSV (Tab-Separated Values) formats remains a steadfast favorite in the data
+                        management.
+                        These structured textual formats have withstood the test of time, cherished for their
+                        approachable
+                        and user-friendly characteristics. Over the years, a cadre of command-line tools, featuring
+                        stalwarts
+                        such as <code>sed</code>, <code>cut</code>, and <code>awk</code>, have emerged as indispensable
+                        companions in the craft of working with such data.
+                    </p>
+                    <p>
+                        These tools empower users to execute a wide range of operations, spanning from fundamental text
+                        manipulation to data extraction, all within delimited text files. The accessibility of CSV and
+                        TSV, coupled with the versatility of these command-line tools, has contributed to their enduring
+                        presence in data science. They remain the preferred choice for numerous data professionals,
+                        providing efficiency and user-friendliness in managing and extracting insights from structured
+                        textual data.
+                    </p>
+                </section>
+
+                <section class="content-section">
+                    <h3>Unstructured Data and Document Stores</h3>
+                    <p>
+                        Unstructured data, often in the form of documents, poses a unique challenge in text analyses.
+                        Historically, command-line tools like <code>grep</code> have been instrumental in the formidable
+                        task of sorting through and extracting valuable insights.
+                        However, the data landscape is far from static; it is in a state of perpetual evolution. One
+                        significant catalyst for this transformation is the rise of document stores <a
+                            href="#ref14">[14]</a>. These specialized databases
+                        are reshaping the rules of engagement when it comes to handling and querying unstructured data.
+                    </p>
+                </section>
+
+                <section class="content-section">
+                    <h3>Conclusion</h3>
+                    <p>
+                        The world of query languages and their interaction with diverse data formats is a dynamic and
+                        ever-evolving field. These languages serve as the linchpin in enabling users to glean insights,
+                        manipulate data, and pose inquiries across a wide spectrum of data formats, whether structured,
+                        semi-structured, or unstructured.
+                    </p>
+                    <p>
+                        From the well-established domain of SQL, which governs relational databases, to the flexibility
+                        of
+                        languages like XQuery, SPARQL, and JSONPath, designed for XML, graph databases, and JSON, the
+                        adaptability of query languages continues to broaden its horizons. Their proficiency in
+                        navigating
+                        intricate data hierarchies, managing real-time streaming data, and harmonizing with various
+                        formats
+                        has ushered in a revolution in our approach to data analysis.
+                    </p>
+                    <p>
+                        Furthermore, the advent of specialized tools and document stores has democratized the process of
+                        querying unstructured data like never before. This evolutionary journey underscores the
+                        adaptability
+                        and resilience of query languages in the face of an ever-shifting field of textual data
+                        analysis.
+                    </p>
+                </section>
+
+                <section class="references">
+                    <h3>References</h3>
+                    <ol>
+                        <li id="ref1"><a href="https://en.wikipedia.org/wiki/Query_language">Query language</a></li>
+                        <li id="ref2"><a href="https://en.wikipedia.org/wiki/Relational_database">Relational
+                                database</a></li>
+                        <li id="ref3"><a href="https://en.wikipedia.org/wiki/SQL">SQL</a></li>
+                        <li id="ref4"><a href="https://en.wikipedia.org/wiki/Graph_database">Graph database</a></li>
+                        <li id="ref5"><a
+                                href="https://neo4j.com/blog/rdf-triple-store-vs-labeled-property-graph-difference/">RDF
+                                Triple Stores vs. Labeled Property Graphs: What's the Difference?</a></li>
+                        <li id="ref6"><a href="https://en.wikipedia.org/wiki/SPARQL">SPARQL</a></li>
+                        <li id="ref7"><a href="https://neo4j.com/docs/cypher-manual/current/introduction/">Cypher
+                                Manual</a></li>
+                        <li id="ref8"><a href="https://neo4j.com/blog/graph-algorithms-neo4j-shortest-path/">Graph
+                                Algorithms in Neo4j: Shortest Path</a></li>
+                        <li id="ref9"><a href="https://www.w3.org/XML/Query/">W3C XML Query (XQuery)</a></li>
+                        <li id="ref10"><a href="https://www.w3.org/TR/xpath-31/">XML Path Language (XPath) 3.1</a></li>
+                        <li id="ref11"><a href="https://goessner.net/articles/JsonPath/">JSONPath - XPath for JSON</a>
+                        </li>
+                        <li id="ref12"><a href="https://jmespath.org/">JMESPath</a></li>
+                        <li id="ref13"><a href="https://stedolan.github.io/jq/manual/">jq Manual</a></li>
+                        <li id="ref14"><a
+                                href="https://en.wikipedia.org/wiki/Document-oriented_database">Document-oriented
+                                database</a></li>
+                    </ol>
+                </section>
+            </article>
+        </main>
+
+        <!-- Footer -->
+        <footer>
+            <div class="footer-content">
+                <div class="footer-links">
+                    <a href="../index.html">Home</a>
+                    <a href="../programming/index.html">Programming</a>
+                    <a href="../research/research.html">Research</a>
+                    <a href="../about.html">About</a>
+                </div>
+                <div class="copyright">
+                    © 2025 John Samuel. All rights reserved.
+                </div>
+            </div>
+        </footer>
     </body>
 
 </html>

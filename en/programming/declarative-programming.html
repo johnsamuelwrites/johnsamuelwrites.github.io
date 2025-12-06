@@ -2,266 +2,657 @@
 <html lang="en">
 
     <head>
-        <meta charset="utf-8" />
-        <meta http-equiv="Content-Language" content="en" />
-        <link rel="shortcut icon" href="../../images/logo/favicon.png" />
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta http-equiv="Content-Language" content="en">
+        <link rel="shortcut icon" href="../../images/logo/favicon.png">
         <title>Declarative Programming: John Samuel</title>
-        <style type="text/css">
-            body {
-                background-color: #FFFFFF;
+        <style>
+            /* ===== Design Tokens ===== */
+            :root {
+                /* Technology/Research Theme Colors */
+                --color-base-bg: #f5f8fa;
+                --color-base-surface: #ffffff;
+                --color-base-text: #1a202c;
+                --color-base-text-muted: #4a5568;
+
+                /* Accent Colors - Programming/Tech Theme */
+                --color-accent-1: #4a90e2;
+                --color-accent-2: #2d5f8d;
+                --color-accent-3: #7b68ee;
+                --color-accent-light: #e8f2ff;
+
+                /* Functional Colors */
+                --color-shadow: rgba(74, 144, 226, 0.12);
+                --color-border: rgba(74, 144, 226, 0.15);
+                --color-hover: rgba(74, 144, 226, 0.08);
+
+                /* Gradients */
+                --gradient-primary: linear-gradient(135deg, #4a90e2 0%, #7b68ee 100%);
+                --gradient-subtle: linear-gradient(180deg, #f5f8fa 0%, #e8f2ff 100%);
+                --gradient-hero: linear-gradient(135deg, #2d5f8d 0%, #4a90e2 50%, #7b68ee 100%);
+
+                /* Spacing Scale */
+                --space-xs: 0.25rem;
+                --space-sm: 0.5rem;
+                --space-md: 1rem;
+                --space-lg: 1.5rem;
+                --space-xl: 2rem;
+                --space-2xl: 3rem;
+                --space-3xl: 4rem;
+                --space-4xl: 6rem;
+
+                /* Typography Scale */
+                --text-xs: clamp(0.75rem, 0.7rem + 0.25vw, 0.875rem);
+                --text-sm: clamp(0.875rem, 0.8rem + 0.35vw, 1rem);
+                --text-base: clamp(1rem, 0.95rem + 0.25vw, 1.125rem);
+                --text-lg: clamp(1.125rem, 1.05rem + 0.35vw, 1.25rem);
+                --text-xl: clamp(1.25rem, 1.15rem + 0.5vw, 1.5rem);
+                --text-2xl: clamp(1.5rem, 1.3rem + 1vw, 2rem);
+                --text-3xl: clamp(2rem, 1.6rem + 2vw, 2.5rem);
+                --text-4xl: clamp(2.5rem, 2rem + 2.5vw, 3.5rem);
+
+                /* Shadows */
+                --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.04), 0 1px 3px rgba(0, 0, 0, 0.06);
+                --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.05), 0 2px 4px rgba(0, 0, 0, 0.06);
+                --shadow-lg: 0 10px 24px rgba(0, 0, 0, 0.08), 0 4px 8px rgba(0, 0, 0, 0.06);
+                --shadow-theme: 0 10px 30px var(--color-shadow), 0 4px 10px rgba(0, 0, 0, 0.06);
+
+                /* Border Radius */
+                --radius-sm: 4px;
+                --radius-md: 8px;
+                --radius-lg: 12px;
+                --radius-xl: 16px;
+                --radius-2xl: 24px;
+                --radius-full: 9999px;
+
+                /* Font Stack */
+                --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
             }
 
-            #sidebar {
-                position: fixed;
-                background-color: #009AA6;
-                top: 0;
-                left: 0;
-                bottom: 0;
-                width: 30vw;
-            }
-
-            #sidebar .title {
-                position: relative;
-                text-align: center;
-                line-height: 5vmax;
-                font-size: 1.4vmax;
-                font-family: 'Arial';
-                margin-top: 30vh;
-            }
-
-            #sidebar .title a:link,
-            #sidebar .title a:visited {
-                color: #FFFFFF;
-                text-decoration: none;
-            }
-
-            .subtitle {
-                top: 50vh;
-                text-align: center;
-                line-height: 1.3vmax;
-                font-family: 'Arial';
-                font-size: 1.2vmax;
-                color: #FFFFFF;
-            }
-
-            .subtitle a:link,
-            .subtitle a:visited {
-                color: #FFFFFF;
-                text-decoration: none;
-            }
-
-            .licence {
-                position: fixed;
-                text-align: right;
-                bottom: 0;
-                right: 0;
-            }
-
-            .home {
-                position: fixed;
-                text-align: left;
-                font-family: 'Arial';
-                color: #D3D3D3;
-                z-index: 100;
-                width: 100%;
-                background-color: #FFFFFF;
-                top: 0px;
-                margin-bottom: 10px;
-                padding-bottom: 10px;
-            }
-
-            .home a:link,
-            .home a:visited {
-                text-decoration: none;
-                color: #D3D3D3;
-            }
-
-            .home ul {
+            /* ===== Reset & Base Styles ===== */
+            * {
                 margin: 0;
                 padding: 0;
-                text-align: left;
-                list-style: none;
+                box-sizing: border-box;
             }
 
-            .home li {
-                position: relative;
-                float: left;
-                padding-top: 15px;
-                margin-right: 1em;
-                font-family: 'Arial';
+            html {
+                scroll-behavior: smooth;
+                scroll-padding-top: 80px;
             }
 
-            .home li:hover {
-                display: block;
+            body {
+                font-family: var(--font-sans);
+                font-size: var(--text-base);
+                line-height: 1.7;
+                color: var(--color-base-text);
+                background: var(--gradient-subtle);
+                background-attachment: fixed;
+                overflow-x: hidden;
             }
 
-            .home li:hover a:link,
-            .home li:hover a:visited {
+            /* ===== Skip Link ===== */
+            .skip-link {
+                position: absolute;
+                top: -40px;
+                left: 0;
+                background: var(--color-accent-1);
+                color: white;
+                padding: var(--space-sm) var(--space-md);
                 text-decoration: none;
-                padding: 15px;
-                color: #FFFFFF;
-                background-color: #009AA6;
+                z-index: 9999;
+                border-radius: 0 0 var(--radius-md) 0;
             }
 
-            .content {
-                line-height: 1.8vmax;
-                font-size: 1.2vmax;
-                font-family: 'Arial';
-                margin-top: 15vh;
-                width: 90%;
+            .skip-link:focus {
+                top: 0;
             }
 
-            .content h2,
-            h3,
-            h4 {
-                color: #009AA6;
-            }
-
-            .content a:link,
-            .content a:visited {
-                color: #009AA6;
-            }
-
-            .content h3 {
-                color: #009AA6;
-            }
-
-            .content h2::before,
-            .content h3::before {
-                display: block;
-                content: " ";
-                visibility: hidden;
-                height: 50px;
-                margin-top: -50px;
+            /* ===== Animated Background Pattern ===== */
+            body::before {
+                content: '';
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background-image:
+                    radial-gradient(circle at 20% 30%, rgba(74, 144, 226, 0.03) 0%, transparent 50%),
+                    radial-gradient(circle at 80% 70%, rgba(123, 104, 238, 0.03) 0%, transparent 50%),
+                    linear-gradient(90deg, transparent 49.5%, rgba(74, 144, 226, 0.03) 49.5%, rgba(74, 144, 226, 0.03) 50.5%, transparent 50.5%),
+                    linear-gradient(0deg, transparent 49.5%, rgba(74, 144, 226, 0.03) 49.5%, rgba(74, 144, 226, 0.03) 50.5%, transparent 50.5%);
+                background-size: 100% 100%, 100% 100%, 40px 40px, 40px 40px;
                 pointer-events: none;
-                background-color: #FFFFFF;
+                z-index: 0;
+                animation: patternShift 20s ease infinite;
             }
 
-            .content a:link,
-            .content a:visited {
-                color: #009AA6;
+            @keyframes patternShift {
+
+                0%,
+                100% {
+                    opacity: 1;
+                }
+
+                50% {
+                    opacity: 0.6;
+                }
             }
 
-            .home a:link,
-            .home a:visited {
-                color: #D3D3D3;
+            /* ===== Navigation ===== */
+            .nav-wrapper {
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                z-index: 1000;
+                background: rgba(255, 255, 255, 0.8);
+                -webkit-backdrop-filter: blur(12px) saturate(180%);
+                backdrop-filter: blur(12px) saturate(180%);
+                border-bottom: 1px solid var(--color-border);
+                box-shadow: var(--shadow-sm);
             }
 
-            .page {
-                width: 65vw;
-                height: 100%;
-                margin-left: 30vw;
+            nav {
+                max-width: 1400px;
+                margin: 0 auto;
+                padding: var(--space-md) var(--space-xl);
+                display: flex;
+                align-items: center;
+                gap: var(--space-2xl);
+            }
+
+            .nav-brand {
+                font-size: var(--text-lg);
+                font-weight: 700;
+                color: var(--color-accent-1);
+                text-decoration: none;
+                letter-spacing: -0.02em;
+                position: relative;
+                padding: var(--space-sm) var(--space-md);
+                background: var(--gradient-primary);
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                background-clip: text;
+            }
+
+            .nav-brand::before {
+                content: '';
+                position: absolute;
+                inset: 0;
+                background: var(--color-accent-light);
+                border-radius: var(--radius-md);
+                z-index: -1;
+                opacity: 0;
+                transition: opacity 0.3s ease;
+            }
+
+            .nav-brand:hover::before {
+                opacity: 1;
+            }
+
+            .breadcrumb {
+                display: flex;
+                list-style: none;
+                gap: var(--space-sm);
+                flex: 1;
+                flex-wrap: wrap;
+                align-items: center;
+            }
+
+            .breadcrumb li {
+                display: flex;
+                align-items: center;
+                font-size: var(--text-sm);
+            }
+
+            .breadcrumb li:not(:last-child)::after {
+                content: '→';
+                margin-left: var(--space-sm);
+                color: var(--color-base-text-muted);
+            }
+
+            .breadcrumb a {
+                color: var(--color-base-text-muted);
+                text-decoration: none;
+                padding: var(--space-xs) var(--space-sm);
+                border-radius: var(--radius-sm);
+                transition: all 0.3s ease;
+            }
+
+            .breadcrumb a:hover {
+                color: var(--color-accent-1);
+                background: var(--color-hover);
+            }
+
+            /* ===== Hero Section ===== */
+            .hero {
+                position: relative;
+                margin-top: 80px;
+                padding: var(--space-4xl) var(--space-xl);
+                background: var(--gradient-hero);
                 overflow: hidden;
-                padding: 0 1em;
-                font-family: 'Arial';
             }
 
-            .page img {
-                max-width: 100%;
-                max-height: 100%;
+            .hero::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background: url('data:image/svg+xml,<svg width="100" height="100" xmlns="http://www.w3.org/2000/svg"><path d="M10 10h80v80h-80z" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="1"/><circle cx="50" cy="50" r="3" fill="rgba(255,255,255,0.2)"/></svg>');
+                background-size: 100px 100px;
+                opacity: 0.3;
+                animation: heroPattern 30s linear infinite;
             }
 
-            @media (max-width: 640px),
-            screen and (orientation: portrait) {
-                body {
-                    max-width: 100%;
-                    max-height: 100%;
+            @keyframes heroPattern {
+                from {
+                    transform: translateX(0) translateY(0);
                 }
 
-                #sidebar {
-                    position: fixed;
-                    background-color: #009AA6;
-                    top: 0;
-                    left: 0;
-                    bottom: 80vh;
-                    width: 100vw;
+                to {
+                    transform: translateX(100px) translateY(100px);
+                }
+            }
+
+            .hero-content {
+                max-width: 1200px;
+                margin: 0 auto;
+                position: relative;
+                z-index: 1;
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: var(--space-3xl);
+                align-items: center;
+            }
+
+            .hero-text h1 {
+                font-size: var(--text-4xl);
+                font-weight: 800;
+                color: white;
+                line-height: 1.2;
+                letter-spacing: -0.03em;
+                margin-bottom: var(--space-lg);
+                text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+            }
+
+            .hero-text .subtitle {
+                font-size: var(--text-xl);
+                color: rgba(255, 255, 255, 0.9);
+                line-height: 1.6;
+                margin-bottom: var(--space-xl);
+            }
+
+            .hero-text .author {
+                display: inline-block;
+                padding: var(--space-sm) var(--space-lg);
+                background: rgba(255, 255, 255, 0.15);
+                -webkit-backdrop-filter: blur(8px);
+                backdrop-filter: blur(8px);
+                border-radius: var(--radius-full);
+                color: white;
+                text-decoration: none;
+                font-weight: 500;
+                transition: all 0.3s ease;
+                border: 1px solid rgba(255, 255, 255, 0.2);
+            }
+
+            .hero-text .author:hover {
+                background: rgba(255, 255, 255, 0.25);
+                transform: translateY(-2px);
+                box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+            }
+
+            /* ===== Hero SVG Illustration ===== */
+            .hero-svg {
+                position: relative;
+            }
+
+            .hero-svg svg {
+                width: 100%;
+                height: auto;
+                filter: drop-shadow(0 10px 30px rgba(0, 0, 0, 0.2));
+            }
+
+            @keyframes float {
+
+                0%,
+                100% {
+                    transform: translateY(0px);
                 }
 
-                #sidebar .title {
-                    text-align: center;
-                    position: fixed;
-                    margin-top: 6vh;
-                    left: 0px;
-                    right: 0px;
-                    line-height: 3.5vmax;
-                    font-size: 1.5vmax;
-                    font-family: 'Arial';
+                50% {
+                    transform: translateY(-20px);
+                }
+            }
+
+            @keyframes rotate {
+                from {
+                    transform: rotate(0deg);
                 }
 
-                #sidebar .subtitle {
-                    text-align: center;
-                    top: 5vh;
-                    left: 0px;
-                    right: 0px;
-                    position: fixed;
-                    margin-top: 10vh;
-                    font-size: 1.5vmax;
+                to {
+                    transform: rotate(360deg);
+                }
+            }
+
+            @keyframes pulse {
+
+                0%,
+                100% {
+                    opacity: 0.6;
                 }
 
-                #sidebar .title a:link,
-                #sidebar .title a:visited {
-                    text-align: center;
-                    color: #FFFFFF;
+                50% {
+                    opacity: 1;
+                }
+            }
+
+            @keyframes dashArray {
+                to {
+                    stroke-dashoffset: -100;
+                }
+            }
+
+            /* ===== Main Content ===== */
+            .container {
+                max-width: 1200px;
+                margin: 0 auto;
+                padding: var(--space-4xl) var(--space-xl);
+                position: relative;
+                z-index: 1;
+            }
+
+            /* ===== Section Styling ===== */
+            .content-section {
+                background: var(--color-base-surface);
+                border-radius: var(--radius-2xl);
+                padding: var(--space-3xl) var(--space-2xl);
+                margin-bottom: var(--space-3xl);
+                box-shadow: var(--shadow-theme);
+                position: relative;
+                overflow: hidden;
+                transition: transform 0.3s ease, box-shadow 0.3s ease;
+            }
+
+            .content-section::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                height: 4px;
+                background: var(--gradient-primary);
+                border-radius: var(--radius-2xl) var(--radius-2xl) 0 0;
+            }
+
+            .content-section:hover {
+                transform: translateY(-4px);
+                box-shadow: 0 20px 50px var(--color-shadow), 0 8px 20px rgba(0, 0, 0, 0.08);
+            }
+
+            .content-section h3 {
+                font-size: var(--text-2xl);
+                font-weight: 700;
+                color: var(--color-accent-2);
+                margin-bottom: var(--space-xl);
+                line-height: 1.3;
+                letter-spacing: -0.02em;
+                position: relative;
+                padding-bottom: var(--space-md);
+            }
+
+            .content-section h3::after {
+                content: '';
+                position: absolute;
+                bottom: 0;
+                left: 0;
+                width: 60px;
+                height: 3px;
+                background: var(--gradient-primary);
+                border-radius: var(--radius-full);
+            }
+
+            .content-section p {
+                color: var(--color-base-text);
+                line-height: 1.8;
+                margin-bottom: var(--space-lg);
+            }
+
+            .content-section p:last-child {
+                margin-bottom: 0;
+            }
+
+            .content-section a {
+                color: var(--color-accent-1);
+                text-decoration: none;
+                position: relative;
+                font-weight: 500;
+                transition: color 0.3s ease;
+            }
+
+            .content-section a::after {
+                content: '';
+                position: absolute;
+                bottom: -2px;
+                left: 0;
+                width: 100%;
+                height: 2px;
+                background: var(--gradient-primary);
+                transform: scaleX(0);
+                transform-origin: right;
+                transition: transform 0.3s ease;
+            }
+
+            .content-section a:hover {
+                color: var(--color-accent-2);
+            }
+
+            .content-section a:hover::after {
+                transform: scaleX(1);
+                transform-origin: left;
+            }
+
+            .content-section b {
+                color: var(--color-accent-2);
+                font-weight: 600;
+            }
+
+            /* ===== References Section ===== */
+            .references {
+                background: linear-gradient(135deg, rgba(74, 144, 226, 0.03) 0%, rgba(123, 104, 238, 0.03) 100%);
+                border-radius: var(--radius-2xl);
+                padding: var(--space-3xl) var(--space-2xl);
+                margin-top: var(--space-4xl);
+                border: 2px solid var(--color-border);
+            }
+
+            .references h3 {
+                font-size: var(--text-2xl);
+                font-weight: 700;
+                color: var(--color-accent-2);
+                margin-bottom: var(--space-xl);
+                display: flex;
+                align-items: center;
+                gap: var(--space-md);
+            }
+
+            .references h3::before {
+                content: '📚';
+                font-size: var(--text-3xl);
+            }
+
+            .references ol {
+                margin-left: var(--space-xl);
+                display: grid;
+                gap: var(--space-md);
+            }
+
+            .references li {
+                line-height: 1.7;
+                padding-left: var(--space-sm);
+            }
+
+            .references li::marker {
+                color: var(--color-accent-1);
+                font-weight: 700;
+            }
+
+            .references a {
+                color: var(--color-accent-1);
+                text-decoration: none;
+                transition: all 0.3s ease;
+                border-bottom: 1px solid transparent;
+            }
+
+            .references a:hover {
+                color: var(--color-accent-2);
+                border-bottom-color: var(--color-accent-2);
+            }
+
+            /* ===== Footer ===== */
+            footer {
+                background: linear-gradient(135deg, #2d5f8d 0%, #4a90e2 100%);
+                color: white;
+                padding: var(--space-3xl) var(--space-xl) var(--space-2xl);
+                margin-top: var(--space-4xl);
+                position: relative;
+                overflow: hidden;
+            }
+
+            footer::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background: url('data:image/svg+xml,<svg width="60" height="60" xmlns="http://www.w3.org/2000/svg"><circle cx="30" cy="30" r="1.5" fill="rgba(255,255,255,0.1)"/></svg>');
+                background-size: 60px 60px;
+                opacity: 0.3;
+            }
+
+            .footer-content {
+                max-width: 1200px;
+                margin: 0 auto;
+                position: relative;
+                z-index: 1;
+            }
+
+            .footer-links {
+                display: flex;
+                gap: var(--space-xl);
+                margin-bottom: var(--space-xl);
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+
+            .footer-links a {
+                color: rgba(255, 255, 255, 0.9);
+                text-decoration: none;
+                padding: var(--space-sm) var(--space-md);
+                border-radius: var(--radius-md);
+                transition: all 0.3s ease;
+                font-size: var(--text-sm);
+                background: rgba(255, 255, 255, 0.05);
+            }
+
+            .footer-links a:hover {
+                background: rgba(255, 255, 255, 0.15);
+                transform: translateY(-2px);
+            }
+
+            .copyright {
+                text-align: center;
+                color: rgba(255, 255, 255, 0.7);
+                font-size: var(--text-sm);
+                padding-top: var(--space-lg);
+                border-top: 1px solid rgba(255, 255, 255, 0.1);
+            }
+
+            /* ===== Responsive Design ===== */
+            @media (max-width: 1024px) {
+                .hero-content {
+                    grid-template-columns: 1fr;
+                    gap: var(--space-2xl);
                 }
 
-                #sidebar .subtitle a:link,
-                #sidebar .subtitle a:visited {
-                    text-align: center;
-                    color: #FFFFFF;
+                .hero-svg {
+                    order: -1;
+                }
+            }
+
+            @media (max-width: 768px) {
+                nav {
+                    flex-direction: column;
+                    gap: var(--space-md);
+                    padding: var(--space-md);
                 }
 
-                .home {
-                    z-index: 100;
-                    width: 100%;
-                    background-color: #009AA6;
-                    font-size: 1.5vmax;
+                .breadcrumb {
+                    justify-content: center;
                 }
 
-                .home a:link,
-                .home a:visited {
-                    text-decoration: none;
-                    color: #FFFFFF;
+                .hero {
+                    padding: var(--space-3xl) var(--space-md);
                 }
 
-                .content {
-                    line-height: 3.8vmax;
-                    font-size: 1.8vmax;
-                    font-family: 'Arial';
-                    margin-top: 22vh;
+                .container {
+                    padding: var(--space-2xl) var(--space-md);
                 }
 
-                .content a:link,
-                .content a:visited {
-                    color: #009AA6;
+                .content-section {
+                    padding: var(--space-2xl) var(--space-lg);
+                    margin-bottom: var(--space-2xl);
                 }
 
-                .page {
-                    top: 40vh;
-                    width: 95%;
-                    margin-left: 0vw;
+                .references {
+                    padding: var(--space-2xl) var(--space-lg);
                 }
 
-                .page img {
-                    max-width: 100%;
-                    max-height: 100%;
-                    border: 0;
+                .references ol {
+                    margin-left: var(--space-lg);
                 }
+
+                .footer-links {
+                    flex-direction: column;
+                    align-items: center;
+                    gap: var(--space-sm);
+                }
+            }
+
+            /* ===== Reduced Motion ===== */
+            @media (prefers-reduced-motion: reduce) {
+
+                *,
+                *::before,
+                *::after {
+                    animation-duration: 0.01ms !important;
+                    animation-iteration-count: 1 !important;
+                    transition-duration: 0.01ms !important;
+                }
+            }
+
+            /* ===== Focus Styles ===== */
+            *:focus-visible {
+                outline: 3px solid var(--color-accent-1);
+                outline-offset: 2px;
+                border-radius: var(--radius-sm);
             }
         </style>
     </head>
 
     <body vocab="http://schema.org/">
-        <div id="sidebar">
-            <div class="title">
-                <h1><a href="./declarative-programming.html">Declarative Programming</a></h1>
-            </div>
-            <div class="subtitle">
-                <h2><a href="../about.html">John Samuel</a></h2>
-            </div>
-        </div>
-        <div class="page">
-            <div class="home">
-                <ul typeof="BreadcrumbList">
+        <a href="#main-content" class="skip-link">Skip to main content</a>
+
+        <!-- Navigation -->
+        <div class="nav-wrapper">
+            <nav>
+                <a href="../about.html" class="nav-brand">John Samuel</a>
+                <ul class="breadcrumb" typeof="BreadcrumbList">
                     <li property="itemListElement" typeof="ListItem">
                         <a property="item" typeof="WebPage" href="../index.html">
                             <span property="name">Home</span>
@@ -278,223 +669,338 @@
                         </a>
                     </li>
                 </ul>
-            </div>
-            <div class="separator" id="top">
-            </div>
-            <div class="content">
-                <h3>Unlocking the Potential of Declarative Languages in Modern Computing</h3>
-                <p>
-                    In our increasingly digital world, programming has seamlessly integrated into our online existence.
-                    Educational institutions, especially schools, have acknowledged the significance of incorporating
-                    programming into their curricula [1,2]. However, when people contemplate programming, they often
-                    envision scenes from movies with scrolling screens displaying highlighted code or monochrome
-                    terminals.
-                    This perception can be daunting to many. Nevertheless, it's vital to recognize that text-based
-                    programming is just one aspect of this domain. Some programming languages necessitate a fundamental
-                    understanding of underlying systems, but there are also visual [3] and natural programming languages
-                    that transcend the need for memorizing countless keywords and complex syntax or semantics.
-                </p>
-                <p>
-                    In the era of generative AI [4], programming undergoes a rapid transformation. Instead of issuing
-                    machines with intricate step-by-step instructions, we could simply make use of generative AI tools
-                    to
-                    write software [5,6]. And if you believe this concept is novel, you'd be mistaken. Computer
-                    scientists
-                    have long been dedicated to making computers accessible to all and democratizing programming. Over
-                    the
-                    past few decades, there has been a significant <a href="./programming-paradigms.html">evolution in
-                        programming languages</a>. One particular approach, often termed <b>declarative programming</b>
-                    [7],
-                    has a long-standing history.
-                </p>
-                <h3>The Historical Significance of Declarative Programming</h3>
-                <p>
-                    Historically, declarative programming can trace its origins back to the mid-20th century when the
-                    field
-                    of computer science was still in its infancy. Declarative programming emerged in response to the
-                    increasing complexity of software development. In the early days of computing, imperative and
-                    procedural
-                    programming reigned supreme, demanding that programmers specify not only what a program should
-                    accomplish but also how it should achieve it. This approach resulted in intricate and error-prone
-                    code,
-                    making software development a daunting endeavor. Declarative programming, as we understand it today,
-                    started taking form in the 1970s with the development of languages like Prolog [8] and Lisp [9].
-                    These
-                    languages introduced the concept of emphasizing what needs to be achieved, shifting the
-                    responsibility
-                    of 'how' to the compiler or interpreter. Over the years, declarative programming has evolved and
-                    expanded into various domains, establishing itself as a cornerstone of modern software development.
-                </p>
-                <p>
-                    Declarative programming offers several distinct advantages. One of its primary strengths lies in
-                    abstracting away the intricate details of implementation, resulting in more concise and readable
-                    code.
-                    This abstraction fosters reusability, as declarative code typically follows a modular structure
-                    independent of underlying hardware or software alterations. Declarative programming finds its niche
-                    in
-                    tasks where 'what' holds more significance than 'how,' such as data retrieval, web design, and
-                    infrastructure management. However, it's essential to recognize its limitations. Declarative
-                    programming
-                    may not be the optimal choice for tasks necessitating fine-grained control over execution, such as
-                    performance-critical applications or scenarios where efficiency is paramount. In such situations,
-                    procedural and imperative programming, offering precise control over execution flow, may be the
-                    preferred option. The selection between these paradigms often hinges on the specific project
-                    requirements, underscoring the programmer's responsibility to comprehend and select the most
-                    appropriate
-                    paradigm for the given task.
-                </p>
-                <h3>Declarative Programming in Action</h3>
-                <p>
-                    Declarative programming finds diverse and impactful applications in the real world. Consider data
-                    analysis and reporting; languages like SQL empower analysts to effortlessly retrieve, filter, and
-                    manipulate
-                    extensive datasets without immersing themselves in the intricacies of data storage and retrieval. In
-                    web
-                    development, CSS (Cascading Style Sheets) is another illustration. It enables web designers to
-                    declaratively define the styling of web pages, specifying the appearance of elements without
-                    scripting
-                    the detailed steps for each styling effect. In web application development, declarative approaches,
-                    like
-                    extensions to XForms [10], serve both client and server-side programming, communication, and
-                    storage,
-                    striving for consistency and minimizing the need for multiple programming languages to meet varying
-                    requirements.
-                </p>
-                <p>
-                    Having explored the world of databases, I've grown fascinated by declarative programming. The
-                    paradigm
-                    is vividly apparent in SQL, where programmers state what should be accomplished, rather than the
-                    steps
-                    to achieve it. SQL empowers programmers to store, manipulate, delete, and execute complex queries
-                    without delving into the intricacies of database storage. Unlike procedural and imperative
-                    programming,
-                    declarative programming brings a high level of abstraction, offering a concise set of commands,
-                    primarily centered on the CRUD operations: create, read, update, and delete [11].
-                </p>
-                <p>
-                    Database administrators and users commence by establishing a schema and related tables. They then
-                    populate these tables with data for future manipulation. The necessary knowledge for querying and
-                    manipulating the database focuses on the relational schema, including tables and their attributes.
-                    End
-                    users remain blissfully unaware of low-level technical details such as file allocations, memory
-                    management, and system calls. Declarative programming boasts a gentle learning curve, as seen in
-                    SQL,
-                    where users can swiftly begin with a minimal command subset, including SELECT, UPDATE, CREATE,
-                    DELETE, WHERE,.... While SQL
-                    primarily serves relational database management, it also stands as a fundamental language in
-                    computer
-                    science education, encompassing data management and analysis within a single linguistic field.
-                </p>
-                <h3>Implementing Declarative Languages</h3>
-                <p>
-                    Effectively implementing declarative languages necessitates a profound comprehension of the domain
-                    and
-                    the associated resources. One might question the rationale behind creating new programming
-                    languages.
-                    For CRUD operations and analytical tasks, SQL takes center stage. SQL enables the seamless execution
-                    of
-                    operations, ranging from straightforward, natural language-like queries such as SELECT ... FROM ...
-                    WHERE ... to
-                    more complex ones employing NOT, UNION, and other operators. Can we devise a universal, SQL-like
-                    language encompassing file handling, command-line operations, networking, process management, memory
-                    and
-                    storage management, and distributed environments? This idea is exemplified by osquery [12], which
-                    provides SQL-like commands for managing system resources. Another instance is Hive [13], a data
-                    warehouse infrastructure built atop Hadoop, introducing a SQL-like query language, HiveQL, for
-                    querying
-                    and managing large datasets in a distributed setting.
-                </p>
-                <p>
-                    Declarative languages should prioritize readability and expressiveness, enabling users to succinctly
-                    convey their intentions. As the ultimate objective is to conceal the intricacies of the underlying
-                    machinery and systems, developers of declarative languages should make use of existing libraries and
-                    frameworks whenever feasible. Leveraging established components can significantly expedite
-                    development.
-                    While declarative programming is renowned for its abstraction, optimizing performance when necessary
-                    remains critical. Declarative languages may excel in handling access patterns such as input and
-                    output, but
-                    what about error handling? [14] Reflecting on the requisite level of abstraction becomes imperative.
-                    How
-                    do we strike a balance between abstraction and performance in the domain of declarative programming?
-                </p>
-                <h3>Conclusion</h3>
-                <p>
-                    As technology advances, declarative programming is evolving to meet the changing landscape. In the
-                    current environment, there is a noticeable drive to extend the reach of declarative languages to
-                    encompass a wider array of tasks. Beyond data manipulation and web design, the goal is to develop
-                    declarative solutions for activities like cloud computing and the
-                    management of distributed or decentralized systems. The objective is to furnish developers with a
-                    unified language that
-                    streamlines multiple facets of software development.
-                </p>
-                <p>
-                    Peering into the future, an exciting trend is the integration of declarative programming with
-                    emerging
-                    technologies such as AI and machine learning. As AI-powered tools become increasingly proficient at
-                    comprehending natural language, we can anticipate declarative programming languages that are even
-                    more
-                    user-friendly, enabling developers to express their intentions in everyday language. Additionally,
-                    with
-                    the growing significance of cloud computing and serverless architectures, declarative approaches for
-                    infrastructure as code [15] and deployment pipelines are poised to gain prominence. These trends
-                    signify that
-                    declarative programming is well-positioned to continue shaping the software development landscape,
-                    rendering intricate tasks more accessible and expediting the development process. How will the
-                    convergence of declarative programming and AI transform the way we interact with computers and
-                    develop
-                    software in the future?
-                </p>
-                <h3>References</h3>
-                <p>
-                <ol>
-                    <li><a
-                            href="https://www.edutopia.org/blog/computer-science-future-of-education-alison-derbenwick-miller">Computer
-                            Science: The Future of Education</a></li>
-                    <li><a href="https://www.theguardian.com/education/2012/mar/31/why-kids-should-be-taught-code">Why
-                            all
-                            our kids should be taught how to code</a></li>
-                    <li><a
-                            href="https://www.theguardian.com/media-network/media-network-blog/2014/oct/20/teaching-children-programme-code-technology-creativity">Every
-                            child should learn to program, but not necessarily how to code</a></li>
-                    <li id="genai"><a href="https://en.wikipedia.org/wiki/Generative_artificial_intelligence">Generative
-                            artificial intelligence</a></li>
-                    <li><a href="https://github.blog/2021-06-29-introducing-github-copilot-ai-pair-programmer/">Introducing
-                            GitHub Copilot: your AI pair programmer</a></li>
-                    <li><a
-                            href="https://www.ibm.com/blog/announcement/reshaping-it-automation-with-ibm-watson-code-assistant/">Reshaping
-                            IT automation with IBM watsonx Code Assistant</a></li>
-                    <li id="declarative-programming"><a
-                            href="https://en.wikipedia.org/wiki/Declarative_programming">Declarative Programming</a>
-                    </li>
-                    <li>Colmerauer, Alain, et Philippe Roussel. « The birth of Prolog ». The second ACM SIGPLAN
-                        conference
-                        on History of programming languages, Association for Computing Machinery, 1993, p. 37‑52. ACM
-                        Digital Library, <a
-                            href="https://dl.acm.org/doi/10.1145/154766.155362">https://doi.org/10.1145/154766.155362</a>.
-                    </li>
-                    <li>Steele, Guy L., et Richard P. Gabriel. « The evolution of Lisp ». The second ACM SIGPLAN
-                        conference
-                        on History of programming languages, Association for Computing Machinery, 1993, p. 231‑70. ACM
-                        Digital Library, <a
-                            href="https://dl.acm.org/doi/10.1145/154766.155373">https://doi.org/10.1145/154766.155373</a>.
-                    </li>
-                    <li id="declarativewebdevelopment">Vuorimaa, Petri, et al. “Leveraging Declarative Languages in Web
-                        Application Development.” World Wide Web, vol. 19, no. 4, July 2016, pp. 519–43. Springer Link,
-                        <a
-                            href="https://link.springer.com/article/10.1007/s11280-015-0339-z">doi:10.1007/s11280-015-0339-z</a>
-                    </li>
-                    <li id="crud"><a href="https://en.wikipedia.org/wiki/Create,_read,_update_and_delete">Create, read,
-                            update and delete</a></li>
-                    <li id="osquery"><a href="https://github.com/osquery/osquery">osquery</a></li>
-                    <li id="hive"><a href="https://en.wikipedia.org/wiki/Apache_Hive">Apache Hive</a></li>
-                    <li id="error"><a href="https://en.wikipedia.org/wiki/Exception_handling">Exception handling</a>
-                    </li>
-                    <li id="IaC"><a href="https://en.wikipedia.org/wiki/Infrastructure_as_code">Infrastructure as
-                            code</a></li>
-                </ol>
-                </p>
-            </div>
+            </nav>
         </div>
+
+        <!-- Hero Section -->
+        <section class="hero">
+            <div class="hero-content">
+                <div class="hero-text">
+                    <h1>Declarative Programming</h1>
+                    <p class="subtitle">Unlocking the Potential of Declarative Languages in Modern Computing</p>
+                    <a href="../about.html" class="author">By John Samuel</a>
+                </div>
+                <div class="hero-svg">
+                    <svg viewBox="0 0 400 300" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                        <!-- Background circle with animation -->
+                        <circle cx="200" cy="150" r="120" fill="rgba(255, 255, 255, 0.1)"
+                            style="animation: pulse 4s ease-in-out infinite;" />
+
+                        <!-- Code brackets representation -->
+                        <g style="animation: float 6s ease-in-out infinite;">
+                            <path d="M 120 100 Q 100 100 100 120 L 100 180 Q 100 200 120 200" stroke="white"
+                                stroke-width="4" fill="none" stroke-linecap="round" />
+                            <path d="M 280 100 Q 300 100 300 120 L 300 180 Q 300 200 280 200" stroke="white"
+                                stroke-width="4" fill="none" stroke-linecap="round" />
+                        </g>
+
+                        <!-- Database/data representation -->
+                        <g style="animation: float 5s ease-in-out infinite; animation-delay: 0.5s;">
+                            <rect x="160" y="120" width="80" height="15" rx="3" fill="rgba(255, 255, 255, 0.9)" />
+                            <rect x="160" y="145" width="80" height="15" rx="3" fill="rgba(255, 255, 255, 0.7)" />
+                            <rect x="160" y="170" width="80" height="15" rx="3" fill="rgba(255, 255, 255, 0.5)" />
+                        </g>
+
+                        <!-- Connecting nodes -->
+                        <g style="animation: pulse 3s ease-in-out infinite;">
+                            <circle cx="140" cy="80" r="8" fill="white" opacity="0.8" />
+                            <circle cx="260" cy="80" r="8" fill="white" opacity="0.8" />
+                            <circle cx="140" cy="220" r="8" fill="white" opacity="0.8" />
+                            <circle cx="260" cy="220" r="8" fill="white" opacity="0.8" />
+                        </g>
+
+                        <!-- Connection lines -->
+                        <g stroke="white" stroke-width="2" opacity="0.4" fill="none">
+                            <line x1="140" y1="80" x2="180" y2="127" stroke-dasharray="5,5"
+                                style="animation: dashArray 2s linear infinite;" />
+                            <line x1="260" y1="80" x2="220" y2="127" stroke-dasharray="5,5"
+                                style="animation: dashArray 2s linear infinite; animation-delay: 0.5s;" />
+                            <line x1="140" y1="220" x2="180" y2="178" stroke-dasharray="5,5"
+                                style="animation: dashArray 2s linear infinite; animation-delay: 1s;" />
+                            <line x1="260" y1="220" x2="220" y2="178" stroke-dasharray="5,5"
+                                style="animation: dashArray 2s linear infinite; animation-delay: 1.5s;" />
+                        </g>
+
+                        <!-- Central gear/process indicator -->
+                        <g style="transform-origin: 200px 150px; animation: rotate 20s linear infinite;">
+                            <circle cx="200" cy="150" r="30" fill="none" stroke="white" stroke-width="2"
+                                opacity="0.6" />
+                            <path d="M 200 125 L 200 175 M 175 150 L 225 150" stroke="white" stroke-width="2"
+                                opacity="0.6" />
+                        </g>
+                    </svg>
+                </div>
+            </div>
+        </section>
+
+        <!-- Main Content -->
+        <main class="container" id="main-content">
+            <article>
+                <section class="content-section">
+                    <h3>The Modern Programming Landscape</h3>
+                    <p>
+                        In our increasingly digital world, programming has seamlessly integrated into our online
+                        existence.
+                        Educational institutions, especially schools, have acknowledged the significance of
+                        incorporating
+                        programming into their curricula <a href="#ref1">[1,2]</a>. However, when people contemplate
+                        programming, they often
+                        envision scenes from movies with scrolling screens displaying highlighted code or monochrome
+                        terminals.
+                        This perception can be daunting to many. Nevertheless, it's vital to recognize that text-based
+                        programming is just one aspect of this domain. Some programming languages necessitate a
+                        fundamental
+                        understanding of underlying systems, but there are also visual <a href="#ref3">[3]</a> and
+                        natural programming languages
+                        that transcend the need for memorizing countless keywords and complex syntax or semantics.
+                    </p>
+                    <p>
+                        In the era of generative AI <a href="#ref4">[4]</a>, programming undergoes a rapid
+                        transformation. Instead of issuing
+                        machines with intricate step-by-step instructions, we could simply make use of generative AI
+                        tools
+                        to write software <a href="#ref5">[5,6]</a>. And if you believe this concept is novel, you'd be
+                        mistaken. Computer
+                        scientists have long been dedicated to making computers accessible to all and democratizing
+                        programming. Over
+                        the past few decades, there has been a significant <a
+                            href="./programming-paradigms.html">evolution in
+                            programming languages</a>. One particular approach, often termed <b>declarative
+                            programming</b> <a href="#ref7">[7]</a>,
+                        has a long-standing history.
+                    </p>
+                </section>
+
+                <section class="content-section">
+                    <h3>The Historical Significance of Declarative Programming</h3>
+                    <p>
+                        Historically, declarative programming can trace its origins back to the mid-20th century when
+                        the
+                        field of computer science was still in its infancy. Declarative programming emerged in response
+                        to the
+                        increasing complexity of software development. In the early days of computing, imperative and
+                        procedural programming reigned supreme, demanding that programmers specify not only what a
+                        program should
+                        accomplish but also how it should achieve it. This approach resulted in intricate and
+                        error-prone
+                        code, making software development a daunting endeavor. Declarative programming, as we understand
+                        it today,
+                        started taking form in the 1970s with the development of languages like Prolog <a
+                            href="#ref8">[8]</a> and Lisp <a href="#ref9">[9]</a>.
+                        These languages introduced the concept of emphasizing what needs to be achieved, shifting the
+                        responsibility of 'how' to the compiler or interpreter. Over the years, declarative programming
+                        has evolved and
+                        expanded into various domains, establishing itself as a cornerstone of modern software
+                        development.
+                    </p>
+                    <p>
+                        Declarative programming offers several distinct advantages. One of its primary strengths lies in
+                        abstracting away the intricate details of implementation, resulting in more concise and readable
+                        code. This abstraction fosters reusability, as declarative code typically follows a modular
+                        structure
+                        independent of underlying hardware or software alterations. Declarative programming finds its
+                        niche
+                        in tasks where 'what' holds more significance than 'how,' such as data retrieval, web design,
+                        and
+                        infrastructure management. However, it's essential to recognize its limitations. Declarative
+                        programming may not be the optimal choice for tasks necessitating fine-grained control over
+                        execution, such as
+                        performance-critical applications or scenarios where efficiency is paramount. In such
+                        situations,
+                        procedural and imperative programming, offering precise control over execution flow, may be the
+                        preferred option. The selection between these paradigms often hinges on the specific project
+                        requirements, underscoring the programmer's responsibility to comprehend and select the most
+                        appropriate paradigm for the given task.
+                    </p>
+                </section>
+
+                <section class="content-section">
+                    <h3>Declarative Programming in Action</h3>
+                    <p>
+                        Declarative programming finds diverse and impactful applications in the real world. Consider
+                        data
+                        analysis and reporting; languages like SQL empower analysts to effortlessly retrieve, filter,
+                        and
+                        manipulate extensive datasets without immersing themselves in the intricacies of data storage
+                        and retrieval. In
+                        web development, CSS (Cascading Style Sheets) is another illustration. It enables web designers
+                        to
+                        declaratively define the styling of web pages, specifying the appearance of elements without
+                        scripting the detailed steps for each styling effect. In web application development,
+                        declarative approaches,
+                        like extensions to XForms <a href="#ref10">[10]</a>, serve both client and server-side
+                        programming, communication, and
+                        storage, striving for consistency and minimizing the need for multiple programming languages to
+                        meet varying
+                        requirements.
+                    </p>
+                    <p>
+                        Having explored the world of databases, I've grown fascinated by declarative programming. The
+                        paradigm is vividly apparent in SQL, where programmers state what should be accomplished, rather
+                        than the
+                        steps to achieve it. SQL empowers programmers to store, manipulate, delete, and execute complex
+                        queries
+                        without delving into the intricacies of database storage. Unlike procedural and imperative
+                        programming, declarative programming brings a high level of abstraction, offering a concise set
+                        of commands,
+                        primarily centered on the CRUD operations: create, read, update, and delete <a
+                            href="#ref11">[11]</a>.
+                    </p>
+                    <p>
+                        Database administrators and users commence by establishing a schema and related tables. They
+                        then
+                        populate these tables with data for future manipulation. The necessary knowledge for querying
+                        and
+                        manipulating the database focuses on the relational schema, including tables and their
+                        attributes.
+                        End users remain blissfully unaware of low-level technical details such as file allocations,
+                        memory
+                        management, and system calls. Declarative programming boasts a gentle learning curve, as seen in
+                        SQL, where users can swiftly begin with a minimal command subset, including SELECT, UPDATE,
+                        CREATE,
+                        DELETE, WHERE,.... While SQL primarily serves relational database management, it also stands as
+                        a fundamental language in
+                        computer science education, encompassing data management and analysis within a single linguistic
+                        field.
+                    </p>
+                </section>
+
+                <section class="content-section">
+                    <h3>Implementing Declarative Languages</h3>
+                    <p>
+                        Effectively implementing declarative languages necessitates a profound comprehension of the
+                        domain
+                        and the associated resources. One might question the rationale behind creating new programming
+                        languages. For CRUD operations and analytical tasks, SQL takes center stage. SQL enables the
+                        seamless execution
+                        of operations, ranging from straightforward, natural language-like queries such as SELECT ...
+                        FROM ...
+                        WHERE ... to more complex ones employing NOT, UNION, and other operators. Can we devise a
+                        universal, SQL-like
+                        language encompassing file handling, command-line operations, networking, process management,
+                        memory
+                        and storage management, and distributed environments? This idea is exemplified by osquery <a
+                            href="#ref12">[12]</a>, which
+                        provides SQL-like commands for managing system resources. Another instance is Hive <a
+                            href="#ref13">[13]</a>, a data
+                        warehouse infrastructure built atop Hadoop, introducing a SQL-like query language, HiveQL, for
+                        querying and managing large datasets in a distributed setting.
+                    </p>
+                    <p>
+                        Declarative languages should prioritize readability and expressiveness, enabling users to
+                        succinctly
+                        convey their intentions. As the ultimate objective is to conceal the intricacies of the
+                        underlying
+                        machinery and systems, developers of declarative languages should make use of existing libraries
+                        and
+                        frameworks whenever feasible. Leveraging established components can significantly expedite
+                        development. While declarative programming is renowned for its abstraction, optimizing
+                        performance when necessary
+                        remains critical. Declarative languages may excel in handling access patterns such as input and
+                        output, but what about error handling? <a href="#ref14">[14]</a> Reflecting on the requisite
+                        level of abstraction becomes imperative.
+                        How do we strike a balance between abstraction and performance in the domain of declarative
+                        programming?
+                    </p>
+                </section>
+
+                <section class="content-section">
+                    <h3>Conclusion</h3>
+                    <p>
+                        As technology advances, declarative programming is evolving to meet the changing landscape. In
+                        the
+                        current environment, there is a noticeable drive to extend the reach of declarative languages to
+                        encompass a wider array of tasks. Beyond data manipulation and web design, the goal is to
+                        develop
+                        declarative solutions for activities like cloud computing and the
+                        management of distributed or decentralized systems. The objective is to furnish developers with
+                        a
+                        unified language that streamlines multiple facets of software development.
+                    </p>
+                    <p>
+                        Peering into the future, an exciting trend is the integration of declarative programming with
+                        emerging technologies such as AI and machine learning. As AI-powered tools become increasingly
+                        proficient at
+                        comprehending natural language, we can anticipate declarative programming languages that are
+                        even
+                        more user-friendly, enabling developers to express their intentions in everyday language.
+                        Additionally,
+                        with the growing significance of cloud computing and serverless architectures, declarative
+                        approaches for
+                        infrastructure as code <a href="#ref15">[15]</a> and deployment pipelines are poised to gain
+                        prominence. These trends
+                        signify that declarative programming is well-positioned to continue shaping the software
+                        development landscape,
+                        rendering intricate tasks more accessible and expediting the development process. How will the
+                        convergence of declarative programming and AI transform the way we interact with computers and
+                        develop software in the future?
+                    </p>
+                </section>
+
+                <section class="references">
+                    <h3>References</h3>
+                    <ol>
+                        <li id="ref1"><a
+                                href="https://www.edutopia.org/blog/computer-science-future-of-education-alison-derbenwick-miller">Computer
+                                Science: The Future of Education</a></li>
+                        <li id="ref2"><a
+                                href="https://www.theguardian.com/education/2012/mar/31/why-kids-should-be-taught-code">Why
+                                all our kids should be taught how to code</a></li>
+                        <li id="ref3"><a
+                                href="https://www.theguardian.com/media-network/media-network-blog/2014/oct/20/teaching-children-programme-code-technology-creativity">Every
+                                child should learn to program, but not necessarily how to code</a></li>
+                        <li id="ref4"><a
+                                href="https://en.wikipedia.org/wiki/Generative_artificial_intelligence">Generative
+                                artificial intelligence</a></li>
+                        <li id="ref5"><a
+                                href="https://github.blog/2021-06-29-introducing-github-copilot-ai-pair-programmer/">Introducing
+                                GitHub Copilot: your AI pair programmer</a></li>
+                        <li id="ref6"><a
+                                href="https://www.ibm.com/blog/announcement/reshaping-it-automation-with-ibm-watson-code-assistant/">Reshaping
+                                IT automation with IBM watsonx Code Assistant</a></li>
+                        <li id="ref7"><a href="https://en.wikipedia.org/wiki/Declarative_programming">Declarative
+                                Programming</a></li>
+                        <li id="ref8">Colmerauer, Alain, et Philippe Roussel. « The birth of Prolog ». The second ACM
+                            SIGPLAN conference on History of programming languages, Association for Computing Machinery,
+                            1993, p. 37‑52. ACM Digital Library, <a
+                                href="https://dl.acm.org/doi/10.1145/154766.155362">https://doi.org/10.1145/154766.155362</a>.
+                        </li>
+                        <li id="ref9">Steele, Guy L., et Richard P. Gabriel. « The evolution of Lisp ». The second ACM
+                            SIGPLAN conference on History of programming languages, Association for Computing Machinery,
+                            1993, p. 231‑70. ACM Digital Library, <a
+                                href="https://dl.acm.org/doi/10.1145/154766.155373">https://doi.org/10.1145/154766.155373</a>.
+                        </li>
+                        <li id="ref10">Vuorimaa, Petri, et al. "Leveraging Declarative Languages in Web Application
+                            Development." World Wide Web, vol. 19, no. 4, July 2016, pp. 519–43. Springer Link, <a
+                                href="https://link.springer.com/article/10.1007/s11280-015-0339-z">doi:10.1007/s11280-015-0339-z</a>
+                        </li>
+                        <li id="ref11"><a href="https://en.wikipedia.org/wiki/Create,_read,_update_and_delete">Create,
+                                read, update and delete</a></li>
+                        <li id="ref12"><a href="https://github.com/osquery/osquery">osquery</a></li>
+                        <li id="ref13"><a href="https://en.wikipedia.org/wiki/Apache_Hive">Apache Hive</a></li>
+                        <li id="ref14"><a href="https://en.wikipedia.org/wiki/Exception_handling">Exception handling</a>
+                        </li>
+                        <li id="ref15"><a href="https://en.wikipedia.org/wiki/Infrastructure_as_code">Infrastructure as
+                                code</a></li>
+                    </ol>
+                </section>
+            </article>
+        </main>
+
+        <!-- Footer -->
+        <footer>
+            <div class="footer-content">
+                <div class="footer-links">
+                    <a href="../index.html">Home</a>
+                    <a href="../programming/index.html">Programming</a>
+                    <a href="../research/research.html">Research</a>
+                    <a href="../about.html">About</a>
+                </div>
+                <div class="copyright">
+                    © 2025 John Samuel. All rights reserved.
+                </div>
+            </div>
+        </footer>
     </body>
 
 </html>
