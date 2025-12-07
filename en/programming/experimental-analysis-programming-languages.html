@@ -3,266 +3,679 @@
 
     <head>
         <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <meta http-equiv="Content-Language" content="en" />
         <link rel="shortcut icon" href="../../images/logo/favicon.png" />
         <title>Experimental Analysis of Programming Languages: John Samuel</title>
-        <style type="text/css">
-            body {
-                background-color: #FFFFFF;
+        <style>
+            /* ===== Design Tokens ===== */
+            :root {
+                /* Base Colors - Light Theme with Code/Syntax Feel */
+                --color-base-bg: #fafbfd;
+                --color-base-surface: #ffffff;
+                --color-base-text: #1a202c;
+                --color-base-text-muted: #4a5568;
+
+                /* Theme Accents - Programming Languages */
+                --color-accent-1: #e74c3c;
+                /* Red - syntax highlighting */
+                --color-accent-2: #9b59b6;
+                /* Purple - keywords */
+                --color-accent-3: #3498db;
+                /* Blue - functions */
+                --color-accent-4: #2ecc71;
+                /* Green - strings */
+                --color-accent-5: #f39c12;
+                /* Orange - operators */
+                --color-accent-light: #fef5f1;
+
+                /* Functional Colors */
+                --color-shadow: rgba(231, 76, 60, 0.12);
+                --color-border: rgba(231, 76, 60, 0.15);
+                --color-hover: rgba(231, 76, 60, 0.08);
+
+                /* Gradients */
+                --gradient-primary: linear-gradient(135deg, var(--color-accent-1) 0%, var(--color-accent-2) 50%, var(--color-accent-3) 100%);
+                --gradient-secondary: linear-gradient(135deg, var(--color-accent-4) 0%, var(--color-accent-3) 100%);
+                --gradient-hero: linear-gradient(135deg, #e74c3c 0%, #9b59b6 33%, #3498db 66%, #2ecc71 100%);
+
+                /* Spacing Scale */
+                --space-xs: 0.25rem;
+                --space-sm: 0.5rem;
+                --space-md: 1rem;
+                --space-lg: 1.5rem;
+                --space-xl: 2rem;
+                --space-2xl: 3rem;
+                --space-3xl: 4rem;
+                --space-4xl: 6rem;
+
+                /* Border Radius */
+                --radius-sm: 4px;
+                --radius-md: 8px;
+                --radius-lg: 12px;
+                --radius-xl: 16px;
+                --radius-2xl: 24px;
+                --radius-full: 9999px;
+
+                /* Shadows */
+                --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.04), 0 1px 3px rgba(0, 0, 0, 0.06);
+                --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.05), 0 2px 4px rgba(0, 0, 0, 0.06);
+                --shadow-lg: 0 10px 24px rgba(0, 0, 0, 0.08), 0 4px 8px rgba(0, 0, 0, 0.06);
+                --shadow-xl: 0 20px 40px rgba(0, 0, 0, 0.12), 0 8px 16px rgba(0, 0, 0, 0.08);
+                --shadow-theme: 0 10px 30px var(--color-shadow), 0 4px 10px rgba(0, 0, 0, 0.06);
+
+                /* Typography */
+                --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+                --font-mono: 'SF Mono', Monaco, 'Cascadia Code', 'Consolas', 'Courier New', monospace;
+                --text-xs: clamp(0.75rem, 0.7rem + 0.25vw, 0.875rem);
+                --text-sm: clamp(0.875rem, 0.8rem + 0.35vw, 1rem);
+                --text-base: clamp(1rem, 0.95rem + 0.25vw, 1.125rem);
+                --text-lg: clamp(1.125rem, 1.05rem + 0.35vw, 1.25rem);
+                --text-xl: clamp(1.25rem, 1.15rem + 0.5vw, 1.5rem);
+                --text-2xl: clamp(1.5rem, 1.3rem + 1vw, 2rem);
+                --text-3xl: clamp(2rem, 1.6rem + 2vw, 2.5rem);
+                --text-4xl: clamp(2.5rem, 2rem + 2.5vw, 3.5rem);
+
+                --weight-normal: 400;
+                --weight-medium: 500;
+                --weight-semibold: 600;
+                --weight-bold: 700;
             }
 
-            #sidebar {
-                position: fixed;
-                background-color: #009AA6;
-                top: 0;
-                left: 0;
-                bottom: 0;
-                width: 30vw;
-            }
-
-            #sidebar .title {
-                position: relative;
-                text-align: center;
-                line-height: 5vmax;
-                font-size: 1.4vmax;
-                font-family: 'Arial';
-                margin-top: 30vh;
-            }
-
-            #sidebar .title a:link,
-            #sidebar .title a:visited {
-                color: #FFFFFF;
-                text-decoration: none;
-            }
-
-            .subtitle {
-                top: 50vh;
-                text-align: center;
-                line-height: 1.3vmax;
-                font-family: 'Arial';
-                font-size: 1.2vmax;
-                color: #FFFFFF;
-            }
-
-            .subtitle a:link,
-            .subtitle a:visited {
-                color: #FFFFFF;
-                text-decoration: none;
-            }
-
-            .licence {
-                position: fixed;
-                text-align: right;
-                bottom: 0;
-                right: 0;
-            }
-
-            .home {
-                position: fixed;
-                text-align: left;
-                font-family: 'Arial';
-                color: #D3D3D3;
-                z-index: 100;
-                width: 100%;
-                background-color: #FFFFFF;
-                top: 0px;
-                margin-bottom: 10px;
-                padding-bottom: 10px;
-            }
-
-            .home a:link,
-            .home a:visited {
-                text-decoration: none;
-                color: #D3D3D3;
-            }
-
-            .home ul {
+            /* ===== Reset & Base Styles ===== */
+            * {
                 margin: 0;
                 padding: 0;
-                text-align: left;
-                list-style: none;
+                box-sizing: border-box;
             }
 
-            .home li {
-                position: relative;
-                float: left;
-                padding-top: 15px;
-                margin-right: 1em;
-                font-family: 'Arial';
+            html {
+                scroll-behavior: smooth;
+                scroll-padding-top: 100px;
             }
 
-            .home li:hover {
-                display: block;
+            body {
+                font-family: var(--font-sans);
+                font-size: var(--text-base);
+                line-height: 1.7;
+                color: var(--color-base-text);
+                background: var(--color-base-bg);
+                background-image:
+                    radial-gradient(circle at 10% 20%, rgba(231, 76, 60, 0.03) 0%, transparent 50%),
+                    radial-gradient(circle at 90% 80%, rgba(52, 152, 219, 0.03) 0%, transparent 50%),
+                    radial-gradient(circle at 50% 50%, rgba(155, 89, 182, 0.02) 0%, transparent 50%);
+                background-attachment: fixed;
+                letter-spacing: -0.005em;
+                overflow-x: hidden;
             }
 
-            .home li:hover a:link,
-            .home li:hover a:visited {
+            /* Skip Link for Accessibility */
+            .skip-link {
+                position: absolute;
+                top: -40px;
+                left: 0;
+                background: var(--color-accent-1);
+                color: white;
+                padding: var(--space-sm) var(--space-md);
                 text-decoration: none;
-                padding: 15px;
-                color: #FFFFFF;
-                background-color: #009AA6;
+                border-radius: var(--radius-md);
+                z-index: 100;
             }
 
-            .content {
-                line-height: 1.8vmax;
-                font-size: 1.2vmax;
-                font-family: 'Arial';
-                margin-top: 15vh;
-                width: 90%;
+            .skip-link:focus {
+                top: var(--space-sm);
+                left: var(--space-sm);
             }
 
-            .content h2,
-            h3,
-            h4 {
-                color: #009AA6;
+            /* ===== Navigation ===== */
+            nav {
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                background: rgba(255, 255, 255, 0.85);
+                -webkit-backdrop-filter: blur(12px) saturate(180%);
+                backdrop-filter: blur(12px) saturate(180%);
+                border-bottom: 1px solid rgba(231, 76, 60, 0.1);
+                box-shadow: var(--shadow-sm);
+                z-index: 50;
+                animation: slideDown 0.6s ease-out;
             }
 
-            .content a:link,
-            .content a:visited {
-                color: #009AA6;
+            @keyframes slideDown {
+                from {
+                    transform: translateY(-100%);
+                    opacity: 0;
+                }
+
+                to {
+                    transform: translateY(0);
+                    opacity: 1;
+                }
             }
 
-            .content h3 {
-                color: #009AA6;
+            .nav-container {
+                max-width: 1400px;
+                margin: 0 auto;
+                padding: var(--space-md) var(--space-xl);
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                gap: var(--space-lg);
             }
 
-            .content h2::before,
-            .content h3::before {
-                display: block;
-                content: " ";
-                visibility: hidden;
-                height: 50px;
-                margin-top: -50px;
-                pointer-events: none;
-                background-color: #FFFFFF;
+            .nav-brand {
+                display: flex;
+                align-items: center;
+                gap: var(--space-md);
             }
 
-            .content a:link,
-            .content a:visited {
-                color: #009AA6;
+            .nav-brand h2 {
+                font-size: var(--text-xl);
+                font-weight: var(--weight-bold);
+                letter-spacing: -0.02em;
             }
 
-            .home a:link,
-            .home a:visited {
-                color: #D3D3D3;
+            .nav-brand h2 a {
+                color: var(--color-base-text);
+                text-decoration: none;
+                background: var(--gradient-primary);
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                background-clip: text;
+                transition: opacity 0.3s ease;
             }
 
-            .page {
-                width: 65vw;
-                height: 100%;
-                margin-left: 30vw;
+            .nav-brand h2 a:hover {
+                opacity: 0.8;
+            }
+
+            .breadcrumb {
+                display: flex;
+                list-style: none;
+                gap: var(--space-sm);
+                font-size: var(--text-sm);
+                color: var(--color-base-text-muted);
+                flex-wrap: wrap;
+            }
+
+            .breadcrumb li::after {
+                content: '→';
+                margin-left: var(--space-sm);
+                opacity: 0.5;
+            }
+
+            .breadcrumb li:last-child::after {
+                display: none;
+            }
+
+            .breadcrumb a {
+                color: var(--color-accent-1);
+                text-decoration: none;
+                transition: color 0.3s ease;
+            }
+
+            .breadcrumb a:hover {
+                color: var(--color-accent-2);
+            }
+
+            /* ===== Main Container ===== */
+            main {
+                max-width: 1400px;
+                margin: 0 auto;
+                padding: calc(80px + var(--space-3xl)) var(--space-xl) var(--space-4xl);
+            }
+
+            /* ===== Hero Section ===== */
+            .hero {
+                position: relative;
+                margin-bottom: var(--space-4xl);
+                padding: var(--space-4xl) var(--space-3xl);
+                background: var(--gradient-hero);
+                background-size: 300% 300%;
+                border-radius: var(--radius-2xl);
                 overflow: hidden;
-                padding: 0 1em;
-                font-family: 'Arial';
+                animation: gradientShift 15s ease infinite, fadeInUp 0.8s ease-out;
             }
 
-            .page img {
-                max-width: 100%;
-                max-height: 100%;
+            @keyframes gradientShift {
+
+                0%,
+                100% {
+                    background-position: 0% 50%;
+                }
+
+                50% {
+                    background-position: 100% 50%;
+                }
             }
 
-            @media (max-width: 640px),
-            screen and (orientation: portrait) {
-                body {
-                    max-width: 100%;
-                    max-height: 100%;
+            @keyframes fadeInUp {
+                from {
+                    opacity: 0;
+                    transform: translateY(30px);
                 }
 
-                #sidebar {
-                    position: fixed;
-                    background-color: #009AA6;
-                    top: 0;
-                    left: 0;
-                    bottom: 80vh;
-                    width: 100vw;
+                to {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            }
+
+            .hero::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background:
+                    repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.02) 0px, transparent 1px, transparent 30px),
+                    repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.02) 0px, transparent 1px, transparent 30px);
+                pointer-events: none;
+            }
+
+            .hero-content {
+                position: relative;
+                z-index: 1;
+                max-width: 850px;
+            }
+
+            .hero h1 {
+                font-size: var(--text-4xl);
+                font-weight: var(--weight-bold);
+                color: white;
+                margin-bottom: var(--space-lg);
+                letter-spacing: -0.03em;
+                line-height: 1.2;
+                text-shadow: 0 2px 20px rgba(0, 0, 0, 0.15);
+            }
+
+            .hero-intro {
+                font-size: var(--text-lg);
+                color: rgba(255, 255, 255, 0.95);
+                line-height: 1.7;
+                margin-bottom: var(--space-md);
+                text-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            }
+
+            .hero-svg {
+                position: absolute;
+                right: -20px;
+                top: 50%;
+                transform: translateY(-50%);
+                width: 550px;
+                height: 550px;
+                opacity: 0.85;
+                pointer-events: none;
+            }
+
+            @media (max-width: 1200px) {
+                .hero-svg {
+                    opacity: 0.5;
+                    width: 400px;
+                    height: 400px;
+                }
+            }
+
+            /* ===== Section Styles ===== */
+            section {
+                margin-bottom: var(--space-4xl);
+                animation: fadeInUp 0.8s ease-out;
+                animation-fill-mode: both;
+            }
+
+            section:nth-child(2) {
+                animation-delay: 0.1s;
+            }
+
+            section:nth-child(3) {
+                animation-delay: 0.2s;
+            }
+
+            section:nth-child(4) {
+                animation-delay: 0.3s;
+            }
+
+            .section-header {
+                position: relative;
+                margin-bottom: var(--space-2xl);
+            }
+
+            .section-header h2,
+            .section-header h3 {
+                font-weight: var(--weight-bold);
+                letter-spacing: -0.02em;
+                color: var(--color-base-text);
+                position: relative;
+                display: inline-block;
+            }
+
+            .section-header h2 {
+                font-size: var(--text-3xl);
+                margin-bottom: var(--space-lg);
+            }
+
+            .section-header h3 {
+                font-size: var(--text-2xl);
+                margin-bottom: var(--space-md);
+                color: var(--color-accent-1);
+            }
+
+            .section-header h2::after {
+                content: '';
+                position: absolute;
+                bottom: -8px;
+                left: 0;
+                width: 60px;
+                height: 4px;
+                background: var(--gradient-primary);
+                border-radius: var(--radius-full);
+            }
+
+            .section-header h3::after {
+                content: '';
+                position: absolute;
+                bottom: -6px;
+                left: 0;
+                width: 40px;
+                height: 3px;
+                background: var(--gradient-primary);
+                border-radius: var(--radius-full);
+            }
+
+            /* ===== Content Section ===== */
+            .content-section {
+                background: var(--color-base-surface);
+                border-radius: var(--radius-xl);
+                padding: var(--space-3xl);
+                box-shadow: var(--shadow-theme);
+                border: 1px solid var(--color-border);
+                margin-bottom: var(--space-2xl);
+                position: relative;
+                overflow: hidden;
+                transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            }
+
+            .content-section::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 4px;
+                height: 100%;
+                background: var(--gradient-primary);
+                opacity: 0;
+                transition: opacity 0.3s ease;
+            }
+
+            .content-section:hover {
+                transform: translateX(8px);
+                box-shadow: 0 16px 48px rgba(231, 76, 60, 0.18);
+                border-color: var(--color-accent-1);
+            }
+
+            .content-section:hover::before {
+                opacity: 1;
+            }
+
+            /* ===== Paragraph Styles ===== */
+            p {
+                margin-bottom: var(--space-lg);
+                line-height: 1.8;
+                color: var(--color-base-text);
+            }
+
+            p b {
+                color: var(--color-accent-1);
+                font-weight: var(--weight-semibold);
+            }
+
+            /* ===== Code Styles ===== */
+            code {
+                font-family: var(--font-mono);
+                font-size: 0.9em;
+                background: rgba(231, 76, 60, 0.08);
+                padding: 0.2em 0.4em;
+                border-radius: var(--radius-sm);
+                color: var(--color-accent-1);
+                font-weight: var(--weight-medium);
+            }
+
+            /* ===== Figure Styles ===== */
+            figure {
+                margin: var(--space-2xl) 0;
+                padding: var(--space-xl);
+                background: var(--color-base-surface);
+                border-radius: var(--radius-lg);
+                box-shadow: var(--shadow-md);
+                border: 1px solid var(--color-border);
+            }
+
+            figure img {
+                width: 100%;
+                height: auto;
+                border-radius: var(--radius-md);
+                display: block;
+            }
+
+            figcaption {
+                margin-top: var(--space-md);
+                font-size: var(--text-sm);
+                color: var(--color-base-text-muted);
+                text-align: center;
+                font-style: italic;
+            }
+
+            /* ===== Lists ===== */
+            ul,
+            ol {
+                margin-left: var(--space-xl);
+                margin-bottom: var(--space-lg);
+            }
+
+            ul li,
+            ol li {
+                margin-bottom: var(--space-md);
+                line-height: 1.7;
+                color: var(--color-base-text);
+            }
+
+            ul li b,
+            ol li b {
+                color: var(--color-accent-1);
+                font-weight: var(--weight-semibold);
+            }
+
+            /* ===== Links ===== */
+            a {
+                color: var(--color-accent-1);
+                text-decoration: none;
+                transition: color 0.3s ease;
+                position: relative;
+            }
+
+            a:hover {
+                color: var(--color-accent-2);
+            }
+
+            a:focus {
+                outline: 2px solid var(--color-accent-1);
+                outline-offset: 2px;
+                border-radius: var(--radius-sm);
+            }
+
+            /* ===== Decorative Elements ===== */
+            .section-divider {
+                width: 100%;
+                height: 2px;
+                background: linear-gradient(90deg, transparent 0%, var(--color-accent-1) 50%, transparent 100%);
+                margin: var(--space-3xl) 0;
+                opacity: 0.3;
+            }
+
+            /* ===== Footer ===== */
+            footer {
+                background: linear-gradient(135deg, rgba(231, 76, 60, 0.05) 0%, rgba(155, 89, 182, 0.05) 100%);
+                border-top: 1px solid var(--color-border);
+                padding: var(--space-2xl) var(--space-xl) var(--space-xl);
+                margin-top: var(--space-4xl);
+            }
+
+            .footer-container {
+                max-width: 1400px;
+                margin: 0 auto;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                flex-wrap: wrap;
+                gap: var(--space-lg);
+                font-size: var(--text-sm);
+                color: var(--color-base-text-muted);
+            }
+
+            /* ===== SVG Animations ===== */
+            .code-element {
+                animation: codeFloat 5s ease-in-out infinite;
+            }
+
+            .syntax-highlight {
+                animation: syntaxPulse 3s ease-in-out infinite;
+            }
+
+            .bracket-pair {
+                animation: bracketBounce 4s ease-in-out infinite;
+            }
+
+            @keyframes codeFloat {
+
+                0%,
+                100% {
+                    transform: translateY(0px) translateX(0px);
                 }
 
-                #sidebar .title {
-                    text-align: center;
-                    position: fixed;
-                    margin-top: 6vh;
-                    left: 0px;
-                    right: 0px;
-                    line-height: 3.5vmax;
-                    font-size: 1.5vmax;
-                    font-family: 'Arial';
+                50% {
+                    transform: translateY(-10px) translateX(5px);
+                }
+            }
+
+            @keyframes syntaxPulse {
+
+                0%,
+                100% {
+                    opacity: 0.7;
                 }
 
-                #sidebar .subtitle {
-                    text-align: center;
-                    top: 5vh;
-                    left: 0px;
-                    right: 0px;
-                    position: fixed;
-                    margin-top: 10vh;
-                    font-size: 1.5vmax;
+                50% {
+                    opacity: 1;
+                }
+            }
+
+            @keyframes bracketBounce {
+
+                0%,
+                100% {
+                    transform: scale(1);
                 }
 
-                #sidebar .title a:link,
-                #sidebar .title a:visited {
-                    text-align: center;
-                    color: #FFFFFF;
+                50% {
+                    transform: scale(1.1);
+                }
+            }
+
+            /* ===== Responsive Design ===== */
+            @media (max-width: 768px) {
+                .nav-container {
+                    flex-direction: column;
+                    align-items: flex-start;
+                    padding: var(--space-md);
                 }
 
-                #sidebar .subtitle a:link,
-                #sidebar .subtitle a:visited {
-                    text-align: center;
-                    color: #FFFFFF;
+                .breadcrumb {
+                    font-size: var(--text-xs);
                 }
 
-                .home {
-                    z-index: 100;
-                    width: 100%;
-                    background-color: #009AA6;
-                    font-size: 1.5vmax;
+                main {
+                    padding: calc(120px + var(--space-xl)) var(--space-md) var(--space-2xl);
                 }
 
-                .home a:link,
-                .home a:visited {
-                    text-decoration: none;
-                    color: #FFFFFF;
+                .hero {
+                    padding: var(--space-2xl) var(--space-lg);
                 }
 
-                .content {
-                    line-height: 3.8vmax;
-                    font-size: 1.8vmax;
-                    font-family: 'Arial';
-                    margin-top: 22vh;
+                .hero-svg {
+                    width: 250px;
+                    height: 250px;
+                    opacity: 0.3;
+                    right: -50px;
                 }
 
-                .content a:link,
-                .content a:visited {
-                    color: #009AA6;
+                .content-section {
+                    padding: var(--space-xl);
                 }
 
-                .page {
-                    top: 40vh;
-                    width: 95%;
-                    margin-left: 0vw;
+                figure {
+                    padding: var(--space-md);
+                }
+            }
+
+            @media (max-width: 480px) {
+                .hero-svg {
+                    display: none;
                 }
 
-                .page img {
-                    max-width: 100%;
-                    max-height: 100%;
-                    border: 0;
+                .content-section {
+                    padding: var(--space-lg);
+                }
+            }
+
+            /* ===== Reduced Motion ===== */
+            @media (prefers-reduced-motion: reduce) {
+
+                *,
+                *::before,
+                *::after {
+                    animation-duration: 0.01ms !important;
+                    animation-iteration-count: 1 !important;
+                    transition-duration: 0.01ms !important;
+                }
+            }
+
+            /* ===== Print Styles ===== */
+            @media print {
+
+                nav,
+                footer {
+                    display: none;
+                }
+
+                main {
+                    padding-top: 0;
+                }
+
+                .hero {
+                    background: none;
+                    border: 1px solid #ddd;
+                }
+
+                a {
+                    color: #000;
+                    text-decoration: underline;
                 }
             }
         </style>
     </head>
 
     <body vocab="http://schema.org/">
-        <div id="sidebar">
-            <div class="title">
-                <h1><a href="./experimental-analysis-programming-languages.html">Experimental Analysis of Programming
-                        Languages</a></h1>
-            </div>
-            <div class="subtitle">
-                <h3><a href="../about.html">John Samuel</a></h3>
-            </div>
-        </div>
-        <div class="page">
-            <div class="home">
-                <ul typeof="BreadcrumbList">
+        <a href="#main-content" class="skip-link">Skip to main content</a>
+
+        <!-- Navigation -->
+        <nav role="navigation" aria-label="Main navigation">
+            <div class="nav-container">
+                <div class="nav-brand">
+                    <h2><a href="../about.html">John Samuel</a></h2>
+                </div>
+                <ul class="breadcrumb" typeof="BreadcrumbList">
                     <li property="itemListElement" typeof="ListItem">
                         <a property="item" typeof="WebPage" href="../index.html">
                             <span property="name">Home</span>
@@ -279,518 +692,687 @@
                         </a>
                     </li>
                 </ul>
+            </div>
+        </nav>
 
+        <!-- Main Content -->
+        <main id="main-content">
+            <!-- Hero Section -->
+            <div class="hero">
+                <div class="hero-content">
+                    <h1>Experimental Analysis of Programming Languages</h1>
+                    <p class="hero-intro">
+                        Programming languages serve as the cornerstone of modern computing, facilitating communication
+                        between humans and machines. This article offers a comprehensive overview of programming
+                        languages, unveiling their multifaceted characteristics and their pivotal role in empowering
+                        software development.
+                    </p>
+                    <p class="hero-intro">
+                        From the flexibility of dynamic memory allocation to the humble 'Hello, World!' program, from
+                        the support for objects and classes to the vast libraries at developers' disposal, programming
+                        languages embody a diverse toolkit for solving complex problems.
+                    </p>
+                </div>
+
+                <!-- Code Syntax SVG -->
+                <svg class="hero-svg" viewBox="0 0 600 600" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                    <defs>
+                        <filter id="codeGlow">
+                            <feGaussianBlur stdDeviation="4" result="coloredBlur" />
+                            <feMerge>
+                                <feMergeNode in="coloredBlur" />
+                                <feMergeNode in="SourceGraphic" />
+                            </feMerge>
+                        </filter>
+                        <linearGradient id="redGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                            <stop offset="0%" style="stop-color:rgba(255,255,255,0.9);stop-opacity:1" />
+                            <stop offset="100%" style="stop-color:rgba(255,255,255,0.6);stop-opacity:1" />
+                        </linearGradient>
+                    </defs>
+
+                    <!-- Outer Code Brackets -->
+                    <g class="bracket-pair">
+                        <path d="M 100 150 L 80 200 L 100 250" stroke="rgba(255, 255, 255, 0.8)" stroke-width="6"
+                            fill="none" stroke-linecap="round" stroke-linejoin="round" filter="url(#codeGlow)" />
+                        <path d="M 500 150 L 520 200 L 500 250" stroke="rgba(255, 255, 255, 0.8)" stroke-width="6"
+                            fill="none" stroke-linecap="round" stroke-linejoin="round" filter="url(#codeGlow)" />
+                    </g>
+
+                    <!-- Code Lines - Simulating Syntax -->
+                    <g class="code-element" style="animation-delay: 0s">
+                        <!-- if keyword -->
+                        <rect x="140" y="120" width="50" height="20" rx="4" fill="rgba(231, 76, 60, 0.9)"
+                            filter="url(#codeGlow)" />
+                        <text x="165" y="135" text-anchor="middle" fill="white" font-size="12" font-family="monospace"
+                            font-weight="bold">if</text>
+
+                        <!-- Parentheses and condition -->
+                        <circle cx="210" cy="130" r="3" fill="rgba(255, 255, 255, 0.7)" />
+                        <rect x="220" y="120" width="60" height="20" rx="4" fill="rgba(52, 152, 219, 0.8)" />
+                        <circle cx="290" cy="130" r="3" fill="rgba(255, 255, 255, 0.7)" />
+
+                        <!-- Curly brace -->
+                        <path d="M 310 125 L 320 130 L 310 135" stroke="rgba(255, 255, 255, 0.7)" stroke-width="2"
+                            fill="none" />
+                    </g>
+
+                    <g class="code-element" style="animation-delay: 0.5s">
+                        <!-- function keyword -->
+                        <rect x="160" y="180" width="80" height="20" rx="4" fill="rgba(155, 89, 182, 0.9)"
+                            filter="url(#codeGlow)" />
+                        <text x="200" y="195" text-anchor="middle" fill="white" font-size="12" font-family="monospace"
+                            font-weight="bold">function</text>
+
+                        <!-- Function name -->
+                        <rect x="250" y="180" width="70" height="20" rx="4" fill="rgba(46, 204, 113, 0.8)" />
+
+                        <!-- Parentheses -->
+                        <text x="330" y="195" fill="rgba(255, 255, 255, 0.8)" font-size="16"
+                            font-family="monospace">()</text>
+                    </g>
+
+                    <g class="code-element" style="animation-delay: 1s">
+                        <!-- for loop -->
+                        <rect x="140" y="240" width="50" height="20" rx="4" fill="rgba(231, 76, 60, 0.9)"
+                            filter="url(#codeGlow)" />
+                        <text x="165" y="255" text-anchor="middle" fill="white" font-size="12" font-family="monospace"
+                            font-weight="bold">for</text>
+
+                        <!-- Loop variable -->
+                        <rect x="200" y="240" width="40" height="20" rx="4" fill="rgba(52, 152, 219, 0.8)" />
+                        <text x="220" y="255" text-anchor="middle" fill="white" font-size="11"
+                            font-family="monospace">i</text>
+
+                        <!-- in keyword -->
+                        <text x="255" y="255" fill="rgba(255, 255, 255, 0.7)" font-size="12"
+                            font-family="monospace">in</text>
+
+                        <!-- range -->
+                        <rect x="275" y="240" width="60" height="20" rx="4" fill="rgba(46, 204, 113, 0.8)" />
+                    </g>
+
+                    <g class="code-element" style="animation-delay: 1.5s">
+                        <!-- class keyword -->
+                        <rect x="140" y="300" width="60" height="20" rx="4" fill="rgba(155, 89, 182, 0.9)"
+                            filter="url(#codeGlow)" />
+                        <text x="170" y="315" text-anchor="middle" fill="white" font-size="12" font-family="monospace"
+                            font-weight="bold">class</text>
+
+                        <!-- Class name -->
+                        <rect x="210" y="300" width="80" height="20" rx="4" fill="rgba(243, 156, 18, 0.8)" />
+
+                        <!-- Colon -->
+                        <text x="300" y="315" fill="rgba(255, 255, 255, 0.8)" font-size="16"
+                            font-family="monospace">:</text>
+                    </g>
+
+                    <g class="code-element" style="animation-delay: 2s">
+                        <!-- return keyword -->
+                        <rect x="160" y="360" width="70" height="20" rx="4" fill="rgba(231, 76, 60, 0.9)"
+                            filter="url(#codeGlow)" />
+                        <text x="195" y="375" text-anchor="middle" fill="white" font-size="12" font-family="monospace"
+                            font-weight="bold">return</text>
+
+                        <!-- String value -->
+                        <rect x="240" y="360" width="100" height="20" rx="4" fill="rgba(46, 204, 113, 0.8)" />
+                        <text x="290" y="375" text-anchor="middle" fill="white" font-size="11"
+                            font-family="monospace">"result"</text>
+                    </g>
+
+                    <!-- Language Tags Floating -->
+                    <g class="syntax-highlight" style="animation-delay: 0s">
+                        <rect x="380" y="100" width="70" height="30" rx="15" fill="url(#redGrad)"
+                            filter="url(#codeGlow)" />
+                        <text x="415" y="120" text-anchor="middle" fill="rgba(231, 76, 60, 0.9)" font-size="14"
+                            font-weight="bold">Python</text>
+                    </g>
+
+                    <g class="syntax-highlight" style="animation-delay: 0.5s">
+                        <rect x="460" y="180" width="60" height="30" rx="15" fill="url(#redGrad)"
+                            filter="url(#codeGlow)" />
+                        <text x="490" y="200" text-anchor="middle" fill="rgba(52, 152, 219, 0.9)" font-size="14"
+                            font-weight="bold">Java</text>
+                    </g>
+
+                    <g class="syntax-highlight" style="animation-delay: 1s">
+                        <rect x="390" y="260" width="50" height="30" rx="15" fill="url(#redGrad)"
+                            filter="url(#codeGlow)" />
+                        <text x="415" y="280" text-anchor="middle" fill="rgba(155, 89, 182, 0.9)" font-size="14"
+                            font-weight="bold">C++</text>
+                    </g>
+
+                    <g class="syntax-highlight" style="animation-delay: 1.5s">
+                        <rect x="450" y="340" width="60" height="30" rx="15" fill="url(#redGrad)"
+                            filter="url(#codeGlow)" />
+                        <text x="480" y="360" text-anchor="middle" fill="rgba(243, 156, 18, 0.9)" font-size="14"
+                            font-weight="bold">Rust</text>
+                    </g>
+
+                    <g class="syntax-highlight" style="animation-delay: 2s">
+                        <rect x="380" y="420" width="50" height="30" rx="15" fill="url(#redGrad)"
+                            filter="url(#codeGlow)" />
+                        <text x="405" y="440" text-anchor="middle" fill="rgba(46, 204, 113, 0.9)" font-size="14"
+                            font-weight="bold">Go</text>
+                    </g>
+
+                    <!-- Operators -->
+                    <g class="code-element" style="animation-delay: 2.5s">
+                        <circle cx="150" cy="480" r="20" fill="rgba(255, 255, 255, 0.2)"
+                            stroke="rgba(243, 156, 18, 0.8)" stroke-width="2" />
+                        <text x="150" y="488" text-anchor="middle" fill="rgba(255, 255, 255, 0.9)" font-size="20"
+                            font-weight="bold">+</text>
+
+                        <circle cx="220" cy="480" r="20" fill="rgba(255, 255, 255, 0.2)"
+                            stroke="rgba(52, 152, 219, 0.8)" stroke-width="2" />
+                        <text x="220" y="488" text-anchor="middle" fill="rgba(255, 255, 255, 0.9)" font-size="20"
+                            font-weight="bold">-</text>
+
+                        <circle cx="290" cy="480" r="20" fill="rgba(255, 255, 255, 0.2)" stroke="rgba(231, 76, 60, 0.8)"
+                            stroke-width="2" />
+                        <text x="290" y="488" text-anchor="middle" fill="rgba(255, 255, 255, 0.9)" font-size="20"
+                            font-weight="bold">*</text>
+
+                        <circle cx="360" cy="480" r="20" fill="rgba(255, 255, 255, 0.2)"
+                            stroke="rgba(155, 89, 182, 0.8)" stroke-width="2" />
+                        <text x="360" y="488" text-anchor="middle" fill="rgba(255, 255, 255, 0.9)" font-size="20"
+                            font-weight="bold">/</text>
+                    </g>
+
+                    <!-- Curly Braces -->
+                    <g class="bracket-pair" style="animation-delay: 3s">
+                        <path d="M 140 520 Q 130 540 140 560" stroke="rgba(255, 255, 255, 0.7)" stroke-width="4"
+                            fill="none" />
+                        <path d="M 360 520 Q 370 540 360 560" stroke="rgba(255, 255, 255, 0.7)" stroke-width="4"
+                            fill="none" />
+                    </g>
+                </svg>
             </div>
-            <div class="content">
-                <p>Programming languages serve as the cornerstone of modern computing, facilitating communication
-                    between
-                    humans and machines. This article offers a comprehensive overview of programming languages,
-                    unveiling their multifaceted characteristics and their pivotal role in empowering software
-                    development.
-                    From the flexibility of dynamic memory allocation to the humble 'Hello, World!' program, from the
-                    support for objects and classes to the vast libraries at developers' disposal, programming languages
-                    embody a diverse toolkit for solving complex problems.
-                </p>
-                <p>
-                    In the dynamic landscape of software development, communities continually shape these languages,
-                    fostering innovation through the creation of new compilers and the evolution of existing languages.
-                    This
-                    article dives deep into the unique attributes and capabilities of programming languages,
-                    illuminating their evolutionary journey and the driving forces behind their adaptability.
-                </p>
-                <p>
-                    As technology advances, a profound understanding of programming languages equips us to navigate the
-                    evolving digital landscape with confidence and creativity. This article explores some reflections on
-                    the
-                    experimental analysis of programming languages.
-                </p>
-                <h3>Introduction</h3>
-                <p>
-                    A multitude of programming languages [1], numbering in the thousands, exists today. Yet, in
-                    educational
-                    institutions, students typically encounter only a limited selection of programming languages.
-                    The curriculum often introduces languages like Python, PHP, Java, C, or C++, essential for
-                    understanding the foundations of programming. Alongside these, web development languages such as
-                    HTML,
-                    CSS, and JavaScript are emphasized, reflecting the demands of the digital age. Yet, many other
-                    programming languages remain in the shadows, waiting to be explored. Some, like COBOL, Pascal, or
-                    Fortran, carry
-                    the weight of history, while newcomers like Swift, Rust represent the latest advancements.
-                    Remarkably,
-                    these
-                    languages may not always find a place in contemporary coursework, potentially leaving aspiring
-                    developers unaware of their existence.
-                </p>
-                <p>
-                    This situation raises a pertinent question: Is it imperative for one to master every programming
-                    language in existence? Alternatively, should we prioritize comprehending the universal principles
-                    that
-                    underpin all languages before delving into the intricacies of each new (or old) language we
-                    encounter?
-                    In essence, what does it truly mean to learn a programming language? Is it merely a matter of
-                    translating human needs into lines of code, or should we first grasp the fundamental concepts that
-                    govern computational thinking?
-                </p>
-                <p>
-                    Taking an alternate perspective, one can consider programming language learning as an exploration of
-                    how
-                    each
-                    language tackles fundamental tasks like iterative loops, mathematical and logical operations,
-                    functions,
-                    and classes. It's important to note that this learning process can be highly individualized, as
-                    learners
-                    arrive with diverse backgrounds, encompassing varying levels of proficiency in logic, mathematics,
-                    and
-                    programming.
-                </p>
-                <p>
-                    Nevettheless, the decision on which programming languages to teach and learn isn't arbitrary. It's
-                    often
-                    influenced by factors such as industry demand, community support, and the language's ecosystem.
-                    Newer
-                    languages may gain <b>popularity</b> swiftly [3, 4, 5, 6, 7] due to their alignment with modern
-                    software
-                    development
-                    practices,
-                    while older languages endure in niche areas like scientific computing or legacy system maintenance.
-                    Hence, understanding the evolving landscape of programming languages is not merely an academic
-                    pursuit
-                    but a pragmatic necessity.
-                </p>
-                <p>
-                    In this context, the role of educators and institutions becomes crucial. They must strike a balance
-                    between imparting foundational knowledge applicable across languages and equipping students with the
-                    practical skills needed in the ever-changing tech industry. This balance ensures that learners not
-                    only
-                    master specific languages but also develop a deep understanding of the principles that will serve
-                    them
-                    well throughout their careers.
-                </p>
-                <h3>Understanding a Programming Language</h3>
-                <p>
-                    Realistically, it's impossible to learn every programming language. To address this challenge, the
-                    programming language research community has developed <b>programming language paradigms</b> [2] to
-                    understand the
-                    various ways we can interact with computers.
-                    These paradigms offer insights into what we can expect from a particular programming
-                    language. For instance, when a programming language is described as object-oriented, we anticipate
-                    the
-                    presence of classes, resembling hierarchical structures seen in real life, such as the
-                    classification of
-                    animals or plants. Functional programming languages, on the other hand, emphasize communication with
-                    computers through functions. However, today's programming languages often blur the lines between
-                    paradigms, attracting developers by supporting multiple paradigms. These are referred to as
-                    multi-paradigm programming languages. Examples include languages like C#, Go, Java, JavaScript,
-                    Kotlin,
-                    Scala, Swift, Python, Rust, and more. </p>
-                <p>
-                    Another valuable indicator of a programming language's evolution is the <b>year of its initial
-                        release</b>,
-                    offering valuable insights into its associated paradigms. In the early days, programming languages
-                    were
-                    primarily rooted in procedural and imperative paradigms. However, as time progressed, there was a
-                    significant shift towards the emergence of object-oriented languages. Presently, the emphasis lies
-                    in
-                    accommodating multiple paradigms, making it easier for learners to adopt these languages and
-                    reducing
-                    the associated learning curve.
-                </p>
-                <figure>
-                    <img
-                        src="../../fr/enseignement/cours/2022/C/Screenshot 2022-09-12 at 15-51-06 Wikidata Query Service.png" />
-                    <figcaption>Timeline of the initial release some of the programming languages documented on
-                        Wikidata.
-                    </figcaption>
-                </figure>
-                <p>
-                    The distinction between <b>compilation and interpretation</b> is pivotal in understanding
-                    programming
-                    languages. Some languages follow a compilation approach, which involves a thorough check of the
-                    entire
-                    program by a compiler. This process identifies errors and alerts the programmer, enabling them to
-                    rectify any issues. Once the necessary corrections are made, a clean and error-free program is
-                    generated, poised for compilation into an executable file. This compilation step is a critical part
-                    of
-                    the journey from writing code to producing a fully functional program.
-                </p>
-                <p>
-                    Identifying a programming language solely by examining the contents of a file can be a challenging
-                    task.
-                    However, <b>file exensions</b> often serve as clear indicators of the programming language used. For
-                    instance,
-                    a .py extension typically signifies a Python program, while .c or .cpp extensions commonly indicate
-                    C or
-                    C++ programs, respectively. Another noteworthy aspect is the presence of header files, a
-                    characteristic
-                    found in some early programming languages like C. In such languages, files with extensions .h
-                    declare
-                    functions and variables, while the actual implementations reside in .c or .cpp files.
-                </p>
-                <p>
-                    Furthermore, certain programming languages introduce distinct file extensions to distinguish
-                    <b>intermediary files generated during compilation</b> from the final executable files and original
-                    source
-                    code. For instance, languages like Java make use of the .class extension for intermediary programs.
-                    These integrated class files encompass the entire code and facilitate compilation and error
-                    checking.
-                    When interpretation is needed, they employ the Java class instead of the original Java source code.
-                    Intermediary files play a crucial role in
-                    comprehending executables and optimizing programs when necessary. This also
-                    highlights the diverse approaches to program creation and execution, emphasizing the importance of
-                    understanding the evolution of programming languages.
-                </p>
-                <p>
-                    Programming languages often exhibit striking similarities, prompting questions about whether this
-                    similarity is intentional, aimed at <b>reducing the learning curve</b>, or if it mirrors the natural
-                    evolution
-                    of human languages. Regardless of the reason, certain commonalities pervade all programming
-                    languages.
-                    For instance, they share fundamental constructs such as loops for iteration and functions for code
-                    organization. Generic patterns emerge, encompassing various types
-                    of operators, including mathematical, logical, and bit manipulation operators. Some languages also
-                    facilitate the recursive calling of functions, a technique known as recursion, although not all
-                    languages (for example, BASIC) support it.
-                </p>
-                <p>
-                    <b>Keywords</b> hold a significant role in this common ground. An analysis of various programming
-                    languages,
-                    starting from C and progressing onward, reveals striking similarities. Frequently used keywords like
-                    <code>if</code>, <code>break</code>, <code>continue</code>, <code>for</code>, and
-                    <code>int</code> are pervasive in procedural languages. Furthermore, keywords like
-                    <code>class</code>
-                    typically
-                    appear in languages like Ruby, C++, Python, Scala, Java, and more. It's
-                    worth noting that many of these keywords are rooted in the English language [8], underlining the
-                    close
-                    relationship between programming and human languages. Efforts have been made to develop programming
-                    languages that cater to non-English [9,10] speakers, with the aim of making programming more
-                    accessible
-                    to
-                    a
-                    global audience.
-                </p>
-                <p>
-                    <b>Data Types</b> are the foundation of programming, determining the type of data that variables can
-                    store.
-                    Most programming languages include basic data types like integers, floating-point numbers,
-                    characters,
-                    and arrays. These fundamental data types serve as building blocks for more complex data structures.
-                    For
-                    instance, arrays can hold multiple elements of basic data types, allowing for the creation of
-                    structured
-                    data.
-                </p>
-                <p>
-                    <b>Complex Data Types</b> play a crucial role in programming languages. Many languages provide these
-                    complex data structures in their standard libraries, simplifying the implementation of advanced data
-                    structures and algorithms. For example, Java offers the <code>HashMap</code>, while Python provides
-                    the
-                    <code>dict</code> (dictionary). These complex data types streamline working with data in various
-                    applications.
-                </p>
-                <p>
-                    <b>Modularization and Code Structuring</b> are essential for project organization. Programming
-                    languages
-                    use different approaches to structure code. Some rely on blocks enclosed in curly braces (as in C,
-                    C++,
-                    JavaScript, Rust,
-                    Go, PHP) or indentation
-                    (as in Python, Haskell, CoffeeScript) to segment code into manageable sections. Some languages, like
-                    Java, enforce the
-                    convention of one class per file, while others, such
-                    as Python, permit multiple classes in a single file. This choice impacts how developers organize and
-                    manage their codebases. Languages
-                    feature constructs like functions, procedures, or modules to facilitate code reuse,
-                    maintainability, and readability.
-                </p>
-                <h3>Data Analysis</h3>
-                <p>
-                    In recent decades, there has been a noticeable shift in the programming landscape from string
-                    manipulation languages to those dedicated to handling complex data processing tasks. Modern
-                    programming languages have evolved to meet the demands of an increasingly data-centric world. They
-                    offer various ways to <b>search and manipulate information</b>, reflecting the need for efficient
-                    data
-                    handling.
-                </p>
-                <p>
-                    One notable trend is the inclusion of default support for <b>pattern matching and regular
-                        expressions</b>
-                    in many newer languages and their libraries. This feature simplifies tasks like text parsing and
-                    data
-                    extraction, making these languages more versatile for data-related operations. For example, SQL, a
-                    language predominantly used in database management, excels in providing built-in mechanisms for
-                    <b>searching and filtering data</b>. Meanwhile, languages like JavaScript, Python enhance their data
-                    manipulation
-                    capabilities with functions like <code>map</code>, <code>filter</code>, and <code>reduce</code>,
-                    offering flexibility for developers to
-                    tailor their data processing logic.
-                </p>
-                <p>
-                    Beyond searching and filtering, programming languages offer powerful tools for <b>
-                        aggregating
-                        data
-                    </b> effectively. SQL's proficiency in data aggregation is well-established, making it a
-                    popular choice for handling large datasets. However, many modern programming languages have followed
-                    suit by incorporating built-in functions and libraries to streamline information aggregation. Some
-                    languages like R even take it a step further by integrating statistical calculations, making them
-                    valuable
-                    assets in industries that rely on data analysis and modeling.
-                </p>
-                <h3>Testing and Performance</h3>
-                <p>
-                    <b>Debugging and memory profiling</b> are integral components of the programming process, playing
-                    pivotal
-                    roles in ensuring the reliability and performance of software. When it comes to programming,
-                    understanding the inner workings of code translation into executables or interpretation is
-                    paramount.
-                    This understanding allows developers to identify and rectify errors efficiently, ultimately leading
-                    to
-                    the creation of more robust and efficient programs.
-                </p>
-                <p>
-                    In the context of modern programming languages, debugging and memory profiling hold even greater
-                    significance. Many contemporary languages are known for their
-                    <b> increased CPU cycle and memory consumption</b>.
-                    Consequently, efficient debugging becomes an essential skill for programmers working with these
-                    languages. Debugging tools and techniques help pinpoint and resolve issues related to logic, data
-                    handling, and resource management, ensuring that the final executable meets performance
-                    expectations.
-                </p>
-                <p>
-                    Moreover, the importance of memory profiling cannot be overstated. In a world where memory-efficient
-                    software is highly sought after, understanding how programs utilize memory during execution is
-                    crucial.
-                    Memory profiling tools provide developers with insights into memory allocation, usage patterns, and
-                    potential memory leaks. This information empowers them to optimize their code, minimize resource
-                    wastage, and enhance the overall performance of their applications. When coupled with
-                    <b>code coverage analysis</b>, unit testing, and functional testing, memory profiling tools form a
-                    comprehensive suite for
-                    assessing the thoroughness of test coverage, ensuring that all code pathways are rigorously tested.
-                    In essence, the choice of a programming language may well hinge on the availability of these
-                    invaluable
-                    tools, as they are indispensable for maintaining high-quality software in today's development
-                    landscape.
-                </p>
-                <h3>Abstraction</h3>
-                <p>
-                    Abstraction is a foundational concept in programming, enabling the encapsulation of complex
-                    information
-                    into simplified representations within a given context. In essence, it allows developers to work
-                    with
-                    higher-level concepts without getting bogged down by intricate details. This simplification of
-                    information fosters clarity and efficiency in code development.
-                </p>
-                <p>
-                    One notable application of abstraction in programming languages is the ability to abstract the
-                    <b>distributed nature of underlying machines</b>. Certain programming languages, like Erlang, Java,
-                    Scala,
-                    Hive, excel
-                    in this
-                    regard. They provide developers with the means to write code as if all data is local, even when, in
-                    reality, it is distributed across multiple machines. This abstraction is particularly valuable in
-                    distributed computing scenarios, where managing data across multiple nodes can be a complex and
-                    error-prone task.
-                </p>
-                <p>
-                    It's essential to recognize the stark contrast between programming languages designed for
-                    distributed
-                    architectures and those suited for centralized ones. Languages tailored for centralized systems
-                    typically assume that all data is stored in a single location, simplifying data management and
-                    reducing
-                    the complexity of handling failures. In contrast, languages built for distributed systems must
-                    contend
-                    with the challenges of network communication, data replication, fault tolerance, and debugging
-                    across
-                    multiple machines. As a result, the choice of programming language can significantly impact the ease
-                    with which developers navigate the intricacies of distributed computing environments. Ultimately,
-                    the
-                    ability to abstract such complexities is a testament to the adaptability and power of programming
-                    languages in addressing the evolving needs of modern software development.
-                </p>
-                <p>Abstractions in programming languages also hide the intricacies of <b>parallelism and
-                        concurrency</b>,
-                    making it easier for developers to create efficient and scalable software. They promote cleaner
-                    code, reduce the likelihood of bugs related to parallel execution, and enhance productivity by
-                    allowing
-                    developers to focus on high-level logic.
-                </p>
-                <p>
-                    Parallelism, in the context of programming, refers to the simultaneous execution of multiple tasks
-                    or
-                    threads to achieve faster and more efficient computation. Concurrency, on the other hand, deals with
-                    the
-                    concurrent execution of multiple tasks, which may not necessarily execute simultaneously but can be
-                    managed efficiently by the programming language.
-                </p>
-                <p>
-                    Traditionally, writing parallel programs required careful consideration of issues like data
-                    synchronization,
-                    resource sharing, and thread management, which could lead to challenging debugging and optimization
-                    processes.
-                    In contrast, languages like Erlang, Go, Haskell provide abstractions and tools that simplify
-                    parallel
-                    and concurrent
-                    programming. They often offer constructs like threads, processes, or parallel execution frameworks
-                    that
-                    allow developers to express parallelism and concurrency more intuitively. This abstraction shields
-                    programmers from low-level concerns and enables them to focus on the logic of their applications,
-                    resulting
-                    in more efficient and scalable software.
-                </p>
-                <h3>Extensions</h3>
-                <p>
-                    Programming languages are versatile tools that can extend their capabilities through various means.
-                    One
-                    such avenue for extension is through the <b>integration of existing software libraries</b> within
-                    the
-                    operating
-                    system. Developers frequently write code to seamlessly connect their programs with pre-existing
-                    tools
-                    and services on the host machine. This practice not only enhances the functionality of their
-                    applications but also streamlines development by capitalizing on established resources.
-                </p>
-                <p>
-                    Additionally, some modern programming languages go a step further by supporting the <b>
-                        execution of code
-                        written in different programming languages
-                    </b>. This flexibility enables early adopters of a new language to
-                    harness the potential of pre-existing codebases, fostering interoperability and facilitating the
-                    transition to new programming paradigms.
-                </p>
-                <p> Another notable feature offered by some programming languages is the ability to dynamically allocate
-                    memory</b>, as opposed to requiring memory specification during compilation. This dynamic memory
-                    allocation
-                    offers valuable flexibility, especially when the program's size or memory requirements remain
-                    uncertain.
-                    Unlike the less practical approach of modifying memory size during code development and subsequent
-                    recompilation, dynamic memory allocation enables programs to adapt seamlessly to the memory
-                    constraints
-                    of the underlying machine. This adaptability is particularly advantageous when developing software
-                    for
-                    clients, as it ensures efficient resource utilization without the need for frequent code
-                    modifications.
-                </p>
-                <p>
-                    However, the domain of <b>multilingual support</b> in programming languages presents an opportunity
-                    for
-                    enhancement. The majority of programming languages are predominantly designed and documented in
-                    English
-                    [8],
-                    which caters primarily to English-speaking programmers. To promote inclusivity and accessibility on
-                    a
-                    global scale, there is room for improvement in expanding support for multiple languages, including
-                    accommodating keywords in various languages [9, 10, 12]. This evolution would bridge language
-                    barriers
-                    and
-                    make
-                    programming more accessible to a diverse international audience.
-                </p>
-                <h3>Community</h3>
-                <p>
-                    Understanding a programming language begins with a simple task: examining how a <b>'Hello, World!'
-                        program</b> [11] is
-                    written in that language. For example, in Python, it's concise: 'print('Hello, World!')', while in C
-                    or
-                    Java, it's more detailed. This initial exploration reveals syntax and complexity differences across
-                    languages.
-                </p>
-                <p>
-                    <b>Official documentation </b>accessibility is another facet. Some languages lack official pages,
-                    like
-                    C.
-                    Still,
-                    community-driven efforts standardize them, as seen in C99 or C11. Knowing where to find
-                    documentation
-                    matters.
-                    Community plays a vital role, extending standard libraries for easier, efficient programming. They
-                    establish
-                    best practices and style guides, enhancing code maintainability. Community-driven growth is
-                    facilitated
-                    by
-                    languages through library creation.
-                </p>
-                <p>
-                    New compilers for specific languages experiment with optimizations, enhancing performance. Language
-                    evolution introduces keywords and extends libraries. For instance, despite its 1972 debut, C saw
-                    updates
-                    in
-                    1989, 1999, 2011, and 2018 showing continuous community efforts. Assessing support for various data
-                    structures
-                    beyond basics provides valuable insights.
-                    Regarding <b>backward compatibility</b>, it varies. Some updates aim to maintain it, while others
-                    introduce
-                    breaking changes for new features or security. The extent depends on community philosophy and goals
-                    for
-                    each
-                    update.
-                </p>
-                <h3>Conclusion</h3>
-                <p>
-                    In conclusion, exploring the diverse world of programming languages reveals a rich tapestry of
-                    features,
-                    syntax, and capabilities. From memory management to the simplicity of 'Hello, World!' programs, from
-                    support
-                    for objects and classes to the extent of available libraries, programming languages offer unique
-                    approaches
-                    to problem-solving.
-                </p>
-                <p>
-                    The dynamism of language communities and their dedication to expanding standard libraries exemplify
-                    the
-                    collaborative nature of software development. As new compilers emerge and languages evolve, the
-                    boundaries
-                    of what can be achieved in the programming realm continue to expand.
-                </p>
-                <p>
-                    Ultimately, the choice of a programming language depends on the specific needs of a project, the
-                    problem
-                    to
-                    be solved, and the preferences of developers. Understanding these languages not only broadens our
-                    programming horizons but also equips us to make informed decisions in a rapidly evolving
-                    technological
-                    landscape. Whether you're a seasoned developer or just starting your programming journey, the world
-                    of
-                    programming languages remains a fascinating and ever-evolving domain to explore. </p>
-                <h3>References</h3>
-                <p>
-                <ol>
-                    <li id="programming-language"><a
-                            href="https://en.wikipedia.org/wiki/Programming_language">Programming
-                            Language</a></li>
-                    <li id="programming-paradigms"><a
-                            href="https://en.wikipedia.org/wiki/Programming_paradigm">Programming
-                            Paradigm</a></li>
-                    <li id="tiobe"><a href="https://www.tiobe.com/tiobe-index/">TIOBE Index</a></li>
-                    <li id="tiobe-definition"><a
-                            href="https://www.tiobe.com/tiobe-index/programming-languages-definition/">TIOBE Programming
-                            Community Index Definition</a></li>
-                    <li id="unpopular"><a
-                            href="https://www.johndcook.com/blog/2018/04/17/unpopular-languages/">Viability of
-                            unpopular programming languages</a></li>
-                    <li id="sosurvey2018"><a href="https://insights.stackoverflow.com/survey/2018#technology">Stack
-                            Overflow
-                            Developer Survey 2019: Programming, Scripting, and Markup Languages</a></li>
-                    <li id="sosurvey2019"><a
-                            href="https://insights.stackoverflow.com/survey/2019#most-popular-technologies">Stack
-                            Overflow
-                            Developer Survey 2019: Programming, Scripting, and Markup Languages</a></li>
-                    <li id="coding"><a
-                            href="https://www.wired.com/story/coding-is-for-everyoneas-long-as-you-speak-english/">Coding
-                            Is
-                            for Everyone—as Long as You Speak English</a></li>
-                    <li id="commandline"><a href="../programming/command-line-arguments.html">Rethinking the
-                            command-line</a></li>
-                    <li id="nonenglish"><a
-                            href="https://en.wikipedia.org/wiki/Non-English-based_programming_languages">Non-English-based
-                            programming languages</a></li>
-                    <li id="helloworld"><a href="http://helloworldcollection.de/">The Hello World Collection</a></li>
-                    <li id="multilingual"><a
-                            href="https://johnsamuel.info/en/research/multilingual-programming-experience.html">Multilingual
-                            Programming Experience</a>
-                </ol>
-                </p>
+
+            <!-- Introduction -->
+            <section>
+                <div class="content-section">
+                    <p>
+                        In the dynamic landscape of software development, communities continually shape these languages,
+                        fostering innovation through the creation of new compilers and the evolution of existing
+                        languages. This article dives deep into the unique attributes and capabilities of programming
+                        languages, illuminating their evolutionary journey and the driving forces behind their
+                        adaptability.
+                    </p>
+                    <p>
+                        As technology advances, a profound understanding of programming languages equips us to navigate
+                        the evolving digital landscape with confidence and creativity. This article explores some
+                        reflections on the experimental analysis of programming languages.
+                    </p>
+                </div>
+            </section>
+
+            <div class="section-divider"></div>
+
+            <!-- Introduction Section -->
+            <section>
+                <div class="section-header">
+                    <h2>Introduction</h2>
+                </div>
+                <div class="content-section">
+                    <p>
+                        A multitude of programming languages <a
+                            href="https://en.wikipedia.org/wiki/Programming_language">[1]</a>, numbering in the
+                        thousands, exists today. Yet, in educational institutions, students typically encounter only a
+                        limited selection of programming languages. The curriculum often introduces languages like
+                        Python, PHP, Java, C, or C++, essential for understanding the foundations of programming.
+                        Alongside these, web development languages such as HTML, CSS, and JavaScript are emphasized,
+                        reflecting the demands of the digital age. Yet, many other programming languages remain in the
+                        shadows, waiting to be explored. Some, like COBOL, Pascal, or Fortran, carry the weight of
+                        history, while newcomers like Swift, Rust represent the latest advancements. Remarkably, these
+                        languages may not always find a place in contemporary coursework, potentially leaving aspiring
+                        developers unaware of their existence.
+                    </p>
+                    <p>
+                        This situation raises a pertinent question: Is it imperative for one to master every programming
+                        language in existence? Alternatively, should we prioritize comprehending the universal
+                        principles that underpin all languages before delving into the intricacies of each new (or old)
+                        language we encounter? In essence, what does it truly mean to learn a programming language? Is
+                        it merely a matter of translating human needs into lines of code, or should we first grasp the
+                        fundamental concepts that govern computational thinking?
+                    </p>
+                    <p>
+                        Taking an alternate perspective, one can consider programming language learning as an
+                        exploration of how each language tackles fundamental tasks like iterative loops, mathematical
+                        and logical operations, functions, and classes. It's important to note that this learning
+                        process can be highly individualized, as learners arrive with diverse backgrounds, encompassing
+                        varying levels of proficiency in logic, mathematics, and programming.
+                    </p>
+                    <p>
+                        Nevertheless, the decision on which programming languages to teach and learn isn't arbitrary.
+                        It's often influenced by factors such as industry demand, community support, and the language's
+                        ecosystem. Newer languages may gain <b>popularity</b> swiftly <a
+                            href="https://www.tiobe.com/tiobe-index/">[3]</a>, <a
+                            href="https://www.tiobe.com/tiobe-index/programming-languages-definition/">[4]</a>, <a
+                            href="https://www.johndcook.com/blog/2018/04/17/unpopular-languages/">[5]</a>, <a
+                            href="https://insights.stackoverflow.com/survey/2018#technology">[6]</a>, <a
+                            href="https://insights.stackoverflow.com/survey/2019#most-popular-technologies">[7]</a> due
+                        to their alignment with modern software development practices, while older languages endure in
+                        niche areas like scientific computing or legacy system maintenance. Hence, understanding the
+                        evolving landscape of programming languages is not merely an academic pursuit but a pragmatic
+                        necessity.
+                    </p>
+                    <p>
+                        In this context, the role of educators and institutions becomes crucial. They must strike a
+                        balance between imparting foundational knowledge applicable across languages and equipping
+                        students with the practical skills needed in the ever-changing tech industry. This balance
+                        ensures that learners not only master specific languages but also develop a deep understanding
+                        of the principles that will serve them well throughout their careers.
+                    </p>
+                </div>
+            </section>
+
+            <div class="section-divider"></div>
+
+            <!-- Understanding Programming Languages -->
+            <section>
+                <div class="section-header">
+                    <h2>Understanding a Programming Language</h2>
+                </div>
+                <div class="content-section">
+                    <p>
+                        Realistically, it's impossible to learn every programming language. To address this challenge,
+                        the programming language research community has developed <b>programming language paradigms</b>
+                        <a href="https://en.wikipedia.org/wiki/Programming_paradigm">[2]</a> to understand the various
+                        ways we can interact with computers. These paradigms offer insights into what we can expect from
+                        a particular programming language. For instance, when a programming language is described as
+                        object-oriented, we anticipate the presence of classes, resembling hierarchical structures seen
+                        in real life, such as the classification of animals or plants. Functional programming languages,
+                        on the other hand, emphasize communication with computers through functions. However, today's
+                        programming languages often blur the lines between paradigms, attracting developers by
+                        supporting multiple paradigms. These are referred to as multi-paradigm programming languages.
+                        Examples include languages like C#, Go, Java, JavaScript, Kotlin, Scala, Swift, Python, Rust,
+                        and more.
+                    </p>
+                    <p>
+                        Another valuable indicator of a programming language's evolution is the <b>year of its initial
+                            release</b>, offering valuable insights into its associated paradigms. In the early days,
+                        programming languages were primarily rooted in procedural and imperative paradigms. However, as
+                        time progressed, there was a significant shift towards the emergence of object-oriented
+                        languages. Presently, the emphasis lies in accommodating multiple paradigms, making it easier
+                        for learners to adopt these languages and reducing the associated learning curve.
+                    </p>
+
+                    <figure>
+                        <img src="../../fr/enseignement/cours/2022/C/Screenshot 2022-09-12 at 15-51-06 Wikidata Query Service.png"
+                            alt="Timeline of programming languages" />
+                        <figcaption>Timeline of the initial release some of the programming languages documented on
+                            Wikidata.</figcaption>
+                    </figure>
+
+                    <p>
+                        The distinction between <b>compilation and interpretation</b> is pivotal in understanding
+                        programming languages. Some languages follow a compilation approach, which involves a thorough
+                        check of the entire program by a compiler. This process identifies errors and alerts the
+                        programmer, enabling them to rectify any issues. Once the necessary corrections are made, a
+                        clean and error-free program is generated, poised for compilation into an executable file. This
+                        compilation step is a critical part of the journey from writing code to producing a fully
+                        functional program.
+                    </p>
+                    <p>
+                        Identifying a programming language solely by examining the contents of a file can be a
+                        challenging task. However, <b>file extensions</b> often serve as clear indicators of the
+                        programming language used. For instance, a .py extension typically signifies a Python program,
+                        while .c or .cpp extensions commonly indicate C or C++ programs, respectively. Another
+                        noteworthy aspect is the presence of header files, a characteristic found in some early
+                        programming languages like C. In such languages, files with extensions .h declare functions and
+                        variables, while the actual implementations reside in .c or .cpp files.
+                    </p>
+                    <p>
+                        Furthermore, certain programming languages introduce distinct file extensions to distinguish
+                        <b>intermediary files generated during compilation</b> from the final executable files and
+                        original source code. For instance, languages like Java make use of the .class extension for
+                        intermediary programs. These integrated class files encompass the entire code and facilitate
+                        compilation and error checking. When interpretation is needed, they employ the Java class
+                        instead of the original Java source code. Intermediary files play a crucial role in
+                        comprehending executables and optimizing programs when necessary. This also highlights the
+                        diverse approaches to program creation and execution, emphasizing the importance of
+                        understanding the evolution of programming languages.
+                    </p>
+                    <p>
+                        Programming languages often exhibit striking similarities, prompting questions about whether
+                        this similarity is intentional, aimed at <b>reducing the learning curve</b>, or if it mirrors
+                        the natural evolution of human languages. Regardless of the reason, certain commonalities
+                        pervade all programming languages. For instance, they share fundamental constructs such as loops
+                        for iteration and functions for code organization. Generic patterns emerge, encompassing various
+                        types of operators, including mathematical, logical, and bit manipulation operators. Some
+                        languages also facilitate the recursive calling of functions, a technique known as recursion,
+                        although not all languages (for example, BASIC) support it.
+                    </p>
+                    <p>
+                        <b>Keywords</b> hold a significant role in this common ground. An analysis of various
+                        programming languages, starting from C and progressing onward, reveals striking similarities.
+                        Frequently used keywords like <code>if</code>, <code>break</code>, <code>continue</code>,
+                        <code>for</code>, and <code>int</code> are pervasive in procedural languages. Furthermore,
+                        keywords like <code>class</code> typically appear in languages like Ruby, C++, Python, Scala,
+                        Java, and more. It's worth noting that many of these keywords are rooted in the English language
+                        <a
+                            href="https://www.wired.com/story/coding-is-for-everyoneas-long-as-you-speak-english/">[8]</a>,
+                        underlining the close relationship between programming and human languages. Efforts have been
+                        made to develop programming languages that cater to non-English <a
+                            href="../programming/command-line-arguments.html">[9]</a>, <a
+                            href="https://en.wikipedia.org/wiki/Non-English-based_programming_languages">[10]</a>
+                        speakers, with the aim of making programming more accessible to a global audience.
+                    </p>
+                    <p>
+                        <b>Data Types</b> are the foundation of programming, determining the type of data that variables
+                        can store. Most programming languages include basic data types like integers, floating-point
+                        numbers, characters, and arrays. These fundamental data types serve as building blocks for more
+                        complex data structures. For instance, arrays can hold multiple elements of basic data types,
+                        allowing for the creation of structured data.
+                    </p>
+                    <p>
+                        <b>Complex Data Types</b> play a crucial role in programming languages. Many languages provide
+                        these complex data structures in their standard libraries, simplifying the implementation of
+                        advanced data structures and algorithms. For example, Java offers the <code>HashMap</code>,
+                        while Python provides the <code>dict</code> (dictionary). These complex data types streamline
+                        working with data in various applications.
+                    </p>
+                    <p>
+                        <b>Modularization and Code Structuring</b> are essential for project organization. Programming
+                        languages use different approaches to structure code. Some rely on blocks enclosed in curly
+                        braces (as in C, C++, JavaScript, Rust, Go, PHP) or indentation (as in Python, Haskell,
+                        CoffeeScript) to segment code into manageable sections. Some languages, like Java, enforce the
+                        convention of one class per file, while others, such as Python, permit multiple classes in a
+                        single file. This choice impacts how developers organize and manage their codebases. Languages
+                        feature constructs like functions, procedures, or modules to facilitate code reuse,
+                        maintainability, and readability.
+                    </p>
+                </div>
+            </section>
+
+            <div class="section-divider"></div>
+
+            <!-- Data Analysis -->
+            <section>
+                <div class="section-header">
+                    <h2>Data Analysis</h2>
+                </div>
+                <div class="content-section">
+                    <p>
+                        In recent decades, there has been a noticeable shift in the programming landscape from string
+                        manipulation languages to those dedicated to handling complex data processing tasks. Modern
+                        programming languages have evolved to meet the demands of an increasingly data-centric world.
+                        They offer various ways to <b>search and manipulate information</b>, reflecting the need for
+                        efficient data handling.
+                    </p>
+                    <p>
+                        One notable trend is the inclusion of default support for <b>pattern matching and regular
+                            expressions</b> in many newer languages and their libraries. This feature simplifies tasks
+                        like text parsing and data extraction, making these languages more versatile for data-related
+                        operations. For example, SQL, a language predominantly used in database management, excels in
+                        providing built-in mechanisms for <b>searching and filtering data</b>. Meanwhile, languages like
+                        JavaScript, Python enhance their data manipulation capabilities with functions like
+                        <code>map</code>, <code>filter</code>, and <code>reduce</code>, offering flexibility for
+                        developers to tailor their data processing logic.
+                    </p>
+                    <p>
+                        Beyond searching and filtering, programming languages offer powerful tools for <b>aggregating
+                            data</b> effectively. SQL's proficiency in data aggregation is well-established, making it a
+                        popular choice for handling large datasets. However, many modern programming languages have
+                        followed suit by incorporating built-in functions and libraries to streamline information
+                        aggregation. Some languages like R even take it a step further by integrating statistical
+                        calculations, making them valuable assets in industries that rely on data analysis and modeling.
+                    </p>
+                </div>
+            </section>
+
+            <div class="section-divider"></div>
+
+            <!-- Testing and Performance -->
+            <section>
+                <div class="section-header">
+                    <h2>Testing and Performance</h2>
+                </div>
+                <div class="content-section">
+                    <p>
+                        <b>Debugging and memory profiling</b> are integral components of the programming process,
+                        playing pivotal roles in ensuring the reliability and performance of software. When it comes to
+                        programming, understanding the inner workings of code translation into executables or
+                        interpretation is paramount. This understanding allows developers to identify and rectify errors
+                        efficiently, ultimately leading to the creation of more robust and efficient programs.
+                    </p>
+                    <p>
+                        In the context of modern programming languages, debugging and memory profiling hold even greater
+                        significance. Many contemporary languages are known for their <b>increased CPU cycle and memory
+                            consumption</b>. Consequently, efficient debugging becomes an essential skill for
+                        programmers working with these languages. Debugging tools and techniques help pinpoint and
+                        resolve issues related to logic, data handling, and resource management, ensuring that the final
+                        executable meets performance expectations.
+                    </p>
+                    <p>
+                        Moreover, the importance of memory profiling cannot be overstated. In a world where
+                        memory-efficient software is highly sought after, understanding how programs utilize memory
+                        during execution is crucial. Memory profiling tools provide developers with insights into memory
+                        allocation, usage patterns, and potential memory leaks. This information empowers them to
+                        optimize their code, minimize resource wastage, and enhance the overall performance of their
+                        applications. When coupled with <b>code coverage analysis</b>, unit testing, and functional
+                        testing, memory profiling tools form a comprehensive suite for assessing the thoroughness of
+                        test coverage, ensuring that all code pathways are rigorously tested. In essence, the choice of
+                        a programming language may well hinge on the availability of these invaluable tools, as they are
+                        indispensable for maintaining high-quality software in today's development landscape.
+                    </p>
+                </div>
+            </section>
+
+            <div class="section-divider"></div>
+
+            <!-- Abstraction -->
+            <section>
+                <div class="section-header">
+                    <h2>Abstraction</h2>
+                </div>
+                <div class="content-section">
+                    <p>
+                        Abstraction is a foundational concept in programming, enabling the encapsulation of complex
+                        information into simplified representations within a given context. In essence, it allows
+                        developers to work with higher-level concepts without getting bogged down by intricate details.
+                        This simplification of information fosters clarity and efficiency in code development.
+                    </p>
+                    <p>
+                        One notable application of abstraction in programming languages is the ability to abstract the
+                        <b>distributed nature of underlying machines</b>. Certain programming languages, like Erlang,
+                        Java, Scala, Hive, excel in this regard. They provide developers with the means to write code as
+                        if all data is local, even when, in reality, it is distributed across multiple machines. This
+                        abstraction is particularly valuable in distributed computing scenarios, where managing data
+                        across multiple nodes can be a complex and error-prone task.
+                    </p>
+                    <p>
+                        It's essential to recognize the stark contrast between programming languages designed for
+                        distributed architectures and those suited for centralized ones. Languages tailored for
+                        centralized systems typically assume that all data is stored in a single location, simplifying
+                        data management and reducing the complexity of handling failures. In contrast, languages built
+                        for distributed systems must contend with the challenges of network communication, data
+                        replication, fault tolerance, and debugging across multiple machines. As a result, the choice of
+                        programming language can significantly impact the ease with which developers navigate the
+                        intricacies of distributed computing environments. Ultimately, the ability to abstract such
+                        complexities is a testament to the adaptability and power of programming languages in addressing
+                        the evolving needs of modern software development.
+                    </p>
+                    <p>
+                        Abstractions in programming languages also hide the intricacies of <b>parallelism and
+                            concurrency</b>, making it easier for developers to create efficient and scalable software.
+                        They promote cleaner code, reduce the likelihood of bugs related to parallel execution, and
+                        enhance productivity by allowing developers to focus on high-level logic.
+                    </p>
+                    <p>
+                        Parallelism, in the context of programming, refers to the simultaneous execution of multiple
+                        tasks or threads to achieve faster and more efficient computation. Concurrency, on the other
+                        hand, deals with the concurrent execution of multiple tasks, which may not necessarily execute
+                        simultaneously but can be managed efficiently by the programming language.
+                    </p>
+                    <p>
+                        Traditionally, writing parallel programs required careful consideration of issues like data
+                        synchronization, resource sharing, and thread management, which could lead to challenging
+                        debugging and optimization processes. In contrast, languages like Erlang, Go, Haskell provide
+                        abstractions and tools that simplify parallel and concurrent programming. They often offer
+                        constructs like threads, processes, or parallel execution frameworks that allow developers to
+                        express parallelism and concurrency more intuitively. This abstraction shields programmers from
+                        low-level concerns and enables them to focus on the logic of their applications, resulting in
+                        more efficient and scalable software.
+                    </p>
+                </div>
+            </section>
+
+            <div class="section-divider"></div>
+
+            <!-- Extensions -->
+            <section>
+                <div class="section-header">
+                    <h2>Extensions</h2>
+                </div>
+                <div class="content-section">
+                    <p>
+                        Programming languages are versatile tools that can extend their capabilities through various
+                        means. One such avenue for extension is through the <b>integration of existing software
+                            libraries</b> within the operating system. Developers frequently write code to seamlessly
+                        connect their programs with pre-existing tools and services on the host machine. This practice
+                        not only enhances the functionality of their applications but also streamlines development by
+                        capitalizing on established resources.
+                    </p>
+                    <p>
+                        Additionally, some modern programming languages go a step further by supporting the <b>execution
+                            of code written in different programming languages</b>. This flexibility enables early
+                        adopters of a new language to harness the potential of pre-existing codebases, fostering
+                        interoperability and facilitating the transition to new programming paradigms.
+                    </p>
+                    <p>
+                        Another notable feature offered by some programming languages is the ability to <b>dynamically
+                            allocate memory</b>, as opposed to requiring memory specification during compilation. This
+                        dynamic memory allocation offers valuable flexibility, especially when the program's size or
+                        memory requirements remain uncertain. Unlike the less practical approach of modifying memory
+                        size during code development and subsequent recompilation, dynamic memory allocation enables
+                        programs to adapt seamlessly to the memory constraints of the underlying machine. This
+                        adaptability is particularly advantageous when developing software for clients, as it ensures
+                        efficient resource utilization without the need for frequent code modifications.
+                    </p>
+                    <p>
+                        However, the domain of <b>multilingual support</b> in programming languages presents an
+                        opportunity for enhancement. The majority of programming languages are predominantly designed
+                        and documented in English <a
+                            href="https://www.wired.com/story/coding-is-for-everyoneas-long-as-you-speak-english/">[8]</a>,
+                        which caters primarily to English-speaking programmers. To promote inclusivity and accessibility
+                        on a global scale, there is room for improvement in expanding support for multiple languages,
+                        including accommodating keywords in various languages <a
+                            href="../programming/command-line-arguments.html">[9]</a>, <a
+                            href="https://en.wikipedia.org/wiki/Non-English-based_programming_languages">[10]</a>, <a
+                            href="https://johnsamuel.info/en/research/multilingual-programming-experience.html">[12]</a>.
+                        This evolution would bridge language barriers and make programming more accessible to a diverse
+                        international audience.
+                    </p>
+                </div>
+            </section>
+
+            <div class="section-divider"></div>
+
+            <!-- Community -->
+            <section>
+                <div class="section-header">
+                    <h2>Community</h2>
+                </div>
+                <div class="content-section">
+                    <p>
+                        Understanding a programming language begins with a simple task: examining how a <b>'Hello,
+                            World!' program</b> <a href="http://helloworldcollection.de/">[11]</a> is written in that
+                        language. For example, in Python, it's concise: 'print('Hello, World!')', while in C or Java,
+                        it's more detailed. This initial exploration reveals syntax and complexity differences across
+                        languages.
+                    </p>
+                    <p>
+                        <b>Official documentation</b> accessibility is another facet. Some languages lack official
+                        pages, like C. Still, community-driven efforts standardize them, as seen in C99 or C11. Knowing
+                        where to find documentation matters. Community plays a vital role, extending standard libraries
+                        for easier, efficient programming. They establish best practices and style guides, enhancing
+                        code maintainability. Community-driven growth is facilitated by languages through library
+                        creation.
+                    </p>
+                    <p>
+                        New compilers for specific languages experiment with optimizations, enhancing performance.
+                        Language evolution introduces keywords and extends libraries. For instance, despite its 1972
+                        debut, C saw updates in 1989, 1999, 2011, and 2018 showing continuous community efforts.
+                        Assessing support for various data structures beyond basics provides valuable insights.
+                        Regarding <b>backward compatibility</b>, it varies. Some updates aim to maintain it, while
+                        others introduce breaking changes for new features or security. The extent depends on community
+                        philosophy and goals for each update.
+                    </p>
+                </div>
+            </section>
+
+            <div class="section-divider"></div>
+
+            <!-- Conclusion -->
+            <section>
+                <div class="section-header">
+                    <h2>Conclusion</h2>
+                </div>
+                <div class="content-section">
+                    <p>
+                        In conclusion, exploring the diverse world of programming languages reveals a rich tapestry of
+                        features, syntax, and capabilities. From memory management to the simplicity of 'Hello, World!'
+                        programs, from support for objects and classes to the extent of available libraries, programming
+                        languages offer unique approaches to problem-solving.
+                    </p>
+                    <p>
+                        The dynamism of language communities and their dedication to expanding standard libraries
+                        exemplify the collaborative nature of software development. As new compilers emerge and
+                        languages evolve, the boundaries of what can be achieved in the programming realm continue to
+                        expand.
+                    </p>
+                    <p>
+                        Ultimately, the choice of a programming language depends on the specific needs of a project, the
+                        problem to be solved, and the preferences of developers. Understanding these languages not only
+                        broadens our programming horizons but also equips us to make informed decisions in a rapidly
+                        evolving technological landscape. Whether you're a seasoned developer or just starting your
+                        programming journey, the world of programming languages remains a fascinating and ever-evolving
+                        domain to explore.
+                    </p>
+                </div>
+            </section>
+
+            <div class="section-divider"></div>
+
+            <!-- References -->
+            <section>
+                <div class="section-header">
+                    <h2>References</h2>
+                </div>
+                <div class="content-section">
+                    <ol>
+                        <li><a href="https://en.wikipedia.org/wiki/Programming_language">Programming Language</a></li>
+                        <li><a href="https://en.wikipedia.org/wiki/Programming_paradigm">Programming Paradigm</a></li>
+                        <li><a href="https://www.tiobe.com/tiobe-index/">TIOBE Index</a></li>
+                        <li><a href="https://www.tiobe.com/tiobe-index/programming-languages-definition/">TIOBE
+                                Programming Community Index Definition</a></li>
+                        <li><a href="https://www.johndcook.com/blog/2018/04/17/unpopular-languages/">Viability of
+                                unpopular programming languages</a></li>
+                        <li><a href="https://insights.stackoverflow.com/survey/2018#technology">Stack Overflow Developer
+                                Survey 2019: Programming, Scripting, and Markup Languages</a></li>
+                        <li><a href="https://insights.stackoverflow.com/survey/2019#most-popular-technologies">Stack
+                                Overflow Developer Survey 2019: Programming, Scripting, and Markup Languages</a></li>
+                        <li><a href="https://www.wired.com/story/coding-is-for-everyoneas-long-as-you-speak-english/">Coding
+                                Is for Everyone—as Long as You Speak English</a></li>
+                        <li><a href="../programming/command-line-arguments.html">Rethinking the command-line</a></li>
+                        <li><a href="https://en.wikipedia.org/wiki/Non-English-based_programming_languages">Non-English-based
+                                programming languages</a></li>
+                        <li><a href="http://helloworldcollection.de/">The Hello World Collection</a></li>
+                        <li><a href="https://johnsamuel.info/en/research/multilingual-programming-experience.html">Multilingual
+                                Programming Experience</a></li>
+                    </ol>
+                </div>
+            </section>
+        </main>
+
+        <!-- Footer -->
+        <footer>
+            <div class="footer-container">
+                <p>&copy; 2024 John Samuel. All rights reserved.</p>
+                <p>Experimental Analysis of Programming Languages</p>
             </div>
-        </div>
+        </footer>
     </body>
 
 </html>

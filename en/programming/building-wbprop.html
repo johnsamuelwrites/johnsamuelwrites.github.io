@@ -3,269 +3,697 @@
 
     <head>
         <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <meta http-equiv="Content-Language" content="en" />
         <link rel="shortcut icon" href="../../images/logo/favicon.png" />
         <title>Building WBProp: John Samuel</title>
-        <style type="text/css">
-            body {
-                background-color: #FFFFFF;
+        <style>
+            /* ===== Design Tokens ===== */
+            :root {
+                /* Base Colors - Light Theme with Data/Knowledge Feel */
+                --color-base-bg: #f8f9fb;
+                --color-base-surface: #ffffff;
+                --color-base-text: #1a202c;
+                --color-base-text-muted: #4a5568;
+
+                /* Theme Accents - Wikidata/Linked Data */
+                --color-accent-1: #006699;
+                /* Wikidata blue - trust, knowledge */
+                --color-accent-2: #339966;
+                /* Linked data green - connections */
+                --color-accent-3: #990033;
+                /* Property red - emphasis */
+                --color-accent-4: #ff6600;
+                /* Visualization orange - insights */
+                --color-accent-5: #6b46c1;
+                /* Dashboard purple - analytics */
+                --color-accent-light: #e6f3f7;
+
+                /* Functional Colors */
+                --color-shadow: rgba(0, 102, 153, 0.12);
+                --color-border: rgba(0, 102, 153, 0.15);
+                --color-hover: rgba(0, 102, 153, 0.08);
+
+                /* Gradients */
+                --gradient-primary: linear-gradient(135deg, var(--color-accent-1) 0%, var(--color-accent-2) 100%);
+                --gradient-secondary: linear-gradient(135deg, var(--color-accent-3) 0%, var(--color-accent-4) 100%);
+                --gradient-hero: linear-gradient(135deg, #006699 0%, #339966 50%, #990033 100%);
+
+                /* Spacing Scale */
+                --space-xs: 0.25rem;
+                --space-sm: 0.5rem;
+                --space-md: 1rem;
+                --space-lg: 1.5rem;
+                --space-xl: 2rem;
+                --space-2xl: 3rem;
+                --space-3xl: 4rem;
+                --space-4xl: 6rem;
+
+                /* Border Radius */
+                --radius-sm: 4px;
+                --radius-md: 8px;
+                --radius-lg: 12px;
+                --radius-xl: 16px;
+                --radius-2xl: 24px;
+                --radius-full: 9999px;
+
+                /* Shadows */
+                --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.04), 0 1px 3px rgba(0, 0, 0, 0.06);
+                --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.05), 0 2px 4px rgba(0, 0, 0, 0.06);
+                --shadow-lg: 0 10px 24px rgba(0, 0, 0, 0.08), 0 4px 8px rgba(0, 0, 0, 0.06);
+                --shadow-xl: 0 20px 40px rgba(0, 0, 0, 0.12), 0 8px 16px rgba(0, 0, 0, 0.08);
+                --shadow-theme: 0 10px 30px var(--color-shadow), 0 4px 10px rgba(0, 0, 0, 0.06);
+
+                /* Typography */
+                --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+                --font-mono: 'SF Mono', Monaco, 'Cascadia Code', 'Consolas', 'Courier New', monospace;
+                --text-xs: clamp(0.75rem, 0.7rem + 0.25vw, 0.875rem);
+                --text-sm: clamp(0.875rem, 0.8rem + 0.35vw, 1rem);
+                --text-base: clamp(1rem, 0.95rem + 0.25vw, 1.125rem);
+                --text-lg: clamp(1.125rem, 1.05rem + 0.35vw, 1.25rem);
+                --text-xl: clamp(1.25rem, 1.15rem + 0.5vw, 1.5rem);
+                --text-2xl: clamp(1.5rem, 1.3rem + 1vw, 2rem);
+                --text-3xl: clamp(2rem, 1.6rem + 2vw, 2.5rem);
+                --text-4xl: clamp(2.5rem, 2rem + 2.5vw, 3.5rem);
+
+                --weight-normal: 400;
+                --weight-medium: 500;
+                --weight-semibold: 600;
+                --weight-bold: 700;
             }
 
-            #sidebar {
-                position: fixed;
-                background-color: #009AA6;
-                top: 0;
-                left: 0;
-                bottom: 0;
-                width: 30vw;
-            }
-
-            #sidebar .title {
-                position: relative;
-                text-align: center;
-                line-height: 5vmax;
-                font-size: 1.4vmax;
-                font-family: 'Arial';
-                margin-top: 30vh;
-            }
-
-            #sidebar .title a:link,
-            #sidebar .title a:visited {
-                color: #FFFFFF;
-                text-decoration: none;
-            }
-
-            .subtitle {
-                top: 50vh;
-                text-align: center;
-                line-height: 1.3vmax;
-                font-family: 'Arial';
-                font-size: 1.2vmax;
-                color: #FFFFFF;
-            }
-
-            .subtitle a:link,
-            .subtitle a:visited {
-                color: #FFFFFF;
-                text-decoration: none;
-            }
-
-            .licence {
-                position: fixed;
-                text-align: right;
-                bottom: 0;
-                right: 0;
-            }
-
-            .home {
-                position: fixed;
-                text-align: left;
-                font-family: 'Arial';
-                color: #D3D3D3;
-                z-index: 100;
-                width: 100%;
-                background-color: #FFFFFF;
-                top: 0px;
-                margin-bottom: 10px;
-                padding-bottom: 10px;
-            }
-
-            .home a:link,
-            .home a:visited {
-                text-decoration: none;
-                color: #D3D3D3;
-            }
-
-            .home ul {
+            /* ===== Reset & Base Styles ===== */
+            * {
                 margin: 0;
                 padding: 0;
-                text-align: left;
-                list-style: none;
+                box-sizing: border-box;
             }
 
-            .home li {
-                position: relative;
-                float: left;
-                padding-top: 15px;
-                margin-right: 1em;
-                font-family: 'Arial';
+            html {
+                scroll-behavior: smooth;
+                scroll-padding-top: 100px;
             }
 
-            .home li:hover {
-                display: block;
+            body {
+                font-family: var(--font-sans);
+                font-size: var(--text-base);
+                line-height: 1.7;
+                color: var(--color-base-text);
+                background: var(--color-base-bg);
+                background-image:
+                    radial-gradient(circle at 20% 30%, rgba(0, 102, 153, 0.04) 0%, transparent 50%),
+                    radial-gradient(circle at 80% 70%, rgba(51, 153, 102, 0.04) 0%, transparent 50%),
+                    repeating-linear-gradient(90deg, rgba(0, 102, 153, 0.01) 0px, transparent 1px, transparent 80px),
+                    repeating-linear-gradient(0deg, rgba(0, 102, 153, 0.01) 0px, transparent 1px, transparent 80px);
+                background-attachment: fixed;
+                letter-spacing: -0.005em;
+                overflow-x: hidden;
             }
 
-            .home li:hover a:link,
-            .home li:hover a:visited {
+            /* Skip Link for Accessibility */
+            .skip-link {
+                position: absolute;
+                top: -40px;
+                left: 0;
+                background: var(--color-accent-1);
+                color: white;
+                padding: var(--space-sm) var(--space-md);
                 text-decoration: none;
-                padding: 15px;
-                color: #FFFFFF;
-                background-color: #009AA6;
+                border-radius: var(--radius-md);
+                z-index: 100;
             }
 
-            .content {
-                line-height: 1.8vmax;
-                font-size: 1.2vmax;
-                font-family: 'Arial';
-                margin-top: 15vh;
-                width: 90%;
+            .skip-link:focus {
+                top: var(--space-sm);
+                left: var(--space-sm);
             }
 
-            .content h2,
-            h3,
-            h4 {
-                color: #009AA6;
+            /* ===== Navigation ===== */
+            nav {
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                background: rgba(255, 255, 255, 0.85);
+                -webkit-backdrop-filter: blur(12px) saturate(180%);
+                backdrop-filter: blur(12px) saturate(180%);
+                border-bottom: 1px solid rgba(0, 102, 153, 0.1);
+                box-shadow: var(--shadow-sm);
+                z-index: 50;
+                animation: slideDown 0.6s ease-out;
             }
 
-            .content a:link,
-            .content a:visited {
-                color: #009AA6;
+            @keyframes slideDown {
+                from {
+                    transform: translateY(-100%);
+                    opacity: 0;
+                }
+
+                to {
+                    transform: translateY(0);
+                    opacity: 1;
+                }
             }
 
-            .content h3 {
-                color: #009AA6;
+            .nav-container {
+                max-width: 1400px;
+                margin: 0 auto;
+                padding: var(--space-md) var(--space-xl);
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                gap: var(--space-lg);
             }
 
-            .content h2::before,
-            .content h3::before {
-                display: block;
-                content: " ";
-                visibility: hidden;
-                height: 50px;
-                margin-top: -50px;
-                pointer-events: none;
-                background-color: #FFFFFF;
+            .nav-brand {
+                display: flex;
+                align-items: center;
+                gap: var(--space-md);
             }
 
-            .content a:link,
-            .content a:visited {
-                color: #009AA6;
+            .nav-brand h2 {
+                font-size: var(--text-xl);
+                font-weight: var(--weight-bold);
+                letter-spacing: -0.02em;
             }
 
-            .home a:link,
-            .home a:visited {
-                color: #D3D3D3;
+            .nav-brand h2 a {
+                color: var(--color-base-text);
+                text-decoration: none;
+                background: var(--gradient-primary);
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                background-clip: text;
+                transition: opacity 0.3s ease;
             }
 
-            .page {
-                width: 65vw;
-                height: 100%;
-                margin-left: 30vw;
+            .nav-brand h2 a:hover {
+                opacity: 0.8;
+            }
+
+            .breadcrumb {
+                display: flex;
+                list-style: none;
+                gap: var(--space-sm);
+                font-size: var(--text-sm);
+                color: var(--color-base-text-muted);
+                flex-wrap: wrap;
+            }
+
+            .breadcrumb li::after {
+                content: '→';
+                margin-left: var(--space-sm);
+                opacity: 0.5;
+            }
+
+            .breadcrumb li:last-child::after {
+                display: none;
+            }
+
+            .breadcrumb a {
+                color: var(--color-accent-1);
+                text-decoration: none;
+                transition: color 0.3s ease;
+            }
+
+            .breadcrumb a:hover {
+                color: var(--color-accent-2);
+            }
+
+            /* ===== Main Container ===== */
+            main {
+                max-width: 1400px;
+                margin: 0 auto;
+                padding: calc(80px + var(--space-3xl)) var(--space-xl) var(--space-4xl);
+            }
+
+            /* ===== Hero Section ===== */
+            .hero {
+                position: relative;
+                margin-bottom: var(--space-4xl);
+                padding: var(--space-4xl) var(--space-3xl);
+                background: var(--gradient-hero);
+                background-size: 200% 200%;
+                border-radius: var(--radius-2xl);
                 overflow: hidden;
-                padding: 0 1em;
-                font-family: 'Arial';
+                animation: gradientShift 12s ease infinite, fadeInUp 0.8s ease-out;
             }
 
-            .page img {
-                max-width: 100%;
-                max-height: 100%;
+            @keyframes gradientShift {
+
+                0%,
+                100% {
+                    background-position: 0% 50%;
+                }
+
+                50% {
+                    background-position: 100% 50%;
+                }
             }
 
-            @media (max-width: 640px),
-            screen and (orientation: portrait) {
-                body {
-                    max-width: 100%;
-                    max-height: 100%;
+            @keyframes fadeInUp {
+                from {
+                    opacity: 0;
+                    transform: translateY(30px);
                 }
 
-                #sidebar {
-                    position: fixed;
-                    background-color: #009AA6;
-                    top: 0;
-                    left: 0;
-                    bottom: 80vh;
-                    width: 100vw;
+                to {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            }
+
+            .hero::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background:
+                    repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.02) 0px, transparent 1px, transparent 40px),
+                    repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.02) 0px, transparent 1px, transparent 40px);
+                pointer-events: none;
+            }
+
+            .hero-content {
+                position: relative;
+                z-index: 1;
+                max-width: 900px;
+            }
+
+            .hero h1 {
+                font-size: var(--text-4xl);
+                font-weight: var(--weight-bold);
+                color: white;
+                margin-bottom: var(--space-lg);
+                letter-spacing: -0.03em;
+                line-height: 1.2;
+                text-shadow: 0 2px 20px rgba(0, 0, 0, 0.15);
+            }
+
+            .hero-intro {
+                font-size: var(--text-lg);
+                color: rgba(255, 255, 255, 0.95);
+                line-height: 1.7;
+                margin-bottom: var(--space-md);
+                text-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            }
+
+            .hero-svg {
+                position: absolute;
+                right: -30px;
+                top: 50%;
+                transform: translateY(-50%);
+                width: 520px;
+                height: 520px;
+                opacity: 0.9;
+                pointer-events: none;
+            }
+
+            @media (max-width: 1200px) {
+                .hero-svg {
+                    opacity: 0.6;
+                    width: 400px;
+                    height: 400px;
+                }
+            }
+
+            /* ===== Section Styles ===== */
+            section {
+                margin-bottom: var(--space-4xl);
+                animation: fadeInUp 0.8s ease-out;
+                animation-fill-mode: both;
+            }
+
+            section:nth-child(2) {
+                animation-delay: 0.1s;
+            }
+
+            section:nth-child(3) {
+                animation-delay: 0.2s;
+            }
+
+            section:nth-child(4) {
+                animation-delay: 0.3s;
+            }
+
+            .section-header {
+                position: relative;
+                margin-bottom: var(--space-2xl);
+            }
+
+            .section-header h2,
+            .section-header h3,
+            .section-header h4 {
+                font-weight: var(--weight-bold);
+                letter-spacing: -0.02em;
+                color: var(--color-base-text);
+                position: relative;
+                display: inline-block;
+            }
+
+            .section-header h2 {
+                font-size: var(--text-3xl);
+                margin-bottom: var(--space-lg);
+            }
+
+            .section-header h3 {
+                font-size: var(--text-2xl);
+                margin-bottom: var(--space-md);
+                color: var(--color-accent-1);
+            }
+
+            .section-header h4 {
+                font-size: var(--text-xl);
+                margin-bottom: var(--space-md);
+                color: var(--color-accent-2);
+            }
+
+            .section-header h2::after {
+                content: '';
+                position: absolute;
+                bottom: -8px;
+                left: 0;
+                width: 60px;
+                height: 4px;
+                background: var(--gradient-primary);
+                border-radius: var(--radius-full);
+            }
+
+            .section-header h3::after {
+                content: '';
+                position: absolute;
+                bottom: -6px;
+                left: 0;
+                width: 40px;
+                height: 3px;
+                background: var(--gradient-primary);
+                border-radius: var(--radius-full);
+            }
+
+            /* ===== Content Section ===== */
+            .content-section {
+                background: var(--color-base-surface);
+                border-radius: var(--radius-xl);
+                padding: var(--space-3xl);
+                box-shadow: var(--shadow-theme);
+                border: 1px solid var(--color-border);
+                margin-bottom: var(--space-2xl);
+                position: relative;
+                overflow: hidden;
+                transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            }
+
+            .content-section::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 4px;
+                height: 100%;
+                background: var(--gradient-primary);
+                opacity: 0;
+                transition: opacity 0.3s ease;
+            }
+
+            .content-section:hover {
+                transform: translateX(8px);
+                box-shadow: 0 16px 48px rgba(0, 102, 153, 0.18);
+                border-color: var(--color-accent-1);
+            }
+
+            .content-section:hover::before {
+                opacity: 1;
+            }
+
+            /* ===== Paragraph Styles ===== */
+            p {
+                margin-bottom: var(--space-lg);
+                line-height: 1.8;
+                color: var(--color-base-text);
+            }
+
+            p strong {
+                color: var(--color-accent-1);
+                font-weight: var(--weight-semibold);
+            }
+
+            /* ===== Code Styles ===== */
+            code {
+                font-family: var(--font-mono);
+                font-size: 0.9em;
+                background: rgba(0, 102, 153, 0.08);
+                padding: 0.2em 0.4em;
+                border-radius: var(--radius-sm);
+                color: var(--color-accent-1);
+                font-weight: var(--weight-medium);
+            }
+
+            pre {
+                background: linear-gradient(135deg, rgba(0, 102, 153, 0.04) 0%, rgba(51, 153, 102, 0.04) 100%);
+                border: 1px solid var(--color-border);
+                border-radius: var(--radius-lg);
+                padding: var(--space-lg);
+                margin: var(--space-lg) 0;
+                overflow-x: auto;
+                box-shadow: var(--shadow-sm);
+            }
+
+            pre code {
+                display: block;
+                background: none;
+                padding: 0;
+                color: var(--color-base-text);
+                font-size: var(--text-sm);
+                line-height: 1.6;
+                white-space: pre;
+            }
+
+            /* ===== Lists ===== */
+            ul,
+            ol {
+                margin-left: var(--space-xl);
+                margin-bottom: var(--space-lg);
+            }
+
+            ul li,
+            ol li {
+                margin-bottom: var(--space-md);
+                line-height: 1.7;
+                color: var(--color-base-text);
+            }
+
+            /* ===== Links ===== */
+            a {
+                color: var(--color-accent-1);
+                text-decoration: none;
+                transition: color 0.3s ease;
+                position: relative;
+            }
+
+            a:hover {
+                color: var(--color-accent-2);
+            }
+
+            a:focus {
+                outline: 2px solid var(--color-accent-1);
+                outline-offset: 2px;
+                border-radius: var(--radius-sm);
+            }
+
+            /* ===== Decorative Elements ===== */
+            .section-divider {
+                width: 100%;
+                height: 2px;
+                background: linear-gradient(90deg, transparent 0%, var(--color-accent-1) 50%, transparent 100%);
+                margin: var(--space-3xl) 0;
+                opacity: 0.3;
+            }
+
+            /* ===== Footer ===== */
+            footer {
+                background: linear-gradient(135deg, rgba(0, 102, 153, 0.05) 0%, rgba(51, 153, 102, 0.05) 100%);
+                border-top: 1px solid var(--color-border);
+                padding: var(--space-3xl) var(--space-xl) var(--space-xl);
+                margin-top: var(--space-4xl);
+            }
+
+            .footer-container {
+                max-width: 1400px;
+                margin: 0 auto;
+                display: flex;
+                flex-direction: column;
+                gap: var(--space-xl);
+            }
+
+            .footer-license {
+                display: flex;
+                align-items: center;
+                gap: var(--space-md);
+                padding: var(--space-lg);
+                background: var(--color-base-surface);
+                border-radius: var(--radius-lg);
+                box-shadow: var(--shadow-sm);
+            }
+
+            .footer-license img {
+                width: 88px;
+                height: auto;
+            }
+
+            .footer-bottom {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                flex-wrap: wrap;
+                gap: var(--space-lg);
+                padding-top: var(--space-lg);
+                border-top: 1px solid var(--color-border);
+                font-size: var(--text-sm);
+                color: var(--color-base-text-muted);
+            }
+
+            /* ===== SVG Animations ===== */
+            .data-node {
+                animation: nodeFloat 5s ease-in-out infinite;
+            }
+
+            .property-link {
+                animation: linkPulse 3s ease-in-out infinite;
+            }
+
+            .wikidata-logo {
+                animation: logoRotate 20s linear infinite;
+            }
+
+            @keyframes nodeFloat {
+
+                0%,
+                100% {
+                    transform: translateY(0px);
                 }
 
-                #sidebar .title {
-                    text-align: center;
-                    position: fixed;
-                    margin-top: 6vh;
-                    left: 0px;
-                    right: 0px;
-                    line-height: 3.5vmax;
-                    font-size: 1.5vmax;
-                    font-family: 'Arial';
+                50% {
+                    transform: translateY(-12px);
+                }
+            }
+
+            @keyframes linkPulse {
+
+                0%,
+                100% {
+                    opacity: 0.6;
                 }
 
-                #sidebar .subtitle {
-                    text-align: center;
-                    top: 5vh;
-                    left: 0px;
-                    right: 0px;
-                    position: fixed;
-                    margin-top: 10vh;
-                    font-size: 1.5vmax;
+                50% {
+                    opacity: 1;
+                }
+            }
+
+            @keyframes logoRotate {
+                from {
+                    transform: rotate(0deg);
                 }
 
-                #sidebar .title a:link,
-                #sidebar .title a:visited {
-                    text-align: center;
-                    color: #FFFFFF;
+                to {
+                    transform: rotate(360deg);
+                }
+            }
+
+            /* ===== Responsive Design ===== */
+            @media (max-width: 768px) {
+                .nav-container {
+                    flex-direction: column;
+                    align-items: flex-start;
+                    padding: var(--space-md);
                 }
 
-                #sidebar .subtitle a:link,
-                #sidebar .subtitle a:visited {
-                    text-align: center;
-                    color: #FFFFFF;
+                .breadcrumb {
+                    font-size: var(--text-xs);
                 }
 
-                .home {
-                    z-index: 100;
-                    width: 100%;
-                    background-color: #009AA6;
-                    font-size: 1.5vmax;
+                main {
+                    padding: calc(120px + var(--space-xl)) var(--space-md) var(--space-2xl);
                 }
 
-                .home a:link,
-                .home a:visited {
-                    text-decoration: none;
-                    color: #FFFFFF;
+                .hero {
+                    padding: var(--space-2xl) var(--space-lg);
                 }
 
-                .content {
-                    line-height: 3.8vmax;
-                    font-size: 1.8vmax;
-                    font-family: 'Arial';
-                    margin-top: 22vh;
+                .hero-svg {
+                    width: 280px;
+                    height: 280px;
+                    opacity: 0.4;
+                    right: -50px;
                 }
 
-                .content a:link,
-                .content a:visited {
-                    color: #009AA6;
+                .content-section {
+                    padding: var(--space-xl);
                 }
 
-                .page {
-                    top: 40vh;
-                    width: 95%;
-                    margin-left: 0vw;
+                pre {
+                    padding: var(--space-md);
+                }
+            }
+
+            @media (max-width: 480px) {
+                .hero-svg {
+                    display: none;
                 }
 
-                .page img {
-                    max-width: 100%;
-                    max-height: 100%;
-                    border: 0;
+                .content-section {
+                    padding: var(--space-lg);
+                }
+            }
+
+            /* ===== Reduced Motion ===== */
+            @media (prefers-reduced-motion: reduce) {
+
+                *,
+                *::before,
+                *::after {
+                    animation-duration: 0.01ms !important;
+                    animation-iteration-count: 1 !important;
+                    transition-duration: 0.01ms !important;
+                }
+            }
+
+            /* ===== Print Styles ===== */
+            @media print {
+
+                nav,
+                footer {
+                    display: none;
+                }
+
+                main {
+                    padding-top: 0;
+                }
+
+                .hero {
+                    background: none;
+                    border: 1px solid #ddd;
+                }
+
+                a {
+                    color: #000;
+                    text-decoration: underline;
                 }
             }
         </style>
     </head>
 
     <body vocab="http://schema.org/">
-        <div id="sidebar">
-            <div class="title">
-                <h1><a href="./building-wbprop.html">Building WBProp</a></h1>
-            </div>
-            <div class="subtitle">
-                <h4><a href="../about.html">John Samuel</a></h4>
-            </div>
-        </div>
-        <div class="licence">
-            <a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/"><img alt="Creative Commons License"
-                    style="border-width:0" src="./../../images/license.png" /></a>
-        </div>
-        <div class="page">
-            <div class="home">
-                <ul typeof="BreadcrumbList">
+        <a href="#main-content" class="skip-link">Skip to main content</a>
+
+        <!-- Navigation -->
+        <nav role="navigation" aria-label="Main navigation">
+            <div class="nav-container">
+                <div class="nav-brand">
+                    <h2><a href="../about.html">John Samuel</a></h2>
+                </div>
+                <ul class="breadcrumb" typeof="BreadcrumbList">
                     <li property="itemListElement" typeof="ListItem">
                         <a property="item" typeof="WebPage" href="../index.html">
                             <span property="name">Home</span>
@@ -282,186 +710,426 @@
                         </a>
                     </li>
                 </ul>
-
             </div>
-            <div class="content">
-                <h2>Building WBProp</h2>
-                <p>
-                    The WBProp project was initiated to analyze and visualize properties used in
-                    <strong>Wikidata</strong>, and more broadly, within the <strong>Wikibase</strong> ecosystem.
-                    As Wikidata grows in scale and complexity, it becomes essential to have tools that provide
-                    insights into the use, frequency, and structure of properties. This is where WBProp comes in
-                    — as a lightweight dashboard that helps developers, researchers, and data curators explore
-                    Wikibase properties.
-                </p>
+        </nav>
 
-                <h3>Setup</h3>
-                <p>
-                    The first step is to create a working directory for the project:
-                </p>
-                <pre><code>$ mkdir wbprop
-                $ cd wbprop</code></pre>
+        <!-- Main Content -->
+        <main id="main-content">
+            <!-- Hero Section -->
+            <div class="hero">
+                <div class="hero-content">
+                    <h1>Building WBProp</h1>
+                    <p class="hero-intro">
+                        The WBProp project was initiated to analyze and visualize properties used in
+                        <strong>Wikidata</strong>, and more broadly, within the <strong>Wikibase</strong> ecosystem. As
+                        Wikidata grows in scale and complexity, it becomes essential to have tools that provide insights
+                        into the use, frequency, and structure of properties.
+                    </p>
+                </div>
 
-                <p>
-                    Initialize the project with <code>npm init</code>. This command creates a
-                    <code>package.json</code> file that describes the project's metadata and dependencies.
-                </p>
-                <pre><code>$ npm init</code></pre>
+                <!-- Wikidata Knowledge Graph SVG -->
+                <svg class="hero-svg" viewBox="0 0 550 550" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                    <defs>
+                        <filter id="dataGlow">
+                            <feGaussianBlur stdDeviation="5" result="coloredBlur" />
+                            <feMerge>
+                                <feMergeNode in="coloredBlur" />
+                                <feMergeNode in="SourceGraphic" />
+                            </feMerge>
+                        </filter>
+                        <linearGradient id="wikiGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" style="stop-color:rgba(255,255,255,0.9);stop-opacity:1" />
+                            <stop offset="100%" style="stop-color:rgba(255,255,255,0.6);stop-opacity:1" />
+                        </linearGradient>
+                    </defs>
 
-                <p>You will be prompted for several inputs. Here’s an example session:</p>
-                <pre><code>
-                package name: (wbprop) wbprop
-                version: (1.0.0) 0.1.0
-                description: Everything about Wikibase properties
-                entry point: (index.js) index.html
-                test command: webpack-dev-server
-                git repository: https://github.com/johnsamuelwrites/wbprop
-                keywords: Wikidata, Properties, Dashboard
-                author: John Samuel
-                license: (ISC) GPL-3.0-or-later
-                    </code></pre>
+                    <!-- Central Wikidata Node -->
+                    <g class="wikidata-logo">
+                        <circle cx="275" cy="275" r="55" fill="url(#wikiGrad)" filter="url(#dataGlow)" opacity="0.95" />
+                        <text x="275" y="285" text-anchor="middle" fill="rgba(0, 102, 153, 0.9)" font-size="18"
+                            font-weight="bold">Wikidata</text>
+                        <circle cx="275" cy="275" r="50" fill="none" stroke="rgba(255, 255, 255, 0.5)" stroke-width="2"
+                            stroke-dasharray="5,5" />
+                    </g>
 
-                <p>This will result in the following <code>package.json</code> file:</p>
-                <pre><code>
-                {
-                  "name": "wbprop",
-                  "version": "0.1.0",
-                  "description": "Everything about Wikibase properties",
-                  "main": "index.html",
-                  "scripts": {
-                    "test": "webpack-dev-server"
-                  },
-                  "repository": {
-                    "type": "git",
-                    "url": "git+https://github.com/johnsamuelwrites/wbprop.git"
-                  },
-                  "keywords": [
-                    "Wikidata",
-                    "Properties",
-                    "Dashboard"
-                  ],
-                  "author": "John Samuel",
-                  "license": "GPL-3.0-or-later",
-                  "bugs": {
-                    "url": "https://github.com/johnsamuelwrites/wbprop/issues"
-                  },
-                  "homepage": "https://github.com/johnsamuelwrites/wbprop#readme"
-                }
-                    </code></pre>
+                    <!-- Property Nodes (surrounding the center) -->
+                    <g class="data-node" style="animation-delay: 0s">
+                        <circle cx="275" cy="140" r="35" fill="url(#wikiGrad)" filter="url(#dataGlow)" opacity="0.85" />
+                        <text x="275" y="148" text-anchor="middle" fill="rgba(153, 0, 51, 0.9)" font-size="14"
+                            font-weight="bold">P31</text>
+                        <text x="275" y="130" text-anchor="middle" fill="rgba(74, 85, 104, 0.7)" font-size="10">instance
+                            of</text>
+                    </g>
 
-                <h4>Installing Dependencies</h4>
-                <p>
-                    Next, install Webpack and the development server:
-                </p>
-                <pre><code>
-                $ npm install --save-dev webpack webpack-cli webpack-dev-server
-                    </code></pre>
+                    <g class="data-node" style="animation-delay: 0.5s">
+                        <circle cx="410" cy="200" r="32" fill="url(#wikiGrad)" filter="url(#dataGlow)" opacity="0.85" />
+                        <text x="410" y="207" text-anchor="middle" fill="rgba(153, 0, 51, 0.9)" font-size="13"
+                            font-weight="bold">P279</text>
+                        <text x="410" y="190" text-anchor="middle" fill="rgba(74, 85, 104, 0.7)"
+                            font-size="9">subclass</text>
+                    </g>
 
-                <h4>Creating the Frontend</h4>
+                    <g class="data-node" style="animation-delay: 1s">
+                        <circle cx="450" cy="320" r="30" fill="url(#wikiGrad)" filter="url(#dataGlow)" opacity="0.85" />
+                        <text x="450" y="327" text-anchor="middle" fill="rgba(153, 0, 51, 0.9)" font-size="13"
+                            font-weight="bold">P580</text>
+                        <text x="450" y="312" text-anchor="middle" fill="rgba(74, 85, 104, 0.7)" font-size="9">start
+                            time</text>
+                    </g>
 
-                <p>Create a basic HTML file called <code>index.html</code>:</p>
-                <pre><code>
-                &lt;!DOCTYPE html&gt;
-                &lt;html&gt;
-                &lt;head&gt;
-                    &lt;title&gt;WBProp: Everything about Wikibase Properties&lt;/title&gt;
-                &lt;/head&gt;
-                &lt;body&gt;
-                    &lt;p&gt;WBProp: Everything about Wikibase Properties&lt;/p&gt;
-                    &lt;script src="main.js"&gt;&lt;/script&gt;
-                &lt;/body&gt;
-                &lt;/html&gt;
-                    </code></pre>
+                    <g class="data-node" style="animation-delay: 1.5s">
+                        <circle cx="410" cy="420" r="33" fill="url(#wikiGrad)" filter="url(#dataGlow)" opacity="0.85" />
+                        <text x="410" y="427" text-anchor="middle" fill="rgba(153, 0, 51, 0.9)" font-size="13"
+                            font-weight="bold">P625</text>
+                        <text x="410" y="410" text-anchor="middle" fill="rgba(74, 85, 104, 0.7)"
+                            font-size="9">coordinate</text>
+                    </g>
 
-                <p>
-                    Create a simple JavaScript file named <code>wbprop.js</code> to serve as the project entry:
-                </p>
-                <pre><code>
-                console.log("WBProp: Hello!");
-                    </code></pre>
+                    <g class="data-node" style="animation-delay: 2s">
+                        <circle cx="275" cy="470" r="34" fill="url(#wikiGrad)" filter="url(#dataGlow)" opacity="0.85" />
+                        <text x="275" y="477" text-anchor="middle" fill="rgba(153, 0, 51, 0.9)" font-size="13"
+                            font-weight="bold">P18</text>
+                        <text x="275" y="461" text-anchor="middle" fill="rgba(74, 85, 104, 0.7)"
+                            font-size="9">image</text>
+                    </g>
 
-                <p>
-                    To specify the entry point for Webpack, create a file named <code>webpack.config.js</code>:
-                </p>
-                <pre><code>
-                const path = require('path');
-                
-                module.exports = {
-                  entry: './wbprop.js',
-                  output: {
-                    filename: 'main.js',
-                    path: path.resolve(__dirname, 'dist'),
-                  },
-                  devServer: {
-                    static: {
-                      directory: __dirname,
-                    },
-                    port: 8080
-                  },
-                  mode: 'development'
-                };
-                    </code></pre>
+                    <g class="data-node" style="animation-delay: 2.5s">
+                        <circle cx="140" cy="420" r="31" fill="url(#wikiGrad)" filter="url(#dataGlow)" opacity="0.85" />
+                        <text x="140" y="427" text-anchor="middle" fill="rgba(153, 0, 51, 0.9)" font-size="13"
+                            font-weight="bold">P106</text>
+                        <text x="140" y="411" text-anchor="middle" fill="rgba(74, 85, 104, 0.7)"
+                            font-size="9">occupation</text>
+                    </g>
 
-                <h4>Running the Development Server</h4>
-                <p>Start the development server using:</p>
-                <pre><code>
-                $ npm test
-                > wbprop@0.1.0 test
-                > webpack-dev-server
-                
-                ℹ ｢wds｣: Project is running at http://localhost:8080/
-                ℹ ｢wds｣: Content not from webpack is served from /home/john/contributions/wbprop
-                    </code></pre>
+                    <g class="data-node" style="animation-delay: 3s">
+                        <circle cx="100" cy="320" r="32" fill="url(#wikiGrad)" filter="url(#dataGlow)" opacity="0.85" />
+                        <text x="100" y="327" text-anchor="middle" fill="rgba(153, 0, 51, 0.9)" font-size="13"
+                            font-weight="bold">P21</text>
+                        <text x="100" y="311" text-anchor="middle" fill="rgba(74, 85, 104, 0.7)"
+                            font-size="9">sex/gender</text>
+                    </g>
 
-                <p>
-                    Open <code>http://localhost:8080/</code> in your browser. You should see the WBProp message
-                    displayed on the page and in the developer console.
-                </p>
+                    <g class="data-node" style="animation-delay: 3.5s">
+                        <circle cx="140" cy="200" r="33" fill="url(#wikiGrad)" filter="url(#dataGlow)" opacity="0.85" />
+                        <text x="140" y="207" text-anchor="middle" fill="rgba(153, 0, 51, 0.9)" font-size="13"
+                            font-weight="bold">P569</text>
+                        <text x="140" y="191" text-anchor="middle" fill="rgba(74, 85, 104, 0.7)" font-size="9">birth
+                            date</text>
+                    </g>
 
-                <h4>Adding Loaders and Babel Support</h4>
-                <p>To support additional web technologies such as CSS, Sass, and modern JavaScript (ES6+),
-                    install the following loaders:</p>
-                <pre><code>
-                $ npm install --save-dev css-loader sass-loader sass extract-loader file-loader
-                $ npm install --save-dev autoprefixer postcss-loader
-                $ npm install --save-dev @babel/core babel-loader @babel/preset-env
-                    </code></pre>
+                    <!-- Connection Lines (Properties to Center) -->
+                    <g class="property-link">
+                        <line x1="275" y1="220" x2="275" y2="175" stroke="rgba(255, 255, 255, 0.5)" stroke-width="2.5"
+                            stroke-dasharray="4,4">
+                            <animate attributeName="stroke-dashoffset" from="0" to="30" dur="2s"
+                                repeatCount="indefinite" />
+                        </line>
+                        <line x1="330" y1="230" x2="380" y2="210" stroke="rgba(255, 255, 255, 0.5)" stroke-width="2.5"
+                            stroke-dasharray="4,4">
+                            <animate attributeName="stroke-dashoffset" from="0" to="30" dur="2.3s"
+                                repeatCount="indefinite" />
+                        </line>
+                        <line x1="325" y1="280" x2="420" y2="300" stroke="rgba(255, 255, 255, 0.5)" stroke-width="2.5"
+                            stroke-dasharray="4,4">
+                            <animate attributeName="stroke-dashoffset" from="0" to="30" dur="2.6s"
+                                repeatCount="indefinite" />
+                        </line>
+                        <line x1="315" y1="320" x2="377" y2="405" stroke="rgba(255, 255, 255, 0.5)" stroke-width="2.5"
+                            stroke-dasharray="4,4">
+                            <animate attributeName="stroke-dashoffset" from="0" to="30" dur="2.9s"
+                                repeatCount="indefinite" />
+                        </line>
+                        <line x1="275" y1="330" x2="275" y2="436" stroke="rgba(255, 255, 255, 0.5)" stroke-width="2.5"
+                            stroke-dasharray="4,4">
+                            <animate attributeName="stroke-dashoffset" from="0" to="30" dur="3.2s"
+                                repeatCount="indefinite" />
+                        </line>
+                        <line x1="235" y1="320" x2="173" y2="405" stroke="rgba(255, 255, 255, 0.5)" stroke-width="2.5"
+                            stroke-dasharray="4,4">
+                            <animate attributeName="stroke-dashoffset" from="0" to="30" dur="3.5s"
+                                repeatCount="indefinite" />
+                        </line>
+                        <line x1="225" y1="280" x2="132" y2="300" stroke="rgba(255, 255, 255, 0.5)" stroke-width="2.5"
+                            stroke-dasharray="4,4">
+                            <animate attributeName="stroke-dashoffset" from="0" to="30" dur="3.8s"
+                                repeatCount="indefinite" />
+                        </line>
+                        <line x1="220" y1="230" x2="173" y2="210" stroke="rgba(255, 255, 255, 0.5)" stroke-width="2.5"
+                            stroke-dasharray="4,4">
+                            <animate attributeName="stroke-dashoffset" from="0" to="30" dur="4.1s"
+                                repeatCount="indefinite" />
+                        </line>
+                    </g>
 
-                <p>
-                    With these tools in place, WBProp is ready to evolve from a basic interface to a powerful
-                    dashboard that can parse, visualize, and analyze data from Wikidata SPARQL queries, property
-                    statistics, and more.
-                </p>
+                    <!-- Dashboard Elements -->
+                    <g transform="translate(420, 100)">
+                        <rect x="0" y="0" width="80" height="50" rx="8" fill="rgba(255, 255, 255, 0.15)"
+                            stroke="rgba(255, 102, 0, 0.6)" stroke-width="2" />
+                        <text x="40" y="22" text-anchor="middle" fill="rgba(255, 255, 255, 0.9)" font-size="11"
+                            font-weight="600">Dashboard</text>
+                        <rect x="10" y="28" width="15" height="15" rx="2" fill="rgba(255, 102, 0, 0.4)" />
+                        <rect x="32" y="28" width="15" height="15" rx="2" fill="rgba(51, 153, 102, 0.4)" />
+                        <rect x="54" y="28" width="15" height="15" rx="2" fill="rgba(107, 70, 193, 0.4)" />
+                    </g>
 
-                <h3>Next Steps</h3>
-                <p>
-                    After setting up the base environment, the WBProp project evolved to include real-time
-                    SPARQL querying, property analysis, and visualizations using libraries such as
-                    D3.js. Its modular and open-source architecture ensures that contributors can extend the
-                    dashboard to support various Wikibase-compatible installations.
-                </p>
-
-                <h3>Conclusion</h3>
-                <p>
-                    WBProp is an initiative to make the complex property structure
-                    of Wikidata (or Wikibase) more accessible and transparent. By building a simple and extensible
-                    framework,
-                    WBProp invites developers and data enthusiasts to contribute to the ever-expanding landscape
-                    of linked open data.
-                </p>
-
-                <h4>References</h4>
-                <ol>
-                    <li><a href="https://www.wikidata.org/wiki/Wikidata:Main_Page">Wikidata: Main Page</a></li>
-                    <li><a href="https://www.mediawiki.org/wiki/Wikibase">Wikibase Documentation - MediaWiki</a>
-                    </li>
-                    <li><a href="https://webpack.js.org/">Webpack Official Documentation</a></li>
-                    <li><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript">MDN Web Docs -
-                            JavaScript</a></li>
-                    <li><a href="https://github.com/johnsamuelwrites/wbprop">WBProp GitHub Repository</a></li>
-                </ol>
+                    <!-- Webpack/Build Symbol -->
+                    <g transform="translate(50, 90)">
+                        <polygon points="40,10 70,27.5 70,62.5 40,80 10,62.5 10,27.5" fill="rgba(255, 255, 255, 0.15)"
+                            stroke="rgba(51, 153, 102, 0.6)" stroke-width="2" />
+                        <text x="40" y="50" text-anchor="middle" fill="rgba(255, 255, 255, 0.9)" font-size="12"
+                            font-weight="bold">npm</text>
+                    </g>
+                </svg>
             </div>
-        </div>
+
+            <!-- Main Content Section -->
+            <section>
+                <div class="content-section">
+                    <p>
+                        This is where WBProp comes in — as a lightweight dashboard that helps developers, researchers,
+                        and data curators explore Wikibase properties.
+                    </p>
+                </div>
+            </section>
+
+            <div class="section-divider"></div>
+
+            <!-- Setup Section -->
+            <section>
+                <div class="section-header">
+                    <h2>Setup</h2>
+                </div>
+                <div class="content-section">
+                    <p>
+                        The first step is to create a working directory for the project:
+                    </p>
+                    <pre><code>$ mkdir wbprop
+$ cd wbprop</code></pre>
+
+                    <p>
+                        Initialize the project with <code>npm init</code>. This command creates a
+                        <code>package.json</code> file that describes the project's metadata and dependencies.
+                    </p>
+                    <pre><code>$ npm init</code></pre>
+
+                    <p>You will be prompted for several inputs. Here's an example session:</p>
+                    <pre><code>package name: (wbprop) wbprop
+version: (1.0.0) 0.1.0
+description: Everything about Wikibase properties
+entry point: (index.js) index.html
+test command: webpack-dev-server
+git repository: https://github.com/johnsamuelwrites/wbprop
+keywords: Wikidata, Properties, Dashboard
+author: John Samuel
+license: (ISC) GPL-3.0-or-later</code></pre>
+
+                    <p>This will result in the following <code>package.json</code> file:</p>
+                    <pre><code>{
+  "name": "wbprop",
+  "version": "0.1.0",
+  "description": "Everything about Wikibase properties",
+  "main": "index.html",
+  "scripts": {
+    "test": "webpack-dev-server"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/johnsamuelwrites/wbprop.git"
+  },
+  "keywords": [
+    "Wikidata",
+    "Properties",
+    "Dashboard"
+  ],
+  "author": "John Samuel",
+  "license": "GPL-3.0-or-later",
+  "bugs": {
+    "url": "https://github.com/johnsamuelwrites/wbprop/issues"
+  },
+  "homepage": "https://github.com/johnsamuelwrites/wbprop#readme"
+}</code></pre>
+                </div>
+            </section>
+
+            <div class="section-divider"></div>
+
+            <!-- Installing Dependencies -->
+            <section>
+                <div class="section-header">
+                    <h3>Installing Dependencies</h3>
+                </div>
+                <div class="content-section">
+                    <p>
+                        Next, install Webpack and the development server:
+                    </p>
+                    <pre><code>$ npm install --save-dev webpack webpack-cli webpack-dev-server</code></pre>
+                </div>
+            </section>
+
+            <div class="section-divider"></div>
+
+            <!-- Creating the Frontend -->
+            <section>
+                <div class="section-header">
+                    <h3>Creating the Frontend</h3>
+                </div>
+                <div class="content-section">
+                    <p>Create a basic HTML file called <code>index.html</code>:</p>
+                    <pre><code>&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+&lt;head&gt;
+    &lt;title&gt;WBProp: Everything about Wikibase Properties&lt;/title&gt;
+&lt;/head&gt;
+&lt;body&gt;
+    &lt;p&gt;WBProp: Everything about Wikibase Properties&lt;/p&gt;
+    &lt;script src="main.js"&gt;&lt;/script&gt;
+&lt;/body&gt;
+&lt;/html&gt;</code></pre>
+
+                    <p>
+                        Create a simple JavaScript file named <code>wbprop.js</code> to serve as the project entry:
+                    </p>
+                    <pre><code>console.log("WBProp: Hello!");</code></pre>
+
+                    <p>
+                        To specify the entry point for Webpack, create a file named <code>webpack.config.js</code>:
+                    </p>
+                    <pre><code>const path = require('path');
+
+module.exports = {
+  entry: './wbprop.js',
+  output: {
+    filename: 'main.js',
+    path: path.resolve(__dirname, 'dist'),
+  },
+  devServer: {
+    static: {
+      directory: __dirname,
+    },
+    port: 8080
+  },
+  mode: 'development'
+};</code></pre>
+                </div>
+            </section>
+
+            <div class="section-divider"></div>
+
+            <!-- Running the Development Server -->
+            <section>
+                <div class="section-header">
+                    <h3>Running the Development Server</h3>
+                </div>
+                <div class="content-section">
+                    <p>Start the development server using:</p>
+                    <pre><code>$ npm test
+> wbprop@0.1.0 test
+> webpack-dev-server
+
+ℹ ｢wds｣: Project is running at http://localhost:8080/
+ℹ ｢wds｣: Content not from webpack is served from /home/john/contributions/wbprop</code></pre>
+
+                    <p>
+                        Open <code>http://localhost:8080/</code> in your browser. You should see the WBProp message
+                        displayed on the page and in the developer console.
+                    </p>
+                </div>
+            </section>
+
+            <div class="section-divider"></div>
+
+            <!-- Adding Loaders -->
+            <section>
+                <div class="section-header">
+                    <h3>Adding Loaders and Babel Support</h3>
+                </div>
+                <div class="content-section">
+                    <p>To support additional web technologies such as CSS, Sass, and modern JavaScript (ES6+), install
+                        the following loaders:</p>
+                    <pre><code>$ npm install --save-dev css-loader sass-loader sass extract-loader file-loader
+$ npm install --save-dev autoprefixer postcss-loader
+$ npm install --save-dev @babel/core babel-loader @babel/preset-env</code></pre>
+
+                    <p>
+                        With these tools in place, WBProp is ready to evolve from a basic interface to a powerful
+                        dashboard that can parse, visualize, and analyze data from Wikidata SPARQL queries, property
+                        statistics, and more.
+                    </p>
+                </div>
+            </section>
+
+            <div class="section-divider"></div>
+
+            <!-- Next Steps -->
+            <section>
+                <div class="section-header">
+                    <h2>Next Steps</h2>
+                </div>
+                <div class="content-section">
+                    <p>
+                        After setting up the base environment, the WBProp project evolved to include real-time SPARQL
+                        querying, property analysis, and visualizations using libraries such as D3.js. Its modular and
+                        open-source architecture ensures that contributors can extend the dashboard to support various
+                        Wikibase-compatible installations.
+                    </p>
+                </div>
+            </section>
+
+            <div class="section-divider"></div>
+
+            <!-- Conclusion -->
+            <section>
+                <div class="section-header">
+                    <h2>Conclusion</h2>
+                </div>
+                <div class="content-section">
+                    <p>
+                        WBProp is an initiative to make the complex property structure of Wikidata (or Wikibase) more
+                        accessible and transparent. By building a simple and extensible framework, WBProp invites
+                        developers and data enthusiasts to contribute to the ever-expanding landscape of linked open
+                        data.
+                    </p>
+                </div>
+            </section>
+
+            <div class="section-divider"></div>
+
+            <!-- References -->
+            <section>
+                <div class="section-header">
+                    <h3>References</h3>
+                </div>
+                <div class="content-section">
+                    <ol>
+                        <li><a href="https://www.wikidata.org/wiki/Wikidata:Main_Page">Wikidata: Main Page</a></li>
+                        <li><a href="https://www.mediawiki.org/wiki/Wikibase">Wikibase Documentation - MediaWiki</a>
+                        </li>
+                        <li><a href="https://webpack.js.org/">Webpack Official Documentation</a></li>
+                        <li><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript">MDN Web Docs -
+                                JavaScript</a></li>
+                        <li><a href="https://github.com/johnsamuelwrites/wbprop">WBProp GitHub Repository</a></li>
+                    </ol>
+                </div>
+            </section>
+        </main>
+
+        <!-- Footer -->
+        <footer>
+            <div class="footer-container">
+                <div class="footer-license">
+                    <a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/">
+                        <img alt="Creative Commons License" src="../../images/license.png" />
+                    </a>
+                    <span>This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 International
+                        License.</span>
+                </div>
+
+                <div class="footer-bottom">
+                    <p>&copy; 2024 John Samuel. All rights reserved.</p>
+                    <p>Building WBProp</p>
+                </div>
+            </div>
+        </footer>
     </body>
 
 </html>
