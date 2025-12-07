@@ -4,269 +4,608 @@
     <head>
         <meta charset="utf-8" />
         <meta http-equiv="Content-Language" content="en" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <link rel="shortcut icon" href="../../images/logo/favicon.png" />
         <title>Learning by Experimentation: John Samuel</title>
-        <style type="text/css">
-            body {
-                background-color: #FFFFFF;
+        <style>
+            /* ===== DESIGN TOKENS ===== */
+            :root {
+                /* Color Palette - Experimentation Theme (Discovery, Innovation, Process) */
+                --color-base-bg: #f8f9fd;
+                --color-base-surface: #ffffff;
+                --color-base-text: #1a1f2e;
+                --color-base-text-muted: #4a5568;
+
+                /* Theme Accents - Scientific Discovery Colors */
+                --color-accent-1: #5a67d8;
+                /* Deep indigo - exploration */
+                --color-accent-2: #9333ea;
+                /* Purple - innovation */
+                --color-accent-3: #06b6d4;
+                /* Cyan - discovery */
+                --color-accent-light: #eef2ff;
+                --color-accent-glow: rgba(90, 103, 216, 0.15);
+
+                /* Functional Colors */
+                --color-shadow: rgba(90, 103, 216, 0.12);
+                --color-border: rgba(90, 103, 216, 0.15);
+                --color-hover: rgba(90, 103, 216, 0.08);
+
+                /* Gradients */
+                --gradient-primary: linear-gradient(135deg, var(--color-accent-1) 0%, var(--color-accent-2) 50%, var(--color-accent-3) 100%);
+                --gradient-subtle: linear-gradient(180deg, var(--color-base-bg), var(--color-accent-light));
+                --gradient-mesh: radial-gradient(at 0% 0%, var(--color-accent-1) 0%, transparent 50%),
+                    radial-gradient(at 100% 100%, var(--color-accent-2) 0%, transparent 50%),
+                    radial-gradient(at 100% 0%, var(--color-accent-3) 0%, transparent 50%);
+
+                /* Spacing Scale */
+                --space-xs: 0.25rem;
+                --space-sm: 0.5rem;
+                --space-md: 1rem;
+                --space-lg: 1.5rem;
+                --space-xl: 2rem;
+                --space-2xl: 3rem;
+                --space-3xl: 4rem;
+                --space-4xl: 6rem;
+
+                /* Border Radius */
+                --radius-sm: 4px;
+                --radius-md: 8px;
+                --radius-lg: 12px;
+                --radius-xl: 16px;
+                --radius-2xl: 24px;
+                --radius-full: 9999px;
+                --radius-organic: 63% 37% 54% 46% / 45% 62% 38% 55%;
+
+                /* Shadows */
+                --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.04), 0 1px 3px rgba(0, 0, 0, 0.06);
+                --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.05), 0 2px 4px rgba(0, 0, 0, 0.06), 0 0 0 1px var(--color-border);
+                --shadow-lg: 0 10px 24px rgba(0, 0, 0, 0.08), 0 4px 8px rgba(0, 0, 0, 0.06), 0 1px 3px rgba(0, 0, 0, 0.04);
+                --shadow-xl: 0 20px 40px rgba(0, 0, 0, 0.12), 0 8px 16px rgba(0, 0, 0, 0.08), 0 3px 6px rgba(0, 0, 0, 0.06);
+                --shadow-theme: 0 10px 30px var(--color-shadow), 0 4px 10px rgba(0, 0, 0, 0.06);
+
+                /* Typography */
+                --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji';
+                --font-mono: 'SF Mono', Monaco, 'Cascadia Code', 'Consolas', 'Courier New', monospace;
+
+                --text-xs: clamp(0.75rem, 0.7rem + 0.25vw, 0.875rem);
+                --text-sm: clamp(0.875rem, 0.8rem + 0.35vw, 1rem);
+                --text-base: clamp(1rem, 0.95rem + 0.25vw, 1.125rem);
+                --text-lg: clamp(1.125rem, 1.05rem + 0.35vw, 1.25rem);
+                --text-xl: clamp(1.25rem, 1.15rem + 0.5vw, 1.5rem);
+                --text-2xl: clamp(1.5rem, 1.3rem + 1vw, 2rem);
+                --text-3xl: clamp(2rem, 1.6rem + 2vw, 2.5rem);
+
+                --weight-normal: 400;
+                --weight-medium: 500;
+                --weight-semibold: 600;
+                --weight-bold: 700;
+
+                --leading-tight: 1.25;
+                --leading-snug: 1.375;
+                --leading-normal: 1.5;
+                --leading-relaxed: 1.625;
             }
 
-            #sidebar {
-                position: fixed;
-                background-color: #009AA6;
-                top: 0;
-                left: 0;
-                bottom: 0;
-                width: 30vw;
-            }
-
-            #sidebar .title {
-                position: relative;
-                text-align: center;
-                line-height: 5vmax;
-                font-size: 1.4vmax;
-                font-family: 'Arial';
-                margin-top: 30vh;
-            }
-
-            #sidebar .title a:link,
-            #sidebar .title a:visited {
-                color: #FFFFFF;
-                text-decoration: none;
-            }
-
-            .subtitle {
-                top: 50vh;
-                text-align: center;
-                line-height: 1.3vmax;
-                font-family: 'Arial';
-                font-size: 1.2vmax;
-                color: #FFFFFF;
-            }
-
-            .subtitle a:link,
-            .subtitle a:visited {
-                color: #FFFFFF;
-                text-decoration: none;
-            }
-
-            .licence {
-                position: fixed;
-                text-align: right;
-                bottom: 0;
-                right: 0;
-            }
-
-            .home {
-                position: fixed;
-                text-align: left;
-                font-family: 'Arial';
-                color: #D3D3D3;
-                z-index: 100;
-                width: 100%;
-                background-color: #FFFFFF;
-                top: 0px;
-                margin-bottom: 10px;
-                padding-bottom: 10px;
-            }
-
-            .home a:link,
-            .home a:visited {
-                text-decoration: none;
-                color: #D3D3D3;
-            }
-
-            .home ul {
+            /* ===== RESET & BASE ===== */
+            *,
+            *::before,
+            *::after {
+                box-sizing: border-box;
                 margin: 0;
                 padding: 0;
-                text-align: left;
-                list-style: none;
             }
 
-            .home li {
-                position: relative;
-                float: left;
-                padding-top: 15px;
-                margin-right: 1em;
-                font-family: 'Arial';
+            html {
+                scroll-behavior: smooth;
+                scroll-padding-top: 80px;
             }
 
-            .home li:hover {
-                display: block;
+            body {
+                font-family: var(--font-sans);
+                font-size: var(--text-base);
+                line-height: var(--leading-relaxed);
+                color: var(--color-base-text);
+                background: var(--color-base-bg);
+                overflow-x: hidden;
+                -webkit-font-smoothing: antialiased;
+                -moz-osx-font-smoothing: grayscale;
             }
 
-            .home li:hover a:link,
-            .home li:hover a:visited {
+            /* Skip Link for Accessibility */
+            .skip-link {
+                position: absolute;
+                top: -40px;
+                left: 0;
+                background: var(--color-accent-1);
+                color: white;
+                padding: var(--space-sm) var(--space-md);
                 text-decoration: none;
-                padding: 15px;
-                color: #FFFFFF;
-                background-color: #009AA6;
+                border-radius: var(--radius-md);
+                z-index: 100;
             }
 
-            .content {
-                line-height: 1.8vmax;
-                font-size: 1.2vmax;
-                font-family: 'Arial';
-                margin-top: 15vh;
-                width: 90%;
+            .skip-link:focus {
+                top: var(--space-sm);
+                left: var(--space-sm);
             }
 
-            .content h2,
-            h3,
-            h4 {
-                color: #009AA6;
+            /* ===== ANIMATED BACKGROUND ===== */
+            .animated-bg {
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                z-index: -2;
+                background: var(--gradient-mesh);
+                opacity: 0.05;
+                animation: meshMove 20s ease-in-out infinite;
             }
 
-            .content a:link,
-            .content a:visited {
-                color: #009AA6;
+            @keyframes meshMove {
+
+                0%,
+                100% {
+                    transform: translate(0, 0) scale(1);
+                }
+
+                33% {
+                    transform: translate(5%, -5%) scale(1.05);
+                }
+
+                66% {
+                    transform: translate(-5%, 5%) scale(0.95);
+                }
             }
 
-            .content h3 {
-                color: #009AA6;
+            .pattern-overlay {
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                z-index: -1;
+                background-image:
+                    repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(90, 103, 216, 0.02) 2px, rgba(90, 103, 216, 0.02) 4px),
+                    repeating-linear-gradient(90deg, transparent, transparent 2px, rgba(90, 103, 216, 0.02) 2px, rgba(90, 103, 216, 0.02) 4px);
             }
 
-            .content h2::before,
-            .content h3::before {
-                display: block;
-                content: " ";
-                visibility: hidden;
-                height: 50px;
-                margin-top: -50px;
-                pointer-events: none;
-                background-color: #FFFFFF;
+            /* ===== HEADER & NAVIGATION ===== */
+            header {
+                position: sticky;
+                top: 0;
+                z-index: 50;
+                background: rgba(255, 255, 255, 0.8);
+                -webkit-backdrop-filter: blur(12px) saturate(180%);
+                backdrop-filter: blur(12px) saturate(180%);
+                border-bottom: 1px solid var(--color-border);
+                box-shadow: var(--shadow-sm);
             }
 
-            .content p {
-                text-align: justify;
-                text-justify: inter-word;
+            nav {
+                max-width: 1400px;
+                margin: 0 auto;
+                padding: var(--space-lg) var(--space-xl);
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                gap: var(--space-xl);
             }
 
-            .content a:link,
-            .content a:visited {
-                color: #009AA6;
+            .nav-brand {
+                display: flex;
+                align-items: center;
+                gap: var(--space-md);
             }
 
-            .home a:link,
-            .home a:visited {
-                color: #D3D3D3;
+            .nav-brand a {
+                font-size: var(--text-xl);
+                font-weight: var(--weight-bold);
+                color: var(--color-base-text);
+                text-decoration: none;
+                letter-spacing: -0.02em;
+                transition: color 0.3s ease;
             }
 
-            .page {
-                width: 65vw;
-                height: 100%;
-                margin-left: 30vw;
+            .nav-brand a:hover {
+                color: var(--color-accent-1);
+            }
+
+            .nav-brand-highlight {
+                background: var(--gradient-primary);
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                background-clip: text;
+            }
+
+            .breadcrumb {
+                display: flex;
+                list-style: none;
+                gap: var(--space-sm);
+                flex-wrap: wrap;
+            }
+
+            .breadcrumb li {
+                display: flex;
+                align-items: center;
+                gap: var(--space-sm);
+            }
+
+            .breadcrumb li:not(:last-child)::after {
+                content: '→';
+                color: var(--color-base-text-muted);
+                font-size: var(--text-sm);
+            }
+
+            .breadcrumb a {
+                color: var(--color-base-text-muted);
+                text-decoration: none;
+                font-size: var(--text-sm);
+                transition: color 0.3s ease;
+                padding: var(--space-xs) var(--space-sm);
+                border-radius: var(--radius-sm);
+            }
+
+            .breadcrumb a:hover {
+                color: var(--color-accent-1);
+                background: var(--color-hover);
+            }
+
+            /* ===== MAIN CONTENT CONTAINER ===== */
+            main {
+                max-width: 1400px;
+                margin: 0 auto;
+                padding: var(--space-4xl) var(--space-xl);
+            }
+
+            /* ===== HERO SECTION ===== */
+            .hero {
+                text-align: center;
+                margin-bottom: var(--space-4xl);
+                position: relative;
+            }
+
+            .hero-svg {
+                width: 100%;
+                max-width: 600px;
+                height: auto;
+                margin: 0 auto var(--space-3xl);
+                filter: drop-shadow(0 10px 30px var(--color-shadow));
+            }
+
+            .hero h1 {
+                font-size: var(--text-3xl);
+                font-weight: var(--weight-bold);
+                line-height: var(--leading-tight);
+                letter-spacing: -0.03em;
+                color: var(--color-base-text);
+                margin-bottom: var(--space-lg);
+                background: var(--gradient-primary);
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                background-clip: text;
+                animation: fadeInUp 0.6s ease-out;
+            }
+
+            @keyframes fadeInUp {
+                from {
+                    opacity: 0;
+                    transform: translateY(20px);
+                }
+
+                to {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            }
+
+            /* ===== CONTENT SECTIONS ===== */
+            .content-section {
+                margin-bottom: var(--space-4xl);
+            }
+
+            .section-divider {
+                height: 4px;
+                background: var(--gradient-primary);
+                border-radius: var(--radius-full);
+                margin: var(--space-3xl) auto;
+                max-width: 200px;
+                position: relative;
                 overflow: hidden;
-                padding: 0 1em;
-                font-family: 'Arial';
             }
 
-            .page img {
-                max-width: 100%;
-                max-height: 100%;
+            .section-divider::after {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: -100%;
+                width: 50%;
+                height: 100%;
+                background: rgba(255, 255, 255, 0.5);
+                animation: shimmer 3s infinite;
             }
 
-            @media (max-width: 640px),
-            screen and (orientation: portrait) {
-                body {
-                    max-width: 100%;
-                    max-height: 100%;
+            @keyframes shimmer {
+                0% {
+                    left: -100%;
                 }
 
-                #sidebar {
-                    position: fixed;
-                    background-color: #009AA6;
-                    top: 0;
-                    left: 0;
-                    bottom: 80vh;
-                    width: 100vw;
+                50%,
+                100% {
+                    left: 100%;
+                }
+            }
+
+            /* ===== PROCESS CARDS ===== */
+            .process-grid {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+                gap: var(--space-xl);
+                margin: var(--space-3xl) 0;
+            }
+
+            .process-card {
+                background: rgba(255, 255, 255, 0.7);
+                -webkit-backdrop-filter: blur(12px) saturate(180%);
+                backdrop-filter: blur(12px) saturate(180%);
+                border: 1px solid rgba(255, 255, 255, 0.3);
+                border-radius: var(--radius-xl);
+                padding: var(--space-xl);
+                box-shadow: var(--shadow-theme);
+                transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+                position: relative;
+                overflow: hidden;
+            }
+
+            .process-card::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                height: 4px;
+                background: var(--gradient-primary);
+                transform: scaleX(0);
+                transform-origin: left;
+                transition: transform 0.4s ease;
+            }
+
+            .process-card:hover::before {
+                transform: scaleX(1);
+            }
+
+            .process-card:hover {
+                transform: translateY(-8px) scale(1.02);
+                box-shadow: 0 20px 40px rgba(90, 103, 216, 0.2);
+            }
+
+            .process-icon {
+                width: 60px;
+                height: 60px;
+                background: var(--gradient-primary);
+                border-radius: var(--radius-organic);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: var(--text-2xl);
+                font-weight: var(--weight-bold);
+                color: white;
+                margin-bottom: var(--space-lg);
+                animation: morphShape 8s ease-in-out infinite;
+            }
+
+            @keyframes morphShape {
+
+                0%,
+                100% {
+                    border-radius: 63% 37% 54% 46% / 45% 62% 38% 55%;
                 }
 
-                #sidebar .title {
-                    text-align: center;
-                    position: fixed;
-                    margin-top: 6vh;
-                    left: 0px;
-                    right: 0px;
-                    line-height: 3.5vmax;
-                    font-size: 1.5vmax;
-                    font-family: 'Arial';
+                25% {
+                    border-radius: 37% 63% 46% 54% / 62% 45% 55% 38%;
                 }
 
-                #sidebar .subtitle {
-                    text-align: center;
-                    top: 5vh;
-                    left: 0px;
-                    right: 0px;
-                    position: fixed;
-                    margin-top: 10vh;
-                    font-size: 1.5vmax;
+                50% {
+                    border-radius: 54% 46% 37% 63% / 55% 38% 62% 45%;
                 }
 
-                #sidebar .title a:link,
-                #sidebar .title a:visited {
-                    text-align: center;
-                    color: #FFFFFF;
+                75% {
+                    border-radius: 46% 54% 63% 37% / 38% 55% 45% 62%;
+                }
+            }
+
+            .process-card:nth-child(1) .process-icon {
+                animation-delay: 0s;
+            }
+
+            .process-card:nth-child(2) .process-icon {
+                animation-delay: -2s;
+            }
+
+            .process-card:nth-child(3) .process-icon {
+                animation-delay: -4s;
+            }
+
+            .process-card h3 {
+                font-size: var(--text-xl);
+                font-weight: var(--weight-semibold);
+                color: var(--color-base-text);
+                margin-bottom: var(--space-md);
+                letter-spacing: -0.01em;
+            }
+
+            .process-card p {
+                color: var(--color-base-text-muted);
+                line-height: var(--leading-relaxed);
+            }
+
+            /* ===== CONTENT PARAGRAPHS ===== */
+            .content-text {
+                background: var(--color-base-surface);
+                border-radius: var(--radius-xl);
+                padding: var(--space-2xl);
+                margin: var(--space-xl) 0;
+                box-shadow: var(--shadow-md);
+                border-left: 4px solid var(--color-accent-1);
+            }
+
+            .content-text p {
+                margin-bottom: var(--space-lg);
+                line-height: var(--leading-relaxed);
+            }
+
+            .content-text p:last-child {
+                margin-bottom: 0;
+            }
+
+            .content-text b {
+                color: var(--color-accent-1);
+                font-weight: var(--weight-semibold);
+            }
+
+            /* ===== REFERENCES ===== */
+            .references {
+                background: var(--gradient-subtle);
+                border-radius: var(--radius-xl);
+                padding: var(--space-2xl);
+                margin: var(--space-3xl) 0;
+            }
+
+            .references h3 {
+                font-size: var(--text-xl);
+                font-weight: var(--weight-semibold);
+                color: var(--color-base-text);
+                margin-bottom: var(--space-lg);
+                letter-spacing: -0.01em;
+            }
+
+            .references ol {
+                list-style-position: inside;
+                color: var(--color-base-text-muted);
+            }
+
+            .references li {
+                margin-bottom: var(--space-sm);
+                padding-left: var(--space-sm);
+            }
+
+            .references a {
+                color: var(--color-accent-1);
+                text-decoration: none;
+                transition: color 0.3s ease;
+                border-bottom: 1px solid transparent;
+            }
+
+            .references a:hover {
+                color: var(--color-accent-2);
+                border-bottom-color: var(--color-accent-2);
+            }
+
+            /* ===== FOOTER ===== */
+            footer {
+                background: rgba(255, 255, 255, 0.7);
+                -webkit-backdrop-filter: blur(12px) saturate(180%);
+                backdrop-filter: blur(12px) saturate(180%);
+                border-top: 1px solid var(--color-border);
+                margin-top: var(--space-4xl);
+                padding: var(--space-2xl) var(--space-xl);
+            }
+
+            .footer-content {
+                max-width: 1400px;
+                margin: 0 auto;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                flex-wrap: wrap;
+                gap: var(--space-lg);
+            }
+
+            .footer-copyright {
+                color: var(--color-base-text-muted);
+                font-size: var(--text-sm);
+            }
+
+            .language-selector {
+                display: flex;
+                gap: var(--space-md);
+            }
+
+            .language-link {
+                color: var(--color-base-text-muted);
+                text-decoration: none;
+                font-size: var(--text-sm);
+                padding: var(--space-xs) var(--space-md);
+                border-radius: var(--radius-sm);
+                border: 1px solid var(--color-border);
+                transition: all 0.3s ease;
+            }
+
+            .language-link:hover {
+                color: var(--color-accent-1);
+                border-color: var(--color-accent-1);
+                background: var(--color-hover);
+            }
+
+            /* ===== RESPONSIVE DESIGN ===== */
+            @media (max-width: 768px) {
+                nav {
+                    flex-direction: column;
+                    align-items: flex-start;
+                    padding: var(--space-lg);
                 }
 
-                #sidebar .subtitle a:link,
-                #sidebar .subtitle a:visited {
-                    text-align: center;
-                    color: #FFFFFF;
-                }
-
-                .home {
-                    z-index: 100;
+                .breadcrumb {
                     width: 100%;
-                    background-color: #009AA6;
-                    font-size: 1.5vmax;
                 }
 
-                .home a:link,
-                .home a:visited {
-                    text-decoration: none;
-                    color: #FFFFFF;
+                main {
+                    padding: var(--space-2xl) var(--space-lg);
                 }
 
-                .content {
-                    line-height: 3.8vmax;
-                    font-size: 1.8vmax;
-                    font-family: 'Arial';
-                    margin-top: 22vh;
+                .process-grid {
+                    grid-template-columns: 1fr;
                 }
 
-                .content a:link,
-                .content a:visited {
-                    color: #009AA6;
+                .footer-content {
+                    flex-direction: column;
+                    text-align: center;
                 }
+            }
 
-                .page {
-                    top: 40vh;
-                    width: 95%;
-                    margin-left: 0vw;
-                }
+            /* ===== ACCESSIBILITY ===== */
+            @media (prefers-reduced-motion: reduce) {
 
-                .page img {
-                    max-width: 100%;
-                    max-height: 100%;
-                    border: 0;
+                *,
+                *::before,
+                *::after {
+                    animation-duration: 0.01ms !important;
+                    animation-iteration-count: 1 !important;
+                    transition-duration: 0.01ms !important;
                 }
+            }
+
+            :focus-visible {
+                outline: 3px solid var(--color-accent-1);
+                outline-offset: 2px;
+                border-radius: var(--radius-sm);
             }
         </style>
     </head>
 
     <body vocab="http://schema.org/">
-        <div id="sidebar">
-            <div class="title">
-                <h1><a href="./learning-by-experimentation.html">Learning by Experimentation</a></h1>
-            </div>
-            <div class="subtitle">
-                <h3><a href="../about.html">John Samuel</a></h3>
-            </div>
-        </div>
-        <div class="page">
-            <div class="home">
-                <ul typeof="BreadcrumbList">
+        <a href="#main-content" class="skip-link">Skip to main content</a>
+
+        <div class="animated-bg"></div>
+        <div class="pattern-overlay"></div>
+
+        <header>
+            <nav>
+                <div class="nav-brand">
+                    <a href="../about.html"><span class="nav-brand-highlight">John Samuel</span></a>
+                </div>
+                <ul class="breadcrumb" typeof="BreadcrumbList">
                     <li property="itemListElement" typeof="ListItem">
                         <a property="item" typeof="WebPage" href="../index.html">
                             <span property="name">Home</span>
@@ -283,62 +622,223 @@
                         </a>
                     </li>
                 </ul>
+            </nav>
+        </header>
+
+        <main id="main-content">
+            <section class="hero">
+                <svg class="hero-svg" viewBox="0 0 600 400" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                    <!-- Background gradient -->
+                    <defs>
+                        <linearGradient id="heroGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" style="stop-color:#5a67d8;stop-opacity:0.2" />
+                            <stop offset="50%" style="stop-color:#9333ea;stop-opacity:0.2" />
+                            <stop offset="100%" style="stop-color:#06b6d4;stop-opacity:0.2" />
+                        </linearGradient>
+
+                        <filter id="glow">
+                            <feGaussianBlur stdDeviation="4" result="coloredBlur" />
+                            <feMerge>
+                                <feMergeNode in="coloredBlur" />
+                                <feMergeNode in="SourceGraphic" />
+                            </feMerge>
+                        </filter>
+                    </defs>
+
+                    <!-- Background blob -->
+                    <ellipse cx="300" cy="200" rx="250" ry="180" fill="url(#heroGradient)" opacity="0.3">
+                        <animate attributeName="rx" values="250;270;250" dur="8s" repeatCount="indefinite" />
+                        <animate attributeName="ry" values="180;200;180" dur="8s" repeatCount="indefinite" />
+                    </ellipse>
+
+                    <!-- Central experimental flask -->
+                    <g transform="translate(300, 200)">
+                        <!-- Flask body -->
+                        <path d="M -40,-80 L -40,-20 L -60,40 L -60,80 L 60,80 L 60,40 L 40,-20 L 40,-80 Z" fill="none"
+                            stroke="#5a67d8" stroke-width="3" filter="url(#glow)">
+                            <animate attributeName="opacity" values="0.6;1;0.6" dur="3s" repeatCount="indefinite" />
+                        </path>
+
+                        <!-- Flask neck -->
+                        <rect x="-30" y="-100" width="60" height="20" rx="5" fill="none" stroke="#5a67d8"
+                            stroke-width="3" />
+
+                        <!-- Liquid inside -->
+                        <path d="M -58,45 L -58,78 L 58,78 L 58,45 L 38,-18 L -38,-18 Z" fill="#06b6d4" opacity="0.3">
+                            <animate attributeName="d" values="M -58,45 L -58,78 L 58,78 L 58,45 L 38,-18 L -38,-18 Z;
+                                        M -58,40 L -58,78 L 58,78 L 58,40 L 38,-15 L -38,-15 Z;
+                                        M -58,45 L -58,78 L 58,78 L 58,45 L 38,-18 L -38,-18 Z" dur="4s"
+                                repeatCount="indefinite" />
+                        </path>
+
+                        <!-- Bubbles -->
+                        <circle cx="-20" cy="20" r="4" fill="#9333ea" opacity="0.6">
+                            <animate attributeName="cy" values="20;-40;20" dur="3s" repeatCount="indefinite" />
+                            <animate attributeName="opacity" values="0.6;0;0.6" dur="3s" repeatCount="indefinite" />
+                        </circle>
+                        <circle cx="10" cy="35" r="3" fill="#9333ea" opacity="0.6">
+                            <animate attributeName="cy" values="35;-40;35" dur="4s" repeatCount="indefinite" />
+                            <animate attributeName="opacity" values="0.6;0;0.6" dur="4s" repeatCount="indefinite" />
+                        </circle>
+                        <circle cx="25" cy="50" r="5" fill="#9333ea" opacity="0.6">
+                            <animate attributeName="cy" values="50;-40;50" dur="3.5s" repeatCount="indefinite" />
+                            <animate attributeName="opacity" values="0.6;0;0.6" dur="3.5s" repeatCount="indefinite" />
+                        </circle>
+                    </g>
+
+                    <!-- Orbiting particles representing exploration -->
+                    <g transform="translate(300, 200)">
+                        <!-- Orbit 1 -->
+                        <circle cx="0" cy="-120" r="6" fill="#5a67d8" opacity="0.8">
+                            <animateTransform attributeName="transform" type="rotate" from="0 0 0" to="360 0 0"
+                                dur="10s" repeatCount="indefinite" />
+                        </circle>
+
+                        <!-- Orbit 2 -->
+                        <circle cx="0" cy="-140" r="5" fill="#9333ea" opacity="0.7">
+                            <animateTransform attributeName="transform" type="rotate" from="0 0 0" to="-360 0 0"
+                                dur="12s" repeatCount="indefinite" />
+                        </circle>
+
+                        <!-- Orbit 3 -->
+                        <circle cx="0" cy="-160" r="4" fill="#06b6d4" opacity="0.6">
+                            <animateTransform attributeName="transform" type="rotate" from="0 0 0" to="360 0 0"
+                                dur="15s" repeatCount="indefinite" />
+                        </circle>
+                    </g>
+
+                    <!-- Connecting lines (neural network style) -->
+                    <line x1="150" y1="100" x2="220" y2="150" stroke="#5a67d8" stroke-width="1" opacity="0.3">
+                        <animate attributeName="opacity" values="0.3;0.6;0.3" dur="2s" repeatCount="indefinite" />
+                    </line>
+                    <line x1="450" y1="100" x2="380" y2="150" stroke="#9333ea" stroke-width="1" opacity="0.3">
+                        <animate attributeName="opacity" values="0.3;0.6;0.3" dur="2.5s" repeatCount="indefinite" />
+                    </line>
+                    <line x1="150" y1="300" x2="220" y2="250" stroke="#06b6d4" stroke-width="1" opacity="0.3">
+                        <animate attributeName="opacity" values="0.3;0.6;0.3" dur="3s" repeatCount="indefinite" />
+                    </line>
+                    <line x1="450" y1="300" x2="380" y2="250" stroke="#5a67d8" stroke-width="1" opacity="0.3">
+                        <animate attributeName="opacity" values="0.3;0.6;0.3" dur="2.7s" repeatCount="indefinite" />
+                    </line>
+                </svg>
+
+                <h1>Learning by Experimentation</h1>
+            </section>
+
+            <section class="content-section">
+                <div class="process-grid">
+                    <article class="process-card">
+                        <div class="process-icon">🔍</div>
+                        <h3>Exploration</h3>
+                        <p>Exploring tools and applications for a given problem. This exploration is like jumping into
+                            the rabbit hole of tools, discovering other tools for other purposes along the way.</p>
+                    </article>
+
+                    <article class="process-card">
+                        <div class="process-icon">⚗️</div>
+                        <h3>Experimentation</h3>
+                        <p>Once the tools are found, the phase of experiments begins. It may take hours or days to
+                            finish experimenting with them, but this hands-on approach leads to deep understanding.</p>
+                    </article>
+
+                    <article class="process-card">
+                        <div class="process-icon">💡</div>
+                        <h3>Enhancement</h3>
+                        <p>If the tools serve their purpose, they become part of the workflow for years. This journey
+                            leads to proposals for enhancements and identification of new research problems.</p>
+                    </article>
+                </div>
+            </section>
+
+            <div class="section-divider"></div>
+
+            <section class="content-section">
+                <div class="content-text">
+                    <p>
+                        I love experimenting and I like to write and share about my experiments. It starts with
+                        <b>exploration</b>, exploring tools and applications for a given problem. This exploration of
+                        tools
+                        is like jumping into the rabbit hole of tools, i.e., discovering other tools for other purposes.
+                        Once the tools are found, then starts the phase of <b>Experiments</b>. It may take some hours or
+                        days to finish experimenting with them. If the tools served my purpose, I continue using them
+                        for
+                        years. This is how I discovered many interesting programming languages, tools, applications, and
+                        web
+                        services.
+                    </p>
+
+                    <p>
+                        The advantage of experimenting with multiple applications helped me understand some common and
+                        necessary features across the applications as well as interesting scientific and technical
+                        challenges. As they say, there is no one single solution to a problem, there are multiple
+                        possible
+                        ways to achieve a solution. Yet some solutions are more effective than the others are and some
+                        problems have no quick solution.
+                    </p>
+
+                    <p>
+                        I share some <b>personal experiments</b> on this blog, especially my experiments with Inkscape.
+                        I
+                        started using the basics of this blog and today, I am using many interesting features. The same
+                        is
+                        the case with my usage of GIMP. It is interesting to observe my learning curve. I liked these
+                        tools,
+                        and experimented with them, improving each time, with more and more practice. During this time,
+                        I
+                        also continued my reading on similar topics and associated technologies. This helped me to
+                        further
+                        link previous experiences in data science, like working with data formats, XML, SVG, JSON, etc.
+                        Another example, I would give is my experiments with Linux containers, especially Docker. This
+                        helped me to discover the interesting way of layered unification file systems based on which the
+                        Docker images have been built.
+                    </p>
+
+                    <p>
+                        Sometimes, experiments are needed until finding the right tool for our work. Unfortunately, this
+                        may
+                        take years for some use cases. Some problems are difficult to solve and there are several
+                        criteria
+                        to measure the feasibility of a solution. Some applications provide temporary solutions.
+                        Multiple
+                        approaches may sometimes guide us to an optimum solution, or in some cases, help to identify
+                        different categories of the given problem. Other factors that may help in identifying the
+                        appropriate solution are execution time, latency, disk space usage, memory consumption,
+                        processor
+                        usage, knowledge expertise of the contributors, learning curve, flexibility of the tool, etc.
+                    </p>
+
+                    <p>
+                        Experiments with multiple tools and solutions are crucial before making a final decision.
+                        Documented
+                        experimentation should be part of our regular practices and official planning. It will not help
+                        us
+                        to ignore some bad practices, but may also help us propose <b>enhancements</b> and suggestions
+                        for
+                        new research and scientific and technical problems.
+                    </p>
+                </div>
+            </section>
+
+            <section class="content-section">
+                <div class="references">
+                    <h3>References</h3>
+                    <ol>
+                        <li id="experiment"><a href="https://en.wikipedia.org/wiki/Experiment">Experiment</a></li>
+                    </ol>
+                </div>
+            </section>
+        </main>
+
+        <footer>
+            <div class="footer-content">
+                <div class="footer-copyright">
+                    © John Samuel
+                </div>
+                <div class="language-selector">
+                    <a href="./learning-by-experimentation.html" class="language-link">English</a>
+                </div>
             </div>
-            <div class="content">
-                <p>
-                    I love experimenting and I like to write and share about my experiments. It starts with
-                    <b>exploration</b>, exploring tools and applications for a given problem. This exploration of tools
-                    is like jumping into the rabbit hole of tools, i.e., discovering other tools for other purposes.
-                    Once the tools are found, then starts the phase of <b>Experiments</b>. It may take some hours or
-                    days to finish experimenting with them. If the tools served my purpose, I continue using them for
-                    years. This is how I discovered many interesting programming languages, tools, applications, and web
-                    services.
-                </p>
-
-                <p>
-                    The advantage of experimenting with multiple applications helped me understand some common and
-                    necessary features across the applications as well as interesting scientific and technical
-                    challenges. As they say, there is no one single solution to a problem, there are multiple possible
-                    ways to achieve a solution. Yet some solutions are more effective than the others are and some
-                    problems have no quick solution.
-                </p>
-
-                <p>
-                    I share some <b>personal experiments</b> on this blog, especially my experiments with Inkscape. I
-                    started using the basics of this blog and today, I am using many interesting features. The same is
-                    the case with my usage of GIMP. It is interesting to observe my learning curve. I liked these tools,
-                    and experimented with them, improving each time, with more and more practice. During this time, I
-                    also continued my reading on similar topics and associated technologies. This helped me to further
-                    link previous experiences in data science, like working with data formats, XML, SVG, JSON, etc.
-                    Another example, I would give is my experiments with Linux containers, especially Docker. This
-                    helped me to discover the interesting way of layered unification file systems based on which the
-                    Docker images have been built.
-                </p>
-
-                <p>
-                    Sometimes, experiments are needed until finding the right tool for our work. Unfortunately, this may
-                    take years for some use cases. Some problems are difficult to solve and there are several criteria
-                    to measure the feasibility of a solution. Some applications provide temporary solutions. Multiple
-                    approaches may sometimes guide us to an optimum solution, or in some cases, help to identify
-                    different categories of the given problem. Other factors that may help in identifying the
-                    appropriate solution are execution time, latency, disk space usage, memory consumption, processor
-                    usage, knowledge expertise of the contributors, learning curve, flexibility of the tool, etc.
-                </p>
-
-                <p>
-                    Experiments with multiple tools and solutions are crucial before making a final decision. Documented
-                    experimentation should be part of our regular practices and official planning. It will not help us
-                    to ignore some bad practices, but may also help us propose <b>enhancements</b> and suggestions for
-                    new research and scientific and technical problems.
-                </p>
-                <h3>References</h3>
-                <p>
-                <ol>
-                    <li id="experiment"><a href="https://en.wikipedia.org/wiki/Experiment">Experiment</a></li>
-                </ol>
-                </p>
-            </div>
-        </div>
+        </footer>
     </body>
 
 </html>

@@ -4,273 +4,799 @@
     <head>
         <meta charset="utf-8" />
         <meta http-equiv="Content-Language" content="en" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <link rel="shortcut icon" href="../../images/logo/favicon.png" />
         <title>Building a Personalized Feed Aggregator: John Samuel</title>
-        <style type="text/css">
-            body {
-                background-color: #FFFFFF;
+        <style>
+            /* ===== DESIGN TOKENS ===== */
+            :root {
+                /* Color Palette - Personalization & Content Streams Theme */
+                --color-base-bg: #f7f9fc;
+                --color-base-surface: #ffffff;
+                --color-base-text: #1e293b;
+                --color-base-text-muted: #64748b;
+
+                /* Theme Accents - Feed & Filtering Colors */
+                --color-accent-1: #0ea5e9;
+                /* Sky blue - content streams */
+                --color-accent-2: #8b5cf6;
+                /* Violet - personalization */
+                --color-accent-3: #10b981;
+                /* Emerald - relevant content */
+                --color-accent-4: #f59e0b;
+                /* Amber - filtering */
+                --color-accent-light: #f0f9ff;
+                --color-accent-glow: rgba(14, 165, 233, 0.15);
+
+                /* Functional Colors */
+                --color-shadow: rgba(14, 165, 233, 0.12);
+                --color-border: rgba(14, 165, 233, 0.15);
+                --color-hover: rgba(14, 165, 233, 0.08);
+
+                /* Gradients */
+                --gradient-primary: linear-gradient(135deg, var(--color-accent-1) 0%, var(--color-accent-2) 100%);
+                --gradient-feed: linear-gradient(135deg, #0ea5e9 0%, #8b5cf6 50%, #10b981 100%);
+                --gradient-subtle: linear-gradient(180deg, var(--color-base-bg), var(--color-accent-light));
+                --gradient-mesh: radial-gradient(at 30% 20%, rgba(14, 165, 233, 0.08) 0%, transparent 50%),
+                    radial-gradient(at 70% 80%, rgba(139, 92, 246, 0.08) 0%, transparent 50%),
+                    radial-gradient(at 50% 50%, rgba(16, 185, 129, 0.06) 0%, transparent 50%);
+
+                /* Spacing Scale */
+                --space-xs: 0.25rem;
+                --space-sm: 0.5rem;
+                --space-md: 1rem;
+                --space-lg: 1.5rem;
+                --space-xl: 2rem;
+                --space-2xl: 3rem;
+                --space-3xl: 4rem;
+                --space-4xl: 6rem;
+
+                /* Border Radius */
+                --radius-sm: 4px;
+                --radius-md: 8px;
+                --radius-lg: 12px;
+                --radius-xl: 16px;
+                --radius-2xl: 24px;
+                --radius-full: 9999px;
+                --radius-organic: 62% 38% 56% 44% / 47% 59% 41% 53%;
+
+                /* Shadows */
+                --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.04), 0 1px 3px rgba(0, 0, 0, 0.06);
+                --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.05), 0 2px 4px rgba(0, 0, 0, 0.06), 0 0 0 1px var(--color-border);
+                --shadow-lg: 0 10px 24px rgba(0, 0, 0, 0.08), 0 4px 8px rgba(0, 0, 0, 0.06), 0 1px 3px rgba(0, 0, 0, 0.04);
+                --shadow-xl: 0 20px 40px rgba(0, 0, 0, 0.12), 0 8px 16px rgba(0, 0, 0, 0.08), 0 3px 6px rgba(0, 0, 0, 0.06);
+                --shadow-theme: 0 10px 30px var(--color-shadow), 0 4px 10px rgba(0, 0, 0, 0.06);
+
+                /* Typography */
+                --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji';
+                --font-mono: 'SF Mono', Monaco, 'Cascadia Code', 'Consolas', 'Courier New', monospace;
+
+                --text-xs: clamp(0.75rem, 0.7rem + 0.25vw, 0.875rem);
+                --text-sm: clamp(0.875rem, 0.8rem + 0.35vw, 1rem);
+                --text-base: clamp(1rem, 0.95rem + 0.25vw, 1.125rem);
+                --text-lg: clamp(1.125rem, 1.05rem + 0.35vw, 1.25rem);
+                --text-xl: clamp(1.25rem, 1.15rem + 0.5vw, 1.5rem);
+                --text-2xl: clamp(1.5rem, 1.3rem + 1vw, 2rem);
+                --text-3xl: clamp(2rem, 1.6rem + 2vw, 2.5rem);
+
+                --weight-normal: 400;
+                --weight-medium: 500;
+                --weight-semibold: 600;
+                --weight-bold: 700;
+
+                --leading-tight: 1.25;
+                --leading-snug: 1.375;
+                --leading-normal: 1.5;
+                --leading-relaxed: 1.625;
             }
 
-            #sidebar {
-                position: fixed;
-                background-color: #009AA6;
-                top: 0;
-                left: 0;
-                bottom: 0;
-                width: 30vw;
-            }
-
-            #sidebar .title {
-                position: relative;
-                text-align: center;
-                line-height: 5vmax;
-                font-size: 1.4vmax;
-                font-family: 'Arial';
-                margin-top: 30vh;
-            }
-
-            #sidebar .title a:link,
-            #sidebar .title a:visited {
-                color: #FFFFFF;
-                text-decoration: none;
-            }
-
-            .subtitle {
-                top: 50vh;
-                text-align: center;
-                line-height: 1.3vmax;
-                font-family: 'Arial';
-                font-size: 1.2vmax;
-                color: #FFFFFF;
-            }
-
-            .subtitle a:link,
-            .subtitle a:visited {
-                color: #FFFFFF;
-                text-decoration: none;
-            }
-
-            .licence {
-                position: fixed;
-                text-align: right;
-                bottom: 0;
-                right: 0;
-            }
-
-            .home {
-                position: fixed;
-                text-align: left;
-                font-family: 'Arial';
-                color: #D3D3D3;
-                z-index: 100;
-                width: 100%;
-                background-color: #FFFFFF;
-                top: 0px;
-                margin-bottom: 10px;
-                padding-bottom: 10px;
-            }
-
-            .home a:link,
-            .home a:visited {
-                text-decoration: none;
-                color: #D3D3D3;
-            }
-
-            .home ul {
+            /* ===== RESET & BASE ===== */
+            *,
+            *::before,
+            *::after {
+                box-sizing: border-box;
                 margin: 0;
                 padding: 0;
-                text-align: left;
-                list-style: none;
             }
 
-            .home li {
-                position: relative;
-                float: left;
-                padding-top: 15px;
-                margin-right: 1em;
-                font-family: 'Arial';
+            html {
+                scroll-behavior: smooth;
+                scroll-padding-top: 80px;
             }
 
-            .home li:hover {
-                display: block;
+            body {
+                font-family: var(--font-sans);
+                font-size: var(--text-base);
+                line-height: var(--leading-relaxed);
+                color: var(--color-base-text);
+                background: var(--color-base-bg);
+                overflow-x: hidden;
+                -webkit-font-smoothing: antialiased;
+                -moz-osx-font-smoothing: grayscale;
             }
 
-            .home li:hover a:link,
-            .home li:hover a:visited {
+            /* Skip Link */
+            .skip-link {
+                position: absolute;
+                top: -40px;
+                left: 0;
+                background: var(--color-accent-1);
+                color: white;
+                padding: var(--space-sm) var(--space-md);
                 text-decoration: none;
-                padding: 15px;
-                color: #FFFFFF;
-                background-color: #009AA6;
+                border-radius: var(--radius-md);
+                z-index: 100;
             }
 
-            .content {
-                line-height: 1.8vmax;
-                font-size: 1.2vmax;
-                font-family: 'Arial';
-                margin-top: 15vh;
-                width: 90%;
+            .skip-link:focus {
+                top: var(--space-sm);
+                left: var(--space-sm);
             }
 
-            .content h2,
-            h3,
-            h4 {
-                color: #009AA6;
+            /* ===== ANIMATED BACKGROUND ===== */
+            .animated-bg {
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                z-index: -2;
+                background: var(--gradient-mesh);
+                animation: meshFlow 20s ease-in-out infinite;
             }
 
-            .content a:link,
-            .content a:visited {
-                color: #009AA6;
+            @keyframes meshFlow {
+
+                0%,
+                100% {
+                    transform: translate(0, 0) rotate(0deg);
+                }
+
+                33% {
+                    transform: translate(2%, -2%) rotate(1deg);
+                }
+
+                66% {
+                    transform: translate(-2%, 2%) rotate(-1deg);
+                }
             }
 
-            .content h3 {
-                color: #009AA6;
+            .flow-overlay {
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                z-index: -1;
+                background-image:
+                    repeating-linear-gradient(90deg, transparent, transparent 40px, rgba(14, 165, 233, 0.02) 40px, rgba(14, 165, 233, 0.02) 80px);
+                animation: flowMove 30s linear infinite;
             }
 
-            .content h2::before,
-            .content h3::before {
-                display: block;
-                content: " ";
-                visibility: hidden;
-                height: 50px;
-                margin-top: -50px;
-                pointer-events: none;
-                background-color: #FFFFFF;
+            @keyframes flowMove {
+                0% {
+                    background-position: 0 0;
+                }
+
+                100% {
+                    background-position: 80px 0;
+                }
             }
 
-            .content p {
-                text-align: justify;
-                text-justify: inter-word;
+            /* ===== HEADER & NAVIGATION ===== */
+            header {
+                position: sticky;
+                top: 0;
+                z-index: 50;
+                background: rgba(255, 255, 255, 0.8);
+                -webkit-backdrop-filter: blur(12px) saturate(180%);
+                backdrop-filter: blur(12px) saturate(180%);
+                border-bottom: 1px solid var(--color-border);
+                box-shadow: var(--shadow-sm);
             }
 
-            .content a:link,
-            .content a:visited {
-                color: #009AA6;
+            nav {
+                max-width: 1400px;
+                margin: 0 auto;
+                padding: var(--space-lg) var(--space-xl);
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                gap: var(--space-xl);
             }
 
-            .home a:link,
-            .home a:visited {
-                color: #D3D3D3;
+            .nav-brand {
+                display: flex;
+                align-items: center;
+                gap: var(--space-md);
             }
 
-            .page {
-                width: 65vw;
-                height: 100%;
-                margin-left: 30vw;
+            .nav-brand a {
+                font-size: var(--text-xl);
+                font-weight: var(--weight-bold);
+                color: var(--color-base-text);
+                text-decoration: none;
+                letter-spacing: -0.02em;
+                transition: color 0.3s ease;
+            }
+
+            .nav-brand a:hover {
+                color: var(--color-accent-1);
+            }
+
+            .nav-brand-highlight {
+                background: var(--gradient-primary);
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                background-clip: text;
+            }
+
+            .breadcrumb {
+                display: flex;
+                list-style: none;
+                gap: var(--space-sm);
+                flex-wrap: wrap;
+            }
+
+            .breadcrumb li {
+                display: flex;
+                align-items: center;
+                gap: var(--space-sm);
+            }
+
+            .breadcrumb li:not(:last-child)::after {
+                content: '→';
+                color: var(--color-base-text-muted);
+                font-size: var(--text-sm);
+            }
+
+            .breadcrumb a {
+                color: var(--color-base-text-muted);
+                text-decoration: none;
+                font-size: var(--text-sm);
+                transition: color 0.3s ease;
+                padding: var(--space-xs) var(--space-sm);
+                border-radius: var(--radius-sm);
+            }
+
+            .breadcrumb a:hover {
+                color: var(--color-accent-1);
+                background: var(--color-hover);
+            }
+
+            /* ===== MAIN CONTENT ===== */
+            main {
+                max-width: 1400px;
+                margin: 0 auto;
+                padding: var(--space-4xl) var(--space-xl);
+            }
+
+            /* ===== HERO SECTION ===== */
+            .hero {
+                text-align: center;
+                margin-bottom: var(--space-4xl);
+                position: relative;
+            }
+
+            .hero-svg {
+                width: 100%;
+                max-width: 700px;
+                height: auto;
+                margin: 0 auto var(--space-3xl);
+                filter: drop-shadow(0 10px 30px var(--color-shadow));
+            }
+
+            .hero h1 {
+                font-size: var(--text-3xl);
+                font-weight: var(--weight-bold);
+                line-height: var(--leading-tight);
+                letter-spacing: -0.03em;
+                color: var(--color-base-text);
+                margin-bottom: var(--space-lg);
+                background: var(--gradient-feed);
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                background-clip: text;
+                background-size: 200% 200%;
+                animation: gradientShift 8s ease infinite;
+            }
+
+            @keyframes gradientShift {
+
+                0%,
+                100% {
+                    background-position: 0% 50%;
+                }
+
+                50% {
+                    background-position: 100% 50%;
+                }
+            }
+
+            /* ===== LICENSE BADGE ===== */
+            .license-badge {
+                display: inline-flex;
+                align-items: center;
+                gap: var(--space-sm);
+                padding: var(--space-sm) var(--space-lg);
+                background: rgba(255, 255, 255, 0.7);
+                -webkit-backdrop-filter: blur(12px) saturate(180%);
+                backdrop-filter: blur(12px) saturate(180%);
+                border: 1px solid var(--color-border);
+                border-radius: var(--radius-full);
+                box-shadow: var(--shadow-sm);
+                margin-bottom: var(--space-2xl);
+                transition: all 0.3s ease;
+            }
+
+            .license-badge:hover {
+                transform: translateY(-2px);
+                box-shadow: var(--shadow-md);
+            }
+
+            .license-badge img {
+                height: 20px;
+                width: auto;
+            }
+
+            /* ===== CONTENT SECTIONS ===== */
+            .content-section {
+                margin-bottom: var(--space-4xl);
+            }
+
+            .section-divider {
+                height: 4px;
+                background: var(--gradient-feed);
+                border-radius: var(--radius-full);
+                margin: var(--space-3xl) auto;
+                max-width: 200px;
+                position: relative;
                 overflow: hidden;
-                padding: 0 1em;
-                font-family: 'Arial';
             }
 
-            .page img {
-                max-width: 100%;
-                max-height: 100%;
+            .section-divider::after {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: -100%;
+                width: 50%;
+                height: 100%;
+                background: rgba(255, 255, 255, 0.6);
+                animation: shimmer 3s infinite;
             }
 
-            @media (max-width: 640px),
-            screen and (orientation: portrait) {
-                body {
-                    max-width: 100%;
-                    max-height: 100%;
+            @keyframes shimmer {
+                0% {
+                    left: -100%;
                 }
 
-                #sidebar {
-                    position: fixed;
-                    background-color: #009AA6;
-                    top: 0;
-                    left: 0;
-                    bottom: 80vh;
-                    width: 100vw;
+                50%,
+                100% {
+                    left: 100%;
+                }
+            }
+
+            .content-text {
+                background: var(--color-base-surface);
+                border-radius: var(--radius-xl);
+                padding: var(--space-2xl);
+                margin: var(--space-xl) 0;
+                box-shadow: var(--shadow-md);
+                border-left: 4px solid var(--color-accent-1);
+            }
+
+            .content-text p {
+                margin-bottom: var(--space-lg);
+                line-height: var(--leading-relaxed);
+            }
+
+            .content-text p:last-child {
+                margin-bottom: 0;
+            }
+
+            .content-text b {
+                color: var(--color-accent-1);
+                font-weight: var(--weight-semibold);
+            }
+
+            .content-text a {
+                color: var(--color-accent-1);
+                text-decoration: none;
+                border-bottom: 1px solid transparent;
+                transition: all 0.3s ease;
+            }
+
+            .content-text a:hover {
+                color: var(--color-accent-2);
+                border-bottom-color: var(--color-accent-2);
+            }
+
+            .content-text sup {
+                font-size: var(--text-xs);
+            }
+
+            /* ===== SECTION HEADINGS ===== */
+            h3 {
+                font-size: var(--text-2xl);
+                font-weight: var(--weight-bold);
+                color: var(--color-base-text);
+                margin: var(--space-3xl) 0 var(--space-xl);
+                letter-spacing: -0.02em;
+                position: relative;
+                padding-left: var(--space-lg);
+            }
+
+            h3::before {
+                content: '';
+                position: absolute;
+                left: 0;
+                top: 50%;
+                transform: translateY(-50%);
+                width: 4px;
+                height: 60%;
+                background: var(--gradient-feed);
+                border-radius: var(--radius-full);
+            }
+
+            h4 {
+                font-size: var(--text-xl);
+                font-weight: var(--weight-semibold);
+                color: var(--color-accent-1);
+                margin: var(--space-2xl) 0 var(--space-lg);
+                letter-spacing: -0.01em;
+            }
+
+            /* ===== FEATURE GRID ===== */
+            .feature-grid {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+                gap: var(--space-xl);
+                margin: var(--space-3xl) 0;
+            }
+
+            .feature-card {
+                background: rgba(255, 255, 255, 0.7);
+                -webkit-backdrop-filter: blur(12px) saturate(180%);
+                backdrop-filter: blur(12px) saturate(180%);
+                border: 1px solid rgba(255, 255, 255, 0.3);
+                border-radius: var(--radius-xl);
+                padding: var(--space-xl);
+                box-shadow: var(--shadow-theme);
+                transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+                position: relative;
+                overflow: hidden;
+            }
+
+            .feature-card::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                height: 3px;
+                transform: scaleX(0);
+                transform-origin: left;
+                transition: transform 0.4s ease;
+            }
+
+            .feature-card:nth-child(1)::before {
+                background: linear-gradient(90deg, #0ea5e9, #06b6d4);
+            }
+
+            .feature-card:nth-child(2)::before {
+                background: linear-gradient(90deg, #8b5cf6, #a855f7);
+            }
+
+            .feature-card:nth-child(3)::before {
+                background: linear-gradient(90deg, #10b981, #34d399);
+            }
+
+            .feature-card:hover::before {
+                transform: scaleX(1);
+            }
+
+            .feature-card:hover {
+                transform: translateY(-8px) scale(1.02);
+                box-shadow: 0 20px 40px rgba(14, 165, 233, 0.2);
+            }
+
+            .feature-icon {
+                width: 60px;
+                height: 60px;
+                border-radius: var(--radius-organic);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: var(--text-2xl);
+                margin-bottom: var(--space-lg);
+                animation: floatIcon 4s ease-in-out infinite;
+            }
+
+            @keyframes floatIcon {
+
+                0%,
+                100% {
+                    transform: translateY(0) rotate(0deg);
                 }
 
-                #sidebar .title {
-                    text-align: center;
-                    position: fixed;
-                    margin-top: 6vh;
-                    left: 0px;
-                    right: 0px;
-                    line-height: 3.5vmax;
-                    font-size: 1.5vmax;
-                    font-family: 'Arial';
+                50% {
+                    transform: translateY(-8px) rotate(2deg);
+                }
+            }
+
+            .feature-card:nth-child(1) .feature-icon {
+                background: linear-gradient(135deg, #0ea5e9, #06b6d4);
+                animation-delay: 0s;
+            }
+
+            .feature-card:nth-child(2) .feature-icon {
+                background: linear-gradient(135deg, #8b5cf6, #a855f7);
+                animation-delay: -1.3s;
+            }
+
+            .feature-card:nth-child(3) .feature-icon {
+                background: linear-gradient(135deg, #10b981, #34d399);
+                animation-delay: -2.6s;
+            }
+
+            .feature-card h4 {
+                margin-top: 0;
+                margin-bottom: var(--space-md);
+            }
+
+            .feature-card p {
+                color: var(--color-base-text-muted);
+                line-height: var(--leading-relaxed);
+                font-size: var(--text-sm);
+            }
+
+            /* ===== LISTS ===== */
+            ul {
+                list-style-position: outside;
+                padding-left: var(--space-xl);
+                margin: var(--space-lg) 0;
+                color: var(--color-base-text-muted);
+            }
+
+            ul li {
+                margin-bottom: var(--space-sm);
+                line-height: var(--leading-relaxed);
+            }
+
+            ul ul {
+                margin-top: var(--space-sm);
+                margin-bottom: var(--space-sm);
+            }
+
+            /* ===== HIGHLIGHT BOXES ===== */
+            .highlight-box {
+                background: linear-gradient(135deg, rgba(14, 165, 233, 0.05) 0%, rgba(139, 92, 246, 0.05) 100%);
+                border-left: 4px solid var(--color-accent-2);
+                border-radius: var(--radius-lg);
+                padding: var(--space-xl);
+                margin: var(--space-2xl) 0;
+                transition: all 0.3s ease;
+            }
+
+            .highlight-box:hover {
+                transform: translateX(4px);
+                box-shadow: var(--shadow-md);
+            }
+
+            .highlight-box p {
+                color: var(--color-base-text);
+                line-height: var(--leading-relaxed);
+                margin-bottom: var(--space-md);
+            }
+
+            .highlight-box p:last-child {
+                margin-bottom: 0;
+            }
+
+            .highlight-box b {
+                color: var(--color-accent-2);
+                font-weight: var(--weight-semibold);
+            }
+
+            /* ===== GOAL CARDS ===== */
+            .goal-grid {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+                gap: var(--space-2xl);
+                margin: var(--space-3xl) 0;
+            }
+
+            .goal-card {
+                background: var(--gradient-subtle);
+                border-radius: var(--radius-xl);
+                padding: var(--space-2xl);
+                box-shadow: var(--shadow-md);
+                border: 2px solid transparent;
+                transition: all 0.4s ease;
+                position: relative;
+            }
+
+            .goal-card::before {
+                content: '';
+                position: absolute;
+                top: -2px;
+                left: -2px;
+                right: -2px;
+                bottom: -2px;
+                background: var(--gradient-feed);
+                border-radius: var(--radius-xl);
+                z-index: -1;
+                opacity: 0;
+                transition: opacity 0.4s ease;
+            }
+
+            .goal-card:hover::before {
+                opacity: 0.3;
+            }
+
+            .goal-card:hover {
+                transform: scale(1.03);
+            }
+
+            .goal-card h4 {
+                margin-top: 0;
+                color: var(--color-accent-2);
+            }
+
+            .goal-card p {
+                color: var(--color-base-text);
+                line-height: var(--leading-relaxed);
+            }
+
+            /* ===== REFERENCES ===== */
+            .references {
+                background: var(--gradient-subtle);
+                border-radius: var(--radius-xl);
+                padding: var(--space-2xl);
+                margin: var(--space-3xl) 0;
+            }
+
+            .references h3 {
+                margin-top: 0;
+                padding-left: 0;
+            }
+
+            .references h3::before {
+                display: none;
+            }
+
+            .references ol {
+                list-style-position: inside;
+                color: var(--color-base-text-muted);
+                padding-left: 0;
+            }
+
+            .references li {
+                margin-bottom: var(--space-md);
+                padding-left: var(--space-sm);
+            }
+
+            .references a {
+                color: var(--color-accent-1);
+                text-decoration: none;
+                transition: color 0.3s ease;
+                border-bottom: 1px solid transparent;
+            }
+
+            .references a:hover {
+                color: var(--color-accent-2);
+                border-bottom-color: var(--color-accent-2);
+            }
+
+            /* ===== FOOTER ===== */
+            footer {
+                background: rgba(255, 255, 255, 0.7);
+                -webkit-backdrop-filter: blur(12px) saturate(180%);
+                backdrop-filter: blur(12px) saturate(180%);
+                border-top: 1px solid var(--color-border);
+                margin-top: var(--space-4xl);
+                padding: var(--space-2xl) var(--space-xl);
+            }
+
+            .footer-content {
+                max-width: 1400px;
+                margin: 0 auto;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                flex-wrap: wrap;
+                gap: var(--space-lg);
+            }
+
+            .footer-copyright {
+                color: var(--color-base-text-muted);
+                font-size: var(--text-sm);
+            }
+
+            .language-selector {
+                display: flex;
+                gap: var(--space-md);
+            }
+
+            .language-link {
+                color: var(--color-base-text-muted);
+                text-decoration: none;
+                font-size: var(--text-sm);
+                padding: var(--space-xs) var(--space-md);
+                border-radius: var(--radius-sm);
+                border: 1px solid var(--color-border);
+                transition: all 0.3s ease;
+            }
+
+            .language-link:hover {
+                color: var(--color-accent-1);
+                border-color: var(--color-accent-1);
+                background: var(--color-hover);
+            }
+
+            /* ===== RESPONSIVE DESIGN ===== */
+            @media (max-width: 768px) {
+                nav {
+                    flex-direction: column;
+                    align-items: flex-start;
+                    padding: var(--space-lg);
                 }
 
-                #sidebar .subtitle {
-                    text-align: center;
-                    top: 5vh;
-                    left: 0px;
-                    right: 0px;
-                    position: fixed;
-                    margin-top: 10vh;
-                    font-size: 1.5vmax;
-                }
-
-                #sidebar .title a:link,
-                #sidebar .title a:visited {
-                    text-align: center;
-                    color: #FFFFFF;
-                }
-
-                #sidebar .subtitle a:link,
-                #sidebar .subtitle a:visited {
-                    text-align: center;
-                    color: #FFFFFF;
-                }
-
-                .home {
-                    z-index: 100;
+                .breadcrumb {
                     width: 100%;
-                    background-color: #009AA6;
-                    font-size: 1.5vmax;
                 }
 
-                .home a:link,
-                .home a:visited {
-                    text-decoration: none;
-                    color: #FFFFFF;
+                main {
+                    padding: var(--space-2xl) var(--space-lg);
                 }
 
-                .content {
-                    line-height: 3.8vmax;
-                    font-size: 1.8vmax;
-                    font-family: 'Arial';
-                    margin-top: 22vh;
+                .feature-grid,
+                .goal-grid {
+                    grid-template-columns: 1fr;
                 }
 
-                .content a:link,
-                .content a:visited {
-                    color: #009AA6;
+                .footer-content {
+                    flex-direction: column;
+                    text-align: center;
                 }
 
-                .page {
-                    top: 40vh;
-                    width: 95%;
-                    margin-left: 0vw;
+                h3 {
+                    padding-left: var(--space-md);
                 }
+            }
 
-                .page img {
-                    max-width: 100%;
-                    max-height: 100%;
-                    border: 0;
+            /* ===== ACCESSIBILITY ===== */
+            @media (prefers-reduced-motion: reduce) {
+
+                *,
+                *::before,
+                *::after {
+                    animation-duration: 0.01ms !important;
+                    animation-iteration-count: 1 !important;
+                    transition-duration: 0.01ms !important;
                 }
+            }
+
+            :focus-visible {
+                outline: 3px solid var(--color-accent-1);
+                outline-offset: 2px;
+                border-radius: var(--radius-sm);
             }
         </style>
     </head>
 
     <body vocab="http://schema.org/">
-        <div id="sidebar">
-            <div class="title">
-                <h1><a href="./analysis-bookmarks-feeds.html">Building a Personalized Feed Aggregator</a></h1>
-            </div>
-            <div class="subtitle">
-                <h3><a href="../about.html">John Samuel</a></h3>
-            </div>
-        </div>
-        <div class="licence">
-            <a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/"><img alt="Creative Commons License"
-                    style="border-width:0" src="./../../images/license.png" /></a>
-        </div>
-        <div class="page">
-            <div class="home">
-                <ul typeof="BreadcrumbList">
+        <a href="#main-content" class="skip-link">Skip to main content</a>
+
+        <div class="animated-bg"></div>
+        <div class="flow-overlay"></div>
+
+        <header>
+            <nav>
+                <div class="nav-brand">
+                    <a href="../about.html"><span class="nav-brand-highlight">John Samuel</span></a>
+                </div>
+                <ul class="breadcrumb" typeof="BreadcrumbList">
                     <li property="itemListElement" typeof="ListItem">
                         <a property="item" typeof="WebPage" href="../index.html">
                             <span property="name">Home</span>
@@ -287,42 +813,302 @@
                         </a>
                     </li>
                 </ul>
+            </nav>
+        </header>
 
-            </div>
-            <div class="content">
-                <p>Feed aggregators are helpful in getting the latest news from various blogs and news websites. But the
-                    consequence of subscribing to a large number of feeds is waste of time, especially when it requires
-                    skimming through a multitude of irrelevant
-                    and redundant articles. Many of the current desktop feed aggregators don't have options to filter
-                    out the articles based on the past reading profile and to group similar articles from multiple
-                    sites. A reading profile can be built by analysis
-                    of the articles read in the past and their associated tags (e.g., important, read-later). Grouping
-                    of articles, however, can be done considering their titles, their website source etc. So what I am
-                    looking for is a feed aggregator that
-                    can help me to analyse <b>bookmarked and tagged articles</b> to <b>automatically filter out relevant
-                        articles and group together similar articles from subscribed feeds</b>.
-                </p>
-                <h3>Analysis of Bookmarks and Feeds</h3>
+        <main id="main-content">
+            <section class="hero">
+                <svg class="hero-svg" viewBox="0 0 700 400" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                    <defs>
+                        <linearGradient id="streamGradient1" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" style="stop-color:#0ea5e9;stop-opacity:1" />
+                            <stop offset="100%" style="stop-color:#06b6d4;stop-opacity:1" />
+                        </linearGradient>
+
+                        <linearGradient id="streamGradient2" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" style="stop-color:#8b5cf6;stop-opacity:1" />
+                            <stop offset="100%" style="stop-color:#a855f7;stop-opacity:1" />
+                        </linearGradient>
+
+                        <linearGradient id="streamGradient3" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" style="stop-color:#10b981;stop-opacity:1" />
+                            <stop offset="100%" style="stop-color:#34d399;stop-opacity:1" />
+                        </linearGradient>
+
+                        <linearGradient id="filterGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" style="stop-color:#f59e0b;stop-opacity:0.8" />
+                            <stop offset="100%" style="stop-color:#fbbf24;stop-opacity:0.8" />
+                        </linearGradient>
+
+                        <filter id="glow">
+                            <feGaussianBlur stdDeviation="3" result="coloredBlur" />
+                            <feMerge>
+                                <feMergeNode in="coloredBlur" />
+                                <feMergeNode in="SourceGraphic" />
+                            </feMerge>
+                        </filter>
+                    </defs>
+
+                    <!-- Multiple feed sources (left side) -->
+                    <g transform="translate(80, 80)">
+                        <!-- Feed source 1 -->
+                        <circle cx="0" cy="0" r="18" fill="url(#streamGradient1)" opacity="0.8">
+                            <animate attributeName="opacity" values="0.8;1;0.8" dur="2s" repeatCount="indefinite" />
+                        </circle>
+                        <path d="M -8,-3 Q -8,-8 -3,-8 Q 2,-8 2,-3" fill="none" stroke="white" stroke-width="2" />
+                        <path d="M -8,2 Q -8,-3 -3,-3 Q 2,-3 2,2" fill="none" stroke="white" stroke-width="2" />
+                        <path d="M -8,7 Q -8,2 -3,2 Q 2,2 2,7" fill="none" stroke="white" stroke-width="2" />
+
+                        <!-- Feed source 2 -->
+                        <g transform="translate(0, 80)">
+                            <circle cx="0" cy="0" r="18" fill="url(#streamGradient2)" opacity="0.8">
+                                <animate attributeName="opacity" values="0.8;1;0.8" dur="2s" begin="0.5s"
+                                    repeatCount="indefinite" />
+                            </circle>
+                            <path d="M -8,-3 Q -8,-8 -3,-8 Q 2,-8 2,-3" fill="none" stroke="white" stroke-width="2" />
+                            <path d="M -8,2 Q -8,-3 -3,-3 Q 2,-3 2,2" fill="none" stroke="white" stroke-width="2" />
+                            <path d="M -8,7 Q -8,2 -3,2 Q 2,2 2,7" fill="none" stroke="white" stroke-width="2" />
+                        </g>
+
+                        <!-- Feed source 3 -->
+                        <g transform="translate(0, 160)">
+                            <circle cx="0" cy="0" r="18" fill="url(#streamGradient3)" opacity="0.8">
+                                <animate attributeName="opacity" values="0.8;1;0.8" dur="2s" begin="1s"
+                                    repeatCount="indefinite" />
+                            </circle>
+                            <path d="M -8,-3 Q -8,-8 -3,-8 Q 2,-8 2,-3" fill="none" stroke="white" stroke-width="2" />
+                            <path d="M -8,2 Q -8,-3 -3,-3 Q 2,-3 2,2" fill="none" stroke="white" stroke-width="2" />
+                            <path d="M -8,7 Q -8,2 -3,2 Q 2,2 2,7" fill="none" stroke="white" stroke-width="2" />
+                        </g>
+                    </g>
+
+                    <!-- Content particles flowing from feeds -->
+                    <g opacity="0.6">
+                        <!-- Stream 1 particles -->
+                        <circle cx="120" cy="80" r="5" fill="#0ea5e9">
+                            <animate attributeName="cx" values="120;200;280" dur="3s" repeatCount="indefinite" />
+                            <animate attributeName="opacity" values="0.6;1;0.6" dur="3s" repeatCount="indefinite" />
+                        </circle>
+                        <circle cx="140" cy="80" r="4" fill="#0ea5e9">
+                            <animate attributeName="cx" values="140;220;300" dur="3s" begin="0.5s"
+                                repeatCount="indefinite" />
+                            <animate attributeName="opacity" values="0.6;1;0.6" dur="3s" begin="0.5s"
+                                repeatCount="indefinite" />
+                        </circle>
+
+                        <!-- Stream 2 particles -->
+                        <circle cx="120" cy="160" r="5" fill="#8b5cf6">
+                            <animate attributeName="cx" values="120;200;280" dur="3s" begin="0.3s"
+                                repeatCount="indefinite" />
+                            <animate attributeName="cy" values="160;150;140" dur="3s" begin="0.3s"
+                                repeatCount="indefinite" />
+                            <animate attributeName="opacity" values="0.6;1;0.6" dur="3s" begin="0.3s"
+                                repeatCount="indefinite" />
+                        </circle>
+                        <circle cx="140" cy="160" r="4" fill="#8b5cf6">
+                            <animate attributeName="cx" values="140;220;300" dur="3s" begin="0.8s"
+                                repeatCount="indefinite" />
+                            <animate attributeName="cy" values="160;150;140" dur="3s" begin="0.8s"
+                                repeatCount="indefinite" />
+                            <animate attributeName="opacity" values="0.6;1;0.6" dur="3s" begin="0.8s"
+                                repeatCount="indefinite" />
+                        </circle>
+
+                        <!-- Stream 3 particles -->
+                        <circle cx="120" cy="240" r="5" fill="#10b981">
+                            <animate attributeName="cx" values="120;200;280" dur="3s" begin="0.6s"
+                                repeatCount="indefinite" />
+                            <animate attributeName="cy" values="240;220;200" dur="3s" begin="0.6s"
+                                repeatCount="indefinite" />
+                            <animate attributeName="opacity" values="0.6;1;0.6" dur="3s" begin="0.6s"
+                                repeatCount="indefinite" />
+                        </circle>
+                        <circle cx="140" cy="240" r="4" fill="#10b981">
+                            <animate attributeName="cx" values="140;220;300" dur="3s" begin="1.1s"
+                                repeatCount="indefinite" />
+                            <animate attributeName="cy" values="240;220;200" dur="3s" begin="1.1s"
+                                repeatCount="indefinite" />
+                            <animate attributeName="opacity" values="0.6;1;0.6" dur="3s" begin="1.1s"
+                                repeatCount="indefinite" />
+                        </circle>
+                    </g>
+
+                    <!-- Central filter/aggregator (funnel shape) -->
+                    <g transform="translate(350, 160)">
+                        <!-- Funnel outline -->
+                        <path d="M -60,-60 L -60,-40 L -20,40 L 20,40 L 60,-40 L 60,-60 Z" fill="url(#filterGradient)"
+                            opacity="0.3" filter="url(#glow)" />
+                        <path d="M -60,-60 L -60,-40 L -20,40 M 60,-60 L 60,-40 L 20,40" fill="none" stroke="#f59e0b"
+                            stroke-width="3" opacity="0.8" />
+
+                        <!-- Filter symbol -->
+                        <circle cx="0" cy="-20" r="25" fill="none" stroke="#f59e0b" stroke-width="2" opacity="0.6">
+                            <animate attributeName="r" values="25;28;25" dur="2s" repeatCount="indefinite" />
+                        </circle>
+                        <text x="0" y="-15" text-anchor="middle" fill="#f59e0b" font-size="20" font-weight="bold"
+                            opacity="0.8">⚙</text>
+                    </g>
+
+                    <!-- Filtered/personalized output (right side) -->
+                    <g transform="translate(580, 160)">
+                        <!-- Output container -->
+                        <rect x="-40" y="-60" width="80" height="120" rx="12" fill="none" stroke="url(#streamGradient1)"
+                            stroke-width="3" opacity="0.8" />
+
+                        <!-- Relevant items (fewer, organized) -->
+                        <g opacity="0.9">
+                            <rect x="-30" y="-45" width="60" height="12" rx="3" fill="#10b981">
+                                <animate attributeName="opacity" values="0.9;1;0.9" dur="2s" repeatCount="indefinite" />
+                            </rect>
+                            <rect x="-30" y="-25" width="60" height="12" rx="3" fill="#10b981">
+                                <animate attributeName="opacity" values="0.9;1;0.9" dur="2s" begin="0.3s"
+                                    repeatCount="indefinite" />
+                            </rect>
+                            <rect x="-30" y="-5" width="60" height="12" rx="3" fill="#10b981">
+                                <animate attributeName="opacity" values="0.9;1;0.9" dur="2s" begin="0.6s"
+                                    repeatCount="indefinite" />
+                            </rect>
+                            <rect x="-30" y="15" width="60" height="12" rx="3" fill="#10b981">
+                                <animate attributeName="opacity" values="0.9;1;0.9" dur="2s" begin="0.9s"
+                                    repeatCount="indefinite" />
+                            </rect>
+                        </g>
+
+                        <!-- Checkmark for relevant -->
+                        <circle cx="0" cy="75" r="15" fill="#10b981" opacity="0.8" />
+                        <path d="M -5,75 L -2,80 L 7,68" fill="none" stroke="white" stroke-width="3"
+                            stroke-linecap="round" />
+                    </g>
+
+                    <!-- Flow lines showing aggregation -->
+                    <g opacity="0.3">
+                        <path d="M 120,80 Q 200,80 280,120" fill="none" stroke="#0ea5e9" stroke-width="2"
+                            stroke-dasharray="5,5">
+                            <animate attributeName="stroke-dashoffset" from="0" to="10" dur="2s"
+                                repeatCount="indefinite" />
+                        </path>
+                        <path d="M 120,160 Q 200,160 280,160" fill="none" stroke="#8b5cf6" stroke-width="2"
+                            stroke-dasharray="5,5">
+                            <animate attributeName="stroke-dashoffset" from="0" to="10" dur="2s"
+                                repeatCount="indefinite" />
+                        </path>
+                        <path d="M 120,240 Q 200,220 280,200" fill="none" stroke="#10b981" stroke-width="2"
+                            stroke-dasharray="5,5">
+                            <animate attributeName="stroke-dashoffset" from="0" to="10" dur="2s"
+                                repeatCount="indefinite" />
+                        </path>
+
+                        <!-- From filter to output -->
+                        <path d="M 370,200 Q 450,180 540,160" fill="none" stroke="#10b981" stroke-width="2"
+                            stroke-dasharray="5,5">
+                            <animate attributeName="stroke-dashoffset" from="0" to="10" dur="2s"
+                                repeatCount="indefinite" />
+                        </path>
+                    </g>
+
+                    <!-- Labels -->
+                    <text x="80" y="320" text-anchor="middle" fill="#64748b" font-size="12" font-weight="600">Multiple
+                        Feeds</text>
+                    <text x="350" y="320" text-anchor="middle" fill="#64748b" font-size="12" font-weight="600">Smart
+                        Filter</text>
+                    <text x="580" y="320" text-anchor="middle" fill="#64748b" font-size="12"
+                        font-weight="600">Personalized</text>
+                </svg>
+
+                <h1>Building a Personalized Feed Aggregator</h1>
+
+                <a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/" class="license-badge">
+                    <img alt="Creative Commons License" src="./../../images/license.png" />
+                    <span style="color: var(--color-base-text-muted); font-size: var(--text-sm);">CC BY-SA 4.0</span>
+                </a>
+            </section>
+
+            <section class="content-section">
+                <div class="content-text">
+                    <p>Feed aggregators are helpful in getting the latest news from various blogs and news websites. But
+                        the
+                        consequence of subscribing to a large number of feeds is waste of time, especially when it
+                        requires
+                        skimming through a multitude of irrelevant
+                        and redundant articles. Many of the current desktop feed aggregators don't have options to
+                        filter
+                        out the articles based on the past reading profile and to group similar articles from multiple
+                        sites. A reading profile can be built by analysis
+                        of the articles read in the past and their associated tags (e.g., important, read-later).
+                        Grouping
+                        of articles, however, can be done considering their titles, their website source etc. So what I
+                        am
+                        looking for is a feed aggregator that
+                        can help me to analyse <b>bookmarked and tagged articles</b> to <b>automatically filter out
+                            relevant
+                            articles and group together similar articles from subscribed feeds</b>.
+                    </p>
+                </div>
+            </section>
+
+            <h3>Analysis of Bookmarks and Feeds</h3>
+
+            <section class="content-section">
+                <div class="feature-grid">
+                    <article class="feature-card">
+                        <div class="feature-icon">📥</div>
+                        <h4>1. Identifying the Data Sources</h4>
+                        <p>Gather data from bookmarks (browsers) and feed aggregators. Extract information from HTML,
+                            XML, JSON, and OPML formats to build a comprehensive reading profile.</p>
+                    </article>
+
+                    <article class="feature-card">
+                        <div class="feature-icon">📊</div>
+                        <h4>2. Data Analysis</h4>
+                        <p>Analyze patterns in bookmarked content, timestamps, tags, and categories. Identify topics of
+                            interest, frequently visited websites, and evolving reading preferences.</p>
+                    </article>
+
+                    <article class="feature-card">
+                        <div class="feature-icon">📈</div>
+                        <h4>3. Data Visualization</h4>
+                        <p>Create word clouds, timeline visualizations, and pattern recognition displays to understand
+                            reading habits and discover forgotten topics of interest.</p>
+                    </article>
+                </div>
+            </section>
+
+            <section class="content-section">
                 <h4>1. Identifying the Data Sources</h4>
-                <p>There are primarily two data sources for building a user reading profile: <b>bookmarks from internet
-                        browsers</b> and <b>feed aggregators</b>. Internet browsers and feed aggregators usually use
-                    HTML, XML or JSON data format to store bookmarks
-                    and feeds. But the data format is not <b>standardized</b> across browsers and feed aggregators. Feed
-                    aggregators usually support importing or exporting files of subscriptions in OPML (Outline Processor
-                    Markup Language)<a href="#opml"><sup>1</sup></a> format. Browsers let you export or import bookmarks
-                    in HTML format. In some cases like Firefox, user tags are not present in the exported HTML file. One
-                    option here, in case of Firefox is to make use of bookmark backups that provide a
-                    lot of information usually absent in the exported files like the logo URL of the bookmarked sites,
-                    time of bookmarking, user-generated tags.
-                </p>
+                <div class="content-text">
+                    <p>There are primarily two data sources for building a user reading profile: <b>bookmarks from
+                            internet
+                            browsers</b> and <b>feed aggregators</b>. Internet browsers and feed aggregators usually use
+                        HTML, XML or JSON data format to store bookmarks
+                        and feeds. But the data format is not <b>standardized</b> across browsers and feed aggregators.
+                        Feed
+                        aggregators usually support importing or exporting files of subscriptions in OPML (Outline
+                        Processor
+                        Markup Language)<a href="#opml"><sup>1</sup></a> format. Browsers let you export or import
+                        bookmarks
+                        in HTML format. In some cases like Firefox, user tags are not present in the exported HTML file.
+                        One
+                        option here, in case of Firefox is to make use of bookmark backups that provide a
+                        lot of information usually absent in the exported files like the logo URL of the bookmarked
+                        sites,
+                        time of bookmarking, user-generated tags.
+                    </p>
+                </div>
+            </section>
+
+            <section class="content-section">
                 <h4>2. Data Analysis</h4>
-                <p>
-                    So the next obvious question that arises: what are the <b>data available for performing analysis</b>
-                    and <b>what do we want to achieve from this analyis</b>? Following is a list of data available from
-                    the exported bookmark HTML, bookmark
-                    backup JSON files and subscribed feeds OPML file:
-                </p>
-                <p>
+                <div class="content-text">
+                    <p>
+                        So the next obvious question that arises: what are the <b>data available for performing
+                            analysis</b>
+                        and <b>what do we want to achieve from this analyis</b>? Following is a list of data available
+                        from
+                        the exported bookmark HTML, bookmark
+                        backup JSON files and subscribed feeds OPML file:
+                    </p>
+                </div>
+
                 <ul>
                     <li>Source URL
                         <ul>
@@ -346,16 +1132,21 @@
                         </ul>
                     </li>
                 </ul>
-                </p>
-                <p>
-                    This is a treasure-trove of information. Take for example, given the availability of time, one
-                    interesting aspect is to know what theme of topics interested me during specific periods of time and
-                    when did a particular topic caught first attention. Tags
-                    and categories (or folders) may also give an idea of the way of information classification style.
-                    Seemingly we are aware of the data to analyse but not what all to infer with these data. Yet some
-                    non-exhaustive questions are given below:
-                </p>
-                <p>
+
+                <div class="content-text">
+                    <p>
+                        This is a treasure-trove of information. Take for example, given the availability of time, one
+                        interesting aspect is to know what theme of topics interested me during specific periods of time
+                        and
+                        when did a particular topic caught first attention. Tags
+                        and categories (or folders) may also give an idea of the way of information classification
+                        style.
+                        Seemingly we are aware of the data to analyse but not what all to infer with these data. Yet
+                        some
+                        non-exhaustive questions are given below:
+                    </p>
+                </div>
+
                 <ul>
                     <li> Bookmarks
                         <ul>
@@ -383,66 +1174,126 @@
                         </ul>
                     </li>
                 </ul>
-                </p>
-                <p>
-                    All of the above questions are based on the aggregation functions like count, minimum, maximum,
-                    average. These are commonly asked while performing analysis in almost every domain. This information
-                    is sufficient enough to build a basic reading profile.
-                    But care must be taken to ensure that it doesn't lead to building a profile that ignores least
-                    commonly used bookmarks or websites. In other words, data analysis must also help in <b>filtering
-                        out the forgotten topics or bookmarks and websites</b>.
-                </p>
+
+                <div class="highlight-box">
+                    <p>
+                        All of the above questions are based on the aggregation functions like count, minimum, maximum,
+                        average. These are commonly asked while performing analysis in almost every domain. This
+                        information
+                        is sufficient enough to build a basic reading profile.
+                        But care must be taken to ensure that it doesn't lead to building a profile that ignores least
+                        commonly used bookmarks or websites. In other words, data analysis must also help in
+                        <b>filtering
+                            out the forgotten topics or bookmarks and websites</b>.
+                    </p>
+                </div>
+            </section>
+
+            <section class="content-section">
                 <h4>3. Data Visualization</h4>
-                <p>What better way to analyse than to <b>visualize</b>! Visualization techniques help not only to find
-                    interesting patterns but also pop out striking features. As time passes, bookmark related
-                    information accumulates. When the amount of data
-                    increases, it's usually not feasible to analyse with tables. There are more data that need to be
-                    analysed than those that can be analysed on a single glance. There are a large number of
-                    visualization libraries available that can help to
-                    obtain a word cloud<a href="#tagcloud"><sup>2</sup></a> corresponding to bookmarked articles,
-                    particularly to understand the main topics of interest. Then there are those that can be used to
-                    visualize the pattern of website visits on a
-                    timeline. This idea can be extended to understand the (recurrent) pattern of bookmarks concerning a
-                    particular topic. The interesting results thus obtained can be fed back to the system in the form of
-                    new user-generated tags.
-                </p>
-                <h3>Building a Reading Profile</h3>
-                <h4>1. Recommendation</h4>
-                <p>
-                    Such a reading profile built after analysis of past bookmarks and feeds can be used to recommend
-                    articles. But a mere recommendation isn't enough. The justification for a recommendation must also
-                    be presented. This contextual information can be verified
-                    and any corrections required can be fed back to the system for improving the recommendation
-                    mechanism.
-                </p>
-                <h3>A Personalized Feed Aggregator</h3>
-                <h3>Conclusion</h3>
-                <p>
-                    The overall goal is not to understand reading behaviour but to save time skipping through irrelevant
-                    or redundant articles. Therefore it is very important to cluster the articles based on theme and
-                    grouping similar articles. But the aspect of surprise
-                    (e.g., new technological advancement) should not be missing from the overall scene of filtering.
-                </p>
-                <p>
-                    <b>Information overload</b> is a major challenge, but there are several ways to reduce it.
-                </p>
-                <h3>References</h3>
-                <ol>
-                    <li id="opml"><a href="https://en.wikipedia.org/wiki/OPML">OPML (Outline Processor Markup
-                            Language)</a></li>
-                    <li id="tagcloud"><a href="https://en.wikipedia.org/wiki/Tag_cloud">Tag (Word) Cloud</a></li>
-                    <li id="bookmark"><a href="https://en.wikipedia.org/wiki/Bookmark">Bookmark</a></li>
-                    <li id="bookmark-web"><a href="https://en.wikipedia.org/wiki/Bookmark_%28World_Wide_Web%29">Bookmark
-                            (World Wide Web)</a></li>
-                    <li id="categorization"><a href="https://en.wikipedia.org/wiki/Categorization">Categorization</a>
-                    </li>
-                    <li id="tag"><a href="https://en.wikipedia.org/wiki/Tag_%28metadata%29">Tag (metadata)</a></li>
-                    <li id="aggregator"><a href="https://en.wikipedia.org/wiki/News_aggregator">News Aggregator</a></li>
-                    <li id="web-feed"><a href="https://en.wikipedia.org/wiki/Web_feed">Web Feed</a></li>
-                    <li id="data-analysis"><a href="https://en.wikipedia.org/wiki/Data_analysis">Data Analysis</a></li>
-                </ol>
+                <div class="content-text">
+                    <p>What better way to analyse than to <b>visualize</b>! Visualization techniques help not only to
+                        find
+                        interesting patterns but also pop out striking features. As time passes, bookmark related
+                        information accumulates. When the amount of data
+                        increases, it's usually not feasible to analyse with tables. There are more data that need to be
+                        analysed than those that can be analysed on a single glance. There are a large number of
+                        visualization libraries available that can help to
+                        obtain a word cloud<a href="#tagcloud"><sup>2</sup></a> corresponding to bookmarked articles,
+                        particularly to understand the main topics of interest. Then there are those that can be used to
+                        visualize the pattern of website visits on a
+                        timeline. This idea can be extended to understand the (recurrent) pattern of bookmarks
+                        concerning a
+                        particular topic. The interesting results thus obtained can be fed back to the system in the
+                        form of
+                        new user-generated tags.
+                    </p>
+                </div>
+            </section>
+
+            <div class="section-divider"></div>
+
+            <h3>Building a Reading Profile</h3>
+
+            <section class="content-section">
+                <div class="goal-grid">
+                    <article class="goal-card">
+                        <h4>1. Recommendation</h4>
+                        <p>
+                            Such a reading profile built after analysis of past bookmarks and feeds can be used to
+                            recommend
+                            articles. But a mere recommendation isn't enough. The justification for a recommendation
+                            must also
+                            be presented. This contextual information can be verified
+                            and any corrections required can be fed back to the system for improving the recommendation
+                            mechanism.
+                        </p>
+                    </article>
+                </div>
+            </section>
+
+            <h3>A Personalized Feed Aggregator</h3>
+
+            <section class="content-section">
+                <div class="content-text">
+                    <p style="text-align: center; color: var(--color-base-text-muted); font-style: italic;">
+                        [Section placeholder for detailed implementation discussion]
+                    </p>
+                </div>
+            </section>
+
+            <h3>Conclusion</h3>
+
+            <section class="content-section">
+                <div class="highlight-box">
+                    <p>
+                        The overall goal is not to understand reading behaviour but to save time skipping through
+                        irrelevant
+                        or redundant articles. Therefore it is very important to cluster the articles based on theme and
+                        grouping similar articles. But the aspect of surprise
+                        (e.g., new technological advancement) should not be missing from the overall scene of filtering.
+                    </p>
+                    <p>
+                        <b>Information overload</b> is a major challenge, but there are several ways to reduce it.
+                    </p>
+                </div>
+            </section>
+
+            <section class="content-section">
+                <div class="references">
+                    <h3>References</h3>
+                    <ol>
+                        <li id="opml"><a href="https://en.wikipedia.org/wiki/OPML">OPML (Outline Processor Markup
+                                Language)</a></li>
+                        <li id="tagcloud"><a href="https://en.wikipedia.org/wiki/Tag_cloud">Tag (Word) Cloud</a></li>
+                        <li id="bookmark"><a href="https://en.wikipedia.org/wiki/Bookmark">Bookmark</a></li>
+                        <li id="bookmark-web"><a
+                                href="https://en.wikipedia.org/wiki/Bookmark_%28World_Wide_Web%29">Bookmark
+                                (World Wide Web)</a></li>
+                        <li id="categorization"><a
+                                href="https://en.wikipedia.org/wiki/Categorization">Categorization</a>
+                        </li>
+                        <li id="tag"><a href="https://en.wikipedia.org/wiki/Tag_%28metadata%29">Tag (metadata)</a></li>
+                        <li id="aggregator"><a href="https://en.wikipedia.org/wiki/News_aggregator">News Aggregator</a>
+                        </li>
+                        <li id="web-feed"><a href="https://en.wikipedia.org/wiki/Web_feed">Web Feed</a></li>
+                        <li id="data-analysis"><a href="https://en.wikipedia.org/wiki/Data_analysis">Data Analysis</a>
+                        </li>
+                    </ol>
+                </div>
+            </section>
+        </main>
+
+        <footer>
+            <div class="footer-content">
+                <div class="footer-copyright">
+                    © John Samuel
+                </div>
+                <div class="language-selector">
+                    <a href="./personalized-feed-aggregator.html" class="language-link">English</a>
+                </div>
             </div>
-        </div>
+        </footer>
     </body>
 
 </html>
