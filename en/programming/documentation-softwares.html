@@ -1,310 +1,743 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 
     <head>
-        <meta charset="utf-8" />
-        <title>Documenting Software Applications on Wikidata</title>
-        <meta http-equiv="Content-Language" content="en" />
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta name="description" content="Documenting Software Applications on Wikidata">
         <link rel="shortcut icon" href="../../images/logo/favicon.png" />
-        <style type="text/css">
-            body {
-                background-color: #FFFFFF;
+        <title>Documenting Software Applications on Wikidata | John Samuel</title>
+        <style>
+            /* Design Tokens */
+            :root {
+                /* Knowledge Graph Theme Colors */
+                --color-base-bg: #f5f8fb;
+                --color-base-surface: #ffffff;
+                --color-base-text: #1a1f2e;
+                --color-base-text-muted: #4a5568;
+
+                /* Semantic Web Theme Accents */
+                --color-accent-1: #3b82f6;
+                /* Knowledge blue */
+                --color-accent-2: #1e40af;
+                /* Deep data blue */
+                --color-accent-3: #8b5cf6;
+                /* Semantic purple */
+                --color-accent-light: #dbeafe;
+                --color-accent-soft: #eff6ff;
+
+                /* Functional Colors */
+                --color-shadow: rgba(59, 130, 246, 0.12);
+                --color-border: rgba(59, 130, 246, 0.15);
+                --color-hover: rgba(59, 130, 246, 0.08);
+                --color-node: #10b981;
+
+                /* Gradients */
+                --gradient-primary: linear-gradient(135deg, var(--color-accent-1), var(--color-accent-3));
+                --gradient-subtle: linear-gradient(180deg, var(--color-base-bg), var(--color-accent-soft));
+                --gradient-hero: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #3b82f6 100%);
+
+                /* Spacing Scale */
+                --space-xs: 0.25rem;
+                --space-sm: 0.5rem;
+                --space-md: 1rem;
+                --space-lg: 1.5rem;
+                --space-xl: 2rem;
+                --space-2xl: 3rem;
+                --space-3xl: 4rem;
+                --space-4xl: 6rem;
+
+                /* Border Radius */
+                --radius-sm: 6px;
+                --radius-md: 12px;
+                --radius-lg: 16px;
+                --radius-xl: 24px;
+                --radius-organic: 63% 37% 54% 46% / 45% 62% 38% 55%;
+
+                /* Typography */
+                --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+                --font-mono: 'SF Mono', Monaco, 'Cascadia Code', Consolas, monospace;
+
+                --text-xs: clamp(0.75rem, 0.7rem + 0.25vw, 0.875rem);
+                --text-sm: clamp(0.875rem, 0.8rem + 0.35vw, 1rem);
+                --text-base: clamp(1rem, 0.95rem + 0.25vw, 1.125rem);
+                --text-lg: clamp(1.125rem, 1.05rem + 0.35vw, 1.25rem);
+                --text-xl: clamp(1.25rem, 1.15rem + 0.5vw, 1.5rem);
+                --text-2xl: clamp(1.5rem, 1.3rem + 1vw, 2rem);
+                --text-3xl: clamp(2rem, 1.6rem + 2vw, 2.75rem);
+                --text-4xl: clamp(2.5rem, 2rem + 2.5vw, 3.5rem);
+
+                /* Shadows */
+                --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.04), 0 1px 3px rgba(0, 0, 0, 0.06);
+                --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.05), 0 2px 4px rgba(0, 0, 0, 0.06);
+                --shadow-lg: 0 10px 24px rgba(0, 0, 0, 0.08), 0 4px 8px rgba(0, 0, 0, 0.06);
+                --shadow-xl: 0 20px 40px rgba(0, 0, 0, 0.12), 0 8px 16px rgba(0, 0, 0, 0.08);
+                --shadow-theme: 0 10px 30px var(--color-shadow), 0 4px 10px rgba(0, 0, 0, 0.06);
             }
 
-            #sidebar {
-                position: fixed;
-                background-color: #009AA6;
-                top: 0;
-                left: 0;
-                bottom: 0;
-                width: 30vw;
-            }
-
-            #sidebar .title {
-                position: relative;
-                text-align: center;
-                line-height: 5vmax;
-                font-size: 1.4vmax;
-                font-family: 'Arial';
-                margin-top: 30vh;
-            }
-
-            #sidebar .title a:link,
-            #sidebar .title a:visited {
-                color: #FFFFFF;
-                text-decoration: none;
-            }
-
-            .subtitle {
-                top: 50vh;
-                text-align: center;
-                line-height: 1.3vmax;
-                font-family: 'Arial';
-                font-size: 1.2vmax;
-                color: #FFFFFF;
-            }
-
-            .subtitle a:link,
-            .subtitle a:visited {
-                color: #FFFFFF;
-                text-decoration: none;
-            }
-
-            .licence {
-                position: fixed;
-                text-align: right;
-                bottom: 0;
-                right: 0;
-            }
-
-            .home {
-                position: fixed;
-                text-align: left;
-                font-family: 'Arial';
-                color: #D3D3D3;
-                z-index: 100;
-                width: 100%;
-                background-color: #FFFFFF;
-                top: 0px;
-                margin-bottom: 10px;
-                padding-bottom: 10px;
-            }
-
-            .home a:link,
-            .home a:visited {
-                text-decoration: none;
-                color: #D3D3D3;
-            }
-
-            .home ul {
+            /* Reset & Base Styles */
+            *,
+            *::before,
+            *::after {
                 margin: 0;
                 padding: 0;
-                text-align: left;
-                list-style: none;
+                box-sizing: border-box;
             }
 
-            .home li {
-                position: relative;
-                float: left;
-                padding-top: 15px;
-                margin-right: 1em;
-                font-family: 'Arial';
+            html {
+                scroll-behavior: smooth;
+                scroll-padding-top: 100px;
             }
 
-            .home li:hover {
-                display: block;
+            body {
+                font-family: var(--font-sans);
+                font-size: var(--text-base);
+                line-height: 1.7;
+                color: var(--color-base-text);
+                background: var(--gradient-subtle);
+                background-attachment: fixed;
+                min-height: 100vh;
+                overflow-x: hidden;
             }
 
-            .home li:hover a:link,
-            .home li:hover a:visited {
-                text-decoration: none;
-                padding: 15px;
-                color: #FFFFFF;
-                background-color: #009AA6;
-            }
-
-            .content {
-                line-height: 1.8vmax;
-                font-size: 1.2vmax;
-                font-family: 'Arial';
-                margin-top: 15vh;
-                width: 90%;
-            }
-
-            .content h2,
-            h3,
-            h4 {
-                color: #009AA6;
-            }
-
-            .content a:link,
-            .content a:visited {
-                color: #009AA6;
-            }
-
-            .content h3 {
-                color: #009AA6;
-            }
-
-            .content h2::before,
-            .content h3::before {
-                display: block;
-                content: " ";
-                visibility: hidden;
-                height: 50px;
-                margin-top: -50px;
-                pointer-events: none;
-                background-color: #FFFFFF;
-            }
-
-            .content a:link,
-            .content a:visited {
-                color: #009AA6;
-            }
-
-            .home a:link,
-            .home a:visited {
-                color: #D3D3D3;
-            }
-
-            figure {
-                margin-left: auto;
-                margin-right: auto;
-                width: 90%;
-            }
-
-            .content figure figcaption {
-                font-size: 0.9vmax;
-                text-align: center;
-            }
-
-            .page {
-                width: 65vw;
+            /* Animated Background Pattern */
+            body::before {
+                content: '';
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
                 height: 100%;
-                margin-left: 30vw;
+                background-image:
+                    radial-gradient(circle at 20% 30%, rgba(59, 130, 246, 0.03) 0%, transparent 50%),
+                    radial-gradient(circle at 80% 70%, rgba(139, 92, 246, 0.03) 0%, transparent 50%),
+                    radial-gradient(circle at 50% 50%, rgba(16, 185, 129, 0.02) 0%, transparent 50%);
+                background-size: 150% 150%;
+                animation: backgroundShift 20s ease infinite;
+                pointer-events: none;
+                z-index: -1;
+            }
+
+            @keyframes backgroundShift {
+
+                0%,
+                100% {
+                    background-position: 0% 0%;
+                }
+
+                50% {
+                    background-position: 100% 100%;
+                }
+            }
+
+            /* Skip to Content Link */
+            .skip-link {
+                position: absolute;
+                top: -40px;
+                left: 0;
+                background: var(--color-accent-1);
+                color: white;
+                padding: var(--space-sm) var(--space-lg);
+                text-decoration: none;
+                border-radius: 0 0 var(--radius-md) 0;
+                z-index: 10000;
+            }
+
+            .skip-link:focus {
+                top: 0;
+            }
+
+            /* Navigation */
+            .nav {
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                z-index: 1000;
+                background: rgba(255, 255, 255, 0.85);
+                -webkit-backdrop-filter: blur(20px) saturate(180%);
+                backdrop-filter: blur(20px) saturate(180%);
+                border-bottom: 1px solid var(--color-border);
+                box-shadow: var(--shadow-md);
+            }
+
+            .nav-container {
+                max-width: 1400px;
+                margin: 0 auto;
+                padding: var(--space-lg) var(--space-xl);
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                gap: var(--space-xl);
+            }
+
+            .nav-brand {
+                font-size: var(--text-xl);
+                font-weight: 700;
+                letter-spacing: -0.02em;
+                background: var(--gradient-primary);
+                -webkit-background-clip: text;
+                background-clip: text;
+                -webkit-text-fill-color: transparent;
+                text-decoration: none;
+                transition: all 0.3s ease;
+                position: relative;
+            }
+
+            .nav-brand::after {
+                content: '';
+                position: absolute;
+                bottom: -4px;
+                left: 0;
+                width: 0;
+                height: 3px;
+                background: var(--gradient-primary);
+                transition: width 0.3s ease;
+                border-radius: 2px;
+            }
+
+            .nav-brand:hover::after {
+                width: 100%;
+            }
+
+            .breadcrumb {
+                display: flex;
+                align-items: center;
+                gap: var(--space-sm);
+                font-size: var(--text-sm);
+                color: var(--color-base-text-muted);
+                flex-wrap: wrap;
+            }
+
+            .breadcrumb a {
+                color: var(--color-base-text-muted);
+                text-decoration: none;
+                transition: color 0.3s ease;
+                position: relative;
+            }
+
+            .breadcrumb a:hover {
+                color: var(--color-accent-1);
+            }
+
+            .breadcrumb-separator {
+                color: var(--color-border);
+            }
+
+            /* Main Container */
+            .container {
+                max-width: 1200px;
+                margin: 0 auto;
+                padding: var(--space-2xl) var(--space-xl);
+                margin-top: 90px;
+            }
+
+            /* Hero Section */
+            .hero {
+                position: relative;
+                padding: var(--space-4xl) 0;
+                margin-bottom: var(--space-4xl);
                 overflow: hidden;
-                padding: 0 1em;
-                font-family: 'Arial';
             }
 
-            .page img {
-                border: 1px solid;
-                max-width: 100%;
-                max-height: 100%;
-                box-shadow: 3px 4px #D3D3D3;
+            .hero-background {
+                position: absolute;
+                top: -50%;
+                left: -10%;
+                width: 120%;
+                height: 200%;
+                z-index: -1;
+                opacity: 0.4;
             }
 
-            @media (max-width: 640px),
-            screen and (orientation: portrait) {
+            .hero-title {
+                font-size: var(--text-4xl);
+                font-weight: 800;
+                letter-spacing: -0.03em;
+                line-height: 1.1;
+                margin-bottom: var(--space-lg);
+                background: var(--gradient-primary);
+                -webkit-background-clip: text;
+                background-clip: text;
+                -webkit-text-fill-color: transparent;
+                animation: fadeInUp 0.8s ease;
+            }
+
+            .hero-subtitle {
+                font-size: var(--text-xl);
+                color: var(--color-base-text-muted);
+                max-width: 800px;
+                line-height: 1.6;
+                animation: fadeInUp 0.8s ease 0.2s backwards;
+            }
+
+            @keyframes fadeInUp {
+                from {
+                    opacity: 0;
+                    transform: translateY(30px);
+                }
+
+                to {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            }
+
+            /* Section Styling */
+            section {
+                margin-bottom: var(--space-4xl);
+                animation: fadeInUp 0.8s ease;
+            }
+
+            h2 {
+                font-size: var(--text-3xl);
+                font-weight: 700;
+                letter-spacing: -0.02em;
+                color: var(--color-accent-2);
+                margin-bottom: var(--space-xl);
+                margin-top: var(--space-4xl);
+                position: relative;
+                padding-bottom: var(--space-md);
+            }
+
+            h2::after {
+                content: '';
+                position: absolute;
+                bottom: 0;
+                left: 0;
+                width: 80px;
+                height: 4px;
+                background: var(--gradient-primary);
+                border-radius: 2px;
+            }
+
+            h3 {
+                font-size: var(--text-2xl);
+                font-weight: 600;
+                letter-spacing: -0.01em;
+                color: var(--color-accent-1);
+                margin-bottom: var(--space-lg);
+                margin-top: var(--space-2xl);
+            }
+
+            h4 {
+                font-size: var(--text-xl);
+                font-weight: 600;
+                color: var(--color-accent-3);
+                margin-bottom: var(--space-md);
+                margin-top: var(--space-xl);
+            }
+
+            p {
+                margin-bottom: var(--space-lg);
+                line-height: 1.8;
+            }
+
+            a {
+                color: var(--color-accent-1);
+                text-decoration: none;
+                transition: all 0.3s ease;
+                position: relative;
+            }
+
+            a:hover {
+                color: var(--color-accent-2);
+            }
+
+            /* Card System */
+            .card {
+                background: var(--color-base-surface);
+                border-radius: var(--radius-lg);
+                padding: var(--space-xl);
+                margin-bottom: var(--space-xl);
+                box-shadow: var(--shadow-theme);
+                border: 1px solid var(--color-border);
+                transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+                position: relative;
+                overflow: hidden;
+            }
+
+            .card::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 4px;
+                height: 100%;
+                background: var(--gradient-primary);
+                opacity: 0;
+                transition: opacity 0.4s ease;
+            }
+
+            .card:hover {
+                transform: translateY(-8px) scale(1.01);
+                box-shadow: var(--shadow-xl);
+            }
+
+            .card:hover::before {
+                opacity: 1;
+            }
+
+            /* Figure & Images */
+            figure {
+                margin: var(--space-2xl) 0;
+                padding: var(--space-xl);
+                background: var(--color-base-surface);
+                border-radius: var(--radius-lg);
+                box-shadow: var(--shadow-md);
+                border: 1px solid var(--color-border);
+                transition: all 0.4s ease;
+            }
+
+            figure:hover {
+                box-shadow: var(--shadow-lg);
+                transform: translateY(-4px);
+            }
+
+            figure img {
+                width: 100%;
+                height: auto;
+                border-radius: var(--radius-md);
+                display: block;
+            }
+
+            figcaption {
+                margin-top: var(--space-md);
+                font-size: var(--text-sm);
+                color: var(--color-base-text-muted);
+                text-align: center;
+                line-height: 1.6;
+            }
+
+            /* Lists */
+            ol,
+            ul {
+                margin-bottom: var(--space-xl);
+                padding-left: var(--space-xl);
+            }
+
+            li {
+                margin-bottom: var(--space-md);
+                line-height: 1.8;
+            }
+
+            li::marker {
+                color: var(--color-accent-1);
+                font-weight: 600;
+            }
+
+            /* Code Blocks */
+            code {
+                font-family: var(--font-mono);
+                font-size: 0.9em;
+                background: var(--color-accent-soft);
+                color: var(--color-accent-2);
+                padding: 0.2em 0.5em;
+                border-radius: var(--radius-sm);
+                border: 1px solid var(--color-border);
+            }
+
+            pre {
+                background: var(--color-accent-soft);
+                border: 1px solid var(--color-border);
+                border-radius: var(--radius-md);
+                padding: var(--space-lg);
+                overflow-x: auto;
+                margin: var(--space-xl) 0;
+                font-family: var(--font-mono);
+                font-size: var(--text-sm);
+                line-height: 1.6;
+            }
+
+            pre code {
+                background: none;
+                border: none;
+                padding: 0;
+            }
+
+            /* Blockquote */
+            blockquote {
+                background: linear-gradient(135deg, var(--color-accent-soft), rgba(139, 92, 246, 0.05));
+                border-left: 4px solid var(--color-accent-1);
+                padding: var(--space-lg) var(--space-xl);
+                margin: var(--space-xl) 0;
+                border-radius: var(--radius-md);
+                font-style: italic;
+                color: var(--color-base-text-muted);
+            }
+
+            /* Footer */
+            .footer {
+                margin-top: var(--space-4xl);
+                padding: var(--space-3xl) var(--space-xl);
+                background: rgba(255, 255, 255, 0.5);
+                -webkit-backdrop-filter: blur(12px);
+                backdrop-filter: blur(12px);
+                border-top: 1px solid var(--color-border);
+            }
+
+            .footer-content {
+                max-width: 1200px;
+                margin: 0 auto;
+            }
+
+            .footer-section {
+                margin-bottom: var(--space-xl);
+            }
+
+            .footer-title {
+                font-size: var(--text-lg);
+                font-weight: 600;
+                color: var(--color-accent-2);
+                margin-bottom: var(--space-md);
+            }
+
+            .language-links {
+                display: flex;
+                flex-wrap: wrap;
+                gap: var(--space-md);
+                margin-top: var(--space-md);
+            }
+
+            .language-tag {
+                display: inline-block;
+                padding: var(--space-sm) var(--space-md);
+                background: var(--color-accent-soft);
+                border: 1px solid var(--color-border);
+                border-radius: var(--radius-md);
+                font-size: var(--text-sm);
+                color: var(--color-accent-1);
+                transition: all 0.3s ease;
+            }
+
+            .language-tag:hover {
+                background: var(--color-accent-1);
+                color: white;
+                transform: translateY(-2px);
+            }
+
+            .copyright {
+                margin-top: var(--space-2xl);
+                padding-top: var(--space-xl);
+                border-top: 1px solid var(--color-border);
+                text-align: center;
+                font-size: var(--text-sm);
+                color: var(--color-base-text-muted);
+            }
+
+            /* SVG Hero Illustration */
+            .svg-illustration {
+                width: 100%;
+                max-width: 600px;
+                margin: var(--space-2xl) auto;
+                display: block;
+            }
+
+            /* Responsive Design */
+            @media (max-width: 768px) {
+                .nav-container {
+                    flex-direction: column;
+                    gap: var(--space-md);
+                    align-items: flex-start;
+                }
+
+                .container {
+                    padding: var(--space-xl) var(--space-lg);
+                    margin-top: 140px;
+                }
+
+                .hero {
+                    padding: var(--space-2xl) 0;
+                }
+
+                .card {
+                    padding: var(--space-lg);
+                }
+
+                figure {
+                    padding: var(--space-md);
+                }
+
+                .language-links {
+                    gap: var(--space-sm);
+                }
+            }
+
+            /* Accessibility: Reduced Motion */
+            @media (prefers-reduced-motion: reduce) {
+
+                *,
+                *::before,
+                *::after {
+                    animation-duration: 0.01ms !important;
+                    animation-iteration-count: 1 !important;
+                    transition-duration: 0.01ms !important;
+                }
+
+                html {
+                    scroll-behavior: auto;
+                }
+            }
+
+            /* Print Styles */
+            @media print {
                 body {
-                    max-width: 100%;
-                    max-height: 100%;
+                    background: white;
                 }
 
-                #sidebar {
-                    position: fixed;
-                    background-color: #009AA6;
-                    top: 0;
-                    left: 0;
-                    bottom: 80vh;
-                    width: 100vw;
+                .nav,
+                .skip-link,
+                .footer {
+                    display: none;
                 }
 
-                #sidebar .title {
-                    text-align: center;
-                    position: fixed;
-                    margin-top: 6vh;
-                    left: 0px;
-                    right: 0px;
-                    line-height: 3.5vmax;
-                    font-size: 1.5vmax;
-                    font-family: 'Arial';
+                .container {
+                    margin-top: 0;
                 }
 
-                #sidebar .subtitle {
-                    text-align: center;
-                    top: 5vh;
-                    left: 0px;
-                    right: 0px;
-                    position: fixed;
-                    margin-top: 10vh;
-                    font-size: 1.5vmax;
-                }
-
-                #sidebar .title a:link,
-                #sidebar .title a:visited {
-                    text-align: center;
-                    color: #FFFFFF;
-                }
-
-                #sidebar .subtitle a:link,
-                #sidebar .subtitle a:visited {
-                    text-align: center;
-                    color: #FFFFFF;
-                }
-
-                .home {
-                    z-index: 100;
-                    width: 100%;
-                    background-color: #009AA6;
-                    font-size: 1.5vmax;
-                }
-
-                .home a:link,
-                .home a:visited {
-                    text-decoration: none;
-                    color: #FFFFFF;
-                }
-
-                .content {
-                    line-height: 3.8vmax;
-                    font-size: 1.8vmax;
-                    font-family: 'Arial';
-                    margin-top: 22vh;
-                }
-
-                .content a:link,
-                .content a:visited {
-                    color: #009AA6;
-                }
-
-                .page {
-                    top: 40vh;
-                    width: 95%;
-                    margin-left: 0vw;
-                }
-
-                .page img {
-                    max-width: 100%;
-                    max-height: 100%;
-                    border: 0;
+                a {
+                    color: var(--color-base-text);
+                    text-decoration: underline;
                 }
             }
         </style>
     </head>
 
-    <body vocab="http://schema.org/" typeof="Website">
-        <div id="sidebar">
-            <div id="sidebar">
-                <div class="title">
-                    <h1 lang="en"><a href="./index.html" property="url" typeof="WebPage"><span
-                                typeof="WebPage">Documenting Software Applications on Wikidata</span></a></h1>
-                </div>
-                <div class="subtitle">
-                    <h3 lang="en"><a href="../../index.html" property="url" typeof="WebPage"><span typeof="WebPage"
-                                property="author">John Samuel</span></a></h3>
+    <body>
+        <a href="#main-content" class="skip-link">Skip to main content</a>
+
+        <nav class="nav" role="navigation" aria-label="Main navigation">
+            <div class="nav-container">
+                <a href="../../index.html" class="nav-brand">John Samuel</a>
+                <div class="breadcrumb" role="navigation" aria-label="Breadcrumb">
+                    <a href="../index.html">Home</a>
+                    <span class="breadcrumb-separator" aria-hidden="true">›</span>
+                    <a href="../research/research.html">Research</a>
+                    <span class="breadcrumb-separator" aria-hidden="true">›</span>
+                    <span>Wikidata Software Documentation</span>
                 </div>
             </div>
-        </div>
+        </nav>
 
-        <div class="page" typeof="WebPage">
-            <div class="home">
-                <ul typeof="BreadcrumbList">
-                    <li property="itemListElement" typeof="ListItem">
-                        <a property="item" typeof="WebPage" href="../index.html">
-                            <span property="name">Home</span>
-                        </a>
-                    </li>
-                    <li property="itemListElement" typeof="ListItem">
-                        <a property="item" typeof="WebPage" href="../research/research.html">
-                            <span property="name">Research</span>
-                        </a>
-                    </li>
-                </ul>
+        <main id="main-content" class="container">
+            <article>
+                <header class="hero">
+                    <svg class="hero-background" viewBox="0 0 800 600" xmlns="http://www.w3.org/2000/svg"
+                        aria-hidden="true">
+                        <!-- Knowledge Graph Network -->
+                        <defs>
+                            <linearGradient id="nodeGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" style="stop-color:#3b82f6;stop-opacity:0.8" />
+                                <stop offset="100%" style="stop-color:#8b5cf6;stop-opacity:0.8" />
+                            </linearGradient>
+                            <linearGradient id="linkGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                                <stop offset="0%" style="stop-color:#3b82f6;stop-opacity:0.3" />
+                                <stop offset="100%" style="stop-color:#8b5cf6;stop-opacity:0.3" />
+                            </linearGradient>
+                            <filter id="glow">
+                                <feGaussianBlur stdDeviation="3" result="coloredBlur" />
+                                <feMerge>
+                                    <feMergeNode in="coloredBlur" />
+                                    <feMergeNode in="SourceGraphic" />
+                                </feMerge>
+                            </filter>
+                        </defs>
 
-            </div>
-            <div class="content">
-                <section>
-                    <p>Most of us have heard about Wikipedia and probably use it daily. However, many are still not
+                        <!-- Connecting Lines (Semantic Relations) -->
+                        <g opacity="0.4">
+                            <line x1="150" y1="150" x2="400" y2="200" stroke="url(#linkGradient)" stroke-width="2">
+                                <animate attributeName="stroke-dashoffset" from="0" to="20" dur="4s"
+                                    repeatCount="indefinite" />
+                                <animate attributeName="opacity" values="0.3;0.6;0.3" dur="3s"
+                                    repeatCount="indefinite" />
+                            </line>
+                            <line x1="400" y1="200" x2="650" y2="180" stroke="url(#linkGradient)" stroke-width="2">
+                                <animate attributeName="stroke-dashoffset" from="0" to="20" dur="5s"
+                                    repeatCount="indefinite" />
+                                <animate attributeName="opacity" values="0.3;0.6;0.3" dur="4s"
+                                    repeatCount="indefinite" />
+                            </line>
+                            <line x1="150" y1="150" x2="300" y2="400" stroke="url(#linkGradient)" stroke-width="2">
+                                <animate attributeName="stroke-dashoffset" from="0" to="20" dur="4.5s"
+                                    repeatCount="indefinite" />
+                                <animate attributeName="opacity" values="0.3;0.6;0.3" dur="3.5s"
+                                    repeatCount="indefinite" />
+                            </line>
+                            <line x1="300" y1="400" x2="500" y2="450" stroke="url(#linkGradient)" stroke-width="2">
+                                <animate attributeName="stroke-dashoffset" from="0" to="20" dur="5.5s"
+                                    repeatCount="indefinite" />
+                                <animate attributeName="opacity" values="0.3;0.6;0.3" dur="4.5s"
+                                    repeatCount="indefinite" />
+                            </line>
+                            <line x1="500" y1="450" x2="650" y2="180" stroke="url(#linkGradient)" stroke-width="2">
+                                <animate attributeName="stroke-dashoffset" from="0" to="20" dur="6s"
+                                    repeatCount="indefinite" />
+                                <animate attributeName="opacity" values="0.3;0.6;0.3" dur="5s"
+                                    repeatCount="indefinite" />
+                            </line>
+                            <line x1="400" y1="200" x2="300" y2="400" stroke="url(#linkGradient)" stroke-width="2">
+                                <animate attributeName="stroke-dashoffset" from="0" to="20" dur="3.5s"
+                                    repeatCount="indefinite" />
+                                <animate attributeName="opacity" values="0.3;0.6;0.3" dur="2.5s"
+                                    repeatCount="indefinite" />
+                            </line>
+                        </g>
+
+                        <!-- Knowledge Nodes (Animated) -->
+                        <g filter="url(#glow)">
+                            <circle cx="150" cy="150" r="25" fill="url(#nodeGradient)">
+                                <animate attributeName="r" values="25;28;25" dur="3s" repeatCount="indefinite" />
+                                <animate attributeName="opacity" values="0.7;1;0.7" dur="3s" repeatCount="indefinite" />
+                            </circle>
+                            <circle cx="400" cy="200" r="30" fill="url(#nodeGradient)">
+                                <animate attributeName="r" values="30;34;30" dur="4s" repeatCount="indefinite" />
+                                <animate attributeName="opacity" values="0.7;1;0.7" dur="4s" repeatCount="indefinite" />
+                            </circle>
+                            <circle cx="650" cy="180" r="28" fill="url(#nodeGradient)">
+                                <animate attributeName="r" values="28;32;28" dur="3.5s" repeatCount="indefinite" />
+                                <animate attributeName="opacity" values="0.7;1;0.7" dur="3.5s"
+                                    repeatCount="indefinite" />
+                            </circle>
+                            <circle cx="300" cy="400" r="26" fill="url(#nodeGradient)">
+                                <animate attributeName="r" values="26;30;26" dur="4.5s" repeatCount="indefinite" />
+                                <animate attributeName="opacity" values="0.7;1;0.7" dur="4.5s"
+                                    repeatCount="indefinite" />
+                            </circle>
+                            <circle cx="500" cy="450" r="27" fill="url(#nodeGradient)">
+                                <animate attributeName="r" values="27;31;27" dur="5s" repeatCount="indefinite" />
+                                <animate attributeName="opacity" values="0.7;1;0.7" dur="5s" repeatCount="indefinite" />
+                            </circle>
+                        </g>
+
+                        <!-- Data Flow Particles -->
+                        <g opacity="0.6">
+                            <circle r="4" fill="#10b981">
+                                <animateMotion dur="8s" repeatCount="indefinite" path="M150,150 Q300,100 400,200" />
+                                <animate attributeName="opacity" values="0;1;0" dur="8s" repeatCount="indefinite" />
+                            </circle>
+                            <circle r="4" fill="#10b981">
+                                <animateMotion dur="10s" repeatCount="indefinite" path="M400,200 Q550,150 650,180" />
+                                <animate attributeName="opacity" values="0;1;0" dur="10s" repeatCount="indefinite" />
+                            </circle>
+                            <circle r="4" fill="#3b82f6">
+                                <animateMotion dur="9s" repeatCount="indefinite" path="M150,150 Q200,300 300,400" />
+                                <animate attributeName="opacity" values="0;1;0" dur="9s" repeatCount="indefinite" />
+                            </circle>
+                        </g>
+                    </svg>
+
+                    <h1 class="hero-title">Documenting Software Applications on Wikidata</h1>
+                    <p class="hero-subtitle">
+                        Most of us have heard about Wikipedia and probably use it daily. However, many are still not
                         aware of the much recent project of the Wikimedia Foundation called Wikidata. Wikidata, started
-                        in 2012 is a sister project of Wikipedia and is
-                        aimed to be a knowledge base of facts with references. Unlike Wikipedia, which is aimed
-                        primarily for human consumption, Wikidata can be used both by machines and humans, given its
-                        structured nature. This article documents how Wikidata
-                        can play a key role in the documentation of software.
+                        in 2012 is a sister project of Wikipedia and is aimed to be a knowledge base of facts with
+                        references. Unlike Wikipedia, which is aimed primarily for human consumption, Wikidata can be
+                        used both by machines and humans, given its structured nature. This article documents how
+                        Wikidata can play a key role in the documentation of software.
                     </p>
-                </section>
-                <section>
+                </header>
+
+                <section id="wikipedia-documentation">
                     <h2>Software Documentation on Wikipedia</h2>
                     <p>
                         Instead of focusing on individual software, this article focuses on two popular Linux
@@ -312,373 +745,474 @@
                             href="https://www.gnome.org/">GNOME</a>, because they manage a very large number of
                         applications. Both these distributions have an international open-source community with
                         contributors from across the world. These contributions can be in many forms including
-                        development, testing, marketing, documentation, etc. Each
-                        distribution has several software applications related to games, education, development,
-                        graphics, multimedia, internet, etc. Many of the software applications sometimes have their own
-                        homepages or dedicated pages on the KDE or GNOME
-                        websites and sometimes even both. Some applications have also been documented on Wikipedia.
+                        development, testing, marketing, documentation, etc. Each distribution has several software
+                        applications related to games, education, development, graphics, multimedia, internet, etc. Many
+                        of the software applications sometimes have their own homepages or dedicated pages on the KDE or
+                        GNOME websites and sometimes even both. Some applications have also been documented on
+                        Wikipedia.
                     </p>
-                </section>
-                <section>
+
                     <p>
                         However, a careful look at the documentation and the availability of these software on Wikipedia
                         can help us understand that not all the applications have been equally documented on all
-                        language editions. Given below are screenshots of Wikipedia pages
-                        related to GNOME and KDE applications in different languages.
+                        language editions. Given below are screenshots of Wikipedia pages related to GNOME and KDE
+                        applications in different languages.
                     </p>
-                    <p>
-                        <a href="https://en.wikipedia.org/wiki/List_of_KDE_applications">KDE Applications</a> is a
-                        dedicated page on English Wikipedia that lists applications in different categories. For
-                        example, the following screenshot shows the different
-                        applications in the category 'Production'. It can be seen that not all the applications have an
-                        associated link or a dedicated Wikipedia page detailing the application.
-                    </p>
+
+                    <div class="card">
+                        <p>
+                            <a href="https://en.wikipedia.org/wiki/List_of_KDE_applications">KDE Applications</a> is a
+                            dedicated page on English Wikipedia that lists applications in different categories. For
+                            example, the following screenshot shows the different applications in the category
+                            'Production'. It can be seen that not all the applications have an associated link or a
+                            dedicated Wikipedia page detailing the application.
+                        </p>
+                    </div>
+
                     <figure>
-                        <img src="screenshots/Screenshot_2020-12-12 KDE Applications - Wikipedia.png" />
+                        <img src="screenshots/Screenshot_2020-12-12 KDE Applications - Wikipedia.png"
+                            alt="Screenshot of KDE Applications Wikipedia page showing application categories" />
                         <figcaption>Screenshot of the article <a
                                 href="https://en.wikipedia.org/wiki/List_of_KDE_applications">KDE Applications</a> on
                             English Wikipedia as of December 2020</figcaption>
                     </figure>
-                    <p>
-                        But this problem is not limited to KDE applications. All the core applications of GNOME are
-                        listed on the English Wikipedia page: <a
-                            href="https://en.wikipedia.org/wiki/GNOME_Core_Applications">GNOME Core Applications</a>.
-                        Here too,
-                        we see that not all the applications have a dedicated page as seen in the screenshot below.
-                    </p>
+
+                    <div class="card">
+                        <p>
+                            But this problem is not limited to KDE applications. All the core applications of GNOME are
+                            listed on the English Wikipedia page: <a
+                                href="https://en.wikipedia.org/wiki/GNOME_Core_Applications">GNOME Core
+                                Applications</a>. Here too, we see that not all the applications have a dedicated page
+                            as seen in the screenshot below.
+                        </p>
+                    </div>
+
                     <figure>
-                        <img src="screenshots/Screenshot_2020-12-12 GNOME Core Applications - Wikipedia.png" />
+                        <img src="screenshots/Screenshot_2020-12-12 GNOME Core Applications - Wikipedia.png"
+                            alt="Screenshot of GNOME Core Applications Wikipedia page" />
                         <figcaption>Screenshot of article <a
                                 href="https://en.wikipedia.org/wiki/GNOME_Core_Applications">GNOME Core Applications</a>
                             on English Wikipedia as of December 2020</figcaption>
                     </figure>
                 </section>
-                <section>
+
+                <section id="template-analysis">
                     <p>
                         We can also get a clearer view of the different applications from the template pages of KDE and
                         GNOME applications on Wikipedia. Up until now, we just focused on English Wikipedia pages. We
-                        will also consider Wikipedia pages from languages like Italian,
-                        Portuguese, French, etc. in the upcoming sections.
+                        will also consider Wikipedia pages from languages like Italian, Portuguese, French, etc. in the
+                        upcoming sections.
                     </p>
-                    <p>
-                        Starting with English, we have a template page for KDE applications: <a
-                            href="https://en.wikipedia.org/wiki/Template:KDE">Template:KDE</a> which lists a large
-                        number of applications under different categories. There are very few redlinks.
-                        A redlink corresponds to an application with no dedicated article or article section for the
-                        given application.
-                    </p>
+
+                    <div class="card">
+                        <p>
+                            Starting with English, we have a template page for KDE applications: <a
+                                href="https://en.wikipedia.org/wiki/Template:KDE">Template:KDE</a> which lists a large
+                            number of applications under different categories. There are very few redlinks. A redlink
+                            corresponds to an application with no dedicated article or article section for the given
+                            application.
+                        </p>
+                    </div>
+
                     <figure>
-                        <img src="screenshots/Screenshot_2020-12-12 Template KDE - EN Wikipedia.png" />
+                        <img src="screenshots/Screenshot_2020-12-12 Template KDE - EN Wikipedia.png"
+                            alt="English Wikipedia KDE template page" />
                         <figcaption>Screenshot of the template <a
                                 href="https://en.wikipedia.org/wiki/Template:KDE">Template:KDE</a> on English Wikipedia
                             as of December 2020</figcaption>
                     </figure>
-                    <p>
-                        Let us now consider the Italian template page for the KDE applications: <a
-                            href="https://it.wikipedia.org/wiki/Template:KDE">Template:KDE</a>. We see several redlinks
-                        corresponding to the missing pages for the applications.
-                    </p>
+
+                    <div class="card">
+                        <p>
+                            Let us now consider the Italian template page for the KDE applications: <a
+                                href="https://it.wikipedia.org/wiki/Template:KDE">Template:KDE</a>. We see several
+                            redlinks corresponding to the missing pages for the applications.
+                        </p>
+                    </div>
+
                     <figure>
-                        <img src="screenshots/Screenshot_2020-12-12 Template KDE - Wikipedia.png" />
+                        <img src="screenshots/Screenshot_2020-12-12 Template KDE - Wikipedia.png"
+                            alt="Italian Wikipedia KDE template page showing multiple red links" />
                         <figcaption>Screenshot of the template <a
                                 href="https://it.wikipedia.org/wiki/Template:KDE">Template:KDE</a> on Italian Wikipedia
                             as of December 2020</figcaption>
                     </figure>
-                    <p>
-                        Moving on to the French page: <a
-                            href="https://fr.wikipedia.org/wiki/Mod%C3%A8le:Palette_KDE">Modèle:Palette KDE</a>, we also
-                        see many redlinks.
-                    </p>
+
+                    <div class="card">
+                        <p>
+                            Moving on to the French page: <a
+                                href="https://fr.wikipedia.org/wiki/Mod%C3%A8le:Palette_KDE">Modèle:Palette KDE</a>, we
+                            also see many redlinks.
+                        </p>
+                    </div>
+
                     <figure>
-                        <img src="screenshots/Screenshot_2020-12-12 Modèle Palette KDE — Wikipédia.png" />
+                        <img src="screenshots/Screenshot_2020-12-12 Modèle Palette KDE — Wikipédia.png"
+                            alt="French Wikipedia KDE template page with red links" />
                         <figcaption>Screenshot of the template <a
                                 href="https://fr.wikipedia.org/wiki/Mod%C3%A8le:Palette_KDE">Modèle:Palette KDE</a> on
                             French Wikipedia as of December 2020</figcaption>
                     </figure>
-                    <p>
-                        The situation is same on the Portuguese webpage: <a
-                            href="https://pt.wikipedia.org/wiki/Predefini%C3%A7%C3%A3o:KDE">Predefinição:KDE</a>.
-                    </p>
+
+                    <div class="card">
+                        <p>
+                            The situation is same on the Portuguese webpage: <a
+                                href="https://pt.wikipedia.org/wiki/Predefini%C3%A7%C3%A3o:KDE">Predefinição:KDE</a>.
+                        </p>
+                    </div>
+
                     <figure>
-                        <img
-                            src="screenshots/Screenshot_2020-12-12 Predefinição KDE – Wikipédia, a enciclopédia livre.png" />
+                        <img src="screenshots/Screenshot_2020-12-12 Predefinição KDE – Wikipédia, a enciclopédia livre.png"
+                            alt="Portuguese Wikipedia KDE template page" />
                         <figcaption>Screenshot of the template <a
                                 href="https://pt.wikipedia.org/wiki/Predefini%C3%A7%C3%A3o:KDE">Predefinição:KDE</a> on
                             Portuguese Wikipedia as of December 2020</figcaption>
                     </figure>
                 </section>
-                <section>
-                    <p>
-                        The situation is not different for GNOME applications. Though the English Wikipedia template
-                        page currently shows no redlinks: <a
-                            href="https://en.wikipedia.org/wiki/Template:GNOME">Template:GNOME</a>, this is not the case
-                        for other
-                        languages.
-                    </p>
+
+                <section id="gnome-templates">
+                    <div class="card">
+                        <p>
+                            The situation is not different for GNOME applications. Though the English Wikipedia template
+                            page currently shows no redlinks: <a
+                                href="https://en.wikipedia.org/wiki/Template:GNOME">Template:GNOME</a>, this is not the
+                            case for other languages.
+                        </p>
+                    </div>
+
                     <figure>
-                        <img src="screenshots/Screenshot_2020-12-12 Template GNOME - Wikipedia.png" />
+                        <img src="screenshots/Screenshot_2020-12-12 Template GNOME - Wikipedia.png"
+                            alt="English Wikipedia GNOME template page" />
                         <figcaption>Screenshot of the template <a
                                 href="https://en.wikipedia.org/wiki/Template:GNOME">Template:GNOME</a> on English
                             Wikipedia as of December 2020</figcaption>
                     </figure>
-                </section>
-                <section>
-                    <p>
-                        Let's take an example. A template page for the GNOME applications from Portuguese Wikipedia <a
-                            href="https://pt.wikipedia.org/wiki/Predefini%C3%A7%C3%A3o:GNOME">Predefinição:GNOME</a>
-                        shows a large number of redlinks.
-                    </p>
+
+                    <div class="card">
+                        <p>
+                            Let's take an example. A template page for the GNOME applications from Portuguese Wikipedia
+                            <a href="https://pt.wikipedia.org/wiki/Predefini%C3%A7%C3%A3o:GNOME">Predefinição:GNOME</a>
+                            shows a large number of redlinks.
+                        </p>
+                    </div>
+
                     <figure>
-                        <img
-                            src="screenshots/Screenshot_2020-12-12 Predefinição GNOME – Wikipédia, a enciclopédia livre.png" />
+                        <img src="screenshots/Screenshot_2020-12-12 Predefinição GNOME – Wikipédia, a enciclopédia livre.png"
+                            alt="Portuguese Wikipedia GNOME template page with many red links" />
                         <figcaption>Screenshot of the template <a
                                 href="https://pt.wikipedia.org/wiki/Predefini%C3%A7%C3%A3o:GNOME">Predefinição:GNOME</a>
                             on Portuguese Wikipedia as of December 2020</figcaption>
                     </figure>
-                    <p>
-                    </p>
                 </section>
-                <section>
-                    <p>
-                        Documentation is a difficult task. No software developer or company can ensure documentation in
-                        every language of their users, especially in their native languages. Adding to this problem is
-                        the constant evolution of software. Software applications evolve.
-                        New versions are released from time to time with the addition of new features or the removal of
-                        certain others. Documenting this constant evolution in all languages is indeed a difficult task.
-                    </p>
-                    <p>
-                        These problems have been known to developers and researchers for quite a long time. One possible
-                        solution is to ensure a possible central store of information, which contains the key
-                        information of different software applications. This information can
-                        be translated in an automatic manner or with the help of contributors. Such a central store
-                        ensures that the information that needs to be repeated multiple times is translated only once.
-                        For example, if we know that every software
-                        requires the following information: homepage, logo, images, screenshots, software version, etc.,
-                        we can ensure that the translations for these phrases in all possible languages. Such a central
-                        store came in the form of Wikidata.
-                    </p>
+
+                <section id="documentation-challenges">
+                    <div class="card">
+                        <p>
+                            Documentation is a difficult task. No software developer or company can ensure documentation
+                            in every language of their users, especially in their native languages. Adding to this
+                            problem is the constant evolution of software. Software applications evolve. New versions
+                            are released from time to time with the addition of new features or the removal of certain
+                            others. Documenting this constant evolution in all languages is indeed a difficult task.
+                        </p>
+
+                        <p>
+                            These problems have been known to developers and researchers for quite a long time. One
+                            possible solution is to ensure a possible central store of information, which contains the
+                            key information of different software applications. This information can be translated in an
+                            automatic manner or with the help of contributors. Such a central store ensures that the
+                            information that needs to be repeated multiple times is translated only once. For example,
+                            if we know that every software requires the following information: homepage, logo, images,
+                            screenshots, software version, etc., we can ensure that the translations for these phrases
+                            in all possible languages. Such a central store came in the form of Wikidata.
+                        </p>
+                    </div>
                 </section>
-                <section>
+
+                <section id="wikidata-documentation">
                     <h2>Software Documentation on Wikidata</h2>
-                    <p>
-                        Wikidata is a free, open, linked, structured, collaborative, and multilingual knowledge base.
-                        Wikidata allows contributors to document different concepts across domains and is not just
-                        limited to software. Additionally, Wikidata contributors can import
-                        existing information from different language Wikipedia to Wikidata. Every Wikidata article (also
-                        called item) has several statements. Each statement can be seen as a combination of three
-                        values: <i>subject-property-value</i>,
-                        where the <i>subject</i> is the Wikidata article, <i>property</i> could be one of the following
-                        discussed above: homepage, logo, images, screenshots, etc. and <i>value</i> corresponds to the
-                        property value. Each statement must also
-                        be supported by one or more references. These references include books, journals, etc. If the
-                        information is imported from a Wikipedia page, it can also be specified.
-                    </p>
+
+                    <div class="card">
+                        <p>
+                            Wikidata is a free, open, linked, structured, collaborative, and multilingual knowledge
+                            base. Wikidata allows contributors to document different concepts across domains and is not
+                            just limited to software. Additionally, Wikidata contributors can import existing
+                            information from different language Wikipedia to Wikidata. Every Wikidata article (also
+                            called item) has several statements. Each statement can be seen as a combination of three
+                            values: <em>subject-property-value</em>, where the <em>subject</em> is the Wikidata article,
+                            <em>property</em> could be one of the following discussed above: homepage, logo, images,
+                            screenshots, etc. and <em>value</em> corresponds to the property value. Each statement must
+                            also be supported by one or more references. These references include books, journals, etc.
+                            If the information is imported from a Wikipedia page, it can also be specified.
+                        </p>
+                    </div>
+
                     <figure>
-                        <img src="../slides/2018/CLEF/WikipediaImport.svg" />
+                        <img src="../slides/2018/CLEF/WikipediaImport.svg"
+                            alt="Diagram showing Wikidata importing key information from different language Wikipedia pages" />
                         <figcaption>Wikidata importing key information of software applications from different language
                             pages</figcaption>
                     </figure>
-                    <p>
-                        But the information on Wikidata pages can also be used by existing Wikipedia pages. In fact,
-                        some Wikipedia pages have templates (also called infoboxes) that are linked to Wikidata and the
-                        data is fetched from Wikidata. For example, the
-                        <a href="https://eu.wikipedia.org/wiki/KDE">KDE page in Basque</a>.
-                    </p>
+
+                    <div class="card">
+                        <p>
+                            But the information on Wikidata pages can also be used by existing Wikipedia pages. In fact,
+                            some Wikipedia pages have templates (also called infoboxes) that are linked to Wikidata and
+                            the data is fetched from Wikidata. For example, the <a
+                                href="https://eu.wikipedia.org/wiki/KDE">KDE page in Basque</a>.
+                        </p>
+                    </div>
+
                     <figure>
-                        <img src="../slides/2018/CLEF/WikipediaExport.svg" />
+                        <img src="../slides/2018/CLEF/WikipediaExport.svg"
+                            alt="Diagram showing Wikidata becoming a central information hub for different language Wikipedia pages" />
                         <figcaption>Wikidata becoming a central point of information on software applications for
                             different language pages</figcaption>
                     </figure>
                 </section>
-                <section>
+
+                <section id="software-information">
                     <h3>Information related to Software</h3>
-                    <p>
-                        What type of information about Software can be documented on Wikidata. Every article on Wikidata
-                        is usually called an item-page. We will see the property pages later. Take, for example, the
-                        software called Akregator has a page on Wikidata:
-                        <a href="https://www.wikidata.org/wiki/Q1765672">https://www.wikidata.org/wiki/Q1765672</a>,
-                        where Q1765672 is called the identifier (or Q-number) of the software Akregator. In the
-                        screenshot below, we see this identifier along with
-                        the labels, descriptions, and aliases for the software. The contributors translate this
-                        information into different languages. Hence, Wikidata is also referred to as a multilingual
-                        knowledge base.
-                    </p>
+
+                    <div class="card">
+                        <p>
+                            What type of information about Software can be documented on Wikidata. Every article on
+                            Wikidata is usually called an item-page. We will see the property pages later. Take, for
+                            example, the software called Akregator has a page on Wikidata: <a
+                                href="https://www.wikidata.org/wiki/Q1765672">https://www.wikidata.org/wiki/Q1765672</a>,
+                            where Q1765672 is called the identifier (or Q-number) of the software Akregator. In the
+                            screenshot below, we see this identifier along with the labels, descriptions, and aliases
+                            for the software. The contributors translate this information into different languages.
+                            Hence, Wikidata is also referred to as a multilingual knowledge base.
+                        </p>
+                    </div>
+
                     <figure>
-                        <img src="../slides/2017/Akademy/html/akregator.png" />
+                        <img src="../slides/2017/Akademy/html/akregator.png"
+                            alt="Wikidata article page for Akregator showing Q-number and multilingual labels" />
                         <figcaption>Wikidata article on <a href="https://www.wikidata.org/wiki/Q1765672">Akregator</a>
                         </figcaption>
                     </figure>
-                    <p>Now our next goal is to see statements about Akregator. We will see how the <span>Q-number</span>
-                        of Akregator (i.e., Q1765672) is used to specify the different information. For example, if we
-                        want to specify the fact that Akregator is
-                        an application and Akregator is a news aggregator, we may need to use the property <i>instance
-                            of</i>.
-                    </p>
+
+                    <div class="card">
+                        <p>
+                            Now our next goal is to see statements about Akregator. We will see how the Q-number of
+                            Akregator (i.e., Q1765672) is used to specify the different information. For example, if we
+                            want to specify the fact that Akregator is an application and Akregator is a news
+                            aggregator, we may need to use the property <em>instance of</em>.
+                        </p>
+                    </div>
+
                     <figure>
-                        <img src="../slides/2017/Akademy/html/akregator-P31.png" />
+                        <img src="../slides/2017/Akademy/html/akregator-P31.png"
+                            alt="Wikidata statements for Akregator showing instance of properties" />
                         <figcaption>Statements related to <a href="https://www.wikidata.org/wiki/Q1765672">Akregator</a>
                             on Wikidata</figcaption>
                     </figure>
-                    <p>But as described above, repetitive information can be translated into multiple languages. So the
-                        same page with a parameter <code>?uselang=fr</code> will give the French version of Akregator:
-                        <a
-                            href="https://www.wikidata.org/wiki/Q1765672?uselang=fr">https://www.wikidata.org/wiki/Q1765672?uselang=fr</a>.
-                        Q1765672 is the Q-number (or identifier) of Akregator in any language on Wikidata. Given below
-                        is the screenshot of information related to Akregator in French.
-                    </p>
+
+                    <div class="card">
+                        <p>
+                            But as described above, repetitive information can be translated into multiple languages. So
+                            the same page with a parameter <code>?uselang=fr</code> will give the French version of
+                            Akregator: <a
+                                href="https://www.wikidata.org/wiki/Q1765672?uselang=fr">https://www.wikidata.org/wiki/Q1765672?uselang=fr</a>.
+                            Q1765672 is the Q-number (or identifier) of Akregator in any language on Wikidata. Given
+                            below is the screenshot of information related to Akregator in French.
+                        </p>
+                    </div>
+
                     <figure>
-                        <img src="../slides/2017/Akademy/html/akregator-P31-fr.png" />
+                        <img src="../slides/2017/Akademy/html/akregator-P31-fr.png"
+                            alt="French language view of Akregator on Wikidata" />
                         <figcaption>Statements related to <a
                                 href="https://www.wikidata.org/wiki/Q1765672?uselang=fr">Akregator</a> on Wikidata in
                             French</figcaption>
                     </figure>
-                    <p>
-                        But what is <i>instance of</i>. This brings us to the second type of pages on Wikidata- the
-                        property pages. The <i>instance of</i> has a dedicated page: <a
-                            href="https://www.wikidata.org/wiki/Property:P31">https://www.wikidata.org/wiki/Property:P31</a>,
-                        where the different translations can be found. The screenshot below shows the labels,
-                        descriptions and aliases of <code>P31</code>, also known as <i>instance of</i> in English. The
-                        properties are identified by their P-numbers. We use
-                        <i>instance of</i> to specify that Akregator is an application (or precisely, Akregator is an
-                        instance of an application).
-                    </p>
+
+                    <div class="card">
+                        <p>
+                            But what is <em>instance of</em>. This brings us to the second type of pages on Wikidata-
+                            the property pages. The <em>instance of</em> has a dedicated page: <a
+                                href="https://www.wikidata.org/wiki/Property:P31">https://www.wikidata.org/wiki/Property:P31</a>,
+                            where the different translations can be found. The screenshot below shows the labels,
+                            descriptions and aliases of <code>P31</code>, also known as <em>instance of</em> in English.
+                            The properties are identified by their P-numbers. We use <em>instance of</em> to specify
+                            that Akregator is an application (or precisely, Akregator is an instance of an application).
+                        </p>
+                    </div>
+
                     <figure>
-                        <img src="../slides/2017/Akademy/html/P31.png" />
+                        <img src="../slides/2017/Akademy/html/P31.png"
+                            alt="Property page for P31 (instance of) on Wikidata" />
                         <figcaption>Property <a href="https://www.wikidata.org/wiki/Property:P31">instance of</a> on
                             Wikidata</figcaption>
                     </figure>
-                    <p>This brings us to the next important question: what information is required for describing a
-                        software application. What are the different properties (or the P-numbers)? Some examples are
-                        given below:
-                    </p>
-                    <ol>
-                        <li>instance of <b>P31</b></li>
-                        <li>image <b>P18</b></li>
-                        <li>logo image <b>P154</b></li>
-                        <li>GUI toolkit or framework <b>P1414</b></li>
-                        <li>software version <b>P348</b></li>
-                        <li>...</li>
-                    </ol>
-                    <p>All those numbers!!!. Any newcomer may be alarmed by all these numbers. For this reason, there
-                        are several WikiProjects on Wikidata dedicated to different domains.
-                    </p>
+
+                    <div class="card">
+                        <p>This brings us to the next important question: what information is required for describing a
+                            software application. What are the different properties (or the P-numbers)? Some examples
+                            are given below:</p>
+
+                        <ol>
+                            <li>instance of <strong>P31</strong></li>
+                            <li>image <strong>P18</strong></li>
+                            <li>logo image <strong>P154</strong></li>
+                            <li>GUI toolkit or framework <strong>P1414</strong></li>
+                            <li>software version <strong>P348</strong></li>
+                            <li>...</li>
+                        </ol>
+
+                        <p>All those numbers!!!. Any newcomer may be alarmed by all these numbers. For this reason,
+                            there are several WikiProjects on Wikidata dedicated to different domains.</p>
+                    </div>
                 </section>
-                <section>
+
+                <section id="wikiprojects">
                     <h3>Wikidata WikiProjects</h3>
-                    <p>
-                        Wikidata WikiProjects help the contributors to identify the properties required to document a
-                        software application or information about other domains. For example, given below are some
-                        projects related to identifying the properties for software, operating
-                        systems, programming languages, etc.
-                    </p>
-                    <ol>
-                        <li><a
-                                href="https://www.wikidata.org/wiki/Wikidata:WikiProject_Informatics/Software/Properties">WikiProject
-                                Informatics/Software</a></li>
-                        <li><a href="https://www.wikidata.org/wiki/Wikidata:WikiProject_Informatics/Operating System">WikiProject
-                                Informatics/Operating System</a></li>
-                        <li><a
-                                href="https://www.wikidata.org/wiki/Wikidata:WikiProject_Informatics/Programming Language">WikiProject
-                                Informatics/Programming Language</a></li>
-                        <li>...</li>
-                    </ol>
-                    <p>A screenshot of one such WikiProject is given below. It shows the different properties required
-                        to describe a software application.
-                    </p>
+
+                    <div class="card">
+                        <p>
+                            Wikidata WikiProjects help the contributors to identify the properties required to document
+                            a software application or information about other domains. For example, given below are some
+                            projects related to identifying the properties for software, operating systems, programming
+                            languages, etc.
+                        </p>
+
+                        <ol>
+                            <li><a
+                                    href="https://www.wikidata.org/wiki/Wikidata:WikiProject_Informatics/Software/Properties">WikiProject
+                                    Informatics/Software</a></li>
+                            <li><a
+                                    href="https://www.wikidata.org/wiki/Wikidata:WikiProject_Informatics/Operating System">WikiProject
+                                    Informatics/Operating System</a></li>
+                            <li><a
+                                    href="https://www.wikidata.org/wiki/Wikidata:WikiProject_Informatics/Programming Language">WikiProject
+                                    Informatics/Programming Language</a></li>
+                            <li>...</li>
+                        </ol>
+
+                        <p>A screenshot of one such WikiProject is given below. It shows the different properties
+                            required to describe a software application.</p>
+                    </div>
+
                     <figure>
-                        <img src="../slides/2017/Akademy/html/software-properties.png" />
+                        <img src="../slides/2017/Akademy/html/software-properties.png"
+                            alt="WikiProject Software page showing list of properties for software documentation" />
                         <figcaption><a
                                 href="https://www.wikidata.org/wiki/Wikidata:WikiProject_Informatics/Software/Properties">WikiProject
                                 Software</a> lists properties to describe software</figcaption>
                     </figure>
                 </section>
-                <section>
+
+                <section id="editing-wikidata">
                     <h3>How to edit?</h3>
-                    <p>
-                        The next important question is how to add new information on Wikidata. The first option is to
-                        add it manually. The following screenshot shows how a new statement is added. A contributor
-                        wants to add the information: the <code>official website</code> on a Wikidata page. They type
-                        the first few characters and Wikidata shows two properties and they can choose any one of them
-                        and add the value.
-                    </p>
+
+                    <div class="card">
+                        <p>
+                            The next important question is how to add new information on Wikidata. The first option is
+                            to add it manually. The following screenshot shows how a new statement is added. A
+                            contributor wants to add the information: the <code>official website</code> on a Wikidata
+                            page. They type the first few characters and Wikidata shows two properties and they can
+                            choose any one of them and add the value.
+                        </p>
+                    </div>
+
                     <figure>
-                        <img src="screenshots/Screenshot_2020-12-12 Akregator.png" />
+                        <img src="screenshots/Screenshot_2020-12-12 Akregator.png"
+                            alt="Screenshot showing the process of adding a new statement on Wikidata" />
                         <figcaption>Contributor adding a statement about official website on <a
                                 href="https://www.wikidata.org/">Wikidata</a></figcaption>
                     </figure>
+
+                    <div class="card">
+                        <p>
+                            Wikidata also supports the addition of new statements using bots and tools. Three following
+                            tools are quite popular among the contributors for adding new information and even modifying
+                            or deleting existing information.
+                        </p>
+
+                        <ol>
+                            <li><a href="https://quickstatements.toolforge.org/">Quickstatements</a></li>
+                            <li><a href="https://pltools.toolforge.org/harvesttemplates/">HarvestTemplates</a></li>
+                            <li><a href="https://petscan.wmflabs.org/">PetScan</a></li>
+                        </ol>
+
+                        <p>Quickstatements, for example, can be used to create new Wikidata pages. The following code
+                            can be used to create a Wikidata page for software.</p>
+                    </div>
+
+                    <pre><code>CREATE
+LAST Len "Software Name"
+LAST Lfr "Nom du logiciel"
+LAST Den "description"
+LAST Dfr "la description"
+LAST P31 Q?</code></pre>
+
+                    <div class="card">
+                        <p>HarvestTemplates can be used to import data from Wikipedia Templates (e.g., Infoboxes). All
+                            you need is the following information: the name of the template, property name on the
+                            template page (e.g., logo image), and the corresponding P-Number (e.g., P154 for logo). This
+                            tool will then import the data from Wikipedia pages to Wikidata.</p>
+
+                        <p>PetScan is a very interesting tool that can be used to find Wikipedia articles matching
+                            categories and even be used to edit Wikidata items. Finally, contributors can even write
+                            bots making use of</p>
+
+                        <ul>
+                            <li><a href="https://www.mediawiki.org/wiki/API:Main_page">MediaWiki API</a></li>
+                            <li><a href="https://www.mediawiki.org/wiki/Manual:Pywikibot">pywikibot</a></li>
+                        </ul>
+                    </div>
                 </section>
-                <section>
-                    <p>
-                        Wikidata also supports the addition of new statements using bots and tools. Three following
-                        tools are quite popular among the contributors for adding new information and even modifying or
-                        deleting existing information.
-                    </p>
-                    <ol>
-                        <li><a href="https://quickstatements.toolforge.org/">Quickstatements</a></li>
-                        <li><a href="https://pltools.toolforge.org/harvesttemplates/">HarvestTemplates</a></li>
-                        <li><a href="https://petscan.wmflabs.org/">PetScan</a></li>
-                    </ol>
-                    <p>Quickstatements, for example, can be used to create new Wikidata pages. The following code can be
-                        used to create a Wikidata page for software.
-                    </p>
-                    <code>
-             <pre>
-               CREATE
-               LAST Len "Software Name"
-               LAST Lfr "Nom du logiciel"
-               LAST Den "description"
-               LAST Dfr "la description"
-               LAST P31 Q?
-            </pre>
-           </code>
-                    <p>HarvestTemplates can be used to import data from Wikipedia Templates (e.g.,
-                        <span>Infoboxes</span>). All you need is the following information: the name of the template,
-                        property name on the template page (e.g., logo image), and the corresponding
-                        P-Number (e.g., P154 for logo). This tool will then import the data from Wikipedia pages to
-                        Wikidata.
-                    </p>
-                    <p>PetScan is a very interesting tool that can be used to find Wikipedia articles matching
-                        categories and even be used to edit Wikidata items. Finally, contributors can even write bots
-                        making use of</p>
-                    <ul>
-                        <li><a href="https://www.mediawiki.org/wiki/API:Main_page">MediaWiki API</a></li>
-                        <li><a href="https://www.mediawiki.org/wiki/Manual:Pywikibot">pywikibot</a></li>
-                    </ul>
-                </section>
-                <section>
+
+                <section id="conclusion">
                     <h2>Conclusion</h2>
-                    <p>Wikipedia or Wikidata? The answer is both. Both play an important role in the documentation of
-                        software. Because of its structured nature, not all information can be added on Wikidata,
-                        especially if the contributors want to compare two
-                        or more software. That being said, projects like <a
-                            href="https://meta.wikimedia.org/wiki/Abstract_Wikipedia">Abstract Wikipedia</a> shows how
-                        Wikidata and Wikipedia can play an important role together in the future. Integration between
-                        Wikipedia infoboxes and Wikidata shows another possible potential, where rapidly changing
-                        information like software versions can be fetched from Wikidata.</p>
-                    <p>Wikidata can also be used to automatically generate articles. For example, the following line can
-                        be generated from a Wikidata page. Contributors may replace them with other software
-                        applications.
-                    </p>
-                    <blockquote><i>Akregator</i> is a <i>news aggregator</i> application in <i>KDE</i>. It was developed
-                        in the <i>QT</i> GUI framework.</blockquote>
-                    <p>
-                        Finally, software applications are under constant evolution and no contributor can ensure
-                        up-to-date information on every Wikipedia page. Automation and collaboration together can play
-                        an important role in software documentation and preserving the digital
-                        heritage and linguistic diversity, ensuring that both current and legacy software solutions are
-                        known to the current and future generations in their native languages.
-                    </p>
+
+                    <div class="card">
+                        <p>
+                            Wikipedia or Wikidata? The answer is both. Both play an important role in the documentation
+                            of software. Because of its structured nature, not all information can be added on Wikidata,
+                            especially if the contributors want to compare two or more software. That being said,
+                            projects like <a href="https://meta.wikimedia.org/wiki/Abstract_Wikipedia">Abstract
+                                Wikipedia</a> shows how Wikidata and Wikipedia can play an important role together in
+                            the future. Integration between Wikipedia infoboxes and Wikidata shows another possible
+                            potential, where rapidly changing information like software versions can be fetched from
+                            Wikidata.
+                        </p>
+
+                        <p>Wikidata can also be used to automatically generate articles. For example, the following line
+                            can be generated from a Wikidata page. Contributors may replace them with other software
+                            applications.</p>
+                    </div>
+
+                    <blockquote>
+                        <em>Akregator</em> is a <em>news aggregator</em> application in <em>KDE</em>. It was developed
+                        in the <em>QT</em> GUI framework.
+                    </blockquote>
+
+                    <div class="card">
+                        <p>
+                            Finally, software applications are under constant evolution and no contributor can ensure
+                            up-to-date information on every Wikipedia page. Automation and collaboration together can
+                            play an important role in software documentation and preserving the digital heritage and
+                            linguistic diversity, ensuring that both current and legacy software solutions are known to
+                            the current and future generations in their native languages.
+                        </p>
+                    </div>
                 </section>
-                <section>
-                    <p>
-                        <a href="https://www.wikidata.org/wiki/Q19279214">Q19279214!</a> for reading this article.
-                    </p>
-                    <p>
-                        There is nothing cryptic about the above sentence. It's just to say <i>Gracias! thank you!
-                            Merci! </i> in Wikidata-style.
-                    </p>
+
+                <section id="thanks">
+                    <div class="card">
+                        <p>
+                            <a href="https://www.wikidata.org/wiki/Q19279214">Q19279214!</a> for reading this article.
+                        </p>
+                        <p>
+                            There is nothing cryptic about the above sentence. It's just to say <em>Gracias! thank you!
+                                Merci!</em> in Wikidata-style.
+                        </p>
+                    </div>
                 </section>
-                <section>
+
+                <section id="references">
                     <h2>References</h2>
                     <ol>
                         <li><a href="https://commons.wikimedia.org/wiki/File:Wikidata_in_Wikipedia.pdf">Wikidata in
@@ -696,20 +1230,46 @@
                         <li><a href="https://petscan.wmflabs.org/">PetScan</a></li>
                     </ol>
                 </section>
-                <section>
+
+                <section id="acknowledgments">
                     <h2>Acknowledgments</h2>
-                    <p>The author would like to thank <i>Wikimedia Hackathons</i> and <i>Wikidata community members</i>
-                        for several discussions around these topics.</p>
+                    <p>The author would like to thank <em>Wikimedia Hackathons</em> and <em>Wikidata community
+                            members</em> for several discussions around these topics.</p>
                 </section>
-                <section>
-                    <p>This is an abridged version of the talk <i> <a
-                                href="https://figshare.com/articles/presentation/Wikidata_Exploring_more_visibility_and_coverage_of_KDE_Applications-John_Samuel_pdf/5661823">Wikidata:
-                                Exploring more visibility and coverage of KDE Applications</a></i> given by me at
-                        <span>Akademy 2017 in Almeria on 22<sup>nd</sup> July 2017</span>.
-                    </p>
+
+                <section id="about-talk">
+                    <div class="card">
+                        <p>This is an abridged version of the talk <em><a
+                                    href="https://figshare.com/articles/presentation/Wikidata_Exploring_more_visibility_and_coverage_of_KDE_Applications-John_Samuel_pdf/5661823">Wikidata:
+                                    Exploring more visibility and coverage of KDE Applications</a></em> given by me at
+                            Akademy 2017 in Almeria on 22<sup>nd</sup> July 2017.</p>
+                    </div>
                 </section>
+            </article>
+        </main>
+
+        <footer class="footer">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3 class="footer-title">About this Article</h3>
+                    <p>An exploration of how Wikidata serves as a central knowledge base for software documentation
+                        across multiple languages.</p>
+                </div>
+
+                <div class="footer-section">
+                    <h3 class="footer-title">Languages</h3>
+                    <div class="language-links">
+                        <span class="language-tag"><a href="./documentation-softwares.html">English</a></span>
+
+                    </div>
+                </div>
+
+                <div class="copyright">
+                    <p>&copy; 2020-2024 John Samuel. All rights reserved.</p>
+                    <p>Content available under Creative Commons licenses.</p>
+                </div>
             </div>
-        </div>
+        </footer>
     </body>
 
 </html>
