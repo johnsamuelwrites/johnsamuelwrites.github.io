@@ -3,269 +3,757 @@
 
     <head>
         <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <meta http-equiv="Content-Language" content="en" />
         <link rel="shortcut icon" href="../../images/logo/favicon.png" />
         <title>Analyzing Open-source Projects: John Samuel</title>
-        <style type="text/css">
-            body {
-                background-color: #FFFFFF;
+        <style>
+            /* ===== Design Tokens ===== */
+            :root {
+                /* Base Colors - Light Theme with Tech Feel */
+                --color-base-bg: #f5f8fa;
+                --color-base-surface: #ffffff;
+                --color-base-text: #1a202c;
+                --color-base-text-muted: #4a5568;
+
+                /* Theme Accents - Open Source Software Development */
+                --color-accent-1: #4a90e2;
+                /* Primary blue - trust, technology */
+                --color-accent-2: #2d5f8d;
+                /* Deep blue - stability */
+                --color-accent-3: #7b68ee;
+                /* Purple - innovation */
+                --color-accent-4: #5cb85c;
+                /* Green - open source */
+                --color-accent-light: #e8f2fa;
+
+                /* Functional Colors */
+                --color-shadow: rgba(74, 144, 226, 0.12);
+                --color-border: rgba(74, 144, 226, 0.15);
+                --color-hover: rgba(74, 144, 226, 0.08);
+
+                /* Gradients */
+                --gradient-primary: linear-gradient(135deg, var(--color-accent-1) 0%, var(--color-accent-3) 100%);
+                --gradient-subtle: linear-gradient(180deg, var(--color-base-bg) 0%, var(--color-accent-light) 100%);
+                --gradient-hero: linear-gradient(135deg, #4a90e2 0%, #7b68ee 50%, #5cb85c 100%);
+
+                /* Spacing Scale */
+                --space-xs: 0.25rem;
+                --space-sm: 0.5rem;
+                --space-md: 1rem;
+                --space-lg: 1.5rem;
+                --space-xl: 2rem;
+                --space-2xl: 3rem;
+                --space-3xl: 4rem;
+                --space-4xl: 6rem;
+
+                /* Border Radius */
+                --radius-sm: 4px;
+                --radius-md: 8px;
+                --radius-lg: 12px;
+                --radius-xl: 16px;
+                --radius-2xl: 24px;
+                --radius-full: 9999px;
+                --radius-organic: 63% 37% 54% 46% / 45% 62% 38% 55%;
+
+                /* Shadows */
+                --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.04), 0 1px 3px rgba(0, 0, 0, 0.06);
+                --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.05), 0 2px 4px rgba(0, 0, 0, 0.06);
+                --shadow-lg: 0 10px 24px rgba(0, 0, 0, 0.08), 0 4px 8px rgba(0, 0, 0, 0.06);
+                --shadow-xl: 0 20px 40px rgba(0, 0, 0, 0.12), 0 8px 16px rgba(0, 0, 0, 0.08);
+                --shadow-theme: 0 10px 30px var(--color-shadow), 0 4px 10px rgba(0, 0, 0, 0.06);
+
+                /* Typography */
+                --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+                --text-xs: clamp(0.75rem, 0.7rem + 0.25vw, 0.875rem);
+                --text-sm: clamp(0.875rem, 0.8rem + 0.35vw, 1rem);
+                --text-base: clamp(1rem, 0.95rem + 0.25vw, 1.125rem);
+                --text-lg: clamp(1.125rem, 1.05rem + 0.35vw, 1.25rem);
+                --text-xl: clamp(1.25rem, 1.15rem + 0.5vw, 1.5rem);
+                --text-2xl: clamp(1.5rem, 1.3rem + 1vw, 2rem);
+                --text-3xl: clamp(2rem, 1.6rem + 2vw, 2.5rem);
+                --text-4xl: clamp(2.5rem, 2rem + 2.5vw, 3.5rem);
+
+                --weight-normal: 400;
+                --weight-medium: 500;
+                --weight-semibold: 600;
+                --weight-bold: 700;
             }
 
-            #sidebar {
-                position: fixed;
-                background-color: #009AA6;
-                top: 0;
-                left: 0;
-                bottom: 0;
-                width: 30vw;
-            }
-
-            #sidebar .title {
-                position: relative;
-                text-align: center;
-                line-height: 5vmax;
-                font-size: 1.4vmax;
-                font-family: 'Arial';
-                margin-top: 30vh;
-            }
-
-            #sidebar .title a:link,
-            #sidebar .title a:visited {
-                color: #FFFFFF;
-                text-decoration: none;
-            }
-
-            .subtitle {
-                top: 50vh;
-                text-align: center;
-                line-height: 1.3vmax;
-                font-family: 'Arial';
-                font-size: 1.2vmax;
-                color: #FFFFFF;
-            }
-
-            .subtitle a:link,
-            .subtitle a:visited {
-                color: #FFFFFF;
-                text-decoration: none;
-            }
-
-            .licence {
-                position: fixed;
-                text-align: right;
-                bottom: 0;
-                right: 0;
-            }
-
-            .home {
-                position: fixed;
-                text-align: left;
-                font-family: 'Arial';
-                color: #D3D3D3;
-                z-index: 100;
-                width: 100%;
-                background-color: #FFFFFF;
-                top: 0px;
-                margin-bottom: 10px;
-                padding-bottom: 10px;
-            }
-
-            .home a:link,
-            .home a:visited {
-                text-decoration: none;
-                color: #D3D3D3;
-            }
-
-            .home ul {
+            /* ===== Reset & Base Styles ===== */
+            * {
                 margin: 0;
                 padding: 0;
-                text-align: left;
-                list-style: none;
+                box-sizing: border-box;
             }
 
-            .home li {
-                position: relative;
-                float: left;
-                padding-top: 15px;
-                margin-right: 1em;
-                font-family: 'Arial';
+            html {
+                scroll-behavior: smooth;
+                scroll-padding-top: 100px;
             }
 
-            .home li:hover {
-                display: block;
+            body {
+                font-family: var(--font-sans);
+                font-size: var(--text-base);
+                line-height: 1.7;
+                color: var(--color-base-text);
+                background: var(--color-base-bg);
+                background-image:
+                    radial-gradient(circle at 20% 20%, rgba(74, 144, 226, 0.05) 0%, transparent 50%),
+                    radial-gradient(circle at 80% 80%, rgba(123, 104, 238, 0.05) 0%, transparent 50%);
+                background-attachment: fixed;
+                letter-spacing: -0.005em;
+                overflow-x: hidden;
             }
 
-            .home li:hover a:link,
-            .home li:hover a:visited {
+            /* Skip Link for Accessibility */
+            .skip-link {
+                position: absolute;
+                top: -40px;
+                left: 0;
+                background: var(--color-accent-1);
+                color: white;
+                padding: var(--space-sm) var(--space-md);
                 text-decoration: none;
-                padding: 15px;
-                color: #FFFFFF;
-                background-color: #009AA6;
+                border-radius: var(--radius-md);
+                z-index: 100;
             }
 
-            .content {
-                line-height: 1.8vmax;
-                font-size: 1.2vmax;
-                font-family: 'Arial';
-                margin-top: 15vh;
-                width: 90%;
+            .skip-link:focus {
+                top: var(--space-sm);
+                left: var(--space-sm);
             }
 
-            .content h2,
-            h3,
-            h4 {
-                color: #009AA6;
+            /* ===== Navigation ===== */
+            nav {
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                background: rgba(255, 255, 255, 0.85);
+                -webkit-backdrop-filter: blur(12px) saturate(180%);
+                backdrop-filter: blur(12px) saturate(180%);
+                border-bottom: 1px solid rgba(74, 144, 226, 0.1);
+                box-shadow: var(--shadow-sm);
+                z-index: 50;
+                animation: slideDown 0.6s ease-out;
             }
 
-            .content a:link,
-            .content a:visited {
-                color: #009AA6;
+            @keyframes slideDown {
+                from {
+                    transform: translateY(-100%);
+                    opacity: 0;
+                }
+
+                to {
+                    transform: translateY(0);
+                    opacity: 1;
+                }
             }
 
-            .content h3 {
-                color: #009AA6;
+            .nav-container {
+                max-width: 1400px;
+                margin: 0 auto;
+                padding: var(--space-md) var(--space-xl);
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                gap: var(--space-lg);
             }
 
-            .content h2::before,
-            .content h3::before {
-                display: block;
-                content: " ";
-                visibility: hidden;
-                height: 50px;
-                margin-top: -50px;
-                pointer-events: none;
-                background-color: #FFFFFF;
+            .nav-brand {
+                display: flex;
+                align-items: center;
+                gap: var(--space-md);
             }
 
-            .content a:link,
-            .content a:visited {
-                color: #009AA6;
+            .nav-brand h2 {
+                font-size: var(--text-xl);
+                font-weight: var(--weight-bold);
+                letter-spacing: -0.02em;
             }
 
-            .home a:link,
-            .home a:visited {
-                color: #D3D3D3;
+            .nav-brand h2 a {
+                color: var(--color-base-text);
+                text-decoration: none;
+                background: var(--gradient-primary);
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                background-clip: text;
+                transition: opacity 0.3s ease;
             }
 
-            .page {
-                width: 65vw;
-                height: 100%;
-                margin-left: 30vw;
+            .nav-brand h2 a:hover {
+                opacity: 0.8;
+            }
+
+            .breadcrumb {
+                display: flex;
+                list-style: none;
+                gap: var(--space-sm);
+                font-size: var(--text-sm);
+                color: var(--color-base-text-muted);
+                flex-wrap: wrap;
+            }
+
+            .breadcrumb li::after {
+                content: '→';
+                margin-left: var(--space-sm);
+                opacity: 0.5;
+            }
+
+            .breadcrumb li:last-child::after {
+                display: none;
+            }
+
+            .breadcrumb a {
+                color: var(--color-accent-1);
+                text-decoration: none;
+                transition: color 0.3s ease;
+            }
+
+            .breadcrumb a:hover {
+                color: var(--color-accent-3);
+            }
+
+            /* ===== Main Container ===== */
+            main {
+                max-width: 1400px;
+                margin: 0 auto;
+                padding: calc(80px + var(--space-3xl)) var(--space-xl) var(--space-4xl);
+            }
+
+            /* ===== Hero Section ===== */
+            .hero {
+                position: relative;
+                margin-bottom: var(--space-4xl);
+                padding: var(--space-4xl) var(--space-3xl);
+                background: var(--gradient-hero);
+                background-size: 200% 200%;
+                border-radius: var(--radius-2xl);
                 overflow: hidden;
-                padding: 0 1em;
-                font-family: 'Arial';
+                animation: gradientShift 12s ease infinite, fadeInUp 0.8s ease-out;
             }
 
-            .page img {
-                max-width: 100%;
-                max-height: 100%;
+            @keyframes gradientShift {
+
+                0%,
+                100% {
+                    background-position: 0% 50%;
+                }
+
+                50% {
+                    background-position: 100% 50%;
+                }
             }
 
-            @media (max-width: 640px),
-            screen and (orientation: portrait) {
-                body {
-                    max-width: 100%;
-                    max-height: 100%;
+            @keyframes fadeInUp {
+                from {
+                    opacity: 0;
+                    transform: translateY(30px);
                 }
 
-                #sidebar {
-                    position: fixed;
-                    background-color: #009AA6;
-                    top: 0;
-                    left: 0;
-                    bottom: 80vh;
-                    width: 100vw;
+                to {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            }
+
+            .hero::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background:
+                    repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.03) 0px, transparent 1px, transparent 40px),
+                    repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.03) 0px, transparent 1px, transparent 40px);
+                pointer-events: none;
+            }
+
+            .hero-content {
+                position: relative;
+                z-index: 1;
+                max-width: 900px;
+            }
+
+            .hero h1 {
+                font-size: var(--text-4xl);
+                font-weight: var(--weight-bold);
+                color: white;
+                margin-bottom: var(--space-lg);
+                letter-spacing: -0.03em;
+                line-height: 1.2;
+                text-shadow: 0 2px 20px rgba(0, 0, 0, 0.15);
+            }
+
+            .hero-intro {
+                font-size: var(--text-lg);
+                color: rgba(255, 255, 255, 0.95);
+                line-height: 1.7;
+                margin-bottom: var(--space-md);
+                text-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            }
+
+            .hero-svg {
+                position: absolute;
+                right: 20px;
+                top: 50%;
+                transform: translateY(-50%);
+                width: 450px;
+                height: 450px;
+                opacity: 0.9;
+                pointer-events: none;
+            }
+
+            @media (max-width: 1200px) {
+                .hero-svg {
+                    opacity: 0.6;
+                    width: 350px;
+                    height: 350px;
+                }
+            }
+
+            /* ===== Section Styles ===== */
+            section {
+                margin-bottom: var(--space-4xl);
+                animation: fadeInUp 0.8s ease-out;
+                animation-fill-mode: both;
+            }
+
+            section:nth-child(2) {
+                animation-delay: 0.1s;
+            }
+
+            section:nth-child(3) {
+                animation-delay: 0.2s;
+            }
+
+            section:nth-child(4) {
+                animation-delay: 0.3s;
+            }
+
+            .section-header {
+                position: relative;
+                margin-bottom: var(--space-2xl);
+            }
+
+            .section-header h2,
+            .section-header h3 {
+                font-weight: var(--weight-bold);
+                letter-spacing: -0.02em;
+                color: var(--color-base-text);
+                position: relative;
+                display: inline-block;
+            }
+
+            .section-header h2 {
+                font-size: var(--text-3xl);
+                margin-bottom: var(--space-lg);
+            }
+
+            .section-header h3 {
+                font-size: var(--text-2xl);
+                margin-bottom: var(--space-md);
+            }
+
+            .section-header h4 {
+                font-size: var(--text-xl);
+                font-weight: var(--weight-semibold);
+                color: var(--color-accent-1);
+                margin-bottom: var(--space-md);
+                letter-spacing: -0.01em;
+            }
+
+            .section-header h2::after {
+                content: '';
+                position: absolute;
+                bottom: -8px;
+                left: 0;
+                width: 60px;
+                height: 4px;
+                background: var(--gradient-primary);
+                border-radius: var(--radius-full);
+            }
+
+            .section-header h3::after {
+                content: '';
+                position: absolute;
+                bottom: -6px;
+                left: 0;
+                width: 40px;
+                height: 3px;
+                background: var(--gradient-primary);
+                border-radius: var(--radius-full);
+            }
+
+            /* ===== Content Cards ===== */
+            .content-grid {
+                display: flex;
+                flex-direction: column;
+                gap: var(--space-2xl);
+                margin-bottom: var(--space-3xl);
+            }
+
+            .card {
+                background: var(--color-base-surface);
+                border-radius: var(--radius-xl);
+                padding: var(--space-3xl);
+                box-shadow: var(--shadow-theme);
+                border: 1px solid var(--color-border);
+                transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+                position: relative;
+                overflow: hidden;
+                display: grid;
+                grid-template-columns: auto 1fr;
+                gap: var(--space-xl);
+                align-items: start;
+            }
+
+            .card::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 4px;
+                height: 100%;
+                background: var(--gradient-primary);
+                opacity: 0;
+                transition: opacity 0.3s ease;
+            }
+
+            .card:hover {
+                transform: translateX(8px);
+                box-shadow: 0 16px 48px rgba(74, 144, 226, 0.18);
+                border-color: var(--color-accent-1);
+            }
+
+            .card:hover::before {
+                opacity: 1;
+            }
+
+            .card-icon-wrapper {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                gap: var(--space-sm);
+                padding-top: var(--space-xs);
+            }
+
+            .card-icon {
+                width: 64px;
+                height: 64px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                background: var(--gradient-primary);
+                border-radius: var(--radius-lg);
+                color: white;
+                font-size: 32px;
+                font-weight: var(--weight-bold);
+                flex-shrink: 0;
+                box-shadow: var(--shadow-md);
+                transition: transform 0.3s ease;
+            }
+
+            .card:hover .card-icon {
+                transform: scale(1.1) rotate(5deg);
+            }
+
+            .card-content h4 {
+                font-size: var(--text-2xl);
+                font-weight: var(--weight-bold);
+                color: var(--color-accent-1);
+                margin-bottom: var(--space-lg);
+                letter-spacing: -0.01em;
+            }
+
+            .card-content p {
+                margin-bottom: var(--space-md);
+            }
+
+            .card-content p:last-child {
+                margin-bottom: 0;
+            }
+
+            /* ===== Paragraph Styles ===== */
+            p {
+                margin-bottom: var(--space-lg);
+                line-height: 1.8;
+                color: var(--color-base-text);
+            }
+
+            p em,
+            p i {
+                color: var(--color-base-text-muted);
+                font-style: italic;
+            }
+
+            /* ===== Links ===== */
+            a {
+                color: var(--color-accent-1);
+                text-decoration: none;
+                transition: color 0.3s ease;
+                position: relative;
+            }
+
+            a:hover {
+                color: var(--color-accent-3);
+            }
+
+            a:focus {
+                outline: 2px solid var(--color-accent-1);
+                outline-offset: 2px;
+                border-radius: var(--radius-sm);
+            }
+
+            /* ===== Lists ===== */
+            ol {
+                margin-left: var(--space-xl);
+                margin-bottom: var(--space-lg);
+            }
+
+            ol li {
+                margin-bottom: var(--space-sm);
+                line-height: 1.7;
+                color: var(--color-base-text);
+            }
+
+            ol li a {
+                display: inline-block;
+                padding: var(--space-xs) 0;
+            }
+
+            /* ===== Footer ===== */
+            footer {
+                background: linear-gradient(135deg, rgba(74, 144, 226, 0.05) 0%, rgba(123, 104, 238, 0.05) 100%);
+                border-top: 1px solid var(--color-border);
+                padding: var(--space-3xl) var(--space-xl) var(--space-xl);
+                margin-top: var(--space-4xl);
+            }
+
+            .footer-container {
+                max-width: 1400px;
+                margin: 0 auto;
+                display: flex;
+                flex-direction: column;
+                gap: var(--space-xl);
+            }
+
+            .footer-license {
+                display: flex;
+                align-items: center;
+                gap: var(--space-md);
+                padding: var(--space-lg);
+                background: var(--color-base-surface);
+                border-radius: var(--radius-lg);
+                box-shadow: var(--shadow-sm);
+            }
+
+            .footer-license img {
+                width: 88px;
+                height: auto;
+            }
+
+            .footer-bottom {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                flex-wrap: wrap;
+                gap: var(--space-lg);
+                padding-top: var(--space-lg);
+                border-top: 1px solid var(--color-border);
+                font-size: var(--text-sm);
+                color: var(--color-base-text-muted);
+            }
+
+            /* ===== SVG Animation ===== */
+            .code-network-icon {
+                animation: float 6s ease-in-out infinite;
+            }
+
+            .code-bracket {
+                animation: pulse 3s ease-in-out infinite;
+            }
+
+            .node-circle {
+                animation: nodeGlow 4s ease-in-out infinite;
+            }
+
+            .connection-line {
+                animation: dataFlow 5s linear infinite;
+                stroke-dasharray: 5, 5;
+            }
+
+            @keyframes float {
+
+                0%,
+                100% {
+                    transform: translateY(0px);
                 }
 
-                #sidebar .title {
+                50% {
+                    transform: translateY(-20px);
+                }
+            }
+
+            @keyframes pulse {
+
+                0%,
+                100% {
+                    opacity: 0.8;
+                }
+
+                50% {
+                    opacity: 1;
+                }
+            }
+
+            @keyframes nodeGlow {
+
+                0%,
+                100% {
+                    opacity: 0.6;
+                }
+
+                50% {
+                    opacity: 1;
+                }
+            }
+
+            @keyframes dataFlow {
+                0% {
+                    stroke-dashoffset: 0;
+                }
+
+                100% {
+                    stroke-dashoffset: 50;
+                }
+            }
+
+            /* ===== Decorative Elements ===== */
+            .section-divider {
+                width: 100%;
+                height: 2px;
+                background: linear-gradient(90deg, transparent 0%, var(--color-accent-1) 50%, transparent 100%);
+                margin: var(--space-3xl) 0;
+                opacity: 0.3;
+            }
+
+            /* ===== Responsive Design ===== */
+            @media (max-width: 768px) {
+                .nav-container {
+                    flex-direction: column;
+                    align-items: flex-start;
+                    padding: var(--space-md);
+                }
+
+                .breadcrumb {
+                    font-size: var(--text-xs);
+                }
+
+                main {
+                    padding: calc(120px + var(--space-xl)) var(--space-md) var(--space-2xl);
+                }
+
+                .hero {
+                    padding: var(--space-2xl) var(--space-lg);
+                }
+
+                .hero-svg {
+                    width: 250px;
+                    height: 250px;
+                    opacity: 0.4;
+                    right: -30px;
+                }
+
+                .card {
+                    grid-template-columns: 1fr;
+                    padding: var(--space-xl);
+                    gap: var(--space-md);
+                }
+
+                .card-icon-wrapper {
+                    flex-direction: row;
+                    justify-content: flex-start;
+                }
+
+                .card-icon {
+                    width: 48px;
+                    height: 48px;
+                    font-size: 24px;
+                }
+
+                .footer-bottom {
+                    flex-direction: column;
                     text-align: center;
-                    position: fixed;
-                    margin-top: 6vh;
-                    left: 0px;
-                    right: 0px;
-                    line-height: 3.5vmax;
-                    font-size: 1.5vmax;
-                    font-family: 'Arial';
+                }
+            }
+
+            @media (max-width: 480px) {
+                .hero-svg {
+                    display: none;
                 }
 
-                #sidebar .subtitle {
-                    text-align: center;
-                    top: 5vh;
-                    left: 0px;
-                    right: 0px;
-                    position: fixed;
-                    margin-top: 10vh;
-                    font-size: 1.5vmax;
+                .card {
+                    padding: var(--space-lg);
                 }
 
-                #sidebar .title a:link,
-                #sidebar .title a:visited {
-                    text-align: center;
-                    color: #FFFFFF;
+                .card-icon {
+                    width: 40px;
+                    height: 40px;
+                    font-size: 20px;
+                }
+            }
+
+            /* ===== Reduced Motion ===== */
+            @media (prefers-reduced-motion: reduce) {
+
+                *,
+                *::before,
+                *::after {
+                    animation-duration: 0.01ms !important;
+                    animation-iteration-count: 1 !important;
+                    transition-duration: 0.01ms !important;
+                }
+            }
+
+            /* ===== Print Styles ===== */
+            @media print {
+
+                nav,
+                footer {
+                    display: none;
                 }
 
-                #sidebar .subtitle a:link,
-                #sidebar .subtitle a:visited {
-                    text-align: center;
-                    color: #FFFFFF;
+                main {
+                    padding-top: 0;
                 }
 
-                .home {
-                    z-index: 100;
-                    width: 100%;
-                    background-color: #009AA6;
-                    font-size: 1.5vmax;
+                .hero {
+                    background: none;
+                    border: 1px solid #ddd;
                 }
 
-                .home a:link,
-                .home a:visited {
-                    text-decoration: none;
-                    color: #FFFFFF;
-                }
-
-                .content {
-                    line-height: 3.8vmax;
-                    font-size: 1.8vmax;
-                    font-family: 'Arial';
-                    margin-top: 22vh;
-                }
-
-                .content a:link,
-                .content a:visited {
-                    color: #009AA6;
-                }
-
-                .page {
-                    top: 40vh;
-                    width: 95%;
-                    margin-left: 0vw;
-                }
-
-                .page img {
-                    max-width: 100%;
-                    max-height: 100%;
-                    border: 0;
+                a {
+                    color: #000;
+                    text-decoration: underline;
                 }
             }
         </style>
     </head>
 
     <body vocab="http://schema.org/">
-        <div id="sidebar">
-            <div class="title">
-                <h1><a href="./analyzing-open-source-projects.html">Analyzing Open-source Projects</a></h1>
-            </div>
-            <div class="subtitle">
-                <h2><a href="../about.html">John Samuel</a></h2>
-            </div>
-        </div>
-        <div class="licence">
-            <a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/"><img alt="Creative Commons License"
-                    style="border-width:0" src="./../../images/license.png" /></a>
-        </div>
-        <div class="page">
-            <div class="home">
-                <ul typeof="BreadcrumbList">
+        <a href="#main-content" class="skip-link">Skip to main content</a>
+
+        <!-- Navigation -->
+        <nav role="navigation" aria-label="Main navigation">
+            <div class="nav-container">
+                <div class="nav-brand">
+                    <h2><a href="../about.html">John Samuel</a></h2>
+                </div>
+                <ul class="breadcrumb" typeof="BreadcrumbList">
                     <li property="itemListElement" typeof="ListItem">
                         <a property="item" typeof="WebPage" href="../index.html">
                             <span property="name">Home</span>
@@ -282,286 +770,519 @@
                         </a>
                     </li>
                 </ul>
-
             </div>
-            <div class="content">
-                <p><i>
-                        Open source has come a long way, from being a taboo subject to becoming a prominent buzzword.
-                        While
-                        it may be challenging to grasp the nuances of the multitude of software shared under open-source
-                        licenses, it's evident that opening up source code plays a vital role in swiftly identifying
-                        issues,
-                        gathering user and developer feedback, and enhancing code security. Individuals and enterprises
-                        alike have embraced this approach, sharing experiments and proofs of concept in open source to
-                        obtain instant feedback via social media.
-                    </i></p>
-                <p><i>In the continuously expanding realm of open-source software, choosing the right project can be a
-                        daunting task. This article delves into the process of effectively evaluating open-source
-                        projects.
-                        It covers a wide range of crucial parameters, including documentation quality, security
-                        considerations, scalability, and community support.</i></p>
-                <h3>Introduction</h3>
+        </nav>
+
+        <!-- Main Content -->
+        <main id="main-content">
+            <!-- Hero Section -->
+            <div class="hero">
+                <div class="hero-content">
+                    <h1>Analyzing Open-source Projects</h1>
+                    <p class="hero-intro">
+                        <em>Open source has come a long way, from being a taboo subject to becoming a prominent
+                            buzzword. While it may be challenging to grasp the nuances of the multitude of software
+                            shared under open-source licenses, it's evident that opening up source code plays a vital
+                            role in swiftly identifying issues, gathering user and developer feedback, and enhancing
+                            code security.</em>
+                    </p>
+                    <p class="hero-intro">
+                        <em>In the continuously expanding realm of open-source software, choosing the right project can
+                            be a daunting task. This article delves into the process of effectively evaluating
+                            open-source projects. It covers a wide range of crucial parameters, including documentation
+                            quality, security considerations, scalability, and community support.</em>
+                    </p>
+                </div>
+
+                <!-- Decorative SVG - Open Source Network -->
+                <svg class="hero-svg" viewBox="0 0 500 500" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                    <defs>
+                        <filter id="glow">
+                            <feGaussianBlur stdDeviation="5" result="coloredBlur" />
+                            <feMerge>
+                                <feMergeNode in="coloredBlur" />
+                                <feMergeNode in="SourceGraphic" />
+                            </feMerge>
+                        </filter>
+                        <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" style="stop-color:rgba(255,255,255,0.9);stop-opacity:1" />
+                            <stop offset="100%" style="stop-color:rgba(255,255,255,0.6);stop-opacity:1" />
+                        </linearGradient>
+                        <linearGradient id="grad2" x1="0%" y1="0%" x2="100%" y2="0%">
+                            <stop offset="0%" style="stop-color:rgba(255,255,255,0.8);stop-opacity:1" />
+                            <stop offset="100%" style="stop-color:rgba(255,255,255,0.5);stop-opacity:1" />
+                        </linearGradient>
+                    </defs>
+
+                    <!-- Background Circles -->
+                    <circle cx="250" cy="250" r="200" fill="none" stroke="rgba(255, 255, 255, 0.15)" stroke-width="2"
+                        stroke-dasharray="5,5">
+                        <animateTransform attributeName="transform" type="rotate" from="0 250 250" to="360 250 250"
+                            dur="30s" repeatCount="indefinite" />
+                    </circle>
+                    <circle cx="250" cy="250" r="140" fill="none" stroke="rgba(255, 255, 255, 0.1)" stroke-width="1.5"
+                        stroke-dasharray="3,3">
+                        <animateTransform attributeName="transform" type="rotate" from="360 250 250" to="0 250 250"
+                            dur="25s" repeatCount="indefinite" />
+                    </circle>
+
+                    <!-- Central Hub - Repository -->
+                    <g class="code-network-icon">
+                        <circle cx="250" cy="250" r="45" fill="url(#grad1)" filter="url(#glow)" opacity="0.95">
+                            <animate attributeName="r" values="45;50;45" dur="4s" repeatCount="indefinite" />
+                        </circle>
+
+                        <!-- Git Branch Symbol -->
+                        <circle cx="235" cy="235" r="8" fill="rgba(74, 144, 226, 0.8)" />
+                        <circle cx="265" cy="235" r="8" fill="rgba(123, 104, 238, 0.8)" />
+                        <circle cx="250" cy="265" r="8" fill="rgba(92, 184, 92, 0.8)" />
+                        <line x1="235" y1="243" x2="242" y2="257" stroke="rgba(74, 144, 226, 0.8)" stroke-width="3"
+                            stroke-linecap="round" />
+                        <line x1="265" y1="243" x2="258" y2="257" stroke="rgba(123, 104, 238, 0.8)" stroke-width="3"
+                            stroke-linecap="round" />
+                    </g>
+
+                    <!-- Outer Nodes - Contributors/Projects -->
+                    <!-- Node 1 - Top -->
+                    <g class="node-circle">
+                        <circle cx="250" cy="80" r="30" fill="url(#grad2)" filter="url(#glow)" opacity="0.85">
+                            <animate attributeName="opacity" values="0.85;1;0.85" dur="3s" repeatCount="indefinite" />
+                        </circle>
+                        <text x="250" y="88" text-anchor="middle" fill="rgba(74, 144, 226, 0.9)" font-size="24"
+                            font-weight="bold">&lt;/&gt;</text>
+                    </g>
+
+                    <!-- Node 2 - Top Right -->
+                    <g class="node-circle" style="animation-delay: 0.5s">
+                        <circle cx="400" cy="150" r="28" fill="url(#grad2)" filter="url(#glow)" opacity="0.85">
+                            <animate attributeName="opacity" values="0.85;1;0.85" dur="3.5s" repeatCount="indefinite" />
+                        </circle>
+                        <text x="400" y="158" text-anchor="middle" fill="rgba(123, 104, 238, 0.9)" font-size="22"
+                            font-weight="bold">⚡</text>
+                    </g>
+
+                    <!-- Node 3 - Right -->
+                    <g class="node-circle" style="animation-delay: 1s">
+                        <circle cx="420" cy="280" r="26" fill="url(#grad2)" filter="url(#glow)" opacity="0.85">
+                            <animate attributeName="opacity" values="0.85;1;0.85" dur="4s" repeatCount="indefinite" />
+                        </circle>
+                        <text x="420" y="288" text-anchor="middle" fill="rgba(92, 184, 92, 0.9)" font-size="20"
+                            font-weight="bold">✓</text>
+                    </g>
+
+                    <!-- Node 4 - Bottom Right -->
+                    <g class="node-circle" style="animation-delay: 1.5s">
+                        <circle cx="370" cy="400" r="27" fill="url(#grad2)" filter="url(#glow)" opacity="0.85">
+                            <animate attributeName="opacity" values="0.85;1;0.85" dur="3.8s" repeatCount="indefinite" />
+                        </circle>
+                        <text x="370" y="408" text-anchor="middle" fill="rgba(74, 144, 226, 0.9)" font-size="21"
+                            font-weight="bold">★</text>
+                    </g>
+
+                    <!-- Node 5 - Bottom -->
+                    <g class="node-circle" style="animation-delay: 2s">
+                        <circle cx="250" cy="430" r="29" fill="url(#grad2)" filter="url(#glow)" opacity="0.85">
+                            <animate attributeName="opacity" values="0.85;1;0.85" dur="4.2s" repeatCount="indefinite" />
+                        </circle>
+                        <text x="250" y="438" text-anchor="middle" fill="rgba(123, 104, 238, 0.9)" font-size="23"
+                            font-weight="bold">♦</text>
+                    </g>
+
+                    <!-- Node 6 - Bottom Left -->
+                    <g class="node-circle" style="animation-delay: 2.5s">
+                        <circle cx="130" cy="400" r="25" fill="url(#grad2)" filter="url(#glow)" opacity="0.85">
+                            <animate attributeName="opacity" values="0.85;1;0.85" dur="3.6s" repeatCount="indefinite" />
+                        </circle>
+                        <text x="130" y="407" text-anchor="middle" fill="rgba(92, 184, 92, 0.9)" font-size="19"
+                            font-weight="bold">◆</text>
+                    </g>
+
+                    <!-- Node 7 - Left -->
+                    <g class="node-circle" style="animation-delay: 3s">
+                        <circle cx="80" cy="280" r="27" fill="url(#grad2)" filter="url(#glow)" opacity="0.85">
+                            <animate attributeName="opacity" values="0.85;1;0.85" dur="4.5s" repeatCount="indefinite" />
+                        </circle>
+                        <text x="80" y="288" text-anchor="middle" fill="rgba(74, 144, 226, 0.9)" font-size="21"
+                            font-weight="bold">▲</text>
+                    </g>
+
+                    <!-- Node 8 - Top Left -->
+                    <g class="node-circle" style="animation-delay: 3.5s">
+                        <circle cx="100" cy="150" r="28" fill="url(#grad2)" filter="url(#glow)" opacity="0.85">
+                            <animate attributeName="opacity" values="0.85;1;0.85" dur="3.3s" repeatCount="indefinite" />
+                        </circle>
+                        <text x="100" y="158" text-anchor="middle" fill="rgba(123, 104, 238, 0.9)" font-size="22"
+                            font-weight="bold">●</text>
+                    </g>
+
+                    <!-- Connection Lines - Animated Data Flow -->
+                    <g class="connection-line">
+                        <line x1="250" y1="250" x2="250" y2="80" stroke="rgba(255, 255, 255, 0.5)" stroke-width="3">
+                            <animate attributeName="stroke-dashoffset" from="0" to="50" dur="3s"
+                                repeatCount="indefinite" />
+                        </line>
+                        <line x1="250" y1="250" x2="400" y2="150" stroke="rgba(255, 255, 255, 0.5)" stroke-width="3">
+                            <animate attributeName="stroke-dashoffset" from="0" to="50" dur="3.5s"
+                                repeatCount="indefinite" />
+                        </line>
+                        <line x1="250" y1="250" x2="420" y2="280" stroke="rgba(255, 255, 255, 0.5)" stroke-width="3">
+                            <animate attributeName="stroke-dashoffset" from="0" to="50" dur="4s"
+                                repeatCount="indefinite" />
+                        </line>
+                        <line x1="250" y1="250" x2="370" y2="400" stroke="rgba(255, 255, 255, 0.5)" stroke-width="3">
+                            <animate attributeName="stroke-dashoffset" from="0" to="50" dur="3.8s"
+                                repeatCount="indefinite" />
+                        </line>
+                        <line x1="250" y1="250" x2="250" y2="430" stroke="rgba(255, 255, 255, 0.5)" stroke-width="3">
+                            <animate attributeName="stroke-dashoffset" from="0" to="50" dur="4.2s"
+                                repeatCount="indefinite" />
+                        </line>
+                        <line x1="250" y1="250" x2="130" y2="400" stroke="rgba(255, 255, 255, 0.5)" stroke-width="3">
+                            <animate attributeName="stroke-dashoffset" from="0" to="50" dur="3.6s"
+                                repeatCount="indefinite" />
+                        </line>
+                        <line x1="250" y1="250" x2="80" y2="280" stroke="rgba(255, 255, 255, 0.5)" stroke-width="3">
+                            <animate attributeName="stroke-dashoffset" from="0" to="50" dur="4.5s"
+                                repeatCount="indefinite" />
+                        </line>
+                        <line x1="250" y1="250" x2="100" y2="150" stroke="rgba(255, 255, 255, 0.5)" stroke-width="3">
+                            <animate attributeName="stroke-dashoffset" from="0" to="50" dur="3.3s"
+                                repeatCount="indefinite" />
+                        </line>
+                    </g>
+
+                    <!-- Data Packets - Small circles moving along paths -->
+                    <circle r="4" fill="rgba(74, 144, 226, 0.9)" filter="url(#glow)">
+                        <animateMotion dur="3s" repeatCount="indefinite">
+                            <mpath href="#path1" />
+                        </animateMotion>
+                    </circle>
+                    <path id="path1" d="M 250,250 L 250,80" fill="none" stroke="none" />
+
+                    <circle r="4" fill="rgba(123, 104, 238, 0.9)" filter="url(#glow)">
+                        <animateMotion dur="3.5s" repeatCount="indefinite">
+                            <mpath href="#path2" />
+                        </animateMotion>
+                    </circle>
+                    <path id="path2" d="M 250,250 L 400,150" fill="none" stroke="none" />
+
+                    <circle r="4" fill="rgba(92, 184, 92, 0.9)" filter="url(#glow)">
+                        <animateMotion dur="4s" repeatCount="indefinite">
+                            <mpath href="#path3" />
+                        </animateMotion>
+                    </circle>
+                    <path id="path3" d="M 250,250 L 420,280" fill="none" stroke="none" />
+                </svg>
+            </div>
+
+            <!-- Introduction Section -->
+            <section>
+                <div class="section-header">
+                    <h2>Introduction</h2>
+                </div>
                 <p>
-                    A plethora of open-source [1] projects [2] exists across various platforms, including GitHub,
-                    GitLab,
-                    and private Git and GitLab instances. These projects cover a wide range of topics and applications,
-                    making it a challenging task to understand their motivations. Moreover, recent years have brought
-                    significant changes to the software landscape, extending beyond desktop projects to include a wealth
-                    of
-                    open-source web and mobile application projects. With so many project names out there, it's easy to
-                    feel
-                    overwhelmed.
+                    A plethora of open-source <a href="https://en.wikipedia.org/wiki/Open_source">[1]</a> projects <a
+                        href="https://en.wikipedia.org/wiki/Project">[2]</a> exists across various platforms, including
+                    GitHub, GitLab, and private Git and GitLab instances. These projects cover a wide range of topics
+                    and applications, making it a challenging task to understand their motivations. Moreover, recent
+                    years have brought significant changes to the software landscape, extending beyond desktop projects
+                    to include a wealth of open-source web and mobile application projects. With so many project names
+                    out there, it's easy to feel overwhelmed.
                 </p>
                 <p>
                     Before delving further, it's crucial to establish a clear definition of open source. Simply sharing
-                    code
-                    doesn't necessarily make a project open source, despite the literal interpretation. As the term
-                    "open
-                    source" gains popularity, many projects incorporate "Open" [3] into their names, which can
-                    complicate
-                    its understanding. When I refer to "open source," I adhere to the definition provided by the Open
-                    Source
-                    Initiative (OSI) [4].
+                    code doesn't necessarily make a project open source, despite the literal interpretation. As the term
+                    "open source" gains popularity, many projects incorporate "Open" <a
+                        href="https://www.itprotoday.com/software-development/openai-not-open-source-neither-are-plenty-other-open-organizations">[3]</a>
+                    into their names, which can complicate its understanding. When I refer to "open source," I adhere to
+                    the definition provided by the Open Source Initiative (OSI) <a
+                        href="https://opensource.org/licenses/">[4]</a>.
                 </p>
                 <p>
-                    In the past, the development approach often adhered to Dieter Rams' "less, but better" philosophy
-                    [5],
+                    In the past, the development approach often adhered to Dieter Rams' "less, but better" philosophy <a
+                        href="https://www.newyorker.com/culture/cultural-comment/what-weve-learned-from-dieter-rams-and-what-weve-ignored">[5]</a>,
                     favoring fewer features executed perfectly. This approach is akin to the efficiency of terminal
-                    commands
-                    and their utilization through piping. Consider the terminal, where dedicated commands exist for
-                    reading,
-                    writing, modifying, and deleting resources. There are commands for files like 'cat' for reading,
-                    'sed'
-                    and 'awk' for text manipulation, and 'rm' for file removal. Additionally, there are commands for
-                    managing directories, processes, devices, networks, and more. While this array of commands might
-                    seem
-                    daunting for command-line users, the power of piping allows for accomplishing many machine
-                    administration tasks with just a few commands.
+                    commands and their utilization through piping. Consider the terminal, where dedicated commands exist
+                    for reading, writing, modifying, and deleting resources. There are commands for files like 'cat' for
+                    reading, 'sed' and 'awk' for text manipulation, and 'rm' for file removal. Additionally, there are
+                    commands for managing directories, processes, devices, networks, and more. While this array of
+                    commands might seem daunting for command-line users, the power of piping allows for accomplishing
+                    many machine administration tasks with just a few commands.
                 </p>
                 <p>
-                    However, today's software demands new and additional features [6], often across multiple platforms.
+                    However, today's software demands new and additional features <a
+                        href="https://en.wikipedia.org/wiki/Software_bloat">[6]</a>, often across multiple platforms.
                     Modern software tends to be feature-rich but can be challenging for a single person to maintain.
                     Interestingly, numerous open-source projects address similar tasks but bring unique perspectives,
                     whether through platform choices or interface design. These next-generation projects often excel in
                     refining subtle features and bringing their distinct touch to the software landscape.
                 </p>
-                <h3>Evaluation Parameters</h3>
+            </section>
+
+            <div class="section-divider"></div>
+
+            <!-- Evaluation Parameters Section -->
+            <section>
+                <div class="section-header">
+                    <h2>Evaluation Parameters</h2>
+                </div>
                 <p>
                     The abundance of open-source projects, addressing similar or diverse needs, presents an intriguing
                     landscape. However, selecting the most suitable project for one's specific requirements has become
                     progressively challenging. To effectively compare open-source projects, it's imperative to define
                     appropriate evaluation parameters. These considerations should encompass the quality of
-                    documentation,
-                    user-friendly learning curves, responsiveness, seamless integration with other tools, licensing
-                    terms,
-                    and the extent of ongoing development. Yet, amidst this wealth of project options and scattered
-                    information, it's all too common to feel overwhelmed.
+                    documentation, user-friendly learning curves, responsiveness, seamless integration with other tools,
+                    licensing terms, and the extent of ongoing development. Yet, amidst this wealth of project options
+                    and scattered information, it's all too common to feel overwhelmed.
                 </p>
-                <h4>User profiles</h4>
-                <p>
-                    To gain a comprehensive understanding and depict the broader perspective of an open-source project,
-                    it's
-                    crucial to evaluate several key aspects. First and foremost, examine whether the project facilitates
-                    multi-user functionality, enabling multiple individuals to collaborate or work within their unique
-                    profiles. This functionality bears resemblance to user profile management in web browsers like
-                    Firefox.
-                    While multi-user functionality may appear straightforward for web applications, its relevance might
-                    not
-                    be immediately evident in desktop applications. Nevertheless, the ability to maintain profiles for
-                    various facets of life—work, personal, family, etc.—holds significance.
-                </p>
-                <h4>Storage and computation</h4>
-                <p>
-                    When considering the suitability of a specific open-source project for a particular purpose, it's
-                    essential to examine its default behavior in handling computing and storage tasks. This
-                    understanding
-                    provides valuable insights into its adaptability for various use cases.
-                </p>
-                <p>
 
-                    Given the sensitivity of certain data, a critical aspect to explore is how these projects manage
-                    data
-                    storage. Does the project store data locally? If so, in what format? Are data stored as text files,
-                    or
-                    are they in formats compatible with other applications? In cases where data is stored remotely,
-                    users
-                    may not have full control over it, as schema and storage location are often determined by the web
-                    service provider. However, some providers allow users to select their storage location, aligning
-                    with
-                    regulatory principles. Additionally, emerging technologies like decentralized applications [7] and
-                    IPFS
-                    [8] enable transparent data distribution across machines scattered throughout the internet. Projects
-                    often make trade-offs between local, centralized, or distributed storage to optimize performance.
-                </p>
-                <p>
+                <div class="content-grid">
+                    <div class="card">
+                        <div class="card-icon-wrapper">
+                            <div class="card-icon">👥</div>
+                        </div>
+                        <div class="card-content">
+                            <h4>User Profiles</h4>
+                            <p>
+                                To gain a comprehensive understanding and depict the broader perspective of an
+                                open-source project, it's crucial to evaluate several key aspects. First and foremost,
+                                examine whether the project facilitates multi-user functionality, enabling multiple
+                                individuals to collaborate or work within their unique profiles. This functionality
+                                bears resemblance to user profile management in web browsers like Firefox. While
+                                multi-user functionality may appear straightforward for web applications, its relevance
+                                might not be immediately evident in desktop applications. Nevertheless, the ability to
+                                maintain profiles for various facets of life—work, personal, family, etc.—holds
+                                significance.
+                            </p>
+                        </div>
+                    </div>
 
-                    Equally important is evaluating the project's scalability—its ability to handle increased workloads.
-                    Ensuring the project meets the performance requirements for your intended use is vital.
-                </p>
-                <h4>Ecosystem Integration</h4>
-                <p>
-                    To comprehensively evaluate an open-source project, it's crucial to delve into the array of
-                    interfaces
-                    it offers. Consider whether the project caters to a wide range of user preferences and skill levels
-                    by
-                    providing both user-friendly visual interfaces and command-line options.
-                </p>
-                <p>
-                    Next, examine the project's interaction capabilities. Does it offer real-time information support,
-                    or
-                    does it rely on batched processing? Understanding the reasons behind asynchronous and synchronous
-                    operations is essential, as these aspects significantly impact user experience and project
-                    functionality. It's vital to distinguish between an instant response and receiving a reminder when a
-                    task is completed.
-                </p>
-                <p>
-                    In the context of today's software landscape, consider how the project integrates with other
-                    applications. This could involve mobile platforms launching associated applications when a user
-                    clicks a
-                    URL, or the ability to incorporate data from external sources like Wikipedia or linked data sources.
-                    These linkages enhance the project's functionality by tapping into a vast pool of data and
-                    knowledge,
-                    providing valuable context.
-                </p>
-                <p>
-                    Resource access is another aspect to verify. Does the project support the generation of shareable
-                    URLs,
-                    simplifying collaboration and resource sharing? Often overlooked, robust search and filtering
-                    functionalities are essential for efficient navigation and locating specific information within the
-                    project's ecosystem, regardless of whether the data is stored locally or remotely.
-                </p>
-                <p>
-                    Additionally, assess how well the project integrates with the broader technology ecosystem. Consider
-                    its
-                    compatibility with common libraries, frameworks, and tools. Evaluate factors such as the
-                    availability of
-                    APIs for various programming languages, the presence of a RESTful API [9], the existence of a
-                    graphical
-                    user interface, and the flexibility of command-line options. Decisions regarding project
-                    distribution
-                    (centralized, decentralized), and support for asynchronous or synchronous API operations, can
-                    significantly impact the evaluation.
-                </p>
-                <p>
-                    Domain-specific parameters, such as compatibility with specific platforms or support for particular
-                    algorithms, should also be taken into account. Lastly, consider the project's overall flexibility
-                    and
-                    its ability to adapt to different use cases when comparing open-source solutions.
-                </p>
-                <p>
-                    Finally, ensure that the project's licensing aligns with your organization's policies and doesn't
-                    introduce conflicts with other software you're using.
-                </p>
-                <h4>Long-Term Viability</h4>
-                <p>
-                    Assessing the long-term viability of an open-source project can be challenging [10], given the
-                    rapidly
-                    evolving landscape of requirements. However, several key indicators can offer valuable insights.
-                </p>
-                <p>
-                    Firstly, consider the completeness and clarity of the project's documentation, which includes
-                    tutorials,
-                    guides, and API references. Well-documented projects are more likely to be easily and quickly
-                    adopted,
-                    as they provide users with the necessary resources for effective utilization.
-                </p>
-                <p>
-                    Secondly, evaluate the responsiveness of the project's community. This encompasses forums, mailing
-                    lists, and social media presence. A vibrant community indicates potential avenues for seeking
-                    assistance
-                    and staying updated on project developments.
-                </p>
-                <p>
-                    Additionally, user reviews, feedback, and case studies can provide real-world insights into the
-                    project's usage and user satisfaction. These external perspectives offer valuable context for
-                    measuring
-                    the project's viability.
-                </p>
-                <p>
-                    Understanding the project's history, roadmap, and developer commitment is also crucial for assessing
-                    its
-                    long-term sustainability. A project's track record and future plans can indicate its dedication to
-                    ongoing development and improvement.
-                </p>
-                <p>
-                    As project requirements evolve, it's essential to monitor the changing landscape of resources and
-                    associated interfaces. Adaptability ensures that the project remains relevant and efficient over
-                    time,
-                    even in the face of shifting needs and technologies.
-                </p>
-                <p>
-                    In summary, evaluating the long-term viability of an open-source project involves considering
-                    documentation quality, community responsiveness, user feedback, project history, and adaptability to
-                    changing requirements. These factors collectively provide valuable insights into the project's
-                    potential
-                    to thrive over time.
-                </p>
-                <h3>Conclusion</h3>
+                    <div class="card">
+                        <div class="card-icon-wrapper">
+                            <div class="card-icon">💾</div>
+                        </div>
+                        <div class="card-content">
+                            <h4>Storage & Computation</h4>
+                            <p>
+                                When considering the suitability of a specific open-source project for a particular
+                                purpose, it's essential to examine its default behavior in handling computing and
+                                storage tasks. This understanding provides valuable insights into its adaptability for
+                                various use cases.
+                            </p>
+                            <p>
+                                Given the sensitivity of certain data, a critical aspect to explore is how these
+                                projects manage data storage. Does the project store data locally? If so, in what
+                                format? Are data stored as text files, or are they in formats compatible with other
+                                applications? In cases where data is stored remotely, users may not have full control
+                                over it, as schema and storage location are often determined by the web service
+                                provider. However, some providers allow users to select their storage location, aligning
+                                with regulatory principles. Additionally, emerging technologies like decentralized
+                                applications <a href="https://en.wikipedia.org/wiki/Decentralized_application">[7]</a>
+                                and IPFS <a href="https://en.wikipedia.org/wiki/InterPlanetary_File_System">[8]</a>
+                                enable transparent data distribution across machines scattered throughout the internet.
+                                Projects often make trade-offs between local, centralized, or distributed storage to
+                                optimize performance.
+                            </p>
+                            <p>
+                                Equally important is evaluating the project's scalability—its ability to handle
+                                increased workloads. Ensuring the project meets the performance requirements for your
+                                intended use is vital.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-icon-wrapper">
+                            <div class="card-icon">🔗</div>
+                        </div>
+                        <div class="card-content">
+                            <h4>Ecosystem Integration</h4>
+                            <p>
+                                To comprehensively evaluate an open-source project, it's crucial to delve into the array
+                                of interfaces it offers. Consider whether the project caters to a wide range of user
+                                preferences and skill levels by providing both user-friendly visual interfaces and
+                                command-line options.
+                            </p>
+                            <p>
+                                Next, examine the project's interaction capabilities. Does it offer real-time
+                                information support, or does it rely on batched processing? Understanding the reasons
+                                behind asynchronous and synchronous operations is essential, as these aspects
+                                significantly impact user experience and project functionality. It's vital to
+                                distinguish between an instant response and receiving a reminder when a task is
+                                completed.
+                            </p>
+                            <p>
+                                In the context of today's software landscape, consider how the project integrates with
+                                other applications. This could involve mobile platforms launching associated
+                                applications when a user clicks a URL, or the ability to incorporate data from external
+                                sources like Wikipedia or linked data sources. These linkages enhance the project's
+                                functionality by tapping into a vast pool of data and knowledge, providing valuable
+                                context.
+                            </p>
+                            <p>
+                                Resource access is another aspect to verify. Does the project support the generation of
+                                shareable URLs, simplifying collaboration and resource sharing? Often overlooked, robust
+                                search and filtering functionalities are essential for efficient navigation and locating
+                                specific information within the project's ecosystem, regardless of whether the data is
+                                stored locally or remotely.
+                            </p>
+                            <p>
+                                Additionally, assess how well the project integrates with the broader technology
+                                ecosystem. Consider its compatibility with common libraries, frameworks, and tools.
+                                Evaluate factors such as the availability of APIs for various programming languages, the
+                                presence of a RESTful API <a
+                                    href="https://www.redhat.com/en/topics/api/what-is-a-rest-api">[9]</a>, the
+                                existence of a graphical user interface, and the flexibility of command-line options.
+                                Decisions regarding project distribution (centralized, decentralized), and support for
+                                asynchronous or synchronous API operations, can significantly impact the evaluation.
+                            </p>
+                            <p>
+                                Domain-specific parameters, such as compatibility with specific platforms or support for
+                                particular algorithms, should also be taken into account. Lastly, consider the project's
+                                overall flexibility and its ability to adapt to different use cases when comparing
+                                open-source solutions.
+                            </p>
+                            <p>
+                                Finally, ensure that the project's licensing aligns with your organization's policies
+                                and doesn't introduce conflicts with other software you're using.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-icon-wrapper">
+                            <div class="card-icon">🚀</div>
+                        </div>
+                        <div class="card-content">
+                            <h4>Long-Term Viability</h4>
+                            <p>
+                                Assessing the long-term viability of an open-source project can be challenging <a
+                                    href="#">[10]</a>, given the rapidly evolving landscape of requirements. However,
+                                several key indicators can offer valuable insights.
+                            </p>
+                            <p>
+                                Firstly, consider the completeness and clarity of the project's documentation, which
+                                includes tutorials, guides, and API references. Well-documented projects are more likely
+                                to be easily and quickly adopted, as they provide users with the necessary resources for
+                                effective utilization.
+                            </p>
+                            <p>
+                                Secondly, evaluate the responsiveness of the project's community. This encompasses
+                                forums, mailing lists, and social media presence. A vibrant community indicates
+                                potential avenues for seeking assistance and staying updated on project developments.
+                            </p>
+                            <p>
+                                Additionally, user reviews, feedback, and case studies can provide real-world insights
+                                into the project's usage and user satisfaction. These external perspectives offer
+                                valuable context for measuring the project's viability.
+                            </p>
+                            <p>
+                                Understanding the project's history, roadmap, and developer commitment is also crucial
+                                for assessing its long-term sustainability. A project's track record and future plans
+                                can indicate its dedication to ongoing development and improvement.
+                            </p>
+                            <p>
+                                As project requirements evolve, it's essential to monitor the changing landscape of
+                                resources and associated interfaces. Adaptability ensures that the project remains
+                                relevant and efficient over time, even in the face of shifting needs and technologies.
+                            </p>
+                            <p>
+                                In summary, evaluating the long-term viability of an open-source project involves
+                                considering documentation quality, community responsiveness, user feedback, project
+                                history, and adaptability to changing requirements. These factors collectively provide
+                                valuable insights into the project's potential to thrive over time.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <div class="section-divider"></div>
+
+            <!-- Conclusion Section -->
+            <section>
+                <div class="section-header">
+                    <h2>Conclusion</h2>
+                </div>
                 <p>
                     In the ever-expanding world of open-source software, the significance of robust evaluation processes
                     cannot be overstated. This guide has delved into a multitude of factors to consider when assessing
                     open-source projects, recognizing that the right choice can profoundly impact the success of
-                    endeavors,
-                    whether they are personal projects, business initiatives, or research undertakings.
+                    endeavors, whether they are personal projects, business initiatives, or research undertakings.
                 </p>
                 <p>
                     From evaluating documentation quality and learning curves to assessing security, scalability, and
                     community support, this guide has provided a comprehensive roadmap for making informed decisions. It
                     emphasizes the critical alignment of project requirements with software capabilities to ensure that
-                    the
-                    chosen solution not only addresses immediate needs but also supports long-term objectives.
+                    the chosen solution not only addresses immediate needs but also supports long-term objectives.
                 </p>
                 <p>
                     The realm of open-source software brims with opportunities, each project offering its unique
-                    strengths
-                    and characteristics. By applying the parameters discussed in this guide, individuals and
-                    organizations
-                    can confidently navigate this dynamic landscape, uncovering open-source solutions that seamlessly
-                    align
-                    with their goals and aspirations.
+                    strengths and characteristics. By applying the parameters discussed in this guide, individuals and
+                    organizations can confidently navigate this dynamic landscape, uncovering open-source solutions that
+                    seamlessly align with their goals and aspirations.
                 </p>
                 <p>
                     Ultimately, the power of open-source extends beyond the code; it resides in the community,
                     collaboration, and adaptability it embodies. With these principles as a guiding force, readers are
-                    now
-                    prepared to embark on their journey of exploration, evaluation, and harnessing the transformative
-                    potential of open-source projects.
+                    now prepared to embark on their journey of exploration, evaluation, and harnessing the
+                    transformative potential of open-source projects.
                 </p>
                 <p>
                     The choices made today can mold the future of projects and initiatives. Armed with knowledge,
                     individuals and organizations are poised to make those choices wisely and effectively, contributing
-                    to
-                    the ever-evolving landscape of open-source innovation.
+                    to the ever-evolving landscape of open-source innovation.
                 </p>
-                <h3>References</h3>
-                <p>
+            </section>
+
+            <div class="section-divider"></div>
+
+            <!-- References Section -->
+            <section>
+                <div class="section-header">
+                    <h2>References</h2>
+                </div>
                 <ol>
-                    <li id="open-source"><a href="https://en.wikipedia.org/wiki/Open_source">Open Source</a></li>
-                    <li id="project"><a href="https://en.wikipedia.org/wiki/Project">Project</a></li>
-                    <li id="openai"><a
+                    <li><a href="https://en.wikipedia.org/wiki/Open_source">Open Source</a></li>
+                    <li><a href="https://en.wikipedia.org/wiki/Project">Project</a></li>
+                    <li><a
                             href="https://www.itprotoday.com/software-development/openai-not-open-source-neither-are-plenty-other-open-organizations">OpenAI
                             Is Not Open Source — But Neither Are Plenty of Other 'Open' Organizations</a></li>
-                    <li id="osi"><a href="https://opensource.org/licenses/">OSI Approved Licenses</a></li>
-                    <li id="less"><a
+                    <li><a href="https://opensource.org/licenses/">OSI Approved Licenses</a></li>
+                    <li><a
                             href="https://www.newyorker.com/culture/cultural-comment/what-weve-learned-from-dieter-rams-and-what-weve-ignored">What
-                            We’ve Learned from Dieter Rams, and What We’ve Ignored</a></li>
-                    <li id="bloat"><a href="https://en.wikipedia.org/wiki/Software_bloat">Software bloat</a></li>
-                    <li id="dapp"><a href="https://en.wikipedia.org/wiki/Decentralized_application">Decentralized
-                            application</a></li>
-                    <li id="ipfs"><a href="https://en.wikipedia.org/wiki/InterPlanetary_File_System">InterPlanetary File
+                            We've Learned from Dieter Rams, and What We've Ignored</a></li>
+                    <li><a href="https://en.wikipedia.org/wiki/Software_bloat">Software bloat</a></li>
+                    <li><a href="https://en.wikipedia.org/wiki/Decentralized_application">Decentralized application</a>
+                    </li>
+                    <li><a href="https://en.wikipedia.org/wiki/InterPlanetary_File_System">InterPlanetary File
                             System</a></li>
-                    <li id="rest"><a href="https://www.redhat.com/en/topics/api/what-is-a-rest-api">What is a REST
-                            API?</a>
-                    </li>
-                    <li id="">Chełkowski, Tadeusz, et al. "Inequalities in Open Source Software Development: Analysis of
-                        Contributor’s Commits in Apache Software Foundation Projects." PLOS ONE, edited by Christophe
-                        Antoniewski, vol. 11, no. 4, Apr. 2016, p. e0152976.
-                        DOI.org (Crossref), doi:10.1371/journal.pone.0152976.
-                    </li>
+                    <li><a href="https://www.redhat.com/en/topics/api/what-is-a-rest-api">What is a REST API?</a></li>
+                    <li>Chełkowski, Tadeusz, et al. "Inequalities in Open Source Software Development: Analysis of
+                        Contributor's Commits in Apache Software Foundation Projects." PLOS ONE, edited by Christophe
+                        Antoniewski, vol. 11, no. 4, Apr. 2016, p. e0152976. DOI.org (Crossref),
+                        doi:10.1371/journal.pone.0152976.</li>
                 </ol>
-                </p>
+            </section>
+        </main>
+
+        <!-- Footer -->
+        <footer>
+            <div class="footer-container">
+                <div class="footer-license">
+                    <a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/">
+                        <img alt="Creative Commons License" src="../../images/license.png" />
+                    </a>
+                    <span>This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 International
+                        License.</span>
+                </div>
+
+                <div class="footer-bottom">
+                    <p>&copy; 2024 John Samuel. All rights reserved.</p>
+                    <p>Analyzing Open-source Projects</p>
+                </div>
             </div>
-        </div>
+        </footer>
     </body>
 
 </html>
