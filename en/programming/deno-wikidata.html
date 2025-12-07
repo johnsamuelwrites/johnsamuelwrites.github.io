@@ -2,311 +2,604 @@
 <html lang="en">
 
     <head>
-        <meta charset="utf-8" />
-        <meta http-equiv="Content-Language" content="en" />
-        <link rel="shortcut icon" href="../../images/logo/favicon.png" />
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta http-equiv="Content-Language" content="en">
+        <link rel="shortcut icon" href="../../images/logo/favicon.png">
         <title>When Deno meets Wikidata: John Samuel</title>
-        <style type="text/css">
-            body {
-                background-color: #FFFFFF;
+        <script type="application/ld+json">
+    {
+        "@context": "http://schema.org",
+        "@type": "BlogPosting",
+        "mainEntityOfPage": {
+            "@type": "WebPage",
+            "@id": "https://johnsamuel.info"
+        },
+        "articleSection": "blog",
+        "name": "When Deno meets Wikidata",
+        "headline": "When Deno meets Wikidata",
+        "description": "Article by John Samuel",
+        "inLanguage": "en",
+        "author": "John Samuel",
+        "datePublished": "2020-06-20 19:03:57",
+        "dateModified": "2020-06-20 19:25:09",
+        "dateCreated": "2020-06-20 19:03:57",
+        "url": "https://johnsamuel.info/en/programming/deno-wikidata.html",
+        "image": {
+            "@type": "imageObject",
+            "url": "https://johnsamuel.info/images/writings/coconut-trees-landscape.svg",
+            "height": "600",
+            "width": "800"
+        },
+        "publisher": {
+            "@type": "Organization",
+            "name": "John Samuel",
+            "logo": {
+                "@type": "imageObject",
+                "url": "https://johnsamuel.info/images/writings/coconut-trees-landscape.svg"
+            }
+        },
+        "keywords": ["Blog"]
+    }
+    </script>
+        <style>
+            /* Design Tokens */
+            :root {
+                /* Software Development Theme - Tech Colors */
+                --color-base-bg: #f5f8fa;
+                --color-base-surface: #ffffff;
+                --color-base-text: #1a202c;
+                --color-base-text-muted: #4a5568;
+
+                /* Tech-inspired accents */
+                --color-accent-1: #4a90e2;
+                --color-accent-2: #2d5f8d;
+                --color-accent-3: #7b68ee;
+                --color-accent-4: #00d4aa;
+                --color-accent-light: #e8f4fd;
+
+                /* Functional colors */
+                --color-shadow: rgba(74, 144, 226, 0.12);
+                --color-border: rgba(74, 144, 226, 0.15);
+                --color-hover: rgba(74, 144, 226, 0.08);
+
+                /* Gradients */
+                --gradient-primary: linear-gradient(135deg, #4a90e2 0%, #7b68ee 100%);
+                --gradient-secondary: linear-gradient(225deg, #2d5f8d 0%, #4a90e2 50%, #7b68ee 100%);
+                --gradient-accent: linear-gradient(135deg, #00d4aa 0%, #4a90e2 100%);
+
+                /* Spacing */
+                --space-xs: 0.25rem;
+                --space-sm: 0.5rem;
+                --space-md: 1rem;
+                --space-lg: 1.5rem;
+                --space-xl: 2rem;
+                --space-2xl: 3rem;
+                --space-3xl: 4rem;
+                --space-4xl: 6rem;
+
+                /* Border radius */
+                --radius-sm: 4px;
+                --radius-md: 8px;
+                --radius-lg: 12px;
+                --radius-xl: 16px;
+                --radius-2xl: 24px;
+                --radius-organic: 63% 37% 54% 46% / 45% 62% 38% 55%;
+
+                /* Shadows */
+                --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.04), 0 1px 3px rgba(0, 0, 0, 0.06);
+                --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.05), 0 2px 4px rgba(0, 0, 0, 0.06);
+                --shadow-lg: 0 10px 24px rgba(0, 0, 0, 0.08), 0 4px 8px rgba(0, 0, 0, 0.06);
+                --shadow-theme: 0 10px 30px var(--color-shadow), 0 4px 10px rgba(0, 0, 0, 0.06);
+
+                /* Typography */
+                --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+                --font-mono: 'SF Mono', Monaco, 'Cascadia Code', 'Consolas', 'Courier New', monospace;
+
+                --text-xs: clamp(0.75rem, 0.7rem + 0.25vw, 0.875rem);
+                --text-sm: clamp(0.875rem, 0.8rem + 0.35vw, 1rem);
+                --text-base: clamp(1rem, 0.95rem + 0.25vw, 1.125rem);
+                --text-lg: clamp(1.125rem, 1.05rem + 0.35vw, 1.25rem);
+                --text-xl: clamp(1.25rem, 1.15rem + 0.5vw, 1.5rem);
+                --text-2xl: clamp(1.5rem, 1.3rem + 1vw, 2rem);
+                --text-3xl: clamp(2rem, 1.6rem + 2vw, 2.5rem);
+                --text-4xl: clamp(2.5rem, 2rem + 2.5vw, 3.5rem);
             }
 
-            #sidebar {
+            /* Reset and Base Styles */
+            * {
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
+            }
+
+            html {
+                scroll-behavior: smooth;
+                scroll-padding-top: 100px;
+            }
+
+            body {
+                font-family: var(--font-sans);
+                font-size: var(--text-base);
+                line-height: 1.7;
+                color: var(--color-base-text);
+                background: var(--color-base-bg);
+                background-image:
+                    radial-gradient(circle at 20% 80%, rgba(74, 144, 226, 0.03) 0%, transparent 50%),
+                    radial-gradient(circle at 80% 20%, rgba(123, 104, 238, 0.03) 0%, transparent 50%);
+                overflow-x: hidden;
+            }
+
+
+            /* Navigation */
+            nav {
                 position: fixed;
-                background-color: #009AA6;
                 top: 0;
                 left: 0;
-                bottom: 0;
-                width: 30vw;
-            }
-
-            #sidebar .title {
-                position: relative;
-                text-align: center;
-                line-height: 5vmax;
-                font-size: 1.4vmax;
-                font-family: 'Arial';
-                margin-top: 30vh;
-            }
-
-            #sidebar .title a:link,
-            #sidebar .title a:visited {
-                color: #FFFFFF;
-                text-decoration: none;
-            }
-
-            .subtitle {
-                top: 50vh;
-                text-align: center;
-                line-height: 1.3vmax;
-                font-family: 'Arial';
-                font-size: 1.2vmax;
-                color: #FFFFFF;
-            }
-
-            .subtitle a:link,
-            .subtitle a:visited {
-                color: #FFFFFF;
-                text-decoration: none;
-            }
-
-            .licence {
-                position: fixed;
-                text-align: right;
-                bottom: 0;
                 right: 0;
+                background: rgba(255, 255, 255, 0.85);
+                -webkit-backdrop-filter: blur(12px) saturate(180%);
+                backdrop-filter: blur(12px) saturate(180%);
+                border-bottom: 1px solid var(--color-border);
+                box-shadow: var(--shadow-sm);
+                z-index: 50;
+                padding: var(--space-lg) var(--space-xl);
             }
 
-            .home {
-                position: fixed;
-                text-align: left;
-                font-family: 'Arial';
-                color: #D3D3D3;
-                z-index: 100;
+            .nav-container {
+                max-width: 1400px;
+                margin: 0 auto;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                flex-wrap: wrap;
+                gap: var(--space-md);
+            }
+
+            .nav-brand {
+                font-size: var(--text-xl);
+                font-weight: 700;
+                letter-spacing: -0.02em;
+                background: var(--gradient-primary);
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                background-clip: text;
+                text-decoration: none;
+                display: flex;
+                align-items: center;
+                gap: var(--space-sm);
+            }
+
+            .nav-brand::before {
+                content: '⟨/⟩';
+                font-size: var(--text-2xl);
+                background: var(--gradient-primary);
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                background-clip: text;
+            }
+
+            .breadcrumb {
+                display: flex;
+                align-items: center;
+                gap: var(--space-sm);
+                list-style: none;
+                flex-wrap: wrap;
+            }
+
+            .breadcrumb li {
+                display: flex;
+                align-items: center;
+                gap: var(--space-sm);
+            }
+
+            .breadcrumb li:not(:last-child)::after {
+                content: '→';
+                color: var(--color-accent-1);
+                font-weight: 600;
+            }
+
+            .breadcrumb a {
+                color: var(--color-base-text-muted);
+                text-decoration: none;
+                transition: all 0.3s ease;
+                padding: var(--space-xs) var(--space-sm);
+                border-radius: var(--radius-sm);
+            }
+
+            .breadcrumb a:hover {
+                color: var(--color-accent-1);
+                background: var(--color-hover);
+            }
+
+            /* Main Content */
+            main {
+                max-width: 1400px;
+                margin: 0 auto;
+                padding: calc(80px + var(--space-4xl)) var(--space-xl) var(--space-4xl);
+            }
+
+            /* Hero Section */
+            .hero {
+                text-align: center;
+                margin-bottom: var(--space-4xl);
+                position: relative;
+            }
+
+            .hero-decoration {
+                position: absolute;
+                top: -40px;
+                left: 50%;
+                transform: translateX(-50%);
                 width: 100%;
-                background-color: #FFFFFF;
-                top: 0px;
-                margin-bottom: 10px;
-                padding-bottom: 10px;
+                height: 300px;
+                z-index: -1;
+                pointer-events: none;
+            }
+
+            h1 {
+                font-size: var(--text-4xl);
+                font-weight: 800;
+                letter-spacing: -0.03em;
+                line-height: 1.2;
+                margin-bottom: var(--space-lg);
+                background: var(--gradient-secondary);
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                background-clip: text;
+                background-size: 200% 200%;
+                animation: gradientShift 8s ease infinite;
+            }
+
+            @keyframes gradientShift {
+
+                0%,
+                100% {
+                    background-position: 0% 50%;
+                }
+
+                50% {
+                    background-position: 100% 50%;
+                }
+            }
+
+            .hero-subtitle {
+                font-size: var(--text-lg);
+                color: var(--color-base-text-muted);
+                max-width: 800px;
+                margin: 0 auto var(--space-2xl);
+            }
+
+            .hero-meta {
+                display: flex;
+                justify-content: center;
+                gap: var(--space-xl);
+                flex-wrap: wrap;
+                font-size: var(--text-sm);
+                color: var(--color-base-text-muted);
+            }
+
+            .meta-item {
+                display: flex;
+                align-items: center;
+                gap: var(--space-xs);
+            }
+
+            /* Content Sections */
+            .content-section {
+                margin-bottom: var(--space-4xl);
+            }
+
+            h2 {
+                font-size: var(--text-3xl);
+                font-weight: 700;
+                letter-spacing: -0.02em;
+                line-height: 1.3;
+                margin-bottom: var(--space-xl);
+                color: var(--color-base-text);
+                position: relative;
+                padding-bottom: var(--space-md);
+            }
+
+            h2::after {
+                content: '';
+                position: absolute;
+                bottom: 0;
+                left: 0;
+                width: 80px;
+                height: 4px;
+                background: var(--gradient-accent);
+                border-radius: 2px;
+            }
+
+            h3 {
+                font-size: var(--text-2xl);
+                font-weight: 600;
+                letter-spacing: -0.01em;
+                line-height: 1.4;
+                margin: var(--space-2xl) 0 var(--space-lg);
+                color: var(--color-base-text);
+            }
+
+            p {
+                margin-bottom: var(--space-lg);
+                color: var(--color-base-text);
+            }
+
+            /* Code Blocks */
+            pre,
+            code {
+                font-family: var(--font-mono);
+                font-size: var(--text-sm);
             }
 
             pre {
-                background-color: #eeeeee;
-                overflow: auto;
-            }
-
-            .home a:link,
-            .home a:visited {
-                text-decoration: none;
-                color: #D3D3D3;
-            }
-
-            .home ul {
-                margin: 0;
-                padding: 0;
-                text-align: left;
-                list-style: none;
-            }
-
-            .home li {
+                background: var(--color-base-surface);
+                border: 1px solid var(--color-border);
+                border-radius: var(--radius-lg);
+                padding: var(--space-xl);
+                overflow-x: auto;
+                margin: var(--space-xl) 0;
+                box-shadow: var(--shadow-theme);
                 position: relative;
-                float: left;
-                padding-top: 15px;
-                margin-right: 1em;
-                font-family: 'Arial';
             }
 
-            .home li:hover {
+            pre::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                height: 40px;
+                background: linear-gradient(135deg, rgba(74, 144, 226, 0.05) 0%, rgba(123, 104, 238, 0.05) 100%);
+                border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+                border-bottom: 1px solid var(--color-border);
+            }
+
+            pre code {
                 display: block;
+                padding-top: var(--space-lg);
+                color: var(--color-base-text);
+                line-height: 1.6;
             }
 
-            .home li:hover a:link,
-            .home li:hover a:visited {
+            code {
+                background: var(--color-accent-light);
+                padding: 0.2em 0.4em;
+                border-radius: var(--radius-sm);
+                color: var(--color-accent-2);
+                font-weight: 500;
+            }
+
+            pre code {
+                background: none;
+                padding: 0;
+                color: inherit;
+                font-weight: normal;
+            }
+
+            /* Links */
+            a {
+                color: var(--color-accent-1);
                 text-decoration: none;
-                padding: 15px;
-                color: #FFFFFF;
-                background-color: #009AA6;
+                transition: all 0.3s ease;
+                position: relative;
             }
 
-            .content {
-                line-height: 1.8vmax;
-                font-size: 1.2vmax;
-                font-family: 'Arial';
-                margin-top: 15vh;
-                width: 90%;
+            a:hover {
+                color: var(--color-accent-2);
             }
 
-            .content h1,
-            h2,
-            h3,
-            h4 {
-                color: #009AA6;
+            p a,
+            li a {
+                text-decoration: underline;
+                text-decoration-thickness: 1px;
+                text-underline-offset: 3px;
             }
 
-            .content a:link,
-            .content a:visited {
-                color: #009AA6;
+            p a:hover,
+            li a:hover {
+                text-decoration-thickness: 2px;
             }
 
-            .content h3 {
-                color: #009AA6;
+            /* Lists */
+            ol {
+                margin: var(--space-xl) 0;
+                padding-left: var(--space-2xl);
             }
 
-            .content h2::before,
-            .content h3::before {
-                display: block;
-                content: " ";
-                visibility: hidden;
-                height: 50px;
-                margin-top: -50px;
-                pointer-events: none;
-                background-color: #FFFFFF;
+            ol li {
+                margin-bottom: var(--space-md);
+                color: var(--color-base-text);
+                padding-left: var(--space-sm);
             }
 
-            .content a:link,
-            .content a:visited {
-                color: #009AA6;
+            ol li::marker {
+                color: var(--color-accent-1);
+                font-weight: 600;
             }
 
-            .home a:link,
-            .home a:visited {
-                color: #D3D3D3;
+            /* Reference Cards */
+            .references {
+                background: var(--color-base-surface);
+                border-radius: var(--radius-xl);
+                padding: var(--space-2xl);
+                box-shadow: var(--shadow-theme);
+                border: 1px solid var(--color-border);
+                margin-top: var(--space-4xl);
             }
 
-            .content li {
-                line-height: 1vmax;
+            .references h3 {
+                margin-top: 0;
             }
 
-            .page {
-                width: 65vw;
+            .references ol {
+                margin-bottom: 0;
+            }
+
+            /* Footer */
+            footer {
+                background: var(--color-base-surface);
+                border-top: 1px solid var(--color-border);
+                margin-top: var(--space-4xl);
+                padding: var(--space-3xl) var(--space-xl);
+            }
+
+            .footer-content {
+                max-width: 1400px;
+                margin: 0 auto;
+                display: grid;
+                gap: var(--space-2xl);
+            }
+
+            .footer-section h4 {
+                font-size: var(--text-lg);
+                font-weight: 600;
+                margin-bottom: var(--space-lg);
+                color: var(--color-base-text);
+            }
+
+            .language-links {
+                display: flex;
+                gap: var(--space-md);
+                flex-wrap: wrap;
+            }
+
+            .language-links a {
+                padding: var(--space-sm) var(--space-lg);
+                background: var(--color-hover);
+                border-radius: var(--radius-md);
+                color: var(--color-base-text);
+                transition: all 0.3s ease;
+                border: 1px solid var(--color-border);
+            }
+
+            .language-links a:hover {
+                background: var(--color-accent-1);
+                color: white;
+                transform: translateY(-2px);
+                box-shadow: var(--shadow-md);
+            }
+
+            .copyright {
+                text-align: center;
+                padding-top: var(--space-2xl);
+                margin-top: var(--space-2xl);
+                border-top: 1px solid var(--color-border);
+                color: var(--color-base-text-muted);
+                font-size: var(--text-sm);
+            }
+
+            /* Decorative Elements */
+            .circuit-pattern {
+                position: fixed;
+                top: 0;
+                right: 0;
+                width: 50%;
                 height: 100%;
-                margin-left: 30vw;
-                overflow: hidden;
-                padding: 0 1em;
-                font-family: 'Arial';
+                opacity: 0.03;
+                pointer-events: none;
+                z-index: -1;
+                background-image:
+                    repeating-linear-gradient(90deg, var(--color-accent-1) 0px, transparent 1px, transparent 20px),
+                    repeating-linear-gradient(0deg, var(--color-accent-1) 0px, transparent 1px, transparent 20px);
             }
 
-            .page img {
-                max-width: 100%;
-                max-height: 100%;
+            /* Animations */
+            @keyframes float {
+
+                0%,
+                100% {
+                    transform: translateY(0px);
+                }
+
+                50% {
+                    transform: translateY(-20px);
+                }
             }
 
-            @media (max-width: 640px),
-            screen and (orientation: portrait) {
-                body {
-                    max-width: 100%;
-                    max-height: 100%;
+            @keyframes pulse {
+
+                0%,
+                100% {
+                    opacity: 1;
                 }
 
-                #sidebar {
-                    position: fixed;
-                    background-color: #009AA6;
-                    top: 0;
-                    left: 0;
-                    bottom: 80vh;
-                    width: 100vw;
+                50% {
+                    opacity: 0.5;
+                }
+            }
+
+            @keyframes rotate {
+                from {
+                    transform: rotate(0deg);
                 }
 
-                #sidebar .title {
-                    text-align: center;
-                    position: fixed;
-                    margin-top: 6vh;
-                    left: 0px;
-                    right: 0px;
-                    line-height: 3.5vmax;
-                    font-size: 1.5vmax;
-                    font-family: 'Arial';
+                to {
+                    transform: rotate(360deg);
+                }
+            }
+
+            /* Responsive Design */
+            @media (max-width: 768px) {
+                nav {
+                    padding: var(--space-md) var(--space-lg);
                 }
 
-                #sidebar .subtitle {
-                    text-align: center;
-                    top: 5vh;
-                    left: 0px;
-                    right: 0px;
-                    position: fixed;
-                    margin-top: 10vh;
-                    font-size: 1.5vmax;
+                .nav-container {
+                    flex-direction: column;
+                    align-items: flex-start;
                 }
 
-                #sidebar .title a:link,
-                #sidebar .title a:visited {
-                    text-align: center;
-                    color: #FFFFFF;
+                main {
+                    padding: calc(140px + var(--space-2xl)) var(--space-lg) var(--space-2xl);
                 }
 
-                #sidebar .subtitle a:link,
-                #sidebar .subtitle a:visited {
-                    text-align: center;
-                    color: #FFFFFF;
+                .hero-meta {
+                    flex-direction: column;
+                    gap: var(--space-md);
                 }
 
-                .home {
-                    z-index: 100;
-                    width: 100%;
-                    background-color: #009AA6;
-                    font-size: 1.5vmax;
+                pre {
+                    padding: var(--space-lg);
+                    font-size: var(--text-xs);
                 }
+            }
 
-                .home a:link,
-                .home a:visited {
-                    text-decoration: none;
-                    color: #FFFFFF;
+            @media (prefers-reduced-motion: reduce) {
+                * {
+                    animation-duration: 0.01ms !important;
+                    animation-iteration-count: 1 !important;
+                    transition-duration: 0.01ms !important;
                 }
+            }
 
-                .content {
-                    line-height: 3.8vmax;
-                    font-size: 1.8vmax;
-                    font-family: 'Arial';
-                    margin-top: 22vh;
-                }
+            /* Focus Styles */
+            *:focus-visible {
+                outline: 3px solid var(--color-accent-1);
+                outline-offset: 2px;
+                border-radius: var(--radius-sm);
+            }
 
-                .content a:link,
-                .content a:visited {
-                    color: #009AA6;
-                }
-
-                .page {
-                    top: 40vh;
-                    width: 95%;
-                    margin-left: 0vw;
-                }
-
-                .page img {
-                    max-width: 100%;
-                    max-height: 100%;
-                    border: 0;
-                }
+            /* SVG Illustration Styles */
+            .hero-svg {
+                width: 100%;
+                max-width: 800px;
+                height: auto;
+                margin: var(--space-2xl) auto;
+                display: block;
             }
         </style>
-        <script type="application/ld+json">
-        {
-            "@context": "http://schema.org",
-            "@type": "BlogPosting",
-            "mainEntityOfPage": {
-                "@type": "WebPage",
-                "@id": "https://johnsamuel.info"
-            },
-            "articleSection": "blog",
-            "name": "When Deno meets Wikidata",
-            "headline": "When Deno meets Wikidata",
-            "description": "Article by John Samuel",
-            "inLanguage": "en",
-            "author": "John Samuel",
-            "datePublished": "2020-06-20 19:03:57",
-            "dateModified": "2020-06-20 19:25:09",
-            "dateCreated": "2020-06-20 19:03:57",
-            "url": "https://johnsamuel.info/en/programming/deno-wikidata.html",
-            "image": {
-                "@type": "imageObject",
-                "url": "https://johnsamuel.info/images/writings/coconut-trees-landscape.svg",
-                "height": "600",
-                "width": "800"
-            },
-            "publisher": {
-                "@type": "Organization",
-                "name": "John Samuel",
-                "logo": {
-                    "@type": "imageObject",
-                    "url": "https://johnsamuel.info/images/writings/coconut-trees-landscape.svg"
-                }
-            },
-            "keywords": ["Blog"]
-        }
-    </script>
     </head>
 
     <body vocab="http://schema.org/">
-        <div id="sidebar">
-            <div class="title">
-                <h1><a href="./deno-wikidata.html">When Deno meets Wikidata</a></h1>
-            </div>
-            <div class="subtitle">
-                <h3><a href="../about.html">John Samuel</a></h3>
-            </div>
-        </div>
-        <div class="page">
-            <div class="home">
-                <ul typeof="BreadcrumbList">
+
+        <div class="circuit-pattern" aria-hidden="true"></div>
+
+        <nav role="navigation" aria-label="Main navigation">
+            <div class="nav-container">
+                <a href="../index.html" class="nav-brand">John Samuel</a>
+                <ul class="breadcrumb" typeof="BreadcrumbList">
                     <li property="itemListElement" typeof="ListItem">
                         <a property="item" typeof="WebPage" href="../index.html">
                             <span property="name">Home</span>
@@ -324,205 +617,356 @@
                     </li>
                 </ul>
             </div>
-            <div class="content">
-                <p>Recently Deno 1.0<sup><a href="#denov1">1</a></sup> was released. I have been experimenting with
-                    Javascript and Node.js for quite a while. However, my experiments with Typescript were very limited.
-                    Deno provides a secure runtime for both Javascript
-                    and Typescript. This article is related to my experiments with Deno and Typescript for accessing
-                    Wikidata. If you have been following some of my past works like WDProp<sup><a
-                            href="#wdprop">2</a></sup> or WikiProvenance<sup><a href="#wikiprovenance">3</a></sup>,
-                    you may have observed that both of these works were developed in vanilla Javascript without any
-                    Node.js<sup><a href="#nodejs">4</a></sup> module. However, given the static typing of Typescript, I
-                    want to explore it with Deno for accessing
-                    Wikidata. And the preliminary development experience went well.</p>
-                <h3>Deno</h3>
-                <p>Installing Deno<sup><a href="#installation">5</a></sup> was easy and it could be installed locally in
-                    the user environment.</p>
-                <code>
-	  <pre>
-  $ curl -fsSL https://deno.land/x/install/install.sh | sh
-  ######################################################################## 100,0%##O#- #                                       ######################################################################## 100,0%
-  Archive:  /home/john/.deno/bin/deno.zip
-     inflating: deno
-  Deno was installed successfully to /home/john/.deno/bin/deno
-	  </pre>
-	</code>
-                <p>After manually adding the <code>deno</code> directory to my <code>$HOME/.bashrc</code>, I could start
-                    working with it.</p>
-                <code>
-	  <pre>
-     export DENO_INSTALL="/home/john/.deno"
-     export PATH="$DENO_INSTALL/bin:$PATH"
-	  </pre>
-	</code>
-                <p>To ensure that my changes are taken into consideration, I ran</p>
-                <code>
-	  <pre>
-     $ source $HOME/.bashrc
-	  </pre>
-	</code>
-                <p>At the time of writing, I have the following version of Deno installed.</p>
-                <code>
-	  <pre>
-     $ deno --version
-      deno 1.1.0
-      v8 8.4.300
-      typescript 3.9.2
-	  </pre>
-	</code>
-                <p>My first <code>Hello World</code> program was written in the file <code>hello.ts</code></p>
-                <code>
-	  <pre>
-      console.log("Hello World!")
-	  </pre>
-	</code>
-                <p>Executing it required the <code>run</code> option and I could see that the file was compiled and the
-                    output can be seen on the terminal.</p>
-                <code>
-	  <pre>
-     $ deno run hello.ts 
-      Compile file:///home/john/deno/hello.ts
-      Hello World! 
-	  </pre>
-	</code>
-                <p>Thus I am all set for running my Typescript programs with <code>deno</code>.</p>
-                <h3>Wikidata</h3>
-                <p>My next goal was to make use of simple SPARQL queries and get data from the Wikidata SPARQL
-                    endpoint<sup><a href="#wikidata">6</a></sup>. For example, the following SPARQL queries would give
-                    me 10 human from Wikidata.</p>
-                <code>
-	  <pre>
-	  SELECT ?item {
-	    ?item wdt:P31 wd:Q5
-	  }
-	  LIMIT 10
-	  </pre>
-	</code>
-                <h3>Deno and Wikidata</h3>
-                <p>Making use of Wikidata SPARQL endpoint, I first wrote the following code <code>fetch.ts</code>.</p>
-                <pre>
-	<code>
-   const result = await fetch("https://query.wikidata.org/sparql?query=SELECT%20%3Fitem%20%7B%0A%20%20%3Fitem%20wdt%3AP31%20wd%3AQ5%0A%7D%0ALIMIT%2010&format=json");
-   const data = await result.json();
-   console.log(data.results)
-	</code>
-	  </pre>
-                <p>Continuing with the same style of execution as shown above, a simple <code>deno run</code> however
-                    gave the following errors:</p>
-                <code>
-	  <pre>
-     $ deno run fetch.ts
-     Compile file:///home/john/deno/fetch.ts
-     error: Uncaught PermissionDenied: network access to "https://query.wikidata.org/sparql?query=SELECT%20%3Fitem%20%7B%0A%20%20%3Fitem%20wdt%3AP31%20wd%3AQ5%0A%7D%0ALIMIT%2010&format=jsn", run again with the --allow-net flag
-        at unwrapResponse ($deno$/ops/dispatch_json.ts:43:11)
-        at Object.sendAsync ($deno$/ops/dispatch_json.ts:98:10)
-        at async fetch ($deno$/web/fetch.ts:265:27)
-        at async file:///home/john/contributions/deno/fetch.ts:1:16
-	  </pre>
-	</code>
-                <p>This is the interesting part of <code>deno</code>. Unlike node, deno requires permissions from the
-                    user to connect with the internet. Hence the option <code>--allow-net</code> need to be used with
-                    <code>deno run</code> for running the above
-                    file.
-                </p>
-                <code>
-	  <pre>
-     $ deno run --allow-net fetch.ts 
-      {
-        bindings: [
-          { item: { type: "uri", value: "http://www.wikidata.org/entity/Q23" } },
-          { item: { type: "uri", value: "http://www.wikidata.org/entity/Q42" } },
-          { item: { type: "uri", value: "http://www.wikidata.org/entity/Q76" } },
-          { item: { type: "uri", value: "http://www.wikidata.org/entity/Q80" } },
-          { item: { type: "uri", value: "http://www.wikidata.org/entity/Q91" } },
-          { item: { type: "uri", value: "http://www.wikidata.org/entity/Q157" } },
-          { item: { type: "uri", value: "http://www.wikidata.org/entity/Q181" } },
-          { item: { type: "uri", value: "http://www.wikidata.org/entity/Q185" } },
-          { item: { type: "uri", value: "http://www.wikidata.org/entity/Q186" } },
-          { item: { type: "uri", value: "http://www.wikidata.org/entity/Q192" } }
-        ]
-      }
-	  </pre>
-	</code>
-                <p>The next goal is to make use of functions and split the logic of calling Wikidata and printing
-                    results separately. First, a function in the file <code>wdqs.ts</code> is created to query Wikidata
-                    and handle proper response or an error. Note
-                    that the function has been declared as asynchronous and it is also declared to be exported, i.e., it
-                    can be used in other Typescript files. </p>
-                <code>
-	  <pre>
-  export async function query_wikidata(query: string){
-    let queryresults:object = [];
-    await fetch(query)
-    .then(response => {
-      if (!response.ok) {
-        throw new Error("Problem in obtaining a response");
-      }
-      return response.json();
-    })
-    .then(results => {
-      queryresults = results.results.bindings;
-    })
-    .catch(error => {
-      console.error('Error in calling Wikidata API', error);
-    });
-    return (queryresults);
-  }
+        </nav>
 
-	  </pre>
-	</code>
-                <p>Now, this function is imported in another file <code>query.ts</code>. The first line imports the
-                    function <code>query_wikidata()</code>. In this file, the URL of SPARQL endpoint is passed as an
-                    input. And once the result is obtained, the Wikidata
-                    identifiers of different humans are obtained.</p>
-                <code>
-	  <pre>
-  import {query_wikidata} from "./wdqs.ts"
-  
-  let promise = query_wikidata("https://query.wikidata.org/sparql?query=SELECT%20%3Fitem%20%7B%0A%20%20%3Fitem%20wdt%3AP31%20wd%3AQ5%0A%7D%0ALIMIT%2010&format=json")
-  promise.then(
-     (result: any) => {
-       for (let row of result) {
-         console.log(row.item.value)
-       }
-     });
-	  </pre>
-	</code>
-                <p>Finally, the new file <code>query.ts</code> is run using <code>deno</code>.</p>
-                <code>
-	  <pre>
-  $ deno run --allow-net query.ts 
-  Compile file:///home/john/deno/query.ts
-  http://www.wikidata.org/entity/Q23
-  http://www.wikidata.org/entity/Q42
-  http://www.wikidata.org/entity/Q76
-  http://www.wikidata.org/entity/Q80
-  http://www.wikidata.org/entity/Q91
-  http://www.wikidata.org/entity/Q157
-  http://www.wikidata.org/entity/Q181
-  http://www.wikidata.org/entity/Q185
-  http://www.wikidata.org/entity/Q186
-  http://www.wikidata.org/entity/Q192
-	  </pre>
-	</code>
-                <p>I like how <code>deno</code> asks permissions from the user before running the scripts. There are
-                    flags like <code>--allow-read</code> or <code>--allow-net</code> that ensures <code>deno</code> does
-                    not access the local filesystem and the
-                    local environment respectively without these flags. The current way of importing functions using
-                    URLs (not discussed here) is very interesting. I would like to further explore Typescript and Deno
-                    for future Wikidata related projects.</p>
-                <h3>References</h3>
-                <ol>
-                    <li id="#denov1"><a href="https://deno.land/v1">Deno 1.0</a></li>
-                    <li id="#wdprop"><a href="https://github.com/johnsamuelwrites/wdprop">WDProp</a></li>
-                    <li id="#wikiprovenance"><a
-                            href="https://github.com/johnsamuelwrites/WikiProvenance">WikiProvenance</a></li>
-                    <li id="#nodejs"><a href="https://nodejs.org/en/">Node.js</a></li>
-                    <li id="#installation"><a href="https://deno.land/">Deno</a></li>
-                    <li id="#wikidata"><a href="https://query.wikidata.org/">Wikidata Query Service</a></li>
-                </ol>
+        <main id="main-content">
+            <article>
+                <header class="hero">
+                    <svg class="hero-svg" viewBox="0 0 800 300" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                        <!-- Background gradient -->
+                        <defs>
+                            <linearGradient id="bgGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" style="stop-color:#e8f4fd;stop-opacity:1" />
+                                <stop offset="100%" style="stop-color:#f5f8fa;stop-opacity:1" />
+                            </linearGradient>
+
+                            <linearGradient id="denoGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" style="stop-color:#4a90e2;stop-opacity:1">
+                                    <animate attributeName="stop-color" values="#4a90e2;#7b68ee;#4a90e2" dur="4s"
+                                        repeatCount="indefinite" />
+                                </stop>
+                                <stop offset="100%" style="stop-color:#7b68ee;stop-opacity:1">
+                                    <animate attributeName="stop-color" values="#7b68ee;#4a90e2;#7b68ee" dur="4s"
+                                        repeatCount="indefinite" />
+                                </stop>
+                            </linearGradient>
+
+                            <linearGradient id="wikidataGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" style="stop-color:#00d4aa;stop-opacity:1" />
+                                <stop offset="100%" style="stop-color:#4a90e2;stop-opacity:1" />
+                            </linearGradient>
+
+                            <filter id="glow">
+                                <feGaussianBlur stdDeviation="3" result="coloredBlur" />
+                                <feMerge>
+                                    <feMergeNode in="coloredBlur" />
+                                    <feMergeNode in="SourceGraphic" />
+                                </feMerge>
+                            </filter>
+                        </defs>
+
+                        <!-- Background -->
+                        <rect width="800" height="300" fill="url(#bgGradient)" opacity="0.5" />
+
+                        <!-- Circuit board pattern -->
+                        <g opacity="0.2">
+                            <line x1="100" y1="50" x2="300" y2="50" stroke="#4a90e2" stroke-width="1" />
+                            <line x1="300" y1="50" x2="300" y2="150" stroke="#4a90e2" stroke-width="1" />
+                            <line x1="500" y1="250" x2="700" y2="250" stroke="#7b68ee" stroke-width="1" />
+                            <line x1="700" y1="250" x2="700" y2="150" stroke="#7b68ee" stroke-width="1" />
+                            <circle cx="300" cy="50" r="3" fill="#4a90e2" />
+                            <circle cx="300" cy="150" r="3" fill="#4a90e2" />
+                            <circle cx="700" cy="250" r="3" fill="#7b68ee" />
+                            <circle cx="700" cy="150" r="3" fill="#7b68ee" />
+                        </g>
+
+                        <!-- Left code bracket - Deno -->
+                        <g filter="url(#glow)">
+                            <path
+                                d="M 200 100 L 220 100 L 220 80 M 220 100 L 220 120 M 200 200 L 220 200 L 220 180 M 220 200 L 220 220"
+                                stroke="url(#denoGradient)" stroke-width="4" fill="none" stroke-linecap="round">
+                                <animateTransform attributeName="transform" type="scale" values="1;1.1;1" dur="3s"
+                                    repeatCount="indefinite" additive="sum" />
+                            </path>
+
+                            <!-- Deno dinosaur abstraction -->
+                            <circle cx="180" cy="150" r="25" fill="url(#denoGradient)" opacity="0.7">
+                                <animate attributeName="r" values="25;28;25" dur="3s" repeatCount="indefinite" />
+                            </circle>
+                            <circle cx="175" cy="145" r="4" fill="white" />
+                            <path d="M 180 155 Q 185 160 190 155" stroke="white" stroke-width="2" fill="none" />
+                        </g>
+
+                        <!-- Center connection - Data flow -->
+                        <g>
+                            <path d="M 250 150 L 550 150" stroke="#00d4aa" stroke-width="2" stroke-dasharray="5,5"
+                                opacity="0.6">
+                                <animate attributeName="stroke-dashoffset" from="0" to="10" dur="1s"
+                                    repeatCount="indefinite" />
+                            </path>
+
+                            <!-- Data particles -->
+                            <circle cx="300" cy="150" r="3" fill="#4a90e2">
+                                <animate attributeName="cx" from="250" to="550" dur="2s" repeatCount="indefinite" />
+                                <animate attributeName="opacity" values="0;1;1;0" dur="2s" repeatCount="indefinite" />
+                            </circle>
+                            <circle cx="350" cy="150" r="3" fill="#7b68ee">
+                                <animate attributeName="cx" from="250" to="550" dur="2.5s" repeatCount="indefinite" />
+                                <animate attributeName="opacity" values="0;1;1;0" dur="2.5s" repeatCount="indefinite" />
+                            </circle>
+                            <circle cx="400" cy="150" r="3" fill="#00d4aa">
+                                <animate attributeName="cx" from="250" to="550" dur="3s" repeatCount="indefinite" />
+                                <animate attributeName="opacity" values="0;1;1;0" dur="3s" repeatCount="indefinite" />
+                            </circle>
+                        </g>
+
+                        <!-- Right database icon - Wikidata -->
+                        <g filter="url(#glow)">
+                            <path
+                                d="M 580 100 L 600 100 L 600 80 M 600 100 L 600 120 M 580 200 L 600 200 L 600 180 M 600 200 L 600 220"
+                                stroke="url(#wikidataGradient)" stroke-width="4" fill="none" stroke-linecap="round">
+                                <animateTransform attributeName="transform" type="scale" values="1;1.1;1" dur="3.5s"
+                                    repeatCount="indefinite" additive="sum" />
+                            </path>
+
+                            <!-- Wikidata database layers -->
+                            <ellipse cx="620" cy="130" rx="30" ry="8" fill="none" stroke="url(#wikidataGradient)"
+                                stroke-width="2">
+                                <animate attributeName="ry" values="8;10;8" dur="3.5s" repeatCount="indefinite" />
+                            </ellipse>
+                            <ellipse cx="620" cy="150" rx="30" ry="8" fill="none" stroke="url(#wikidataGradient)"
+                                stroke-width="2">
+                                <animate attributeName="ry" values="8;10;8" dur="3.5s" begin="0.5s"
+                                    repeatCount="indefinite" />
+                            </ellipse>
+                            <ellipse cx="620" cy="170" rx="30" ry="8" fill="none" stroke="url(#wikidataGradient)"
+                                stroke-width="2">
+                                <animate attributeName="ry" values="8;10;8" dur="3.5s" begin="1s"
+                                    repeatCount="indefinite" />
+                            </ellipse>
+                            <line x1="590" y1="130" x2="590" y2="170" stroke="url(#wikidataGradient)"
+                                stroke-width="2" />
+                            <line x1="650" y1="130" x2="650" y2="170" stroke="url(#wikidataGradient)"
+                                stroke-width="2" />
+                        </g>
+
+                        <!-- Floating code symbols -->
+                        <text x="120" y="80" font-family="monospace" font-size="20" fill="#4a90e2" opacity="0.6">
+                            <animate attributeName="y" values="80;60;80" dur="4s" repeatCount="indefinite" />
+                            <animate attributeName="opacity" values="0.6;0.3;0.6" dur="4s" repeatCount="indefinite" />
+                            async
+                        </text>
+
+                        <text x="680" y="250" font-family="monospace" font-size="20" fill="#00d4aa" opacity="0.6">
+                            <animate attributeName="y" values="250;230;250" dur="5s" repeatCount="indefinite" />
+                            <animate attributeName="opacity" values="0.6;0.3;0.6" dur="5s" repeatCount="indefinite" />
+                            SPARQL
+                        </text>
+
+                        <text x="370" y="100" font-family="monospace" font-size="18" fill="#7b68ee" opacity="0.5">
+                            <animate attributeName="y" values="100;85;100" dur="4.5s" repeatCount="indefinite" />
+                            TypeScript
+                        </text>
+                    </svg>
+
+                    <h1>When Deno meets Wikidata</h1>
+
+                    <div class="hero-meta">
+                        <span class="meta-item">📅 Published: June 20, 2020</span>
+                        <span class="meta-item">✍️ Author: John Samuel</span>
+                        <span class="meta-item">🏷️ Category: Programming</span>
+                    </div>
+                </header>
+
+                <section class="content-section">
+                    <p>Recently Deno 1.0<sup><a href="#denov1">1</a></sup> was released. I have been experimenting with
+                        Javascript and Node.js for quite a while. However, my experiments with Typescript were very
+                        limited. Deno provides a secure runtime for both Javascript and Typescript. This article is
+                        related to my experiments with Deno and Typescript for accessing Wikidata. If you have been
+                        following some of my past works like WDProp<sup><a href="#wdprop">2</a></sup> or
+                        WikiProvenance<sup><a href="#wikiprovenance">3</a></sup>, you may have observed that both of
+                        these works were developed in vanilla Javascript without any Node.js<sup><a
+                                href="#nodejs">4</a></sup> module. However, given the static typing of Typescript, I
+                        want to explore it with Deno for accessing Wikidata. And the preliminary development experience
+                        went well.</p>
+                </section>
+
+                <section class="content-section">
+                    <h3>Deno</h3>
+                    <p>Installing Deno<sup><a href="#installation">5</a></sup> was easy and it could be installed
+                        locally in the user environment.</p>
+
+                    <pre><code>$ curl -fsSL https://deno.land/x/install/install.sh | sh
+######################################################################## 100,0%##O#- #
+######################################################################## 100,0%
+Archive:  /home/john/.deno/bin/deno.zip
+   inflating: deno
+Deno was installed successfully to /home/john/.deno/bin/deno</code></pre>
+
+                    <p>After manually adding the <code>deno</code> directory to my <code>$HOME/.bashrc</code>, I could
+                        start working with it.</p>
+
+                    <pre><code>export DENO_INSTALL="/home/john/.deno"
+export PATH="$DENO_INSTALL/bin:$PATH"</code></pre>
+
+                    <p>To ensure that my changes are taken into consideration, I ran</p>
+
+                    <pre><code>$ source $HOME/.bashrc</code></pre>
+
+                    <p>At the time of writing, I have the following version of Deno installed.</p>
+
+                    <pre><code>$ deno --version
+deno 1.1.0
+v8 8.4.300
+typescript 3.9.2</code></pre>
+
+                    <p>My first <code>Hello World</code> program was written in the file <code>hello.ts</code></p>
+
+                    <pre><code>console.log("Hello World!")</code></pre>
+
+                    <p>Executing it required the <code>run</code> option and I could see that the file was compiled and
+                        the output can be seen on the terminal.</p>
+
+                    <pre><code>$ deno run hello.ts 
+Compile file:///home/john/deno/hello.ts
+Hello World!</code></pre>
+
+                    <p>Thus I am all set for running my Typescript programs with <code>deno</code>.</p>
+                </section>
+
+                <section class="content-section">
+                    <h3>Wikidata</h3>
+                    <p>My next goal was to make use of simple SPARQL queries and get data from the Wikidata SPARQL
+                        endpoint<sup><a href="#wikidata">6</a></sup>. For example, the following SPARQL queries would
+                        give me 10 human from Wikidata.</p>
+
+                    <pre><code>SELECT ?item {
+  ?item wdt:P31 wd:Q5
+}
+LIMIT 10</code></pre>
+                </section>
+
+                <section class="content-section">
+                    <h3>Deno and Wikidata</h3>
+                    <p>Making use of Wikidata SPARQL endpoint, I first wrote the following code <code>fetch.ts</code>.
+                    </p>
+
+                    <pre><code>const result = await fetch("https://query.wikidata.org/sparql?query=SELECT%20%3Fitem%20%7B%0A%20%20%3Fitem%20wdt%3AP31%20wd%3AQ5%0A%7D%0ALIMIT%2010&format=json");
+const data = await result.json();
+console.log(data.results)</code></pre>
+
+                    <p>Continuing with the same style of execution as shown above, a simple <code>deno run</code>
+                        however gave the following errors:</p>
+
+                    <pre><code>$ deno run fetch.ts
+Compile file:///home/john/deno/fetch.ts
+error: Uncaught PermissionDenied: network access to "https://query.wikidata.org/sparql?query=SELECT%20%3Fitem%20%7B%0A%20%20%3Fitem%20wdt%3AP31%20wd%3AQ5%0A%7D%0ALIMIT%2010&format=jsn", run again with the --allow-net flag
+   at unwrapResponse ($deno$/ops/dispatch_json.ts:43:11)
+   at Object.sendAsync ($deno$/ops/dispatch_json.ts:98:10)
+   at async fetch ($deno$/web/fetch.ts:265:27)
+   at async file:///home/john/contributions/deno/fetch.ts:1:16</code></pre>
+
+                    <p>This is the interesting part of <code>deno</code>. Unlike node, deno requires permissions from
+                        the user to connect with the internet. Hence the option <code>--allow-net</code> need to be used
+                        with <code>deno run</code> for running the above file.</p>
+
+                    <pre><code>$ deno run --allow-net fetch.ts 
+{
+  bindings: [
+    { item: { type: "uri", value: "http://www.wikidata.org/entity/Q23" } },
+    { item: { type: "uri", value: "http://www.wikidata.org/entity/Q42" } },
+    { item: { type: "uri", value: "http://www.wikidata.org/entity/Q76" } },
+    { item: { type: "uri", value: "http://www.wikidata.org/entity/Q80" } },
+    { item: { type: "uri", value: "http://www.wikidata.org/entity/Q91" } },
+    { item: { type: "uri", value: "http://www.wikidata.org/entity/Q157" } },
+    { item: { type: "uri", value: "http://www.wikidata.org/entity/Q181" } },
+    { item: { type: "uri", value: "http://www.wikidata.org/entity/Q185" } },
+    { item: { type: "uri", value: "http://www.wikidata.org/entity/Q186" } },
+    { item: { type: "uri", value: "http://www.wikidata.org/entity/Q192" } }
+  ]
+}</code></pre>
+
+                    <p>The next goal is to make use of functions and split the logic of calling Wikidata and printing
+                        results separately. First, a function in the file <code>wdqs.ts</code> is created to query
+                        Wikidata and handle proper response or an error. Note that the function has been declared as
+                        asynchronous and it is also declared to be exported, i.e., it can be used in other Typescript
+                        files.</p>
+
+                    <pre><code>export async function query_wikidata(query: string){
+  let queryresults:object = [];
+  await fetch(query)
+  .then(response => {
+    if (!response.ok) {
+      throw new Error("Problem in obtaining a response");
+    }
+    return response.json();
+  })
+  .then(results => {
+    queryresults = results.results.bindings;
+  })
+  .catch(error => {
+    console.error('Error in calling Wikidata API', error);
+  });
+  return (queryresults);
+}</code></pre>
+
+                    <p>Now, this function is imported in another file <code>query.ts</code>. The first line imports the
+                        function <code>query_wikidata()</code>. In this file, the URL of SPARQL endpoint is passed as an
+                        input. And once the result is obtained, the Wikidata identifiers of different humans are
+                        obtained.</p>
+
+                    <pre><code>import {query_wikidata} from "./wdqs.ts"
+
+let promise = query_wikidata("https://query.wikidata.org/sparql?query=SELECT%20%3Fitem%20%7B%0A%20%20%3Fitem%20wdt%3AP31%20wd%3AQ5%0A%7D%0ALIMIT%2010&format=json")
+promise.then(
+   (result: any) => {
+     for (let row of result) {
+       console.log(row.item.value)
+     }
+   });</code></pre>
+
+                    <p>Finally, the new file <code>query.ts</code> is run using <code>deno</code>.</p>
+
+                    <pre><code>$ deno run --allow-net query.ts 
+Compile file:///home/john/deno/query.ts
+http://www.wikidata.org/entity/Q23
+http://www.wikidata.org/entity/Q42
+http://www.wikidata.org/entity/Q76
+http://www.wikidata.org/entity/Q80
+http://www.wikidata.org/entity/Q91
+http://www.wikidata.org/entity/Q157
+http://www.wikidata.org/entity/Q181
+http://www.wikidata.org/entity/Q185
+http://www.wikidata.org/entity/Q186
+http://www.wikidata.org/entity/Q192</code></pre>
+
+                    <p>I like how <code>deno</code> asks permissions from the user before running the scripts. There are
+                        flags like <code>--allow-read</code> or <code>--allow-net</code> that ensures <code>deno</code>
+                        does not access the local filesystem and the local environment respectively without these flags.
+                        The current way of importing functions using URLs (not discussed here) is very interesting. I
+                        would like to further explore Typescript and Deno for future Wikidata related projects.</p>
+                </section>
+
+                <section class="references">
+                    <h3>References</h3>
+                    <ol>
+                        <li id="denov1"><a href="https://deno.land/v1">Deno 1.0</a></li>
+                        <li id="wdprop"><a href="https://github.com/johnsamuelwrites/wdprop">WDProp</a></li>
+                        <li id="wikiprovenance"><a
+                                href="https://github.com/johnsamuelwrites/WikiProvenance">WikiProvenance</a></li>
+                        <li id="nodejs"><a href="https://nodejs.org/en/">Node.js</a></li>
+                        <li id="installation"><a href="https://deno.land/">Deno</a></li>
+                        <li id="wikidata"><a href="https://query.wikidata.org/">Wikidata Query Service</a></li>
+                    </ol>
+                </section>
+            </article>
+        </main>
+
+        <footer>
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h4>Languages</h4>
+                    <div class="language-links" aria-label="Language versions">
+                        <a href="../../en/programming/deno-wikidata.html" hreflang="en">English</a>
+                    </div>
+                </div>
+
+                <div class="copyright">
+                    <p>&copy; 2020-2024 John Samuel. All content is licensed under the appropriate open license unless
+                        otherwise stated.</p>
+                </div>
             </div>
-        </div>
+        </footer>
     </body>
 
 </html>
