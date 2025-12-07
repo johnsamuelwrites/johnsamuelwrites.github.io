@@ -7,9 +7,9 @@
 # Change the section of one or more HTML files
 
 """
-  This will take one or more input HTML files and a single CSS file.
-  Content between <template> and </template> will be replaced by the contents 
-  of the CSS file
+This will take one or more input HTML files and a single CSS file.
+Content between <template> and </template> will be replaced by the contents
+of the CSS file
 """
 
 import argparse
