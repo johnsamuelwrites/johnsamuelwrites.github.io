@@ -6,12 +6,13 @@
 
 from bs4 import BeautifulSoup
 from nltk.tokenize import sent_tokenize, word_tokenize
-from gensim.models import Word2Vec, Phrases
+from gensim.models import Word2Vec
 from nltk.corpus import stopwords
 from nltk.util import ngrams
 from collections import Counter
 from git import get_first_latest_modification
 import os
+from pathlib import Path
 import pandas
 
 # Download the stopwords
@@ -20,217 +21,22 @@ import pandas
 
 
 class WebsiteAnalysis:
-    directories = {}
-    directories["en"] = [
-        "en",
-        "en/blog",
-        "en/photography",
-        "en/research",
-        "en/teaching",
-        "en/writings",
-        "en/linguistics",
-        "en/programming",
-        "en/slides",
-        "en/technology",
-        "en/travel",
-        "en/research/art",
-        "en/research/color",
-        "en/research/3d",
-        "en/research/games",
-        "en/teaching/courses/2017/ArchitectureInformationSystems",
-        "en/teaching/courses/2017/BigData",
-        "en/teaching/courses/2017/C",
-        "en/teaching/courses/2017/DataMining",
-        "en/teaching/courses/2017/InternetTechnologyLanguage",
-        "en/teaching/courses/2018/AITL",
-        "en/teaching/courses/2018/Algorithms",
-        "en/teaching/courses/2018/ArchitectureInformationSystems",
-        "en/teaching/courses/2018/BigData",
-        "en/teaching/courses/2018/C",
-        "en/teaching/courses/2018/DataMining",
-        "en/teaching/courses/2018/InternetTechnologyLanguage",
-        "en/teaching/courses/2019/Algorithms",
-        "en/teaching/courses/2019/ArchitectureInformationSystems",
-        "en/teaching/courses/2019/BigData",
-        "en/teaching/courses/2019/C",
-        "en/teaching/courses/2019/DataMining",
-        "en/teaching/courses/2019/InternetTechnologyLanguage",
-        "en/teaching/courses/2019/MachineLearning",
-        "en/teaching/courses/2019/SysProg",
-        "en/teaching/courses/2020/Algorithms",
-        "en/teaching/courses/2020/BigData",
-        "en/teaching/courses/2020/C",
-        "en/teaching/courses/2020/DataMining",
-        "en/teaching/courses/2020/InternetTechnologyLanguage",
-        "en/teaching/courses/2020/MachineLearning",
-        "en/teaching/courses/2020/MDP",
-        "en/teaching/courses/2020/SysProg",
-        "en/teaching/courses/2021/Algorithms",
-        "en/teaching/courses/2021/BigData",
-        "en/teaching/courses/2021/C",
-        "en/teaching/courses/2021/DataMining",
-        "en/teaching/courses/2021/InternetTechnologyLanguage",
-        "en/teaching/courses/2021/MachineLearning",
-        "en/teaching/courses/2021/MDP",
-        "en/teaching/courses/2021/SysProg",
-        "en/teaching/courses/2022/AI-DeepLearning",
-        "en/teaching/courses/2022/Algorithms",
-        "en/teaching/courses/2022/C",
-        "en/teaching/courses/2022/CN",
-        "en/teaching/courses/2022/DataMining",
-        "en/teaching/courses/2022/DP",
-        "en/teaching/courses/2022/InternetTechnologyLanguage",
-        "en/teaching/courses/2022/MachineLearning",
-        "en/teaching/courses/2022/MDP",
-        "en/teaching/courses/2022/SysProg",
-        "en/teaching/courses/2023/AI-DeepLearning",
-        "en/teaching/courses/2023/Algorithms",
-        "en/teaching/courses/2023/C",
-        "en/teaching/courses/2023/DataScience",
-        "en/teaching/courses/2023/DataMining",
-        "en/teaching/courses/2023/DP",
-        "en/teaching/courses/2023/MachineLearning",
-        "en/teaching/courses/2023/MDP",
-        "en/teaching/courses/2023/DS4C",
-        "en/teaching/courses/2024/PPL",
-        "en/teaching/courses/2024/C",
-        "en/teaching/courses/2024/DataScience",
-        "en/teaching/courses/2024/DataMining",
-        "en/teaching/courses/2024/DP",
-        "en/teaching/courses/2024/MachineLearning",
-        "en/teaching/courses/2024/MDP",
-        "en/slides/2017/Akademy/html",
-        "en/slides/2017/CapitoleduLibre/html",
-        "en/slides/2017/XLDB/html",
-        "en/slides/2018/CLEF",
-        "en/slides/2018/SWIB",
-        "en/slides/2018/UNILOG",
-        "en/slides/2018/WikimediaHackathon",
-        "en/slides/2018/WikiWorkshop",
-        "en/slides/2019/Catai",
-        "en/slides/2019/WikidataCon",
-        "en/slides/2020/DebConf",
-        "en/slides/2020/DublinCoreMeeting",
-        "en/slides/2020/EUvsVirus",
-        "en/slides/2021/ContribuLing",
-        "en/slides/2021/DCMIVirtual",
-        "en/slides/2021/OpenSym",
-        "en/slides/2021/WikidataCon",
-        "en/slides/2021/WikiWorkshop",
-        "en/slides/2022/QueeringWikipedia",
-        "en/slides/2023/CollectifArchivesLGBTQI+",
-        "en/slides/2023/SASSQueer",
-        "en/slides/2023/QueeringWikipedia",
-        "en/slides/2024/CampusduLibre",
-        "en/slides/2025/FOSDEM",
-    ]
+    """Analyzes website content across multiple languages and directories."""
 
-    directories["fr"] = [
-        "fr",
-        "fr/blog",
-        "fr/enseignement",
-        "fr/linguistique",
-        "fr/programmation",
-        "fr/technologie",
-        "fr/voyages",
-        "fr/ecrits",
-        "fr/photographie",
-        "fr/recherche",
-        "fr/enseignement/cours/2017/ArchitectureSystemeInformation",
-        "fr/enseignement/cours/2017/BigData",
-        "fr/enseignement/cours/2017/C",
-        "fr/enseignement/cours/2017/CN",
-        "fr/enseignement/cours/2017/DataMining",
-        "fr/enseignement/cours/2017/TLI",
-        "fr/enseignement/cours/2017/TLIA",
-        "fr/enseignement/cours/2018/Algorithmes",
-        "fr/enseignement/cours/2018/ArchitectureSystemeInformation",
-        "fr/enseignement/cours/2018/BigData",
-        "fr/enseignement/cours/2018/C",
-        "fr/enseignement/cours/2018/CN",
-        "fr/enseignement/cours/2018/DataMining",
-        "fr/enseignement/cours/2018/TLI",
-        "fr/enseignement/cours/2018/TLIA",
-        "fr/enseignement/cours/2019/Algorithmes",
-        "fr/enseignement/cours/2019/ArchitectureSystemeInformation",
-        "fr/enseignement/cours/2019/BigData",
-        "fr/enseignement/cours/2019/C",
-        "fr/enseignement/cours/2019/DataMining",
-        "fr/enseignement/cours/2019/MachineLearning",
-        "fr/enseignement/cours/2019/ProgSys",
-        "fr/enseignement/cours/2019/TLI",
-        "fr/enseignement/cours/2020/Algorithmes",
-        "fr/enseignement/cours/2020/BigData",
-        "fr/enseignement/cours/2020/C",
-        "fr/enseignement/cours/2020/DataMining",
-        "fr/enseignement/cours/2020/MachineLearning",
-        "fr/enseignement/cours/2020/ProgSys",
-        "fr/enseignement/cours/2020/TDM",
-        "fr/enseignement/cours/2020/TLI",
-        "fr/enseignement/cours/2021/Algorithmes",
-        "fr/enseignement/cours/2021/BigData",
-        "fr/enseignement/cours/2021/C",
-        "fr/enseignement/cours/2021/DataMining",
-        "fr/enseignement/cours/2021/MachineLearning",
-        "fr/enseignement/cours/2021/ProgSys",
-        "fr/enseignement/cours/2021/TDM",
-        "fr/enseignement/cours/2021/TLI",
-        "fr/enseignement/cours/2021/DP",
-        "fr/enseignement/cours/2022/Algorithmes",
-        "fr/enseignement/cours/2022/C",
-        "fr/enseignement/cours/2022/CN",
-        "fr/enseignement/cours/2022/DataMining",
-        "fr/enseignement/cours/2022/DP",
-        "fr/enseignement/cours/2022/IA-DeepLearning",
-        "fr/enseignement/cours/2022/MachineLearning",
-        "fr/enseignement/cours/2022/ProgSys",
-        "fr/enseignement/cours/2022/TDM",
-        "fr/enseignement/cours/2022/TLI",
-        "fr/enseignement/cours/2023/Algorithmes",
-        "fr/enseignement/cours/2023/C",
-        "fr/enseignement/cours/2023/DataScience",
-        "fr/enseignement/cours/2023/DataMining",
-        "fr/enseignement/cours/2023/DP",
-        "fr/enseignement/cours/2023/IA-DeepLearning",
-        "fr/enseignement/cours/2023/MachineLearning",
-        "fr/enseignement/cours/2023/TDM",
-        "fr/enseignement/cours/2024/PLP",
-        "fr/enseignement/cours/2024/C",
-        "fr/enseignement/cours/2024/DataScience",
-        "fr/enseignement/cours/2024/DataMining",
-        "fr/enseignement/cours/2024/DP",
-        "fr/enseignement/cours/2024/IA-DeepLearning",
-        "fr/enseignement/cours/2024/MachineLearning",
-        "fr/enseignement/cours/2024/TDM",
-    ]
+    # Supported languages for the website
+    SUPPORTED_LANGUAGES = ["en", "fr", "hi", "pa", "ml"]
 
-    directories["ml"] = [
-        "ml",
-        "ml/അദ്ധ്യാപനം",
-        "ml/ഗവേഷണം",
-        "ml/ഭാഷാശാസ്ത്രം",
-        "ml/യാത്രകൾ",
-        "ml/രചനകൾ",
-    ]
+    # Root directories for each language
+    LANGUAGE_ROOTS = {
+        "en": "en",
+        "fr": "fr",
+        "ml": "ml",
+        "hi": "hi",
+        "pa": "pa",
+    }
 
-    directories["hi"] = [
-        "hi",
-        "hi/अध्यापन",
-        "hi/अनुसंधान",
-        "hi/भाषाविज्ञान",
-        "hi/यात्रा",
-        "hi/रचनायें",
-    ]
-
-    directories["pa"] = [
-        "pa",
-        "pa/ਅਧਿਆਪਨ",
-        "pa/ਖੋਜ",
-        "pa/ਭਾਸ਼ਾ ਵਿਗਿਆਨ",
-        "pa/ਯਾਤਰਾ",
-        "pa/ਲਿਖਤਾਂ",
-    ]
-    exclude_files = {
+    # Files to exclude from analysis (relative paths from main_directory)
+    EXCLUDE_FILES = {
         "en/template.html",
         "fr/template.html",
         "en/slides/2017/Akademy/html/kde-wikidata.html",
@@ -261,150 +67,355 @@ class WebsiteAnalysis:
         "fr/recherche/template.html",
     }
 
-    def get_directories():
-        return WebsiteAnalysis.directories
-
+    @staticmethod
     def get_languages():
-        return ["en", "fr", "hi", "pa", "ml"]
+        """Return list of supported languages."""
+        return WebsiteAnalysis.SUPPORTED_LANGUAGES
 
+    @staticmethod
     def get_excluded_files():
-        return WebsiteAnalysis.exclude_files
+        """Return set of excluded file paths."""
+        return WebsiteAnalysis.EXCLUDE_FILES
 
+    @staticmethod
+    def _find_html_files(root_dir, language_root, main_directory=""):
+        """
+        Recursively find all HTML files under a language root directory.
+
+        Args:
+            root_dir: Absolute path to the language root directory
+            language_root: Relative path from main_directory (e.g., "en", "fr")
+            main_directory: Base directory path
+
+        Yields:
+            Tuples of (relative_filepath, absolute_filepath, language)
+        """
+        try:
+            for root, dirs, files in os.walk(root_dir):
+                # Calculate relative path from main_directory
+                rel_root = os.path.relpath(root, main_directory)
+
+                for filename in files:
+                    if not filename.endswith(".html"):
+                        continue
+
+                    # Construct paths
+                    rel_filepath = os.path.join(rel_root, filename)
+                    abs_filepath = os.path.join(root, filename)
+
+                    # Normalize path separators for consistent comparison
+                    rel_filepath = rel_filepath.replace(os.sep, "/")
+
+                    # Skip excluded files
+                    if rel_filepath in WebsiteAnalysis.EXCLUDE_FILES:
+                        continue
+
+                    # Determine language from the root path
+                    language = language_root.split("/")[0]
+
+                    yield rel_filepath, abs_filepath, language
+
+        except (OSError, PermissionError) as e:
+            print(f"Warning: Could not access directory {root_dir}: {e}")
+
+    @staticmethod
     def get_articles_list_dataframe(main_directory=""):
+        """
+        Recursively scan all language directories for HTML articles.
+
+        Args:
+            main_directory: Base directory path (can be empty for current directory)
+
+        Returns:
+            pandas.DataFrame with columns: filepath, language, first, latest
+        """
         article_metadata = []
-        directories = WebsiteAnalysis.get_directories()
-        for language in directories:
-            for directory in directories[language]:
+
+        # Ensure main_directory ends with separator if not empty
+        if main_directory and not main_directory.endswith(os.sep):
+            main_directory += os.sep
+
+        # Process each language root directory
+        for language, language_root in WebsiteAnalysis.LANGUAGE_ROOTS.items():
+            root_dir = (
+                os.path.join(main_directory, language_root)
+                if main_directory
+                else language_root
+            )
+
+            # Skip if directory doesn't exist
+            if not os.path.isdir(root_dir):
+                print(f"Warning: Language root directory not found: {root_dir}")
+                continue
+
+            # Find and process all HTML files
+            for rel_filepath, abs_filepath, lang in WebsiteAnalysis._find_html_files(
+                root_dir, language_root, main_directory
+            ):
                 try:
-                    filepath = None
-                    for filename in os.listdir(main_directory + directory):
-                        if ".html" not in filename:
+                    # Check if file contains "Article in Progress" marker
+                    with open(abs_filepath, "r", encoding="utf-8") as f:
+                        content = f.read()
+                        if "NOTE: Article in Progress" in content:
                             continue
-                        filepath = directory + "/" + filename
-                        complete_filepath = main_directory + directory + "/" + filename
-                        if (
-                            os.path.isfile(complete_filepath)
-                            and filepath not in WebsiteAnalysis.get_excluded_files()
-                        ):
-                            with open(complete_filepath, "r") as f:
-                                if "NOTE: Article in Progress" not in f.read():
-                                    first, latest = get_first_latest_modification(
-                                        filepath, main_directory
-                                    )
-                                    article_metadata.append(
-                                        [
-                                            main_directory + filepath,
-                                            language,
-                                            first,
-                                            latest,
-                                        ]
-                                    )
 
+                    # Get Git modification dates
+                    first, latest = get_first_latest_modification(
+                        rel_filepath, main_directory
+                    )
+
+                    article_metadata.append(
+                        [
+                            abs_filepath,
+                            lang,
+                            first,
+                            latest,
+                        ]
+                    )
+
+                except (OSError, UnicodeDecodeError) as e:
+                    print(f"Error processing file {rel_filepath}: {e}")
                 except Exception as e:
-                    print("Error: in file: " + filepath + ": " + str(e))
+                    print(f"Unexpected error processing file {rel_filepath}: {e}")
 
+        # Create and sort DataFrame
         df = pandas.DataFrame(
             article_metadata, columns=["filepath", "language", "first", "latest"]
         )
         df = df.sort_values(["latest", "first"], ascending=[False, False])
+
         return df
 
 
 class HTMLTextAnalysis:
+    """Provides text analysis utilities for HTML documents."""
+
+    @staticmethod
+    def _parse_html_text(filepath):
+        """
+        Extract text content from HTML file.
+
+        Args:
+            filepath: Path to HTML file
+
+        Returns:
+            Extracted text string or None if parsing fails
+        """
+        try:
+            with open(filepath, "r", encoding="utf-8") as inputfile:
+                content = inputfile.read()
+                parsed_html = BeautifulSoup(content, features="html.parser")
+
+                if parsed_html.body:
+                    return parsed_html.body.get_text()
+                else:
+                    print(f"Warning: No body tag found in {filepath}")
+                    return parsed_html.get_text()
+        except Exception as e:
+            print(f"Error parsing HTML from {filepath}: {e}")
+            return None
+
     @staticmethod
     def get_sentences_with_tokens(
-        filepath, lowercase=True, remove_punctuation=False, remove_stopwords=False
+        filepath,
+        lowercase=True,
+        remove_punctuation=False,
+        remove_stopwords=False,
+        language="english",
     ):
-        sentences = []
-        stopwords_set = set(stopwords.words("english"))
-        with open(filepath, "r") as inputfile:
-            content = inputfile.read()
-            parsed_html = BeautifulSoup(content, features="html.parser")
+        """
+        Extract sentences as lists of tokens from HTML file.
 
-            text = parsed_html.body.get_text()
-            for sentence in sent_tokenize(text):
-                token_list = []
-                for token in word_tokenize(sentence):
-                    if remove_punctuation and not token.isalnum():
-                        continue
-                    if remove_stopwords and (token in stopwords_set):
-                        continue
-                    if lowercase:
-                        token_list.append(token.lower())
-                    else:
-                        token_list.append(token)
+        Args:
+            filepath: Path to HTML file
+            lowercase: Convert tokens to lowercase
+            remove_punctuation: Remove non-alphanumeric tokens
+            remove_stopwords: Remove common stopwords
+            language: Language for stopwords (default: 'english')
+
+        Returns:
+            List of sentences, where each sentence is a list of tokens
+        """
+        sentences = []
+        stopwords_set = set(stopwords.words(language)) if remove_stopwords else set()
+
+        text = HTMLTextAnalysis._parse_html_text(filepath)
+        if not text:
+            return sentences
+
+        for sentence in sent_tokenize(text):
+            token_list = []
+            for token in word_tokenize(sentence):
+                # Apply filters
+                if remove_punctuation and not token.isalnum():
+                    continue
+                if remove_stopwords and token.lower() in stopwords_set:
+                    continue
+
+                # Apply case transformation
+                token_list.append(token.lower() if lowercase else token)
+
+            if token_list:  # Only add non-empty sentences
                 sentences.append(token_list)
+
         return sentences
 
     @staticmethod
     def get_tokens(
-        filepath, lowercase=True, remove_punctuation=False, remove_stopwords=False
+        filepath,
+        lowercase=True,
+        remove_punctuation=False,
+        remove_stopwords=False,
+        language="english",
     ):
-        tokens = []
-        stopwords_set = set(stopwords.words("english"))
-        with open(filepath, "r") as inputfile:
-            content = inputfile.read()
-            parsed_html = BeautifulSoup(content, features="html.parser")
+        """
+        Extract all tokens from HTML file.
 
-            text = parsed_html.body.get_text()
-            for sentence in sent_tokenize(text):
-                for token in word_tokenize(sentence):
-                    if remove_punctuation and not token.isalnum():
-                        continue
-                    if remove_stopwords and token in stopwords_set:
-                        continue
-                    if lowercase:
-                        tokens.append(token.lower())
-                    else:
-                        tokens.append(token)
+        Args:
+            filepath: Path to HTML file
+            lowercase: Convert tokens to lowercase
+            remove_punctuation: Remove non-alphanumeric tokens
+            remove_stopwords: Remove common stopwords
+            language: Language for stopwords (default: 'english')
+
+        Returns:
+            List of tokens
+        """
+        tokens = []
+        stopwords_set = set(stopwords.words(language)) if remove_stopwords else set()
+
+        text = HTMLTextAnalysis._parse_html_text(filepath)
+        if not text:
+            return tokens
+
+        for sentence in sent_tokenize(text):
+            for token in word_tokenize(sentence):
+                # Apply filters
+                if remove_punctuation and not token.isalnum():
+                    continue
+                if remove_stopwords and token.lower() in stopwords_set:
+                    continue
+
+                # Apply case transformation
+                tokens.append(token.lower() if lowercase else token)
+
         return tokens
 
     @staticmethod
     def get_distinct_tokens(
-        filepath, lowercase=True, remove_punctuation=False, remove_stopwords=False
+        filepath,
+        lowercase=True,
+        remove_punctuation=False,
+        remove_stopwords=False,
+        language="english",
     ):
-        tokens = HTMLTextAnalysis.get_tokens(filepath, lowercase)
-        distinct_tokens = list(set(tokens))
-        return distinct_tokens
+        """
+        Extract unique tokens from HTML file.
+
+        Args:
+            filepath: Path to HTML file
+            lowercase: Convert tokens to lowercase
+            remove_punctuation: Remove non-alphanumeric tokens
+            remove_stopwords: Remove common stopwords
+            language: Language for stopwords (default: 'english')
+
+        Returns:
+            List of unique tokens
+        """
+        tokens = HTMLTextAnalysis.get_tokens(
+            filepath, lowercase, remove_punctuation, remove_stopwords, language
+        )
+        return list(set(tokens))
 
     @staticmethod
     def get_ngrams(article, n=2):
-        tokens = HTMLTextAnalysis.get_tokens(article, False, True, True)
-        ngrams_list = ngrams(tokens, n)
-        return ngrams_list
+        """
+        Extract n-grams from HTML file.
+
+        Args:
+            article: Path to HTML file
+            n: Size of n-grams (default: 2 for bigrams)
+
+        Returns:
+            Generator of n-gram tuples
+        """
+        tokens = HTMLTextAnalysis.get_tokens(
+            article, lowercase=False, remove_punctuation=True, remove_stopwords=True
+        )
+        return ngrams(tokens, n)
 
     @staticmethod
     def get_ngrams_frequency(article, n=2):
-        tokens = HTMLTextAnalysis.get_tokens(article, False, True, True)
-        ngrams_list = ngrams(tokens, n)
-        frequency = Counter(ngrams_list)
-        return frequency
+        """
+        Calculate frequency distribution of n-grams in HTML file.
+
+        Args:
+            article: Path to HTML file
+            n: Size of n-grams (default: 2 for bigrams)
+
+        Returns:
+            Counter object with n-gram frequencies
+        """
+        ngrams_list = HTMLTextAnalysis.get_ngrams(article, n)
+        return Counter(ngrams_list)
 
 
 class WordEmbedding:
+    """Provides word embedding utilities using Word2Vec."""
+
     @staticmethod
-    def get_word2vec_model_from_sentences(sentences, skipgram=False):
-        """By default, this approach uses CBOW model"""
-        model = None
-        if skipgram:
-            model = Word2Vec(
-                sentences=sentences,
-                vector_size=100,
-                window=2,
-                min_count=1,
-                workers=4,
-                sg=1,
-            )
-        else:
-            model = Word2Vec(
-                sentences=sentences, vector_size=100, window=2, min_count=1, workers=4
-            )
+    def get_word2vec_model_from_sentences(
+        sentences, skipgram=False, vector_size=100, window=2, min_count=1, workers=4
+    ):
+        """
+        Train Word2Vec model from sentences.
+
+        Args:
+            sentences: List of sentences, where each sentence is a list of tokens
+            skipgram: Use Skip-gram model if True, otherwise use CBOW (default: False)
+            vector_size: Dimensionality of word vectors (default: 100)
+            window: Maximum distance between current and predicted word (default: 2)
+            min_count: Minimum word frequency threshold (default: 1)
+            workers: Number of worker threads (default: 4)
+
+        Returns:
+            Trained Word2Vec model
+        """
+        if not sentences:
+            raise ValueError("Cannot train model on empty sentences list")
+
+        model = Word2Vec(
+            sentences=sentences,
+            vector_size=vector_size,
+            window=window,
+            min_count=min_count,
+            workers=workers,
+            sg=1 if skipgram else 0,
+        )
         return model
 
     @staticmethod
-    def get_word2vec_model_from_HTMLfile(article, skipgram=False):
+    def get_word2vec_model_from_HTMLfile(
+        article, skipgram=False, vector_size=100, window=2, min_count=1, workers=4
+    ):
+        """
+        Train Word2Vec model from HTML file content.
+
+        Args:
+            article: Path to HTML file
+            skipgram: Use Skip-gram model if True, otherwise use CBOW (default: False)
+            vector_size: Dimensionality of word vectors (default: 100)
+            window: Maximum distance between current and predicted word (default: 2)
+            min_count: Minimum word frequency threshold (default: 1)
+            workers: Number of worker threads (default: 4)
+
+        Returns:
+            Trained Word2Vec model
+        """
         sentences = HTMLTextAnalysis.get_sentences_with_tokens(
-            article, False, True, True
+            article, lowercase=False, remove_punctuation=True, remove_stopwords=True
         )
-        model = WordEmbedding.get_word2vec_model_from_sentences(sentences, skipgram)
-        return model
+
+        return WordEmbedding.get_word2vec_model_from_sentences(
+            sentences, skipgram, vector_size, window, min_count, workers
+        )
