@@ -3,272 +3,789 @@
 
     <head>
         <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <meta http-equiv="Content-Language" content="en" />
         <link rel="shortcut icon" href="../../images/logo/favicon.png" />
         <title>Complexity Emerging from Simplicity: John Samuel</title>
-        <style type="text/css">
-            body {
-                background-color: #252525;
+        <style>
+            /* ===========================
+           Design Token System
+           =========================== */
+            :root {
+                /* Nature & Emergence Theme Colors */
+                --color-base-bg: #fafbf9;
+                --color-base-surface: #ffffff;
+                --color-base-text: #1a2e1a;
+                --color-base-text-muted: #4a5d4a;
+
+                /* Organic Growth Palette */
+                --color-accent-1: #2d9f5e;
+                /* Life green */
+                --color-accent-2: #1a6b3f;
+                /* Deep forest */
+                --color-accent-3: #6b46c1;
+                /* Cosmic purple */
+                --color-accent-4: #e07a3f;
+                /* Growth amber */
+                --color-accent-light: #f0f8f4;
+                /* Pale nature */
+
+                /* Functional Colors */
+                --color-shadow: rgba(45, 159, 94, 0.12);
+                --color-border: rgba(45, 159, 94, 0.15);
+                --color-hover: rgba(45, 159, 94, 0.08);
+
+                /* Gradients */
+                --gradient-primary: linear-gradient(135deg, #2d9f5e 0%, #6b46c1 100%);
+                --gradient-hero: linear-gradient(135deg, #1a6b3f 0%, #2d9f5e 50%, #6b46c1 100%);
+                --gradient-organic: linear-gradient(135deg, #2d9f5e 0%, #e07a3f 50%, #6b46c1 100%);
+
+                /* Spacing Scale */
+                --space-xs: 0.25rem;
+                --space-sm: 0.5rem;
+                --space-md: 1rem;
+                --space-lg: 1.5rem;
+                --space-xl: 2rem;
+                --space-2xl: 3rem;
+                --space-3xl: 4rem;
+                --space-4xl: 6rem;
+
+                /* Border Radius */
+                --radius-sm: 4px;
+                --radius-md: 8px;
+                --radius-lg: 12px;
+                --radius-xl: 16px;
+                --radius-2xl: 24px;
+                --radius-organic: 63% 37% 54% 46% / 45% 62% 38% 55%;
+
+                /* Shadows */
+                --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.04), 0 1px 3px rgba(0, 0, 0, 0.06);
+                --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.05), 0 2px 4px rgba(0, 0, 0, 0.06);
+                --shadow-lg: 0 10px 24px rgba(0, 0, 0, 0.08), 0 4px 8px rgba(0, 0, 0, 0.06);
+                --shadow-theme: 0 10px 30px var(--color-shadow), 0 4px 10px rgba(0, 0, 0, 0.06);
+
+                /* Typography */
+                --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+
+                --text-xs: clamp(0.75rem, 0.7rem + 0.25vw, 0.875rem);
+                --text-sm: clamp(0.875rem, 0.8rem + 0.35vw, 1rem);
+                --text-base: clamp(1rem, 0.95rem + 0.25vw, 1.125rem);
+                --text-lg: clamp(1.125rem, 1.05rem + 0.35vw, 1.25rem);
+                --text-xl: clamp(1.25rem, 1.15rem + 0.5vw, 1.5rem);
+                --text-2xl: clamp(1.5rem, 1.3rem + 1vw, 2rem);
+                --text-3xl: clamp(2rem, 1.6rem + 2vw, 2.5rem);
+                --text-4xl: clamp(2.5rem, 2rem + 2.5vw, 3.5rem);
             }
 
-            #sidebar {
-                position: fixed;
-                background-color: #e57255;
-                top: 0;
-                left: 0;
-                bottom: 0;
-                width: 25vw;
-            }
-
-            #sidebar .title {
-                position: relative;
-                text-align: center;
-                line-height: 8vh;
-                font-size: 1.6vmax;
-                font-family: 'Arial';
-                margin-top: 30vh;
-            }
-
-            #sidebar .title a:link,
-            #sidebar .title a:visited {
-                color: #FFFFFF;
-                text-decoration: none;
-            }
-
-            #sidebar .subtitle {
-                top: 50vh;
-                text-align: center;
-                line-height: 1.3vmax;
-                font-family: 'Arial';
-                font-size: 1.5vmax;
-                color: #FFFFFF;
-            }
-
-            .subtitle a:link,
-            .subtitle a:visited {
-                color: #FFFFFF;
-                text-decoration: none;
-            }
-
-            .licence {
-                position: fixed;
-                text-align: right;
-                bottom: 0;
-                right: 0;
-            }
-
-            .home {
-                position: fixed;
-                text-align: left;
-                font-family: 'Arial';
-                color: #D3D3D3;
-                z-index: 100;
-                width: 100%;
-                background-color: #252525;
-                top: 0px;
-                margin-bottom: 10px;
-            }
-
-            .home a:link,
-            .home a:visited {
-                text-decoration: none;
-                color: #D3D3D3;
-            }
-
-            .home ul {
+            /* ===========================
+           Reset & Base Styles
+           =========================== */
+            *,
+            *::before,
+            *::after {
+                box-sizing: border-box;
                 margin: 0;
                 padding: 0;
-                text-align: left;
-                list-style: none;
             }
 
-            .home li {
+            html {
+                scroll-behavior: smooth;
+                scroll-padding-top: 100px;
+            }
+
+            body {
+                font-family: var(--font-sans);
+                font-size: var(--text-base);
+                line-height: 1.7;
+                color: var(--color-base-text);
+                background: var(--color-base-bg);
                 position: relative;
-                float: left;
-                padding-top: 15px;
-                margin-right: 1em;
-                font-family: 'Arial';
+                overflow-x: hidden;
             }
 
-            .home li:hover {
-                display: block;
-            }
-
-            .home li:hover a:link,
-            .home li:hover a:visited {
+            /* Skip Link for Accessibility */
+            .skip-link {
+                position: absolute;
+                top: -40px;
+                left: 0;
+                background: var(--color-accent-1);
+                color: white;
+                padding: var(--space-sm) var(--space-md);
                 text-decoration: none;
-                padding: 15px;
-                color: #FFFFFF;
-                background-color: #e57255;
+                border-radius: var(--radius-md);
+                z-index: 100;
             }
 
-            .content {
-                line-height: 1.6vmax;
-                font-size: 1.1vmax;
-                font-family: 'Arial';
-                margin-top: 15vh;
-                width: 90%;
-                color: #e1e1e3;
+            .skip-link:focus {
+                top: var(--space-sm);
+                left: var(--space-sm);
             }
 
-            .content h2,
-            h3,
-            h4 {
-                color: #e57255;
-            }
-
-            .content a:link,
-            .content a:visited {
-                color: #e57255;
-            }
-
-            .content h2::before,
-            .content h3::before {
-                display: block;
-                content: " ";
-                visibility: hidden;
-                height: 50px;
-                margin-top: -50px;
-                pointer-events: none;
-                background-color: #FFFFFF;
-            }
-
-            .content #topics li {
-                list-style: none;
-                padding: 2rem;
-                font-size: 1.6rem;
-                line-height: 2.2rem;
-                display: flex;
-                flex-wrap: wrap;
-                align-items: center;
-                padding-bottom: 5rem;
-            }
-
-            .content #topics li>a {
-                text-decoration: none;
-                font-size: 3.8rem;
-                line-height: 4rem;
-                padding: 0 1rem 1rem 0;
-                border-bottom-width: 1px;
-                border-bottom-style: solid;
-            }
-
-            .content li>span {
-                font-size: 1.6rem;
-                line-height: 2.2rem;
-            }
-
-            .content a:link,
-            .content a:visited {
-                color: #e57255;
-            }
-
-            .page {
-                width: 75vw;
+            /* ===========================
+           Background Patterns
+           =========================== */
+            body::before {
+                content: '';
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
                 height: 100%;
-                margin-left: 25vw;
-                overflow: auto;
-                padding: 0 1em;
+                background-image:
+                    radial-gradient(circle at 25% 25%, rgba(45, 159, 94, 0.04) 0%, transparent 50%),
+                    radial-gradient(circle at 75% 75%, rgba(107, 70, 193, 0.04) 0%, transparent 50%);
+                pointer-events: none;
+                z-index: 0;
             }
 
-            .page img {
-                max-width: 100%;
-                max-height: 100%;
+            /* Organic Pattern Background */
+            body::after {
+                content: '';
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background-image:
+                    radial-gradient(circle at 10% 20%, rgba(45, 159, 94, 0.02) 1px, transparent 1px),
+                    radial-gradient(circle at 90% 80%, rgba(107, 70, 193, 0.02) 1px, transparent 1px);
+                background-size: 50px 50px, 70px 70px;
+                pointer-events: none;
+                z-index: 0;
+                animation: patternShift 20s ease-in-out infinite;
             }
 
-            @media (max-width: 640px),
-            screen and (orientation: portrait) {
-                body {
-                    max-width: 100%;
-                    max-height: 100%;
+            @keyframes patternShift {
+
+                0%,
+                100% {
+                    opacity: 0.5;
+                    transform: scale(1);
                 }
 
-                #sidebar {
-                    position: fixed;
-                    background-color: #e57255;
-                    top: 0;
-                    left: 0;
-                    bottom: 80vh;
-                    width: 100vw;
+                50% {
+                    opacity: 0.8;
+                    transform: scale(1.05);
+                }
+            }
+
+            /* ===========================
+           Navigation Header
+           =========================== */
+            .site-header {
+                position: sticky;
+                top: 0;
+                z-index: 50;
+                background: rgba(255, 255, 255, 0.85);
+                -webkit-backdrop-filter: blur(12px) saturate(180%);
+                backdrop-filter: blur(12px) saturate(180%);
+                border-bottom: 1px solid var(--color-border);
+                box-shadow: var(--shadow-sm);
+            }
+
+            .nav-container {
+                max-width: 1400px;
+                margin: 0 auto;
+                padding: var(--space-md) var(--space-xl);
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                gap: var(--space-xl);
+                position: relative;
+                z-index: 1;
+            }
+
+            .site-brand {
+                font-size: var(--text-xl);
+                font-weight: 700;
+                letter-spacing: -0.02em;
+                background: var(--gradient-primary);
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                background-clip: text;
+                text-decoration: none;
+                transition: opacity 0.3s ease;
+            }
+
+            .site-brand:hover {
+                opacity: 0.8;
+            }
+
+            .breadcrumb-nav {
+                display: flex;
+                align-items: center;
+                gap: var(--space-sm);
+                list-style: none;
+                flex-wrap: wrap;
+            }
+
+            .breadcrumb-nav li {
+                display: flex;
+                align-items: center;
+                gap: var(--space-sm);
+            }
+
+            .breadcrumb-nav li:not(:last-child)::after {
+                content: '›';
+                color: var(--color-base-text-muted);
+                font-size: var(--text-lg);
+            }
+
+            .breadcrumb-nav a {
+                color: var(--color-base-text-muted);
+                text-decoration: none;
+                font-size: var(--text-sm);
+                transition: color 0.3s ease;
+            }
+
+            .breadcrumb-nav a:hover,
+            .breadcrumb-nav a:focus {
+                color: var(--color-accent-1);
+            }
+
+            /* ===========================
+           Main Container
+           =========================== */
+            .page-wrapper {
+                position: relative;
+                z-index: 1;
+            }
+
+            .container {
+                max-width: 1200px;
+                margin: 0 auto;
+                padding: var(--space-2xl) var(--space-xl);
+            }
+
+            /* ===========================
+           Hero Section
+           =========================== */
+            .hero-section {
+                position: relative;
+                padding: var(--space-4xl) 0 var(--space-3xl);
+                text-align: center;
+                overflow: hidden;
+            }
+
+            .hero-title {
+                font-size: var(--text-4xl);
+                font-weight: 800;
+                letter-spacing: -0.03em;
+                line-height: 1.2;
+                margin-bottom: var(--space-lg);
+                background: var(--gradient-hero);
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                background-clip: text;
+                animation: titleFadeIn 1s ease-out;
+            }
+
+            .hero-subtitle {
+                font-size: var(--text-lg);
+                color: var(--color-base-text-muted);
+                margin-bottom: var(--space-xl);
+                animation: subtitleFadeIn 1s ease-out 0.2s backwards;
+            }
+
+            /* Animated SVG Hero Illustration */
+            .hero-svg {
+                max-width: 600px;
+                margin: var(--space-2xl) auto 0;
+                animation: svgFadeIn 1.2s ease-out 0.4s backwards;
+            }
+
+            @keyframes titleFadeIn {
+                from {
+                    opacity: 0;
+                    transform: translateY(-20px);
                 }
 
-                #sidebar .title {
-                    text-align: center;
-                    position: fixed;
-                    margin-top: 6vh;
-                    left: 0px;
-                    right: 0px;
-                    line-height: 7vh;
-                    font-size: 2vmax;
-                    font-family: 'Arial';
+                to {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            }
+
+            @keyframes subtitleFadeIn {
+                from {
+                    opacity: 0;
+                    transform: translateY(-15px);
                 }
 
-                #sidebar .subtitle {
-                    text-align: center;
-                    top: 5vh;
-                    left: 0px;
-                    right: 0px;
-                    position: fixed;
-                    margin-top: 10vh;
-                    font-size: 1.5vmax;
+                to {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            }
+
+            @keyframes svgFadeIn {
+                from {
+                    opacity: 0;
+                    transform: scale(0.9);
                 }
 
-                #sidebar .title a:link,
-                #sidebar .title a:visited {
-                    text-align: center;
-                    color: #FFFFFF;
+                to {
+                    opacity: 1;
+                    transform: scale(1);
+                }
+            }
+
+            /* ===========================
+           Content Section
+           =========================== */
+            .content-section {
+                background: var(--color-base-surface);
+                border-radius: var(--radius-2xl);
+                padding: var(--space-3xl) var(--space-2xl);
+                box-shadow: var(--shadow-theme);
+                position: relative;
+                overflow: hidden;
+                animation: contentFadeIn 1s ease-out 0.6s backwards;
+            }
+
+            @keyframes contentFadeIn {
+                from {
+                    opacity: 0;
+                    transform: translateY(30px);
                 }
 
-                #sidebar .subtitle a:link,
-                #sidebar .subtitle a:visited {
-                    text-align: center;
-                    color: #FFFFFF;
+                to {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            }
+
+            /* Organic corner decorations */
+            .content-section::before {
+                content: '';
+                position: absolute;
+                top: -50px;
+                right: -50px;
+                width: 150px;
+                height: 150px;
+                background: var(--gradient-organic);
+                opacity: 0.06;
+                border-radius: var(--radius-organic);
+                pointer-events: none;
+                animation: morphShape 10s ease-in-out infinite;
+            }
+
+            .content-section::after {
+                content: '';
+                position: absolute;
+                bottom: -30px;
+                left: -30px;
+                width: 100px;
+                height: 100px;
+                background: var(--gradient-primary);
+                opacity: 0.06;
+                border-radius: var(--radius-organic);
+                pointer-events: none;
+                animation: morphShapeAlt 12s ease-in-out infinite;
+            }
+
+            @keyframes morphShape {
+
+                0%,
+                100% {
+                    border-radius: 63% 37% 54% 46% / 45% 62% 38% 55%;
+                    transform: rotate(0deg);
                 }
 
-                .home {
-                    z-index: 100;
-                    width: 100%;
-                    background-color: #e57255;
-                    font-size: 1.5vmax;
+                50% {
+                    border-radius: 37% 63% 46% 54% / 62% 45% 55% 38%;
+                    transform: rotate(180deg);
+                }
+            }
+
+            @keyframes morphShapeAlt {
+
+                0%,
+                100% {
+                    border-radius: 54% 46% 63% 37% / 55% 38% 62% 45%;
+                    transform: rotate(0deg);
                 }
 
-                .home a:link,
-                .home a:visited {
-                    text-decoration: none;
-                    color: #FFFFFF;
+                50% {
+                    border-radius: 46% 54% 37% 63% / 38% 55% 45% 62%;
+                    transform: rotate(-180deg);
+                }
+            }
+
+            .content-section p {
+                margin-bottom: var(--space-xl);
+                line-height: 1.8;
+                color: var(--color-base-text);
+                position: relative;
+                z-index: 1;
+            }
+
+            .content-section p:last-child {
+                margin-bottom: 0;
+            }
+
+            .content-section p:first-of-type:first-letter {
+                font-size: 3.5em;
+                font-weight: 700;
+                line-height: 0.8;
+                float: left;
+                margin: 0.05em 0.15em 0 0;
+                background: var(--gradient-primary);
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                background-clip: text;
+            }
+
+            /* Section Divider - Fractal inspired */
+            .section-divider {
+                margin: var(--space-3xl) 0;
+                position: relative;
+                height: 3px;
+                background: linear-gradient(90deg,
+                        transparent 0%,
+                        var(--color-accent-1) 15%,
+                        var(--color-accent-4) 50%,
+                        var(--color-accent-3) 85%,
+                        transparent 100%);
+                opacity: 0.4;
+                overflow: visible;
+            }
+
+            /* Fractal-like branching decorations */
+            .section-divider::before,
+            .section-divider::after {
+                content: '';
+                position: absolute;
+                width: 60%;
+                height: 2px;
+                background: inherit;
+                top: -8px;
+                opacity: 0.6;
+            }
+
+            .section-divider::before {
+                left: 5%;
+                animation: branchGrow 3s ease-in-out infinite;
+            }
+
+            .section-divider::after {
+                right: 5%;
+                animation: branchGrow 3s ease-in-out infinite 1.5s;
+            }
+
+            @keyframes branchGrow {
+
+                0%,
+                100% {
+                    transform: scaleX(0.8);
+                    opacity: 0.4;
                 }
 
-                .content {
-                    line-height: 3.8vmax;
-                    font-size: 1.8vmax;
-                    font-family: 'Arial';
-                    margin-top: 22vh;
+                50% {
+                    transform: scaleX(1);
+                    opacity: 0.7;
+                }
+            }
+
+            /* Emergence dots */
+            .emergence-dot {
+                position: absolute;
+                width: 4px;
+                height: 4px;
+                background: var(--color-accent-1);
+                border-radius: 50%;
+                animation: emerge 4s ease-in-out infinite;
+            }
+
+            .emergence-dot:nth-child(1) {
+                left: 20%;
+                animation-delay: 0s;
+            }
+
+            .emergence-dot:nth-child(2) {
+                left: 40%;
+                animation-delay: 0.8s;
+            }
+
+            .emergence-dot:nth-child(3) {
+                left: 60%;
+                animation-delay: 1.6s;
+            }
+
+            .emergence-dot:nth-child(4) {
+                left: 80%;
+                animation-delay: 2.4s;
+            }
+
+            @keyframes emerge {
+
+                0%,
+                100% {
+                    transform: translateY(0) scale(0.5);
+                    opacity: 0;
                 }
 
-                .content a:link,
-                .content a:visited {
-                    color: #e57255;
+                50% {
+                    transform: translateY(-20px) scale(1.5);
+                    opacity: 1;
+                }
+            }
+
+            /* ===========================
+           Footer
+           =========================== */
+            .site-footer {
+                position: relative;
+                z-index: 1;
+                margin-top: var(--space-4xl);
+                padding: var(--space-2xl) var(--space-xl);
+                background: rgba(255, 255, 255, 0.6);
+                -webkit-backdrop-filter: blur(12px) saturate(180%);
+                backdrop-filter: blur(12px) saturate(180%);
+                border-top: 1px solid var(--color-border);
+            }
+
+            .footer-content {
+                max-width: 1400px;
+                margin: 0 auto;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                gap: var(--space-lg);
+                text-align: center;
+            }
+
+            .footer-links {
+                display: flex;
+                gap: var(--space-xl);
+                flex-wrap: wrap;
+                justify-content: center;
+                list-style: none;
+            }
+
+            .footer-links a {
+                color: var(--color-base-text-muted);
+                text-decoration: none;
+                font-size: var(--text-sm);
+                transition: all 0.3s ease;
+                padding: var(--space-xs) var(--space-sm);
+                border-radius: var(--radius-sm);
+            }
+
+            .footer-links a:hover,
+            .footer-links a:focus {
+                color: var(--color-accent-1);
+                background: var(--color-hover);
+            }
+
+            .footer-copyright {
+                font-size: var(--text-sm);
+                color: var(--color-base-text-muted);
+            }
+
+            /* Language Selector in Footer */
+            .language-selector {
+                display: flex;
+                gap: var(--space-md);
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+
+            .language-selector a {
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                padding: var(--space-xs) var(--space-md);
+                background: rgba(45, 159, 94, 0.08);
+                color: var(--color-accent-1);
+                text-decoration: none;
+                border-radius: var(--radius-md);
+                font-size: var(--text-sm);
+                font-weight: 500;
+                transition: all 0.3s ease;
+                border: 1px solid var(--color-border);
+            }
+
+            .language-selector a:hover,
+            .language-selector a:focus {
+                background: var(--color-accent-1);
+                color: white;
+                transform: translateY(-2px);
+                box-shadow: var(--shadow-md);
+            }
+
+            /* ===========================
+           Responsive Design
+           =========================== */
+            @media (max-width: 768px) {
+                .nav-container {
+                    flex-direction: column;
+                    gap: var(--space-md);
+                    padding: var(--space-md);
                 }
 
-                .page {
-                    top: 40vh;
-                    width: 95%;
-                    margin-left: 0vw;
+                .hero-section {
+                    padding: var(--space-2xl) 0;
                 }
 
-                .page img {
-                    max-width: 100%;
-                    max-height: 100%;
-                    border: 0;
+                .content-section {
+                    padding: var(--space-xl) var(--space-lg);
+                }
+
+                .footer-links {
+                    flex-direction: column;
+                    gap: var(--space-md);
+                }
+
+                .language-selector {
+                    gap: var(--space-sm);
+                }
+            }
+
+            /* ===========================
+           Accessibility Features
+           =========================== */
+            @media (prefers-reduced-motion: reduce) {
+
+                *,
+                *::before,
+                *::after {
+                    animation-duration: 0.01ms !important;
+                    animation-iteration-count: 1 !important;
+                    transition-duration: 0.01ms !important;
+                }
+            }
+
+            /* Focus Styles */
+            *:focus {
+                outline: 2px solid var(--color-accent-1);
+                outline-offset: 2px;
+            }
+
+            *:focus:not(:focus-visible) {
+                outline: none;
+            }
+
+            /* ===========================
+           SVG Animations
+           =========================== */
+            .svg-spiral {
+                animation: spiralGrow 8s ease-in-out infinite;
+                transform-origin: center;
+            }
+
+            .svg-fractal-branch {
+                animation: branchPulse 5s ease-in-out infinite;
+                transform-origin: center;
+            }
+
+            .svg-cellular-grid {
+                animation: cellularLife 6s ease-in-out infinite;
+            }
+
+            .svg-emergence-particle {
+                animation: particleEmerge 4s ease-in-out infinite;
+            }
+
+            .svg-neural-node {
+                animation: neuralPulse 3s ease-in-out infinite;
+            }
+
+            .svg-dna-helix {
+                animation: helixRotate 10s linear infinite;
+                transform-origin: center;
+            }
+
+            @keyframes spiralGrow {
+
+                0%,
+                100% {
+                    transform: scale(1) rotate(0deg);
+                    opacity: 0.6;
+                }
+
+                50% {
+                    transform: scale(1.1) rotate(180deg);
+                    opacity: 1;
+                }
+            }
+
+            @keyframes branchPulse {
+
+                0%,
+                100% {
+                    opacity: 0.4;
+                    stroke-width: 2;
+                }
+
+                50% {
+                    opacity: 1;
+                    stroke-width: 3;
+                }
+            }
+
+            @keyframes cellularLife {
+
+                0%,
+                100% {
+                    opacity: 0.3;
+                }
+
+                50% {
+                    opacity: 0.8;
+                }
+            }
+
+            @keyframes particleEmerge {
+                0% {
+                    transform: translateY(30px) scale(0.3);
+                    opacity: 0;
+                }
+
+                50% {
+                    opacity: 1;
+                }
+
+                100% {
+                    transform: translateY(-30px) scale(1);
+                    opacity: 0;
+                }
+            }
+
+            @keyframes neuralPulse {
+
+                0%,
+                100% {
+                    transform: scale(1);
+                    opacity: 0.6;
+                }
+
+                50% {
+                    transform: scale(1.3);
+                    opacity: 1;
+                }
+            }
+
+            @keyframes helixRotate {
+                from {
+                    transform: rotateY(0deg);
+                }
+
+                to {
+                    transform: rotateY(360deg);
                 }
             }
         </style>
     </head>
 
     <body vocab="http://schema.org/">
-        <div class="page">
-            <div class="home">
-                <ul typeof="BreadcrumbList">
+        <a href="#main-content" class="skip-link">Skip to main content</a>
+
+        <!-- Navigation Header -->
+        <header class="site-header">
+            <nav class="nav-container" role="navigation" aria-label="Main navigation">
+                <a href="../index.html" class="site-brand">John Samuel</a>
+                <ul class="breadcrumb-nav" typeof="BreadcrumbList">
                     <li property="itemListElement" typeof="ListItem">
                         <a property="item" typeof="WebPage" href="../index.html">
                             <span property="name">Home</span>
@@ -279,111 +796,293 @@
                             <span property="name">Research</span>
                         </a>
                     </li>
+                    <li property="itemListElement" typeof="ListItem">
+                        <span property="name">Complexity from Simplicity</span>
+                    </li>
+                </ul>
+            </nav>
+        </header>
+
+        <!-- Main Content -->
+        <main class="page-wrapper" id="main-content">
+            <div class="container">
+                <!-- Hero Section -->
+                <section class="hero-section">
+                    <h1 class="hero-title">Complexity Emerging from Simplicity</h1>
+                    <p class="hero-subtitle">
+                        Exploring the patterns that shape our universe
+                    </p>
+
+                    <!-- Hero SVG Illustration -->
+                    <svg class="hero-svg" viewBox="0 0 700 500" xmlns="http://www.w3.org/2000/svg" role="img"
+                        aria-label="Abstract illustration showing fractals, spirals, cellular patterns, and emergent complexity from simple rules">
+                        <defs>
+                            <linearGradient id="natureGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" style="stop-color:#2d9f5e;stop-opacity:0.8" />
+                                <stop offset="50%" style="stop-color:#6b46c1;stop-opacity:0.7" />
+                                <stop offset="100%" style="stop-color:#e07a3f;stop-opacity:0.8" />
+                            </linearGradient>
+                            <linearGradient id="emergenceGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                                <stop offset="0%" style="stop-color:#1a6b3f;stop-opacity:0.6" />
+                                <stop offset="100%" style="stop-color:#2d9f5e;stop-opacity:0.6" />
+                            </linearGradient>
+                            <radialGradient id="pulseGradient">
+                                <stop offset="0%" style="stop-color:#2d9f5e;stop-opacity:1" />
+                                <stop offset="100%" style="stop-color:#2d9f5e;stop-opacity:0" />
+                            </radialGradient>
+                        </defs>
+
+                        <!-- Central Fibonacci Spiral -->
+                        <g class="svg-spiral">
+                            <path d="M 350 250 Q 370 250 370 230 Q 370 210 350 210 Q 330 210 330 230 Q 330 250 350 250"
+                                fill="none" stroke="url(#natureGradient)" stroke-width="3" opacity="0.7" />
+                            <path d="M 350 250 Q 390 250 390 210 Q 390 170 350 170 Q 310 170 310 210 Q 310 250 350 250"
+                                fill="none" stroke="url(#natureGradient)" stroke-width="2.5" opacity="0.6" />
+                            <path d="M 350 250 Q 420 250 420 180 Q 420 110 350 110 Q 280 110 280 180 Q 280 250 350 250"
+                                fill="none" stroke="url(#natureGradient)" stroke-width="2" opacity="0.5" />
+                        </g>
+
+                        <!-- Fractal Tree Branches -->
+                        <g class="svg-fractal-branch">
+                            <!-- Main trunk -->
+                            <line x1="150" y1="400" x2="150" y2="300" stroke="#2d9f5e" stroke-width="4" opacity="0.6" />
+                            <!-- First level branches -->
+                            <line x1="150" y1="300" x2="130" y2="250" stroke="#2d9f5e" stroke-width="3" opacity="0.5" />
+                            <line x1="150" y1="300" x2="170" y2="250" stroke="#2d9f5e" stroke-width="3" opacity="0.5" />
+                            <!-- Second level branches -->
+                            <line x1="130" y1="250" x2="115" y2="220" stroke="#1a6b3f" stroke-width="2" opacity="0.4" />
+                            <line x1="130" y1="250" x2="145" y2="220" stroke="#1a6b3f" stroke-width="2" opacity="0.4" />
+                            <line x1="170" y1="250" x2="155" y2="220" stroke="#1a6b3f" stroke-width="2" opacity="0.4" />
+                            <line x1="170" y1="250" x2="185" y2="220" stroke="#1a6b3f" stroke-width="2" opacity="0.4" />
+                        </g>
+
+                        <!-- Cellular Automaton Grid -->
+                        <g class="svg-cellular-grid">
+                            <rect x="500" y="80" width="20" height="20" rx="2" fill="#2d9f5e" opacity="0.3" />
+                            <rect x="525" y="80" width="20" height="20" rx="2" fill="#2d9f5e" opacity="0.5" />
+                            <rect x="550" y="80" width="20" height="20" rx="2" fill="#2d9f5e" opacity="0.3" />
+                            <rect x="500" y="105" width="20" height="20" rx="2" fill="#2d9f5e" opacity="0.5" />
+                            <rect x="525" y="105" width="20" height="20" rx="2" fill="#2d9f5e" opacity="0.7" />
+                            <rect x="550" y="105" width="20" height="20" rx="2" fill="#2d9f5e" opacity="0.5" />
+                            <rect x="500" y="130" width="20" height="20" rx="2" fill="#2d9f5e" opacity="0.3" />
+                            <rect x="525" y="130" width="20" height="20" rx="2" fill="#2d9f5e" opacity="0.5" />
+                            <rect x="550" y="130" width="20" height="20" rx="2" fill="#2d9f5e" opacity="0.3" />
+                        </g>
+
+                        <!-- Emergence Particles rising from bottom -->
+                        <g>
+                            <circle class="svg-emergence-particle" cx="100" cy="450" r="4" fill="#2d9f5e"
+                                opacity="0.4" />
+                            <circle class="svg-emergence-particle" cx="200" cy="450" r="4" fill="#6b46c1" opacity="0.4"
+                                style="animation-delay: 1s" />
+                            <circle class="svg-emergence-particle" cx="300" cy="450" r="4" fill="#e07a3f" opacity="0.4"
+                                style="animation-delay: 2s" />
+                            <circle class="svg-emergence-particle" cx="400" cy="450" r="4" fill="#2d9f5e" opacity="0.4"
+                                style="animation-delay: 3s" />
+                            <circle class="svg-emergence-particle" cx="500" cy="450" r="4" fill="#6b46c1" opacity="0.4"
+                                style="animation-delay: 0.5s" />
+                            <circle class="svg-emergence-particle" cx="600" cy="450" r="4" fill="#e07a3f" opacity="0.4"
+                                style="animation-delay: 1.5s" />
+                        </g>
+
+                        <!-- Neural Network Nodes -->
+                        <g>
+                            <circle class="svg-neural-node" cx="550" cy="300" r="8" fill="url(#pulseGradient)"
+                                opacity="0.6" />
+                            <circle class="svg-neural-node" cx="580" cy="340" r="8" fill="url(#pulseGradient)"
+                                opacity="0.6" style="animation-delay: 0.5s" />
+                            <circle class="svg-neural-node" cx="520" cy="340" r="8" fill="url(#pulseGradient)"
+                                opacity="0.6" style="animation-delay: 1s" />
+                            <circle class="svg-neural-node" cx="550" cy="380" r="8" fill="url(#pulseGradient)"
+                                opacity="0.6" style="animation-delay: 1.5s" />
+                            <!-- Connections -->
+                            <line x1="550" y1="300" x2="580" y2="340" stroke="#2d9f5e" stroke-width="1" opacity="0.3" />
+                            <line x1="550" y1="300" x2="520" y2="340" stroke="#2d9f5e" stroke-width="1" opacity="0.3" />
+                            <line x1="580" y1="340" x2="550" y2="380" stroke="#2d9f5e" stroke-width="1" opacity="0.3" />
+                            <line x1="520" y1="340" x2="550" y2="380" stroke="#2d9f5e" stroke-width="1" opacity="0.3" />
+                        </g>
+
+                        <!-- DNA Helix Representation -->
+                        <g class="svg-dna-helix" transform="translate(0, 0)">
+                            <ellipse cx="250" cy="100" rx="30" ry="8" fill="none" stroke="#6b46c1" stroke-width="2"
+                                opacity="0.5" />
+                            <ellipse cx="250" cy="120" rx="30" ry="8" fill="none" stroke="#2d9f5e" stroke-width="2"
+                                opacity="0.4" />
+                            <ellipse cx="250" cy="140" rx="30" ry="8" fill="none" stroke="#e07a3f" stroke-width="2"
+                                opacity="0.5" />
+                            <line x1="235" y1="100" x2="235" y2="140" stroke="#2d9f5e" stroke-width="1.5"
+                                opacity="0.3" />
+                            <line x1="265" y1="100" x2="265" y2="140" stroke="#6b46c1" stroke-width="1.5"
+                                opacity="0.3" />
+                        </g>
+
+                        <!-- Mandelbrot-inspired circles -->
+                        <circle cx="450" cy="400" r="40" fill="none" stroke="url(#emergenceGradient)" stroke-width="2"
+                            opacity="0.4" />
+                        <circle cx="450" cy="400" r="30" fill="none" stroke="url(#emergenceGradient)" stroke-width="2"
+                            opacity="0.5" />
+                        <circle cx="450" cy="400" r="20" fill="none" stroke="url(#emergenceGradient)" stroke-width="2"
+                            opacity="0.6" />
+                        <circle cx="450" cy="400" r="10" fill="url(#emergenceGradient)" opacity="0.7" />
+
+                        <!-- Symmetry Lines -->
+                        <line x1="50" y1="200" x2="200" y2="200" stroke="#2d9f5e" stroke-width="1" opacity="0.2"
+                            stroke-dasharray="5,5" />
+                        <line x1="500" y1="250" x2="650" y2="250" stroke="#6b46c1" stroke-width="1" opacity="0.2"
+                            stroke-dasharray="5,5" />
+                    </svg>
+                </section>
+
+                <div class="section-divider">
+                    <span class="emergence-dot"></span>
+                    <span class="emergence-dot"></span>
+                    <span class="emergence-dot"></span>
+                    <span class="emergence-dot"></span>
+                </div>
+
+                <!-- Article Content -->
+                <article class="content-section">
+                    <p>
+                        Nature is marvelous.
+                        A glance at the world reveals not just a repetition, but a symphony of repetition and
+                        randomness,
+                        crafting beauty anew each day. Symmetry graces almost every living entity, whether it hovers
+                        above
+                        in
+                        the sky, stands on the land, or resides beneath the earth. This prompts a contemplation on
+                        whether a
+                        set
+                        of common rules governs the diverse array of objects observed in the vast expanse of the
+                        universe.
+                    </p>
+
+                    <p>
+                        Consider our bodies, a testament to the wonders of similarity. Exploring our genetic makeup
+                        unveils
+                        underlying parallels, despite the minor DNA variations from our nearest common ancestors. These
+                        seemingly subtle distinctions, when examined closely, unveil profound narratives of evolution.
+                        This
+                        narrative echoes not only through the complex workings of our bodies but also reverberates in
+                        the
+                        advancements of our tools and technology, showcasing the continuous dance of simplicity and
+                        complexity
+                        shaping our understanding of the world.
+                    </p>
+
+                    <p>
+                        In every domain, be it art or science, a relentless quest persists among individuals driven to
+                        unveil
+                        the secrets and expose the enchanting formulas that dictate our world. The more we unearth, the
+                        clearer
+                        it becomes that we've merely scratched the surface. A common refrain in our pursuit is the
+                        mantra
+                        "Keep
+                        it Simple and Stupid," a directive urging us to simplify, and perhaps even over-simplify, as if
+                        we
+                        wielded divine powers, architects shaping the entirety of the known universe. In this quest, we
+                        yearn
+                        for universal models capable of describing every nuance, likely fueled by a desire to replicate
+                        such
+                        comprehensive understanding in the digital world we seek to create. The journey toward
+                        simplicity,
+                        though, unveils not only the beauty of the straightforward but also the complexity that resides
+                        within,
+                        challenging our perceptions and propelling us further into the boundless spheres of knowledge.
+                    </p>
+
+                    <p>
+                        In the digital world, enthusiasts posit that fractals possess the ability to encapsulate the
+                        entirety of
+                        our world. Simultaneously, advocates champion cellular automaton, proposing it as a model
+                        reflective
+                        of
+                        the world's dynamics. Introducing the universal Turing machine into this narrative amplifies our
+                        perpetual quest—to unveil the elusive "universal" laws that shape our existence. Yet, a distinct
+                        faction
+                        among us sets its sights on a different horizon—mimicking the complexity of the human brain.
+                    </p>
+
+                    <p>
+                        In machine learning and deep learning, our endeavor extends beyond mere emulation; it aspires to
+                        unravel
+                        the nuanced complexities embedded in the human brain's operations. Models such as perceptrons
+                        serve
+                        as
+                        beacons in this exploration, offering glimpses into the potential synergy between artificial
+                        intelligence and the complexities of natural cognition. As we navigate this digital frontier,
+                        the
+                        convergence of diverse concepts and aspirations drives us toward a deeper understanding of the
+                        interconnected threads that weave the fabric of our technological and cognitive landscapes.
+                    </p>
+
+                    <p>
+                        In our relentless pursuit of unraveling the mysteries of subatomic particles and the fundamental
+                        laws
+                        shaping the universe, it is crucial not to overlook the profound beauty inherent in the
+                        emergence of
+                        complex entities from simpler components. As we look into the complexities of existence, a
+                        compelling
+                        question emerges: What constitutes the most complex object, a construct composed of nested
+                        entities,
+                        each carefully woven into the fabric of the next? Could it be the Earth, our solar system, the
+                        vast
+                        expanse of our galaxy, or even the entire universe? The quest for understanding propels us into
+                        uncharted territories, urging us to confront our minuscule role in the cosmic vastness that
+                        stretches
+                        beyond.
+                    </p>
+
+                    <p>
+                        Nature imparts invaluable lessons through ants, swarms, and the ecosystems of bird islands. As
+                        we
+                        strive
+                        to replicate and understand the complexity of our surroundings through the construction of
+                        models,
+                        we
+                        embark on a perpetual journey of learning. The diversity found in nature serves as a poignant
+                        reminder
+                        that even adherence to simple rules can give rise to breathtaking variations, a symphony that
+                        delights
+                        our senses. In this pursuit, it becomes not only a choice but a responsibility for our computer
+                        models
+                        to transcend mere imitation and actively contribute to the preservation of this rich diversity.
+                    </p>
+
+                    <p>
+                        The journey to unravel the mysteries of our world, both natural and artificial, is an ongoing
+                        narrative—one that invites collaboration, innovation, and a profound respect for the intricate
+                        dance
+                        of
+                        simplicity and diversity. As we stand at the threshold of new possibilities, let us not only
+                        learn
+                        from
+                        nature but actively contribute to its harmony, fostering a future where the beauty of diversity
+                        is
+                        both
+                        preserved and celebrated.
+                    </p>
+                </article>
+            </div>
+        </main>
+
+        <!-- Footer -->
+        <footer class="site-footer">
+            <div class="footer-content">
+                <nav class="language-selector" aria-label="Language selection">
+                    <a href="complexity-simplicity.html" hreflang="en">English</a>
+                </nav>
+
+                <ul class="footer-links">
+                    <li><a href="../index.html">Home</a></li>
+                    <li><a href="../research/research.html">Research</a></li>
+                    <li><a href="../about.html">About</a></li>
                 </ul>
 
-            </div>
-            <div id="sidebar">
-                <div class="title">
-                    <h1><a href="./complexity-simplicity.html">Complexity Emerging from Simplicity</a></h1>
-                </div>
-                <div class="subtitle">
-                    <h3><a href="../about.html">John Samuel</a></h3>
-                </div>
-            </div>
-
-            <div class="content">
-                <p>Nature is marvelous.
-                    A glance at the world reveals not just a repetition, but a symphony of repetition and randomness,
-                    crafting beauty anew each day. Symmetry graces almost every living entity, whether it hovers above
-                    in
-                    the sky, stands on the land, or resides beneath the earth. This prompts a contemplation on whether a
-                    set
-                    of common rules governs the diverse array of objects observed in the vast expanse of the universe.
-                </p>
-                <p>
-
-                    Consider our bodies, a testament to the wonders of similarity. Exploring our genetic makeup unveils
-                    underlying parallels, despite the minor DNA variations from our nearest common ancestors. These
-                    seemingly subtle distinctions, when examined closely, unveil profound narratives of evolution. This
-                    narrative echoes not only through the complex workings of our bodies but also reverberates in the
-                    advancements of our tools and technology, showcasing the continuous dance of simplicity and
-                    complexity
-                    shaping our understanding of the world.
-                </p>
-                <p>
-                    In every domain, be it art or science, a relentless quest persists among individuals driven to
-                    unveil
-                    the secrets and expose the enchanting formulas that dictate our world. The more we unearth, the
-                    clearer
-                    it becomes that we've merely scratched the surface. A common refrain in our pursuit is the mantra
-                    "Keep
-                    it Simple and Stupid," a directive urging us to simplify, and perhaps even over-simplify, as if we
-                    wielded divine powers, architects shaping the entirety of the known universe. In this quest, we
-                    yearn
-                    for universal models capable of describing every nuance, likely fueled by a desire to replicate such
-                    comprehensive understanding in the digital world we seek to create. The journey toward simplicity,
-                    though, unveils not only the beauty of the straightforward but also the complexity that resides
-                    within,
-                    challenging our perceptions and propelling us further into the boundless spheres of knowledge.
-                </p>
-                <p>
-                    In the digital world, enthusiasts posit that fractals possess the ability to encapsulate the
-                    entirety of
-                    our world. Simultaneously, advocates champion cellular automaton, proposing it as a model reflective
-                    of
-                    the world's dynamics. Introducing the universal Turing machine into this narrative amplifies our
-                    perpetual quest—to unveil the elusive "universal" laws that shape our existence. Yet, a distinct
-                    faction
-                    among us sets its sights on a different horizon—mimicking the complexity of the human brain.
-                </p>
-                <p>
-                    In machine learning and deep learning, our endeavor extends beyond mere emulation; it aspires to
-                    unravel
-                    the nuanced complexities embedded in the human brain's operations. Models such as perceptrons serve
-                    as
-                    beacons in this exploration, offering glimpses into the potential synergy between artificial
-                    intelligence and the complexities of natural cognition. As we navigate this digital frontier, the
-                    convergence of diverse concepts and aspirations drives us toward a deeper understanding of the
-                    interconnected threads that weave the fabric of our technological and cognitive landscapes.
-                </p>
-                <p>
-                    In our relentless pursuit of unraveling the mysteries of subatomic particles and the fundamental
-                    laws
-                    shaping the universe, it is crucial not to overlook the profound beauty inherent in the emergence of
-                    complex entities from simpler components. As we look into the complexities of existence, a
-                    compelling
-                    question emerges: What constitutes the most complex object, a construct composed of nested entities,
-                    each carefully woven into the fabric of the next? Could it be the Earth, our solar system, the vast
-                    expanse of our galaxy, or even the entire universe? The quest for understanding propels us into
-                    uncharted territories, urging us to confront our minuscule role in the cosmic vastness that
-                    stretches
-                    beyond.
-                </p>
-                <p>
-                    Nature imparts invaluable lessons through ants, swarms, and the ecosystems of bird islands. As we
-                    strive
-                    to replicate and understand the complexity of our surroundings through the construction of models,
-                    we
-                    embark on a perpetual journey of learning. The diversity found in nature serves as a poignant
-                    reminder
-                    that even adherence to simple rules can give rise to breathtaking variations, a symphony that
-                    delights
-                    our senses. In this pursuit, it becomes not only a choice but a responsibility for our computer
-                    models
-                    to transcend mere imitation and actively contribute to the preservation of this rich diversity.
-                </p>
-                <p>
-                    The journey to unravel the mysteries of our world, both natural and artificial, is an ongoing
-                    narrative—one that invites collaboration, innovation, and a profound respect for the intricate dance
-                    of
-                    simplicity and diversity. As we stand at the threshold of new possibilities, let us not only learn
-                    from
-                    nature but actively contribute to its harmony, fostering a future where the beauty of diversity is
-                    both
-                    preserved and celebrated.
+                <p class="footer-copyright">
+                    © 2024 John Samuel. All content licensed under Creative Commons CC BY-SA 4.0.
                 </p>
             </div>
-        </div>
+        </footer>
     </body>
 
 </html>

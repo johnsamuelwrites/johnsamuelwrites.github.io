@@ -3,266 +3,700 @@
 
     <head>
         <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <meta http-equiv="Content-Language" content="en" />
         <link rel="shortcut icon" href="../../images/logo/favicon.png" />
         <title>Behind the Curtains: John Samuel</title>
-        <style type="text/css">
-            body {
-                background-color: #FFFFFF;
+        <style>
+            /* ===========================
+           Design Token System
+           =========================== */
+            :root {
+                /* Software Development Theme Colors */
+                --color-base-bg: #f8f9fb;
+                --color-base-surface: #ffffff;
+                --color-base-text: #1a1f36;
+                --color-base-text-muted: #4a5568;
+
+                /* Code-inspired Accent Palette */
+                --color-accent-1: #3b82f6;
+                /* Code editor blue */
+                --color-accent-2: #1e40af;
+                /* Deep syntax blue */
+                --color-accent-3: #8b5cf6;
+                /* Variable purple */
+                --color-accent-4: #10b981;
+                /* Success green */
+                --color-accent-light: #eff6ff;
+                /* Pale code background */
+
+                /* Functional Colors */
+                --color-shadow: rgba(59, 130, 246, 0.12);
+                --color-border: rgba(59, 130, 246, 0.15);
+                --color-hover: rgba(59, 130, 246, 0.08);
+
+                /* Gradients */
+                --gradient-primary: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+                --gradient-hero: linear-gradient(135deg, #1e40af 0%, #3b82f6 50%, #8b5cf6 100%);
+                --gradient-card: linear-gradient(180deg, rgba(255, 255, 255, 0.9), rgba(239, 246, 255, 0.6));
+
+                /* Spacing Scale */
+                --space-xs: 0.25rem;
+                --space-sm: 0.5rem;
+                --space-md: 1rem;
+                --space-lg: 1.5rem;
+                --space-xl: 2rem;
+                --space-2xl: 3rem;
+                --space-3xl: 4rem;
+                --space-4xl: 6rem;
+
+                /* Border Radius */
+                --radius-sm: 4px;
+                --radius-md: 8px;
+                --radius-lg: 12px;
+                --radius-xl: 16px;
+                --radius-2xl: 24px;
+
+                /* Shadows */
+                --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.04), 0 1px 3px rgba(0, 0, 0, 0.06);
+                --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.05), 0 2px 4px rgba(0, 0, 0, 0.06);
+                --shadow-lg: 0 10px 24px rgba(0, 0, 0, 0.08), 0 4px 8px rgba(0, 0, 0, 0.06);
+                --shadow-theme: 0 10px 30px var(--color-shadow), 0 4px 10px rgba(0, 0, 0, 0.06);
+
+                /* Typography */
+                --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+                --font-mono: 'SF Mono', Monaco, 'Cascadia Code', 'Consolas', 'Courier New', monospace;
+
+                --text-xs: clamp(0.75rem, 0.7rem + 0.25vw, 0.875rem);
+                --text-sm: clamp(0.875rem, 0.8rem + 0.35vw, 1rem);
+                --text-base: clamp(1rem, 0.95rem + 0.25vw, 1.125rem);
+                --text-lg: clamp(1.125rem, 1.05rem + 0.35vw, 1.25rem);
+                --text-xl: clamp(1.25rem, 1.15rem + 0.5vw, 1.5rem);
+                --text-2xl: clamp(1.5rem, 1.3rem + 1vw, 2rem);
+                --text-3xl: clamp(2rem, 1.6rem + 2vw, 2.5rem);
+                --text-4xl: clamp(2.5rem, 2rem + 2.5vw, 3.5rem);
             }
 
-            #sidebar {
-                position: fixed;
-                background-color: #1B80CF;
-                top: 0;
-                left: 0;
-                bottom: 0;
-                width: 30vw;
-            }
-
-            #sidebar .title {
-                position: relative;
-                text-align: center;
-                line-height: 4vmax;
-                font-size: 1.4vmax;
-                font-family: 'Arial';
-                margin-top: 25vh;
-            }
-
-            #sidebar .title a:link,
-            #sidebar .title a:visited {
-                color: #FFFFFF;
-                text-decoration: none;
-            }
-
-            .subtitle {
-                top: 50vh;
-                text-align: center;
-                line-height: 1.3vmax;
-                font-family: 'Arial';
-                font-size: 1.5vmax;
-                color: #FFFFFF;
-            }
-
-            .subtitle a:link,
-            .subtitle a:visited {
-                color: #FFFFFF;
-                text-decoration: none;
-            }
-
-            .licence {
-                position: fixed;
-                text-align: right;
-                bottom: 0;
-                right: 0;
-            }
-
-            .home {
-                position: fixed;
-                text-align: left;
-                font-family: 'Arial';
-                color: #D3D3D3;
-                z-index: 100;
-                width: 100%;
-                background-color: #FFFFFF;
-                top: 0px;
-                margin-bottom: 10px;
-                padding-bottom: 10px;
-            }
-
-            .home a:link,
-            .home a:visited {
-                text-decoration: none;
-                color: #D3D3D3;
-            }
-
-            .home ul {
+            /* ===========================
+           Reset & Base Styles
+           =========================== */
+            *,
+            *::before,
+            *::after {
+                box-sizing: border-box;
                 margin: 0;
                 padding: 0;
-                text-align: left;
+            }
+
+            html {
+                scroll-behavior: smooth;
+                scroll-padding-top: 100px;
+            }
+
+            body {
+                font-family: var(--font-sans);
+                font-size: var(--text-base);
+                line-height: 1.7;
+                color: var(--color-base-text);
+                background: var(--color-base-bg);
+                position: relative;
+                overflow-x: hidden;
+            }
+
+            /* Skip Link for Accessibility */
+            .skip-link {
+                position: absolute;
+                top: -40px;
+                left: 0;
+                background: var(--color-accent-1);
+                color: white;
+                padding: var(--space-sm) var(--space-md);
+                text-decoration: none;
+                border-radius: var(--radius-md);
+                z-index: 100;
+            }
+
+            .skip-link:focus {
+                top: var(--space-sm);
+                left: var(--space-sm);
+            }
+
+            /* ===========================
+           Background Patterns
+           =========================== */
+            body::before {
+                content: '';
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background-image:
+                    radial-gradient(circle at 20% 30%, rgba(59, 130, 246, 0.03) 0%, transparent 50%),
+                    radial-gradient(circle at 80% 70%, rgba(139, 92, 246, 0.03) 0%, transparent 50%),
+                    linear-gradient(180deg, transparent 0%, rgba(59, 130, 246, 0.02) 100%);
+                pointer-events: none;
+                z-index: 0;
+            }
+
+            /* Circuit Pattern Background */
+            body::after {
+                content: '';
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background-image:
+                    repeating-linear-gradient(90deg, transparent, transparent 79px, rgba(59, 130, 246, 0.03) 79px, rgba(59, 130, 246, 0.03) 81px),
+                    repeating-linear-gradient(0deg, transparent, transparent 79px, rgba(59, 130, 246, 0.03) 79px, rgba(59, 130, 246, 0.03) 81px);
+                pointer-events: none;
+                z-index: 0;
+                opacity: 0.5;
+            }
+
+            /* ===========================
+           Navigation Header
+           =========================== */
+            .site-header {
+                position: sticky;
+                top: 0;
+                z-index: 50;
+                background: rgba(255, 255, 255, 0.85);
+                -webkit-backdrop-filter: blur(12px) saturate(180%);
+                backdrop-filter: blur(12px) saturate(180%);
+                border-bottom: 1px solid var(--color-border);
+                box-shadow: var(--shadow-sm);
+            }
+
+            .nav-container {
+                max-width: 1400px;
+                margin: 0 auto;
+                padding: var(--space-md) var(--space-xl);
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                gap: var(--space-xl);
+                position: relative;
+                z-index: 1;
+            }
+
+            .site-brand {
+                font-size: var(--text-xl);
+                font-weight: 700;
+                letter-spacing: -0.02em;
+                background: var(--gradient-primary);
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                background-clip: text;
+                text-decoration: none;
+                transition: opacity 0.3s ease;
+            }
+
+            .site-brand:hover {
+                opacity: 0.8;
+            }
+
+            .breadcrumb-nav {
+                display: flex;
+                align-items: center;
+                gap: var(--space-sm);
+                list-style: none;
+                flex-wrap: wrap;
+            }
+
+            .breadcrumb-nav li {
+                display: flex;
+                align-items: center;
+                gap: var(--space-sm);
+            }
+
+            .breadcrumb-nav li:not(:last-child)::after {
+                content: '›';
+                color: var(--color-base-text-muted);
+                font-size: var(--text-lg);
+            }
+
+            .breadcrumb-nav a {
+                color: var(--color-base-text-muted);
+                text-decoration: none;
+                font-size: var(--text-sm);
+                transition: color 0.3s ease;
+            }
+
+            .breadcrumb-nav a:hover,
+            .breadcrumb-nav a:focus {
+                color: var(--color-accent-1);
+            }
+
+            /* ===========================
+           Main Container
+           =========================== */
+            .page-wrapper {
+                position: relative;
+                z-index: 1;
+            }
+
+            .container {
+                max-width: 1200px;
+                margin: 0 auto;
+                padding: var(--space-2xl) var(--space-xl);
+            }
+
+            /* ===========================
+           Hero Section
+           =========================== */
+            .hero-section {
+                position: relative;
+                padding: var(--space-4xl) 0 var(--space-3xl);
+                text-align: center;
+                overflow: hidden;
+            }
+
+            .hero-decoration {
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                width: 600px;
+                height: 600px;
+                opacity: 0.08;
+                pointer-events: none;
+                z-index: -1;
+            }
+
+            .hero-title {
+                font-size: var(--text-4xl);
+                font-weight: 800;
+                letter-spacing: -0.03em;
+                line-height: 1.2;
+                margin-bottom: var(--space-lg);
+                background: var(--gradient-hero);
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                background-clip: text;
+                animation: titleFadeIn 1s ease-out;
+            }
+
+            .hero-subtitle {
+                font-size: var(--text-lg);
+                color: var(--color-base-text-muted);
+                margin-bottom: var(--space-xl);
+                animation: subtitleFadeIn 1s ease-out 0.2s backwards;
+            }
+
+            .hero-subtitle a {
+                color: var(--color-accent-1);
+                text-decoration: none;
+                font-weight: 600;
+                transition: color 0.3s ease;
+            }
+
+            .hero-subtitle a:hover {
+                color: var(--color-accent-2);
+            }
+
+            /* Animated SVG Hero Illustration */
+            .hero-svg {
+                max-width: 500px;
+                margin: var(--space-2xl) auto 0;
+                animation: svgFadeIn 1.2s ease-out 0.4s backwards;
+            }
+
+            @keyframes titleFadeIn {
+                from {
+                    opacity: 0;
+                    transform: translateY(-20px);
+                }
+
+                to {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            }
+
+            @keyframes subtitleFadeIn {
+                from {
+                    opacity: 0;
+                    transform: translateY(-15px);
+                }
+
+                to {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            }
+
+            @keyframes svgFadeIn {
+                from {
+                    opacity: 0;
+                    transform: scale(0.9);
+                }
+
+                to {
+                    opacity: 1;
+                    transform: scale(1);
+                }
+            }
+
+            /* ===========================
+           Content Section
+           =========================== */
+            .content-section {
+                background: var(--color-base-surface);
+                border-radius: var(--radius-2xl);
+                padding: var(--space-3xl) var(--space-2xl);
+                box-shadow: var(--shadow-theme);
+                position: relative;
+                overflow: hidden;
+                animation: contentFadeIn 1s ease-out 0.6s backwards;
+            }
+
+            @keyframes contentFadeIn {
+                from {
+                    opacity: 0;
+                    transform: translateY(30px);
+                }
+
+                to {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            }
+
+            /* Code-inspired corner decoration */
+            .content-section::before {
+                content: '{ }';
+                position: absolute;
+                top: var(--space-lg);
+                right: var(--space-lg);
+                font-family: var(--font-mono);
+                font-size: 4rem;
+                color: var(--color-accent-1);
+                opacity: 0.05;
+                pointer-events: none;
+                font-weight: 700;
+            }
+
+            .content-section p {
+                margin-bottom: var(--space-xl);
+                line-height: 1.8;
+                color: var(--color-base-text);
+            }
+
+            .content-section p:last-child {
+                margin-bottom: 0;
+            }
+
+            .content-section p:first-letter {
+                font-size: 2.5em;
+                font-weight: 700;
+                line-height: 0.8;
+                float: left;
+                margin: 0.1em 0.1em 0 0;
+                background: var(--gradient-primary);
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                background-clip: text;
+            }
+
+            /* Section Divider */
+            .section-divider {
+                margin: var(--space-3xl) 0;
+                position: relative;
+                height: 2px;
+                background: linear-gradient(90deg,
+                        transparent 0%,
+                        var(--color-accent-1) 20%,
+                        var(--color-accent-3) 50%,
+                        var(--color-accent-1) 80%,
+                        transparent 100%);
+                opacity: 0.3;
+            }
+
+            .section-divider::before,
+            .section-divider::after {
+                content: '';
+                position: absolute;
+                top: 50%;
+                transform: translateY(-50%);
+                width: 8px;
+                height: 8px;
+                border-radius: 50%;
+                background: var(--color-accent-1);
+            }
+
+            .section-divider::before {
+                left: 0;
+                animation: pulseLeft 2s ease-in-out infinite;
+            }
+
+            .section-divider::after {
+                right: 0;
+                animation: pulseRight 2s ease-in-out infinite;
+            }
+
+            @keyframes pulseLeft {
+
+                0%,
+                100% {
+                    transform: translateY(-50%) scale(1);
+                    opacity: 1;
+                }
+
+                50% {
+                    transform: translateY(-50%) scale(1.5);
+                    opacity: 0.5;
+                }
+            }
+
+            @keyframes pulseRight {
+
+                0%,
+                100% {
+                    transform: translateY(-50%) scale(1);
+                    opacity: 1;
+                }
+
+                50% {
+                    transform: translateY(-50%) scale(1.5);
+                    opacity: 0.5;
+                }
+            }
+
+            /* ===========================
+           Footer
+           =========================== */
+            .site-footer {
+                position: relative;
+                z-index: 1;
+                margin-top: var(--space-4xl);
+                padding: var(--space-2xl) var(--space-xl);
+                background: rgba(255, 255, 255, 0.6);
+                -webkit-backdrop-filter: blur(12px) saturate(180%);
+                backdrop-filter: blur(12px) saturate(180%);
+                border-top: 1px solid var(--color-border);
+            }
+
+            .footer-content {
+                max-width: 1400px;
+                margin: 0 auto;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                gap: var(--space-lg);
+                text-align: center;
+            }
+
+            .footer-links {
+                display: flex;
+                gap: var(--space-xl);
+                flex-wrap: wrap;
+                justify-content: center;
                 list-style: none;
             }
 
-            .home li {
-                position: relative;
-                float: left;
-                padding-top: 15px;
-                margin-right: 1em;
-                font-family: 'Arial';
-            }
-
-            .home li:hover {
-                display: block;
-            }
-
-            .home a:link,
-            .home a:visited {
-                color: #D3D3D3;
-            }
-
-            .home li:hover a:link,
-            .home li:hover a:visited {
+            .footer-links a {
+                color: var(--color-base-text-muted);
                 text-decoration: none;
-                padding: 15px;
-                color: #FFFFFF;
-                background-color: #1B80CF;
+                font-size: var(--text-sm);
+                transition: all 0.3s ease;
+                padding: var(--space-xs) var(--space-sm);
+                border-radius: var(--radius-sm);
             }
 
-            .content {
-                line-height: 1.8vmax;
-                font-size: 1.2vmax;
-                font-family: 'Arial';
-                margin-top: 15vh;
-                width: 90%;
+            .footer-links a:hover,
+            .footer-links a:focus {
+                color: var(--color-accent-1);
+                background: var(--color-hover);
             }
 
-            .content h2,
-            h3,
-            h4 {
-                color: #1B80CF;
+            .footer-copyright {
+                font-size: var(--text-sm);
+                color: var(--color-base-text-muted);
             }
 
-            .content a:link,
-            .content a:visited {
-                color: #1B80CF;
+            /* Language Selector in Footer */
+            .language-selector {
+                display: flex;
+                gap: var(--space-md);
+                flex-wrap: wrap;
+                justify-content: center;
             }
 
-            .content h3 {
-                color: #1B80CF;
+            .language-selector a {
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                padding: var(--space-xs) var(--space-md);
+                background: rgba(59, 130, 246, 0.08);
+                color: var(--color-accent-1);
+                text-decoration: none;
+                border-radius: var(--radius-md);
+                font-size: var(--text-sm);
+                font-weight: 500;
+                transition: all 0.3s ease;
+                border: 1px solid var(--color-border);
             }
 
-            .content h2::before,
-            .content h3::before {
-                display: block;
-                content: " ";
-                visibility: hidden;
-                height: 50px;
-                margin-top: -50px;
+            .language-selector a:hover,
+            .language-selector a:focus {
+                background: var(--color-accent-1);
+                color: white;
+                transform: translateY(-2px);
+                box-shadow: var(--shadow-md);
+            }
+
+            /* ===========================
+           Responsive Design
+           =========================== */
+            @media (max-width: 768px) {
+                .nav-container {
+                    flex-direction: column;
+                    gap: var(--space-md);
+                    padding: var(--space-md);
+                }
+
+                .hero-section {
+                    padding: var(--space-2xl) 0;
+                }
+
+                .content-section {
+                    padding: var(--space-xl) var(--space-lg);
+                }
+
+                .footer-links {
+                    flex-direction: column;
+                    gap: var(--space-md);
+                }
+
+                .language-selector {
+                    gap: var(--space-sm);
+                }
+            }
+
+            /* ===========================
+           Accessibility Features
+           =========================== */
+            @media (prefers-reduced-motion: reduce) {
+
+                *,
+                *::before,
+                *::after {
+                    animation-duration: 0.01ms !important;
+                    animation-iteration-count: 1 !important;
+                    transition-duration: 0.01ms !important;
+                }
+            }
+
+            /* Focus Styles */
+            *:focus {
+                outline: 2px solid var(--color-accent-1);
+                outline-offset: 2px;
+            }
+
+            *:focus:not(:focus-visible) {
+                outline: none;
+            }
+
+            /* ===========================
+           SVG Animations
+           =========================== */
+            .svg-code-block {
+                animation: float 6s ease-in-out infinite;
+            }
+
+            .svg-gear-1 {
+                animation: rotateClockwise 8s linear infinite;
+                transform-origin: center;
+            }
+
+            .svg-gear-2 {
+                animation: rotateCounter 10s linear infinite;
+                transform-origin: center;
+            }
+
+            .svg-binary-flow {
+                animation: binaryFlow 4s ease-in-out infinite;
+            }
+
+            .svg-connection-line {
+                animation: dashFlow 3s linear infinite;
+                stroke-dasharray: 10 5;
+            }
+
+            @keyframes float {
+
+                0%,
+                100% {
+                    transform: translateY(0px);
+                }
+
+                50% {
+                    transform: translateY(-15px);
+                }
+            }
+
+            @keyframes rotateClockwise {
+                from {
+                    transform: rotate(0deg);
+                }
+
+                to {
+                    transform: rotate(360deg);
+                }
+            }
+
+            @keyframes rotateCounter {
+                from {
+                    transform: rotate(0deg);
+                }
+
+                to {
+                    transform: rotate(-360deg);
+                }
+            }
+
+            @keyframes binaryFlow {
+
+                0%,
+                100% {
+                    opacity: 0.3;
+                    transform: translateY(0);
+                }
+
+                50% {
+                    opacity: 1;
+                    transform: translateY(-10px);
+                }
+            }
+
+            @keyframes dashFlow {
+                to {
+                    stroke-dashoffset: -20;
+                }
+            }
+
+            /* Decorative Code Snippet */
+            .code-decoration {
+                font-family: var(--font-mono);
+                font-size: var(--text-xs);
+                color: var(--color-accent-1);
+                opacity: 0.4;
+                position: absolute;
                 pointer-events: none;
-                background-color: #FFFFFF;
-            }
-
-            .content p {
-                text-align: justify;
-                text-justify: inter-word;
-            }
-
-            .content a:link,
-            .content a:visited {
-                color: #1B80CF;
-            }
-
-            .content li {
-                margin: 5px;
-            }
-
-            .page {
-                width: 65vw;
-                height: 100%;
-                margin-left: 30vw;
-                overflow: hidden;
-                padding: 0 1em;
-                font-family: 'Arial';
-            }
-
-            .page img {
-                max-width: 100%;
-                max-height: 100%;
-            }
-
-            @media (max-width: 640px),
-            screen and (orientation: portrait) {
-                body {
-                    max-width: 100%;
-                    max-height: 100%;
-                }
-
-                #sidebar {
-                    position: fixed;
-                    background-color: #1B80CF;
-                    top: 0;
-                    left: 0;
-                    bottom: 80vh;
-                    width: 100vw;
-                }
-
-                #sidebar .title {
-                    text-align: center;
-                    position: fixed;
-                    margin-top: 6vh;
-                    left: 0px;
-                    right: 0px;
-                    line-height: 3.5vmax;
-                    font-size: 1.5vmax;
-                    font-family: 'Arial';
-                }
-
-                #sidebar .subtitle {
-                    text-align: center;
-                    top: 5vh;
-                    left: 0px;
-                    right: 0px;
-                    position: fixed;
-                    margin-top: 10vh;
-                    font-size: 1.5vmax;
-                }
-
-                #sidebar .title a:link,
-                #sidebar .title a:visited {
-                    text-align: center;
-                    color: #FFFFFF;
-                }
-
-                #sidebar .subtitle a:link,
-                #sidebar .subtitle a:visited {
-                    text-align: center;
-                    color: #FFFFFF;
-                }
-
-                .home {
-                    z-index: 100;
-                    width: 100%;
-                    background-color: #1B80CF;
-                    font-size: 1.5vmax;
-                }
-
-                .home a:link,
-                .home a:visited {
-                    text-decoration: none;
-                    color: #FFFFFF;
-                }
-
-                .content {
-                    line-height: 3.8vmax;
-                    font-size: 1.8vmax;
-                    font-family: 'Arial';
-                    margin-top: 22vh;
-                }
-
-                .content a:link,
-                .content a:visited {
-                    color: #1B80CF;
-                }
-
-                .page {
-                    top: 40vh;
-                    width: 95%;
-                    margin-left: 0vw;
-                }
-
-                .page img {
-                    max-width: 100%;
-                    max-height: 100%;
-                    border: 0;
-                }
             }
         </style>
     </head>
 
     <body vocab="http://schema.org/">
-        <div class="page">
-            <div class="home">
-                <ul typeof="BreadcrumbList">
+        <a href="#main-content" class="skip-link">Skip to main content</a>
+
+        <!-- Navigation Header -->
+        <header class="site-header">
+            <nav class="nav-container" role="navigation" aria-label="Main navigation">
+                <a href="../index.html" class="site-brand">John Samuel</a>
+                <ul class="breadcrumb-nav" typeof="BreadcrumbList">
                     <li property="itemListElement" typeof="ListItem">
                         <a property="item" typeof="WebPage" href="../index.html">
                             <span property="name">Home</span>
@@ -273,119 +707,247 @@
                             <span property="name">Research</span>
                         </a>
                     </li>
+                    <li property="itemListElement" typeof="ListItem">
+                        <span property="name">Behind the Curtains</span>
+                    </li>
+                </ul>
+            </nav>
+        </header>
+
+        <!-- Main Content -->
+        <main class="page-wrapper" id="main-content">
+            <div class="container">
+                <!-- Hero Section -->
+                <section class="hero-section">
+                    <h1 class="hero-title">Behind the Curtains</h1>
+                    <p class="hero-subtitle">
+                        Exploring the untold stories of software development
+                    </p>
+
+                    <!-- Hero SVG Illustration -->
+                    <svg class="hero-svg" viewBox="0 0 600 400" xmlns="http://www.w3.org/2000/svg" role="img"
+                        aria-label="Software development illustration showing code, gears, and digital connections">
+                        <!-- Background Elements -->
+                        <defs>
+                            <linearGradient id="codeGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" style="stop-color:#3b82f6;stop-opacity:0.8" />
+                                <stop offset="50%" style="stop-color:#8b5cf6;stop-opacity:0.8" />
+                                <stop offset="100%" style="stop-color:#3b82f6;stop-opacity:0.8" />
+                            </linearGradient>
+                            <linearGradient id="gearGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" style="stop-color:#10b981;stop-opacity:0.6" />
+                                <stop offset="100%" style="stop-color:#3b82f6;stop-opacity:0.6" />
+                            </linearGradient>
+                        </defs>
+
+                        <!-- Connection Lines -->
+                        <line class="svg-connection-line" x1="100" y1="100" x2="500" y2="100" stroke="#3b82f6"
+                            stroke-width="2" opacity="0.3" />
+                        <line class="svg-connection-line" x1="150" y1="300" x2="450" y2="300" stroke="#8b5cf6"
+                            stroke-width="2" opacity="0.3" />
+
+                        <!-- Code Block -->
+                        <g class="svg-code-block">
+                            <rect x="50" y="50" width="200" height="150" rx="12" fill="url(#codeGradient)"
+                                opacity="0.2" />
+                            <rect x="60" y="65" width="120" height="12" rx="6" fill="#3b82f6" opacity="0.6" />
+                            <rect x="60" y="90" width="160" height="12" rx="6" fill="#3b82f6" opacity="0.4" />
+                            <rect x="60" y="115" width="140" height="12" rx="6" fill="#8b5cf6" opacity="0.5" />
+                            <rect x="60" y="140" width="100" height="12" rx="6" fill="#10b981" opacity="0.4" />
+                            <text x="70" y="180" font-family="monospace" font-size="14" fill="#1e40af"
+                                opacity="0.7">&lt;/&gt;</text>
+                        </g>
+
+                        <!-- Gear 1 -->
+                        <g class="svg-gear-1">
+                            <circle cx="450" cy="150" r="50" fill="none" stroke="url(#gearGradient)" stroke-width="3" />
+                            <circle cx="450" cy="150" r="30" fill="none" stroke="url(#gearGradient)" stroke-width="2" />
+                            <line x1="420" y1="150" x2="400" y2="150" stroke="#10b981" stroke-width="4" />
+                            <line x1="480" y1="150" x2="500" y2="150" stroke="#10b981" stroke-width="4" />
+                            <line x1="450" y1="120" x2="450" y2="100" stroke="#10b981" stroke-width="4" />
+                            <line x1="450" y1="180" x2="450" y2="200" stroke="#10b981" stroke-width="4" />
+                        </g>
+
+                        <!-- Gear 2 (smaller) -->
+                        <g class="svg-gear-2">
+                            <circle cx="150" cy="280" r="35" fill="none" stroke="url(#codeGradient)" stroke-width="2" />
+                            <circle cx="150" cy="280" r="20" fill="none" stroke="url(#codeGradient)" stroke-width="2" />
+                            <line x1="130" y1="280" x2="115" y2="280" stroke="#3b82f6" stroke-width="3" />
+                            <line x1="170" y1="280" x2="185" y2="280" stroke="#3b82f6" stroke-width="3" />
+                            <line x1="150" y1="260" x2="150" y2="245" stroke="#3b82f6" stroke-width="3" />
+                            <line x1="150" y1="300" x2="150" y2="315" stroke="#3b82f6" stroke-width="3" />
+                        </g>
+
+                        <!-- Binary Data Flow -->
+                        <g class="svg-binary-flow">
+                            <text x="350" y="250" font-family="monospace" font-size="20" fill="#8b5cf6"
+                                opacity="0.5">1</text>
+                            <text x="370" y="270" font-family="monospace" font-size="20" fill="#3b82f6"
+                                opacity="0.5">0</text>
+                            <text x="390" y="250" font-family="monospace" font-size="20" fill="#10b981"
+                                opacity="0.5">1</text>
+                            <text x="410" y="270" font-family="monospace" font-size="20" fill="#8b5cf6"
+                                opacity="0.5">1</text>
+                        </g>
+
+                        <!-- Central Node -->
+                        <circle cx="300" cy="200" r="40" fill="rgba(59, 130, 246, 0.1)" stroke="#3b82f6"
+                            stroke-width="2" />
+                        <circle cx="300" cy="200" r="25" fill="rgba(139, 92, 246, 0.2)" stroke="#8b5cf6"
+                            stroke-width="2" />
+                        <circle cx="300" cy="200" r="10" fill="#3b82f6" />
+
+                        <!-- Connecting Dots -->
+                        <circle cx="100" cy="100" r="6" fill="#3b82f6" />
+                        <circle cx="500" cy="100" r="6" fill="#8b5cf6" />
+                        <circle cx="150" cy="300" r="6" fill="#10b981" />
+                        <circle cx="450" cy="300" r="6" fill="#3b82f6" />
+                    </svg>
+                </section>
+
+                <div class="section-divider"></div>
+
+                <!-- Article Content -->
+                <article class="content-section">
+                    <p>
+                        When a product is released, we get to see only the perfect side of the final product. Behind
+                        this
+                        perfection, lies a story, the story of human efforts, of many days, months, and quite often
+                        years.
+                        Whether or not we accept the final output, tremendous
+                        human effort can be neither erased nor forgotten. Lessons learned from them serve for future
+                        guidance.
+                        There are always some lessons to be learned, from positive, negative, or mixed outcomes.
+                    </p>
+
+                    <p>
+                        Taking the analogy of a stage performance that takes hours and hours of training and practice
+                        before
+                        the
+                        final day of the performance, a software takes years and years of experiments and tests and is
+                        sometimes
+                        influenced by other similar software including
+                        some failed previous attempts. The final stage performance is the combined effort of composers,
+                        performers, directors, choreographers, makeup artists, costume designers, lighting managers,
+                        producers,
+                        sound technicians, and numerous other
+                        unnamed people who ensure the stage is in the best shape. Every person contributed to the stage
+                        play
+                        according to their role. Yet, as an audience, we often see and judge the final outcome based on
+                        the
+                        performers and visible persons on
+                        the stage.
+                    </p>
+
+                    <p>
+                        They say that it is not the arrival at the final destination that matters the most, but the
+                        journey
+                        as
+                        well as the lessons learned along the way that counts the most. For a stage performance, it is
+                        the
+                        preparation behind the stage or curtains and the
+                        final performance. Each person learns several lessons during this whole exercise. The making of
+                        this
+                        performance is a performance in itself.
+                    </p>
+
+                    <p>
+                        But this story is not confined to a stage performance. Every painting, movie, or software
+                        application
+                        has a story to tell. There are several lessons learned and decisions made. Some decisions might
+                        have
+                        been rational, while others might have been instinctive.
+                        A failure may lead to new tries or some abrupt endings. In both cases, there is an evolving or
+                        emerging
+                        story to tell for future generations.
+                    </p>
+
+                    <p>
+                        As a contributor to several software applications, I have seen many people come and go as part
+                        of
+                        different projects. Software development continues. Their contributions, decisions, and choices
+                        leave
+                        behind a story of the direction of the software development.
+                        Unfortunately, these stories are not often narrated, because of missing documentation and
+                        discussion
+                        notes. A house is made brick by brick and a software application is created line by line of
+                        code.
+                    </p>
+
+                    <p>
+                        Taking another example of the literature survey made by researchers, they start looking for the
+                        existing
+                        works related to a problem at hand. If the problem is about developing a software application to
+                        resolve
+                        the problem, they may look for existing tools
+                        or applications, study their features and the approaches used, and document their advantages,
+                        uses,
+                        as
+                        well as limitations.
+                    </p>
+
+                    <p>
+                        The lessons that we learn during any of the above exercises and many others not documented here,
+                        but
+                        practiced by people from other professions have tremendous potential. Sometimes, we call this
+                        acquired
+                        knowledge of success and failures by an individual
+                        their expertise. Nevertheless, if we look at these successes and failures around the world, we
+                        see
+                        that
+                        all of us are repeating the same path, often repeating the same failures, forgetting the lessons
+                        learned
+                        from some previous attempts.
+                    </p>
+
+                    <p>
+                        An important question that we need to ask is whether we need to invent the wheel. Some may say
+                        that
+                        an
+                        approach tried elsewhere cannot be repeated in their area, because of the differences in the
+                        environments including societal and cultural differences.
+                        Instead of reusing the existing technology and tools, we end up developing the same solution a
+                        million
+                        times. Some even cite that the license restrictions prevent them to make new modifications. As
+                        we
+                        are
+                        entering into an era, where humanity
+                        is seriously considering the use of our energy and resources, it is time that we reflect more on
+                        creating efficient solutions, learning lessons from people around the world, and not repeating
+                        the
+                        same
+                        mistakes. It is time that we document
+                        and share our lessons, positive, negative, or mixed. There is no shame about sharing mistakes
+                        since
+                        we
+                        all are here because we learned from our own mistakes and had opportunities to improve our
+                        lives. It
+                        is
+                        time that we also learn from
+                        the lessons from others.
+                    </p>
+                </article>
+            </div>
+        </main>
+
+        <!-- Footer -->
+        <footer class="site-footer">
+            <div class="footer-content">
+                <nav class="language-selector" aria-label="Language selection">
+                    <a href="behind-the-curtains.html" hreflang="en">English</a>
+                </nav>
+
+                <ul class="footer-links">
+                    <li><a href="../index.html">Home</a></li>
+                    <li><a href="../research/research.html">Research</a></li>
+                    <li><a href="../about.html">About</a></li>
                 </ul>
 
+                <p class="footer-copyright">
+                    © 2024 John Samuel. All content licensed under Creative Commons CC BY-SA 4.0.
+                </p>
             </div>
-            <div id="sidebar">
-                <div class="title">
-                    <h1><a href="./behind-the-curtains.html">Behind the Curtains</a></h1>
-                </div>
-                <div class="subtitle">
-                    <h3><a href="../about.html">John Samuel</a></h3>
-                </div>
-            </div>
-
-            <div class="content">
-                <p>
-                    When a product is released, we get to see only the perfect side of the final product. Behind this
-                    perfection, lies a story, the story of human efforts, of many days, months, and quite often years.
-                    Whether or not we accept the final output, tremendous
-                    human effort can be neither erased nor forgotten. Lessons learned from them serve for future
-                    guidance.
-                    There are always some lessons to be learned, from positive, negative, or mixed outcomes.
-                </p>
-
-                <p>
-                    Taking the analogy of a stage performance that takes hours and hours of training and practice before
-                    the
-                    final day of the performance, a software takes years and years of experiments and tests and is
-                    sometimes
-                    influenced by other similar software including
-                    some failed previous attempts. The final stage performance is the combined effort of composers,
-                    performers, directors, choreographers, makeup artists, costume designers, lighting managers,
-                    producers,
-                    sound technicians, and numerous other
-                    unnamed people who ensure the stage is in the best shape. Every person contributed to the stage play
-                    according to their role. Yet, as an audience, we often see and judge the final outcome based on the
-                    performers and visible persons on
-                    the stage.
-                </p>
-
-                <p>
-                    They say that it is not the arrival at the final destination that matters the most, but the journey
-                    as
-                    well as the lessons learned along the way that counts the most. For a stage performance, it is the
-                    preparation behind the stage or curtains and the
-                    final performance. Each person learns several lessons during this whole exercise. The making of this
-                    performance is a performance in itself.
-                </p>
-
-                <p>
-                    But this story is not confined to a stage performance. Every painting, movie, or software
-                    application
-                    has a story to tell. There are several lessons learned and decisions made. Some decisions might have
-                    been rational, while others might have been instinctive.
-                    A failure may lead to new tries or some abrupt endings. In both cases, there is an evolving or
-                    emerging
-                    story to tell for future generations.
-                </p>
-
-                <p>
-                    As a contributor to several software applications, I have seen many people come and go as part of
-                    different projects. Software development continues. Their contributions, decisions, and choices
-                    leave
-                    behind a story of the direction of the software development.
-                    Unfortunately, these stories are not often narrated, because of missing documentation and discussion
-                    notes. A house is made brick by brick and a software application is created line by line of code.
-                </p>
-
-                <p>
-                    Taking another example of the literature survey made by researchers, they start looking for the
-                    existing
-                    works related to a problem at hand. If the problem is about developing a software application to
-                    resolve
-                    the problem, they may look for existing tools
-                    or applications, study their features and the approaches used, and document their advantages, uses,
-                    as
-                    well as limitations.
-                </p>
-
-                <p>
-                    The lessons that we learn during any of the above exercises and many others not documented here, but
-                    practiced by people from other professions have tremendous potential. Sometimes, we call this
-                    acquired
-                    knowledge of success and failures by an individual
-                    their expertise. Nevertheless, if we look at these successes and failures around the world, we see
-                    that
-                    all of us are repeating the same path, often repeating the same failures, forgetting the lessons
-                    learned
-                    from some previous attempts.
-                </p>
-
-                <p>
-                    An important question that we need to ask is whether we need to invent the wheel. Some may say that
-                    an
-                    approach tried elsewhere cannot be repeated in their area, because of the differences in the
-                    environments including societal and cultural differences.
-                    Instead of reusing the existing technology and tools, we end up developing the same solution a
-                    million
-                    times. Some even cite that the license restrictions prevent them to make new modifications. As we
-                    are
-                    entering into an era, where humanity
-                    is seriously considering the use of our energy and resources, it is time that we reflect more on
-                    creating efficient solutions, learning lessons from people around the world, and not repeating the
-                    same
-                    mistakes. It is time that we document
-                    and share our lessons, positive, negative, or mixed. There is no shame about sharing mistakes since
-                    we
-                    all are here because we learned from our own mistakes and had opportunities to improve our lives. It
-                    is
-                    time that we also learn from
-                    the lessons from others.
-                </p>
-
-            </div>
-        </div>
+        </footer>
     </body>
 
 </html>

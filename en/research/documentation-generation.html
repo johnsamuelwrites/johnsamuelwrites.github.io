@@ -2,262 +2,669 @@
 <html lang="en">
 
     <head>
-        <meta charset="utf-8" />
-        <meta http-equiv="Content-Language" content="en" />
-        <link rel="shortcut icon" href="../../images/logo/favicon.png" />
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta http-equiv="Content-Language" content="en">
+        <link rel="shortcut icon" href="../../images/logo/favicon.png">
         <title>Documentation Generation: John Samuel</title>
-        <style type="text/css">
-            body {
-                background-color: #FFFFFF;
+        <style>
+            /* ===== CSS CUSTOM PROPERTIES ===== */
+            :root {
+                /* Software Development Theme Color Palette */
+                --color-base-bg: #f5f8fa;
+                --color-base-surface: #ffffff;
+                --color-base-text: #1a202c;
+                --color-base-text-muted: #4a5568;
+
+                /* Theme Accents - Developer Tools Inspired */
+                --color-accent-1: #4a90e2;
+                /* Code blue */
+                --color-accent-2: #2d5f8d;
+                /* Deep developer blue */
+                --color-accent-3: #7b68ee;
+                /* Terminal purple */
+                --color-accent-4: #2ec4b6;
+                /* Success teal */
+                --color-accent-light: #e8f4f8;
+
+                /* Functional Colors */
+                --color-shadow: rgba(74, 144, 226, 0.12);
+                --color-border: rgba(74, 144, 226, 0.15);
+                --color-hover: rgba(74, 144, 226, 0.08);
+
+                /* Gradients */
+                --gradient-primary: linear-gradient(135deg, var(--color-accent-1) 0%, var(--color-accent-2) 50%, var(--color-accent-3) 100%);
+                --gradient-subtle: linear-gradient(180deg, var(--color-base-bg), var(--color-accent-light));
+                --gradient-hero: linear-gradient(135deg, #4a90e2 0%, #7b68ee 50%, #2ec4b6 100%);
+
+                /* Spacing Scale */
+                --space-xs: 0.25rem;
+                --space-sm: 0.5rem;
+                --space-md: 1rem;
+                --space-lg: 1.5rem;
+                --space-xl: 2rem;
+                --space-2xl: 3rem;
+                --space-3xl: 4rem;
+                --space-4xl: 6rem;
+
+                /* Border Radius */
+                --radius-sm: 4px;
+                --radius-md: 8px;
+                --radius-lg: 12px;
+                --radius-xl: 16px;
+                --radius-2xl: 24px;
+                --radius-full: 9999px;
+                --radius-organic: 63% 37% 54% 46% / 45% 62% 38% 55%;
+
+                /* Shadows */
+                --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.04), 0 1px 3px rgba(0, 0, 0, 0.06);
+                --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.05), 0 2px 4px rgba(0, 0, 0, 0.06);
+                --shadow-lg: 0 10px 24px rgba(0, 0, 0, 0.08), 0 4px 8px rgba(0, 0, 0, 0.06);
+                --shadow-xl: 0 20px 40px rgba(0, 0, 0, 0.12), 0 8px 16px rgba(0, 0, 0, 0.08);
+                --shadow-theme: 0 10px 30px var(--color-shadow), 0 4px 10px rgba(0, 0, 0, 0.06);
+
+                /* Typography */
+                --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+                --font-mono: 'SF Mono', Monaco, 'Cascadia Code', 'Consolas', 'Courier New', monospace;
+                --text-xs: clamp(0.75rem, 0.7rem + 0.25vw, 0.875rem);
+                --text-sm: clamp(0.875rem, 0.8rem + 0.35vw, 1rem);
+                --text-base: clamp(1rem, 0.95rem + 0.25vw, 1.125rem);
+                --text-lg: clamp(1.125rem, 1.05rem + 0.35vw, 1.25rem);
+                --text-xl: clamp(1.25rem, 1.15rem + 0.5vw, 1.5rem);
+                --text-2xl: clamp(1.5rem, 1.3rem + 1vw, 2rem);
+                --text-3xl: clamp(2rem, 1.6rem + 2vw, 2.5rem);
+                --text-4xl: clamp(2.5rem, 2rem + 2.5vw, 3.5rem);
+
+                /* Font Weights */
+                --weight-normal: 400;
+                --weight-medium: 500;
+                --weight-semibold: 600;
+                --weight-bold: 700;
+                --weight-extrabold: 800;
+
+                /* Line Heights */
+                --leading-tight: 1.25;
+                --leading-snug: 1.375;
+                --leading-normal: 1.5;
+                --leading-relaxed: 1.625;
+                --leading-loose: 2;
             }
 
-            #sidebar {
-                position: fixed;
-                background-color: #1B80CF;
-                top: 0;
-                left: 0;
-                bottom: 0;
-                width: 30vw;
-            }
-
-            #sidebar .title {
-                position: relative;
-                text-align: center;
-                line-height: 4vmax;
-                font-size: 1.4vmax;
-                font-family: 'Arial';
-                margin-top: 25vh;
-            }
-
-            #sidebar .title a:link,
-            #sidebar .title a:visited {
-                color: #FFFFFF;
-                text-decoration: none;
-            }
-
-            .subtitle {
-                top: 50vh;
-                text-align: center;
-                line-height: 1.3vmax;
-                font-family: 'Arial';
-                font-size: 1.5vmax;
-                color: #FFFFFF;
-            }
-
-            .subtitle a:link,
-            .subtitle a:visited {
-                color: #FFFFFF;
-                text-decoration: none;
-            }
-
-            .licence {
-                position: fixed;
-                text-align: right;
-                bottom: 0;
-                right: 0;
-            }
-
-            .home {
-                position: fixed;
-                text-align: left;
-                font-family: 'Arial';
-                color: #D3D3D3;
-                z-index: 100;
-                width: 100%;
-                background-color: #FFFFFF;
-                top: 0px;
-                margin-bottom: 10px;
-                padding-bottom: 10px;
-            }
-
-            .home a:link,
-            .home a:visited {
-                text-decoration: none;
-                color: #D3D3D3;
-            }
-
-            .home ul {
+            /* ===== RESET & BASE STYLES ===== */
+            * {
                 margin: 0;
                 padding: 0;
-                text-align: left;
-                list-style: none;
+                box-sizing: border-box;
             }
 
-            .home li {
-                position: relative;
-                float: left;
-                padding-top: 15px;
-                margin-right: 1em;
-                font-family: 'Arial';
+            html {
+                scroll-behavior: smooth;
+                scroll-padding-top: 80px;
             }
 
-            .home li:hover {
-                display: block;
+            body {
+                font-family: var(--font-sans);
+                font-size: var(--text-base);
+                line-height: var(--leading-normal);
+                color: var(--color-base-text);
+                background: var(--color-base-bg);
+                overflow-x: hidden;
+                -webkit-font-smoothing: antialiased;
+                -moz-osx-font-smoothing: grayscale;
             }
 
-            .home a:link,
-            .home a:visited {
-                color: #D3D3D3;
-            }
-
-            .home li:hover a:link,
-            .home li:hover a:visited {
-                text-decoration: none;
-                padding: 15px;
-                color: #FFFFFF;
-                background-color: #1B80CF;
-            }
-
-            .content {
-                line-height: 1.8vmax;
-                font-size: 1.2vmax;
-                font-family: 'Arial';
-                margin-top: 15vh;
-                width: 90%;
-            }
-
-            .content h2,
-            h3,
-            h4 {
-                color: #1B80CF;
-            }
-
-            .content a:link,
-            .content a:visited {
-                color: #1B80CF;
-            }
-
-            .content h3 {
-                color: #1B80CF;
-            }
-
-            .content h2::before,
-            .content h3::before {
-                display: block;
-                content: " ";
-                visibility: hidden;
-                height: 50px;
-                margin-top: -50px;
-                pointer-events: none;
-                background-color: #FFFFFF;
-            }
-
-            .content a:link,
-            .content a:visited {
-                color: #1B80CF;
-            }
-
-            .content li {
-                margin: 5px;
-            }
-
-            .page {
-                width: 65vw;
+            /* Background Circuit Pattern */
+            body::before {
+                content: '';
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
                 height: 100%;
-                margin-left: 30vw;
+                z-index: -1;
+                opacity: 0.03;
+                background-image:
+                    repeating-linear-gradient(0deg, transparent, transparent 40px, var(--color-accent-1) 40px, var(--color-accent-1) 41px),
+                    repeating-linear-gradient(90deg, transparent, transparent 40px, var(--color-accent-1) 40px, var(--color-accent-1) 41px);
+            }
+
+            /* ===== SKIP LINK (Accessibility) ===== */
+            .skip-link {
+                position: absolute;
+                top: -40px;
+                left: 0;
+                background: var(--color-accent-1);
+                color: white;
+                padding: var(--space-md);
+                text-decoration: none;
+                z-index: 100;
+                border-radius: var(--radius-md);
+            }
+
+            .skip-link:focus {
+                top: var(--space-md);
+                left: var(--space-md);
+            }
+
+            /* ===== NAVIGATION ===== */
+            nav {
+                position: sticky;
+                top: 0;
+                z-index: 50;
+                background: rgba(255, 255, 255, 0.85);
+                -webkit-backdrop-filter: blur(12px) saturate(180%);
+                backdrop-filter: blur(12px) saturate(180%);
+                border-bottom: 1px solid var(--color-border);
+                box-shadow: var(--shadow-sm);
+            }
+
+            nav .nav-container {
+                max-width: 1400px;
+                margin: 0 auto;
+                padding: var(--space-lg) var(--space-xl);
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                gap: var(--space-xl);
+            }
+
+            .site-title {
+                font-size: var(--text-xl);
+                font-weight: var(--weight-bold);
+                letter-spacing: -0.02em;
+            }
+
+            .site-title a {
+                color: var(--color-accent-1);
+                text-decoration: none;
+                display: inline-flex;
+                align-items: center;
+                gap: var(--space-sm);
+                transition: all 0.3s ease;
+            }
+
+            .site-title a:hover {
+                color: var(--color-accent-2);
+                transform: translateX(4px);
+            }
+
+            .site-title a::before {
+                content: '◆';
+                color: var(--color-accent-3);
+                font-size: 0.8em;
+            }
+
+            .breadcrumb {
+                list-style: none;
+                display: flex;
+                gap: var(--space-sm);
+                flex-wrap: wrap;
+                font-size: var(--text-sm);
+            }
+
+            .breadcrumb li:not(:last-child)::after {
+                content: '›';
+                margin-left: var(--space-sm);
+                color: var(--color-base-text-muted);
+            }
+
+            .breadcrumb a {
+                color: var(--color-base-text-muted);
+                text-decoration: none;
+                transition: color 0.3s ease;
+            }
+
+            .breadcrumb a:hover {
+                color: var(--color-accent-1);
+            }
+
+            /* ===== MAIN LAYOUT ===== */
+            main {
+                max-width: 1400px;
+                margin: 0 auto;
+                padding: var(--space-2xl) var(--space-xl);
+            }
+
+            /* ===== HERO SECTION ===== */
+            .hero {
+                position: relative;
+                margin-bottom: var(--space-4xl);
+                padding: var(--space-4xl) 0;
                 overflow: hidden;
-                padding: 0 1em;
-                font-family: 'Arial';
             }
 
-            .page img {
-                max-width: 100%;
-                max-height: 100%;
+            .hero-background {
+                position: absolute;
+                top: -50%;
+                left: -10%;
+                width: 120%;
+                height: 200%;
+                z-index: -1;
+                opacity: 0.1;
             }
 
-            @media (max-width: 640px),
-            screen and (orientation: portrait) {
+            .hero-content {
+                position: relative;
+                z-index: 1;
+            }
+
+            .page-title {
+                font-size: var(--text-4xl);
+                font-weight: var(--weight-extrabold);
+                letter-spacing: -0.03em;
+                line-height: var(--leading-tight);
+                margin-bottom: var(--space-lg);
+                background: var(--gradient-hero);
+                background-size: 200% 200%;
+                -webkit-background-clip: text;
+                background-clip: text;
+                -webkit-text-fill-color: transparent;
+                animation: gradientShift 8s ease infinite;
+            }
+
+            .page-subtitle {
+                font-size: var(--text-lg);
+                color: var(--color-base-text-muted);
+                line-height: var(--leading-relaxed);
+                max-width: 900px;
+            }
+
+            .author-link {
+                display: inline-block;
+                margin-top: var(--space-lg);
+                font-size: var(--text-sm);
+                font-weight: var(--weight-semibold);
+                color: var(--color-accent-1);
+                text-decoration: none;
+                padding: var(--space-sm) var(--space-lg);
+                border-radius: var(--radius-full);
+                background: var(--color-accent-light);
+                transition: all 0.3s ease;
+            }
+
+            .author-link:hover {
+                background: var(--color-accent-1);
+                color: white;
+                transform: translateY(-2px);
+                box-shadow: var(--shadow-md);
+            }
+
+            /* ===== ARTICLE CONTENT ===== */
+            article {
+                background: var(--color-base-surface);
+                border-radius: var(--radius-2xl);
+                padding: var(--space-3xl);
+                box-shadow: var(--shadow-lg);
+                position: relative;
+            }
+
+            article::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 4px;
+                background: var(--gradient-primary);
+                border-radius: var(--radius-2xl) var(--radius-2xl) 0 0;
+            }
+
+            /* ===== SECTION STYLING ===== */
+            section {
+                margin-bottom: var(--space-4xl);
+                position: relative;
+            }
+
+            section:last-child {
+                margin-bottom: 0;
+            }
+
+            /* Section Decorative Divider */
+            section:not(:last-child)::after {
+                content: '';
+                display: block;
+                width: 60px;
+                height: 3px;
+                background: var(--gradient-primary);
+                margin: var(--space-3xl) 0 0 0;
+                border-radius: var(--radius-full);
+                opacity: 0.6;
+            }
+
+            h2 {
+                font-size: var(--text-3xl);
+                font-weight: var(--weight-bold);
+                letter-spacing: -0.02em;
+                line-height: var(--leading-tight);
+                color: var(--color-accent-2);
+                margin-bottom: var(--space-lg);
+                position: relative;
+                display: inline-block;
+            }
+
+            h2::after {
+                content: '';
+                position: absolute;
+                bottom: -8px;
+                left: 0;
+                width: 100%;
+                height: 2px;
+                background: linear-gradient(90deg, var(--color-accent-1) 0%, transparent 100%);
+            }
+
+            h3 {
+                font-size: var(--text-xl);
+                font-weight: var(--weight-semibold);
+                letter-spacing: -0.01em;
+                line-height: var(--leading-snug);
+                color: var(--color-accent-1);
+                margin-bottom: var(--space-md);
+                margin-top: var(--space-xl);
+            }
+
+            h3::before {
+                content: '▸';
+                margin-right: var(--space-sm);
+                color: var(--color-accent-3);
+            }
+
+            p {
+                margin-bottom: var(--space-lg);
+                line-height: var(--leading-relaxed);
+                color: var(--color-base-text);
+            }
+
+            /* ===== CODE ELEMENTS ===== */
+            code {
+                font-family: var(--font-mono);
+                font-size: 0.9em;
+                background: var(--color-accent-light);
+                color: var(--color-accent-2);
+                padding: 0.2em 0.4em;
+                border-radius: var(--radius-sm);
+                border: 1px solid var(--color-border);
+            }
+
+            /* ===== LISTS ===== */
+            ul,
+            ol {
+                margin-bottom: var(--space-lg);
+                padding-left: var(--space-xl);
+            }
+
+            li {
+                margin-bottom: var(--space-md);
+                line-height: var(--leading-relaxed);
+                color: var(--color-base-text);
+            }
+
+            ul li::marker {
+                color: var(--color-accent-1);
+            }
+
+            ol li::marker {
+                color: var(--color-accent-1);
+                font-weight: var(--weight-semibold);
+            }
+
+            strong {
+                font-weight: var(--weight-semibold);
+                color: var(--color-accent-2);
+            }
+
+            /* ===== LINKS ===== */
+            a {
+                color: var(--color-accent-1);
+                text-decoration: none;
+                transition: all 0.3s ease;
+                position: relative;
+            }
+
+            a:hover {
+                color: var(--color-accent-2);
+            }
+
+            article a:not(.author-link) {
+                border-bottom: 1px solid var(--color-border);
+            }
+
+            article a:not(.author-link):hover {
+                border-bottom-color: var(--color-accent-1);
+            }
+
+            /* ===== REFERENCES SECTION ===== */
+            section:last-child ol {
+                display: grid;
+                gap: var(--space-md);
+            }
+
+            section:last-child li {
+                background: var(--color-accent-light);
+                padding: var(--space-md);
+                border-radius: var(--radius-md);
+                border-left: 3px solid var(--color-accent-1);
+                transition: all 0.3s ease;
+            }
+
+            section:last-child li:hover {
+                background: rgba(74, 144, 226, 0.15);
+                transform: translateX(4px);
+                border-left-color: var(--color-accent-3);
+            }
+
+            /* ===== FOOTER ===== */
+            footer {
+                max-width: 1400px;
+                margin: var(--space-4xl) auto var(--space-2xl);
+                padding: var(--space-2xl) var(--space-xl);
+                text-align: center;
+                border-top: 1px solid var(--color-border);
+            }
+
+            .footer-content {
+                display: flex;
+                flex-direction: column;
+                gap: var(--space-lg);
+                align-items: center;
+            }
+
+            .copyright {
+                font-size: var(--text-sm);
+                color: var(--color-base-text-muted);
+            }
+
+            .language-selector {
+                display: flex;
+                gap: var(--space-md);
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+
+            .language-selector a {
+                font-size: var(--text-sm);
+                padding: var(--space-sm) var(--space-md);
+                background: var(--color-accent-light);
+                border-radius: var(--radius-full);
+                color: var(--color-accent-2);
+                text-decoration: none;
+                transition: all 0.3s ease;
+            }
+
+            .language-selector a:hover {
+                background: var(--color-accent-1);
+                color: white;
+                transform: translateY(-2px);
+            }
+
+            /* ===== ANIMATIONS ===== */
+            @keyframes gradientShift {
+
+                0%,
+                100% {
+                    background-position: 0% 50%;
+                }
+
+                50% {
+                    background-position: 100% 50%;
+                }
+            }
+
+            @keyframes float {
+
+                0%,
+                100% {
+                    transform: translateY(0px);
+                }
+
+                50% {
+                    transform: translateY(-20px);
+                }
+            }
+
+            @keyframes pulse {
+
+                0%,
+                100% {
+                    opacity: 1;
+                }
+
+                50% {
+                    opacity: 0.5;
+                }
+            }
+
+            @keyframes rotate {
+                from {
+                    transform: rotate(0deg);
+                }
+
+                to {
+                    transform: rotate(360deg);
+                }
+            }
+
+            @keyframes fadeInUp {
+                from {
+                    opacity: 0;
+                    transform: translateY(30px);
+                }
+
+                to {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            }
+
+            section {
+                animation: fadeInUp 0.8s ease-out backwards;
+            }
+
+            section:nth-child(1) {
+                animation-delay: 0.1s;
+            }
+
+            section:nth-child(2) {
+                animation-delay: 0.2s;
+            }
+
+            section:nth-child(3) {
+                animation-delay: 0.3s;
+            }
+
+            section:nth-child(4) {
+                animation-delay: 0.4s;
+            }
+
+            section:nth-child(5) {
+                animation-delay: 0.5s;
+            }
+
+            section:nth-child(6) {
+                animation-delay: 0.6s;
+            }
+
+            /* ===== RESPONSIVE DESIGN ===== */
+            @media (max-width: 768px) {
+                nav .nav-container {
+                    flex-direction: column;
+                    gap: var(--space-md);
+                    padding: var(--space-md);
+                }
+
+                .site-title {
+                    font-size: var(--text-lg);
+                }
+
+                .breadcrumb {
+                    font-size: var(--text-xs);
+                }
+
+                main {
+                    padding: var(--space-lg) var(--space-md);
+                }
+
+                .hero {
+                    padding: var(--space-2xl) 0;
+                    margin-bottom: var(--space-2xl);
+                }
+
+                article {
+                    padding: var(--space-xl) var(--space-lg);
+                    border-radius: var(--radius-xl);
+                }
+
+                section {
+                    margin-bottom: var(--space-2xl);
+                }
+            }
+
+            @media (max-width: 480px) {
+                article {
+                    padding: var(--space-lg) var(--space-md);
+                }
+
+                ul,
+                ol {
+                    padding-left: var(--space-lg);
+                }
+            }
+
+            /* ===== REDUCED MOTION ===== */
+            @media (prefers-reduced-motion: reduce) {
+                * {
+                    animation-duration: 0.01ms !important;
+                    animation-iteration-count: 1 !important;
+                    transition-duration: 0.01ms !important;
+                }
+            }
+
+            /* ===== PRINT STYLES ===== */
+            @media print {
                 body {
-                    max-width: 100%;
-                    max-height: 100%;
+                    background: white;
                 }
 
-                #sidebar {
-                    position: fixed;
-                    background-color: #1B80CF;
-                    top: 0;
-                    left: 0;
-                    bottom: 80vh;
-                    width: 100vw;
+                nav,
+                footer {
+                    display: none;
                 }
 
-                #sidebar .title {
-                    text-align: center;
-                    position: fixed;
-                    margin-top: 6vh;
-                    left: 0px;
-                    right: 0px;
-                    line-height: 3.5vmax;
-                    font-size: 1.5vmax;
-                    font-family: 'Arial';
-                }
-
-                #sidebar .subtitle {
-                    text-align: center;
-                    top: 5vh;
-                    left: 0px;
-                    right: 0px;
-                    position: fixed;
-                    margin-top: 10vh;
-                    font-size: 1.5vmax;
-                }
-
-                #sidebar .title a:link,
-                #sidebar .title a:visited {
-                    text-align: center;
-                    color: #FFFFFF;
-                }
-
-                #sidebar .subtitle a:link,
-                #sidebar .subtitle a:visited {
-                    text-align: center;
-                    color: #FFFFFF;
-                }
-
-                .home {
-                    z-index: 100;
-                    width: 100%;
-                    background-color: #1B80CF;
-                    font-size: 1.5vmax;
-                }
-
-                .home a:link,
-                .home a:visited {
-                    text-decoration: none;
-                    color: #FFFFFF;
-                }
-
-                .content {
-                    line-height: 3.8vmax;
-                    font-size: 1.8vmax;
-                    font-family: 'Arial';
-                    margin-top: 22vh;
-                }
-
-                .content a:link,
-                .content a:visited {
-                    color: #1B80CF;
-                }
-
-                .page {
-                    top: 40vh;
-                    width: 95%;
-                    margin-left: 0vw;
-                }
-
-                .page img {
-                    max-width: 100%;
-                    max-height: 100%;
-                    border: 0;
+                article {
+                    box-shadow: none;
                 }
             }
         </style>
     </head>
 
     <body vocab="http://schema.org/">
-        <div class="page">
-            <div class="home">
-                <ul typeof="BreadcrumbList">
+        <a href="#main-content" class="skip-link">Skip to main content</a>
+
+        <nav role="navigation" aria-label="Main navigation">
+            <div class="nav-container">
+                <div class="site-title">
+                    <a href="../index.html">John Samuel</a>
+                </div>
+                <ul typeof="BreadcrumbList" class="breadcrumb">
                     <li property="itemListElement" typeof="ListItem">
                         <a property="item" typeof="WebPage" href="../index.html">
                             <span property="name">Home</span>
@@ -268,252 +675,353 @@
                             <span property="name">Research</span>
                         </a>
                     </li>
+                    <li property="itemListElement" typeof="ListItem">
+                        <span property="name">Documentation Generation</span>
+                    </li>
                 </ul>
-
             </div>
-            <div id="sidebar">
-                <div class="title">
-                    <h1><a href="./documentation-generation.html">Documentation Generation</a></h1>
+        </nav>
+
+        <main id="main-content">
+            <div class="hero">
+                <svg class="hero-background" viewBox="0 0 800 600" xmlns="http://www.w3.org/2000/svg"
+                    aria-hidden="true">
+                    <!-- Code Documentation Abstract Visualization -->
+
+                    <!-- Background Circuit Nodes -->
+                    <circle cx="100" cy="100" r="30" fill="rgba(74, 144, 226, 0.1)" opacity="0.6">
+                        <animate attributeName="r" values="30;35;30" dur="4s" repeatCount="indefinite" />
+                    </circle>
+                    <circle cx="700" cy="150" r="40" fill="rgba(123, 104, 238, 0.1)" opacity="0.5">
+                        <animate attributeName="r" values="40;45;40" dur="5s" repeatCount="indefinite" />
+                    </circle>
+                    <circle cx="600" cy="500" r="35" fill="rgba(46, 196, 182, 0.1)" opacity="0.5">
+                        <animate attributeName="r" values="35;40;35" dur="4.5s" repeatCount="indefinite" />
+                    </circle>
+
+                    <!-- Code Document Icon -->
+                    <g transform="translate(250, 150)">
+                        <rect x="0" y="0" width="300" height="400" rx="20" fill="none" stroke="rgba(74, 144, 226, 0.3)"
+                            stroke-width="3" />
+
+                        <!-- Document lines representing code -->
+                        <line x1="40" y1="60" x2="260" y2="60" stroke="rgba(74, 144, 226, 0.4)" stroke-width="2">
+                            <animate attributeName="x2" values="260;240;260" dur="3s" repeatCount="indefinite" />
+                        </line>
+                        <line x1="40" y1="100" x2="220" y2="100" stroke="rgba(123, 104, 238, 0.4)" stroke-width="2">
+                            <animate attributeName="x2" values="220;200;220" dur="3.5s" repeatCount="indefinite" />
+                        </line>
+                        <line x1="40" y1="140" x2="250" y2="140" stroke="rgba(46, 196, 182, 0.4)" stroke-width="2">
+                            <animate attributeName="x2" values="250;230;250" dur="4s" repeatCount="indefinite" />
+                        </line>
+                        <line x1="40" y1="180" x2="200" y2="180" stroke="rgba(74, 144, 226, 0.4)" stroke-width="2">
+                            <animate attributeName="x2" values="200;180;200" dur="3.2s" repeatCount="indefinite" />
+                        </line>
+
+                        <!-- Code block representation -->
+                        <rect x="40" y="220" width="220" height="120" rx="8" fill="rgba(74, 144, 226, 0.05)"
+                            stroke="rgba(74, 144, 226, 0.3)" stroke-width="2">
+                            <animate attributeName="fill"
+                                values="rgba(74, 144, 226, 0.05);rgba(74, 144, 226, 0.1);rgba(74, 144, 226, 0.05)"
+                                dur="4s" repeatCount="indefinite" />
+                        </rect>
+
+                        <!-- Nested code elements -->
+                        <line x1="60" y1="250" x2="160" y2="250" stroke="rgba(123, 104, 238, 0.5)" stroke-width="2" />
+                        <line x1="60" y1="280" x2="140" y2="280" stroke="rgba(46, 196, 182, 0.5)" stroke-width="2" />
+                        <line x1="60" y1="310" x2="180" y2="310" stroke="rgba(74, 144, 226, 0.5)" stroke-width="2" />
+                    </g>
+
+                    <!-- Connecting lines (data flow) -->
+                    <path d="M 100 100 Q 150 150 250 180" stroke="rgba(74, 144, 226, 0.2)" stroke-width="2" fill="none"
+                        stroke-dasharray="5,5">
+                        <animate attributeName="stroke-dashoffset" from="0" to="-10" dur="2s"
+                            repeatCount="indefinite" />
+                    </path>
+                    <path d="M 700 150 Q 650 200 550 200" stroke="rgba(123, 104, 238, 0.2)" stroke-width="2" fill="none"
+                        stroke-dasharray="5,5">
+                        <animate attributeName="stroke-dashoffset" from="0" to="-10" dur="2.5s"
+                            repeatCount="indefinite" />
+                    </path>
+
+                    <!-- API/Terminal symbols -->
+                    <g transform="translate(50, 400)">
+                        <rect x="0" y="0" width="100" height="80" rx="8" fill="rgba(74, 144, 226, 0.1)"
+                            stroke="rgba(74, 144, 226, 0.3)" stroke-width="2">
+                            <animate attributeName="opacity" values="0.8;1;0.8" dur="3s" repeatCount="indefinite" />
+                        </rect>
+                        <text x="50" y="45" text-anchor="middle" font-family="monospace" font-size="24"
+                            fill="rgba(74, 144, 226, 0.6)" font-weight="bold">&gt;_</text>
+                    </g>
+
+                    <g transform="translate(650, 400)">
+                        <rect x="0" y="0" width="100" height="80" rx="8" fill="rgba(123, 104, 238, 0.1)"
+                            stroke="rgba(123, 104, 238, 0.3)" stroke-width="2">
+                            <animate attributeName="opacity" values="0.8;1;0.8" dur="3.5s" repeatCount="indefinite" />
+                        </rect>
+                        <text x="50" y="45" text-anchor="middle" font-family="monospace" font-size="20"
+                            fill="rgba(123, 104, 238, 0.6)" font-weight="bold">{ }</text>
+                    </g>
+
+                    <!-- Floating particles (representing data/code) -->
+                    <circle cx="150" cy="300" r="3" fill="rgba(46, 196, 182, 0.6)">
+                        <animate attributeName="cy" values="300;250;300" dur="5s" repeatCount="indefinite" />
+                        <animate attributeName="opacity" values="0.6;1;0.6" dur="5s" repeatCount="indefinite" />
+                    </circle>
+                    <circle cx="650" cy="300" r="3" fill="rgba(74, 144, 226, 0.6)">
+                        <animate attributeName="cy" values="300;350;300" dur="4s" repeatCount="indefinite" />
+                        <animate attributeName="opacity" values="0.6;1;0.6" dur="4s" repeatCount="indefinite" />
+                    </circle>
+                    <circle cx="400" cy="100" r="3" fill="rgba(123, 104, 238, 0.6)">
+                        <animate attributeName="cy" values="100;80;100" dur="4.5s" repeatCount="indefinite" />
+                        <animate attributeName="opacity" values="0.6;1;0.6" dur="4.5s" repeatCount="indefinite" />
+                    </circle>
+                </svg>
+
+                <div class="hero-content">
+                    <h1 class="page-title">Documentation Generation</h1>
+                    <p class="page-subtitle">
+                        This article explores the core principles of automated documentation generation, focusing on
+                        APIs, command-line interfaces (CLIs), and web services. It also incorporates current trends
+                        such as multilingual support, evolving documentation pipelines, and the use of generative
+                        AI. Designed for developers, technical writers, and researchers, the article outlines
+                        structured practices across various domains and tools.
+                    </p>
+                    <a href="../about.html" class="author-link">John Samuel</a>
                 </div>
-                <div class="subtitle">
-                    <h3><a href="../about.html">John Samuel</a></h3>
-                </div>
             </div>
 
-            <div class="content">
-                <article>
-                    <header>
-                        <h2>Automated Documentation Generation: Traditional Practices and Emerging Trends</h2>
-                        <p>This article explores the core principles of automated documentation generation, focusing on
-                            APIs, command-line interfaces (CLIs), and web services. It also incorporates current trends
-                            such as multilingual support, evolving documentation pipelines, and the use of generative
-                            AI. Designed for developers, technical writers, and researchers, the article outlines
-                            structured practices across various domains and tools.</p>
-                    </header>
+            <article>
+                <section>
+                    <h2>1. Introduction</h2>
+                    <p>Documentation serves as a critical interface between software systems and their users.
+                        Traditionally written manually, documentation is increasingly generated automatically from
+                        source code, usage patterns, and metadata annotations. This shift enhances maintainability,
+                        consistency, and integration with continuous development workflows. Automated documentation
+                        applies to a variety of contexts—from command-line tools to library APIs and web
+                        services—each with its unique documentation needs.</p>
+                </section>
 
-                    <section>
-                        <h3>1. Introduction</h3>
-                        <p>Documentation serves as a critical interface between software systems and their users.
-                            Traditionally written manually, documentation is increasingly generated automatically from
-                            source code, usage patterns, and metadata annotations. This shift enhances maintainability,
-                            consistency, and integration with continuous development workflows. Automated documentation
-                            applies to a variety of contexts—from command-line tools to library APIs and web
-                            services—each with its unique documentation needs.</p>
-                    </section>
+                <section>
+                    <h2>2. Use Cases for Documentation Generation</h2>
+                    <p>Automated documentation applies to a broad spectrum of software artifacts. Understanding the
+                        typical use cases helps define the requirements and the expected outputs for various
+                        stakeholders:</p>
+                    <ul>
+                        <li><strong>API Documentation:</strong> Includes descriptions of functions, classes,
+                            methods, return values, and exceptions.</li>
+                        <li><strong>Command-Line Interface (CLI) Documentation:</strong> Covers syntax, arguments,
+                            flags, versioning, and examples.</li>
+                        <li><strong>Searchable Help Systems:</strong> Online or offline systems that enable quick
+                            navigation of commands or modules.</li>
+                        <li><strong>Tutorials, Tips, and Examples:</strong> Practical examples are automatically
+                            extracted from test cases or docstrings.</li>
+                        <li><strong>Documentation for Complex Pipelines:</strong> Details multi-step command usage
+                            involving piping, file dependencies, and chained outputs.</li>
+                    </ul>
+                    <p>Automating these documentation types ensures consistency across software versions, reduces
+                        manual effort, and enhances accessibility for diverse audiences.</p>
+                </section>
 
-                    <section>
-                        <h3>2. Use Cases for Documentation Generation</h3>
-                        <p>Automated documentation applies to a broad spectrum of software artifacts. Understanding the
-                            typical use cases helps define the requirements and the expected outputs for various
-                            stakeholders:</p>
-                        <ul>
-                            <li><strong>API Documentation:</strong> Includes descriptions of functions, classes,
-                                methods, return values, and exceptions.</li>
-                            <li><strong>Command-Line Interface (CLI) Documentation:</strong> Covers syntax, arguments,
-                                flags, versioning, and examples.</li>
-                            <li><strong>Searchable Help Systems:</strong> Online or offline systems that enable quick
-                                navigation of commands or modules.</li>
-                            <li><strong>Tutorials, Tips, and Examples:</strong> Practical examples are automatically
-                                extracted from test cases or docstrings.</li>
-                            <li><strong>Documentation for Complex Pipelines:</strong> Details multi-step command usage
-                                involving piping, file dependencies, and chained outputs.</li>
-                        </ul>
-                        <p>Automating these documentation types ensures consistency across software versions, reduces
-                            manual effort, and enhances accessibility for diverse audiences.</p>
-                    </section>
+                <section>
+                    <h2>3. Command-Line Interface (CLI) Documentation</h2>
+                    <p>CLI documentation helps users interact with command-line tools in Linux and Unix
+                        environments. Unlike GUI-based software, command-line tools rely heavily on clear, concise,
+                        and discoverable documentation available directly in the terminal. This documentation needs
+                        to evolve with the tool and often provides insight into advanced usage scenarios like piping
+                        and scripting.</p>
+                    <ol>
+                        <li>Standard command help via <code>-h</code> or <code>--help</code> displays available
+                            options and usage syntax.</li>
+                        <li>Versioning options like <code>-v</code> or <code>--version</code> help users confirm
+                            tool compatibility.</li>
+                        <li>Command-line options typically use both short flags (<code>-f</code>) and long-form
+                            options (<code>--file</code>).</li>
+                        <li>Arguments can be positional (mandatory) or keyword-based (optional).</li>
+                        <li>Input is often taken from command-line arguments, input files, or the output of other
+                            commands through piping.</li>
+                        <li>Output formats vary widely and include plaintext, JSON, XML, or formatted tables.</li>
+                        <li>Return codes (e.g., accessed via <code>$?</code>) and stderr messages provide feedback
+                            on execution success or failure.</li>
+                    </ol>
+                    <p>By automating CLI documentation, developers can maintain up-to-date help content across all
+                        supported platforms. This is especially crucial for tools used in shell scripting or
+                        automation workflows, where documentation may serve as the only available interface.</p>
+                </section>
 
-                    <section>
-                        <h3>3. Command-Line Interface (CLI) Documentation</h3>
-                        <p>CLI documentation helps users interact with command-line tools in Linux and Unix
-                            environments. Unlike GUI-based software, command-line tools rely heavily on clear, concise,
-                            and discoverable documentation available directly in the terminal. This documentation needs
-                            to evolve with the tool and often provides insight into advanced usage scenarios like piping
-                            and scripting.</p>
-                        <ol>
-                            <li>Standard command help via <code>-h</code> or <code>--help</code> displays available
-                                options and usage syntax.</li>
-                            <li>Versioning options like <code>-v</code> or <code>--version</code> help users confirm
-                                tool compatibility.</li>
-                            <li>Command-line options typically use both short flags (<code>-f</code>) and long-form
-                                options (<code>--file</code>).</li>
-                            <li>Arguments can be positional (mandatory) or keyword-based (optional).</li>
-                            <li>Input is often taken from command-line arguments, input files, or the output of other
-                                commands through piping.</li>
-                            <li>Output formats vary widely and include plaintext, JSON, XML, or formatted tables.</li>
-                            <li>Return codes (e.g., accessed via <code>$?</code>) and stderr messages provide feedback
-                                on execution success or failure.</li>
-                        </ol>
-                        <p>By automating CLI documentation, developers can maintain up-to-date help content across all
-                            supported platforms. This is especially crucial for tools used in shell scripting or
-                            automation workflows, where documentation may serve as the only available interface.</p>
-                    </section>
+                <section>
+                    <h2>4. Library API Documentation</h2>
+                    <p>Library APIs require in-depth documentation to describe software components such as classes,
+                        modules, and functions. Developers consuming these libraries rely on detailed specifications
+                        to understand expected behavior, required arguments, side effects, and possible exceptions.
+                        Automated generation tools can extract this information directly from code comments,
+                        annotations, or docstrings.</p>
+                    <ol>
+                        <li>Functions and classes are the building blocks of library APIs, and they must be
+                            documented with purpose and context.</li>
+                        <li>Method signatures list argument types, optional values, and return types for each
+                            callable unit.</li>
+                        <li>Accepted and returned data types ensure proper type checking and usage validation.</li>
+                        <li>Side effects (e.g., modifying global state, writing to disk) should be explicitly noted.
+                        </li>
+                        <li>Input preconditions—such as required formats or ranges—must be clearly defined.</li>
+                        <li>Return values should distinguish between regular outputs and error indicators.</li>
+                        <li>Common exceptions or failure modes must be described with use cases.</li>
+                        <li>Incorrect argument types or internal errors typically trigger defined exceptions that
+                            are part of the documentation.</li>
+                    </ol>
+                    <p>API documentation enables consistent onboarding of new developers, encourages correct usage,
+                        and promotes interface stability. Automated systems such as Sphinx or Javadoc can extract
+                        and format this information into searchable, versioned outputs.</p>
+                </section>
 
-                    <section>
-                        <h3>4. Library API Documentation</h3>
-                        <p>Library APIs require in-depth documentation to describe software components such as classes,
-                            modules, and functions. Developers consuming these libraries rely on detailed specifications
-                            to understand expected behavior, required arguments, side effects, and possible exceptions.
-                            Automated generation tools can extract this information directly from code comments,
-                            annotations, or docstrings.</p>
-                        <ol>
-                            <li>Functions and classes are the building blocks of library APIs, and they must be
-                                documented with purpose and context.</li>
-                            <li>Method signatures list argument types, optional values, and return types for each
-                                callable unit.</li>
-                            <li>Accepted and returned data types ensure proper type checking and usage validation.</li>
-                            <li>Side effects (e.g., modifying global state, writing to disk) should be explicitly noted.
-                            </li>
-                            <li>Input preconditions—such as required formats or ranges—must be clearly defined.</li>
-                            <li>Return values should distinguish between regular outputs and error indicators.</li>
-                            <li>Common exceptions or failure modes must be described with use cases.</li>
-                            <li>Incorrect argument types or internal errors typically trigger defined exceptions that
-                                are part of the documentation.</li>
-                        </ol>
-                        <p>API documentation enables consistent onboarding of new developers, encourages correct usage,
-                            and promotes interface stability. Automated systems such as Sphinx or Javadoc can extract
-                            and format this information into searchable, versioned outputs.</p>
-                    </section>
+                <section>
+                    <h2>5. Web Service API Documentation</h2>
+                    <p>Modern applications frequently depend on web APIs, including RESTful, SOAP-based, and GraphQL
+                        interfaces. Documenting these APIs involves not only function signatures but also network
+                        semantics, authentication mechanisms, request/response schemas, and error codes. Automation
+                        helps maintain accurate and testable API references across frontend and backend systems.</p>
+                    <ol>
+                        <li>Endpoint operations are defined in terms of HTTP verbs such as <code>GET</code>,
+                            <code>POST</code>, <code>PUT</code>, and <code>DELETE</code>.
+                        </li>
+                        <li>API method signatures specify path variables, query parameters, headers, and request
+                            bodies.</li>
+                        <li>Data is exchanged using structured formats like JSON or XML.</li>
+                        <li>APIs may follow REST, SOAP, or GraphQL conventions, each with different tooling needs.
+                        </li>
+                        <li>Side effects of API calls (e.g., changing server state) must be communicated to clients.
+                        </li>
+                        <li>Input validation is governed by formal schemas or contracts (e.g., JSON Schema or WSDL).
+                        </li>
+                        <li>Output formats are also defined by schema, with clear examples and status codes.</li>
+                        <li>Errors and exceptions are typically communicated through standardized HTTP codes (e.g.,
+                            400 for bad request, 500 for server error).</li>
+                        <li>Failures can result from unmet preconditions, validation errors, or backend exceptions.
+                        </li>
+                    </ol>
+                    <p>Tools such as Swagger/OpenAPI, GraphQL introspection, and Postman collections enable
+                        automated generation of interactive API documentation, greatly improving usability for
+                        developers and testers.</p>
+                </section>
 
-                    <section>
-                        <h3>5. Web Service API Documentation</h3>
-                        <p>Modern applications frequently depend on web APIs, including RESTful, SOAP-based, and GraphQL
-                            interfaces. Documenting these APIs involves not only function signatures but also network
-                            semantics, authentication mechanisms, request/response schemas, and error codes. Automation
-                            helps maintain accurate and testable API references across frontend and backend systems.</p>
-                        <ol>
-                            <li>Endpoint operations are defined in terms of HTTP verbs such as <code>GET</code>,
-                                <code>POST</code>, <code>PUT</code>, and <code>DELETE</code>.
-                            </li>
-                            <li>API method signatures specify path variables, query parameters, headers, and request
-                                bodies.</li>
-                            <li>Data is exchanged using structured formats like JSON or XML.</li>
-                            <li>APIs may follow REST, SOAP, or GraphQL conventions, each with different tooling needs.
-                            </li>
-                            <li>Side effects of API calls (e.g., changing server state) must be communicated to clients.
-                            </li>
-                            <li>Input validation is governed by formal schemas or contracts (e.g., JSON Schema or WSDL).
-                            </li>
-                            <li>Output formats are also defined by schema, with clear examples and status codes.</li>
-                            <li>Errors and exceptions are typically communicated through standardized HTTP codes (e.g.,
-                                400 for bad request, 500 for server error).</li>
-                            <li>Failures can result from unmet preconditions, validation errors, or backend exceptions.
-                            </li>
-                        </ol>
-                        <p>Tools such as Swagger/OpenAPI, GraphQL introspection, and Postman collections enable
-                            automated generation of interactive API documentation, greatly improving usability for
-                            developers and testers.</p>
-                    </section>
+                <section>
+                    <h2>6. Multilingual Documentation</h2>
+                    <p>Software applications often serve international audiences, requiring multilingual
+                        documentation. Automating translation and localization processes ensures that documentation
+                        remains accessible without increasing the maintenance burden. This applies to both
+                        user-facing and developer-facing documentation.</p>
+                    <ul>
+                        <li>Translation workflows can leverage tools like <code>gettext</code> or <code>po4a</code>
+                            for structured extraction of translatable content.</li>
+                        <li>Machine translation tools and generative AI can provide fast, initial translations
+                            across many languages.</li>
+                        <li>Community contributions and manual proofreading ensure cultural and contextual accuracy.
+                        </li>
+                        <li>Localization may also include date/time formats, units, and writing direction (LTR vs.
+                            RTL).</li>
+                    </ul>
+                    <p>Automated multilingual pipelines integrated with documentation tools allow teams to ship
+                        inclusive, region-specific versions without duplicating efforts.</p>
+                </section>
 
-                    <section>
-                        <h3>6. Multilingual Documentation</h3>
-                        <p>Software applications often serve international audiences, requiring multilingual
-                            documentation. Automating translation and localization processes ensures that documentation
-                            remains accessible without increasing the maintenance burden. This applies to both
-                            user-facing and developer-facing documentation.</p>
-                        <ul>
-                            <li>Translation workflows can leverage tools like <code>gettext</code> or <code>po4a</code>
-                                for structured extraction of translatable content.</li>
-                            <li>Machine translation tools and generative AI can provide fast, initial translations
-                                across many languages.</li>
-                            <li>Community contributions and manual proofreading ensure cultural and contextual accuracy.
-                            </li>
-                            <li>Localization may also include date/time formats, units, and writing direction (LTR vs.
-                                RTL).</li>
-                        </ul>
-                        <p>Automated multilingual pipelines integrated with documentation tools allow teams to ship
-                            inclusive, region-specific versions without duplicating efforts.</p>
-                    </section>
+                <section>
+                    <h2>7. Output Formats and Delivery</h2>
+                    <p>Documentation may be consumed on the command line, web browsers, PDF readers, or integrated
+                        development environments. Supporting multiple output formats ensures compatibility with
+                        varied platforms, accessibility standards, and user preferences.</p>
+                    <ul>
+                        <li><strong>Man pages</strong> and <strong>info pages</strong> provide classic Unix/Linux
+                            terminal help.</li>
+                        <li><strong>HTML</strong> enables hyperlinked, responsive, and searchable documentation.
+                        </li>
+                        <li><strong>DocBook</strong> offers a semantic XML format used in publishing and enterprise
+                            documentation workflows.</li>
+                        <li><strong>Markdown</strong> and <strong>reStructuredText</strong> allow lightweight
+                            authoring compatible with Git-based workflows.</li>
+                    </ul>
+                    <p>Many documentation generators allow publishing to multiple formats from a single source file,
+                        increasing consistency and reducing duplication of effort.</p>
+                </section>
 
-                    <section>
-                        <h3>7. Output Formats and Delivery</h3>
-                        <p>Documentation may be consumed on the command line, web browsers, PDF readers, or integrated
-                            development environments. Supporting multiple output formats ensures compatibility with
-                            varied platforms, accessibility standards, and user preferences.</p>
-                        <ul>
-                            <li><strong>Man pages</strong> and <strong>info pages</strong> provide classic Unix/Linux
-                                terminal help.</li>
-                            <li><strong>HTML</strong> enables hyperlinked, responsive, and searchable documentation.
-                            </li>
-                            <li><strong>DocBook</strong> offers a semantic XML format used in publishing and enterprise
-                                documentation workflows.</li>
-                            <li><strong>Markdown</strong> and <strong>reStructuredText</strong> allow lightweight
-                                authoring compatible with Git-based workflows.</li>
-                        </ul>
-                        <p>Many documentation generators allow publishing to multiple formats from a single source file,
-                            increasing consistency and reducing duplication of effort.</p>
-                    </section>
+                <section>
+                    <h2>8. Developer Contribution and Versioning</h2>
+                    <p>Effective documentation is not a static artifact—it evolves alongside code.
+                        Developer-friendly tools and workflows make it easier to maintain documentation relevance
+                        over time. Integrating documentation into CI/CD pipelines further automates validation and
+                        publishing.</p>
+                    <ul>
+                        <li>Version control systems like Git allow documentation to evolve with code changes.</li>
+                        <li>Pull requests and merge reviews enable collaborative authoring and peer feedback.</li>
+                        <li>CI pipelines can validate syntax, check for missing references, and deploy published
+                            content automatically.</li>
+                        <li>Version tagging ensures documentation matches specific software releases.</li>
+                        <li>Tools like OpenAPI or GraphQL schema diffing can detect undocumented changes.</li>
+                    </ul>
+                    <p>Involving developers in the documentation process improves quality and ensures that
+                        user-facing content stays aligned with code behavior.</p>
+                </section>
 
-                    <section>
-                        <h3>8. Developer Contribution and Versioning</h3>
-                        <p>Effective documentation is not a static artifact—it evolves alongside code.
-                            Developer-friendly tools and workflows make it easier to maintain documentation relevance
-                            over time. Integrating documentation into CI/CD pipelines further automates validation and
-                            publishing.</p>
-                        <ul>
-                            <li>Version control systems like Git allow documentation to evolve with code changes.</li>
-                            <li>Pull requests and merge reviews enable collaborative authoring and peer feedback.</li>
-                            <li>CI pipelines can validate syntax, check for missing references, and deploy published
-                                content automatically.</li>
-                            <li>Version tagging ensures documentation matches specific software releases.</li>
-                            <li>Tools like OpenAPI or GraphQL schema diffing can detect undocumented changes.</li>
-                        </ul>
-                        <p>Involving developers in the documentation process improves quality and ensures that
-                            user-facing content stays aligned with code behavior.</p>
-                    </section>
+                <section>
+                    <h2>9. Generative AI and Emerging Trends</h2>
+                    <p>Recent advances in natural language processing and machine learning have introduced new ways
+                        to automate documentation. Large Language Models (LLMs) can now generate contextual
+                        documentation from code, generate examples, and even answer natural language queries about
+                        usage.</p>
+                    <ul>
+                        <li>LLM-powered tools (e.g., GitHub Copilot) generate inline docstrings and summaries
+                            automatically.</li>
+                        <li>Conversational documentation interfaces allow users to ask questions like "How do I use
+                            this endpoint?"</li>
+                        <li>Autonomous documentation bots can scan codebases and usage logs to generate initial
+                            drafts.</li>
+                        <li>Schema inference tools use machine learning to suggest undocumented parameters or edge
+                            cases.</li>
+                        <li>However, hallucinations and outdated training data can introduce factual errors,
+                            requiring human validation.</li>
+                    </ul>
+                    <p>Generative AI complements—not replaces—traditional documentation pipelines. Used correctly,
+                        it accelerates the writing process while maintaining overall clarity and coverage.</p>
+                </section>
 
-                    <section>
-                        <h3>9. Generative AI and Emerging Trends</h3>
-                        <p>Recent advances in natural language processing and machine learning have introduced new ways
-                            to automate documentation. Large Language Models (LLMs) can now generate contextual
-                            documentation from code, generate examples, and even answer natural language queries about
-                            usage.</p>
-                        <ul>
-                            <li>LLM-powered tools (e.g., GitHub Copilot) generate inline docstrings and summaries
-                                automatically.</li>
-                            <li>Conversational documentation interfaces allow users to ask questions like “How do I use
-                                this endpoint?”</li>
-                            <li>Autonomous documentation bots can scan codebases and usage logs to generate initial
-                                drafts.</li>
-                            <li>Schema inference tools use machine learning to suggest undocumented parameters or edge
-                                cases.</li>
-                            <li>However, hallucinations and outdated training data can introduce factual errors,
-                                requiring human validation.</li>
-                        </ul>
-                        <p>Generative AI complements—not replaces—traditional documentation pipelines. Used correctly,
-                            it accelerates the writing process while maintaining overall clarity and coverage.</p>
-                    </section>
+                <section>
+                    <h2>10. Conclusion</h2>
+                    <p>Automated documentation generation has evolved into a comprehensive, multi-faceted practice.
+                        From command-line manuals to dynamic web APIs, it ensures that users and developers can
+                        understand, maintain, and build upon software systems effectively. While traditional tools
+                        provide structure and reliability, emerging trends such as multilingual workflows and
+                        generative AI continue to reshape how documentation is created and consumed.</p>
+                </section>
 
-                    <section>
-                        <h3>10. Conclusion</h3>
-                        <p>Automated documentation generation has evolved into a comprehensive, multi-faceted practice.
-                            From command-line manuals to dynamic web APIs, it ensures that users and developers can
-                            understand, maintain, and build upon software systems effectively. While traditional tools
-                            provide structure and reliability, emerging trends such as multilingual workflows and
-                            generative AI continue to reshape how documentation is created and consumed.</p>
-                    </section>
+                <section>
+                    <h2>11. References</h2>
+                    <ol>
+                        <li><a href="https://en.wikipedia.org/wiki/Documentation">Documentation - Wikipedia</a></li>
+                        <li><a href="https://en.wikipedia.org/wiki/Man_page">Man page - Wikipedia</a></li>
+                        <li><a href="https://en.wikipedia.org/wiki/OpenAPI_Specification">OpenAPI Specification -
+                                Wikipedia</a></li>
+                        <li><a href="https://en.wikipedia.org/wiki/REST">REST - Wikipedia</a></li>
+                        <li><a href="https://en.wikipedia.org/wiki/SOAP">SOAP - Wikipedia</a></li>
+                        <li><a href="https://en.wikipedia.org/wiki/GraphQL">GraphQL - Wikipedia</a></li>
+                        <li><a href="https://en.wikipedia.org/wiki/Gettext">gettext - Wikipedia</a></li>
+                        <li><a href="https://en.wikipedia.org/wiki/DocBook">DocBook - Wikipedia</a></li>
+                        <li><a href="https://docs.github.com/en/copilot">GitHub Copilot documentation - GitHub</a></li>
+                        <li><a href="https://po4a.org/">po4a: PO for Anything</a></li>
+                        <li><a href="https://www.mkdocs.org/">MkDocs Documentation</a></li>
+                        <li><a href="https://www.sphinx-doc.org/">Sphinx Documentation</a></li>
+                    </ol>
+                </section>
+            </article>
+        </main>
 
-                    <section>
-                        <h3>11. References</h3>
-                        <ol>
-                            <li><a href="https://en.wikipedia.org/wiki/Documentation">Documentation - Wikipedia</a></li>
-                            <li><a href="https://en.wikipedia.org/wiki/Man_page">Man page - Wikipedia</a></li>
-                            <li><a href="https://en.wikipedia.org/wiki/OpenAPI_Specification">OpenAPI Specification -
-                                    Wikipedia</a></li>
-                            <li><a href="https://en.wikipedia.org/wiki/REST">REST - Wikipedia</a></li>
-                            <li><a href="https://en.wikipedia.org/wiki/SOAP">SOAP - Wikipedia</a></li>
-                            <li><a href="https://en.wikipedia.org/wiki/GraphQL">GraphQL - Wikipedia</a></li>
-                            <li><a href="https://en.wikipedia.org/wiki/Gettext">gettext - Wikipedia</a></li>
-                            <li><a href="https://en.wikipedia.org/wiki/DocBook">DocBook - Wikipedia</a></li>
-                            <li><a href="https://docs.github.com/en/copilot">GitHub Copilot documentation - GitHub</a>
-                            </li>
-                            <li><a href="https://po4a.org/">po4a: PO for Anything</a></li>
-                            <li><a href="https://www.mkdocs.org/">MkDocs Documentation</a></li>
-                            <li><a href="https://www.sphinx-doc.org/">Sphinx Documentation</a></li>
-                        </ol>
-                    </section>
-                </article>
+        <footer role="contentinfo">
+            <div class="footer-content">
+                <p class="copyright">© 2025 John Samuel. Documentation and research content.</p>
+                <nav class="language-selector" aria-label="Language selection">
+                    <a href="documentation-generation.html" hreflang="en">English</a>
+                </nav>
             </div>
-        </div>
+        </footer>
     </body>
 
 </html>

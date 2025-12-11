@@ -3,585 +3,1272 @@
 
     <head>
         <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <meta http-equiv="Content-Language" content="en" />
         <link rel="shortcut icon" href="../../images/logo/favicon.png" />
         <title>Application Metrics: John Samuel</title>
-        <style type="text/css">
-            body {
-                background-color: #FFFFFF;
+        <style>
+            /* ===============================================
+           DESIGN TOKENS - Performance Metrics Theme
+           =============================================== */
+            :root {
+                /* Analytics Color Palette - Performance Metrics Theme */
+                --color-base-bg: #f7f9fc;
+                --color-base-surface: #ffffff;
+                --color-base-text: #1a1f2e;
+                --color-base-text-muted: #475569;
+
+                /* Performance Metrics Accents */
+                --color-accent-1: #10b981;
+                /* Success green - good metrics */
+                --color-accent-2: #059669;
+                /* Deep green */
+                --color-accent-3: #f59e0b;
+                /* Warning amber - attention needed */
+                --color-accent-4: #3b82f6;
+                /* Info blue */
+                --color-accent-5: #8b5cf6;
+                /* Analytics purple */
+                --color-accent-light: #ecfdf5;
+
+                /* Functional Colors */
+                --color-shadow: rgba(16, 185, 129, 0.15);
+                --color-border: rgba(16, 185, 129, 0.12);
+                --color-hover: rgba(16, 185, 129, 0.06);
+
+                /* Gradients */
+                --gradient-primary: linear-gradient(135deg, #10b981 0%, #059669 100%);
+                --gradient-secondary: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+                --gradient-warning: linear-gradient(135deg, #f59e0b 0%, #ef4444 100%);
+                --gradient-subtle: linear-gradient(180deg, #f7f9fc 0%, #ecfdf5 100%);
+                --gradient-hero: linear-gradient(135deg, #059669 0%, #10b981 50%, #3b82f6 100%);
+
+                /* Spacing Scale */
+                --space-xs: 0.25rem;
+                --space-sm: 0.5rem;
+                --space-md: 1rem;
+                --space-lg: 1.5rem;
+                --space-xl: 2rem;
+                --space-2xl: 3rem;
+                --space-3xl: 4rem;
+                --space-4xl: 6rem;
+
+                /* Border Radius */
+                --radius-sm: 6px;
+                --radius-md: 10px;
+                --radius-lg: 16px;
+                --radius-xl: 20px;
+                --radius-2xl: 28px;
+                --radius-full: 9999px;
+
+                /* Shadows */
+                --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.04), 0 1px 2px rgba(0, 0, 0, 0.06);
+                --shadow-md: 0 4px 8px rgba(0, 0, 0, 0.06), 0 2px 4px rgba(0, 0, 0, 0.08);
+                --shadow-lg: 0 12px 28px rgba(0, 0, 0, 0.1), 0 6px 12px rgba(0, 0, 0, 0.08);
+                --shadow-xl: 0 24px 48px rgba(0, 0, 0, 0.14), 0 12px 24px rgba(0, 0, 0, 0.1);
+                --shadow-theme: 0 12px 32px var(--color-shadow), 0 4px 12px rgba(0, 0, 0, 0.08);
+
+                /* Typography */
+                --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+                --font-mono: 'SF Mono', Monaco, 'Cascadia Code', 'Consolas', 'Courier New', monospace;
+
+                --text-xs: clamp(0.75rem, 0.7rem + 0.25vw, 0.875rem);
+                --text-sm: clamp(0.875rem, 0.8rem + 0.35vw, 1rem);
+                --text-base: clamp(1rem, 0.95rem + 0.25vw, 1.125rem);
+                --text-lg: clamp(1.125rem, 1.05rem + 0.35vw, 1.25rem);
+                --text-xl: clamp(1.25rem, 1.15rem + 0.5vw, 1.5rem);
+                --text-2xl: clamp(1.5rem, 1.3rem + 1vw, 2rem);
+                --text-3xl: clamp(2rem, 1.6rem + 2vw, 2.75rem);
+                --text-4xl: clamp(2.5rem, 2rem + 2.5vw, 3.5rem);
+
+                --weight-normal: 400;
+                --weight-medium: 500;
+                --weight-semibold: 600;
+                --weight-bold: 700;
+
+                --leading-tight: 1.25;
+                --leading-snug: 1.375;
+                --leading-normal: 1.5;
+                --leading-relaxed: 1.625;
             }
 
-            #sidebar {
-                position: fixed;
-                background-color: #1B80CF;
-                top: 0;
-                left: 0;
-                bottom: 0;
-                width: 30vw;
-            }
-
-            #sidebar .title {
-                position: relative;
-                text-align: center;
-                line-height: 4vmax;
-                font-size: 1.4vmax;
-                font-family: 'Arial';
-                margin-top: 25vh;
-            }
-
-            #sidebar .title a:link,
-            #sidebar .title a:visited {
-                color: #FFFFFF;
-                text-decoration: none;
-            }
-
-            .subtitle {
-                top: 50vh;
-                text-align: center;
-                line-height: 1.3vmax;
-                font-family: 'Arial';
-                font-size: 1.5vmax;
-                color: #FFFFFF;
-            }
-
-            .subtitle a:link,
-            .subtitle a:visited {
-                color: #FFFFFF;
-                text-decoration: none;
-            }
-
-            .licence {
-                position: fixed;
-                text-align: right;
-                bottom: 0;
-                right: 0;
-            }
-
-            .home {
-                position: fixed;
-                text-align: left;
-                font-family: 'Arial';
-                color: #D3D3D3;
-                z-index: 100;
-                width: 100%;
-                background-color: #FFFFFF;
-                top: 0px;
-                margin-bottom: 10px;
-                padding-bottom: 10px;
-            }
-
-            .home a:link,
-            .home a:visited {
-                text-decoration: none;
-                color: #D3D3D3;
-            }
-
-            .home ul {
+            /* ===============================================
+           RESET & BASE STYLES
+           =============================================== */
+            *,
+            *::before,
+            *::after {
                 margin: 0;
                 padding: 0;
-                text-align: left;
-                list-style: none;
+                box-sizing: border-box;
             }
 
-            .home li {
-                position: relative;
-                float: left;
-                padding-top: 15px;
-                margin-right: 1em;
-                font-family: 'Arial';
+            html {
+                scroll-behavior: smooth;
+                scroll-padding-top: 100px;
             }
 
-            .home li:hover {
-                display: block;
+            body {
+                font-family: var(--font-sans);
+                font-size: var(--text-base);
+                line-height: var(--leading-normal);
+                color: var(--color-base-text);
+                background: var(--gradient-subtle);
+                background-attachment: fixed;
+                -webkit-font-smoothing: antialiased;
+                -moz-osx-font-smoothing: grayscale;
+                overflow-x: hidden;
             }
 
-            .home a:link,
-            .home a:visited {
-                color: #D3D3D3;
-            }
-
-            .home li:hover a:link,
-            .home li:hover a:visited {
+            /* Skip Link for Accessibility */
+            .skip-link {
+                position: absolute;
+                top: -100px;
+                left: var(--space-md);
+                background: var(--color-accent-1);
+                color: white;
+                padding: var(--space-sm) var(--space-lg);
+                border-radius: var(--radius-md);
                 text-decoration: none;
-                padding: 15px;
-                color: #FFFFFF;
-                background-color: #1B80CF;
+                font-weight: var(--weight-semibold);
+                z-index: 10000;
+                transition: top 0.3s;
             }
 
-            .content {
-                line-height: 1.8vmax;
-                font-size: 1.2vmax;
-                font-family: 'Arial';
-                margin-top: 15vh;
-                width: 90%;
+            .skip-link:focus {
+                top: var(--space-md);
             }
 
-            .content h2,
-            h3,
-            h4 {
-                color: #1B80CF;
+            /* ===============================================
+           LAYOUT CONTAINER
+           =============================================== */
+            .page-container {
+                min-height: 100vh;
+                position: relative;
             }
 
-            .content a:link,
-            .content a:visited {
-                color: #1B80CF;
-            }
-
-            .content h3 {
-                color: #1B80CF;
-            }
-
-            .content h2::before,
-            .content h3::before {
-                display: block;
-                content: " ";
-                visibility: hidden;
-                height: 50px;
-                margin-top: -50px;
+            /* Animated Background Pattern - Metrics Grid */
+            .page-container::before {
+                content: '';
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background-image:
+                    repeating-linear-gradient(0deg, rgba(16, 185, 129, 0.02) 0px, transparent 1px, transparent 20px),
+                    repeating-linear-gradient(90deg, rgba(16, 185, 129, 0.02) 0px, transparent 1px, transparent 20px);
                 pointer-events: none;
-                background-color: #FFFFFF;
+                z-index: 0;
+                animation: patternSlide 20s linear infinite;
             }
 
-            .content a:link,
-            .content a:visited {
-                color: #1B80CF;
+            @keyframes patternSlide {
+                0% {
+                    background-position: 0 0;
+                }
+
+                100% {
+                    background-position: 20px 20px;
+                }
             }
 
-            .content li {
-                margin: 5px;
+            /* ===============================================
+           NAVIGATION
+           =============================================== */
+            .navigation {
+                position: sticky;
+                top: 0;
+                z-index: 1000;
+                background: rgba(255, 255, 255, 0.85);
+                -webkit-backdrop-filter: blur(16px) saturate(180%);
+                backdrop-filter: blur(16px) saturate(180%);
+                border-bottom: 1px solid var(--color-border);
+                box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
+                animation: slideDown 0.6s ease-out;
             }
 
-            .page {
-                width: 65vw;
-                height: 100%;
-                margin-left: 30vw;
+            @keyframes slideDown {
+                from {
+                    transform: translateY(-100%);
+                    opacity: 0;
+                }
+
+                to {
+                    transform: translateY(0);
+                    opacity: 1;
+                }
+            }
+
+            .nav-container {
+                max-width: 1400px;
+                margin: 0 auto;
+                padding: var(--space-lg) var(--space-xl);
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                gap: var(--space-xl);
+            }
+
+            .site-name {
+                font-size: var(--text-xl);
+                font-weight: var(--weight-bold);
+                letter-spacing: -0.02em;
+            }
+
+            .site-name a {
+                color: var(--color-base-text);
+                text-decoration: none;
+                background: var(--gradient-primary);
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                background-clip: text;
+                transition: all 0.3s ease;
+                position: relative;
+            }
+
+            .site-name a::after {
+                content: '';
+                position: absolute;
+                bottom: -4px;
+                left: 0;
+                width: 100%;
+                height: 3px;
+                background: var(--gradient-primary);
+                transform: scaleX(0);
+                transform-origin: right;
+                transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+                border-radius: 2px;
+            }
+
+            .site-name a:hover::after {
+                transform: scaleX(1);
+                transform-origin: left;
+            }
+
+            .breadcrumbs {
+                display: flex;
+                align-items: center;
+                gap: var(--space-sm);
+                list-style: none;
+                flex-wrap: wrap;
+            }
+
+            .breadcrumbs li {
+                display: flex;
+                align-items: center;
+                font-size: var(--text-sm);
+            }
+
+            .breadcrumbs li:not(:last-child)::after {
+                content: '→';
+                margin-left: var(--space-sm);
+                color: var(--color-accent-1);
+                font-weight: var(--weight-bold);
+            }
+
+            .breadcrumbs a {
+                color: var(--color-base-text-muted);
+                text-decoration: none;
+                padding: var(--space-xs) var(--space-md);
+                border-radius: var(--radius-sm);
+                transition: all 0.3s ease;
+                position: relative;
+            }
+
+            .breadcrumbs a:hover {
+                color: var(--color-accent-1);
+                background: var(--color-hover);
+            }
+
+            /* ===============================================
+           HERO SECTION
+           =============================================== */
+            .hero {
+                position: relative;
+                max-width: 1400px;
+                margin: 0 auto;
+                padding: var(--space-4xl) var(--space-xl) var(--space-3xl);
                 overflow: hidden;
-                padding: 0 1em;
-                font-family: 'Arial';
             }
 
-            .page img {
-                max-width: 100%;
-                max-height: 100%;
+            .hero-content {
+                position: relative;
+                z-index: 2;
+                text-align: center;
+                max-width: 900px;
+                margin: 0 auto;
+                animation: fadeInUp 0.8s ease-out 0.2s both;
             }
 
-            @media (max-width: 640px),
-            screen and (orientation: portrait) {
-                body {
-                    max-width: 100%;
-                    max-height: 100%;
+            @keyframes fadeInUp {
+                from {
+                    opacity: 0;
+                    transform: translateY(30px);
                 }
 
-                #sidebar {
-                    position: fixed;
-                    background-color: #1B80CF;
-                    top: 0;
-                    left: 0;
-                    bottom: 80vh;
-                    width: 100vw;
+                to {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            }
+
+            .page-title {
+                font-size: var(--text-4xl);
+                font-weight: var(--weight-bold);
+                letter-spacing: -0.03em;
+                line-height: var(--leading-tight);
+                margin-bottom: var(--space-lg);
+                background: var(--gradient-hero);
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                background-clip: text;
+                background-size: 200% 200%;
+                animation: gradientShift 6s ease infinite;
+            }
+
+            @keyframes gradientShift {
+
+                0%,
+                100% {
+                    background-position: 0% 50%;
                 }
 
-                #sidebar .title {
+                50% {
+                    background-position: 100% 50%;
+                }
+            }
+
+            .page-subtitle {
+                font-size: var(--text-lg);
+                color: var(--color-base-text-muted);
+                line-height: var(--leading-relaxed);
+                max-width: 700px;
+                margin: 0 auto var(--space-2xl);
+            }
+
+            /* SVG Illustration Container */
+            .hero-illustration {
+                max-width: 700px;
+                margin: var(--space-3xl) auto 0;
+                animation: fadeInUp 1s ease-out 0.4s both;
+            }
+
+            /* ===============================================
+           MAIN CONTENT
+           =============================================== */
+            .main-content {
+                max-width: 1400px;
+                margin: 0 auto;
+                padding: 0 var(--space-xl) var(--space-4xl);
+                position: relative;
+                z-index: 1;
+            }
+
+            /* Section Styling */
+            .content-section {
+                background: rgba(255, 255, 255, 0.7);
+                -webkit-backdrop-filter: blur(12px) saturate(180%);
+                backdrop-filter: blur(12px) saturate(180%);
+                border: 1px solid rgba(255, 255, 255, 0.3);
+                border-radius: var(--radius-2xl);
+                padding: var(--space-3xl) var(--space-2xl);
+                margin-bottom: var(--space-2xl);
+                box-shadow: var(--shadow-theme);
+                transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+                animation: fadeInUp 0.8s ease-out both;
+                position: relative;
+                overflow: hidden;
+            }
+
+            .content-section::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                right: 0;
+                width: 150px;
+                height: 150px;
+                background: radial-gradient(circle, rgba(16, 185, 129, 0.05) 0%, transparent 70%);
+                border-radius: 50%;
+                pointer-events: none;
+            }
+
+            .content-section:hover {
+                transform: translateY(-4px);
+                box-shadow: 0 16px 40px var(--color-shadow), 0 8px 16px rgba(0, 0, 0, 0.1);
+            }
+
+            .content-section:nth-child(1) {
+                animation-delay: 0.1s;
+            }
+
+            .content-section:nth-child(2) {
+                animation-delay: 0.2s;
+            }
+
+            .content-section:nth-child(3) {
+                animation-delay: 0.3s;
+            }
+
+            .content-section:nth-child(4) {
+                animation-delay: 0.4s;
+            }
+
+            .content-section:nth-child(5) {
+                animation-delay: 0.5s;
+            }
+
+            .content-section:nth-child(6) {
+                animation-delay: 0.6s;
+            }
+
+            .content-section:nth-child(7) {
+                animation-delay: 0.7s;
+            }
+
+            /* Section Headings */
+            .section-heading {
+                font-size: var(--text-2xl);
+                font-weight: var(--weight-bold);
+                letter-spacing: -0.02em;
+                color: var(--color-base-text);
+                margin-bottom: var(--space-lg);
+                position: relative;
+                display: inline-block;
+            }
+
+            .section-heading::after {
+                content: '';
+                position: absolute;
+                bottom: -8px;
+                left: 0;
+                width: 60%;
+                height: 4px;
+                background: var(--gradient-primary);
+                border-radius: var(--radius-full);
+                animation: expandWidth 0.8s ease-out forwards;
+            }
+
+            @keyframes expandWidth {
+                from {
+                    width: 0%;
+                }
+
+                to {
+                    width: 60%;
+                }
+            }
+
+            .subsection-heading {
+                font-size: var(--text-xl);
+                font-weight: var(--weight-semibold);
+                color: var(--color-base-text);
+                margin: var(--space-xl) 0 var(--space-md);
+                display: flex;
+                align-items: center;
+                gap: var(--space-md);
+            }
+
+            .subsection-heading::before {
+                content: '';
+                width: 6px;
+                height: 28px;
+                background: var(--gradient-primary);
+                border-radius: var(--radius-full);
+                flex-shrink: 0;
+            }
+
+            /* Paragraph Styling */
+            .content-section p {
+                margin-bottom: var(--space-lg);
+                line-height: var(--leading-relaxed);
+                color: var(--color-base-text-muted);
+            }
+
+            .content-section p:last-child {
+                margin-bottom: 0;
+            }
+
+            /* List Styling */
+            .content-section ul {
+                list-style: none;
+                margin: var(--space-lg) 0;
+                display: grid;
+                gap: var(--space-md);
+            }
+
+            .content-section li {
+                padding: var(--space-md) var(--space-lg) var(--space-md) var(--space-3xl);
+                background: linear-gradient(135deg, rgba(16, 185, 129, 0.04), rgba(59, 130, 246, 0.04));
+                border-left: 3px solid var(--color-accent-1);
+                border-radius: var(--radius-md);
+                color: var(--color-base-text-muted);
+                transition: all 0.3s ease;
+                position: relative;
+                overflow: hidden;
+            }
+
+            .content-section li::before {
+                content: '✓';
+                position: absolute;
+                left: var(--space-lg);
+                top: 50%;
+                transform: translateY(-50%);
+                width: 24px;
+                height: 24px;
+                background: var(--gradient-primary);
+                color: white;
+                border-radius: var(--radius-full);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: var(--text-sm);
+                font-weight: var(--weight-bold);
+                box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+            }
+
+            .content-section li::after {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: 0;
+                height: 100%;
+                width: 0;
+                background: linear-gradient(90deg, rgba(16, 185, 129, 0.08), transparent);
+                transition: width 0.4s ease;
+            }
+
+            .content-section li:hover {
+                transform: translateX(8px);
+                box-shadow: var(--shadow-md);
+            }
+
+            .content-section li:hover::after {
+                width: 100%;
+            }
+
+            .content-section strong {
+                color: var(--color-accent-2);
+                font-weight: var(--weight-semibold);
+            }
+
+            /* Ordered Lists */
+            .content-section ol {
+                list-style: none;
+                counter-reset: item;
+                margin: var(--space-lg) 0;
+                display: grid;
+                gap: var(--space-md);
+            }
+
+            .content-section ol li {
+                counter-increment: item;
+                padding: var(--space-md) var(--space-lg) var(--space-md) var(--space-3xl);
+                background: linear-gradient(135deg, rgba(59, 130, 246, 0.04), rgba(139, 92, 246, 0.04));
+                border-left: 3px solid var(--color-accent-4);
+                border-radius: var(--radius-md);
+            }
+
+            .content-section ol li::before {
+                content: counter(item);
+                background: var(--gradient-secondary);
+            }
+
+            /* ===============================================
+           REFERENCES SECTION
+           =============================================== */
+            .references {
+                background: rgba(255, 255, 255, 0.6);
+                -webkit-backdrop-filter: blur(12px) saturate(180%);
+                backdrop-filter: blur(12px) saturate(180%);
+                border: 1px solid var(--color-border);
+                border-radius: var(--radius-2xl);
+                padding: var(--space-3xl) var(--space-2xl);
+                margin-top: var(--space-3xl);
+                box-shadow: var(--shadow-lg);
+            }
+
+            .references h3 {
+                font-size: var(--text-2xl);
+                font-weight: var(--weight-bold);
+                margin-bottom: var(--space-xl);
+                color: var(--color-base-text);
+                position: relative;
+                display: inline-block;
+            }
+
+            .references h3::after {
+                content: '';
+                position: absolute;
+                bottom: -6px;
+                left: 0;
+                width: 80%;
+                height: 3px;
+                background: var(--gradient-secondary);
+                border-radius: var(--radius-full);
+            }
+
+            .references ol {
+                counter-reset: ref-counter;
+                list-style: none;
+                display: grid;
+                gap: var(--space-md);
+            }
+
+            .references li {
+                counter-increment: ref-counter;
+                padding: var(--space-md) var(--space-lg) var(--space-md) var(--space-3xl);
+                background: linear-gradient(135deg, rgba(16, 185, 129, 0.03), rgba(59, 130, 246, 0.03));
+                border-radius: var(--radius-md);
+                position: relative;
+                transition: all 0.3s ease;
+            }
+
+            .references li::before {
+                content: counter(ref-counter);
+                position: absolute;
+                left: var(--space-lg);
+                top: 50%;
+                transform: translateY(-50%);
+                width: 28px;
+                height: 28px;
+                background: var(--gradient-primary);
+                color: white;
+                border-radius: var(--radius-full);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: var(--text-sm);
+                font-weight: var(--weight-bold);
+                box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+            }
+
+            .references li:hover {
+                background: linear-gradient(135deg, rgba(16, 185, 129, 0.08), rgba(59, 130, 246, 0.08));
+                transform: translateX(8px);
+                box-shadow: var(--shadow-md);
+            }
+
+            .references a {
+                color: var(--color-accent-1);
+                text-decoration: none;
+                font-weight: var(--weight-medium);
+                transition: all 0.3s ease;
+                position: relative;
+            }
+
+            .references a:hover {
+                color: var(--color-accent-2);
+            }
+
+            .references a::after {
+                content: '↗';
+                margin-left: 4px;
+                font-size: 0.85em;
+                opacity: 0;
+                transform: translate(-4px, 4px);
+                transition: all 0.3s ease;
+                display: inline-block;
+            }
+
+            .references a:hover::after {
+                opacity: 1;
+                transform: translate(0, 0);
+            }
+
+            /* ===============================================
+           FOOTER
+           =============================================== */
+            .footer {
+                background: rgba(255, 255, 255, 0.9);
+                -webkit-backdrop-filter: blur(16px) saturate(180%);
+                backdrop-filter: blur(16px) saturate(180%);
+                border-top: 1px solid var(--color-border);
+                padding: var(--space-2xl) var(--space-xl);
+                margin-top: var(--space-4xl);
+                position: relative;
+                z-index: 10;
+            }
+
+            .footer-container {
+                max-width: 1400px;
+                margin: 0 auto;
+                text-align: center;
+            }
+
+            .footer-content {
+                font-size: var(--text-sm);
+                color: var(--color-base-text-muted);
+                margin-bottom: var(--space-lg);
+            }
+
+            .language-selector {
+                display: flex;
+                gap: var(--space-md);
+                justify-content: center;
+                flex-wrap: wrap;
+                margin-top: var(--space-lg);
+            }
+
+            .language-link {
+                padding: var(--space-sm) var(--space-lg);
+                background: linear-gradient(135deg, rgba(16, 185, 129, 0.1), rgba(59, 130, 246, 0.1));
+                border: 1px solid var(--color-border);
+                border-radius: var(--radius-full);
+                color: var(--color-accent-1);
+                text-decoration: none;
+                font-size: var(--text-sm);
+                font-weight: var(--weight-medium);
+                transition: all 0.3s ease;
+            }
+
+            .language-link:hover {
+                background: var(--gradient-primary);
+                color: white;
+                transform: translateY(-2px);
+                box-shadow: var(--shadow-md);
+            }
+
+            /* ===============================================
+           RESPONSIVE DESIGN
+           =============================================== */
+            @media (max-width: 768px) {
+                .nav-container {
+                    flex-direction: column;
+                    gap: var(--space-md);
                     text-align: center;
-                    position: fixed;
-                    margin-top: 6vh;
-                    left: 0px;
-                    right: 0px;
-                    line-height: 3.5vmax;
-                    font-size: 1.5vmax;
-                    font-family: 'Arial';
                 }
 
-                #sidebar .subtitle {
-                    text-align: center;
-                    top: 5vh;
-                    left: 0px;
-                    right: 0px;
-                    position: fixed;
-                    margin-top: 10vh;
-                    font-size: 1.5vmax;
+                .breadcrumbs {
+                    justify-content: center;
                 }
 
-                #sidebar .title a:link,
-                #sidebar .title a:visited {
-                    text-align: center;
-                    color: #FFFFFF;
+                .hero {
+                    padding: var(--space-3xl) var(--space-lg) var(--space-2xl);
                 }
 
-                #sidebar .subtitle a:link,
-                #sidebar .subtitle a:visited {
-                    text-align: center;
-                    color: #FFFFFF;
+                .main-content {
+                    padding: 0 var(--space-lg) var(--space-3xl);
                 }
 
-                .home {
-                    z-index: 100;
-                    width: 100%;
-                    background-color: #1B80CF;
-                    font-size: 1.5vmax;
+                .content-section {
+                    padding: var(--space-2xl) var(--space-lg);
                 }
 
-                .home a:link,
-                .home a:visited {
-                    text-decoration: none;
-                    color: #FFFFFF;
+                .references {
+                    padding: var(--space-2xl) var(--space-lg);
                 }
 
-                .content {
-                    line-height: 3.8vmax;
-                    font-size: 1.8vmax;
-                    font-family: 'Arial';
-                    margin-top: 22vh;
+                .content-section li,
+                .references li {
+                    padding-left: var(--space-2xl);
                 }
 
-                .content a:link,
-                .content a:visited {
-                    color: #1B80CF;
+                .content-section li::before,
+                .references li::before {
+                    left: var(--space-sm);
                 }
+            }
 
-                .page {
-                    top: 40vh;
-                    width: 95%;
-                    margin-left: 0vw;
-                }
+            /* ===============================================
+           ACCESSIBILITY
+           =============================================== */
+            @media (prefers-reduced-motion: reduce) {
 
-                .page img {
-                    max-width: 100%;
-                    max-height: 100%;
-                    border: 0;
+                *,
+                *::before,
+                *::after {
+                    animation-duration: 0.01ms !important;
+                    animation-iteration-count: 1 !important;
+                    transition-duration: 0.01ms !important;
                 }
+            }
+
+            /* Focus States */
+            a:focus-visible,
+            button:focus-visible {
+                outline: 3px solid var(--color-accent-1);
+                outline-offset: 3px;
+                border-radius: var(--radius-sm);
+            }
+
+            /* Selection */
+            ::selection {
+                background: var(--color-accent-1);
+                color: white;
             }
         </style>
     </head>
 
-    <body vocab="http://schema.org/">
-        <div class="page">
-            <div class="home">
-                <ul typeof="BreadcrumbList">
-                    <li property="itemListElement" typeof="ListItem">
-                        <a property="item" typeof="WebPage" href="../index.html">
-                            <span property="name">Home</span>
-                        </a>
-                    </li>
-                    <li property="itemListElement" typeof="ListItem">
-                        <a property="item" typeof="WebPage" href="../research/research.html">
-                            <span property="name">Research</span>
-                        </a>
-                    </li>
-                </ul>
+    <body>
+        <a href="#main-content" class="skip-link">Skip to main content</a>
 
-            </div>
-            <div id="sidebar">
-                <div class="title">
-                    <h1><a href="./application-metrics.html">Application Metrics</a></h1>
+        <div class="page-container">
+            <!-- Navigation -->
+            <nav class="navigation" role="navigation" aria-label="Main navigation">
+                <div class="nav-container">
+                    <div class="site-name">
+                        <a href="../index.html">John Samuel</a>
+                    </div>
+                    <ul class="breadcrumbs" vocab="http://schema.org/" typeof="BreadcrumbList">
+                        <li property="itemListElement" typeof="ListItem">
+                            <a property="item" typeof="WebPage" href="../index.html">
+                                <span property="name">Home</span>
+                            </a>
+                        </li>
+                        <li property="itemListElement" typeof="ListItem">
+                            <a property="item" typeof="WebPage" href="../research/research.html">
+                                <span property="name">Research</span>
+                            </a>
+                        </li>
+                        <li property="itemListElement" typeof="ListItem">
+                            <a property="item" typeof="WebPage" href="./application-metrics.html">
+                                <span property="name">Application Metrics</span>
+                            </a>
+                        </li>
+                    </ul>
                 </div>
-                <div class="subtitle">
-                    <h3><a href="../about.html">John Samuel</a></h3>
+            </nav>
+
+            <!-- Hero Section -->
+            <header class="hero">
+                <div class="hero-content">
+                    <h1 class="page-title">Application Metrics</h1>
+                    <p class="page-subtitle">Understanding Application Metrics: From Performance to Sustainability</p>
                 </div>
-            </div>
 
-            <div class="content">
-                <article>
-                    <header>
-                        <h2>Understanding Application Metrics: From Performance to Sustainability</h2>
-                    </header>
+                <!-- SVG Illustration - Performance Metrics Dashboard -->
+                <div class="hero-illustration">
+                    <svg viewBox="0 0 700 350" xmlns="http://www.w3.org/2000/svg" role="img" aria-hidden="true">
+                        <defs>
+                            <!-- Gradients -->
+                            <linearGradient id="metricGrad1" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" style="stop-color:#10b981;stop-opacity:1" />
+                                <stop offset="100%" style="stop-color:#059669;stop-opacity:1" />
+                            </linearGradient>
+                            <linearGradient id="metricGrad2" x1="0%" y1="0%" x2="100%" y2="0%">
+                                <stop offset="0%" style="stop-color:#3b82f6;stop-opacity:1" />
+                                <stop offset="100%" style="stop-color:#8b5cf6;stop-opacity:1" />
+                            </linearGradient>
+                            <linearGradient id="metricGrad3" x1="0%" y1="100%" x2="100%" y2="0%">
+                                <stop offset="0%" style="stop-color:#f59e0b;stop-opacity:1" />
+                                <stop offset="100%" style="stop-color:#10b981;stop-opacity:1" />
+                            </linearGradient>
 
-                    <section>
-                        <h3>1. Introduction</h3>
-                        <p>
-                            Application metrics form the backbone of modern software observability and
-                            performance engineering.
-                            By measuring how applications consume system resources and interact with their
-                            environment,
-                            developers can detect bottlenecks, forecast capacity needs, and ensure compliance
-                            with service-level objectives (SLOs).
-                            In the following sections, we discuss both foundational metrics and advanced tools,
-                            including those
-                            concerned with energy efficiency and sustainability.
-                        </p>
-                    </section>
+                            <!-- Glow Filter -->
+                            <filter id="metricGlow">
+                                <feGaussianBlur stdDeviation="3" result="coloredBlur" />
+                                <feMerge>
+                                    <feMergeNode in="coloredBlur" />
+                                    <feMergeNode in="SourceGraphic" />
+                                </feMerge>
+                            </filter>
+                        </defs>
 
-                    <section>
-                        <h3>2. Core Resource Metrics</h3>
+                        <!-- Dashboard Background -->
+                        <rect x="50" y="50" width="600" height="250" rx="16" fill="white" opacity="0.1"
+                            stroke="url(#metricGrad1)" stroke-width="2" />
 
-                        <h3>2.1 CPU Usage</h3>
-                        <p>
-                            Monitoring CPU usage is essential for understanding the computational demand of an
-                            application.
-                            It helps identify resource-heavy functions and evaluate the need for scaling
-                            horizontally or vertically.
-                            The following question helps guide this metric:
-                        </p>
-                        <ul>
-                            <li>What is the current and average CPU usage of the application?</li>
-                        </ul>
-                        <p>
-                            Sustained high CPU usage may indicate inefficient algorithms or insufficient
-                            hardware allocation.
-                            Spikes, on the other hand, may signal intermittent load issues or garbage collection
-                            overhead.
-                        </p>
+                        <!-- Performance Graph Lines -->
+                        <g>
+                            <!-- CPU Usage Line Chart -->
+                            <path d="M 80 220 Q 150 180, 220 200 T 360 160 T 500 180 T 620 140" fill="none"
+                                stroke="url(#metricGrad1)" stroke-width="3" opacity="0.8" filter="url(#metricGlow)">
+                                <animate attributeName="d" values="M 80 220 Q 150 180, 220 200 T 360 160 T 500 180 T 620 140;
+                                             M 80 220 Q 150 190, 220 210 T 360 170 T 500 190 T 620 150;
+                                             M 80 220 Q 150 180, 220 200 T 360 160 T 500 180 T 620 140" dur="4s"
+                                    repeatCount="indefinite" />
+                            </path>
 
-                        <h3>2.2 Memory Usage</h3>
-                        <p>
-                            Memory usage tracking reveals how efficiently an application utilizes RAM. Memory
-                            leaks or fragmentation can degrade performance or even crash the system.
-                            Consider the following:
-                        </p>
-                        <ul>
-                            <li>What is the memory footprint under peak load?</li>
-                            <li>Does the memory usage grow over time (indicative of leaks)?</li>
-                        </ul>
-                        <p>
-                            Memory profiling can be especially useful during stress testing and long-running
-                            integration scenarios.
-                        </p>
+                            <!-- Memory Usage Line Chart -->
+                            <path d="M 80 240 Q 150 220, 220 230 T 360 200 T 500 210 T 620 180" fill="none"
+                                stroke="url(#metricGrad2)" stroke-width="3" opacity="0.7" filter="url(#metricGlow)">
+                                <animate attributeName="d" values="M 80 240 Q 150 220, 220 230 T 360 200 T 500 210 T 620 180;
+                                             M 80 240 Q 150 230, 220 240 T 360 210 T 500 220 T 620 190;
+                                             M 80 240 Q 150 220, 220 230 T 360 200 T 500 210 T 620 180" dur="3.5s"
+                                    repeatCount="indefinite" />
+                            </path>
 
-                        <h3>2.3 Disk Usage</h3>
-                        <p>
-                            Disk usage is critical for applications handling logs, media, or large datasets.
-                            Persistent storage consumption directly affects system throughput and latency.
-                        </p>
-                        <ul>
-                            <li>What is the total disk space used by application logs, cache, or storage
-                                components?</li>
-                        </ul>
-                        <p>
-                            Keeping disk usage within reasonable thresholds helps prevent I/O wait bottlenecks
-                            and ensures faster read/write operations.
-                        </p>
-                    </section>
+                            <!-- Network Throughput Line Chart -->
+                            <path d="M 80 260 Q 150 245, 220 250 T 360 230 T 500 240 T 620 210" fill="none"
+                                stroke="url(#metricGrad3)" stroke-width="3" opacity="0.6" filter="url(#metricGlow)">
+                                <animate attributeName="d" values="M 80 260 Q 150 245, 220 250 T 360 230 T 500 240 T 620 210;
+                                             M 80 260 Q 150 250, 220 255 T 360 235 T 500 245 T 620 215;
+                                             M 80 260 Q 150 245, 220 250 T 360 230 T 500 240 T 620 210" dur="4.5s"
+                                    repeatCount="indefinite" />
+                            </path>
+                        </g>
 
-                    <section>
-                        <h3>3. Network Metrics</h3>
-                        <p>
-                            Applications operating in distributed environments rely heavily on network
-                            infrastructure.
-                            Measuring and understanding network behavior is essential for user experience,
-                            reliability, and debugging.
-                        </p>
+                        <!-- Metric Cards - Top -->
+                        <g>
+                            <!-- CPU Metric Card -->
+                            <rect x="80" y="70" width="140" height="60" rx="8" fill="url(#metricGrad1)" opacity="0.2" />
+                            <text x="150" y="95" text-anchor="middle" fill="#10b981" font-size="14"
+                                font-weight="600">CPU</text>
+                            <text x="150" y="115" text-anchor="middle" fill="#059669" font-size="20" font-weight="700">
+                                <animate attributeName="opacity" values="1;0.7;1" dur="2s" repeatCount="indefinite" />
+                                67%
+                            </text>
 
-                        <ul>
-                            <li>What is the network bandwidth usage of the application?</li>
-                            <li>What is the observed network latency during different time windows?</li>
-                            <li>What is the average and peak network throughput?</li>
-                            <li>What is the packet loss rate during high-concurrency scenarios?</li>
-                        </ul>
+                            <!-- Memory Metric Card -->
+                            <rect x="240" y="70" width="140" height="60" rx="8" fill="url(#metricGrad2)"
+                                opacity="0.2" />
+                            <text x="310" y="95" text-anchor="middle" fill="#3b82f6" font-size="14"
+                                font-weight="600">Memory</text>
+                            <text x="310" y="115" text-anchor="middle" fill="#8b5cf6" font-size="20" font-weight="700">
+                                <animate attributeName="opacity" values="1;0.7;1" dur="2.3s" repeatCount="indefinite" />
+                                4.2GB
+                            </text>
 
-                        <p>
-                            Network metrics help pinpoint issues with connectivity, application load balancing,
-                            or geographic distribution of users.
-                            They are especially critical for APIs, multiplayer games, streaming platforms, and
-                            edge applications.
-                        </p>
-                    </section>
+                            <!-- Network Metric Card -->
+                            <rect x="400" y="70" width="140" height="60" rx="8" fill="url(#metricGrad3)"
+                                opacity="0.2" />
+                            <text x="470" y="95" text-anchor="middle" fill="#f59e0b" font-size="14"
+                                font-weight="600">Network</text>
+                            <text x="470" y="115" text-anchor="middle" fill="#10b981" font-size="20" font-weight="700">
+                                <animate attributeName="opacity" values="1;0.7;1" dur="2.7s" repeatCount="indefinite" />
+                                12Mb/s
+                            </text>
+                        </g>
 
-                    <section>
-                        <h3>4. Response Time and Application Throughput</h3>
-                        <p>
-                            Performance from the user's perspective is often measured via response time and
-                            throughput.
-                            These metrics reflect how quickly and reliably an application processes requests
-                            under different loads.
-                        </p>
+                        <!-- Data Points on Lines -->
+                        <g>
+                            <!-- CPU data points -->
+                            <circle cx="220" cy="200" r="5" fill="#10b981" filter="url(#metricGlow)">
+                                <animate attributeName="cy" values="200;210;200" dur="4s" repeatCount="indefinite" />
+                                <animate attributeName="r" values="5;7;5" dur="2s" repeatCount="indefinite" />
+                            </circle>
+                            <circle cx="360" cy="160" r="5" fill="#10b981" filter="url(#metricGlow)">
+                                <animate attributeName="cy" values="160;170;160" dur="4s" repeatCount="indefinite" />
+                                <animate attributeName="r" values="5;7;5" dur="2.2s" repeatCount="indefinite" />
+                            </circle>
+                            <circle cx="500" cy="180" r="5" fill="#10b981" filter="url(#metricGlow)">
+                                <animate attributeName="cy" values="180;190;180" dur="4s" repeatCount="indefinite" />
+                                <animate attributeName="r" values="5;7;5" dur="2.4s" repeatCount="indefinite" />
+                            </circle>
 
-                        <ul>
-                            <li>What is the average response time per endpoint or transaction?</li>
-                            <li>What portion of response time is due to internal latency?</li>
-                            <li>How many concurrent requests can the system handle per second (throughput)?</li>
-                        </ul>
+                            <!-- Memory data points -->
+                            <circle cx="220" cy="230" r="4" fill="#3b82f6" opacity="0.8">
+                                <animate attributeName="cy" values="230;240;230" dur="3.5s" repeatCount="indefinite" />
+                            </circle>
+                            <circle cx="360" cy="200" r="4" fill="#3b82f6" opacity="0.8">
+                                <animate attributeName="cy" values="200;210;200" dur="3.5s" repeatCount="indefinite" />
+                            </circle>
+                            <circle cx="500" cy="210" r="4" fill="#3b82f6" opacity="0.8">
+                                <animate attributeName="cy" values="210;220;210" dur="3.5s" repeatCount="indefinite" />
+                            </circle>
+                        </g>
 
-                        <p>
-                            These indicators are typically visualized using latency histograms or percentile
-                            breakdowns (e.g., P50, P95, P99) and are
-                            essential for validating service-level agreements (SLAs).
-                        </p>
-                    </section>
+                        <!-- Progress Bars - Bottom Right -->
+                        <g>
+                            <!-- Bar 1 -->
+                            <rect x="560" y="220" width="80" height="8" rx="4" fill="#e5e7eb" />
+                            <rect x="560" y="220" width="56" height="8" rx="4" fill="url(#metricGrad1)">
+                                <animate attributeName="width" values="56;64;56" dur="3s" repeatCount="indefinite" />
+                            </rect>
 
-                    <section>
-                        <h3>5. Tools for Visualization and Monitoring</h3>
-                        <p>
-                            Gathering and interpreting application metrics requires appropriate tools for
-                            real-time observation and long-term analysis.
-                            Below is a categorized overview of commonly used solutions across different
-                            platforms and purposes.
-                        </p>
+                            <!-- Bar 2 -->
+                            <rect x="560" y="240" width="80" height="8" rx="4" fill="#e5e7eb" />
+                            <rect x="560" y="240" width="48" height="8" rx="4" fill="url(#metricGrad2)">
+                                <animate attributeName="width" values="48;56;48" dur="3.5s" repeatCount="indefinite" />
+                            </rect>
 
-                        <h3>5.1 Command-Line Tools</h3>
-                        <p>
-                            These tools are essential for diagnosing performance issues on local or remote
-                            UNIX-based systems.
-                        </p>
-                        <ul>
-                            <li><strong>htop</strong>, <strong>top</strong> – Real-time process and resource
-                                monitors.</li>
-                            <li><strong>iostat</strong>, <strong>vmstat</strong>, <strong>netstat</strong> –
-                                Provide statistics on disk I/O, memory usage, and network connections.</li>
-                        </ul>
-                        <p>
-                            Such tools are lightweight and valuable during SSH-based debugging or container
-                            introspection.
-                        </p>
+                            <!-- Bar 3 -->
+                            <rect x="560" y="260" width="80" height="8" rx="4" fill="#e5e7eb" />
+                            <rect x="560" y="260" width="64" height="8" rx="4" fill="url(#metricGrad3)">
+                                <animate attributeName="width" values="64;72;64" dur="4s" repeatCount="indefinite" />
+                            </rect>
+                        </g>
 
-                        <h3>5.2 Web and Cloud-Native Monitoring</h3>
-                        <p>
-                            These frameworks provide extensive dashboarding, alerting, and time-series
-                            visualizations for large-scale systems.
-                        </p>
-                        <ul>
-                            <li><strong>Prometheus</strong> – Used for scraping and storing time-series metrics
-                                with alerting features.</li>
-                            <li><strong>Grafana</strong> – Visualizes metrics from Prometheus and other sources
-                                in dashboards.</li>
-                            <li><strong>Kibana</strong> – Focused on log analytics and often used in the ELK
-                                stack.</li>
-                        </ul>
-                        <p>
-                            These tools support integrations with cloud-native technologies like Kubernetes and
-                            microservice orchestrators.
-                        </p>
+                        <!-- Monitoring Icons -->
+                        <g>
+                            <!-- Graph Icon -->
+                            <circle cx="620" cy="100" r="16" fill="white" opacity="0.2" stroke="url(#metricGrad1)"
+                                stroke-width="2" />
+                            <path d="M 612 100 L 616 96 L 620 98 L 624 94 L 628 96" fill="none" stroke="#10b981"
+                                stroke-width="2" stroke-linecap="round">
+                                <animate attributeName="d" values="M 612 100 L 616 96 L 620 98 L 624 94 L 628 96;
+                                             M 612 100 L 616 98 L 620 96 L 624 92 L 628 94;
+                                             M 612 100 L 616 96 L 620 98 L 624 94 L 628 96" dur="3s"
+                                    repeatCount="indefinite" />
+                            </path>
 
-                        <h3>5.3 Platform-Specific Monitoring</h3>
-                        <p>
-                            Some tools are tightly coupled with specific languages or operating systems.
-                        </p>
-                        <ul>
-                            <li><strong>JVisualVM</strong>, <strong>JConsole</strong> – Java monitoring tools
-                                that offer profiling, heap dumps, and thread monitoring.</li>
-                            <li><strong>PerfMon</strong> (Windows Performance Monitor) – Built-in Windows tool
-                                for tracking hardware and application metrics.</li>
-                            <li><strong>Process Explorer</strong> – Part of Sysinternals, gives deep process and
-                                handle visibility.</li>
-                        </ul>
-                        <p>
-                            These tools help diagnose memory leaks, GC issues, or permission/access failures.
-                        </p>
+                            <!-- Activity pulse -->
+                            <circle cx="80" cy="100" r="12" fill="none" stroke="url(#metricGrad1)" stroke-width="2">
+                                <animate attributeName="r" values="8;14;8" dur="2s" repeatCount="indefinite" />
+                                <animate attributeName="opacity" values="0.8;0.3;0.8" dur="2s"
+                                    repeatCount="indefinite" />
+                            </circle>
+                            <circle cx="80" cy="100" r="6" fill="#10b981" opacity="0.8">
+                                <animate attributeName="opacity" values="0.8;1;0.8" dur="2s" repeatCount="indefinite" />
+                            </circle>
+                        </g>
+                    </svg>
+                </div>
+            </header>
 
-                        <h3>5.4 System-Level Observability</h3>
-                        <p>
-                            For diagnosing lower-level performance or kernel-related issues, advanced
-                            observability tools can be employed.
-                        </p>
-                        <ul>
-                            <li><strong>DTrace</strong> – Dynamic instrumentation for kernel and user-space
-                                tracing (Solaris, macOS).</li>
-                            <li><strong>SystemTap</strong> – Similar capability for Linux systems.</li>
-                        </ul>
-                        <p>
-                            These tools require elevated privileges and deep OS-level knowledge.
-                        </p>
+            <!-- Main Content -->
+            <main id="main-content" class="main-content">
+                <!-- Introduction Section -->
+                <section class="content-section">
+                    <h2 class="section-heading">1. Introduction</h2>
+                    <p>Application metrics form the backbone of modern software observability and performance
+                        engineering. By measuring how applications consume system resources and interact with their
+                        environment, developers can detect bottlenecks, forecast capacity needs, and ensure compliance
+                        with service-level objectives (SLOs). In the following sections, we discuss both foundational
+                        metrics and advanced tools, including those concerned with energy efficiency and sustainability.
+                    </p>
+                </section>
 
-                        <h3>5.5 Emerging Observability Platforms</h3>
-                        <p>
-                            Modern DevOps workflows often use integrated observability platforms for metrics,
-                            logs, and traces.
-                        </p>
-                        <ul>
-                            <li><strong>OpenTelemetry</strong> – Industry-standard for collecting, processing,
-                                and exporting telemetry data.</li>
-                            <li><strong>Lightstep</strong>, <strong>Datadog</strong>, <strong>New Relic</strong>
-                                – Full-stack platforms offering ML-based anomaly detection and service mapping.
-                            </li>
-                        </ul>
-                        <p>
-                            These platforms unify monitoring and debugging across distributed microservices and
-                            hybrid cloud environments.
-                        </p>
-                    </section>
+                <!-- Core Resource Metrics -->
+                <section class="content-section">
+                    <h2 class="section-heading">2. Core Resource Metrics</h2>
 
-                    <section>
-                        <h3>6. Green Computing and Sustainability Metrics</h3>
-                        <p>
-                            As the environmental impact of computing becomes a global concern, measuring energy
-                            consumption and carbon output has become a key part of responsible application
-                            development.
-                        </p>
+                    <h3 class="subsection-heading">2.1 CPU Usage</h3>
+                    <p>Monitoring CPU usage is essential for understanding the computational demand of an application.
+                        It helps identify resource-heavy functions and evaluate the need for scaling horizontally or
+                        vertically. The following question helps guide this metric:</p>
 
-                        <h3>6.1 Energy and Power Efficiency</h3>
-                        <p>
-                            Applications can be instrumented to track real-time energy usage using
-                            hardware-based tools and energy profilers.
-                        </p>
-                        <ul>
-                            <li>Intel Power Gadget – Tracks CPU power on Intel processors.</li>
-                            <li>ARM Energy Probe – Measures board-level energy consumption.</li>
-                        </ul>
-                        <p>
-                            Energy data can inform runtime decisions such as dynamic frequency scaling or
-                            offloading compute to more efficient hardware.
-                        </p>
+                    <ul>
+                        <li>What is the current and average CPU usage of the application?</li>
+                    </ul>
 
-                        <h3>6.2 Time-Space Trade-offs</h3>
-                        <p>
-                            Sustainable applications often optimize computational complexity to reduce overall
-                            processing time and resource allocation.
-                            Developers should consider:
-                        </p>
-                        <ul>
-                            <li>Using algorithms with lower big-O complexity</li>
-                            <li>Minimizing disk I/O and redundant computations</li>
-                            <li>Reducing in-memory copies and cache misses</li>
-                        </ul>
-                        <p>
-                            Efficient coding directly translates to lower energy consumption and improved
-                            scalability.
-                        </p>
+                    <p>Sustained high CPU usage may indicate inefficient algorithms or insufficient hardware allocation.
+                        Spikes, on the other hand, may signal intermittent load issues or garbage collection overhead.
+                    </p>
 
-                        <h3>6.3 Green AI Metrics</h3>
-                        <p>
-                            Green AI focuses on measuring and reducing the carbon footprint of training and
-                            inference tasks.
-                        </p>
-                        <ul>
-                            <li>FLOPs per watt – Measures compute efficiency</li>
-                            <li>CO₂ equivalent emissions per model</li>
-                            <li>Training time vs inference speed ratio</li>
-                        </ul>
-                        <p>
-                            Such metrics are increasingly reported in academic publications and benchmarks
-                            (e.g., MLPerf, Green AI Index).
-                        </p>
-                    </section>
+                    <h3 class="subsection-heading">2.2 Memory Usage</h3>
+                    <p>Memory usage tracking reveals how efficiently an application utilizes RAM. Memory leaks or
+                        fragmentation can degrade performance or even crash the system. Consider the following:</p>
 
-                    <section>
-                        <h3>7. Conclusion</h3>
-                        <p>
-                            Application metrics serve not only as operational indicators but also as ethical
-                            tools for creating performant, scalable, and sustainable systems.
-                            The evolution from system-level counters to distributed observability and green
-                            computing metrics illustrates a shift toward holistic engineering practices.
-                            With the right measurement strategies and tools, teams can optimize both performance
-                            and ecological footprint.
-                        </p>
-                    </section>
+                    <ul>
+                        <li>What is the memory footprint under peak load?</li>
+                        <li>Does the memory usage grow over time (indicative of leaks)?</li>
+                    </ul>
 
-                    <section>
-                        <h3>References</h3>
-                        <ol>
-                            <li><a href="https://en.wikipedia.org/wiki/Software_metric">Software Metric –
-                                    Wikipedia</a></li>
-                            <li><a href="https://en.wikipedia.org/wiki/Observability">Observability –
-                                    Wikipedia</a></li>
-                            <li><a href="https://opentelemetry.io/">OpenTelemetry Documentation</a></li>
-                            <li><a href="https://prometheus.io/docs/introduction/overview/">Prometheus
-                                    Overview</a></li>
-                            <li><a href="https://grafana.com/docs/grafana/latest/">Grafana Documentation</a>
-                            </li>
-                            <li><a href="https://www.elastic.co/kibana">Kibana – Elastic</a></li>
-                            <li><a href="https://en.wikipedia.org/wiki/Green_computing">Green Computing –
-                                    Wikipedia</a></li>
-                            <li><a href="https://arxiv.org/abs/1907.10597">Green AI – Schwartz et al. (2019),
-                                    arXiv</a></li>
-                            <li><a href="https://learn.microsoft.com/en-us/sysinternals/downloads/process-explorer">Process
-                                    Explorer – Microsoft Sysinternals</a></li>
-                            <li><a href="https://docs.oracle.com/javase/8/docs/technotes/guides/visualvm/index.html">JVisualVM
-                                    Documentation</a></li>
-                            <li><a href="https://en.wikipedia.org/wiki/Carbon_footprint">Carbon Footprint –
-                                    Wikipedia</a></li>
-                        </ol>
-                    </section>
-                </article>
-            </div>
+                    <p>Memory profiling can be especially useful during stress testing and long-running integration
+                        scenarios.</p>
+
+                    <h3 class="subsection-heading">2.3 Disk Usage</h3>
+                    <p>Disk usage is critical for applications handling logs, media, or large datasets. Persistent
+                        storage consumption directly affects system throughput and latency.</p>
+
+                    <ul>
+                        <li>What is the total disk space used by application logs, cache, or storage components?</li>
+                    </ul>
+
+                    <p>Keeping disk usage within reasonable thresholds helps prevent I/O wait bottlenecks and ensures
+                        faster read/write operations.</p>
+                </section>
+
+                <!-- Network Metrics -->
+                <section class="content-section">
+                    <h2 class="section-heading">3. Network Metrics</h2>
+                    <p>Applications operating in distributed environments rely heavily on network infrastructure.
+                        Measuring and understanding network behavior is essential for user experience, reliability, and
+                        debugging.</p>
+
+                    <ul>
+                        <li>What is the network bandwidth usage of the application?</li>
+                        <li>What is the observed network latency during different time windows?</li>
+                        <li>What is the average and peak network throughput?</li>
+                        <li>What is the packet loss rate during high-concurrency scenarios?</li>
+                    </ul>
+
+                    <p>Network metrics help pinpoint issues with connectivity, application load balancing, or geographic
+                        distribution of users. They are especially critical for APIs, multiplayer games, streaming
+                        platforms, and edge applications.</p>
+                </section>
+
+                <!-- Response Time and Application Throughput -->
+                <section class="content-section">
+                    <h2 class="section-heading">4. Response Time and Application Throughput</h2>
+                    <p>Performance from the user's perspective is often measured via response time and throughput. These
+                        metrics reflect how quickly and reliably an application processes requests under different
+                        loads.</p>
+
+                    <ul>
+                        <li>What is the average response time per endpoint or transaction?</li>
+                        <li>What portion of response time is due to internal latency?</li>
+                        <li>How many concurrent requests can the system handle per second (throughput)?</li>
+                    </ul>
+
+                    <p>These indicators are typically visualized using latency histograms or percentile breakdowns
+                        (e.g., P50, P95, P99) and are essential for validating service-level agreements (SLAs).</p>
+                </section>
+
+                <!-- Tools for Visualization and Monitoring -->
+                <section class="content-section">
+                    <h2 class="section-heading">5. Tools for Visualization and Monitoring</h2>
+                    <p>Gathering and interpreting application metrics requires appropriate tools for real-time
+                        observation and long-term analysis. Below is a categorized overview of commonly used solutions
+                        across different platforms and purposes.</p>
+
+                    <h3 class="subsection-heading">5.1 Command-Line Tools</h3>
+                    <p>These tools are essential for diagnosing performance issues on local or remote UNIX-based
+                        systems.</p>
+
+                    <ul>
+                        <li><strong>htop</strong>, <strong>top</strong> – Real-time process and resource monitors.</li>
+                        <li><strong>iostat</strong>, <strong>vmstat</strong>, <strong>netstat</strong> – Provide
+                            statistics on disk I/O, memory usage, and network connections.</li>
+                    </ul>
+
+                    <p>Such tools are lightweight and valuable during SSH-based debugging or container introspection.
+                    </p>
+
+                    <h3 class="subsection-heading">5.2 Web and Cloud-Native Monitoring</h3>
+                    <p>These frameworks provide extensive dashboarding, alerting, and time-series visualizations for
+                        large-scale systems.</p>
+
+                    <ul>
+                        <li><strong>Prometheus</strong> – Used for scraping and storing time-series metrics with
+                            alerting features.</li>
+                        <li><strong>Grafana</strong> – Visualizes metrics from Prometheus and other sources in
+                            dashboards.</li>
+                        <li><strong>Kibana</strong> – Focused on log analytics and often used in the ELK stack.</li>
+                    </ul>
+
+                    <p>These tools support integrations with cloud-native technologies like Kubernetes and microservice
+                        orchestrators.</p>
+
+                    <h3 class="subsection-heading">5.3 Platform-Specific Monitoring</h3>
+                    <p>Some tools are tightly coupled with specific languages or operating systems.</p>
+
+                    <ul>
+                        <li><strong>JVisualVM</strong>, <strong>JConsole</strong> – Java monitoring tools that offer
+                            profiling, heap dumps, and thread monitoring.</li>
+                        <li><strong>PerfMon</strong> (Windows Performance Monitor) – Built-in Windows tool for tracking
+                            hardware and application metrics.</li>
+                        <li><strong>Process Explorer</strong> – Part of Sysinternals, gives deep process and handle
+                            visibility.</li>
+                    </ul>
+
+                    <p>These tools help diagnose memory leaks, GC issues, or permission/access failures.</p>
+
+                    <h3 class="subsection-heading">5.4 System-Level Observability</h3>
+                    <p>For diagnosing lower-level performance or kernel-related issues, advanced observability tools can
+                        be employed.</p>
+
+                    <ul>
+                        <li><strong>DTrace</strong> – Dynamic instrumentation for kernel and user-space tracing
+                            (Solaris, macOS).</li>
+                        <li><strong>SystemTap</strong> – Similar capability for Linux systems.</li>
+                    </ul>
+
+                    <p>These tools require elevated privileges and deep OS-level knowledge.</p>
+
+                    <h3 class="subsection-heading">5.5 Emerging Observability Platforms</h3>
+                    <p>Modern DevOps workflows often use integrated observability platforms for metrics, logs, and
+                        traces.</p>
+
+                    <ul>
+                        <li><strong>OpenTelemetry</strong> – Industry-standard for collecting, processing, and exporting
+                            telemetry data.</li>
+                        <li><strong>Lightstep</strong>, <strong>Datadog</strong>, <strong>New Relic</strong> –
+                            Full-stack platforms offering ML-based anomaly detection and service mapping.</li>
+                    </ul>
+
+                    <p>These platforms unify monitoring and debugging across distributed microservices and hybrid cloud
+                        environments.</p>
+                </section>
+
+                <!-- Green Computing and Sustainability Metrics -->
+                <section class="content-section">
+                    <h2 class="section-heading">6. Green Computing and Sustainability Metrics</h2>
+                    <p>As the environmental impact of computing becomes a global concern, measuring energy consumption
+                        and carbon output has become a key part of responsible application development.</p>
+
+                    <h3 class="subsection-heading">6.1 Energy and Power Efficiency</h3>
+                    <p>Applications can be instrumented to track real-time energy usage using hardware-based tools and
+                        energy profilers.</p>
+
+                    <ul>
+                        <li>Intel Power Gadget – Tracks CPU power on Intel processors.</li>
+                        <li>ARM Energy Probe – Measures board-level energy consumption.</li>
+                    </ul>
+
+                    <p>Energy data can inform runtime decisions such as dynamic frequency scaling or offloading compute
+                        to more efficient hardware.</p>
+
+                    <h3 class="subsection-heading">6.2 Time-Space Trade-offs</h3>
+                    <p>Sustainable applications often optimize computational complexity to reduce overall processing
+                        time and resource allocation. Developers should consider:</p>
+
+                    <ul>
+                        <li>Using algorithms with lower big-O complexity</li>
+                        <li>Minimizing disk I/O and redundant computations</li>
+                        <li>Reducing in-memory copies and cache misses</li>
+                    </ul>
+
+                    <p>Efficient coding directly translates to lower energy consumption and improved scalability.</p>
+
+                    <h3 class="subsection-heading">6.3 Green AI Metrics</h3>
+                    <p>Green AI focuses on measuring and reducing the carbon footprint of training and inference tasks.
+                    </p>
+
+                    <ul>
+                        <li>FLOPs per watt – Measures compute efficiency</li>
+                        <li>CO₂ equivalent emissions per model</li>
+                        <li>Training time vs inference speed ratio</li>
+                    </ul>
+
+                    <p>Such metrics are increasingly reported in academic publications and benchmarks (e.g., MLPerf,
+                        Green AI Index).</p>
+                </section>
+
+                <!-- Conclusion -->
+                <section class="content-section">
+                    <h2 class="section-heading">7. Conclusion</h2>
+                    <p>Application metrics serve not only as operational indicators but also as ethical tools for
+                        creating performant, scalable, and sustainable systems. The evolution from system-level counters
+                        to distributed observability and green computing metrics illustrates a shift toward holistic
+                        engineering practices. With the right measurement strategies and tools, teams can optimize both
+                        performance and ecological footprint.</p>
+                </section>
+
+                <!-- References -->
+                <aside class="references">
+                    <h3>References</h3>
+                    <ol>
+                        <li><a href="https://en.wikipedia.org/wiki/Software_metric" target="_blank"
+                                rel="noopener noreferrer">Software Metric – Wikipedia</a></li>
+                        <li><a href="https://en.wikipedia.org/wiki/Observability" target="_blank"
+                                rel="noopener noreferrer">Observability – Wikipedia</a></li>
+                        <li><a href="https://opentelemetry.io/" target="_blank" rel="noopener noreferrer">OpenTelemetry
+                                Documentation</a></li>
+                        <li><a href="https://prometheus.io/docs/introduction/overview/" target="_blank"
+                                rel="noopener noreferrer">Prometheus Overview</a></li>
+                        <li><a href="https://grafana.com/docs/grafana/latest/" target="_blank"
+                                rel="noopener noreferrer">Grafana Documentation</a></li>
+                        <li><a href="https://www.elastic.co/kibana" target="_blank" rel="noopener noreferrer">Kibana –
+                                Elastic</a></li>
+                        <li><a href="https://en.wikipedia.org/wiki/Green_computing" target="_blank"
+                                rel="noopener noreferrer">Green Computing – Wikipedia</a></li>
+                        <li><a href="https://arxiv.org/abs/1907.10597" target="_blank" rel="noopener noreferrer">Green
+                                AI – Schwartz et al. (2019), arXiv</a></li>
+                        <li><a href="https://learn.microsoft.com/en-us/sysinternals/downloads/process-explorer"
+                                target="_blank" rel="noopener noreferrer">Process Explorer – Microsoft Sysinternals</a>
+                        </li>
+                        <li><a href="https://docs.oracle.com/javase/8/docs/technotes/guides/visualvm/index.html"
+                                target="_blank" rel="noopener noreferrer">JVisualVM Documentation</a></li>
+                        <li><a href="https://en.wikipedia.org/wiki/Carbon_footprint" target="_blank"
+                                rel="noopener noreferrer">Carbon Footprint – Wikipedia</a></li>
+                    </ol>
+                </aside>
+            </main>
+
+            <!-- Footer -->
+            <footer class="footer">
+                <div class="footer-container">
+                    <div class="footer-content">
+                        <p>&copy; 2024 John Samuel. All content licensed under Creative Commons CC BY-SA 4.0.</p>
+                    </div>
+                    <nav class="language-selector" aria-label="Language selection">
+                        <a href="./application-metrics.html" class="language-link" lang="en">English</a>
+                    </nav>
+                </div>
+            </footer>
         </div>
     </body>
 
