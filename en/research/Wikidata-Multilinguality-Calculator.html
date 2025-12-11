@@ -3,261 +3,567 @@
 
     <head>
         <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <meta http-equiv="Content-Language" content="en" />
         <link rel="shortcut icon" href="../../images/logo/favicon.png" />
         <title>Why and How I developed Wikidata Multilinguality Calculator? : John Samuel</title>
-        <style type="text/css">
-            body {
-                background-color: #FFFFFF;
+        <style>
+            /* ==================== Design Tokens ==================== */
+            :root {
+                /* Base Colors - Light Theme Foundation */
+                --color-base-bg: #f9fafb;
+                --color-base-surface: #ffffff;
+                --color-base-text: #1f2937;
+                --color-base-text-muted: #4b5563;
+
+                /* Multilingual/Global Theme Accents */
+                --color-accent-1: #10b981;
+                --color-accent-2: #059669;
+                --color-accent-3: #34d399;
+                --color-accent-light: #d1fae5;
+                --color-accent-bright: #14b8a6;
+
+                /* Functional Colors */
+                --color-shadow: rgba(16, 185, 129, 0.12);
+                --color-border: rgba(16, 185, 129, 0.15);
+                --color-hover: rgba(16, 185, 129, 0.08);
+
+                /* Gradients */
+                --gradient-primary: linear-gradient(135deg, var(--color-accent-1) 0%, var(--color-accent-bright) 100%);
+                --gradient-subtle: linear-gradient(180deg, var(--color-base-bg), var(--color-accent-light));
+                --gradient-hero: linear-gradient(135deg, #10b981 0%, #14b8a6 50%, #34d399 100%);
+
+                /* Spacing Scale */
+                --space-xs: 0.25rem;
+                --space-sm: 0.5rem;
+                --space-md: 1rem;
+                --space-lg: 1.5rem;
+                --space-xl: 2rem;
+                --space-2xl: 3rem;
+                --space-3xl: 4rem;
+                --space-4xl: 6rem;
+
+                /* Border Radius */
+                --radius-sm: 4px;
+                --radius-md: 8px;
+                --radius-lg: 12px;
+                --radius-xl: 16px;
+                --radius-2xl: 24px;
+                --radius-full: 9999px;
+
+                /* Shadows */
+                --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.04), 0 1px 3px rgba(0, 0, 0, 0.06);
+                --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.05), 0 2px 4px rgba(0, 0, 0, 0.06);
+                --shadow-lg: 0 10px 24px rgba(0, 0, 0, 0.08), 0 4px 8px rgba(0, 0, 0, 0.06);
+                --shadow-xl: 0 20px 40px rgba(0, 0, 0, 0.12), 0 8px 16px rgba(0, 0, 0, 0.08);
+                --shadow-theme: 0 10px 30px var(--color-shadow), 0 4px 10px rgba(0, 0, 0, 0.06);
+
+                /* Typography */
+                --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+                --font-mono: 'SF Mono', Monaco, 'Cascadia Code', 'Consolas', 'Courier New', monospace;
+
+                /* Fluid Typography */
+                --text-xs: clamp(0.75rem, 0.7rem + 0.25vw, 0.875rem);
+                --text-sm: clamp(0.875rem, 0.8rem + 0.35vw, 1rem);
+                --text-base: clamp(1rem, 0.95rem + 0.25vw, 1.125rem);
+                --text-lg: clamp(1.125rem, 1.05rem + 0.35vw, 1.25rem);
+                --text-xl: clamp(1.25rem, 1.15rem + 0.5vw, 1.5rem);
+                --text-2xl: clamp(1.5rem, 1.3rem + 1vw, 2rem);
+                --text-3xl: clamp(2rem, 1.6rem + 2vw, 2.5rem);
+                --text-4xl: clamp(2.5rem, 2rem + 2.5vw, 3.5rem);
             }
 
-            #sidebar {
-                position: fixed;
-                background-color: #1B80CF;
-                top: 0;
-                left: 0;
-                bottom: 0;
-                width: 30vw;
-            }
-
-            #sidebar .title {
-                position: relative;
-                text-align: center;
-                line-height: 4vmax;
-                font-size: 1.4vmax;
-                font-family: 'Arial';
-                margin-top: 25vh;
-            }
-
-            #sidebar .title a:link,
-            #sidebar .title a:visited {
-                color: #FFFFFF;
-                text-decoration: none;
-            }
-
-            .subtitle {
-                top: 50vh;
-                text-align: center;
-                line-height: 1.3vmax;
-                font-family: 'Arial';
-                font-size: 1.5vmax;
-                color: #FFFFFF;
-            }
-
-            .subtitle a:link,
-            .subtitle a:visited {
-                color: #FFFFFF;
-                text-decoration: none;
-            }
-
-            .licence {
-                position: fixed;
-                text-align: right;
-                bottom: 0;
-                right: 0;
-            }
-
-            .home {
-                position: fixed;
-                text-align: left;
-                font-family: 'Arial';
-                color: #D3D3D3;
-                z-index: 100;
-                width: 100%;
-                background-color: #FFFFFF;
-                top: 0px;
-                margin-bottom: 10px;
-                padding-bottom: 10px;
-            }
-
-            .home a:link,
-            .home a:visited {
-                text-decoration: none;
-                color: #D3D3D3;
-            }
-
-            .home ul {
+            /* ==================== Base Styles ==================== */
+            * {
                 margin: 0;
                 padding: 0;
-                text-align: left;
+                box-sizing: border-box;
+            }
+
+            html {
+                scroll-behavior: smooth;
+                scroll-padding-top: 80px;
+            }
+
+            body {
+                font-family: var(--font-sans);
+                font-size: var(--text-base);
+                line-height: 1.7;
+                color: var(--color-base-text);
+                background: var(--color-base-bg);
+                letter-spacing: -0.005em;
+                -webkit-font-smoothing: antialiased;
+                -moz-osx-font-smoothing: grayscale;
+            }
+
+            /* Skip Link */
+            .skip-link {
+                position: absolute;
+                top: -100px;
+                left: 0;
+                background: var(--color-accent-1);
+                color: white;
+                padding: var(--space-md);
+                text-decoration: none;
+                z-index: 100;
+                border-radius: var(--radius-md);
+                margin: var(--space-md);
+            }
+
+            .skip-link:focus {
+                top: 0;
+            }
+
+            /* ==================== Navigation ==================== */
+            .navigation {
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                background: rgba(255, 255, 255, 0.85);
+                -webkit-backdrop-filter: blur(12px) saturate(180%);
+                backdrop-filter: blur(12px) saturate(180%);
+                border-bottom: 1px solid var(--color-border);
+                box-shadow: var(--shadow-sm);
+                z-index: 50;
+                animation: slideDown 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+            }
+
+            .nav-container {
+                max-width: 1400px;
+                margin: 0 auto;
+                padding: var(--space-lg) var(--space-xl);
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                gap: var(--space-xl);
+            }
+
+            .site-name {
+                font-size: var(--text-lg);
+                font-weight: 700;
+                letter-spacing: -0.02em;
+            }
+
+            .site-name a {
+                text-decoration: none;
+                color: var(--color-base-text);
+                background: var(--gradient-primary);
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                background-clip: text;
+                transition: all 0.3s ease;
+            }
+
+            .site-name a:hover {
+                opacity: 0.8;
+            }
+
+            .breadcrumbs {
+                display: flex;
+                align-items: center;
+                gap: var(--space-sm);
+                flex-wrap: wrap;
                 list-style: none;
             }
 
-            .home li {
-                position: relative;
-                float: left;
-                padding-top: 15px;
-                margin-right: 1em;
-                font-family: 'Arial';
+            .breadcrumbs li {
+                display: flex;
+                align-items: center;
+                gap: var(--space-sm);
+                font-size: var(--text-sm);
             }
 
-            .home li:hover {
-                display: block;
+            .breadcrumbs li:not(:last-child)::after {
+                content: '→';
+                color: var(--color-base-text-muted);
+                opacity: 0.5;
             }
 
-            .home a:link,
-            .home a:visited {
-                color: #D3D3D3;
-            }
-
-            .home li:hover a:link,
-            .home li:hover a:visited {
+            .breadcrumbs a {
+                color: var(--color-base-text-muted);
                 text-decoration: none;
-                padding: 15px;
-                color: #FFFFFF;
-                background-color: #1B80CF;
+                transition: color 0.3s ease;
             }
 
-            .content {
-                line-height: 1.8vmax;
-                font-size: 1.2vmax;
-                font-family: 'Arial';
-                margin-top: 15vh;
-                width: 90%;
+            .breadcrumbs a:hover {
+                color: var(--color-accent-1);
             }
 
-            .content h2,
-            h3,
-            h4 {
-                color: #1B80CF;
+            /* ==================== Hero Section ==================== */
+            .hero {
+                margin-top: 80px;
+                position: relative;
+                padding: var(--space-4xl) var(--space-xl) var(--space-3xl);
+                background: var(--gradient-hero);
+                background-size: 200% 200%;
+                animation: gradientShift 12s ease infinite;
+                overflow: visible;
+                min-height: 450px;
+                display: flex;
+                align-items: center;
             }
 
-            .content a:link,
-            .content a:visited {
-                color: #1B80CF;
+            .hero::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background: radial-gradient(circle at 20% 50%, rgba(255, 255, 255, 0.1) 0%, transparent 50%),
+                    radial-gradient(circle at 80% 80%, rgba(255, 255, 255, 0.08) 0%, transparent 50%);
+                animation: pulseGlow 8s ease-in-out infinite;
             }
 
-            .content h3 {
-                color: #1B80CF;
+            .hero-content {
+                max-width: 900px;
+                margin: 0 auto;
+                position: relative;
+                z-index: 2;
             }
 
-            .content h2::before,
-            .content h3::before {
-                display: block;
-                content: " ";
-                visibility: hidden;
-                height: 50px;
-                margin-top: -50px;
-                pointer-events: none;
-                background-color: #FFFFFF;
+            .hero-title {
+                font-size: var(--text-4xl);
+                font-weight: 800;
+                color: white;
+                line-height: 1.2;
+                letter-spacing: -0.03em;
+                margin-bottom: var(--space-lg);
+                text-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+                animation: fadeInUp 0.8s cubic-bezier(0.4, 0, 0.2, 1) 0.2s backwards;
             }
 
-            .content a:link,
-            .content a:visited {
-                color: #1B80CF;
+            .hero-subtitle {
+                font-size: var(--text-xl);
+                color: rgba(255, 255, 255, 0.95);
+                font-weight: 500;
+                animation: fadeInUp 0.8s cubic-bezier(0.4, 0, 0.2, 1) 0.4s backwards;
             }
 
-            .content li {
-                margin: 5px;
+            .hero-subtitle a {
+                color: white;
+                text-decoration: none;
+                border-bottom: 2px solid rgba(255, 255, 255, 0.4);
+                transition: border-color 0.3s ease;
             }
 
-            .page {
-                width: 65vw;
-                height: 100%;
-                margin-left: 30vw;
-                overflow: hidden;
-                padding: 0 1em;
-                font-family: 'Arial';
+            .hero-subtitle a:hover {
+                border-color: white;
             }
 
-            .page img {
-                max-width: 100%;
-                max-height: 100%;
+            .hero-svg {
+                position: absolute;
+                right: 5%;
+                top: 50%;
+                transform: translateY(-50%);
+                width: clamp(300px, 35vw, 500px);
+                height: clamp(300px, 35vw, 500px);
+                opacity: 0.25;
+                z-index: 1;
             }
 
-            @media (max-width: 640px),
-            screen and (orientation: portrait) {
-                body {
-                    max-width: 100%;
-                    max-height: 100%;
+            /* ==================== Main Content ==================== */
+            .main-container {
+                max-width: 1200px;
+                margin: 0 auto;
+                padding: var(--space-3xl) var(--space-xl);
+            }
+
+            .intro-text {
+                font-size: var(--text-lg);
+                line-height: 1.8;
+                margin-bottom: var(--space-2xl);
+                animation: fadeInUp 0.8s cubic-bezier(0.4, 0, 0.2, 1) 0.6s backwards;
+            }
+
+            /* Article Sections */
+            .article-section {
+                margin-bottom: var(--space-3xl);
+                animation: fadeInUp 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+            }
+
+            h3 {
+                font-size: var(--text-2xl);
+                font-weight: 700;
+                color: var(--color-base-text);
+                margin-bottom: var(--space-lg);
+                letter-spacing: -0.02em;
+                position: relative;
+                padding-bottom: var(--space-sm);
+            }
+
+            h3::after {
+                content: '';
+                position: absolute;
+                bottom: 0;
+                left: 0;
+                width: 60px;
+                height: 3px;
+                background: var(--gradient-primary);
+                border-radius: var(--radius-full);
+            }
+
+            p {
+                margin-bottom: var(--space-lg);
+                color: var(--color-base-text);
+                line-height: 1.8;
+            }
+
+            strong {
+                font-weight: 600;
+                color: var(--color-accent-2);
+            }
+
+            /* Code blocks */
+            pre {
+                background: var(--color-base-text);
+                color: #d1fae5;
+                padding: var(--space-lg);
+                border-radius: var(--radius-lg);
+                overflow-x: auto;
+                margin-bottom: var(--space-xl);
+                font-family: var(--font-mono);
+                font-size: var(--text-sm);
+                line-height: 1.6;
+                box-shadow: var(--shadow-lg);
+            }
+
+            code {
+                font-family: var(--font-mono);
+                font-size: 0.9em;
+                background: var(--color-accent-light);
+                color: var(--color-accent-2);
+                padding: 0.2em 0.5em;
+                border-radius: var(--radius-sm);
+                border: 1px solid var(--color-border);
+            }
+
+            pre code {
+                background: transparent;
+                color: inherit;
+                padding: 0;
+                border: none;
+            }
+
+            /* Lists */
+            ul,
+            ol {
+                margin-bottom: var(--space-lg);
+                padding-left: var(--space-xl);
+            }
+
+            ul li,
+            ol li {
+                margin-bottom: var(--space-md);
+                color: var(--color-base-text);
+                line-height: 1.8;
+            }
+
+            ul li::marker {
+                color: var(--color-accent-1);
+            }
+
+            ol li::marker {
+                color: var(--color-accent-1);
+                font-weight: 600;
+            }
+
+            /* Links */
+            a {
+                color: var(--color-accent-1);
+                text-decoration: none;
+                transition: all 0.3s ease;
+                position: relative;
+            }
+
+            p a:not(.hero-subtitle a),
+            li a {
+                border-bottom: 1px solid var(--color-accent-1);
+            }
+
+            p a:not(.hero-subtitle a):hover,
+            li a:hover {
+                color: var(--color-accent-2);
+                border-color: var(--color-accent-2);
+            }
+
+            /* ==================== Footer ==================== */
+            .footer {
+                margin-top: var(--space-4xl);
+                padding: var(--space-2xl) var(--space-xl);
+                background: var(--gradient-primary);
+                color: white;
+                text-align: center;
+            }
+
+            .footer-content {
+                max-width: 1200px;
+                margin: 0 auto;
+            }
+
+            .footer p {
+                margin-bottom: var(--space-md);
+                color: rgba(255, 255, 255, 0.9);
+            }
+
+            .footer a {
+                color: white;
+                border-bottom: 1px solid rgba(255, 255, 255, 0.4);
+            }
+
+            .footer a:hover {
+                border-color: white;
+            }
+
+            /* ==================== Animations ==================== */
+            @keyframes slideDown {
+                from {
+                    transform: translateY(-100%);
+                    opacity: 0;
                 }
 
-                #sidebar {
-                    position: fixed;
-                    background-color: #1B80CF;
-                    top: 0;
-                    left: 0;
-                    bottom: 80vh;
-                    width: 100vw;
+                to {
+                    transform: translateY(0);
+                    opacity: 1;
+                }
+            }
+
+            @keyframes fadeInUp {
+                from {
+                    opacity: 0;
+                    transform: translateY(30px);
                 }
 
-                #sidebar .title {
-                    text-align: center;
-                    position: fixed;
-                    margin-top: 6vh;
-                    left: 0px;
-                    right: 0px;
-                    line-height: 3.5vmax;
-                    font-size: 1.5vmax;
-                    font-family: 'Arial';
+                to {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            }
+
+            @keyframes gradientShift {
+
+                0%,
+                100% {
+                    background-position: 0% 50%;
                 }
 
-                #sidebar .subtitle {
-                    text-align: center;
-                    top: 5vh;
-                    left: 0px;
-                    right: 0px;
-                    position: fixed;
-                    margin-top: 10vh;
-                    font-size: 1.5vmax;
+                50% {
+                    background-position: 100% 50%;
+                }
+            }
+
+            @keyframes pulseGlow {
+
+                0%,
+                100% {
+                    opacity: 1;
                 }
 
-                #sidebar .title a:link,
-                #sidebar .title a:visited {
-                    text-align: center;
-                    color: #FFFFFF;
+                50% {
+                    opacity: 0.8;
+                }
+            }
+
+            @keyframes rotate {
+                from {
+                    transform: rotate(0deg);
                 }
 
-                #sidebar .subtitle a:link,
-                #sidebar .subtitle a:visited {
-                    text-align: center;
-                    color: #FFFFFF;
+                to {
+                    transform: rotate(360deg);
+                }
+            }
+
+            @keyframes orbit {
+                from {
+                    transform: rotate(0deg) translateX(80px) rotate(0deg);
                 }
 
-                .home {
-                    z-index: 100;
-                    width: 100%;
-                    background-color: #1B80CF;
-                    font-size: 1.5vmax;
+                to {
+                    transform: rotate(360deg) translateX(80px) rotate(-360deg);
+                }
+            }
+
+            /* ==================== Responsive Design ==================== */
+            @media (max-width: 1024px) {
+                .hero-svg {
+                    width: 280px;
+                    height: 280px;
+                    opacity: 0.2;
+                }
+            }
+
+            @media (max-width: 768px) {
+                .nav-container {
+                    flex-direction: column;
+                    align-items: flex-start;
+                    gap: var(--space-md);
                 }
 
-                .home a:link,
-                .home a:visited {
-                    text-decoration: none;
-                    color: #FFFFFF;
+                .breadcrumbs {
+                    font-size: var(--text-xs);
                 }
 
-                .content {
-                    line-height: 3.8vmax;
-                    font-size: 1.8vmax;
-                    font-family: 'Arial';
-                    margin-top: 22vh;
+                .hero {
+                    padding: var(--space-2xl) var(--space-md);
+                    min-height: 300px;
                 }
 
-                .content a:link,
-                .content a:visited {
-                    color: #1B80CF;
+                .hero-svg {
+                    display: none;
                 }
 
-                .page {
-                    top: 40vh;
-                    width: 95%;
-                    margin-left: 0vw;
+                .main-container {
+                    padding: var(--space-xl) var(--space-md);
                 }
 
-                .page img {
-                    max-width: 100%;
-                    max-height: 100%;
-                    border: 0;
+                pre {
+                    padding: var(--space-md);
+                    font-size: 0.8rem;
+                }
+            }
+
+            /* ==================== Accessibility ==================== */
+            @media (prefers-reduced-motion: reduce) {
+
+                *,
+                *::before,
+                *::after {
+                    animation-duration: 0.01ms !important;
+                    animation-iteration-count: 1 !important;
+                    transition-duration: 0.01ms !important;
+                }
+            }
+
+            /* Focus Styles */
+            a:focus-visible,
+            button:focus-visible {
+                outline: 2px solid var(--color-accent-1);
+                outline-offset: 2px;
+                border-radius: var(--radius-sm);
+            }
+
+            /* High Contrast Mode */
+            @media (prefers-contrast: high) {
+                :root {
+                    --color-base-text: #000000;
+                    --color-base-text-muted: #2d2d2d;
                 }
             }
         </style>
     </head>
 
     <body vocab="http://schema.org/">
-        <div class="page">
-            <div class="home">
-                <ul typeof="BreadcrumbList">
+        <a href="#main-content" class="skip-link">Skip to main content</a>
+
+        <!-- Navigation -->
+        <nav class="navigation" role="navigation" aria-label="Main navigation">
+            <div class="nav-container">
+                <div class="site-name">
+                    <a href="../index.html">John Samuel</a>
+                </div>
+                <ul class="breadcrumbs" typeof="BreadcrumbList">
                     <li property="itemListElement" typeof="ListItem">
                         <a property="item" typeof="WebPage" href="../index.html">
                             <span property="name">Home</span>
@@ -269,77 +575,254 @@
                         </a>
                     </li>
                 </ul>
-
             </div>
-            <div id="sidebar">
-                <div class="title">
-                    <h1><a href="./language-models.html">Why and How I developed Wikidata Multilinguality
-                            Calculator?</a>
-                    </h1>
-                </div>
-                <div class="subtitle">
-                    <h2><a href="../about.html">John Samuel</a></h2>
-                </div>
+        </nav>
+
+        <!-- Hero Section -->
+        <header class="hero">
+            <div class="hero-content">
+                <h1 class="hero-title">Why and How I developed Wikidata Multilinguality Calculator?</h1>
+                <p class="hero-subtitle">by <a href="../about.html">John Samuel</a></p>
             </div>
 
-            <div class="content">
-                <p>Wikidata is a remarkable, free, and open knowledge base that connects structured data from across the
-                    world. One of its standout features is its multilingual nature, allowing users to contribute and
-                    access
-                    data in their native languages. But despite this powerful capability, many Wikidata pages remain a
-                    patchwork of languages, where labels and descriptions lack translations, and cryptic Q-identifiers
-                    and
-                    P-identifiers stand in for meaningful words. This inconsistent multilingual experience is not just
-                    frustrating; it holds back Wikidata’s potential as a truly global platform.</p>
-                <p>Wikidata’s strength lies in its ability to let users translate data once and then share that
-                    knowledge
-                    universally, across languages. But if the properties themselves aren’t translated, this advantage
-                    fades
-                    away. This is where the idea for the <strong><a
-                            href="https://github.com/johnsamuelwrites/mlscores">mlscores - Wikidata Multilingual
-                            Calculator</a></strong> was born. I
-                    wanted to create a tool that helps bridge these gaps, making it easier for contributors to identify
-                    where translation efforts are most needed and to unlock Wikidata’s full potential.</p>
-                <h3 id="the-need-for-a-solution"><strong>The Need for a Solution</strong></h3>
-                <p>The goal of the Wikidata Multilingual Calculator is straightforward: to empower contributors by
+            <!-- Animated SVG Illustration - Global Language Network -->
+            <svg class="hero-svg" viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                <!-- Central Globe -->
+                <circle cx="200" cy="200" r="70" fill="rgba(255, 255, 255, 0.15)" stroke="rgba(255, 255, 255, 0.5)"
+                    stroke-width="2">
+                    <animate attributeName="r" values="70;75;70" dur="4s" repeatCount="indefinite" />
+                </circle>
+
+                <!-- Globe latitude lines -->
+                <ellipse cx="200" cy="200" rx="70" ry="20" fill="none" stroke="rgba(255, 255, 255, 0.3)"
+                    stroke-width="1" />
+                <ellipse cx="200" cy="200" rx="70" ry="40" fill="none" stroke="rgba(255, 255, 255, 0.3)"
+                    stroke-width="1" />
+                <ellipse cx="200" cy="200" rx="70" ry="60" fill="none" stroke="rgba(255, 255, 255, 0.3)"
+                    stroke-width="1" />
+
+                <!-- Globe longitude lines -->
+                <ellipse cx="200" cy="200" rx="20" ry="70" fill="none" stroke="rgba(255, 255, 255, 0.3)"
+                    stroke-width="1" />
+                <ellipse cx="200" cy="200" rx="40" ry="70" fill="none" stroke="rgba(255, 255, 255, 0.3)"
+                    stroke-width="1" />
+                <ellipse cx="200" cy="200" rx="60" ry="70" fill="none" stroke="rgba(255, 255, 255, 0.3)"
+                    stroke-width="1" />
+
+                <!-- Language Nodes -->
+                <!-- EN Node (top) -->
+                <g>
+                    <circle cx="200" cy="100" r="25" fill="rgba(255, 255, 255, 0.25)" stroke="rgba(255, 255, 255, 0.7)"
+                        stroke-width="2">
+                        <animate attributeName="opacity" values="0.8;1;0.8" dur="3s" repeatCount="indefinite" />
+                    </circle>
+                    <text x="200" y="107" text-anchor="middle" fill="white" font-size="16" font-weight="bold">EN</text>
+                    <line x1="200" y1="125" x2="200" y2="130" stroke="rgba(255, 255, 255, 0.5)" stroke-width="2"
+                        stroke-dasharray="3,3">
+                        <animate attributeName="stroke-dashoffset" from="0" to="-6" dur="1.5s"
+                            repeatCount="indefinite" />
+                    </line>
+                </g>
+
+                <!-- FR Node (right) -->
+                <g>
+                    <circle cx="300" cy="200" r="25" fill="rgba(255, 255, 255, 0.25)" stroke="rgba(255, 255, 255, 0.7)"
+                        stroke-width="2">
+                        <animate attributeName="opacity" values="0.8;1;0.8" dur="3.2s" repeatCount="indefinite" />
+                    </circle>
+                    <text x="300" y="207" text-anchor="middle" fill="white" font-size="16" font-weight="bold">FR</text>
+                    <line x1="275" y1="200" x2="270" y2="200" stroke="rgba(255, 255, 255, 0.5)" stroke-width="2"
+                        stroke-dasharray="3,3">
+                        <animate attributeName="stroke-dashoffset" from="0" to="-6" dur="1.5s"
+                            repeatCount="indefinite" />
+                    </line>
+                </g>
+
+                <!-- ES Node (bottom) -->
+                <g>
+                    <circle cx="200" cy="300" r="25" fill="rgba(255, 255, 255, 0.25)" stroke="rgba(255, 255, 255, 0.7)"
+                        stroke-width="2">
+                        <animate attributeName="opacity" values="0.8;1;0.8" dur="3.4s" repeatCount="indefinite" />
+                    </circle>
+                    <text x="200" y="307" text-anchor="middle" fill="white" font-size="16" font-weight="bold">ES</text>
+                    <line x1="200" y1="275" x2="200" y2="270" stroke="rgba(255, 255, 255, 0.5)" stroke-width="2"
+                        stroke-dasharray="3,3">
+                        <animate attributeName="stroke-dashoffset" from="0" to="-6" dur="1.5s"
+                            repeatCount="indefinite" />
+                    </line>
+                </g>
+
+                <!-- PT Node (left) -->
+                <g>
+                    <circle cx="100" cy="200" r="25" fill="rgba(255, 255, 255, 0.25)" stroke="rgba(255, 255, 255, 0.7)"
+                        stroke-width="2">
+                        <animate attributeName="opacity" values="0.8;1;0.8" dur="3.6s" repeatCount="indefinite" />
+                    </circle>
+                    <text x="100" y="207" text-anchor="middle" fill="white" font-size="16" font-weight="bold">PT</text>
+                    <line x1="125" y1="200" x2="130" y2="200" stroke="rgba(255, 255, 255, 0.5)" stroke-width="2"
+                        stroke-dasharray="3,3">
+                        <animate attributeName="stroke-dashoffset" from="0" to="-6" dur="1.5s"
+                            repeatCount="indefinite" />
+                    </line>
+                </g>
+
+                <!-- DE Node (top-right) -->
+                <g>
+                    <circle cx="270" cy="130" r="20" fill="rgba(255, 255, 255, 0.2)" stroke="rgba(255, 255, 255, 0.6)"
+                        stroke-width="1.5">
+                        <animate attributeName="opacity" values="0.7;1;0.7" dur="3.8s" repeatCount="indefinite" />
+                    </circle>
+                    <text x="270" y="136" text-anchor="middle" fill="white" font-size="13" font-weight="bold">DE</text>
+                </g>
+
+                <!-- IT Node (bottom-right) -->
+                <g>
+                    <circle cx="270" cy="270" r="20" fill="rgba(255, 255, 255, 0.2)" stroke="rgba(255, 255, 255, 0.6)"
+                        stroke-width="1.5">
+                        <animate attributeName="opacity" values="0.7;1;0.7" dur="4s" repeatCount="indefinite" />
+                    </circle>
+                    <text x="270" y="276" text-anchor="middle" fill="white" font-size="13" font-weight="bold">IT</text>
+                </g>
+
+                <!-- ZH Node (top-left) -->
+                <g>
+                    <circle cx="130" cy="130" r="20" fill="rgba(255, 255, 255, 0.2)" stroke="rgba(255, 255, 255, 0.6)"
+                        stroke-width="1.5">
+                        <animate attributeName="opacity" values="0.7;1;0.7" dur="4.2s" repeatCount="indefinite" />
+                    </circle>
+                    <text x="130" y="136" text-anchor="middle" fill="white" font-size="13" font-weight="bold">ZH</text>
+                </g>
+
+                <!-- AR Node (bottom-left) -->
+                <g>
+                    <circle cx="130" cy="270" r="20" fill="rgba(255, 255, 255, 0.2)" stroke="rgba(255, 255, 255, 0.6)"
+                        stroke-width="1.5">
+                        <animate attributeName="opacity" values="0.7;1;0.7" dur="4.4s" repeatCount="indefinite" />
+                    </circle>
+                    <text x="130" y="276" text-anchor="middle" fill="white" font-size="13" font-weight="bold">AR</text>
+                </g>
+
+                <!-- Connection arcs between main nodes -->
+                <path d="M 200,130 Q 250,165 270,200" fill="none" stroke="rgba(255, 255, 255, 0.3)" stroke-width="1.5"
+                    stroke-dasharray="4,4">
+                    <animate attributeName="stroke-dashoffset" from="0" to="-8" dur="2s" repeatCount="indefinite" />
+                </path>
+                <path d="M 270,200 Q 235,250 200,270" fill="none" stroke="rgba(255, 255, 255, 0.3)" stroke-width="1.5"
+                    stroke-dasharray="4,4">
+                    <animate attributeName="stroke-dashoffset" from="0" to="-8" dur="2s" repeatCount="indefinite" />
+                </path>
+                <path d="M 200,270 Q 150,235 130,200" fill="none" stroke="rgba(255, 255, 255, 0.3)" stroke-width="1.5"
+                    stroke-dasharray="4,4">
+                    <animate attributeName="stroke-dashoffset" from="0" to="-8" dur="2s" repeatCount="indefinite" />
+                </path>
+                <path d="M 130,200 Q 165,150 200,130" fill="none" stroke="rgba(255, 255, 255, 0.3)" stroke-width="1.5"
+                    stroke-dasharray="4,4">
+                    <animate attributeName="stroke-dashoffset" from="0" to="-8" dur="2s" repeatCount="indefinite" />
+                </path>
+
+                <!-- Data flow particles -->
+                <circle cx="200" cy="200" r="4" fill="rgba(255, 255, 255, 0.9)">
+                    <animateMotion dur="4s" repeatCount="indefinite" path="M 0,0 Q 50,-35 70,0" />
+                    <animate attributeName="opacity" values="0;1;1;0" dur="4s" repeatCount="indefinite" />
+                </circle>
+                <circle cx="200" cy="200" r="3" fill="rgba(255, 255, 255, 0.8)">
+                    <animateMotion dur="5s" repeatCount="indefinite" path="M 0,0 Q -50,35 -70,0" />
+                    <animate attributeName="opacity" values="0;1;1;0" dur="5s" repeatCount="indefinite" />
+                </circle>
+                <circle cx="200" cy="200" r="3.5" fill="rgba(255, 255, 255, 0.85)">
+                    <animateMotion dur="4.5s" repeatCount="indefinite" path="M 0,0 Q 35,50 0,70" />
+                    <animate attributeName="opacity" values="0;1;1;0" dur="4.5s" repeatCount="indefinite" />
+                </circle>
+
+                <!-- Percentage indicators (sparkles) -->
+                <g opacity="0.7">
+                    <text x="210" y="195" fill="white" font-size="10" font-weight="bold">99%
+                        <animate attributeName="opacity" values="0;1;0" dur="3s" repeatCount="indefinite" />
+                    </text>
+                </g>
+                <g opacity="0.7">
+                    <text x="305" y="195" fill="white" font-size="9" font-weight="bold">96%
+                        <animate attributeName="opacity" values="0;1;0" dur="3.5s" repeatCount="indefinite"
+                            begin="0.5s" />
+                    </text>
+                </g>
+            </svg>
+        </header>
+
+        <!-- Main Content -->
+        <main id="main-content" class="main-container">
+            <p class="intro-text">
+                Wikidata is a remarkable, free, and open knowledge base that connects structured data from across the
+                world. One of its standout features is its multilingual nature, allowing users to contribute and
+                access data in their native languages. But despite this powerful capability, many Wikidata pages remain
+                a
+                patchwork of languages, where labels and descriptions lack translations, and cryptic Q-identifiers
+                and P-identifiers stand in for meaningful words. This inconsistent multilingual experience is not just
+                frustrating; it holds back Wikidata's potential as a truly global platform.
+            </p>
+
+            <p class="intro-text">
+                Wikidata's strength lies in its ability to let users translate data once and then share that
+                knowledge universally, across languages. But if the properties themselves aren't translated, this
+                advantage
+                fades away. This is where the idea for the <strong><a
+                        href="https://github.com/johnsamuelwrites/mlscores">mlscores - Wikidata Multilingual
+                        Calculator</a></strong> was born. I
+                wanted to create a tool that helps bridge these gaps, making it easier for contributors to identify
+                where translation efforts are most needed and to unlock Wikidata's full potential.
+            </p>
+
+            <section class="article-section">
+                <h3 id="the-need-for-a-solution">The Need for a Solution</h3>
+                <p>
+                    The goal of the Wikidata Multilingual Calculator is straightforward: to empower contributors by
                     highlighting where translations are missing in Wikidata items. The tool calculates a multilingual
-                    score,
-                    revealing how complete the translations are for a given item. This score helps users prioritize
-                    their
-                    translation efforts, focusing on the properties that need the most attention and ensuring a more
-                    uniform
-                    multilingual experience across the platform.</p>
-                <p>By pinpointing gaps, contributors—whether they’re beginners or seasoned pros—can target their efforts
+                    score, revealing how complete the translations are for a given item. This score helps users
+                    prioritize
+                    their translation efforts, focusing on the properties that need the most attention and ensuring a
+                    more
+                    uniform multilingual experience across the platform.
+                </p>
+                <p>
+                    By pinpointing gaps, contributors—whether they're beginners or seasoned pros—can target their
+                    efforts
                     more effectively, knowing precisely which languages or properties require the most work. This level
-                    of
-                    focus is crucial for enhancing both the quality and accessibility of the data on Wikidata.</p>
-                <h3 id="how-it-works"><strong>How It Works</strong></h3>
-                <p>Building the calculator involved a mix of SPARQL, Python, and a touch of creativity. Here’s a
-                    breakdown
-                    of its workflow:</p>
+                    of focus is crucial for enhancing both the quality and accessibility of the data on Wikidata.
+                </p>
+            </section>
+
+            <section class="article-section">
+                <h3 id="how-it-works">How It Works</h3>
+                <p>
+                    Building the calculator involved a mix of SPARQL, Python, and a touch of creativity. Here's a
+                    breakdown of its workflow:
+                </p>
                 <ol type="1">
                     <li><strong>Data Retrieval</strong>: The tool sends SPARQL queries to Wikidata to gather properties
-                        and
-                        values linked to a specified item.</li>
+                        and values linked to a specified item.</li>
                     <li><strong>Data Processing</strong>: Once retrieved, the data is analyzed to detect missing
                         translations.</li>
                     <li><strong>Score Calculation</strong>: A multilingual score is computed based on the number of
                         translations available for each property, giving a clear indication of where the gaps lie.</li>
                     <li><strong>User-Friendly Display</strong>: The results are shown in an intuitive format using the
-                        Rich
-                        library in Python, highlighting which properties and values lack translations and need
-                        attention.
-                    </li>
+                        Rich library in Python, highlighting which properties and values lack translations and need
+                        attention.</li>
                 </ol>
-                <p>This streamlined approach makes it easy for contributors to visualize the state of multilingualism
-                    for
-                    any Wikidata item, guiding them toward where their efforts will have the most impact.</p>
-                <h3 id="example-use-case"><strong>Example Use Case</strong></h3>
-                <p>Let’s consider the item <strong>human (Q5)</strong>. Running the multilingual calculator on this item
+                <p>
+                    This streamlined approach makes it easy for contributors to visualize the state of multilingualism
+                    for any Wikidata item, guiding them toward where their efforts will have the most impact.
+                </p>
+            </section>
+
+            <section class="article-section">
+                <h3 id="example-use-case">Example Use Case</h3>
+                <p>
+                    Let's consider the item <strong>human (Q5)</strong>. Running the multilingual calculator on this
+                    item
                     will reveal how complete its translations are in different languages, like English, French, Spanish,
-                    and
-                    Portuguese. The output might look like this:</p>
-                <pre class="plaintext"><code>    Combined Language
+                    and Portuguese. The output might look like this:
+                </p>
+                <pre><code>    Combined Language
 Percentages for property
 label and property value
          labels
@@ -352,10 +835,11 @@ label and property value
 │ es       │     92.17% │
 │ pt       │     71.08% │
 └──────────┴────────────┘</code></pre>
-                <p>This table shows at a glance how complete the translations are for each language. With the
+                <p>
+                    This table shows at a glance how complete the translations are for each language. With the
                     <code>--missing</code> option, the tool even lists specific properties that lack translations:
                 </p>
-                <pre class="plaintext"><code>Properties missing translation
+                <pre><code>Properties missing translation
 
 ┏━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
 ┃ Languages ┃ Items                                                      ┃
@@ -366,41 +850,56 @@ label and property value
 │           │ P7329, P3222, P8168, P1256, P7497, P6839, P8895, P7775,    │
 │           │ ... and more ...                                           │
 └───────────┴────────────────────────────────────────────────────────────┘</code></pre>
-                <p>These insights can be a game-changer for translators, helping them focus their efforts on the areas
-                    that
-                    will make the most difference.</p>
-                <h3 id="future-plans"><strong>Future Plans</strong></h3>
-                <p>The Wikidata Multilingual Calculator is only the beginning of a broader vision to enrich Wikidata’s
-                    multilingual experience. Here’s what’s on the horizon:</p>
+                <p>
+                    These insights can be a game-changer for translators, helping them focus their efforts on the areas
+                    that will make the most difference.
+                </p>
+            </section>
+
+            <section class="article-section">
+                <h3 id="future-plans">Future Plans</h3>
+                <p>
+                    The Wikidata Multilingual Calculator is only the beginning of a broader vision to enrich Wikidata's
+                    multilingual experience. Here's what's on the horizon:
+                </p>
                 <ul>
                     <li><strong>Optimized Queries</strong>: Fine-tuning SPARQL queries for faster data retrieval, making
-                        the
-                        tool even more efficient, especially when handling large datasets.</li>
+                        the tool even more efficient, especially when handling large datasets.</li>
                     <li><strong>Web Interface</strong>: Developing a user-friendly web-based version of the calculator
-                        to
-                        make it accessible to a wider audience.</li>
+                        to make it accessible to a wider audience.</li>
                     <li><strong>Wikidata Integration</strong>: Creating a JavaScript gadget that could be embedded
-                        directly
-                        into Wikidata pages, enabling contributors to check multilingual scores without ever leaving the
+                        directly into Wikidata pages, enabling contributors to check multilingual scores without ever
+                        leaving the
                         platform.</li>
                     <li><strong>Enhanced Features</strong>: Adding translation suggestions and potentially allowing
-                        direct
-                        contributions to translations right from the calculator itself.</li>
+                        direct contributions to translations right from the calculator itself.</li>
                 </ul>
-                <h3 id="conclusion"><strong>Conclusion</strong></h3>
-                <p><a href="https://github.com/johnsamuelwrites/mlscores">mlscores</a> or Wikidata Multilingual
-                    Calculator
-                    is a practical tool designed to enhance the multilingual
+            </section>
+
+            <section class="article-section">
+                <h3 id="conclusion">Conclusion</h3>
+                <p>
+                    <a href="https://github.com/johnsamuelwrites/mlscores">mlscores</a> or Wikidata Multilingual
+                    Calculator is a practical tool designed to enhance the multilingual
                     capabilities of Wikidata by highlighting gaps in translations and guiding contributors on where to
-                    focus
-                    their efforts. With plans to optimize its functionality, develop a web interface, and integrate
-                    directly
-                    with Wikidata, the calculator aims to streamline the translation process and make it more accessible
-                    to
-                    all users. Whether you’re a newcomer looking to make your first contribution or a seasoned editor
-                    seeking to close translation gaps, this tool offers a clear path to making Wikidata’s data more
-                    inclusive and accessible.</p>
+                    focus their efforts. With plans to optimize its functionality, develop a web interface, and
+                    integrate
+                    directly with Wikidata, the calculator aims to streamline the translation process and make it more
+                    accessible
+                    to all users. Whether you're a newcomer looking to make your first contribution or a seasoned editor
+                    seeking to close translation gaps, this tool offers a clear path to making Wikidata's data more
+                    inclusive and accessible.
+                </p>
+            </section>
+        </main>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <div class="footer-content">
+                <p>&copy; 2024 John Samuel. All content licensed under Creative Commons CC BY-SA 4.0.</p>
+                <p>Building tools for a more multilingual and inclusive web</p>
             </div>
+        </footer>
     </body>
 
 </html>

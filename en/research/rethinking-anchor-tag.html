@@ -3,261 +3,638 @@
 
     <head>
         <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <meta http-equiv="Content-Language" content="en" />
         <link rel="shortcut icon" href="../../images/logo/favicon.png" />
         <title>Rethinking HTML Anchor Tag in the Age of Generative AI: John Samuel</title>
-        <style type="text/css">
-            body {
-                background-color: #FFFFFF;
+        <style>
+            /* ==================== Design Tokens ==================== */
+            :root {
+                /* Base Colors - Light Theme Foundation */
+                --color-base-bg: #f7f9fc;
+                --color-base-surface: #ffffff;
+                --color-base-text: #1a1f2e;
+                --color-base-text-muted: #4a5568;
+
+                /* AI/Technology Theme Accents */
+                --color-accent-1: #6366f1;
+                --color-accent-2: #4f46e5;
+                --color-accent-3: #818cf8;
+                --color-accent-light: #eef2ff;
+                --color-accent-bright: #7c3aed;
+
+                /* Functional Colors */
+                --color-shadow: rgba(99, 102, 241, 0.12);
+                --color-border: rgba(99, 102, 241, 0.15);
+                --color-hover: rgba(99, 102, 241, 0.08);
+
+                /* Gradients */
+                --gradient-primary: linear-gradient(135deg, var(--color-accent-1) 0%, var(--color-accent-bright) 100%);
+                --gradient-subtle: linear-gradient(180deg, var(--color-base-bg), var(--color-accent-light));
+                --gradient-hero: linear-gradient(135deg, #6366f1 0%, #7c3aed 50%, #818cf8 100%);
+
+                /* Spacing Scale */
+                --space-xs: 0.25rem;
+                --space-sm: 0.5rem;
+                --space-md: 1rem;
+                --space-lg: 1.5rem;
+                --space-xl: 2rem;
+                --space-2xl: 3rem;
+                --space-3xl: 4rem;
+                --space-4xl: 6rem;
+
+                /* Border Radius */
+                --radius-sm: 4px;
+                --radius-md: 8px;
+                --radius-lg: 12px;
+                --radius-xl: 16px;
+                --radius-2xl: 24px;
+                --radius-full: 9999px;
+
+                /* Shadows */
+                --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.04), 0 1px 3px rgba(0, 0, 0, 0.06);
+                --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.05), 0 2px 4px rgba(0, 0, 0, 0.06);
+                --shadow-lg: 0 10px 24px rgba(0, 0, 0, 0.08), 0 4px 8px rgba(0, 0, 0, 0.06);
+                --shadow-xl: 0 20px 40px rgba(0, 0, 0, 0.12), 0 8px 16px rgba(0, 0, 0, 0.08);
+                --shadow-theme: 0 10px 30px var(--color-shadow), 0 4px 10px rgba(0, 0, 0, 0.06);
+
+                /* Typography */
+                --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+                --font-mono: 'SF Mono', Monaco, 'Cascadia Code', 'Consolas', 'Courier New', monospace;
+
+                /* Fluid Typography */
+                --text-xs: clamp(0.75rem, 0.7rem + 0.25vw, 0.875rem);
+                --text-sm: clamp(0.875rem, 0.8rem + 0.35vw, 1rem);
+                --text-base: clamp(1rem, 0.95rem + 0.25vw, 1.125rem);
+                --text-lg: clamp(1.125rem, 1.05rem + 0.35vw, 1.25rem);
+                --text-xl: clamp(1.25rem, 1.15rem + 0.5vw, 1.5rem);
+                --text-2xl: clamp(1.5rem, 1.3rem + 1vw, 2rem);
+                --text-3xl: clamp(2rem, 1.6rem + 2vw, 2.5rem);
+                --text-4xl: clamp(2.5rem, 2rem + 2.5vw, 3.5rem);
             }
 
-            #sidebar {
-                position: fixed;
-                background-color: #1B80CF;
-                top: 0;
-                left: 0;
-                bottom: 0;
-                width: 30vw;
-            }
-
-            #sidebar .title {
-                position: relative;
-                text-align: center;
-                line-height: 4vmax;
-                font-size: 1.4vmax;
-                font-family: 'Arial';
-                margin-top: 25vh;
-            }
-
-            #sidebar .title a:link,
-            #sidebar .title a:visited {
-                color: #FFFFFF;
-                text-decoration: none;
-            }
-
-            .subtitle {
-                top: 50vh;
-                text-align: center;
-                line-height: 1.3vmax;
-                font-family: 'Arial';
-                font-size: 1.5vmax;
-                color: #FFFFFF;
-            }
-
-            .subtitle a:link,
-            .subtitle a:visited {
-                color: #FFFFFF;
-                text-decoration: none;
-            }
-
-            .licence {
-                position: fixed;
-                text-align: right;
-                bottom: 0;
-                right: 0;
-            }
-
-            .home {
-                position: fixed;
-                text-align: left;
-                font-family: 'Arial';
-                color: #D3D3D3;
-                z-index: 100;
-                width: 100%;
-                background-color: #FFFFFF;
-                top: 0px;
-                margin-bottom: 10px;
-                padding-bottom: 10px;
-            }
-
-            .home a:link,
-            .home a:visited {
-                text-decoration: none;
-                color: #D3D3D3;
-            }
-
-            .home ul {
+            /* ==================== Base Styles ==================== */
+            * {
                 margin: 0;
                 padding: 0;
-                text-align: left;
+                box-sizing: border-box;
+            }
+
+            html {
+                scroll-behavior: smooth;
+                scroll-padding-top: 80px;
+            }
+
+            body {
+                font-family: var(--font-sans);
+                font-size: var(--text-base);
+                line-height: 1.7;
+                color: var(--color-base-text);
+                background: var(--color-base-bg);
+                letter-spacing: -0.005em;
+                -webkit-font-smoothing: antialiased;
+                -moz-osx-font-smoothing: grayscale;
+            }
+
+            /* Skip Link */
+            .skip-link {
+                position: absolute;
+                top: -100px;
+                left: 0;
+                background: var(--color-accent-1);
+                color: white;
+                padding: var(--space-md);
+                text-decoration: none;
+                z-index: 100;
+                border-radius: var(--radius-md);
+                margin: var(--space-md);
+            }
+
+            .skip-link:focus {
+                top: 0;
+            }
+
+            /* ==================== Navigation ==================== */
+            .navigation {
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                background: rgba(255, 255, 255, 0.85);
+                -webkit-backdrop-filter: blur(12px) saturate(180%);
+                backdrop-filter: blur(12px) saturate(180%);
+                border-bottom: 1px solid var(--color-border);
+                box-shadow: var(--shadow-sm);
+                z-index: 50;
+                animation: slideDown 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+            }
+
+            .nav-container {
+                max-width: 1400px;
+                margin: 0 auto;
+                padding: var(--space-lg) var(--space-xl);
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                gap: var(--space-xl);
+            }
+
+            .site-name {
+                font-size: var(--text-lg);
+                font-weight: 700;
+                letter-spacing: -0.02em;
+            }
+
+            .site-name a {
+                text-decoration: none;
+                color: var(--color-base-text);
+                background: var(--gradient-primary);
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                background-clip: text;
+                transition: all 0.3s ease;
+            }
+
+            .site-name a:hover {
+                opacity: 0.8;
+            }
+
+            .breadcrumbs {
+                display: flex;
+                align-items: center;
+                gap: var(--space-sm);
+                flex-wrap: wrap;
                 list-style: none;
             }
 
-            .home li {
-                position: relative;
-                float: left;
-                padding-top: 15px;
-                margin-right: 1em;
-                font-family: 'Arial';
+            .breadcrumbs li {
+                display: flex;
+                align-items: center;
+                gap: var(--space-sm);
+                font-size: var(--text-sm);
             }
 
-            .home li:hover {
-                display: block;
+            .breadcrumbs li:not(:last-child)::after {
+                content: '→';
+                color: var(--color-base-text-muted);
+                opacity: 0.5;
             }
 
-            .home a:link,
-            .home a:visited {
-                color: #D3D3D3;
-            }
-
-            .home li:hover a:link,
-            .home li:hover a:visited {
+            .breadcrumbs a {
+                color: var(--color-base-text-muted);
                 text-decoration: none;
-                padding: 15px;
-                color: #FFFFFF;
-                background-color: #1B80CF;
+                transition: color 0.3s ease;
             }
 
-            .content {
-                line-height: 1.8vmax;
-                font-size: 1.2vmax;
-                font-family: 'Arial';
-                margin-top: 15vh;
-                width: 90%;
+            .breadcrumbs a:hover {
+                color: var(--color-accent-1);
             }
 
-            .content h2,
-            h3,
-            h4 {
-                color: #1B80CF;
+            /* ==================== Hero Section ==================== */
+            .hero {
+                margin-top: 80px;
+                position: relative;
+                padding: var(--space-4xl) var(--space-xl) var(--space-3xl);
+                background: var(--gradient-hero);
+                background-size: 200% 200%;
+                animation: gradientShift 12s ease infinite;
+                overflow: visible;
+                min-height: 450px;
+                display: flex;
+                align-items: center;
             }
 
-            .content a:link,
-            .content a:visited {
-                color: #1B80CF;
+            .hero::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background: repeating-linear-gradient(90deg,
+                        rgba(255, 255, 255, 0.03) 0px,
+                        rgba(255, 255, 255, 0.03) 1px,
+                        transparent 1px,
+                        transparent 40px),
+                    repeating-linear-gradient(0deg,
+                        rgba(255, 255, 255, 0.03) 0px,
+                        rgba(255, 255, 255, 0.03) 1px,
+                        transparent 1px,
+                        transparent 40px);
+                animation: gridMove 20s linear infinite;
             }
 
-            .content h3 {
-                color: #1B80CF;
+            .hero-content {
+                max-width: 900px;
+                margin: 0 auto;
+                position: relative;
+                z-index: 2;
             }
 
-            .content h2::before,
-            .content h3::before {
-                display: block;
-                content: " ";
-                visibility: hidden;
-                height: 50px;
-                margin-top: -50px;
-                pointer-events: none;
-                background-color: #FFFFFF;
+            .hero-title {
+                font-size: var(--text-4xl);
+                font-weight: 800;
+                color: white;
+                line-height: 1.2;
+                letter-spacing: -0.03em;
+                margin-bottom: var(--space-lg);
+                text-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+                animation: fadeInUp 0.8s cubic-bezier(0.4, 0, 0.2, 1) 0.2s backwards;
             }
 
-            .content a:link,
-            .content a:visited {
-                color: #1B80CF;
+            .hero-author {
+                font-size: var(--text-xl);
+                color: rgba(255, 255, 255, 0.95);
+                font-weight: 500;
+                animation: fadeInUp 0.8s cubic-bezier(0.4, 0, 0.2, 1) 0.4s backwards;
             }
 
-            .content li {
-                margin: 5px;
+            .hero-author a {
+                color: white;
+                text-decoration: none;
+                border-bottom: 2px solid rgba(255, 255, 255, 0.4);
+                transition: border-color 0.3s ease;
             }
 
-            .page {
-                width: 65vw;
-                height: 100%;
-                margin-left: 30vw;
-                overflow: hidden;
-                padding: 0 1em;
-                font-family: 'Arial';
+            .hero-author a:hover {
+                border-color: white;
             }
 
-            .page img {
-                max-width: 100%;
-                max-height: 100%;
+            .hero-svg {
+                position: absolute;
+                right: 5%;
+                top: 50%;
+                transform: translateY(-50%);
+                width: clamp(280px, 32vw, 450px);
+                height: clamp(280px, 32vw, 450px);
+                opacity: 0.25;
+                z-index: 1;
             }
 
-            @media (max-width: 640px),
-            screen and (orientation: portrait) {
-                body {
-                    max-width: 100%;
-                    max-height: 100%;
+            /* ==================== Main Content ==================== */
+            .main-container {
+                max-width: 1200px;
+                margin: 0 auto;
+                padding: var(--space-3xl) var(--space-xl);
+            }
+
+            .series-notice {
+                background: linear-gradient(135deg, rgba(99, 102, 241, 0.08), rgba(124, 58, 237, 0.08));
+                border-left: 4px solid var(--color-accent-1);
+                border-radius: var(--radius-lg);
+                padding: var(--space-lg);
+                margin-bottom: var(--space-2xl);
+                box-shadow: var(--shadow-sm);
+                animation: fadeInUp 0.8s cubic-bezier(0.4, 0, 0.2, 1) 0.6s backwards;
+            }
+
+            .series-notice strong {
+                font-weight: 600;
+                color: var(--color-accent-2);
+            }
+
+            .series-notice a {
+                color: var(--color-accent-1);
+                text-decoration: none;
+                border-bottom: 1px solid var(--color-accent-1);
+                transition: all 0.3s ease;
+            }
+
+            .series-notice a:hover {
+                color: var(--color-accent-2);
+                border-color: var(--color-accent-2);
+            }
+
+            /* Article Sections */
+            .article-section {
+                margin-bottom: var(--space-3xl);
+                animation: fadeInUp 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+            }
+
+            h2 {
+                font-size: var(--text-2xl);
+                font-weight: 700;
+                color: var(--color-base-text);
+                margin-bottom: var(--space-lg);
+                letter-spacing: -0.02em;
+                position: relative;
+                padding-bottom: var(--space-sm);
+            }
+
+            h2::after {
+                content: '';
+                position: absolute;
+                bottom: 0;
+                left: 0;
+                width: 60px;
+                height: 3px;
+                background: var(--gradient-primary);
+                border-radius: var(--radius-full);
+            }
+
+            h3 {
+                font-size: var(--text-xl);
+                font-weight: 600;
+                color: var(--color-base-text);
+                margin: var(--space-xl) 0 var(--space-md);
+                letter-spacing: -0.01em;
+            }
+
+            p {
+                margin-bottom: var(--space-lg);
+                color: var(--color-base-text);
+                line-height: 1.8;
+            }
+
+            code {
+                font-family: var(--font-mono);
+                font-size: 0.9em;
+                background: var(--color-accent-light);
+                color: var(--color-accent-2);
+                padding: 0.2em 0.5em;
+                border-radius: var(--radius-sm);
+                border: 1px solid var(--color-border);
+            }
+
+            /* Lists */
+            ul,
+            ol {
+                margin-bottom: var(--space-lg);
+                padding-left: var(--space-xl);
+            }
+
+            ul li,
+            ol li {
+                margin-bottom: var(--space-md);
+                color: var(--color-base-text);
+                line-height: 1.8;
+            }
+
+            ul li::marker {
+                color: var(--color-accent-1);
+            }
+
+            ol li::marker {
+                color: var(--color-accent-1);
+                font-weight: 600;
+            }
+
+            ul li strong,
+            ol li strong {
+                color: var(--color-accent-2);
+                font-weight: 600;
+            }
+
+            /* Links */
+            a {
+                color: var(--color-accent-1);
+                text-decoration: none;
+                transition: all 0.3s ease;
+                position: relative;
+            }
+
+            p a,
+            li a {
+                border-bottom: 1px solid var(--color-accent-1);
+            }
+
+            p a:hover,
+            li a:hover {
+                color: var(--color-accent-2);
+                border-color: var(--color-accent-2);
+            }
+
+            /* References Section */
+            .references-section {
+                margin-top: var(--space-4xl);
+                padding: var(--space-2xl);
+                background: rgba(255, 255, 255, 0.7);
+                -webkit-backdrop-filter: blur(12px);
+                backdrop-filter: blur(12px);
+                border-radius: var(--radius-xl);
+                border: 1px solid var(--color-border);
+                box-shadow: var(--shadow-md);
+            }
+
+            .references-section h3 {
+                margin-top: 0;
+                color: var(--color-accent-2);
+            }
+
+            .references-section ol {
+                counter-reset: ref-counter;
+                list-style: none;
+                padding-left: 0;
+            }
+
+            .references-section li {
+                counter-increment: ref-counter;
+                position: relative;
+                padding-left: var(--space-2xl);
+                margin-bottom: var(--space-lg);
+            }
+
+            .references-section li::before {
+                content: '[' counter(ref-counter) ']';
+                position: absolute;
+                left: 0;
+                color: var(--color-accent-1);
+                font-weight: 600;
+            }
+
+            /* ==================== Footer ==================== */
+            .footer {
+                margin-top: var(--space-4xl);
+                padding: var(--space-2xl) var(--space-xl);
+                background: var(--gradient-primary);
+                color: white;
+                text-align: center;
+            }
+
+            .footer-content {
+                max-width: 1200px;
+                margin: 0 auto;
+            }
+
+            .footer p {
+                margin-bottom: var(--space-md);
+                color: rgba(255, 255, 255, 0.9);
+            }
+
+            .footer a {
+                color: white;
+                border-bottom: 1px solid rgba(255, 255, 255, 0.4);
+            }
+
+            .footer a:hover {
+                border-color: white;
+            }
+
+            /* ==================== Animations ==================== */
+            @keyframes slideDown {
+                from {
+                    transform: translateY(-100%);
+                    opacity: 0;
                 }
 
-                #sidebar {
-                    position: fixed;
-                    background-color: #1B80CF;
-                    top: 0;
-                    left: 0;
-                    bottom: 80vh;
-                    width: 100vw;
+                to {
+                    transform: translateY(0);
+                    opacity: 1;
+                }
+            }
+
+            @keyframes fadeInUp {
+                from {
+                    opacity: 0;
+                    transform: translateY(30px);
                 }
 
-                #sidebar .title {
-                    text-align: center;
-                    position: fixed;
-                    margin-top: 6vh;
-                    left: 0px;
-                    right: 0px;
-                    line-height: 3.5vmax;
-                    font-size: 1.5vmax;
-                    font-family: 'Arial';
+                to {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            }
+
+            @keyframes gradientShift {
+
+                0%,
+                100% {
+                    background-position: 0% 50%;
                 }
 
-                #sidebar .subtitle {
-                    text-align: center;
-                    top: 5vh;
-                    left: 0px;
-                    right: 0px;
-                    position: fixed;
-                    margin-top: 10vh;
-                    font-size: 1.5vmax;
+                50% {
+                    background-position: 100% 50%;
+                }
+            }
+
+            @keyframes gridMove {
+                from {
+                    transform: translate(0, 0);
                 }
 
-                #sidebar .title a:link,
-                #sidebar .title a:visited {
-                    text-align: center;
-                    color: #FFFFFF;
+                to {
+                    transform: translate(40px, 40px);
+                }
+            }
+
+            @keyframes pulse {
+
+                0%,
+                100% {
+                    opacity: 1;
                 }
 
-                #sidebar .subtitle a:link,
-                #sidebar .subtitle a:visited {
-                    text-align: center;
-                    color: #FFFFFF;
+                50% {
+                    opacity: 0.6;
+                }
+            }
+
+            @keyframes linkPulse {
+
+                0%,
+                100% {
+                    transform: scale(1);
+                    opacity: 1;
                 }
 
-                .home {
-                    z-index: 100;
-                    width: 100%;
-                    background-color: #1B80CF;
-                    font-size: 1.5vmax;
+                50% {
+                    transform: scale(1.05);
+                    opacity: 0.8;
+                }
+            }
+
+            @keyframes dataFlow {
+                0% {
+                    stroke-dashoffset: 100;
                 }
 
-                .home a:link,
-                .home a:visited {
-                    text-decoration: none;
-                    color: #FFFFFF;
+                100% {
+                    stroke-dashoffset: 0;
+                }
+            }
+
+            /* ==================== Responsive Design ==================== */
+            @media (max-width: 1024px) {
+                .hero-svg {
+                    width: 250px;
+                    height: 250px;
+                    opacity: 0.2;
+                }
+            }
+
+            @media (max-width: 768px) {
+                .nav-container {
+                    flex-direction: column;
+                    align-items: flex-start;
+                    gap: var(--space-md);
                 }
 
-                .content {
-                    line-height: 3.8vmax;
-                    font-size: 1.8vmax;
-                    font-family: 'Arial';
-                    margin-top: 22vh;
+                .breadcrumbs {
+                    font-size: var(--text-xs);
                 }
 
-                .content a:link,
-                .content a:visited {
-                    color: #1B80CF;
+                .hero {
+                    padding: var(--space-2xl) var(--space-md);
+                    min-height: 300px;
                 }
 
-                .page {
-                    top: 40vh;
-                    width: 95%;
-                    margin-left: 0vw;
+                .hero-svg {
+                    display: none;
                 }
 
-                .page img {
-                    max-width: 100%;
-                    max-height: 100%;
-                    border: 0;
+                .main-container {
+                    padding: var(--space-xl) var(--space-md);
+                }
+
+                .series-notice {
+                    padding: var(--space-md);
+                }
+
+                .references-section {
+                    padding: var(--space-lg);
+                }
+            }
+
+            /* ==================== Accessibility ==================== */
+            @media (prefers-reduced-motion: reduce) {
+
+                *,
+                *::before,
+                *::after {
+                    animation-duration: 0.01ms !important;
+                    animation-iteration-count: 1 !important;
+                    transition-duration: 0.01ms !important;
+                }
+            }
+
+            /* Focus Styles */
+            a:focus-visible,
+            button:focus-visible {
+                outline: 2px solid var(--color-accent-1);
+                outline-offset: 2px;
+                border-radius: var(--radius-sm);
+            }
+
+            /* High Contrast Mode */
+            @media (prefers-contrast: high) {
+                :root {
+                    --color-base-text: #000000;
+                    --color-base-text-muted: #2d2d2d;
                 }
             }
         </style>
     </head>
 
     <body vocab="http://schema.org/">
-        <div class="page">
-            <div class="home">
-                <ul typeof="BreadcrumbList">
+        <a href="#main-content" class="skip-link">Skip to main content</a>
+
+        <!-- Navigation -->
+        <nav class="navigation" role="navigation" aria-label="Main navigation">
+            <div class="nav-container">
+                <div class="site-name">
+                    <a href="../index.html">John Samuel</a>
+                </div>
+                <ul class="breadcrumbs" typeof="BreadcrumbList">
                     <li property="itemListElement" typeof="ListItem">
                         <a property="item" typeof="WebPage" href="../index.html">
                             <span property="name">Home</span>
@@ -270,21 +647,157 @@
                     </li>
                 </ul>
             </div>
-            <div id="sidebar">
-                <div class="title">
-                    <h1><a href="rethinking-anchor-tag.html">Rethinking HTML Anchor Tag in the Age of Generative AI</a>
-                    </h1>
-                </div>
-                <div class="subtitle">
-                    <h3><a href="../about.html">John Samuel</a></h3>
-                </div>
+        </nav>
+
+        <!-- Hero Section -->
+        <header class="hero">
+            <div class="hero-content">
+                <h1 class="hero-title">Rethinking HTML Anchor Tag in the Age of Generative AI</h1>
+                <p class="hero-author">by <a href="../about.html">John Samuel</a></p>
             </div>
-            <div class="content">
-                <div
-                    style="background-color: #f0f8ff; border-left: 4px solid #1e90ff; padding: 1em; margin-bottom: 1.5em;">
-                    <strong>This article is part of a series on <a href="./artificial-intelligence.html">Artificial
-                            Intelligence</a>.</strong>
-                </div>
+
+            <!-- Animated SVG Illustration - Dynamic Link Network -->
+            <svg class="hero-svg" viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                <!-- Traditional Static Link -->
+                <g opacity="0.8">
+                    <circle cx="100" cy="150" r="30" fill="rgba(255, 255, 255, 0.2)" stroke="rgba(255, 255, 255, 0.5)"
+                        stroke-width="2">
+                        <animate attributeName="opacity" values="0.6;1;0.6" dur="3s" repeatCount="indefinite" />
+                    </circle>
+                    <text x="100" y="155" text-anchor="middle" fill="rgba(255, 255, 255, 0.9)" font-size="14"
+                        font-weight="bold">Static</text>
+                </g>
+
+                <!-- AI-Generated Dynamic Link -->
+                <g opacity="0.8">
+                    <circle cx="300" cy="150" r="30" fill="rgba(255, 255, 255, 0.3)" stroke="rgba(255, 255, 255, 0.7)"
+                        stroke-width="2">
+                        <animate attributeName="r" values="30;35;30" dur="2.5s" repeatCount="indefinite" />
+                        <animate attributeName="opacity" values="0.7;1;0.7" dur="2.5s" repeatCount="indefinite" />
+                    </circle>
+                    <text x="300" y="155" text-anchor="middle" fill="rgba(255, 255, 255, 0.95)" font-size="14"
+                        font-weight="bold">AI</text>
+
+                    <!-- AI Sparkles -->
+                    <circle cx="280" cy="130" r="2" fill="rgba(255, 255, 255, 0.8)">
+                        <animate attributeName="opacity" values="0;1;0" dur="1.5s" repeatCount="indefinite" />
+                    </circle>
+                    <circle cx="320" cy="135" r="2" fill="rgba(255, 255, 255, 0.8)">
+                        <animate attributeName="opacity" values="0;1;0" dur="2s" repeatCount="indefinite"
+                            begin="0.5s" />
+                    </circle>
+                    <circle cx="310" cy="170" r="2" fill="rgba(255, 255, 255, 0.8)">
+                        <animate attributeName="opacity" values="0;1;0" dur="1.8s" repeatCount="indefinite"
+                            begin="0.3s" />
+                    </circle>
+                </g>
+
+                <!-- Arrow showing transformation -->
+                <g opacity="0.7">
+                    <line x1="135" y1="150" x2="265" y2="150" stroke="rgba(255, 255, 255, 0.6)" stroke-width="2"
+                        stroke-dasharray="5,5">
+                        <animate attributeName="stroke-dashoffset" from="0" to="-10" dur="1s"
+                            repeatCount="indefinite" />
+                    </line>
+                    <polygon points="265,145 275,150 265,155" fill="rgba(255, 255, 255, 0.6)">
+                        <animate attributeName="opacity" values="0.6;1;0.6" dur="1s" repeatCount="indefinite" />
+                    </polygon>
+                </g>
+
+                <!-- Personalized Links branching from AI node -->
+                <g opacity="0.75">
+                    <!-- Link 1 -->
+                    <line x1="300" y1="180" x2="250" y2="250" stroke="rgba(255, 255, 255, 0.4)" stroke-width="1.5"
+                        stroke-dasharray="3,3">
+                        <animate attributeName="stroke-dashoffset" from="0" to="-6" dur="2s" repeatCount="indefinite" />
+                    </line>
+                    <circle cx="250" cy="250" r="15" fill="rgba(255, 255, 255, 0.2)" stroke="rgba(255, 255, 255, 0.5)"
+                        stroke-width="1.5">
+                        <animate attributeName="r" values="15;18;15" dur="3s" repeatCount="indefinite" begin="0s" />
+                    </circle>
+
+                    <!-- Link 2 -->
+                    <line x1="300" y1="180" x2="300" y2="270" stroke="rgba(255, 255, 255, 0.4)" stroke-width="1.5"
+                        stroke-dasharray="3,3">
+                        <animate attributeName="stroke-dashoffset" from="0" to="-6" dur="2.2s"
+                            repeatCount="indefinite" />
+                    </line>
+                    <circle cx="300" cy="270" r="15" fill="rgba(255, 255, 255, 0.2)" stroke="rgba(255, 255, 255, 0.5)"
+                        stroke-width="1.5">
+                        <animate attributeName="r" values="15;18;15" dur="3s" repeatCount="indefinite" begin="0.5s" />
+                    </circle>
+
+                    <!-- Link 3 -->
+                    <line x1="300" y1="180" x2="350" y2="250" stroke="rgba(255, 255, 255, 0.4)" stroke-width="1.5"
+                        stroke-dasharray="3,3">
+                        <animate attributeName="stroke-dashoffset" from="0" to="-6" dur="2.4s"
+                            repeatCount="indefinite" />
+                    </line>
+                    <circle cx="350" cy="250" r="15" fill="rgba(255, 255, 255, 0.2)" stroke="rgba(255, 255, 255, 0.5)"
+                        stroke-width="1.5">
+                        <animate attributeName="r" values="15;18;15" dur="3s" repeatCount="indefinite" begin="1s" />
+                    </circle>
+                </g>
+
+                <!-- Metadata cloud around AI node -->
+                <g opacity="0.6">
+                    <ellipse cx="300" cy="150" rx="65" ry="55" fill="none" stroke="rgba(255, 255, 255, 0.3)"
+                        stroke-width="1" stroke-dasharray="2,4">
+                        <animateTransform attributeName="transform" type="rotate" from="0 300 150" to="360 300 150"
+                            dur="20s" repeatCount="indefinite" />
+                    </ellipse>
+                    <ellipse cx="300" cy="150" rx="75" ry="45" fill="none" stroke="rgba(255, 255, 255, 0.2)"
+                        stroke-width="1" stroke-dasharray="2,4">
+                        <animateTransform attributeName="transform" type="rotate" from="0 300 150" to="-360 300 150"
+                            dur="25s" repeatCount="indefinite" />
+                    </ellipse>
+                </g>
+
+                <!-- Data particles flowing -->
+                <circle cx="200" cy="150" r="3" fill="rgba(255, 255, 255, 0.7)">
+                    <animate attributeName="cx" from="135" to="265" dur="2s" repeatCount="indefinite" />
+                    <animate attributeName="opacity" values="0;1;0" dur="2s" repeatCount="indefinite" />
+                </circle>
+                <circle cx="200" cy="150" r="2" fill="rgba(255, 255, 255, 0.6)">
+                    <animate attributeName="cx" from="135" to="265" dur="2.5s" repeatCount="indefinite" />
+                    <animate attributeName="opacity" values="0;1;0" dur="2.5s" repeatCount="indefinite" />
+                </circle>
+
+                <!-- Anchor symbol (traditional) -->
+                <g transform="translate(100, 80)" opacity="0.6">
+                    <path d="M -5,0 L 5,0 M 0,-5 L 0,5" stroke="rgba(255, 255, 255, 0.8)" stroke-width="2"
+                        stroke-linecap="round" />
+                    <circle cx="0" cy="0" r="8" fill="none" stroke="rgba(255, 255, 255, 0.6)" stroke-width="1.5" />
+                </g>
+
+                <!-- Neural network pattern (AI) -->
+                <g transform="translate(300, 80)" opacity="0.6">
+                    <circle cx="-8" cy="0" r="3" fill="rgba(255, 255, 255, 0.7)">
+                        <animate attributeName="opacity" values="0.5;1;0.5" dur="1.5s" repeatCount="indefinite" />
+                    </circle>
+                    <circle cx="8" cy="0" r="3" fill="rgba(255, 255, 255, 0.7)">
+                        <animate attributeName="opacity" values="0.5;1;0.5" dur="1.5s" repeatCount="indefinite"
+                            begin="0.5s" />
+                    </circle>
+                    <circle cx="0" cy="8" r="3" fill="rgba(255, 255, 255, 0.7)">
+                        <animate attributeName="opacity" values="0.5;1;0.5" dur="1.5s" repeatCount="indefinite"
+                            begin="1s" />
+                    </circle>
+                    <line x1="-8" y1="0" x2="8" y2="0" stroke="rgba(255, 255, 255, 0.5)" stroke-width="1" />
+                    <line x1="-8" y1="0" x2="0" y2="8" stroke="rgba(255, 255, 255, 0.5)" stroke-width="1" />
+                    <line x1="8" y1="0" x2="0" y2="8" stroke="rgba(255, 255, 255, 0.5)" stroke-width="1" />
+                </g>
+            </svg>
+        </header>
+
+        <!-- Main Content -->
+        <main id="main-content" class="main-container">
+            <div class="series-notice">
+                <strong>This article is part of a series on <a href="./artificial-intelligence.html">Artificial
+                        Intelligence</a>.</strong>
+            </div>
+
+            <section class="article-section">
                 <h2>HTML Linking in the Age of Generative AI</h2>
                 <p>
                     The traditional HTML anchor tag (<code>&lt;a&gt;</code>) has long served as a cornerstone of web
@@ -293,14 +806,20 @@
                     and ephemeral. This evolution prompts a critical rethinking of how linking should function in an
                     AI-driven web.
                 </p>
+            </section>
+
+            <section class="article-section">
                 <h3>The Role of the Anchor Tag in Traditional Web Design</h3>
                 <p>
                     Historically, the anchor tag has provided a simple yet powerful mechanism for linking one piece of
-                    content to another, whether it’s a webpage, file, or section within a document. These links
+                    content to another, whether it's a webpage, file, or section within a document. These links
                     typically point to static or versioned content hosted on a stable URL. The simplicity of this model
                     has made the anchor tag one of the most reliable and widely used HTML elements since the inception
                     of the web.
                 </p>
+            </section>
+
+            <section class="article-section">
                 <h3>Challenges Introduced by Generative AI</h3>
                 <p>
                     Generative AI introduces content that is often generated on demand — personalized for individual
@@ -320,6 +839,9 @@
                     and meaningful navigation, especially in educational, scientific, or legal contexts where
                     traceability is essential.
                 </p>
+            </section>
+
+            <section class="article-section">
                 <h3>Rethinking the Anchor Tag: Potential Enhancements</h3>
                 <p>
                     To remain relevant in this new content landscape, the anchor tag may need to evolve. Some proposed
@@ -336,6 +858,9 @@
                     <li><strong>Time-bound links:</strong> Anchors that reflect the state of AI content at a specific
                         time, to aid in archival and reproducibility.</li>
                 </ul>
+            </section>
+
+            <section class="article-section">
                 <h3>Implications for User Experience</h3>
                 <p>
                     These enhancements could improve how users interact with AI-generated content by:
@@ -350,6 +875,9 @@
                     static, dynamic, or personalized links. Designers and developers must strike a balance between
                     flexibility and predictability to ensure the user experience remains intuitive.
                 </p>
+            </section>
+
+            <section class="article-section">
                 <h3>Limitations and Open Questions</h3>
                 <p>
                     While these ideas are promising, several challenges remain:
@@ -364,6 +892,9 @@
                     <li><strong>Browser and platform support:</strong> New features will require updates to browsers,
                         content management systems, and web frameworks.</li>
                 </ul>
+            </section>
+
+            <section class="article-section">
                 <h3>Conclusion</h3>
                 <p>
                     As generative AI continues to reshape the digital landscape, foundational web technologies like the
@@ -371,6 +902,9 @@
                     intelligent, metadata-rich, and context-aware hyperlinking system will be essential to maintain
                     usability, traceability, and trust in the modern web.
                 </p>
+            </section>
+
+            <section class="references-section">
                 <h3>References</h3>
                 <ol>
                     <li><a href="https://html.spec.whatwg.org/multipage/text-level-semantics.html#the-a-element">HTML
@@ -380,8 +914,16 @@
                     <li><a href="https://iiif.io/api/presentation/3.0/">IIIF Presentation API 3.0</a></li>
                     <li><a href="https://w3c.github.io/web-annotation/">W3C Web Annotation Data Model</a></li>
                 </ol>
+            </section>
+        </main>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <div class="footer-content">
+                <p>&copy; 2024 John Samuel. All content licensed under Creative Commons CC BY-SA 4.0.</p>
+                <p>Exploring the intersection of AI and web technologies</p>
             </div>
-        </div>
+        </footer>
     </body>
 
 </html>
