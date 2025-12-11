@@ -3,334 +3,628 @@
 
     <head>
         <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <meta http-equiv="Content-Language" content="en" />
         <link rel="shortcut icon" href="../../images/logo/favicon.png" />
         <title>Modeling Biological Systems: John Samuel</title>
-        <style type="text/css">
+        <style>
+            /* ========================================
+           DESIGN TOKENS & CSS CUSTOM PROPERTIES
+           ======================================== */
+            :root {
+                /* Nature-Inspired Color Palette */
+                --color-base-bg: #f8faf7;
+                --color-base-surface: #ffffff;
+                --color-base-text: #1a2e1a;
+                --color-base-text-muted: #4a5f4a;
+
+                /* Botanical Green Accents */
+                --color-accent-1: #6b9b73;
+                --color-accent-2: #4a7c55;
+                --color-accent-3: #8fbc8f;
+                --color-accent-light: #e8f5e9;
+
+                /* Life Science Purple */
+                --color-bio-purple: #9370db;
+                --color-bio-blue: #5f9ea0;
+
+                /* Functional Colors */
+                --color-shadow: rgba(107, 155, 115, 0.15);
+                --color-border: rgba(107, 155, 115, 0.2);
+                --color-hover: rgba(107, 155, 115, 0.08);
+
+                /* Gradients */
+                --gradient-primary: linear-gradient(135deg, var(--color-accent-1) 0%, var(--color-accent-2) 100%);
+                --gradient-subtle: linear-gradient(180deg, var(--color-base-bg) 0%, var(--color-accent-light) 100%);
+                --gradient-organic: linear-gradient(135deg, var(--color-accent-3) 0%, var(--color-bio-blue) 50%, var(--color-bio-purple) 100%);
+
+                /* Spacing Scale */
+                --space-xs: 0.25rem;
+                --space-sm: 0.5rem;
+                --space-md: 1rem;
+                --space-lg: 1.5rem;
+                --space-xl: 2rem;
+                --space-2xl: 3rem;
+                --space-3xl: 4rem;
+                --space-4xl: 6rem;
+
+                /* Typography Scale */
+                --text-xs: clamp(0.75rem, 0.7rem + 0.25vw, 0.875rem);
+                --text-sm: clamp(0.875rem, 0.8rem + 0.35vw, 1rem);
+                --text-base: clamp(1rem, 0.95rem + 0.25vw, 1.125rem);
+                --text-lg: clamp(1.125rem, 1.05rem + 0.35vw, 1.25rem);
+                --text-xl: clamp(1.25rem, 1.15rem + 0.5vw, 1.5rem);
+                --text-2xl: clamp(1.5rem, 1.3rem + 1vw, 2rem);
+                --text-3xl: clamp(2rem, 1.6rem + 2vw, 2.5rem);
+                --text-4xl: clamp(2.5rem, 2rem + 2.5vw, 3.5rem);
+
+                /* Border Radius */
+                --radius-sm: 4px;
+                --radius-md: 12px;
+                --radius-lg: 16px;
+                --radius-xl: 24px;
+                --radius-organic: 63% 37% 54% 46% / 45% 62% 38% 55%;
+
+                /* Shadows */
+                --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.04), 0 1px 2px rgba(0, 0, 0, 0.06);
+                --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.05), 0 2px 4px rgba(0, 0, 0, 0.06);
+                --shadow-lg: 0 10px 24px var(--color-shadow), 0 4px 8px rgba(0, 0, 0, 0.06);
+                --shadow-xl: 0 20px 40px var(--color-shadow), 0 8px 16px rgba(0, 0, 0, 0.08);
+
+                /* Font Stack */
+                --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+                --font-mono: 'SF Mono', Monaco, 'Cascadia Code', 'Consolas', 'Courier New', monospace;
+            }
+
+            /* ========================================
+           RESET & BASE STYLES
+           ======================================== */
+            * {
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
+            }
+
+            html {
+                scroll-behavior: smooth;
+                scroll-padding-top: 100px;
+            }
+
             body {
-                line-height: 1.6;
-                max-width: 1000px;
-                color: #333;
-                background-color: #fafafa;
+                font-family: var(--font-sans);
+                font-size: var(--text-base);
+                line-height: 1.7;
+                color: var(--color-base-text);
+                background: var(--color-base-bg);
+                background-image:
+                    radial-gradient(circle at 10% 20%, rgba(107, 155, 115, 0.05) 0%, transparent 40%),
+                    radial-gradient(circle at 90% 80%, rgba(147, 112, 219, 0.05) 0%, transparent 40%);
+                background-attachment: fixed;
+                -webkit-font-smoothing: antialiased;
+                -moz-osx-font-smoothing: grayscale;
+            }
+
+            /* ========================================
+           SKIP LINK (ACCESSIBILITY)
+           ======================================== */
+            .skip-link {
+                position: absolute;
+                top: -100px;
+                left: 10px;
+                background: var(--color-accent-1);
+                color: white;
+                padding: var(--space-sm) var(--space-md);
+                border-radius: var(--radius-sm);
+                text-decoration: none;
+                z-index: 1000;
+            }
+
+            .skip-link:focus {
+                top: 10px;
+            }
+
+            /* ========================================
+           NAVIGATION BAR
+           ======================================== */
+            nav {
+                position: sticky;
+                top: 0;
+                z-index: 100;
+                background: rgba(255, 255, 255, 0.85);
+                -webkit-backdrop-filter: blur(16px) saturate(180%);
+                backdrop-filter: blur(16px) saturate(180%);
+                border-bottom: 1px solid var(--color-border);
+                box-shadow: 0 4px 24px rgba(0, 0, 0, 0.04);
+            }
+
+            .nav-container {
+                max-width: 1400px;
+                margin: 0 auto;
+                padding: var(--space-md) var(--space-xl);
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                flex-wrap: wrap;
+                gap: var(--space-md);
+            }
+
+            .nav-brand {
+                font-size: var(--text-xl);
+                font-weight: 700;
+                color: var(--color-accent-2);
+                text-decoration: none;
+                letter-spacing: -0.02em;
+                display: flex;
+                align-items: center;
+                gap: var(--space-sm);
+                transition: all 0.3s ease;
+            }
+
+            .nav-brand::before {
+                content: '';
+                display: inline-block;
+                width: 8px;
+                height: 8px;
+                background: var(--gradient-primary);
+                border-radius: 50%;
+                animation: pulse 2s ease-in-out infinite;
+            }
+
+            .nav-brand:hover {
+                color: var(--color-accent-1);
+                transform: translateX(4px);
+            }
+
+            .breadcrumbs {
+                display: flex;
+                align-items: center;
+                gap: var(--space-sm);
+                list-style: none;
+                flex-wrap: wrap;
+            }
+
+            .breadcrumbs li {
+                display: flex;
+                align-items: center;
+                gap: var(--space-sm);
+            }
+
+            .breadcrumbs li:not(:last-child)::after {
+                content: '→';
+                color: var(--color-accent-1);
+                font-weight: 600;
+            }
+
+            .breadcrumbs a {
+                color: var(--color-base-text-muted);
+                text-decoration: none;
+                font-size: var(--text-sm);
+                transition: color 0.3s ease;
+            }
+
+            .breadcrumbs a:hover {
+                color: var(--color-accent-1);
+            }
+
+            /* ========================================
+           HERO SECTION
+           ======================================== */
+            .hero {
+                max-width: 1400px;
+                margin: 0 auto;
+                padding: var(--space-4xl) var(--space-xl) var(--space-3xl);
+                position: relative;
+                overflow: hidden;
+            }
+
+            .hero-content {
+                max-width: 900px;
+                margin: 0 auto;
+                text-align: center;
+                position: relative;
+                z-index: 2;
+            }
+
+            .page-title {
+                font-size: var(--text-4xl);
+                font-weight: 800;
+                letter-spacing: -0.03em;
+                line-height: 1.2;
+                margin-bottom: var(--space-lg);
+                background: var(--gradient-organic);
+                background-clip: text;
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                background-size: 200% 200%;
+                animation: gradientShift 8s ease infinite;
+            }
+
+            .page-subtitle {
+                font-size: var(--text-xl);
+                font-weight: 600;
+                color: var(--color-accent-2);
+                margin-bottom: var(--space-xl);
+            }
+
+            .hero-svg-container {
+                max-width: 800px;
+                margin: var(--space-3xl) auto 0;
+                position: relative;
+            }
+
+            /* ========================================
+           ABSTRACT SECTION
+           ======================================== */
+            .abstract-section {
+                max-width: 1200px;
+                margin: 0 auto var(--space-4xl);
+                padding: 0 var(--space-xl);
             }
 
             .abstract {
-                background: linear-gradient(135deg, #e8f5e8, #f0f9f0);
-                padding: 20px;
-                border-radius: 8px;
-                border-left: 5px solid #4a934c;
-                margin: 20px 0;
-                font-style: italic;
+                background: rgba(255, 255, 255, 0.7);
+                -webkit-backdrop-filter: blur(12px) saturate(180%);
+                backdrop-filter: blur(12px) saturate(180%);
+                border: 1px solid var(--color-border);
+                border-radius: var(--radius-xl);
+                padding: var(--space-2xl);
+                box-shadow: var(--shadow-lg);
+                position: relative;
+                overflow: hidden;
             }
 
-            .equation {
-                background-color: #f8f9fa;
-                padding: 15px;
-                margin: 15px 0;
-                border-radius: 5px;
-                border-left: 3px solid #4a934c;
-                font-family: 'Courier New', monospace;
-                text-align: center;
-            }
-
-            .code-block {
-                background-color: #f4f4f4;
-                padding: 15px;
-                border-radius: 5px;
-                font-family: 'Courier New', monospace;
-                overflow-x: auto;
-                border: 1px solid #ddd;
-            }
-
-            ul,
-            ol {
-                padding-left: 25px;
-            }
-
-            li {
-                margin-bottom: 8px;
-            }
-
-            .reference {
-                font-size: 0.9em;
-                color: #666;
-            }
-
-            a {
-                color: #2c5f2d;
-                text-decoration: none;
-            }
-
-            a:hover {
-                text-decoration: underline;
-            }
-
-            .highlight {
-                background-color: #fff3cd;
-                padding: 2px 4px;
-                border-radius: 3px;
-            }
-
-            .figure-caption {
-                font-style: italic;
-                color: #666;
-                text-align: center;
-                margin: 10px 0;
-                font-size: 0.9em;
-            }
-
-            .section-divider {
-                border-top: 2px solid #e0e0e0;
-                margin: 40px 0 30px 0;
-            }
-
-            #sidebar {
-                position: fixed;
-                background-color: #1B80CF;
+            .abstract::before {
+                content: '';
+                position: absolute;
                 top: 0;
                 left: 0;
-                bottom: 0;
-                width: 30vw;
-            }
-
-            #sidebar .title {
-                position: relative;
-                text-align: center;
-                line-height: 4vmax;
-                font-size: 1.4vmax;
-                font-family: 'Arial';
-                margin-top: 25vh;
-            }
-
-            #sidebar .title a:link,
-            #sidebar .title a:visited {
-                color: #FFFFFF;
-                text-decoration: none;
-            }
-
-            .subtitle {
-                top: 50vh;
-                text-align: center;
-                line-height: 1.3vmax;
-                font-family: 'Arial';
-                font-size: 1.5vmax;
-                color: #FFFFFF;
-            }
-
-            .subtitle a:link,
-            .subtitle a:visited {
-                color: #FFFFFF;
-                text-decoration: none;
-            }
-
-            .licence {
-                position: fixed;
-                text-align: right;
-                bottom: 0;
                 right: 0;
+                height: 4px;
+                background: var(--gradient-organic);
             }
 
-            .home {
-                position: fixed;
-                text-align: left;
-                font-family: 'Arial';
-                color: #D3D3D3;
-                z-index: 100;
-                width: 100%;
-                background-color: #FFFFFF;
-                top: 0px;
-                margin-bottom: 10px;
-                padding-bottom: 10px;
+            .abstract strong {
+                color: var(--color-accent-2);
+                font-weight: 700;
+                font-size: var(--text-lg);
             }
 
-            .home a:link,
-            .home a:visited {
-                text-decoration: none;
-                color: #D3D3D3;
-            }
-
-            .home ul {
-                margin: 0;
-                padding: 0;
-                text-align: left;
-                list-style: none;
-            }
-
-            .home li {
-                position: relative;
-                float: left;
-                padding-top: 15px;
-                margin-right: 1em;
-                font-family: 'Arial';
-            }
-
-            .home li:hover {
-                display: block;
-            }
-
-            .home a:link,
-            .home a:visited {
-                color: #D3D3D3;
-            }
-
-            .home li:hover a:link,
-            .home li:hover a:visited {
-                text-decoration: none;
-                padding: 15px;
-                color: #FFFFFF;
-                background-color: #1B80CF;
-            }
-
+            /* ========================================
+           MAIN CONTENT
+           ======================================== */
             .content {
-                line-height: 1.8vmax;
-                font-size: 1.2vmax;
-                font-family: 'Arial';
-                margin-top: 15vh;
-                width: 90%;
+                max-width: 1200px;
+                margin: 0 auto;
+                padding: 0 var(--space-xl) var(--space-4xl);
             }
 
-            .content h2,
-            h3,
-            h4 {
-                color: #1B80CF;
+            .content h2 {
+                font-size: var(--text-3xl);
+                font-weight: 700;
+                color: var(--color-accent-2);
+                margin: var(--space-3xl) 0 var(--space-xl);
+                letter-spacing: -0.02em;
+                position: relative;
+                padding-bottom: var(--space-md);
             }
 
-            .content a:link,
-            .content a:visited {
-                color: #1B80CF;
+            .content h2::after {
+                content: '';
+                position: absolute;
+                bottom: 0;
+                left: 0;
+                width: 80px;
+                height: 3px;
+                background: var(--gradient-primary);
+                border-radius: var(--radius-sm);
             }
 
             .content h3 {
-                color: #1B80CF;
+                font-size: var(--text-2xl);
+                font-weight: 600;
+                color: var(--color-accent-1);
+                margin: var(--space-2xl) 0 var(--space-lg);
+                letter-spacing: -0.01em;
             }
 
-            .content h2::before,
-            .content h3::before {
-                display: block;
-                content: " ";
-                visibility: hidden;
-                height: 50px;
-                margin-top: -50px;
-                pointer-events: none;
-                background-color: #FFFFFF;
+            .content p {
+                margin-bottom: var(--space-lg);
+                line-height: 1.8;
+                color: var(--color-base-text);
             }
 
-            .content a:link,
-            .content a:visited {
-                color: #1B80CF;
+            .content ul {
+                margin: var(--space-lg) 0;
+                padding-left: var(--space-xl);
             }
 
             .content li {
-                margin: 5px;
+                margin-bottom: var(--space-md);
+                line-height: 1.7;
             }
 
-            .page {
-                width: 65vw;
-                height: 100%;
-                margin-left: 30vw;
-                overflow: hidden;
-                padding: 0 1em;
-                font-family: 'Arial';
+            .content strong {
+                color: var(--color-accent-2);
+                font-weight: 600;
             }
 
-            .page img {
-                max-width: 100%;
-                max-height: 100%;
+            .highlight {
+                background: linear-gradient(120deg, transparent 0%, var(--color-accent-light) 50%, transparent 100%);
+                padding: 0 var(--space-xs);
+                border-radius: var(--radius-sm);
             }
 
-            @media (max-width: 640px),
-            screen and (orientation: portrait) {
-                body {
-                    max-width: 100%;
-                    max-height: 100%;
+            /* ========================================
+           CODE & EQUATION BLOCKS
+           ======================================== */
+            .code-block,
+            .equation {
+                background: rgba(255, 255, 255, 0.6);
+                -webkit-backdrop-filter: blur(8px);
+                backdrop-filter: blur(8px);
+                border: 1px solid var(--color-border);
+                border-left: 4px solid var(--color-accent-1);
+                border-radius: var(--radius-md);
+                padding: var(--space-lg);
+                margin: var(--space-xl) 0;
+                overflow-x: auto;
+            }
+
+            .code-block pre,
+            .equation pre {
+                font-family: var(--font-mono);
+                font-size: var(--text-sm);
+                line-height: 1.6;
+                color: var(--color-base-text);
+                white-space: pre-wrap;
+                word-wrap: break-word;
+            }
+
+            /* ========================================
+           SECTION DIVIDERS
+           ======================================== */
+            .section-divider {
+                height: 1px;
+                background: linear-gradient(90deg, transparent 0%, var(--color-border) 50%, transparent 100%);
+                margin: var(--space-3xl) 0;
+                position: relative;
+            }
+
+            .section-divider::before {
+                content: '🌿';
+                position: absolute;
+                left: 50%;
+                top: 50%;
+                transform: translate(-50%, -50%);
+                background: var(--color-base-bg);
+                padding: 0 var(--space-md);
+                font-size: var(--text-lg);
+            }
+
+            /* ========================================
+           REFERENCES
+           ======================================== */
+            .reference {
+                list-style: none;
+                counter-reset: reference-counter;
+                padding-left: 0;
+            }
+
+            .reference li {
+                counter-increment: reference-counter;
+                margin-bottom: var(--space-md);
+                padding-left: var(--space-2xl);
+                position: relative;
+                line-height: 1.6;
+            }
+
+            .reference li::before {
+                content: '[' counter(reference-counter) ']';
+                position: absolute;
+                left: 0;
+                color: var(--color-accent-1);
+                font-weight: 600;
+                font-size: var(--text-sm);
+            }
+
+            .reference a {
+                color: var(--color-accent-1);
+                text-decoration: none;
+                transition: color 0.3s ease;
+            }
+
+            .reference a:hover {
+                color: var(--color-accent-2);
+                text-decoration: underline;
+            }
+
+            /* ========================================
+           FOOTER
+           ======================================== */
+            footer {
+                background: rgba(255, 255, 255, 0.7);
+                -webkit-backdrop-filter: blur(12px) saturate(180%);
+                backdrop-filter: blur(12px) saturate(180%);
+                border-top: 1px solid var(--color-border);
+                margin-top: var(--space-4xl);
+            }
+
+            .footer-container {
+                max-width: 1400px;
+                margin: 0 auto;
+                padding: var(--space-2xl) var(--space-xl);
+                display: flex;
+                flex-direction: column;
+                gap: var(--space-xl);
+            }
+
+            .footer-links {
+                display: flex;
+                gap: var(--space-xl);
+                flex-wrap: wrap;
+            }
+
+            .footer-links a {
+                color: var(--color-base-text-muted);
+                text-decoration: none;
+                font-size: var(--text-sm);
+                transition: color 0.3s ease;
+            }
+
+            .footer-links a:hover {
+                color: var(--color-accent-1);
+            }
+
+            .copyright {
+                color: var(--color-base-text-muted);
+                font-size: var(--text-sm);
+                text-align: center;
+            }
+
+            /* ========================================
+           ANIMATIONS
+           ======================================== */
+            @keyframes gradientShift {
+
+                0%,
+                100% {
+                    background-position: 0% 50%;
                 }
 
-                #sidebar {
-                    position: fixed;
-                    background-color: #1B80CF;
-                    top: 0;
-                    left: 0;
-                    bottom: 80vh;
-                    width: 100vw;
+                50% {
+                    background-position: 100% 50%;
+                }
+            }
+
+            @keyframes pulse {
+
+                0%,
+                100% {
+                    opacity: 1;
+                    transform: scale(1);
                 }
 
-                #sidebar .title {
-                    text-align: center;
-                    position: fixed;
-                    margin-top: 6vh;
-                    left: 0px;
-                    right: 0px;
-                    line-height: 3.5vmax;
-                    font-size: 1.5vmax;
-                    font-family: 'Arial';
+                50% {
+                    opacity: 0.6;
+                    transform: scale(1.2);
+                }
+            }
+
+            @keyframes float {
+
+                0%,
+                100% {
+                    transform: translateY(0px);
                 }
 
-                #sidebar .subtitle {
-                    text-align: center;
-                    top: 5vh;
-                    left: 0px;
-                    right: 0px;
-                    position: fixed;
-                    margin-top: 10vh;
-                    font-size: 1.5vmax;
+                50% {
+                    transform: translateY(-20px);
+                }
+            }
+
+            @keyframes rotate {
+                from {
+                    transform: rotate(0deg);
                 }
 
-                #sidebar .title a:link,
-                #sidebar .title a:visited {
-                    text-align: center;
-                    color: #FFFFFF;
+                to {
+                    transform: rotate(360deg);
+                }
+            }
+
+            @keyframes grow {
+                from {
+                    transform: scale(0.95);
+                    opacity: 0.8;
                 }
 
-                #sidebar .subtitle a:link,
-                #sidebar .subtitle a:visited {
-                    text-align: center;
-                    color: #FFFFFF;
+                to {
+                    transform: scale(1.05);
+                    opacity: 1;
+                }
+            }
+
+            @keyframes fadeIn {
+                from {
+                    opacity: 0;
+                    transform: translateY(20px);
                 }
 
-                .home {
-                    z-index: 100;
-                    width: 100%;
-                    background-color: #1B80CF;
-                    font-size: 1.5vmax;
+                to {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            }
+
+            /* Reduced motion support */
+            @media (prefers-reduced-motion: reduce) {
+
+                *,
+                *::before,
+                *::after {
+                    animation-duration: 0.01ms !important;
+                    animation-iteration-count: 1 !important;
+                    transition-duration: 0.01ms !important;
+                }
+            }
+
+            /* ========================================
+           RESPONSIVE DESIGN
+           ======================================== */
+            @media (max-width: 768px) {
+                .nav-container {
+                    flex-direction: column;
+                    align-items: flex-start;
                 }
 
-                .home a:link,
-                .home a:visited {
-                    text-decoration: none;
-                    color: #FFFFFF;
+                .hero {
+                    padding: var(--space-2xl) var(--space-md) var(--space-xl);
                 }
 
+                .abstract-section,
                 .content {
-                    line-height: 3.8vmax;
-                    font-size: 1.8vmax;
-                    font-family: 'Arial';
-                    margin-top: 22vh;
+                    padding: 0 var(--space-md) var(--space-2xl);
                 }
 
-                .content a:link,
-                .content a:visited {
-                    color: #1B80CF;
+                .abstract {
+                    padding: var(--space-lg);
                 }
 
-                .page {
-                    top: 40vh;
-                    width: 95%;
-                    margin-left: 0vw;
+                .footer-container {
+                    padding: var(--space-xl) var(--space-md);
                 }
+            }
 
-                .page img {
-                    max-width: 100%;
-                    max-height: 100%;
-                    border: 0;
-                }
+            /* ========================================
+           SVG SPECIFIC STYLES
+           ======================================== */
+            .dna-helix {
+                animation: rotate 20s linear infinite;
+                transform-origin: center;
+            }
+
+            .leaf {
+                animation: float 4s ease-in-out infinite;
+            }
+
+            .molecule {
+                animation: grow 3s ease-in-out infinite alternate;
+            }
+
+            .tree-branch {
+                animation: float 5s ease-in-out infinite;
             }
         </style>
     </head>
 
     <body vocab="http://schema.org/">
-        <div class="page">
-            <div class="home">
-                <ul typeof="BreadcrumbList">
+        <a href="#main-content" class="skip-link">Skip to main content</a>
+
+        <!-- Navigation -->
+        <nav role="navigation" aria-label="Main navigation">
+            <div class="nav-container">
+                <a href="../about.html" class="nav-brand">John Samuel</a>
+                <ul typeof="BreadcrumbList" class="breadcrumbs">
                     <li property="itemListElement" typeof="ListItem">
                         <a property="item" typeof="WebPage" href="../index.html">
                             <span property="name">Home</span>
@@ -341,533 +635,593 @@
                             <span property="name">Research</span>
                         </a>
                     </li>
+                    <li property="itemListElement" typeof="ListItem">
+                        <span property="name">Modeling Biological Systems</span>
+                    </li>
                 </ul>
-
             </div>
-            <div id="sidebar">
-                <div class="title">
-                    <h1><a href="./biology.html">Modeling Biological Systems</a></h1>
-                </div>
-                <div class="subtitle">
-                    <h3><a href="../about.html">John Samuel</a></h3>
-                </div>
+        </nav>
+
+        <!-- Hero Section -->
+        <header class="hero">
+            <div class="hero-content">
+                <h1 class="page-title">Modeling Biological Systems</h1>
+                <p class="page-subtitle">Digital Modeling of Biology: From Fractals to AI-Driven Ecosystems</p>
             </div>
 
-            <div class="content">
-                <h2>Digital Modeling of Biology: From Fractals to AI-Driven Ecosystems</h2>
-
-                <div class="abstract">
-                    <strong>Abstract:</strong> Digital modeling of biological systems has evolved from simple
-                    geometric representations to sophisticated AI-driven simulations that capture the complexity
-                    of life at multiple scales. This article explores the mathematical foundations,
-                    algorithmic approaches, and emerging technologies that enable the computational
-                    representation of biological forms and processes, from individual plant structures to entire
-                    ecosystem dynamics. There exists several traditional methods including fractal geometry and
-                    L-systems, alongside next-generation approaches utilizing machine learning and artificial
-                    intelligence for predictive biological modeling.
-                </div>
-
-                <h3>1. Introduction: The Mathematical Beauty of Life</h3>
-
-                <p>The intersection of mathematics, computer science, and biology has given rise to a rich field
-                    of digital modeling that seeks to understand and simulate the patterns, structures, and
-                    processes that define living systems. From the spiral arrangements of seeds in a sunflower
-                    head following Fibonacci sequences to the branching patterns of blood vessels mimicking
-                    fractal geometries, nature exhibits mathematical principles that can be captured and
-                    replicated through computational models.</p>
-
-                <p>Digital biological modeling encompasses several fundamental concepts that form the backbone
-                    of all computational approaches to understanding life:</p>
-
-                <h3>1.1 Fundamental Principles</h3>
-
-                <p><strong>Geometric Patterns and Tiling:</strong> Biological systems frequently exhibit regular
-                    geometric patterns and tessellations. From the hexagonal structure of honeycomb cells to the
-                    Voronoi-like patterns in plant cell walls, these arrangements optimize space utilization and
-                    structural efficiency. Mathematical models describing these patterns often employ
-                    computational geometry algorithms and space-filling approaches.</p>
-
-                <p><strong>Evolutionary Dynamics:</strong> The three pillars of evolution—multiplication
-                    (reproduction), variation (genetic diversity), and heredity (inheritance)—provide the
-                    algorithmic framework for many biological modeling approaches. These principles are
-                    formalized in genetic algorithms, evolutionary computation, and population dynamics models
-                    that simulate the emergence of complex biological behaviors over time.</p>
-
-                <p><strong>Fractal Geometry and Self-Similarity:</strong> Many biological structures exhibit
-                    fractal properties, displaying similar patterns at multiple scales. The branching of trees,
-                    the structure of lungs, and the organization of vascular networks all demonstrate fractal
-                    characteristics that can be modeled using recursive mathematical functions and iterative
-                    algorithms.</p>
-
-                <div class="section-divider"></div>
-
-                <h3>2. Mathematical Foundations and Classical Approaches</h3>
-
-                <h3>2.1 Lindenmayer Systems (L-Systems)</h3>
-
-                <p>Developed by Hungarian botanist Aristid Lindenmayer in 1968, L-systems provide a mathematical
-                    framework for modeling the growth processes of plants and other biological structures. These
-                    systems use string rewriting rules to generate
-                    complex structures from simple initial conditions.</p>
-
-                <div class="equation">
-                    <strong>Basic L-System Structure:</strong>
-                    <pre>
-    G = (V, ω, P)<br>
-    Where: V = alphabet of symbols, ω = initial axiom, P = set of production rules
-                </pre>
-                </div>
-
-                <p>A simple example of an L-system for modeling plant growth:</p>
-
-                <div class="code-block">
-                    <pre>
-    Axiom: F
-    Rules: F → F[+F]F[-F]F
-    Where: F = forward, + = turn left, - = turn right, [ = push state, ] = pop state
-                </pre>
-                </div>
-
-                <p>Advanced L-systems incorporate parametric variables, stochastic elements, and
-                    context-sensitive rules to create more realistic biological models. <span
-                        class="highlight">Context-sensitive L-systems</span> allow rules to depend on
-                    neighboring symbols, enabling the modeling of competitive growth and resource allocation in
-                    plant structures.</p>
-
-                <h3>2.2 Fractal Modeling in Biology</h3>
-
-                <p>Fractal geometry provides powerful tools for modeling the self-similar structures commonly
-                    found in biological systems. The fractal dimension D can be calculated using the
-                    box-counting method:</p>
-
-                <div class="equation">
-                    <pre>
-D = lim(ε→0) [log N(ε) / log(1/ε)]<br>
-Where N(ε) is the number of boxes of size ε needed to cover the structure
-                </pre>
-                </div>
-
-                <p>Biological applications of fractal modeling include:</p>
-                <ul>
-                    <li><strong>Branching Structures:</strong> Trees, coral formations, and vascular networks
-                    </li>
-                    <li><strong>Surface Textures:</strong> Leaf surfaces, bark patterns, and cellular membranes
-                    </li>
-                    <li><strong>Growth Patterns:</strong> Root systems, fungal networks, and colony formations
-                    </li>
-                </ul>
-
-                <div class="section-divider"></div>
-
-                <h3>3. Computational Modeling and Rendering Techniques</h3>
-
-                <h3>3.1 Modeling and Rendering Trees</h3>
-
-                <p>Tree modeling represents one of the most extensively studied areas in digital biology,
-                    combining botanical accuracy with computational efficiency. Modern approaches integrate
-                    multiple methodologies:</p>
-
-                <p><strong>Recursive Fractal Approach:</strong> Based on the self-similar nature of tree
-                    branching, this method uses recursive functions to generate branch structures. The basic
-                    algorithm follows:</p>
-
-                <div class="code-block">
-                    <pre>
-    function drawTree(length, angle, depth) {
-        if (depth == 0) return;
-
-        drawLine(length);
-        rotate(angle);
-        drawTree(length * 0.67, angle, depth - 1);
-        rotate(-2 * angle);
-        drawTree(length * 0.67, angle, depth - 1);
-        rotate(angle);
-    }
-                </pre>
-                </div>
-
-                <p><strong>Self-Organizing Growth Models:</strong> These approaches simulate the biological
-                    processes underlying tree development, including apical dominance, phototropism, and
-                    resource allocation. The competition for light and nutrients drives branching patterns
-                    through differential equations:</p>
-
-                <div class="equation">
-                    <pre>
-    dB/dt = k₁ × L(x,y,z) × R(t) - k₂ × B
-    Where B = branch growth rate, L = light availability, R = resource function
-</pre>
-                </div>
-
-                <p><strong>Physics-Based Simulation:</strong> Advanced tree models incorporate mechanical
-                    properties, wind dynamics, and gravitational effects to create realistic swaying and
-                    response behaviors.</p>
-
-                <h3>3.2 Modeling and Rendering Leaves and Venation Patterns</h3>
-
-                <p>Leaf modeling encompasses both the overall leaf shape and the intricate venation patterns
-                    that transport nutrients and water throughout the leaf structure.</p>
-
-                <p><strong>Venation Pattern Generation:</strong> Research by Runions et al. (2005) introduced
-                    biologically-motivated algorithms that simulate the formation of leaf venation through auxin
-                    transport and competitive growth mechanisms.
-
-                <p><strong>Procedural Leaf Shape Generation:</strong> Modern leaf models combine:</p>
-                <ul>
-                    <li>Parametric curve definitions for leaf outlines</li>
-                    <li>Texture synthesis for surface details</li>
-                    <li>Subsurface scattering for realistic light transmission</li>
-                    <li>Seasonal variation algorithms for color changes</li>
-                </ul>
-
-                <h3>3.3 Modeling and Rendering Forests</h3>
-
-                <p>Forest ecosystem modeling presents unique challenges in balancing biological accuracy with
-                    computational efficiency across vast scales. Multiple rendering approaches have been
-                    developed:</p>
-
-                <p><strong>Polygon-Based Rendering:</strong> Traditional approach using geometric primitives to
-                    represent individual trees and forest components. Optimization techniques include:</p>
-                <ul>
-                    <li>Level-of-detail (LOD) systems for distance-based complexity reduction</li>
-                    <li>Instancing for repeated tree geometries</li>
-                    <li>Procedural geometry generation to reduce memory usage</li>
-                </ul>
-
-                <p><strong>Volume Rendering:</strong> Treats forests as continuous volumetric media, enabling
-                    efficient rendering of dense vegetation. This approach excels in representing:</p>
-                <ul>
-                    <li>Fog and atmospheric effects within forest canopies</li>
-                    <li>Light scattering through complex leaf structures</li>
-                    <li>Large-scale forest views where individual trees are not discernible</li>
-                </ul>
-
-                <p><strong>Point-Based Rendering:</strong> Represents forest elements as collections of points
-                    with associated properties (color, normal, size). Benefits include:</p>
-                <ul>
-                    <li>Efficient rendering of highly detailed vegetation</li>
-                    <li>Natural handling of transparency and anti-aliasing</li>
-                    <li>Scalable performance across different hardware platforms</li>
-                </ul>
-
-                <p><strong>Image-Based Rendering:</strong> Uses pre-computed images and impostors to represent
-                    distant or less important vegetation elements. Techniques include:</p>
-                <ul>
-                    <li>Billboard systems for distant trees</li>
-                    <li>Texture atlases for vegetation variety</li>
-                    <li>Environment mapping for reflection and lighting</li>
-                </ul>
-
-                <h3>3.4 Modeling and Rendering Flowers</h3>
-
-                <p>Floral modeling combines geometric precision with biological understanding to capture the
-                    intricate structures and patterns found in flowers.</p>
-
-                <p><strong>Phyllotactic Patterns:</strong> Many flowers exhibit mathematical arrangements based
-                    on the golden angle (≈137.5°) and Fibonacci sequences. The spiral phyllotaxis can be modeled
-                    using:</p>
-
-                <div class="equation">
-                    <pre>
-    θₙ = n × φ, rₙ = c × √n
-    Where φ = golden angle, c = scaling constant, n = element number
-                    </pre>
-                </div>
-
-                <p><strong>Parametric Petal Modeling:</strong> Individual petals can be described using
-                    parametric surfaces that capture both shape and deformation. Common approaches include:</p>
-                <ul>
-                    <li>NURBS (Non-Uniform Rational B-Splines) for smooth organic curves</li>
-                    <li>Subdivision surfaces for detailed petal geometry</li>
-                    <li>Physics-based deformation for natural petal movement</li>
-                </ul>
-
-                <div class="section-divider"></div>
-
-                <h3>4. Next-Generation AI-Driven Approaches</h3>
-
-                <h3>4.1 Machine Learning in Biological Modeling</h3>
-
-                <p>The integration of artificial intelligence and machine learning has revolutionized biological
-                    modeling, enabling <span class="highlight">predictive, adaptive, and data-driven
-                        approaches</span> that were previously impossible with traditional methods.</p>
-
-                <p><strong>Deep Learning for Pattern Recognition:</strong> Convolutional Neural Networks (CNNs)
-                    excel at identifying and classifying biological patterns from image data. Applications
-                    include:</p>
-                <ul>
-                    <li>Automated species identification from leaf shapes and venation patterns</li>
-                    <li>Disease detection in plant tissues</li>
-                    <li>Growth pattern prediction from environmental data</li>
-                </ul>
-
-                <p><strong>Generative Models:</strong> Generative Adversarial Networks (GANs) and Variational
-                    Autoencoders (VAEs) can create realistic biological structures by learning from large
-                    datasets of natural examples.</p>
-
-                <h3>4.2 Multi-Scale Foundation Models</h3>
-
-                <p>Recent advances propose AI-driven digital organisms that integrate multiple scales of
-                    biological modeling, from molecular to ecosystem levels.
-                    These systems combine:</p>
-
-                <ul>
-                    <li><strong>Molecular Level:</strong> Protein folding, genetic expression, metabolic
-                        pathways</li>
-                    <li><strong>Cellular Level:</strong> Cell division, differentiation, signaling</li>
-                    <li><strong>Tissue Level:</strong> Organ development, tissue mechanics, vascularization</li>
-                    <li><strong>Organism Level:</strong> Morphology, behavior, physiological processes</li>
-                    <li><strong>Ecosystem Level:</strong> Population dynamics, environmental interactions,
-                        evolutionary pressures</li>
-                </ul>
-
-                <h3>4.3 Reinforcement Learning for Adaptive Growth</h3>
-
-                <p>Reinforcement learning enables biological models to adapt and optimize their growth
-                    strategies based on environmental feedback, similar to how real organisms respond to their
-                    surroundings.</p>
-
-                <div class="equation">
-                    <pre>
-    Q(s,a) ← Q(s,a) + α[r + γ max Q(s',a') - Q(s,a)]<br>
-    Where s = state, a = action, r = reward, α = learning rate, γ = discount factor
-                </pre>
-                </div>
-
-                <div class="section-divider"></div>
-
-                <h3>5. Ecosystem-Level Modeling and Simulation</h3>
-
-                <h3>5.1 Complex Adaptive Systems</h3>
-
-                <p>Ecosystem modeling requires understanding emergent behaviors that arise from interactions
-                    between multiple biological components. These systems exhibit non-linear dynamics, feedback
-                    loops, and adaptive responses to environmental changes.
-                </p>
-
-                <p><strong>Agent-Based Models (ABM):</strong> Individual organisms are modeled as autonomous
-                    agents with specific behaviors and interaction rules. The ecosystem-level behavior emerges
-                    from these individual interactions:</p>
-
-                <h3>5.2 Environmental Modeling</h3>
-
-                <p>Accurate ecosystem simulation requires detailed environmental models that capture:</p>
-                <ul>
-                    <li><strong>Climate Dynamics:</strong> Temperature, precipitation, seasonal variations</li>
-                    <li><strong>Soil Properties:</strong> Nutrient distribution, pH levels, water retention</li>
-                    <li><strong>Light Availability:</strong> Canopy effects, seasonal changes, shadowing</li>
-                    <li><strong>Atmospheric Conditions:</strong> CO₂ levels, humidity, wind patterns</li>
-                </ul>
-
-                <h3>5.3 Population Dynamics and Biodiversity</h3>
-
-                <p>Mathematical models describing population changes over time form the foundation of ecosystem
-                    modeling:</p>
-
-                <div class="equation">
-                    <pre>
-    dN/dt = rN(1 - N/K) - αNP<br>
-    Where N = population size, r = growth rate, K = carrying capacity, P = predator population
-                    </pre>
-                </div>
-
-                <p>Biodiversity indices help quantify ecosystem health and stability:</p>
-
-                <div class="equation">
-                    <pre>
-    Shannon Diversity: H = -Σ(pᵢ × ln(pᵢ))
-    Where pᵢ = proportion of species i in the community
-                <pre>
-                </div>
-
-                <div class="section-divider"></div>
-
-                <h3>6. Software Tools and Implementation Frameworks</h3>
-
-                <h3>6.1 Open-Source Modeling Platforms</h3>
-
-                <p>Several open-source platforms provide comprehensive tools for biological modeling:</p>
-
-                <p><strong>Blender with Scientific Add-ons:</strong> The popular 3D modeling software includes
-                    specialized add-ons for biological visualization, including molecular structures, cellular
-                    arrangements, and ecosystem simulations.</p>
-
-                <p><strong>Processing and p5.js:</strong> These creative coding frameworks excel at generative
-                    biological art and educational simulations, with extensive libraries for L-systems, genetic
-                    algorithms, and particle systems.</p>
-
-                <p><strong>NetLogo:</strong> Particularly suited for agent-based modeling of biological systems,
-                    NetLogo provides an accessible platform for ecosystem simulations and population dynamics
-                    studies.</p>
-
-                <h3>6.2 Specialized Biological Modeling Software</h3>
-
-                <p><strong>Vlab:</strong> Developed at the University of Calgary, Vlab provides a comprehensive
-                    environment for L-system modeling and virtual plant development.</p>
-
-                <p><strong>GroIMP:</strong> The Growth-Grammar related Interactive Modeling Platform combines
-                    rule-based modeling with 3D visualization for plant architecture studies.</p>
-
-                <p><strong>CellDesigner:</strong> Focuses on biochemical networks and cellular processes,
-                    providing tools for systems biology modeling and simulation.</p>
-
-                <h3>6.3 Machine Learning Frameworks for Biology</h3>
-
-                <p>Modern biological modeling increasingly relies on machine learning frameworks.</p>
-
-                <div class="section-divider"></div>
-
-                <h3>7. Emerging Technologies and Future Directions</h3>
-
-                <h3>7.1 Quantum Computing Applications</h3>
-
-                <p>Quantum computing offers potential breakthroughs in biological simulation, particularly for:
-                </p>
-                <ul>
-                    <li>Molecular dynamics calculations</li>
-                    <li>Protein folding optimization</li>
-                    <li>Genetic algorithm acceleration</li>
-                    <li>Complex ecosystem state space exploration</li>
-                </ul>
-
-                <h3>7.2 Augmented and Virtual Reality</h3>
-
-                <p>Immersive technologies enable new forms of biological visualization and interaction:</p>
-                <ul>
-                    <li><strong>Educational Applications:</strong> Virtual field trips through ecosystems</li>
-                    <li><strong>Research Tools:</strong> 3D manipulation of molecular structures</li>
-                    <li><strong>Data Visualization:</strong> Immersive exploration of high-dimensional
-                        biological data</li>
-                </ul>
-
-                <h3>7.3 Edge Computing and IoT Integration</h3>
-
-                <p>The integration of biological models with Internet of Things (IoT) sensors enables real-time
-                    ecosystem monitoring and adaptive modeling:</p>
-                <ul>
-                    <li>Environmental sensor networks for continuous data collection</li>
-                    <li>Edge computing for local model updates and predictions</li>
-                    <li>Automated irrigation and agricultural management systems</li>
-                </ul>
-
-                <div class="section-divider"></div>
-
-                <h3>8. Challenges and Limitations</h3>
-
-                <h3>8.1 Computational Complexity</h3>
-
-                <p>Biological systems exhibit extraordinary complexity that challenges current computational
-                    capabilities:</p>
-                <ul>
-                    <li><strong>Scale Mismatch:</strong> Bridging molecular to ecosystem scales requires
-                        enormous computational resources</li>
-                    <li><strong>Non-Linear Dynamics:</strong> Small changes can lead to dramatically different
-                        outcomes</li>
-                    <li><strong>Stochastic Processes:</strong> Random elements require ensemble modeling
-                        approaches</li>
-                </ul>
-
-                <h3>8.2 Data Limitations</h3>
-
-                <p>Accurate biological modeling depends on comprehensive data that is often difficult to obtain:
-                </p>
-                <ul>
-                    <li>Long-term ecological studies spanning decades or centuries</li>
-                    <li>High-resolution spatial and temporal data</li>
-                    <li>Standardized measurement protocols across different research groups</li>
-                </ul>
-
-                <h3>8.3 Validation and Verification</h3>
-
-                <p>Ensuring model accuracy presents ongoing challenges:</p>
-                <ul>
-                    <li>Limited ground truth data for complex biological processes</li>
-                    <li>Difficulty in controlled experimentation at ecosystem scales</li>
-                    <li>Trade-offs between model complexity and interpretability</li>
-                </ul>
-
-                <div class="section-divider"></div>
-
-                <h3>9. Conclusion</h3>
-
-                <p>Digital modeling of biology has evolved from simple geometric representations to
-                    sophisticated AI-driven systems capable of simulating life at unprecedented scales and
-                    accuracy. The convergence of mathematical foundations, computational advances, and
-                    biological understanding continues to push the boundaries of what is possible in biological
-                    simulation.</p>
-
-                <p>Future developments will likely focus on integrating multiple modeling approaches, leveraging
-                    emerging technologies like quantum computing and augmented reality, and developing more
-                    sophisticated AI systems capable of learning and adapting from biological data. As our
-                    computational capabilities grow and our understanding of biological systems deepens, digital
-                    models will become increasingly important tools for scientific discovery, environmental
-                    management, and biotechnological innovation.</p>
-
-                <p>The field stands at an exciting crossroads where traditional mathematical modeling meets
-                    cutting-edge artificial intelligence, promising new insights into the fundamental principles
-                    that govern life on Earth and beyond. Through continued interdisciplinary collaboration and
-                    technological advancement, digital biological modeling will undoubtedly play a crucial role
-                    in addressing some of humanity's greatest challenges, from climate change and biodiversity
-                    loss to food security and medical breakthroughs.</p>
-
-                <div class="section-divider"></div>
-
-                <h3>References</h3>
-
-                <ol class="reference">
-                    <li><a href="https://en.wikipedia.org/wiki/Biology">Biology</a> - Wikipedia</li>
-                    <li><a href="https://en.wikipedia.org/wiki/Tessellation">Tessellation</a> -
-                        Wikipedia</li>
-                    <li><a href="https://en.wikipedia.org/wiki/Evolution">Evolution</a> - Wikipedia</li>
-                    <li><a href="https://en.wikipedia.org/wiki/Minkowski%E2%80%93Bouligand_dimension">Minkowski–Bouligand
-                            dimension</a> - Wikipedia</li>
-                    <li>Mandelbrot, B. B. (1982). <em>The Fractal Geometry of Nature</em>. W.H.
-                        Freeman and Company.</li>
-                    <li>Lindenmayer, A. (1968). Mathematical models for cellular interactions in
-                        development. <em>Journal of Theoretical Biology</em>, 18(3), 280-299.</li>
-                    <li>Prusinkiewicz, P., & Lindenmayer, A. (1990). <em>The Algorithmic Beauty of
-                            Plants</em>. Springer-Verlag.</li>
-                    <li>Weber, J., & Penn, J. (1995). Creation and rendering of realistic trees.
-                        <em>Proceedings of the 22nd Annual Conference on Computer Graphics and Interactive
-                            Techniques</em>, 119-128.
-                    </li>
-                    <li>Runions, A., Fuhrer, M., Pavicic, A., Mardia, C., & Pavone, M. (2005).
-                        Modeling and visualization of leaf venation patterns. <em>ACM Transactions on
-                            Graphics</em>, 24(3), 702-711.</li>
-                    <li>Eraslan, G., Avsec, Ž., Gagneur, J., & Theis, F. J. (2019). Deep learning: new
-                        computational modelling techniques for genomics. <em>Nature Reviews Genetics</em>,
-                        20(7), 389-403.</li>
-                    <li>Goodfellow, I., Pouget-Abadie, J., Mirza, M., Xu, B., Warde-Farley, D.,
-                        Ozair, S., ... & Bengio, Y. (2014). Generative adversarial nets. <em>Advances in Neural
-                            Information Processing Systems</em>, 27.</li>
-                    <li>Shi, L., Zhang, Y., & Wang, H. (2024). Toward AI-Driven Digital Organism: A
-                        System of Multiscale Foundation Models for Predicting, Simulating and Programming
-                        Biology at All Levels. <em>arXiv preprint arXiv:2412.06993</em>.</li>
-                    <li>Levin, S. A. (1998). Ecosystems and the biosphere as complex adaptive
-                        systems. <em>Ecosystems</em>, 1(5), 431-436.</li>
-                    <li><a href="https://www.blender.org/">Blender Foundation</a> - Open Source 3D
-                        Creation Suite</li>
-                    <li>Wilensky, U. (1999). NetLogo. <em>Center for Connected Learning and
-                            Computer-Based Modeling, Northwestern University</em>.</li>
-                    <li>Federl, P., & Prusinkiewicz, P. (2004). Virtual laboratory: an interactive
-                        software environment for computer graphics. <em>Proceedings of Computer Graphics
-                            International</em>, 93-100.</li>
-                    <li>Jones, E., Oliphant, T., Peterson, P., et al. (2001–). SciPy: Open source
-                        scientific tools for Python. <a href="http://www.scipy.org/">http://www.scipy.org/</a>
-                    </li>
-                    <li>Hunter, J. D. (2007). Matplotlib: A 2D graphics environment. <em>Computing in
-                            Science & Engineering</em>, 9(3), 90-95.</li>
-                    <li>McKinney, W. (2010). Data structures for statistical computing in Python.
-                        <em>Proceedings of the 9th Python in Science Conference</em>, 445, 51-56.
-                    </li>
-                    <li>Abadi, M., Agarwal, A., Barham, P., et al. (2015). TensorFlow: Large-scale
-                        machine learning on heterogeneous systems. <a
-                            href="https://www.tensorflow.org/">https://www.tensorflow.org/</a></li>
-                    <li>Paszke, A., Gross, S., Massa, F., et al. (2019). PyTorch: An imperative
-                        style, high-performance deep learning library. <em>Advances in Neural Information
-                            Processing Systems</em>, 32.</li>
-                </ol>
+            <div class="hero-svg-container">
+                <svg viewBox="0 0 800 400" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                    <!-- Background gradient -->
+                    <defs>
+                        <linearGradient id="bg-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" style="stop-color:#e8f5e9;stop-opacity:1" />
+                            <stop offset="50%" style="stop-color:#c8e6c9;stop-opacity:1" />
+                            <stop offset="100%" style="stop-color:#a5d6a7;stop-opacity:1" />
+                        </linearGradient>
+
+                        <linearGradient id="leaf-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" style="stop-color:#6b9b73;stop-opacity:1" />
+                            <stop offset="100%" style="stop-color:#4a7c55;stop-opacity:1" />
+                        </linearGradient>
+
+                        <linearGradient id="dna-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" style="stop-color:#9370db;stop-opacity:1" />
+                            <stop offset="100%" style="stop-color:#5f9ea0;stop-opacity:1" />
+                        </linearGradient>
+
+                        <filter id="glow">
+                            <feGaussianBlur stdDeviation="3" result="coloredBlur" />
+                            <feMerge>
+                                <feMergeNode in="coloredBlur" />
+                                <feMergeNode in="SourceGraphic" />
+                            </feMerge>
+                        </filter>
+                    </defs>
+
+                    <!-- Background -->
+                    <rect width="800" height="400" fill="url(#bg-gradient)" opacity="0.3" />
+
+                    <!-- Fractal Tree Structure -->
+                    <g class="tree-branch">
+                        <line x1="150" y1="350" x2="150" y2="250" stroke="#4a7c55" stroke-width="8"
+                            stroke-linecap="round" />
+                        <line x1="150" y1="250" x2="120" y2="200" stroke="#4a7c55" stroke-width="6"
+                            stroke-linecap="round" />
+                        <line x1="150" y1="250" x2="180" y2="200" stroke="#4a7c55" stroke-width="6"
+                            stroke-linecap="round" />
+                        <line x1="120" y1="200" x2="100" y2="160" stroke="#6b9b73" stroke-width="4"
+                            stroke-linecap="round" />
+                        <line x1="120" y1="200" x2="130" y2="170" stroke="#6b9b73" stroke-width="4"
+                            stroke-linecap="round" />
+                        <line x1="180" y1="200" x2="170" y2="170" stroke="#6b9b73" stroke-width="4"
+                            stroke-linecap="round" />
+                        <line x1="180" y1="200" x2="200" y2="160" stroke="#6b9b73" stroke-width="4"
+                            stroke-linecap="round" />
+                    </g>
+
+                    <!-- Leaves -->
+                    <g class="leaf">
+                        <ellipse cx="100" cy="150" rx="15" ry="8" fill="url(#leaf-gradient)" opacity="0.9"
+                            transform="rotate(-30 100 150)" />
+                        <ellipse cx="130" cy="160" rx="15" ry="8" fill="url(#leaf-gradient)" opacity="0.9"
+                            transform="rotate(20 130 160)" />
+                        <ellipse cx="170" cy="160" rx="15" ry="8" fill="url(#leaf-gradient)" opacity="0.9"
+                            transform="rotate(-20 170 160)" />
+                        <ellipse cx="200" cy="150" rx="15" ry="8" fill="url(#leaf-gradient)" opacity="0.9"
+                            transform="rotate(30 200 150)" />
+                    </g>
+
+                    <!-- DNA Helix -->
+                    <g class="dna-helix" opacity="0.8">
+                        <path d="M 400 100 Q 420 120, 400 140 Q 380 160, 400 180 Q 420 200, 400 220 Q 380 240, 400 260"
+                            stroke="url(#dna-gradient)" stroke-width="3" fill="none" stroke-linecap="round" />
+                        <path d="M 440 100 Q 420 120, 440 140 Q 460 160, 440 180 Q 420 200, 440 220 Q 460 240, 440 260"
+                            stroke="url(#dna-gradient)" stroke-width="3" fill="none" stroke-linecap="round" />
+
+                        <!-- DNA connectors -->
+                        <line x1="400" y1="110" x2="440" y2="110" stroke="#9370db" stroke-width="2" opacity="0.6" />
+                        <line x1="400" y1="150" x2="440" y2="150" stroke="#9370db" stroke-width="2" opacity="0.6" />
+                        <line x1="400" y1="190" x2="440" y2="190" stroke="#9370db" stroke-width="2" opacity="0.6" />
+                        <line x1="400" y1="230" x2="440" y2="230" stroke="#9370db" stroke-width="2" opacity="0.6" />
+                    </g>
+
+                    <!-- Molecular Structure -->
+                    <g class="molecule" opacity="0.7">
+                        <circle cx="600" cy="150" r="12" fill="#5f9ea0" filter="url(#glow)" />
+                        <circle cx="650" cy="130" r="12" fill="#6b9b73" filter="url(#glow)" />
+                        <circle cx="670" cy="180" r="12" fill="#9370db" filter="url(#glow)" />
+                        <circle cx="620" cy="200" r="12" fill="#8fbc8f" filter="url(#glow)" />
+
+                        <line x1="600" y1="150" x2="650" y2="130" stroke="#4a7c55" stroke-width="2" opacity="0.5" />
+                        <line x1="600" y1="150" x2="620" y2="200" stroke="#4a7c55" stroke-width="2" opacity="0.5" />
+                        <line x1="650" y1="130" x2="670" y2="180" stroke="#4a7c55" stroke-width="2" opacity="0.5" />
+                        <line x1="670" y1="180" x2="620" y2="200" stroke="#4a7c55" stroke-width="2" opacity="0.5" />
+                    </g>
+
+                    <!-- Organic decorative elements -->
+                    <circle cx="250" cy="80" r="4" fill="#6b9b73" opacity="0.3" />
+                    <circle cx="550" cy="320" r="6" fill="#8fbc8f" opacity="0.3" />
+                    <circle cx="700" cy="50" r="5" fill="#9370db" opacity="0.3" />
+
+                    <!-- Growth rings -->
+                    <circle cx="400" cy="350" r="30" stroke="#6b9b73" stroke-width="1" fill="none" opacity="0.2" />
+                    <circle cx="400" cy="350" r="45" stroke="#6b9b73" stroke-width="1" fill="none" opacity="0.15" />
+                    <circle cx="400" cy="350" r="60" stroke="#6b9b73" stroke-width="1" fill="none" opacity="0.1" />
+                </svg>
             </div>
-        </div>
+        </header>
+
+        <!-- Abstract -->
+        <section class="abstract-section">
+            <div class="abstract">
+                <p><strong>Abstract:</strong> Digital modeling of biological systems has evolved from simple geometric
+                    representations to sophisticated AI-driven simulations that capture the complexity of life at
+                    multiple scales. This article explores the mathematical foundations, algorithmic approaches, and
+                    emerging technologies that enable the computational representation of biological forms and
+                    processes, from individual plant structures to entire ecosystem dynamics. There exists several
+                    traditional methods including fractal geometry and L-systems, alongside next-generation approaches
+                    utilizing machine learning and artificial intelligence for predictive biological modeling.</p>
+            </div>
+        </section>
+
+        <!-- Main Content -->
+        <main id="main-content" class="content">
+            <h2>1. Introduction: The Mathematical Beauty of Life</h2>
+
+            <p>The intersection of mathematics, computer science, and biology has given rise to a rich field of digital
+                modeling that seeks to understand and simulate the patterns, structures, and processes that define
+                living systems. From the spiral arrangements of seeds in a sunflower head following Fibonacci sequences
+                to the branching patterns of blood vessels mimicking fractal geometries, nature exhibits mathematical
+                principles that can be captured and replicated through computational models.</p>
+
+            <p>Digital biological modeling encompasses several fundamental concepts that form the backbone of all
+                computational approaches to understanding life:</p>
+
+            <h3>1.1 Fundamental Principles</h3>
+
+            <p><strong>Geometric Patterns and Tiling:</strong> Biological systems frequently exhibit regular geometric
+                patterns and tessellations. From the hexagonal structure of honeycomb cells to the Voronoi-like patterns
+                in plant cell walls, these arrangements optimize space utilization and structural efficiency.
+                Mathematical models describing these patterns often employ computational geometry algorithms and
+                space-filling approaches.</p>
+
+            <p><strong>Evolutionary Dynamics:</strong> The three pillars of evolution—multiplication (reproduction),
+                variation (genetic diversity), and heredity (inheritance)—provide the algorithmic framework for many
+                biological modeling approaches. These principles are formalized in genetic algorithms, evolutionary
+                computation, and population dynamics models that simulate the emergence of complex biological behaviors
+                over time.</p>
+
+            <p><strong>Fractal Geometry and Self-Similarity:</strong> Many biological structures exhibit fractal
+                properties, displaying similar patterns at multiple scales. The branching of trees, the structure of
+                lungs, and the organization of vascular networks all demonstrate fractal characteristics that can be
+                modeled using recursive mathematical functions and iterative algorithms.</p>
+
+            <div class="section-divider"></div>
+
+            <h2>2. Mathematical Foundations and Classical Approaches</h2>
+
+            <h3>2.1 Lindenmayer Systems (L-Systems)</h3>
+
+            <p>Developed by Hungarian botanist Aristid Lindenmayer in 1968, L-systems provide a mathematical framework
+                for modeling the growth processes of plants and other biological structures. These systems use string
+                rewriting rules to generate complex structures from simple initial conditions.</p>
+
+            <div class="equation">
+                <strong>Basic L-System Structure:</strong>
+                <pre>G = (V, ω, P)
+Where: V = alphabet of symbols, ω = initial axiom, P = set of production rules</pre>
+            </div>
+
+            <p>A simple example of an L-system for modeling plant growth:</p>
+
+            <div class="code-block">
+                <pre>Axiom: F
+Rules: F → F[+F]F[-F]F
+Where: F = forward, + = turn left, - = turn right, [ = push state, ] = pop state</pre>
+            </div>
+
+            <p>Advanced L-systems incorporate parametric variables, stochastic elements, and context-sensitive rules to
+                create more realistic biological models. <span class="highlight">Context-sensitive L-systems</span>
+                allow rules to depend on neighboring symbols, enabling the modeling of competitive growth and resource
+                allocation in plant structures.</p>
+
+            <h3>2.2 Fractal Modeling in Biology</h3>
+
+            <p>Fractal geometry provides powerful tools for modeling the self-similar structures commonly found in
+                biological systems. The fractal dimension D can be calculated using the box-counting method:</p>
+
+            <div class="equation">
+                <pre>D = lim(ε→0) [log N(ε) / log(1/ε)]
+Where N(ε) is the number of boxes of size ε needed to cover the structure</pre>
+            </div>
+
+            <p>Biological applications of fractal modeling include:</p>
+            <ul>
+                <li><strong>Branching Structures:</strong> Trees, coral formations, and vascular networks</li>
+                <li><strong>Surface Textures:</strong> Leaf surfaces, bark patterns, and cellular membranes</li>
+                <li><strong>Growth Patterns:</strong> Root systems, fungal networks, and colony formations</li>
+            </ul>
+
+            <div class="section-divider"></div>
+
+            <h2>3. Computational Modeling and Rendering Techniques</h2>
+
+            <h3>3.1 Modeling and Rendering Trees</h3>
+
+            <p>Tree modeling represents one of the most extensively studied areas in digital biology, combining
+                botanical accuracy with computational efficiency. Modern approaches integrate multiple methodologies:
+            </p>
+
+            <p><strong>Recursive Fractal Approach:</strong> Based on the self-similar nature of tree branching, this
+                method uses recursive functions to generate branch structures. The basic algorithm follows:</p>
+
+            <div class="code-block">
+                <pre>function drawTree(length, angle, depth) {
+    if (depth == 0) return;
+    
+    drawLine(length);
+    rotate(angle);
+    drawTree(length * 0.67, angle, depth - 1);
+    rotate(-2 * angle);
+    drawTree(length * 0.67, angle, depth - 1);
+    rotate(angle);
+}</pre>
+            </div>
+
+            <p><strong>Self-Organizing Growth Models:</strong> These approaches simulate the biological processes
+                underlying tree development, including apical dominance, phototropism, and resource allocation. The
+                competition for light and nutrients drives branching patterns through differential equations:</p>
+
+            <div class="equation">
+                <pre>dB/dt = k₁ × L(x,y,z) × R(t) - k₂ × B
+Where B = branch growth rate, L = light availability, R = resource function</pre>
+            </div>
+
+            <p><strong>Physics-Based Simulation:</strong> Advanced tree models incorporate mechanical properties, wind
+                dynamics, and gravitational effects to create realistic swaying and response behaviors.</p>
+
+            <h3>3.2 Modeling and Rendering Leaves and Venation Patterns</h3>
+
+            <p>Leaf modeling encompasses both the overall leaf shape and the intricate venation patterns that transport
+                nutrients and water throughout the leaf structure.</p>
+
+            <p><strong>Venation Pattern Generation:</strong> Research by Runions et al. (2005) introduced
+                biologically-motivated algorithms that simulate the formation of leaf venation through auxin transport
+                and competitive growth mechanisms.</p>
+
+            <p><strong>Procedural Leaf Shape Generation:</strong> Modern leaf models combine:</p>
+            <ul>
+                <li>Parametric curve definitions for leaf outlines</li>
+                <li>Texture synthesis for surface details</li>
+                <li>Subsurface scattering for realistic light transmission</li>
+                <li>Seasonal variation algorithms for color changes</li>
+            </ul>
+
+            <h3>3.3 Modeling and Rendering Forests</h3>
+
+            <p>Forest ecosystem modeling presents unique challenges in balancing biological accuracy with computational
+                efficiency across vast scales. Multiple rendering approaches have been developed:</p>
+
+            <p><strong>Polygon-Based Rendering:</strong> Traditional approach using geometric primitives to represent
+                individual trees and forest components. Optimization techniques include:</p>
+            <ul>
+                <li>Level-of-detail (LOD) systems for distance-based complexity reduction</li>
+                <li>Instancing for repeated tree geometries</li>
+                <li>Procedural geometry generation to reduce memory usage</li>
+            </ul>
+
+            <p><strong>Volume Rendering:</strong> Treats forests as continuous volumetric media, enabling efficient
+                rendering of dense vegetation. This approach excels in representing:</p>
+            <ul>
+                <li>Fog and atmospheric effects within forest canopies</li>
+                <li>Light scattering through complex leaf structures</li>
+                <li>Large-scale forest views where individual trees are not discernible</li>
+            </ul>
+
+            <p><strong>Point-Based Rendering:</strong> Represents forest elements as collections of points with
+                associated properties (color, normal, size). Benefits include:</p>
+            <ul>
+                <li>Efficient rendering of highly detailed vegetation</li>
+                <li>Natural handling of transparency and anti-aliasing</li>
+                <li>Scalable performance across different hardware platforms</li>
+            </ul>
+
+            <p><strong>Image-Based Rendering:</strong> Uses pre-computed images and impostors to represent distant or
+                less important vegetation elements. Techniques include:</p>
+            <ul>
+                <li>Billboard systems for distant trees</li>
+                <li>Texture atlases for vegetation variety</li>
+                <li>Environment mapping for reflection and lighting</li>
+            </ul>
+
+            <h3>3.4 Modeling and Rendering Flowers</h3>
+
+            <p>Floral modeling combines geometric precision with biological understanding to capture the intricate
+                structures and patterns found in flowers.</p>
+
+            <p><strong>Phyllotactic Patterns:</strong> Many flowers exhibit mathematical arrangements based on the
+                golden angle (≈137.5°) and Fibonacci sequences. The spiral phyllotaxis can be modeled using:</p>
+
+            <div class="equation">
+                <pre>θₙ = n × φ, rₙ = c × √n
+Where φ = golden angle, c = scaling constant, n = element number</pre>
+            </div>
+
+            <p><strong>Parametric Petal Modeling:</strong> Individual petals can be described using parametric surfaces
+                that capture both shape and deformation. Common approaches include:</p>
+            <ul>
+                <li>NURBS (Non-Uniform Rational B-Splines) for smooth organic curves</li>
+                <li>Subdivision surfaces for detailed petal geometry</li>
+                <li>Physics-based deformation for natural petal movement</li>
+            </ul>
+
+            <div class="section-divider"></div>
+
+            <h2>4. Next-Generation AI-Driven Approaches</h2>
+
+            <h3>4.1 Machine Learning in Biological Modeling</h3>
+
+            <p>The integration of artificial intelligence and machine learning has revolutionized biological modeling,
+                enabling <span class="highlight">predictive, adaptive, and data-driven approaches</span> that were
+                previously impossible with traditional methods.</p>
+
+            <p><strong>Deep Learning for Pattern Recognition:</strong> Convolutional Neural Networks (CNNs) excel at
+                identifying and classifying biological patterns from image data. Applications include:</p>
+            <ul>
+                <li>Automated species identification from leaf shapes and venation patterns</li>
+                <li>Disease detection in plant tissues</li>
+                <li>Growth pattern prediction from environmental data</li>
+            </ul>
+
+            <p><strong>Generative Models:</strong> Generative Adversarial Networks (GANs) and Variational Autoencoders
+                (VAEs) can create realistic biological structures by learning from large datasets of natural examples.
+            </p>
+
+            <h3>4.2 Multi-Scale Foundation Models</h3>
+
+            <p>Recent advances propose AI-driven digital organisms that integrate multiple scales of biological
+                modeling, from molecular to ecosystem levels. These systems combine:</p>
+
+            <ul>
+                <li><strong>Molecular Level:</strong> Protein folding, genetic expression, metabolic pathways</li>
+                <li><strong>Cellular Level:</strong> Cell division, differentiation, signaling</li>
+                <li><strong>Tissue Level:</strong> Organ development, tissue mechanics, vascularization</li>
+                <li><strong>Organism Level:</strong> Morphology, behavior, physiological processes</li>
+                <li><strong>Ecosystem Level:</strong> Population dynamics, environmental interactions, evolutionary
+                    pressures</li>
+            </ul>
+
+            <h3>4.3 Reinforcement Learning for Adaptive Growth</h3>
+
+            <p>Reinforcement learning enables biological models to adapt and optimize their growth strategies based on
+                environmental feedback, similar to how real organisms respond to their surroundings.</p>
+
+            <div class="equation">
+                <pre>Q(s,a) ← Q(s,a) + α[r + γ max Q(s',a') - Q(s,a)]
+Where s = state, a = action, r = reward, α = learning rate, γ = discount factor</pre>
+            </div>
+
+            <div class="section-divider"></div>
+
+            <h2>5. Ecosystem-Level Modeling and Simulation</h2>
+
+            <h3>5.1 Complex Adaptive Systems</h3>
+
+            <p>Ecosystem modeling requires understanding emergent behaviors that arise from interactions between
+                multiple biological components. These systems exhibit non-linear dynamics, feedback loops, and adaptive
+                responses to environmental changes.</p>
+
+            <p><strong>Agent-Based Models (ABM):</strong> Individual organisms are modeled as autonomous agents with
+                specific behaviors and interaction rules. The ecosystem-level behavior emerges from these individual
+                interactions.</p>
+
+            <h3>5.2 Environmental Modeling</h3>
+
+            <p>Accurate ecosystem simulation requires detailed environmental models that capture:</p>
+            <ul>
+                <li><strong>Climate Dynamics:</strong> Temperature, precipitation, seasonal variations</li>
+                <li><strong>Soil Properties:</strong> Nutrient distribution, pH levels, water retention</li>
+                <li><strong>Light Availability:</strong> Canopy effects, seasonal changes, shadowing</li>
+                <li><strong>Atmospheric Conditions:</strong> CO₂ levels, humidity, wind patterns</li>
+            </ul>
+
+            <h3>5.3 Population Dynamics and Biodiversity</h3>
+
+            <p>Mathematical models describing population changes over time form the foundation of ecosystem modeling:
+            </p>
+
+            <div class="equation">
+                <pre>dN/dt = rN(1 - N/K) - αNP
+Where N = population size, r = growth rate, K = carrying capacity, P = predator population</pre>
+            </div>
+
+            <p>Biodiversity indices help quantify ecosystem health and stability:</p>
+
+            <div class="equation">
+                <pre>Shannon Diversity: H = -Σ(pᵢ × ln(pᵢ))
+Where pᵢ = proportion of species i in the community</pre>
+            </div>
+
+            <div class="section-divider"></div>
+
+            <h2>6. Software Tools and Implementation Frameworks</h2>
+
+            <h3>6.1 Open-Source Modeling Platforms</h3>
+
+            <p>Several open-source platforms provide comprehensive tools for biological modeling:</p>
+
+            <p><strong>Blender with Scientific Add-ons:</strong> The popular 3D modeling software includes specialized
+                add-ons for biological visualization, including molecular structures, cellular arrangements, and
+                ecosystem simulations.</p>
+
+            <p><strong>Processing and p5.js:</strong> These creative coding frameworks excel at generative biological
+                art and educational simulations, with extensive libraries for L-systems, genetic algorithms, and
+                particle systems.</p>
+
+            <p><strong>NetLogo:</strong> Particularly suited for agent-based modeling of biological systems, NetLogo
+                provides an accessible platform for ecosystem simulations and population dynamics studies.</p>
+
+            <h3>6.2 Specialized Biological Modeling Software</h3>
+
+            <p><strong>Vlab:</strong> Developed at the University of Calgary, Vlab provides a comprehensive environment
+                for L-system modeling and virtual plant development.</p>
+
+            <p><strong>GroIMP:</strong> The Growth-Grammar related Interactive Modeling Platform combines rule-based
+                modeling with 3D visualization for plant architecture studies.</p>
+
+            <p><strong>CellDesigner:</strong> Focuses on biochemical networks and cellular processes, providing tools
+                for systems biology modeling and simulation.</p>
+
+            <h3>6.3 Machine Learning Frameworks for Biology</h3>
+
+            <p>Modern biological modeling increasingly relies on machine learning frameworks.</p>
+
+            <div class="section-divider"></div>
+
+            <h2>7. Emerging Technologies and Future Directions</h2>
+
+            <h3>7.1 Quantum Computing Applications</h3>
+
+            <p>Quantum computing offers potential breakthroughs in biological simulation, particularly for:</p>
+            <ul>
+                <li>Molecular dynamics calculations</li>
+                <li>Protein folding optimization</li>
+                <li>Genetic algorithm acceleration</li>
+                <li>Complex ecosystem state space exploration</li>
+            </ul>
+
+            <h3>7.2 Augmented and Virtual Reality</h3>
+
+            <p>Immersive technologies enable new forms of biological visualization and interaction:</p>
+            <ul>
+                <li><strong>Educational Applications:</strong> Virtual field trips through ecosystems</li>
+                <li><strong>Research Tools:</strong> 3D manipulation of molecular structures</li>
+                <li><strong>Data Visualization:</strong> Immersive exploration of high-dimensional biological data</li>
+            </ul>
+
+            <h3>7.3 Edge Computing and IoT Integration</h3>
+
+            <p>The integration of biological models with Internet of Things (IoT) sensors enables real-time ecosystem
+                monitoring and adaptive modeling:</p>
+            <ul>
+                <li>Environmental sensor networks for continuous data collection</li>
+                <li>Edge computing for local model updates and predictions</li>
+                <li>Automated irrigation and agricultural management systems</li>
+            </ul>
+
+            <div class="section-divider"></div>
+
+            <h2>8. Challenges and Limitations</h2>
+
+            <h3>8.1 Computational Complexity</h3>
+
+            <p>Biological systems exhibit extraordinary complexity that challenges current computational capabilities:
+            </p>
+            <ul>
+                <li><strong>Scale Mismatch:</strong> Bridging molecular to ecosystem scales requires enormous
+                    computational resources</li>
+                <li><strong>Non-Linear Dynamics:</strong> Small changes can lead to dramatically different outcomes</li>
+                <li><strong>Stochastic Processes:</strong> Random elements require ensemble modeling approaches</li>
+            </ul>
+
+            <h3>8.2 Data Limitations</h3>
+
+            <p>Accurate biological modeling depends on comprehensive data that is often difficult to obtain:</p>
+            <ul>
+                <li>Long-term ecological studies spanning decades or centuries</li>
+                <li>High-resolution spatial and temporal data</li>
+                <li>Standardized measurement protocols across different research groups</li>
+            </ul>
+
+            <h3>8.3 Validation and Verification</h3>
+
+            <p>Ensuring model accuracy presents ongoing challenges:</p>
+            <ul>
+                <li>Limited ground truth data for complex biological processes</li>
+                <li>Difficulty in controlled experimentation at ecosystem scales</li>
+                <li>Trade-offs between model complexity and interpretability</li>
+            </ul>
+
+            <div class="section-divider"></div>
+
+            <h2>9. Conclusion</h2>
+
+            <p>Digital modeling of biology has evolved from simple geometric representations to sophisticated AI-driven
+                systems capable of simulating life at unprecedented scales and accuracy. The convergence of mathematical
+                foundations, computational advances, and biological understanding continues to push the boundaries of
+                what is possible in biological simulation.</p>
+
+            <p>Future developments will likely focus on integrating multiple modeling approaches, leveraging emerging
+                technologies like quantum computing and augmented reality, and developing more sophisticated AI systems
+                capable of learning and adapting from biological data. As our computational capabilities grow and our
+                understanding of biological systems deepens, digital models will become increasingly important tools for
+                scientific discovery, environmental management, and biotechnological innovation.</p>
+
+            <p>The field stands at an exciting crossroads where traditional mathematical modeling meets cutting-edge
+                artificial intelligence, promising new insights into the fundamental principles that govern life on
+                Earth and beyond. Through continued interdisciplinary collaboration and technological advancement,
+                digital biological modeling will undoubtedly play a crucial role in addressing some of humanity's
+                greatest challenges, from climate change and biodiversity loss to food security and medical
+                breakthroughs.</p>
+
+            <div class="section-divider"></div>
+
+            <h2>References</h2>
+
+            <ol class="reference">
+                <li><a href="https://en.wikipedia.org/wiki/Biology">Biology</a> - Wikipedia</li>
+                <li><a href="https://en.wikipedia.org/wiki/Tessellation">Tessellation</a> - Wikipedia</li>
+                <li><a href="https://en.wikipedia.org/wiki/Evolution">Evolution</a> - Wikipedia</li>
+                <li><a href="https://en.wikipedia.org/wiki/Minkowski%E2%80%93Bouligand_dimension">Minkowski–Bouligand
+                        dimension</a> - Wikipedia</li>
+                <li>Mandelbrot, B. B. (1982). <em>The Fractal Geometry of Nature</em>. W.H. Freeman and Company.</li>
+                <li>Lindenmayer, A. (1968). Mathematical models for cellular interactions in development. <em>Journal of
+                        Theoretical Biology</em>, 18(3), 280-299.</li>
+                <li>Prusinkiewicz, P., & Lindenmayer, A. (1990). <em>The Algorithmic Beauty of Plants</em>.
+                    Springer-Verlag.</li>
+                <li>Weber, J., & Penn, J. (1995). Creation and rendering of realistic trees. <em>Proceedings of the 22nd
+                        Annual Conference on Computer Graphics and Interactive Techniques</em>, 119-128.</li>
+                <li>Runions, A., Fuhrer, M., Pavicic, A., Mardia, C., & Pavone, M. (2005). Modeling and visualization of
+                    leaf venation patterns. <em>ACM Transactions on Graphics</em>, 24(3), 702-711.</li>
+                <li>Eraslan, G., Avsec, Ž., Gagneur, J., & Theis, F. J. (2019). Deep learning: new computational
+                    modelling techniques for genomics. <em>Nature Reviews Genetics</em>, 20(7), 389-403.</li>
+                <li>Goodfellow, I., Pouget-Abadie, J., Mirza, M., Xu, B., Warde-Farley, D., Ozair, S., ... & Bengio, Y.
+                    (2014). Generative adversarial nets. <em>Advances in Neural Information Processing Systems</em>, 27.
+                </li>
+                <li>Shi, L., Zhang, Y., & Wang, H. (2024). Toward AI-Driven Digital Organism: A System of Multiscale
+                    Foundation Models for Predicting, Simulating and Programming Biology at All Levels. <em>arXiv
+                        preprint arXiv:2412.06993</em>.</li>
+                <li>Levin, S. A. (1998). Ecosystems and the biosphere as complex adaptive systems. <em>Ecosystems</em>,
+                    1(5), 431-436.</li>
+                <li><a href="https://www.blender.org/">Blender Foundation</a> - Open Source 3D Creation Suite</li>
+                <li>Wilensky, U. (1999). NetLogo. <em>Center for Connected Learning and Computer-Based Modeling,
+                        Northwestern University</em>.</li>
+                <li>Federl, P., & Prusinkiewicz, P. (2004). Virtual laboratory: an interactive software environment for
+                    computer graphics. <em>Proceedings of Computer Graphics International</em>, 93-100.</li>
+                <li>Jones, E., Oliphant, T., Peterson, P., et al. (2001–). SciPy: Open source scientific tools for
+                    Python. <a href="http://www.scipy.org/">http://www.scipy.org/</a></li>
+                <li>Hunter, J. D. (2007). Matplotlib: A 2D graphics environment. <em>Computing in Science &
+                        Engineering</em>, 9(3), 90-95.</li>
+                <li>McKinney, W. (2010). Data structures for statistical computing in Python. <em>Proceedings of the 9th
+                        Python in Science Conference</em>, 445, 51-56.</li>
+                <li>Abadi, M., Agarwal, A., Barham, P., et al. (2015). TensorFlow: Large-scale machine learning on
+                    heterogeneous systems. <a href="https://www.tensorflow.org/">https://www.tensorflow.org/</a></li>
+                <li>Paszke, A., Gross, S., Massa, F., et al. (2019). PyTorch: An imperative style, high-performance deep
+                    learning library. <em>Advances in Neural Information Processing Systems</em>, 32.</li>
+            </ol>
+        </main>
+
+        <!-- Footer -->
+        <footer>
+            <div class="footer-container">
+                <div class="footer-links">
+                    <a href="../index.html">Home</a>
+                    <a href="../research/research.html">Research</a>
+                    <a href="../about.html">About</a>
+                </div>
+                <p class="copyright">© John Samuel</p>
+            </div>
+        </footer>
     </body>
 
 </html>

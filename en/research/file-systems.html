@@ -3,261 +3,634 @@
 
     <head>
         <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <meta http-equiv="Content-Language" content="en" />
         <link rel="shortcut icon" href="../../images/logo/favicon.png" />
         <title>File Systems: John Samuel</title>
-        <style type="text/css">
-            body {
-                background-color: #FFFFFF;
+        <style>
+            /* ========================================
+           DESIGN TOKENS & CSS CUSTOM PROPERTIES
+           ======================================== */
+            :root {
+                /* Tech-Inspired Color Palette */
+                --color-base-bg: #f5f8fa;
+                --color-base-surface: #ffffff;
+                --color-base-text: #1a2332;
+                --color-base-text-muted: #4a5f7f;
+
+                /* Digital Blue Accents */
+                --color-accent-1: #4a90e2;
+                --color-accent-2: #2d5f8d;
+                --color-accent-3: #7bb8f5;
+                --color-accent-light: #e8f4fd;
+
+                /* Tech Purple & Cyan */
+                --color-tech-purple: #7b68ee;
+                --color-tech-cyan: #00d4ff;
+
+                /* Functional Colors */
+                --color-shadow: rgba(74, 144, 226, 0.15);
+                --color-border: rgba(74, 144, 226, 0.2);
+                --color-hover: rgba(74, 144, 226, 0.08);
+
+                /* Gradients */
+                --gradient-primary: linear-gradient(135deg, var(--color-accent-1) 0%, var(--color-accent-2) 100%);
+                --gradient-subtle: linear-gradient(180deg, var(--color-base-bg) 0%, var(--color-accent-light) 100%);
+                --gradient-tech: linear-gradient(135deg, var(--color-accent-1) 0%, var(--color-tech-cyan) 50%, var(--color-tech-purple) 100%);
+
+                /* Spacing Scale */
+                --space-xs: 0.25rem;
+                --space-sm: 0.5rem;
+                --space-md: 1rem;
+                --space-lg: 1.5rem;
+                --space-xl: 2rem;
+                --space-2xl: 3rem;
+                --space-3xl: 4rem;
+                --space-4xl: 6rem;
+
+                /* Typography Scale */
+                --text-xs: clamp(0.75rem, 0.7rem + 0.25vw, 0.875rem);
+                --text-sm: clamp(0.875rem, 0.8rem + 0.35vw, 1rem);
+                --text-base: clamp(1rem, 0.95rem + 0.25vw, 1.125rem);
+                --text-lg: clamp(1.125rem, 1.05rem + 0.35vw, 1.25rem);
+                --text-xl: clamp(1.25rem, 1.15rem + 0.5vw, 1.5rem);
+                --text-2xl: clamp(1.5rem, 1.3rem + 1vw, 2rem);
+                --text-3xl: clamp(2rem, 1.6rem + 2vw, 2.5rem);
+                --text-4xl: clamp(2.5rem, 2rem + 2.5vw, 3.5rem);
+
+                /* Border Radius */
+                --radius-sm: 4px;
+                --radius-md: 12px;
+                --radius-lg: 16px;
+                --radius-xl: 24px;
+                --radius-chip: 6px;
+
+                /* Shadows */
+                --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.04), 0 1px 2px rgba(0, 0, 0, 0.06);
+                --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.05), 0 2px 4px rgba(0, 0, 0, 0.06);
+                --shadow-lg: 0 10px 24px var(--color-shadow), 0 4px 8px rgba(0, 0, 0, 0.06);
+                --shadow-xl: 0 20px 40px var(--color-shadow), 0 8px 16px rgba(0, 0, 0, 0.08);
+
+                /* Font Stack */
+                --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+                --font-mono: 'SF Mono', Monaco, 'Cascadia Code', 'Consolas', 'Courier New', monospace;
             }
 
-            #sidebar {
-                position: fixed;
-                background-color: #1B80CF;
-                top: 0;
-                left: 0;
-                bottom: 0;
-                width: 30vw;
-            }
-
-            #sidebar .title {
-                position: relative;
-                text-align: center;
-                line-height: 4vmax;
-                font-size: 1.4vmax;
-                font-family: 'Arial';
-                margin-top: 25vh;
-            }
-
-            #sidebar .title a:link,
-            #sidebar .title a:visited {
-                color: #FFFFFF;
-                text-decoration: none;
-            }
-
-            .subtitle {
-                top: 50vh;
-                text-align: center;
-                line-height: 1.3vmax;
-                font-family: 'Arial';
-                font-size: 1.5vmax;
-                color: #FFFFFF;
-            }
-
-            .subtitle a:link,
-            .subtitle a:visited {
-                color: #FFFFFF;
-                text-decoration: none;
-            }
-
-            .licence {
-                position: fixed;
-                text-align: right;
-                bottom: 0;
-                right: 0;
-            }
-
-            .home {
-                position: fixed;
-                text-align: left;
-                font-family: 'Arial';
-                color: #D3D3D3;
-                z-index: 100;
-                width: 100%;
-                background-color: #FFFFFF;
-                top: 0px;
-                margin-bottom: 10px;
-                padding-bottom: 10px;
-            }
-
-            .home a:link,
-            .home a:visited {
-                text-decoration: none;
-                color: #D3D3D3;
-            }
-
-            .home ul {
+            /* ========================================
+           RESET & BASE STYLES
+           ======================================== */
+            * {
                 margin: 0;
                 padding: 0;
-                text-align: left;
-                list-style: none;
+                box-sizing: border-box;
             }
 
-            .home li {
-                position: relative;
-                float: left;
-                padding-top: 15px;
-                margin-right: 1em;
-                font-family: 'Arial';
+            html {
+                scroll-behavior: smooth;
+                scroll-padding-top: 100px;
             }
 
-            .home li:hover {
-                display: block;
+            body {
+                font-family: var(--font-sans);
+                font-size: var(--text-base);
+                line-height: 1.7;
+                color: var(--color-base-text);
+                background: var(--color-base-bg);
+                background-image:
+                    radial-gradient(circle at 15% 25%, rgba(74, 144, 226, 0.06) 0%, transparent 50%),
+                    radial-gradient(circle at 85% 75%, rgba(0, 212, 255, 0.06) 0%, transparent 50%);
+                background-attachment: fixed;
+                -webkit-font-smoothing: antialiased;
+                -moz-osx-font-smoothing: grayscale;
             }
 
-            .home a:link,
-            .home a:visited {
-                color: #D3D3D3;
-            }
-
-            .home li:hover a:link,
-            .home li:hover a:visited {
+            /* ========================================
+           SKIP LINK (ACCESSIBILITY)
+           ======================================== */
+            .skip-link {
+                position: absolute;
+                top: -100px;
+                left: 10px;
+                background: var(--color-accent-2);
+                color: white;
+                padding: var(--space-sm) var(--space-md);
+                border-radius: var(--radius-sm);
                 text-decoration: none;
-                padding: 15px;
-                color: #FFFFFF;
-                background-color: #1B80CF;
+                z-index: 1000;
             }
 
-            .content {
-                line-height: 1.8vmax;
-                font-size: 1.2vmax;
-                font-family: 'Arial';
-                margin-top: 15vh;
-                width: 90%;
+            .skip-link:focus {
+                top: 10px;
             }
 
-            .content h2,
-            h3,
-            h4 {
-                color: #1B80CF;
+            /* ========================================
+           NAVIGATION BAR
+           ======================================== */
+            nav {
+                position: sticky;
+                top: 0;
+                z-index: 100;
+                background: rgba(255, 255, 255, 0.85);
+                -webkit-backdrop-filter: blur(16px) saturate(180%);
+                backdrop-filter: blur(16px) saturate(180%);
+                border-bottom: 1px solid var(--color-border);
+                box-shadow: 0 4px 24px rgba(0, 0, 0, 0.04);
             }
 
-            .content a:link,
-            .content a:visited {
-                color: #1B80CF;
+            .nav-container {
+                max-width: 1400px;
+                margin: 0 auto;
+                padding: var(--space-md) var(--space-xl);
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                flex-wrap: wrap;
+                gap: var(--space-md);
             }
 
-            .content h3 {
-                color: #1B80CF;
+            .nav-brand {
+                font-size: var(--text-xl);
+                font-weight: 700;
+                color: var(--color-accent-2);
+                text-decoration: none;
+                letter-spacing: -0.02em;
+                display: flex;
+                align-items: center;
+                gap: var(--space-sm);
+                transition: all 0.3s ease;
             }
 
-            .content h2::before,
-            .content h3::before {
-                display: block;
-                content: " ";
-                visibility: hidden;
-                height: 50px;
-                margin-top: -50px;
-                pointer-events: none;
-                background-color: #FFFFFF;
+            .nav-brand::before {
+                content: '';
+                display: inline-block;
+                width: 10px;
+                height: 10px;
+                background: var(--gradient-tech);
+                border-radius: 2px;
+                animation: dataPulse 2s ease-in-out infinite;
             }
 
-            .content a:link,
-            .content a:visited {
-                color: #1B80CF;
+            .nav-brand:hover {
+                color: var(--color-accent-1);
+                transform: translateX(4px);
             }
 
-            .content li {
-                margin: 5px;
+            .breadcrumbs {
+                display: flex;
+                align-items: center;
+                gap: var(--space-sm);
+                list-style: none;
+                flex-wrap: wrap;
             }
 
-            .page {
-                width: 65vw;
-                height: 100%;
-                margin-left: 30vw;
+            .breadcrumbs li {
+                display: flex;
+                align-items: center;
+                gap: var(--space-sm);
+            }
+
+            .breadcrumbs li:not(:last-child)::after {
+                content: '→';
+                color: var(--color-accent-1);
+                font-weight: 600;
+            }
+
+            .breadcrumbs a {
+                color: var(--color-base-text-muted);
+                text-decoration: none;
+                font-size: var(--text-sm);
+                transition: color 0.3s ease;
+            }
+
+            .breadcrumbs a:hover {
+                color: var(--color-accent-1);
+            }
+
+            /* ========================================
+           HERO SECTION
+           ======================================== */
+            .hero {
+                max-width: 1400px;
+                margin: 0 auto;
+                padding: var(--space-4xl) var(--space-xl) var(--space-3xl);
+                position: relative;
                 overflow: hidden;
-                padding: 0 1em;
-                font-family: 'Arial';
             }
 
-            .page img {
-                max-width: 100%;
-                max-height: 100%;
+            .hero-content {
+                max-width: 900px;
+                margin: 0 auto;
+                text-align: center;
+                position: relative;
+                z-index: 2;
             }
 
-            @media (max-width: 640px),
-            screen and (orientation: portrait) {
-                body {
-                    max-width: 100%;
-                    max-height: 100%;
+            .page-title {
+                font-size: var(--text-4xl);
+                font-weight: 800;
+                letter-spacing: -0.03em;
+                line-height: 1.2;
+                margin-bottom: var(--space-lg);
+                background: var(--gradient-tech);
+                background-clip: text;
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                background-size: 200% 200%;
+                animation: gradientShift 8s ease infinite;
+            }
+
+            .page-subtitle {
+                font-size: var(--text-xl);
+                font-weight: 600;
+                color: var(--color-accent-2);
+                margin-bottom: var(--space-xl);
+            }
+
+            .hero-svg-container {
+                max-width: 800px;
+                margin: var(--space-3xl) auto 0;
+                position: relative;
+            }
+
+            /* ========================================
+           ALERT BOX
+           ======================================== */
+            .alert-box {
+                background: linear-gradient(135deg, rgba(74, 144, 226, 0.1) 0%, rgba(123, 184, 245, 0.1) 100%);
+                border-left: 4px solid var(--color-accent-1);
+                border-radius: var(--radius-md);
+                padding: var(--space-lg);
+                margin-bottom: var(--space-2xl);
+            }
+
+            .alert-box strong {
+                color: var(--color-accent-2);
+                font-weight: 600;
+            }
+
+            .alert-box a {
+                color: var(--color-accent-1);
+                text-decoration: none;
+                font-weight: 600;
+                transition: color 0.3s ease;
+            }
+
+            .alert-box a:hover {
+                color: var(--color-accent-2);
+                text-decoration: underline;
+            }
+
+            /* ========================================
+           MAIN CONTENT
+           ======================================== */
+            .content {
+                max-width: 1200px;
+                margin: 0 auto;
+                padding: 0 var(--space-xl) var(--space-4xl);
+            }
+
+            article {
+                background: rgba(255, 255, 255, 0.6);
+                -webkit-backdrop-filter: blur(8px) saturate(180%);
+                backdrop-filter: blur(8px) saturate(180%);
+                border: 1px solid var(--color-border);
+                border-radius: var(--radius-xl);
+                padding: var(--space-3xl);
+                box-shadow: var(--shadow-lg);
+            }
+
+            section {
+                margin-bottom: var(--space-3xl);
+            }
+
+            section:last-of-type {
+                margin-bottom: 0;
+            }
+
+            h3 {
+                font-size: var(--text-2xl);
+                font-weight: 600;
+                color: var(--color-accent-1);
+                margin-bottom: var(--space-lg);
+                letter-spacing: -0.01em;
+                position: relative;
+                padding-left: var(--space-md);
+            }
+
+            h3::before {
+                content: '';
+                position: absolute;
+                left: 0;
+                top: 50%;
+                transform: translateY(-50%);
+                width: 4px;
+                height: 70%;
+                background: var(--gradient-primary);
+                border-radius: var(--radius-sm);
+            }
+
+            p {
+                margin-bottom: var(--space-lg);
+                line-height: 1.8;
+                color: var(--color-base-text);
+            }
+
+            ul,
+            ol {
+                margin: var(--space-lg) 0;
+                padding-left: var(--space-2xl);
+            }
+
+            li {
+                margin-bottom: var(--space-md);
+                line-height: 1.7;
+            }
+
+            li ul {
+                margin-top: var(--space-md);
+            }
+
+            strong {
+                color: var(--color-accent-2);
+                font-weight: 600;
+            }
+
+            code {
+                font-family: var(--font-mono);
+                font-size: 0.9em;
+                background: rgba(74, 144, 226, 0.1);
+                color: var(--color-accent-2);
+                padding: 0.2em 0.4em;
+                border-radius: var(--radius-chip);
+                border: 1px solid rgba(74, 144, 226, 0.2);
+            }
+
+            a {
+                color: var(--color-accent-1);
+                text-decoration: none;
+                transition: color 0.3s ease;
+                position: relative;
+            }
+
+            a:hover {
+                color: var(--color-accent-2);
+            }
+
+            a:not(.nav-brand):not(.breadcrumbs a):not(.alert-box a)::after {
+                content: '';
+                position: absolute;
+                bottom: -2px;
+                left: 0;
+                width: 0;
+                height: 1px;
+                background: var(--color-accent-2);
+                transition: width 0.3s ease;
+            }
+
+            a:not(.nav-brand):not(.breadcrumbs a):not(.alert-box a):hover::after {
+                width: 100%;
+            }
+
+            /* ========================================
+           SECTION DIVIDERS
+           ======================================== */
+            .section-divider {
+                height: 1px;
+                background: linear-gradient(90deg, transparent 0%, var(--color-border) 50%, transparent 100%);
+                margin: var(--space-3xl) 0;
+                position: relative;
+            }
+
+            .section-divider::before {
+                content: '◆';
+                position: absolute;
+                left: 50%;
+                top: 50%;
+                transform: translate(-50%, -50%);
+                background: var(--color-base-bg);
+                padding: 0 var(--space-md);
+                font-size: var(--text-lg);
+                color: var(--color-accent-1);
+            }
+
+            /* ========================================
+           REFERENCES
+           ======================================== */
+            section:last-of-type ol {
+                counter-reset: reference-counter;
+                list-style: none;
+                padding-left: 0;
+            }
+
+            section:last-of-type li {
+                counter-increment: reference-counter;
+                padding-left: var(--space-2xl);
+                position: relative;
+                margin-bottom: var(--space-md);
+                line-height: 1.6;
+            }
+
+            section:last-of-type li::before {
+                content: '[' counter(reference-counter) ']';
+                position: absolute;
+                left: 0;
+                color: var(--color-accent-1);
+                font-weight: 600;
+                font-size: var(--text-sm);
+            }
+
+            /* ========================================
+           FOOTER
+           ======================================== */
+            .page-footer {
+                background: rgba(255, 255, 255, 0.7);
+                -webkit-backdrop-filter: blur(12px) saturate(180%);
+                backdrop-filter: blur(12px) saturate(180%);
+                border-top: 1px solid var(--color-border);
+                margin-top: var(--space-4xl);
+            }
+
+            .footer-container {
+                max-width: 1400px;
+                margin: 0 auto;
+                padding: var(--space-2xl) var(--space-xl);
+                display: flex;
+                flex-direction: column;
+                gap: var(--space-xl);
+            }
+
+            .footer-links {
+                display: flex;
+                gap: var(--space-xl);
+                flex-wrap: wrap;
+            }
+
+            .footer-links a {
+                color: var(--color-base-text-muted);
+                text-decoration: none;
+                font-size: var(--text-sm);
+                transition: color 0.3s ease;
+            }
+
+            .footer-links a:hover {
+                color: var(--color-accent-1);
+            }
+
+            .copyright {
+                color: var(--color-base-text-muted);
+                font-size: var(--text-sm);
+                text-align: center;
+            }
+
+            /* ========================================
+           ANIMATIONS
+           ======================================== */
+            @keyframes gradientShift {
+
+                0%,
+                100% {
+                    background-position: 0% 50%;
                 }
 
-                #sidebar {
-                    position: fixed;
-                    background-color: #1B80CF;
-                    top: 0;
-                    left: 0;
-                    bottom: 80vh;
-                    width: 100vw;
+                50% {
+                    background-position: 100% 50%;
+                }
+            }
+
+            @keyframes dataPulse {
+
+                0%,
+                100% {
+                    opacity: 1;
+                    transform: scale(1) rotate(0deg);
+                    box-shadow: 0 0 0 0 rgba(74, 144, 226, 0.7);
                 }
 
-                #sidebar .title {
-                    text-align: center;
-                    position: fixed;
-                    margin-top: 6vh;
-                    left: 0px;
-                    right: 0px;
-                    line-height: 3.5vmax;
-                    font-size: 1.5vmax;
-                    font-family: 'Arial';
+                50% {
+                    opacity: 0.7;
+                    transform: scale(1.2) rotate(90deg);
+                    box-shadow: 0 0 0 8px rgba(74, 144, 226, 0);
+                }
+            }
+
+            @keyframes dataFlow {
+                0% {
+                    transform: translateX(-100%);
+                    opacity: 0;
                 }
 
-                #sidebar .subtitle {
-                    text-align: center;
-                    top: 5vh;
-                    left: 0px;
-                    right: 0px;
-                    position: fixed;
-                    margin-top: 10vh;
-                    font-size: 1.5vmax;
+                50% {
+                    opacity: 1;
                 }
 
-                #sidebar .title a:link,
-                #sidebar .title a:visited {
-                    text-align: center;
-                    color: #FFFFFF;
+                100% {
+                    transform: translateX(100%);
+                    opacity: 0;
+                }
+            }
+
+            @keyframes circuitPulse {
+
+                0%,
+                100% {
+                    opacity: 0.3;
                 }
 
-                #sidebar .subtitle a:link,
-                #sidebar .subtitle a:visited {
-                    text-align: center;
-                    color: #FFFFFF;
+                50% {
+                    opacity: 1;
+                }
+            }
+
+            @keyframes float {
+
+                0%,
+                100% {
+                    transform: translateY(0px);
                 }
 
-                .home {
-                    z-index: 100;
-                    width: 100%;
-                    background-color: #1B80CF;
-                    font-size: 1.5vmax;
+                50% {
+                    transform: translateY(-15px);
+                }
+            }
+
+            @keyframes rotate {
+                from {
+                    transform: rotate(0deg);
                 }
 
-                .home a:link,
-                .home a:visited {
-                    text-decoration: none;
-                    color: #FFFFFF;
+                to {
+                    transform: rotate(360deg);
+                }
+            }
+
+            /* Reduced motion support */
+            @media (prefers-reduced-motion: reduce) {
+
+                *,
+                *::before,
+                *::after {
+                    animation-duration: 0.01ms !important;
+                    animation-iteration-count: 1 !important;
+                    transition-duration: 0.01ms !important;
+                }
+            }
+
+            /* ========================================
+           RESPONSIVE DESIGN
+           ======================================== */
+            @media (max-width: 768px) {
+                .nav-container {
+                    flex-direction: column;
+                    align-items: flex-start;
+                }
+
+                .hero {
+                    padding: var(--space-2xl) var(--space-md) var(--space-xl);
                 }
 
                 .content {
-                    line-height: 3.8vmax;
-                    font-size: 1.8vmax;
-                    font-family: 'Arial';
-                    margin-top: 22vh;
+                    padding: 0 var(--space-md) var(--space-2xl);
                 }
 
-                .content a:link,
-                .content a:visited {
-                    color: #1B80CF;
+                article {
+                    padding: var(--space-xl);
                 }
 
-                .page {
-                    top: 40vh;
-                    width: 95%;
-                    margin-left: 0vw;
+                .footer-container {
+                    padding: var(--space-xl) var(--space-md);
                 }
+            }
 
-                .page img {
-                    max-width: 100%;
-                    max-height: 100%;
-                    border: 0;
-                }
+            /* ========================================
+           SVG SPECIFIC STYLES
+           ======================================== */
+            .data-node {
+                animation: float 4s ease-in-out infinite;
+            }
+
+            .circuit-line {
+                animation: circuitPulse 3s ease-in-out infinite;
+            }
+
+            .storage-disk {
+                animation: rotate 20s linear infinite;
+                transform-origin: center;
+            }
+
+            .data-packet {
+                animation: dataFlow 4s ease-in-out infinite;
             }
         </style>
     </head>
 
     <body vocab="http://schema.org/">
-        <div class="page">
-            <div class="home">
-                <ul typeof="BreadcrumbList">
+        <a href="#main-content" class="skip-link">Skip to main content</a>
+
+        <!-- Navigation -->
+        <nav role="navigation" aria-label="Main navigation">
+            <div class="nav-container">
+                <a href="../about.html" class="nav-brand">John Samuel</a>
+                <ul typeof="BreadcrumbList" class="breadcrumbs">
                     <li property="itemListElement" typeof="ListItem">
                         <a property="item" typeof="WebPage" href="../index.html">
                             <span property="name">Home</span>
@@ -268,269 +641,433 @@
                             <span property="name">Research</span>
                         </a>
                     </li>
+                    <li property="itemListElement" typeof="ListItem">
+                        <span property="name">File Systems</span>
+                    </li>
                 </ul>
-
             </div>
-            <div id="sidebar">
-                <div class="title">
-                    <h1><a href="./file-systems.html">File Systems</a></h1>
+        </nav>
+
+        <!-- Hero Section -->
+        <header class="hero">
+            <div class="hero-content">
+                <h1 class="page-title">File Systems</h1>
+                <p class="page-subtitle">Foundational Architecture for Data Storage and Management</p>
+            </div>
+
+            <div class="hero-svg-container">
+                <svg viewBox="0 0 800 400" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                    <!-- Background gradient -->
+                    <defs>
+                        <linearGradient id="tech-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" style="stop-color:#4a90e2;stop-opacity:1" />
+                            <stop offset="50%" style="stop-color:#00d4ff;stop-opacity:1" />
+                            <stop offset="100%" style="stop-color:#7b68ee;stop-opacity:1" />
+                        </linearGradient>
+
+                        <linearGradient id="bg-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" style="stop-color:#e8f4fd;stop-opacity:0.5" />
+                            <stop offset="100%" style="stop-color:#f0f8ff;stop-opacity:0.5" />
+                        </linearGradient>
+
+                        <linearGradient id="disk-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" style="stop-color:#2d5f8d;stop-opacity:0.8" />
+                            <stop offset="100%" style="stop-color:#4a90e2;stop-opacity:0.8" />
+                        </linearGradient>
+
+                        <filter id="glow">
+                            <feGaussianBlur stdDeviation="3" result="coloredBlur" />
+                            <feMerge>
+                                <feMergeNode in="coloredBlur" />
+                                <feMergeNode in="SourceGraphic" />
+                            </feMerge>
+                        </filter>
+                    </defs>
+
+                    <!-- Background -->
+                    <rect width="800" height="400" fill="url(#bg-gradient)" />
+
+                    <!-- Central Storage Disk -->
+                    <g class="storage-disk">
+                        <circle cx="400" cy="200" r="80" fill="none" stroke="url(#tech-gradient)" stroke-width="3"
+                            opacity="0.6" />
+                        <circle cx="400" cy="200" r="60" fill="none" stroke="#4a90e2" stroke-width="2" opacity="0.5" />
+                        <circle cx="400" cy="200" r="40" fill="none" stroke="#00d4ff" stroke-width="2" opacity="0.4" />
+                        <circle cx="400" cy="200" r="20" fill="url(#disk-gradient)" opacity="0.7" />
+
+                        <!-- Disk sectors -->
+                        <line x1="400" y1="200" x2="400" y2="120" stroke="#4a90e2" stroke-width="1" opacity="0.3" />
+                        <line x1="400" y1="200" x2="480" y2="200" stroke="#4a90e2" stroke-width="1" opacity="0.3" />
+                        <line x1="400" y1="200" x2="400" y2="280" stroke="#4a90e2" stroke-width="1" opacity="0.3" />
+                        <line x1="400" y1="200" x2="320" y2="200" stroke="#4a90e2" stroke-width="1" opacity="0.3" />
+                    </g>
+
+                    <!-- Data Nodes (representing directories/files) -->
+                    <g class="data-node">
+                        <rect x="150" y="100" width="60" height="60" rx="8" fill="rgba(74, 144, 226, 0.2)"
+                            stroke="#4a90e2" stroke-width="2" />
+                        <rect x="160" y="110" width="15" height="15" fill="#4a90e2" opacity="0.6" />
+                        <rect x="178" y="110" width="15" height="15" fill="#4a90e2" opacity="0.6" />
+                        <rect x="160" y="128" width="32" height="3" fill="#7bb8f5" opacity="0.7" />
+                        <rect x="160" y="135" width="25" height="3" fill="#7bb8f5" opacity="0.7" />
+                    </g>
+
+                    <g class="data-node" style="animation-delay: 0.5s">
+                        <rect x="590" y="100" width="60" height="60" rx="8" fill="rgba(0, 212, 255, 0.2)"
+                            stroke="#00d4ff" stroke-width="2" />
+                        <circle cx="610" cy="120" r="8" fill="#00d4ff" opacity="0.7" />
+                        <circle cx="630" cy="120" r="8" fill="#00d4ff" opacity="0.7" />
+                        <rect x="605" y="135" width="35" height="3" fill="#7bb8f5" opacity="0.7" />
+                        <rect x="605" y="142" width="28" height="3" fill="#7bb8f5" opacity="0.7" />
+                    </g>
+
+                    <g class="data-node" style="animation-delay: 1s">
+                        <rect x="150" y="270" width="60" height="60" rx="8" fill="rgba(123, 104, 238, 0.2)"
+                            stroke="#7b68ee" stroke-width="2" />
+                        <path d="M 165 285 L 175 295 L 165 305" stroke="#7b68ee" stroke-width="2" fill="none" />
+                        <rect x="180" y="288" width="25" height="3" fill="#7bb8f5" opacity="0.7" />
+                        <rect x="180" y="295" width="20" height="3" fill="#7bb8f5" opacity="0.7" />
+                        <rect x="180" y="302" width="28" height="3" fill="#7bb8f5" opacity="0.7" />
+                    </g>
+
+                    <g class="data-node" style="animation-delay: 1.5s">
+                        <rect x="590" y="270" width="60" height="60" rx="8" fill="rgba(45, 95, 141, 0.2)"
+                            stroke="#2d5f8d" stroke-width="2" />
+                        <rect x="600" y="285" width="40" height="8" fill="#4a90e2" opacity="0.6" rx="2" />
+                        <rect x="600" y="298" width="35" height="8" fill="#4a90e2" opacity="0.5" rx="2" />
+                        <rect x="600" y="311" width="30" height="8" fill="#4a90e2" opacity="0.4" rx="2" />
+                    </g>
+
+                    <!-- Circuit connections (data flow paths) -->
+                    <g class="circuit-line">
+                        <path d="M 210 130 Q 300 130, 320 180" stroke="#4a90e2" stroke-width="2" fill="none"
+                            opacity="0.4" stroke-dasharray="5,5" />
+                        <circle cx="210" cy="130" r="3" fill="#4a90e2" />
+                    </g>
+
+                    <g class="circuit-line" style="animation-delay: 0.7s">
+                        <path d="M 590 130 Q 500 130, 480 180" stroke="#00d4ff" stroke-width="2" fill="none"
+                            opacity="0.4" stroke-dasharray="5,5" />
+                        <circle cx="590" cy="130" r="3" fill="#00d4ff" />
+                    </g>
+
+                    <g class="circuit-line" style="animation-delay: 1.4s">
+                        <path d="M 210 300 Q 300 300, 320 220" stroke="#7b68ee" stroke-width="2" fill="none"
+                            opacity="0.4" stroke-dasharray="5,5" />
+                        <circle cx="210" cy="300" r="3" fill="#7b68ee" />
+                    </g>
+
+                    <g class="circuit-line" style="animation-delay: 2s">
+                        <path d="M 590 300 Q 500 300, 480 220" stroke="#2d5f8d" stroke-width="2" fill="none"
+                            opacity="0.4" stroke-dasharray="5,5" />
+                        <circle cx="590" cy="300" r="3" fill="#2d5f8d" />
+                    </g>
+
+                    <!-- Data packets (animated flowing data) -->
+                    <g class="data-packet">
+                        <rect x="0" y="195" width="20" height="10" rx="2" fill="url(#tech-gradient)" opacity="0.8" />
+                    </g>
+
+                    <g class="data-packet" style="animation-delay: 1s">
+                        <rect x="0" y="205" width="15" height="8" rx="2" fill="#00d4ff" opacity="0.7" />
+                    </g>
+
+                    <!-- File system labels -->
+                    <text x="180" y="180" fill="#4a90e2" font-size="10" opacity="0.6"
+                        font-family="monospace">/root</text>
+                    <text x="620" y="180" fill="#00d4ff" font-size="10" opacity="0.6"
+                        font-family="monospace">/home</text>
+                    <text x="180" y="355" fill="#7b68ee" font-size="10" opacity="0.6"
+                        font-family="monospace">/var</text>
+                    <text x="620" y="355" fill="#2d5f8d" font-size="10" opacity="0.6"
+                        font-family="monospace">/usr</text>
+
+                    <!-- Tech decorations -->
+                    <circle cx="50" cy="50" r="4" fill="#4a90e2" opacity="0.3" />
+                    <circle cx="750" cy="50" r="5" fill="#00d4ff" opacity="0.3" />
+                    <circle cx="50" cy="350" r="6" fill="#7b68ee" opacity="0.3" />
+                    <circle cx="750" cy="350" r="4" fill="#2d5f8d" opacity="0.3" />
+
+                    <!-- Binary code decoration -->
+                    <text x="30" y="380" fill="#4a90e2" font-size="10" opacity="0.3"
+                        font-family="monospace">01001000</text>
+                    <text x="680" y="30" fill="#00d4ff" font-size="10" opacity="0.3"
+                        font-family="monospace">11010110</text>
+                </svg>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main id="main-content" class="content">
+            <article>
+                <section>
+                    <div class="alert-box">
+                        <strong>This article is part of a series on <a href="./operating-systems.html">Operating
+                                Systems</a>.</strong>
+                    </div>
+                </section>
+
+                <section>
+                    <h3>Introduction</h3>
+                    <p>File systems are a foundational layer of operating systems, enabling structured storage,
+                        retrieval, and manipulation of data on physical and virtual devices. Whether on hard drives,
+                        SSDs, cloud platforms, or edge devices, file systems define how data is organized, accessed,
+                        and secured. Understanding file systems is essential for developers, system architects, and
+                        computer science students alike.</p>
+                </section>
+
+                <section>
+                    <h3>Key Concepts</h3>
+                    <p>A file system governs how files and directories are stored, named, and managed. It provides:
+                    </p>
+                    <ul>
+                        <li>A <strong>hierarchical structure</strong> for organizing data into files and
+                            directories.</li>
+                        <li><strong>Metadata management</strong>, including file names, sizes, timestamps,
+                            permissions, and ownership.</li>
+                        <li><strong>Basic operations</strong> such as creation, deletion, reading, and writing of
+                            files.</li>
+                        <li><strong>Access control mechanisms</strong> to regulate user permissions.</li>
+                        <li>Support for both <strong>local storage</strong> and <strong>distributed
+                                environments</strong>.</li>
+                    </ul>
+                </section>
+
+                <section>
+                    <h3>Types of File Systems</h3>
+                    <p>File systems are categorized by their deployment context and data model:</p>
+                    <ul>
+                        <li><strong>Local File Systems</strong>: Used on individual devices.
+                            <ul>
+                                <li><code>ext4</code> (Linux), <code>NTFS</code> (Windows), <code>APFS</code>
+                                    (macOS).</li>
+                            </ul>
+                        </li>
+                        <li><strong>Network File Systems</strong>: Enable shared access over a network.
+                            <ul>
+                                <li><code>NFS</code> (UNIX/Linux), <code>SMB/CIFS</code> (Windows).</li>
+                            </ul>
+                        </li>
+                        <li><strong>Distributed File Systems</strong>: Manage data across multiple nodes with fault
+                            tolerance.
+                            <ul>
+                                <li><code>HDFS</code> (Hadoop), <code>CephFS</code>, <code>GlusterFS</code>.</li>
+                            </ul>
+                        </li>
+                        <li><strong>Object Storage Systems</strong>: Store data as objects with metadata and unique
+                            IDs.
+                            <ul>
+                                <li><code>Amazon S3</code>, <code>OpenStack Swift</code>.</li>
+                            </ul>
+                        </li>
+                        <li><strong>Next-Generation File Systems</strong>: Incorporate snapshots, checksums,
+                            compression, and deduplication.
+                            <ul>
+                                <li><code>ZFS</code>, <code>Btrfs</code>, <code>ReFS</code>, <code>F2FS</code>,
+                                    <code>NOVA</code>, <code>IPFS</code>.
+                                </li>
+                            </ul>
+                        </li>
+                    </ul>
+                </section>
+
+                <div class="section-divider"></div>
+
+                <section>
+                    <h3>Core File System Operations</h3>
+                    <p>Typical operations supported by file systems include:</p>
+                    <ul>
+                        <li>Creating, deleting, renaming files and directories</li>
+                        <li>Reading and writing file contents</li>
+                        <li>Managing metadata: timestamps, permissions, size</li>
+                        <li>Setting access permissions and ownership (POSIX ACLs, extended ACLs)</li>
+                        <li>Searching files based on patterns or metadata</li>
+                    </ul>
+                </section>
+
+                <section>
+                    <h3>Design Considerations</h3>
+                    <p>Several factors must be evaluated when designing or selecting a file system:</p>
+                    <ul>
+                        <li><strong>Performance</strong>: Fast read/write latency, especially for large or small
+                            files.</li>
+                        <li><strong>Scalability</strong>: Support for petabyte-scale storage, growing user base.
+                        </li>
+                        <li><strong>Reliability</strong>: Journaling, checksums, and redundancy to prevent
+                            corruption.</li>
+                        <li><strong>Security</strong>: Encryption, user/group ACLs, role-based access.</li>
+                        <li><strong>Compatibility</strong>: Cross-platform support and POSIX compliance.</li>
+                        <li><strong>Usability</strong>: Administration tools, snapshot capabilities, versioning.
+                        </li>
+                    </ul>
+                </section>
+
+                <section>
+                    <h3>File System Architecture and Metadata</h3>
+                    <p>Modern file systems rely on a structured approach for managing storage:</p>
+                    <ul>
+                        <li><strong>Inodes</strong>: Store metadata (owner, permissions, timestamps) and block
+                            pointers.</li>
+                        <li><strong>Superblocks</strong>: Describe the file system layout and mount information.
+                        </li>
+                        <li><strong>Journaling</strong>: Ensures data integrity by logging changes before they're
+                            committed.</li>
+                        <li><strong>Symbolic and Hard Links</strong>: Allow multiple references to the same or
+                            different files.</li>
+                    </ul>
+                </section>
+
+                <div class="section-divider"></div>
+
+                <section>
+                    <h3>POSIX and Compliance</h3>
+                    <p>POSIX (Portable Operating System Interface) defines a standard API and file behavior model.
+                        Most Unix-based file systems (e.g., ext4, XFS) adhere to POSIX, ensuring compatibility with
+                        tools and applications. However, some modern file systems like ZFS and Btrfs extend or
+                        deviate slightly to provide advanced features like checksumming, CoW, and volume management.
+                    </p>
+                </section>
+
+                <section>
+                    <h3>FUSE (Filesystem in Userspace)</h3>
+                    <p>FUSE allows non-privileged users to implement their own file systems without modifying the
+                        kernel. It enables experimental, virtual, and network-backed file systems using languages
+                        like C, Python, or Rust. Examples include <code>sshfs</code> and <code>encfs</code>.</p>
+                </section>
+
+                <section>
+                    <h3>Real-World Use Cases</h3>
+                    <ul>
+                        <li><strong>Netflix</strong> uses NFS and S3 for high-throughput video content delivery.
+                        </li>
+                        <li><strong>Meta</strong> developed <a
+                                href="https://engineering.fb.com/2020/05/14/data-infrastructure/tectonic/">Tectonic</a>
+                            to manage exabyte-scale data with fault-tolerant layers.</li>
+                        <li><strong>Google</strong> uses <a
+                                href="https://en.wikipedia.org/wiki/Colossus_(file_system)">Colossus</a>, successor
+                            to GFS, for massive internal storage and processing.</li>
+                    </ul>
+                </section>
+
+                <div class="section-divider"></div>
+
+                <section>
+                    <h3>Cloud and Edge Integration</h3>
+                    <p>Next-gen file systems support integration with cloud-native platforms via:</p>
+                    <ul>
+                        <li><strong>Kubernetes CSI (Container Storage Interface)</strong> for dynamic provisioning.
+                        </li>
+                        <li><strong>Edge computing</strong>: Lightweight distributed file systems like IPFS or
+                            SeaweedFS reduce latency and bandwidth by enabling local data caching and processing.
+                        </li>
+                        <li><strong>Hybrid architectures</strong>: Systems like ZFS provide cloud backup and remote
+                            replication for hybrid deployments.</li>
+                    </ul>
+                </section>
+
+                <section>
+                    <h3>Advanced Features</h3>
+                    <ul>
+                        <li><strong>Snapshots</strong>: Time-stamped, read-only or writable states (ZFS, Btrfs).
+                        </li>
+                        <li><strong>Checksumming</strong>: Detects and corrects silent corruption (ZFS).</li>
+                        <li><strong>Data Deduplication</strong>: Eliminates redundant data blocks (ZFS, VDO).</li>
+                        <li><strong>Compression</strong>: Transparent compression of file contents (btrfs, zstd in
+                            ext4).</li>
+                        <li><strong>Encryption</strong>: Built-in at-rest encryption (fscrypt, eCryptfs, ZFS native
+                            encryption).</li>
+                    </ul>
+                </section>
+
+                <section>
+                    <h3>Historical Evolution of File Systems</h3>
+                    <ul>
+                        <li><strong>1970s:</strong> FAT (Microsoft), UNIX File System (UFS)</li>
+                        <li><strong>1990s:</strong> ext2, ext3, NTFS, HFS+</li>
+                        <li><strong>2000s:</strong> ext4, XFS, ReiserFS</li>
+                        <li><strong>2010s–present:</strong> ZFS, Btrfs, APFS, ReFS, IPFS, F2FS</li>
+                    </ul>
+                </section>
+
+                <div class="section-divider"></div>
+
+                <section>
+                    <h3>Licensing and Open Source</h3>
+                    <p>Many modern file systems are open source:</p>
+                    <ul>
+                        <li><code>ext4</code>, <code>XFS</code>, <code>Btrfs</code> – Licensed under GPL (Linux
+                            kernel)</li>
+                        <li><code>ZFS</code> – CDDL (not directly merged into Linux kernel)</li>
+                        <li><code>APFS</code> and <code>ReFS</code> – Proprietary (Apple and Microsoft respectively)
+                        </li>
+                    </ul>
+                    <p>The choice of file system can influence adoption due to license compatibility (e.g., ZFS
+                        kernel module vs. user-space via ZFS on Linux).</p>
+                </section>
+
+                <section>
+                    <h3>Future Trends</h3>
+                    <ul>
+                        <li><strong>AI-Enhanced Storage</strong>: Predictive prefetching and auto-tiering using ML
+                            models.</li>
+                        <li><strong>Zero Trust File Systems</strong>: Security-first file systems with integrated
+                            audit trails and encryption.</li>
+                        <li><strong>Quantum-Safe Storage</strong>: Research into quantum-resilient encryption for
+                            data longevity.</li>
+                        <li><strong>Blockchain-Based Systems</strong>: Decentralized file sharing (e.g., IPFS,
+                            Filecoin).</li>
+                    </ul>
+                </section>
+
+                <section>
+                    <h3>References</h3>
+                    <ol>
+                        <li><a href="https://en.wikipedia.org/wiki/File_system">Wikipedia: File System</a></li>
+                        <li><a href="https://en.wikipedia.org/wiki/Inode">Wikipedia: Inode</a></li>
+                        <li><a href="https://en.wikipedia.org/wiki/ZFS">Wikipedia: ZFS</a></li>
+                        <li><a href="https://en.wikipedia.org/wiki/XFS">Wikipedia: XFS</a></li>
+                        <li><a href="https://en.wikipedia.org/wiki/Btrfs">Wikipedia: Btrfs</a></li>
+                        <li><a href="https://en.wikipedia.org/wiki/ReiserFS">Wikipedia: ReiserFS</a></li>
+                        <li><a href="https://en.wikipedia.org/wiki/F2FS">Wikipedia: F2FS</a></li>
+                        <li><a href="https://hadoop.apache.org/docs/r1.2.1/hdfs_design.html">HDFS Architecture
+                                Guide</a></li>
+                        <li><a
+                                href="https://research.facebook.com/publications/facebooks-tectonic-filesystem-efficiency-from-exascale/">Facebook's
+                                Tectonic Filesystem: Efficiency from Exascale</a></li>
+                        <li><a href="https://www.man7.org/linux/man-pages/man5/ext4.5.html">ext4 Linux Man Page</a>
+                        </li>
+                        <li><a href="https://en.wikipedia.org/wiki/Filesystem_in_Userspace">Wikipedia: Filesystem in
+                                Userspace</a></li>
+                        <li><a href="https://www.kernel.org/doc/html/latest/filesystems/">Linux Filesystem
+                                Documentation</a></li>
+                        <li>Ibrahim Umit Akgun, Ali Selman Aydin, Andrew Burford, Michael McNeill, Michael
+                            Arkhangelskiy, and Erez Zadok. 2023. Improving Storage Systems Using Machine Learning.
+                            ACM Trans. Storage 19, 1, Article 9 (February 2023), 30 pages.
+                            <a href="https://doi.org/10.1145/3568429">https://doi.org/10.1145/3568429</a>
+                        </li>
+                        <li><a href="https://www.redhat.com/en/resources/rhel-for-zero-trust-architectures-ebook">Top
+                                Red Hat Enterprise Linux features for implementing zero trust architectures</a></li>
+                        <li><a href="https://www.storagereview.com/review/q-day-is-coming-is-your-storage-quantum-safe">Q-Day
+                                is Coming: Is Your Storage Quantum-Safe?</a></li>
+                        <li><a href="https://www.nature.com/articles/s41598-024-69011-4">An efficient
+                                blockchain-based framework for file sharing</a></li>
+                    </ol>
+                </section>
+            </article>
+        </main>
+
+        <!-- Page Footer -->
+        <footer class="page-footer">
+            <div class="footer-container">
+                <div class="footer-links">
+                    <a href="../index.html">Home</a>
+                    <a href="../research/research.html">Research</a>
+                    <a href="./operating-systems.html">Operating Systems</a>
+                    <a href="../about.html">About</a>
                 </div>
-                <div class="subtitle">
-                    <h3><a href="../about.html">John Samuel</a></h3>
-                </div>
+                <p class="copyright">© John Samuel</p>
             </div>
-
-            <div class="content">
-                <article>
-                    <section>
-                        <div
-                            style="background-color: #f0f8ff; border-left: 4px solid #1e90ff; padding: 1em; margin-bottom: 1.5em;">
-                            <strong>This article is part of a series on <a href="./operating-systems.html">Operating
-                                    Systems</a>.</strong>
-                        </div>
-                    </section>
-                    <section>
-                        <h3>Introduction</h3>
-                        <p>File systems are a foundational layer of operating systems, enabling structured storage,
-                            retrieval, and manipulation of data on physical and virtual devices. Whether on hard drives,
-                            SSDs, cloud platforms, or edge devices, file systems define how data is organized, accessed,
-                            and secured. Understanding file systems is essential for developers, system architects, and
-                            computer science students alike.</p>
-                    </section>
-
-                    <section>
-                        <h3>Key Concepts</h3>
-                        <p>A file system governs how files and directories are stored, named, and managed. It provides:
-                        </p>
-                        <ul>
-                            <li>A <strong>hierarchical structure</strong> for organizing data into files and
-                                directories.</li>
-                            <li><strong>Metadata management</strong>, including file names, sizes, timestamps,
-                                permissions, and ownership.</li>
-                            <li><strong>Basic operations</strong> such as creation, deletion, reading, and writing of
-                                files.</li>
-                            <li><strong>Access control mechanisms</strong> to regulate user permissions.</li>
-                            <li>Support for both <strong>local storage</strong> and <strong>distributed
-                                    environments</strong>.</li>
-                        </ul>
-                    </section>
-
-                    <section>
-                        <h3>Types of File Systems</h3>
-                        <p>File systems are categorized by their deployment context and data model:</p>
-                        <ul>
-                            <li><strong>Local File Systems</strong>: Used on individual devices.
-                                <ul>
-                                    <li><code>ext4</code> (Linux), <code>NTFS</code> (Windows), <code>APFS</code>
-                                        (macOS).</li>
-                                </ul>
-                            </li>
-                            <li><strong>Network File Systems</strong>: Enable shared access over a network.
-                                <ul>
-                                    <li><code>NFS</code> (UNIX/Linux), <code>SMB/CIFS</code> (Windows).</li>
-                                </ul>
-                            </li>
-                            <li><strong>Distributed File Systems</strong>: Manage data across multiple nodes with fault
-                                tolerance.
-                                <ul>
-                                    <li><code>HDFS</code> (Hadoop), <code>CephFS</code>, <code>GlusterFS</code>.</li>
-                                </ul>
-                            </li>
-                            <li><strong>Object Storage Systems</strong>: Store data as objects with metadata and unique
-                                IDs.
-                                <ul>
-                                    <li><code>Amazon S3</code>, <code>OpenStack Swift</code>.</li>
-                                </ul>
-                            </li>
-                            <li><strong>Next-Generation File Systems</strong>: Incorporate snapshots, checksums,
-                                compression, and deduplication.
-                                <ul>
-                                    <li><code>ZFS</code>, <code>Btrfs</code>, <code>ReFS</code>, <code>F2FS</code>,
-                                        <code>NOVA</code>, <code>IPFS</code>.
-                                    </li>
-                                </ul>
-                            </li>
-                        </ul>
-                    </section>
-
-                    <section>
-                        <h3>Core File System Operations</h3>
-                        <p>Typical operations supported by file systems include:</p>
-                        <ul>
-                            <li>Creating, deleting, renaming files and directories</li>
-                            <li>Reading and writing file contents</li>
-                            <li>Managing metadata: timestamps, permissions, size</li>
-                            <li>Setting access permissions and ownership (POSIX ACLs, extended ACLs)</li>
-                            <li>Searching files based on patterns or metadata</li>
-                        </ul>
-                    </section>
-
-                    <section>
-                        <h3>Design Considerations</h3>
-                        <p>Several factors must be evaluated when designing or selecting a file system:</p>
-                        <ul>
-                            <li><strong>Performance</strong>: Fast read/write latency, especially for large or small
-                                files.</li>
-                            <li><strong>Scalability</strong>: Support for petabyte-scale storage, growing user base.
-                            </li>
-                            <li><strong>Reliability</strong>: Journaling, checksums, and redundancy to prevent
-                                corruption.</li>
-                            <li><strong>Security</strong>: Encryption, user/group ACLs, role-based access.</li>
-                            <li><strong>Compatibility</strong>: Cross-platform support and POSIX compliance.</li>
-                            <li><strong>Usability</strong>: Administration tools, snapshot capabilities, versioning.
-                            </li>
-                        </ul>
-                    </section>
-
-                    <section>
-                        <h3>File System Architecture and Metadata</h3>
-                        <p>Modern file systems rely on a structured approach for managing storage:</p>
-                        <ul>
-                            <li><strong>Inodes</strong>: Store metadata (owner, permissions, timestamps) and block
-                                pointers.</li>
-                            <li><strong>Superblocks</strong>: Describe the file system layout and mount information.
-                            </li>
-                            <li><strong>Journaling</strong>: Ensures data integrity by logging changes before they’re
-                                committed.</li>
-                            <li><strong>Symbolic and Hard Links</strong>: Allow multiple references to the same or
-                                different files.</li>
-                        </ul>
-                    </section>
-
-                    <section>
-                        <h3>POSIX and Compliance</h3>
-                        <p>POSIX (Portable Operating System Interface) defines a standard API and file behavior model.
-                            Most Unix-based file systems (e.g., ext4, XFS) adhere to POSIX, ensuring compatibility with
-                            tools and applications. However, some modern file systems like ZFS and Btrfs extend or
-                            deviate slightly to provide advanced features like checksumming, CoW, and volume management.
-                        </p>
-                    </section>
-
-                    <section>
-                        <h3>FUSE (Filesystem in Userspace)</h3>
-                        <p>FUSE allows non-privileged users to implement their own file systems without modifying the
-                            kernel. It enables experimental, virtual, and network-backed file systems using languages
-                            like C, Python, or Rust. Examples include <code>sshfs</code> and <code>encfs</code>.</p>
-                    </section>
-
-                    <section>
-                        <h3>Real-World Use Cases</h3>
-                        <ul>
-                            <li><strong>Netflix</strong> uses NFS and S3 for high-throughput video content delivery.
-                            </li>
-                            <li><strong>Meta</strong> developed <a
-                                    href="https://engineering.fb.com/2020/05/14/data-infrastructure/tectonic/">Tectonic</a>
-                                to manage exabyte-scale data with fault-tolerant layers.</li>
-                            <li><strong>Google</strong> uses <a
-                                    href="https://en.wikipedia.org/wiki/Colossus_(file_system)">Colossus</a>, successor
-                                to GFS, for massive internal storage and processing.</li>
-                        </ul>
-                    </section>
-
-                    <section>
-                        <h3>Cloud and Edge Integration</h3>
-                        <p>Next-gen file systems support integration with cloud-native platforms via:</p>
-                        <ul>
-                            <li><strong>Kubernetes CSI (Container Storage Interface)</strong> for dynamic provisioning.
-                            </li>
-                            <li><strong>Edge computing</strong>: Lightweight distributed file systems like IPFS or
-                                SeaweedFS reduce latency and bandwidth by enabling local data caching and processing.
-                            </li>
-                            <li><strong>Hybrid architectures</strong>: Systems like ZFS provide cloud backup and remote
-                                replication for hybrid deployments.</li>
-                        </ul>
-                    </section>
-
-                    <section>
-                        <h3>Advanced Features</h3>
-                        <ul>
-                            <li><strong>Snapshots</strong>: Time-stamped, read-only or writable states (ZFS, Btrfs).
-                            </li>
-                            <li><strong>Checksumming</strong>: Detects and corrects silent corruption (ZFS).</li>
-                            <li><strong>Data Deduplication</strong>: Eliminates redundant data blocks (ZFS, VDO).</li>
-                            <li><strong>Compression</strong>: Transparent compression of file contents (btrfs, zstd in
-                                ext4).</li>
-                            <li><strong>Encryption</strong>: Built-in at-rest encryption (fscrypt, eCryptfs, ZFS native
-                                encryption).</li>
-                        </ul>
-                    </section>
-
-                    <section>
-                        <h3>Historical Evolution of File Systems</h3>
-                        <ul>
-                            <li><strong>1970s:</strong> FAT (Microsoft), UNIX File System (UFS)</li>
-                            <li><strong>1990s:</strong> ext2, ext3, NTFS, HFS+</li>
-                            <li><strong>2000s:</strong> ext4, XFS, ReiserFS</li>
-                            <li><strong>2010s–present:</strong> ZFS, Btrfs, APFS, ReFS, IPFS, F2FS</li>
-                        </ul>
-                    </section>
-
-                    <section>
-                        <h3>Licensing and Open Source</h3>
-                        <p>Many modern file systems are open source:</p>
-                        <ul>
-                            <li><code>ext4</code>, <code>XFS</code>, <code>Btrfs</code> – Licensed under GPL (Linux
-                                kernel)</li>
-                            <li><code>ZFS</code> – CDDL (not directly merged into Linux kernel)</li>
-                            <li><code>APFS</code> and <code>ReFS</code> – Proprietary (Apple and Microsoft respectively)
-                            </li>
-                        </ul>
-                        <p>The choice of file system can influence adoption due to license compatibility (e.g., ZFS
-                            kernel module vs. user-space via ZFS on Linux).</p>
-                    </section>
-
-                    <section>
-                        <h3>Future Trends</h3>
-                        <ul>
-                            <li><strong>AI-Enhanced Storage</strong>: Predictive prefetching and auto-tiering using ML
-                                models.</li>
-                            <li><strong>Zero Trust File Systems</strong>: Security-first file systems with integrated
-                                audit trails and encryption.</li>
-                            <li><strong>Quantum-Safe Storage</strong>: Research into quantum-resilient encryption for
-                                data longevity.</li>
-                            <li><strong>Blockchain-Based Systems</strong>: Decentralized file sharing (e.g., IPFS,
-                                Filecoin).</li>
-                        </ul>
-                    </section>
-
-                    <section>
-                        <h3>References</h3>
-                        <ol>
-                            <li><a href="https://en.wikipedia.org/wiki/File_system">Wikipedia: File System</a></li>
-                            <li><a href="https://en.wikipedia.org/wiki/Inode">Wikipedia: Inode</a></li>
-                            <li><a href="https://en.wikipedia.org/wiki/ZFS">Wikipedia: ZFS</a></li>
-                            <li><a href="https://en.wikipedia.org/wiki/XFS">Wikipedia: XFS</a></li>
-                            <li><a href="https://en.wikipedia.org/wiki/Btrfs">Wikipedia: Btrfs</a></li>
-                            <li><a href="https://en.wikipedia.org/wiki/ReiserFS">Wikipedia: ReiserFS</a></li>
-                            <li><a href="https://en.wikipedia.org/wiki/F2FS">Wikipedia: F2FS</a></li>
-                            <li><a href="https://hadoop.apache.org/docs/r1.2.1/hdfs_design.html">HDFS Architecture
-                                    Guide</a></li>
-                            <li><a
-                                    href="https://research.facebook.com/publications/facebooks-tectonic-filesystem-efficiency-from-exascale/">Facebook’s
-                                    Tectonic Filesystem: Efficiency from Exascale</a></li>
-                            <li><a href="https://www.man7.org/linux/man-pages/man5/ext4.5.html">ext4 Linux Man Page</a>
-                            </li>
-                            <li><a href="https://en.wikipedia.org/wiki/Filesystem_in_Userspace">Wikipedia: Filesystem in
-                                    Userspace</a></li>
-                            <li><a href="https://www.kernel.org/doc/html/latest/filesystems/">Linux Filesystem
-                                    Documentation</a></li>
-                            <li>Ibrahim Umit Akgun, Ali Selman Aydin, Andrew Burford, Michael McNeill, Michael
-                                Arkhangelskiy, and Erez Zadok. 2023. Improving Storage Systems Using Machine Learning.
-                                ACM Trans. Storage 19, 1, Article 9 (February 2023), 30 pages.
-                                <a href="https://doi.org/10.1145/3568429">https://doi.org/10.1145/3568429</a>
-                            </li>
-                            <li><a href="https://www.redhat.com/en/resources/rhel-for-zero-trust-architectures-ebook">Top
-                                    Red Hat Enterprise Linux features for implementing zero trust architectures</a></li>
-                            <li><a
-                                    href="https://www.storagereview.com/review/q-day-is-coming-is-your-storage-quantum-safe">Q-Day
-                                    is Coming: Is Your Storage Quantum-Safe?</a></li>
-                            <li><a href="https://www.nature.com/articles/s41598-024-69011-4">An efficient
-                                    blockchain-based framework for file sharing</a></li>
-                        </ol>
-                    </section>
-                </article>
-            </div>
-        </div>
+        </footer>
     </body>
 
 </html>

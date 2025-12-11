@@ -3,261 +3,720 @@
 
     <head>
         <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <meta http-equiv="Content-Language" content="en" />
         <link rel="shortcut icon" href="../../images/logo/favicon.png" />
         <title>Exploring Fibonacci Numbers: John Samuel</title>
-        <style type="text/css">
-            body {
-                background-color: #FFFFFF;
+        <style>
+            /* ========================================
+           DESIGN TOKENS & CSS CUSTOM PROPERTIES
+           ======================================== */
+            :root {
+                /* Golden Ratio Color Palette */
+                --color-base-bg: #fdfbf7;
+                --color-base-surface: #ffffff;
+                --color-base-text: #2c1810;
+                --color-base-text-muted: #6b5d54;
+
+                /* Golden & Amber Accents */
+                --color-accent-1: #d4a574;
+                --color-accent-2: #b8860b;
+                --color-accent-3: #f4c542;
+                --color-accent-light: #fff8e7;
+
+                /* Mathematical Blue */
+                --color-math-blue: #4a7ba7;
+                --color-math-purple: #8b7bb8;
+
+                /* Functional Colors */
+                --color-shadow: rgba(212, 165, 116, 0.15);
+                --color-border: rgba(212, 165, 116, 0.25);
+                --color-hover: rgba(212, 165, 116, 0.1);
+
+                /* Gradients */
+                --gradient-primary: linear-gradient(135deg, var(--color-accent-1) 0%, var(--color-accent-2) 100%);
+                --gradient-subtle: linear-gradient(180deg, var(--color-base-bg) 0%, var(--color-accent-light) 100%);
+                --gradient-golden: linear-gradient(135deg, var(--color-accent-3) 0%, var(--color-accent-1) 50%, var(--color-accent-2) 100%);
+
+                /* Spacing Scale (Golden Ratio Based) */
+                --space-xs: 0.25rem;
+                --space-sm: 0.5rem;
+                --space-md: 1rem;
+                --space-phi-sm: 0.618rem;
+                --space-lg: 1.5rem;
+                --space-phi-md: 1.618rem;
+                --space-xl: 2rem;
+                --space-2xl: 3rem;
+                --space-phi-lg: 2.618rem;
+                --space-3xl: 4rem;
+                --space-phi-xl: 4.236rem;
+                --space-4xl: 6rem;
+
+                /* Typography Scale */
+                --text-xs: clamp(0.75rem, 0.7rem + 0.25vw, 0.875rem);
+                --text-sm: clamp(0.875rem, 0.8rem + 0.35vw, 1rem);
+                --text-base: clamp(1rem, 0.95rem + 0.25vw, 1.125rem);
+                --text-lg: clamp(1.125rem, 1.05rem + 0.35vw, 1.25rem);
+                --text-xl: clamp(1.25rem, 1.15rem + 0.5vw, 1.5rem);
+                --text-2xl: clamp(1.5rem, 1.3rem + 1vw, 2rem);
+                --text-3xl: clamp(2rem, 1.6rem + 2vw, 2.5rem);
+                --text-4xl: clamp(2.5rem, 2rem + 2.5vw, 3.5rem);
+
+                /* Border Radius */
+                --radius-sm: 4px;
+                --radius-md: 12px;
+                --radius-lg: 16px;
+                --radius-xl: 24px;
+                --radius-spiral: 50% 0% 50% 50% / 50% 50% 0% 50%;
+
+                /* Shadows */
+                --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.04), 0 1px 2px rgba(0, 0, 0, 0.06);
+                --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.05), 0 2px 4px rgba(0, 0, 0, 0.06);
+                --shadow-lg: 0 10px 24px var(--color-shadow), 0 4px 8px rgba(0, 0, 0, 0.06);
+                --shadow-xl: 0 20px 40px var(--color-shadow), 0 8px 16px rgba(0, 0, 0, 0.08);
+
+                /* Font Stack */
+                --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+                --font-mono: 'SF Mono', Monaco, 'Cascadia Code', 'Consolas', 'Courier New', monospace;
             }
 
-            #sidebar {
-                position: fixed;
-                background-color: #1B80CF;
-                top: 0;
-                left: 0;
-                bottom: 0;
-                width: 30vw;
-            }
-
-            #sidebar .title {
-                position: relative;
-                text-align: center;
-                line-height: 4vmax;
-                font-size: 1.4vmax;
-                font-family: 'Arial';
-                margin-top: 25vh;
-            }
-
-            #sidebar .title a:link,
-            #sidebar .title a:visited {
-                color: #FFFFFF;
-                text-decoration: none;
-            }
-
-            .subtitle {
-                top: 50vh;
-                text-align: center;
-                line-height: 1.3vmax;
-                font-family: 'Arial';
-                font-size: 1.5vmax;
-                color: #FFFFFF;
-            }
-
-            .subtitle a:link,
-            .subtitle a:visited {
-                color: #FFFFFF;
-                text-decoration: none;
-            }
-
-            .licence {
-                position: fixed;
-                text-align: right;
-                bottom: 0;
-                right: 0;
-            }
-
-            .home {
-                position: fixed;
-                text-align: left;
-                font-family: 'Arial';
-                color: #D3D3D3;
-                z-index: 100;
-                width: 100%;
-                background-color: #FFFFFF;
-                top: 0px;
-                margin-bottom: 10px;
-                padding-bottom: 10px;
-            }
-
-            .home a:link,
-            .home a:visited {
-                text-decoration: none;
-                color: #D3D3D3;
-            }
-
-            .home ul {
+            /* ========================================
+           RESET & BASE STYLES
+           ======================================== */
+            * {
                 margin: 0;
                 padding: 0;
-                text-align: left;
-                list-style: none;
+                box-sizing: border-box;
             }
 
-            .home li {
-                position: relative;
-                float: left;
-                padding-top: 15px;
-                margin-right: 1em;
-                font-family: 'Arial';
+            html {
+                scroll-behavior: smooth;
+                scroll-padding-top: 100px;
             }
 
-            .home li:hover {
-                display: block;
+            body {
+                font-family: var(--font-sans);
+                font-size: var(--text-base);
+                line-height: 1.7;
+                color: var(--color-base-text);
+                background: var(--color-base-bg);
+                background-image:
+                    radial-gradient(circle at 20% 30%, rgba(244, 197, 66, 0.08) 0%, transparent 50%),
+                    radial-gradient(circle at 80% 70%, rgba(212, 165, 116, 0.08) 0%, transparent 50%);
+                background-attachment: fixed;
+                -webkit-font-smoothing: antialiased;
+                -moz-osx-font-smoothing: grayscale;
             }
 
-            .home a:link,
-            .home a:visited {
-                color: #D3D3D3;
-            }
-
-            .home li:hover a:link,
-            .home li:hover a:visited {
+            /* ========================================
+           SKIP LINK (ACCESSIBILITY)
+           ======================================== */
+            .skip-link {
+                position: absolute;
+                top: -100px;
+                left: 10px;
+                background: var(--color-accent-2);
+                color: white;
+                padding: var(--space-sm) var(--space-md);
+                border-radius: var(--radius-sm);
                 text-decoration: none;
-                padding: 15px;
-                color: #FFFFFF;
-                background-color: #1B80CF;
+                z-index: 1000;
             }
 
-            .content {
-                line-height: 1.8vmax;
-                font-size: 1.2vmax;
-                font-family: 'Arial';
-                margin-top: 15vh;
-                width: 90%;
+            .skip-link:focus {
+                top: 10px;
             }
 
-            .content h2,
-            h3,
-            h4 {
-                color: #1B80CF;
+            /* ========================================
+           NAVIGATION BAR
+           ======================================== */
+            nav {
+                position: sticky;
+                top: 0;
+                z-index: 100;
+                background: rgba(255, 255, 255, 0.85);
+                -webkit-backdrop-filter: blur(16px) saturate(180%);
+                backdrop-filter: blur(16px) saturate(180%);
+                border-bottom: 1px solid var(--color-border);
+                box-shadow: 0 4px 24px rgba(0, 0, 0, 0.04);
             }
 
-            .content a:link,
-            .content a:visited {
-                color: #1B80CF;
+            .nav-container {
+                max-width: 1400px;
+                margin: 0 auto;
+                padding: var(--space-md) var(--space-xl);
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                flex-wrap: wrap;
+                gap: var(--space-md);
             }
 
-            .content h3 {
-                color: #1B80CF;
+            .nav-brand {
+                font-size: var(--text-xl);
+                font-weight: 700;
+                color: var(--color-accent-2);
+                text-decoration: none;
+                letter-spacing: -0.02em;
+                display: flex;
+                align-items: center;
+                gap: var(--space-sm);
+                transition: all 0.3s ease;
             }
 
-            .content h2::before,
-            .content h3::before {
-                display: block;
-                content: " ";
-                visibility: hidden;
-                height: 50px;
-                margin-top: -50px;
-                pointer-events: none;
-                background-color: #FFFFFF;
+            .nav-brand::before {
+                content: '';
+                display: inline-block;
+                width: 10px;
+                height: 10px;
+                background: var(--gradient-golden);
+                border-radius: 50%;
+                animation: goldenPulse 2s ease-in-out infinite;
             }
 
-            .content a:link,
-            .content a:visited {
-                color: #1B80CF;
+            .nav-brand:hover {
+                color: var(--color-accent-1);
+                transform: translateX(4px);
             }
 
-            .content li {
-                margin: 5px;
+            .breadcrumbs {
+                display: flex;
+                align-items: center;
+                gap: var(--space-sm);
+                list-style: none;
+                flex-wrap: wrap;
             }
 
-            .page {
-                width: 65vw;
-                height: 100%;
-                margin-left: 30vw;
+            .breadcrumbs li {
+                display: flex;
+                align-items: center;
+                gap: var(--space-sm);
+            }
+
+            .breadcrumbs li:not(:last-child)::after {
+                content: '→';
+                color: var(--color-accent-1);
+                font-weight: 600;
+            }
+
+            .breadcrumbs a {
+                color: var(--color-base-text-muted);
+                text-decoration: none;
+                font-size: var(--text-sm);
+                transition: color 0.3s ease;
+            }
+
+            .breadcrumbs a:hover {
+                color: var(--color-accent-1);
+            }
+
+            /* ========================================
+           HERO SECTION
+           ======================================== */
+            .hero {
+                max-width: 1400px;
+                margin: 0 auto;
+                padding: var(--space-4xl) var(--space-xl) var(--space-3xl);
+                position: relative;
                 overflow: hidden;
-                padding: 0 1em;
-                font-family: 'Arial';
             }
 
-            .page img {
-                max-width: 100%;
-                max-height: 100%;
+            .hero-content {
+                max-width: 900px;
+                margin: 0 auto;
+                text-align: center;
+                position: relative;
+                z-index: 2;
             }
 
-            @media (max-width: 640px),
-            screen and (orientation: portrait) {
-                body {
-                    max-width: 100%;
-                    max-height: 100%;
+            .page-title {
+                font-size: var(--text-4xl);
+                font-weight: 800;
+                letter-spacing: -0.03em;
+                line-height: 1.2;
+                margin-bottom: var(--space-lg);
+                background: var(--gradient-golden);
+                background-clip: text;
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                background-size: 200% 200%;
+                animation: gradientShift 8s ease infinite;
+            }
+
+            .page-subtitle {
+                font-size: var(--text-xl);
+                font-weight: 600;
+                color: var(--color-accent-2);
+                margin-bottom: var(--space-xl);
+            }
+
+            .hero-svg-container {
+                max-width: 800px;
+                margin: var(--space-3xl) auto 0;
+                position: relative;
+            }
+
+            /* ========================================
+           MAIN CONTENT
+           ======================================== */
+            .content {
+                max-width: 1200px;
+                margin: 0 auto;
+                padding: 0 var(--space-xl) var(--space-4xl);
+            }
+
+            article {
+                background: rgba(255, 255, 255, 0.6);
+                -webkit-backdrop-filter: blur(8px) saturate(180%);
+                backdrop-filter: blur(8px) saturate(180%);
+                border: 1px solid var(--color-border);
+                border-radius: var(--radius-xl);
+                padding: var(--space-3xl);
+                box-shadow: var(--shadow-lg);
+            }
+
+            article>header {
+                text-align: center;
+                margin-bottom: var(--space-3xl);
+                padding-bottom: var(--space-xl);
+                border-bottom: 2px solid var(--color-border);
+                position: relative;
+            }
+
+            article>header::after {
+                content: '';
+                position: absolute;
+                bottom: -2px;
+                left: 50%;
+                transform: translateX(-50%);
+                width: 100px;
+                height: 2px;
+                background: var(--gradient-primary);
+            }
+
+            article>header h2 {
+                font-size: var(--text-3xl);
+                font-weight: 700;
+                color: var(--color-accent-2);
+                letter-spacing: -0.02em;
+            }
+
+            section {
+                margin-bottom: var(--space-3xl);
+            }
+
+            section:last-of-type {
+                margin-bottom: var(--space-2xl);
+            }
+
+            h3 {
+                font-size: var(--text-2xl);
+                font-weight: 600;
+                color: var(--color-accent-1);
+                margin-bottom: var(--space-lg);
+                letter-spacing: -0.01em;
+                position: relative;
+                padding-left: var(--space-md);
+            }
+
+            h3::before {
+                content: '';
+                position: absolute;
+                left: 0;
+                top: 50%;
+                transform: translateY(-50%);
+                width: 4px;
+                height: 60%;
+                background: var(--gradient-primary);
+                border-radius: var(--radius-sm);
+            }
+
+            h4 {
+                font-size: var(--text-lg);
+                font-weight: 600;
+                color: var(--color-math-blue);
+                margin: var(--space-xl) 0 var(--space-md);
+            }
+
+            p {
+                margin-bottom: var(--space-lg);
+                line-height: 1.8;
+                color: var(--color-base-text);
+            }
+
+            ul {
+                margin: var(--space-lg) 0;
+                padding-left: var(--space-2xl);
+            }
+
+            ol {
+                margin: var(--space-lg) 0;
+                padding-left: var(--space-2xl);
+            }
+
+            li {
+                margin-bottom: var(--space-md);
+                line-height: 1.7;
+            }
+
+            strong {
+                color: var(--color-accent-2);
+                font-weight: 600;
+            }
+
+            em {
+                font-style: italic;
+                color: var(--color-base-text-muted);
+            }
+
+            a {
+                color: var(--color-accent-1);
+                text-decoration: none;
+                transition: color 0.3s ease;
+                position: relative;
+            }
+
+            a:hover {
+                color: var(--color-accent-2);
+            }
+
+            a:not(.nav-brand):not(.breadcrumbs a)::after {
+                content: '';
+                position: absolute;
+                bottom: -2px;
+                left: 0;
+                width: 0;
+                height: 1px;
+                background: var(--color-accent-2);
+                transition: width 0.3s ease;
+            }
+
+            a:not(.nav-brand):not(.breadcrumbs a):hover::after {
+                width: 100%;
+            }
+
+            /* ========================================
+           FIBONACCI NUMBER GRID
+           ======================================== */
+            .fibonacci-grid {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+                gap: var(--space-md);
+                margin: var(--space-xl) 0;
+                padding: var(--space-xl);
+                background: linear-gradient(135deg, rgba(244, 197, 66, 0.1) 0%, rgba(212, 165, 116, 0.1) 100%);
+                border-radius: var(--radius-lg);
+            }
+
+            .fib-number {
+                background: rgba(255, 255, 255, 0.8);
+                -webkit-backdrop-filter: blur(8px);
+                backdrop-filter: blur(8px);
+                border: 1px solid var(--color-border);
+                border-radius: var(--radius-md);
+                padding: var(--space-md);
+                text-align: center;
+                transition: all 0.3s ease;
+                cursor: default;
+            }
+
+            .fib-number:hover {
+                transform: translateY(-4px) scale(1.05);
+                box-shadow: var(--shadow-md);
+                border-color: var(--color-accent-1);
+            }
+
+            /* ========================================
+           MATHEMATICAL FORMULAS
+           ======================================== */
+            .formula-box {
+                background: rgba(255, 255, 255, 0.7);
+                -webkit-backdrop-filter: blur(8px);
+                backdrop-filter: blur(8px);
+                border: 1px solid var(--color-border);
+                border-left: 4px solid var(--color-accent-1);
+                border-radius: var(--radius-md);
+                padding: var(--space-lg);
+                margin: var(--space-xl) 0;
+                font-family: var(--font-mono);
+                font-size: var(--text-base);
+                text-align: center;
+                position: relative;
+            }
+
+            .formula-box::before {
+                content: '∞';
+                position: absolute;
+                top: var(--space-sm);
+                right: var(--space-md);
+                font-size: var(--text-2xl);
+                color: var(--color-accent-1);
+                opacity: 0.2;
+            }
+
+            /* ========================================
+           SECTION DIVIDERS
+           ======================================== */
+            .section-divider {
+                height: 1px;
+                background: linear-gradient(90deg, transparent 0%, var(--color-border) 50%, transparent 100%);
+                margin: var(--space-3xl) 0;
+                position: relative;
+            }
+
+            .section-divider::before {
+                content: 'φ';
+                position: absolute;
+                left: 50%;
+                top: 50%;
+                transform: translate(-50%, -50%);
+                background: var(--color-base-bg);
+                padding: 0 var(--space-md);
+                font-size: var(--text-2xl);
+                color: var(--color-accent-1);
+                font-weight: 700;
+            }
+
+            /* ========================================
+           FOOTER
+           ======================================== */
+            article>footer {
+                margin-top: var(--space-3xl);
+                padding-top: var(--space-xl);
+                border-top: 2px solid var(--color-border);
+            }
+
+            article>footer h4 {
+                font-size: var(--text-xl);
+                color: var(--color-accent-2);
+                margin-bottom: var(--space-lg);
+            }
+
+            article>footer ol {
+                counter-reset: reference-counter;
+                list-style: none;
+                padding-left: 0;
+            }
+
+            article>footer li {
+                counter-increment: reference-counter;
+                padding-left: var(--space-2xl);
+                position: relative;
+                margin-bottom: var(--space-md);
+                line-height: 1.6;
+            }
+
+            article>footer li::before {
+                content: '[' counter(reference-counter) ']';
+                position: absolute;
+                left: 0;
+                color: var(--color-accent-1);
+                font-weight: 600;
+                font-size: var(--text-sm);
+            }
+
+            /* ========================================
+           PAGE FOOTER
+           ======================================== */
+            .page-footer {
+                background: rgba(255, 255, 255, 0.7);
+                -webkit-backdrop-filter: blur(12px) saturate(180%);
+                backdrop-filter: blur(12px) saturate(180%);
+                border-top: 1px solid var(--color-border);
+                margin-top: var(--space-4xl);
+            }
+
+            .footer-container {
+                max-width: 1400px;
+                margin: 0 auto;
+                padding: var(--space-2xl) var(--space-xl);
+                display: flex;
+                flex-direction: column;
+                gap: var(--space-xl);
+            }
+
+            .footer-links {
+                display: flex;
+                gap: var(--space-xl);
+                flex-wrap: wrap;
+            }
+
+            .footer-links a {
+                color: var(--color-base-text-muted);
+                text-decoration: none;
+                font-size: var(--text-sm);
+                transition: color 0.3s ease;
+            }
+
+            .footer-links a:hover {
+                color: var(--color-accent-1);
+            }
+
+            .copyright {
+                color: var(--color-base-text-muted);
+                font-size: var(--text-sm);
+                text-align: center;
+            }
+
+            /* ========================================
+           ANIMATIONS
+           ======================================== */
+            @keyframes gradientShift {
+
+                0%,
+                100% {
+                    background-position: 0% 50%;
                 }
 
-                #sidebar {
-                    position: fixed;
-                    background-color: #1B80CF;
-                    top: 0;
-                    left: 0;
-                    bottom: 80vh;
-                    width: 100vw;
+                50% {
+                    background-position: 100% 50%;
+                }
+            }
+
+            @keyframes goldenPulse {
+
+                0%,
+                100% {
+                    opacity: 1;
+                    transform: scale(1);
+                    box-shadow: 0 0 0 0 rgba(244, 197, 66, 0.7);
                 }
 
-                #sidebar .title {
-                    text-align: center;
-                    position: fixed;
-                    margin-top: 6vh;
-                    left: 0px;
-                    right: 0px;
-                    line-height: 3.5vmax;
-                    font-size: 1.5vmax;
-                    font-family: 'Arial';
+                50% {
+                    opacity: 0.7;
+                    transform: scale(1.3);
+                    box-shadow: 0 0 0 10px rgba(244, 197, 66, 0);
+                }
+            }
+
+            @keyframes spiralRotate {
+                from {
+                    transform: rotate(0deg);
                 }
 
-                #sidebar .subtitle {
-                    text-align: center;
-                    top: 5vh;
-                    left: 0px;
-                    right: 0px;
-                    position: fixed;
-                    margin-top: 10vh;
-                    font-size: 1.5vmax;
+                to {
+                    transform: rotate(360deg);
+                }
+            }
+
+            @keyframes float {
+
+                0%,
+                100% {
+                    transform: translateY(0px);
                 }
 
-                #sidebar .title a:link,
-                #sidebar .title a:visited {
-                    text-align: center;
-                    color: #FFFFFF;
+                50% {
+                    transform: translateY(-15px);
+                }
+            }
+
+            @keyframes fadeInUp {
+                from {
+                    opacity: 0;
+                    transform: translateY(30px);
                 }
 
-                #sidebar .subtitle a:link,
-                #sidebar .subtitle a:visited {
-                    text-align: center;
-                    color: #FFFFFF;
+                to {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            }
+
+            @keyframes expand {
+                from {
+                    transform: scale(0.9);
+                    opacity: 0.5;
                 }
 
-                .home {
-                    z-index: 100;
-                    width: 100%;
-                    background-color: #1B80CF;
-                    font-size: 1.5vmax;
+                to {
+                    transform: scale(1.1);
+                    opacity: 1;
+                }
+            }
+
+            /* Reduced motion support */
+            @media (prefers-reduced-motion: reduce) {
+
+                *,
+                *::before,
+                *::after {
+                    animation-duration: 0.01ms !important;
+                    animation-iteration-count: 1 !important;
+                    transition-duration: 0.01ms !important;
+                }
+            }
+
+            /* ========================================
+           RESPONSIVE DESIGN
+           ======================================== */
+            @media (max-width: 768px) {
+                .nav-container {
+                    flex-direction: column;
+                    align-items: flex-start;
                 }
 
-                .home a:link,
-                .home a:visited {
-                    text-decoration: none;
-                    color: #FFFFFF;
+                .hero {
+                    padding: var(--space-2xl) var(--space-md) var(--space-xl);
                 }
 
                 .content {
-                    line-height: 3.8vmax;
-                    font-size: 1.8vmax;
-                    font-family: 'Arial';
-                    margin-top: 22vh;
+                    padding: 0 var(--space-md) var(--space-2xl);
                 }
 
-                .content a:link,
-                .content a:visited {
-                    color: #1B80CF;
+                article {
+                    padding: var(--space-xl);
                 }
 
-                .page {
-                    top: 40vh;
-                    width: 95%;
-                    margin-left: 0vw;
+                .fibonacci-grid {
+                    grid-template-columns: repeat(auto-fit, minmax(60px, 1fr));
+                    gap: var(--space-sm);
+                    padding: var(--space-md);
                 }
 
-                .page img {
-                    max-width: 100%;
-                    max-height: 100%;
-                    border: 0;
+                .footer-container {
+                    padding: var(--space-xl) var(--space-md);
+                }
+            }
+
+            /* ========================================
+           SVG SPECIFIC STYLES
+           ======================================== */
+            .spiral {
+                animation: spiralRotate 30s linear infinite;
+                transform-origin: center;
+            }
+
+            .golden-rect {
+                animation: float 4s ease-in-out infinite;
+            }
+
+            .fib-circle {
+                animation: expand 3s ease-in-out infinite alternate;
+            }
+
+            .number-path {
+                stroke-dasharray: 1000;
+                stroke-dashoffset: 1000;
+                animation: drawPath 5s ease-out forwards;
+            }
+
+            @keyframes drawPath {
+                to {
+                    stroke-dashoffset: 0;
                 }
             }
         </style>
     </head>
 
     <body vocab="http://schema.org/">
-        <div class="page">
-            <div class="home">
-                <ul typeof="BreadcrumbList">
+        <a href="#main-content" class="skip-link">Skip to main content</a>
+
+        <!-- Navigation -->
+        <nav role="navigation" aria-label="Main navigation">
+            <div class="nav-container">
+                <a href="../about.html" class="nav-brand">John Samuel</a>
+                <ul typeof="BreadcrumbList" class="breadcrumbs">
                     <li property="itemListElement" typeof="ListItem">
                         <a property="item" typeof="WebPage" href="../index.html">
                             <span property="name">Home</span>
@@ -268,280 +727,408 @@
                             <span property="name">Research</span>
                         </a>
                     </li>
+                    <li property="itemListElement" typeof="ListItem">
+                        <span property="name">Exploring Fibonacci Numbers</span>
+                    </li>
                 </ul>
-
             </div>
-            <div id="sidebar">
-                <div class="title">
-                    <h1><a href="./fibonacci-numbers.html">Exploring Fibonacci Numbers</a></h1>
+        </nav>
+
+        <!-- Hero Section -->
+        <header class="hero">
+            <div class="hero-content">
+                <h1 class="page-title">Exploring Fibonacci Numbers</h1>
+                <p class="page-subtitle">A Mathematical Journey Across Nature, Art, and Science</p>
+            </div>
+
+            <div class="hero-svg-container">
+                <svg viewBox="0 0 800 500" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                    <!-- Background gradient -->
+                    <defs>
+                        <linearGradient id="golden-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" style="stop-color:#f4c542;stop-opacity:1" />
+                            <stop offset="50%" style="stop-color:#d4a574;stop-opacity:1" />
+                            <stop offset="100%" style="stop-color:#b8860b;stop-opacity:1" />
+                        </linearGradient>
+
+                        <linearGradient id="bg-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" style="stop-color:#fff8e7;stop-opacity:0.5" />
+                            <stop offset="100%" style="stop-color:#fef4e0;stop-opacity:0.5" />
+                        </linearGradient>
+
+                        <linearGradient id="rect-gradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                            <stop offset="0%" style="stop-color:#d4a574;stop-opacity:0.8" />
+                            <stop offset="100%" style="stop-color:#b8860b;stop-opacity:0.8" />
+                        </linearGradient>
+
+                        <filter id="soft-glow">
+                            <feGaussianBlur stdDeviation="4" result="coloredBlur" />
+                            <feMerge>
+                                <feMergeNode in="coloredBlur" />
+                                <feMergeNode in="SourceGraphic" />
+                            </feMerge>
+                        </filter>
+                    </defs>
+
+                    <!-- Background -->
+                    <rect width="800" height="500" fill="url(#bg-gradient)" />
+
+                    <!-- Golden Ratio Rectangles (Fibonacci Spiral Foundation) -->
+                    <g class="golden-rect" opacity="0.6">
+                        <!-- 1x1 -->
+                        <rect x="400" y="250" width="89" height="89" fill="none" stroke="#d4a574" stroke-width="2" />
+                        <text x="445" y="300" text-anchor="middle" fill="#b8860b" font-size="16"
+                            font-weight="600">1</text>
+
+                        <!-- 1x1 -->
+                        <rect x="400" y="161" width="89" height="89" fill="none" stroke="#d4a574" stroke-width="2" />
+                        <text x="445" y="210" text-anchor="middle" fill="#b8860b" font-size="16"
+                            font-weight="600">1</text>
+
+                        <!-- 2x2 -->
+                        <rect x="311" y="161" width="89" height="178" fill="none" stroke="#d4a574" stroke-width="2" />
+                        <text x="355" y="255" text-anchor="middle" fill="#b8860b" font-size="20"
+                            font-weight="600">2</text>
+
+                        <!-- 3x3 -->
+                        <rect x="311" y="72" width="178" height="89" fill="none" stroke="#d4a574" stroke-width="2" />
+                        <text x="400" y="120" text-anchor="middle" fill="#b8860b" font-size="24"
+                            font-weight="600">3</text>
+
+                        <!-- 5x5 -->
+                        <rect x="133" y="72" width="178" height="267" fill="none" stroke="#d4a574" stroke-width="2" />
+                        <text x="222" y="210" text-anchor="middle" fill="#b8860b" font-size="28"
+                            font-weight="600">5</text>
+                    </g>
+
+                    <!-- Fibonacci Spiral -->
+                    <g class="spiral" opacity="0.8">
+                        <path
+                            d="M 489 250 Q 489 294, 445 294 Q 400 294, 400 250 Q 400 161, 311 161 Q 133 161, 133 250 Q 133 428, 311 428"
+                            stroke="url(#golden-gradient)" stroke-width="4" fill="none" stroke-linecap="round"
+                            filter="url(#soft-glow)" />
+                    </g>
+
+                    <!-- Fibonacci Circles -->
+                    <g class="fib-circle">
+                        <circle cx="650" cy="150" r="25" fill="url(#golden-gradient)" opacity="0.3" />
+                        <circle cx="650" cy="150" r="18" fill="none" stroke="#d4a574" stroke-width="2" />
+                        <text x="650" y="155" text-anchor="middle" fill="#b8860b" font-size="14"
+                            font-weight="700">φ</text>
+                    </g>
+
+                    <g class="fib-circle">
+                        <circle cx="700" cy="350" r="30" fill="url(#golden-gradient)" opacity="0.3" />
+                        <circle cx="700" cy="350" r="22" fill="none" stroke="#d4a574" stroke-width="2" />
+                        <text x="700" y="357" text-anchor="middle" fill="#b8860b" font-size="16"
+                            font-weight="700">1.618</text>
+                    </g>
+
+                    <!-- Decorative number sequence -->
+                    <text x="50" y="450" fill="#d4a574" font-size="14" opacity="0.6" font-family="monospace">0, 1, 1, 2,
+                        3, 5, 8, 13, 21, 34, 55...</text>
+
+                    <!-- Mathematical formula decoration -->
+                    <text x="550" y="480" fill="#b8860b" font-size="12" opacity="0.5" font-style="italic">F(n) = F(n-1)
+                        + F(n-2)</text>
+
+                    <!-- Golden angle indicators -->
+                    <line x1="650" y1="150" x2="680" y2="130" stroke="#f4c542" stroke-width="1" opacity="0.4" />
+                    <line x1="650" y1="150" x2="630" y2="120" stroke="#f4c542" stroke-width="1" opacity="0.4" />
+
+                    <!-- Decorative dots -->
+                    <circle cx="100" cy="100" r="3" fill="#d4a574" opacity="0.4" />
+                    <circle cx="750" cy="100" r="4" fill="#b8860b" opacity="0.4" />
+                    <circle cx="50" cy="350" r="5" fill="#f4c542" opacity="0.4" />
+                </svg>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main id="main-content" class="content">
+            <article>
+                <header>
+                    <h2>Fibonacci Numbers: A Mathematical Journey Across Nature, Art, and Science</h2>
+                </header>
+
+                <section>
+                    <h3>Fibonacci Numbers</h3>
+                    <p>
+                        Fibonacci numbers are a sequence of integers where each number is the sum of the two
+                        preceding ones,
+                        typically starting with 0 and 1. The sequence unfolds as follows: 0, 1, 1, 2, 3, 5,
+                        8, 13, 21, 34, and so on.
+                        Mathematically, the Fibonacci sequence is defined by the recurrence relation:
+                    </p>
+                    <p class="formula-box">
+                        <strong>F(n) = F(n−1) + F(n−2), with F(0) = 0 and F(1) = 1</strong>
+                    </p>
+                    <p>
+                        The sequence is named after <a href="https://en.wikipedia.org/wiki/Fibonacci">Leonardo
+                            Bonacci</a>,
+                        known as Fibonacci, a 13th-century Italian mathematician who popularized these
+                        numbers in his groundbreaking work
+                        <em><a href="https://en.wikipedia.org/wiki/Liber_Abaci">Liber
+                                Abaci</a></em> (1202).
+                    </p>
+                </section>
+
+                <section>
+                    <h3>Examples of Fibonacci Numbers</h3>
+                    <p>The first few Fibonacci numbers are:</p>
+                    <div class="fibonacci-grid">
+                        <div class="fib-number"><strong>F(0)</strong><br>0</div>
+                        <div class="fib-number"><strong>F(1)</strong><br>1</div>
+                        <div class="fib-number"><strong>F(2)</strong><br>1</div>
+                        <div class="fib-number"><strong>F(3)</strong><br>2</div>
+                        <div class="fib-number"><strong>F(4)</strong><br>3</div>
+                        <div class="fib-number"><strong>F(5)</strong><br>5</div>
+                        <div class="fib-number"><strong>F(6)</strong><br>8</div>
+                        <div class="fib-number"><strong>F(7)</strong><br>13</div>
+                        <div class="fib-number"><strong>F(8)</strong><br>21</div>
+                        <div class="fib-number"><strong>F(9)</strong><br>34</div>
+                        <div class="fib-number"><strong>F(10)</strong><br>55</div>
+                    </div>
+                </section>
+
+                <section>
+                    <h3>Applications in Mathematics and Science</h3>
+                    <p>Fibonacci numbers are not just an abstract curiosity—they permeate diverse areas of
+                        science and applied mathematics, including:</p>
+                    <ul>
+                        <li><strong>Combinatorics:</strong> Counting ways to tile spaces or compose words
+                            from certain rules</li>
+                        <li><strong>Number theory:</strong> Properties of primes, modular arithmetic, and
+                            divisibility sequences</li>
+                        <li><strong>Geometry:</strong> Spirals and ratios in shapes</li>
+                        <li><strong>Computer science:</strong> Algorithm analysis, data structures like
+                            heaps and trees</li>
+                        <li><strong>Biology:</strong> Phyllotaxis (leaf arrangements), branching in trees,
+                            and population models</li>
+                        <li><strong>Art and architecture:</strong> Golden rectangles, classical proportions,
+                            and patterns of growth</li>
+                    </ul>
+                </section>
+
+                <div class="section-divider"></div>
+
+                <section>
+                    <h3>Negative Fibonacci Numbers</h3>
+                    <p>
+                        The Fibonacci sequence can be extended to negative indices using the recurrence
+                        relation:
+                    </p>
+                    <p class="formula-box">
+                        <strong>F(−n) = (−1)<sup>n+1</sup> × F(n)</strong>
+                    </p>
+                    <p>This extended version is known as the <em>negafibonacci</em> sequence.</p>
+                    <ul>
+                        <li>F(−1) = 1</li>
+                        <li>F(−2) = −1</li>
+                        <li>F(−3) = 2</li>
+                        <li>F(−4) = −3</li>
+                        <li>F(−5) = 5</li>
+                    </ul>
+                </section>
+
+                <section>
+                    <h3>Lucas Numbers: Fibonacci's Sibling Sequence</h3>
+                    <p>
+                        Closely related to Fibonacci numbers are the <a
+                            href="https://en.wikipedia.org/wiki/Lucas_number">Lucas
+                            numbers</a>,
+                        defined by the same recurrence relation:
+                    </p>
+                    <p class="formula-box"><strong>L(n) = L(n−1) + L(n−2)</strong>, with seed values <strong>L(0) =
+                            2</strong>
+                        and <strong>L(1) = 1</strong>.</p>
+                    <p>Examples of Lucas numbers:</p>
+                    <ul>
+                        <li>L(0) = 2</li>
+                        <li>L(1) = 1</li>
+                        <li>L(2) = 3</li>
+                        <li>L(3) = 4</li>
+                        <li>L(4) = 7</li>
+                        <li>L(5) = 11</li>
+                        <li>L(6) = 18</li>
+                        <li>L(7) = 29</li>
+                    </ul>
+                    <p>The Lucas numbers are closely connected to Fibonacci numbers, satisfying:</p>
+                    <p class="formula-box"><strong>L(n) = F(n) + 2 × F(n−1)</strong></p>
+                </section>
+
+                <div class="section-divider"></div>
+
+                <section>
+                    <h3>The Golden Ratio and Continued Fractions</h3>
+                    <p>
+                        The limit of the ratio of consecutive Fibonacci numbers approaches the <a
+                            href="https://en.wikipedia.org/wiki/Golden_ratio">golden
+                            ratio</a>, denoted φ (phi):
+                    </p>
+                    <p class="formula-box"><strong>φ = (1 + √5) / 2 ≈ 1.6180339887...</strong></p>
+                    <p>This ratio appears in various fields such as design, biology, and architecture.
+                        Fibonacci numbers also approximate golden ratio-related continued fractions and
+                        serve as convergents for <a href="https://en.wikipedia.org/wiki/Continued_fraction">continued
+                            fraction
+                            expansions</a>.</p>
+                </section>
+
+                <section>
+                    <h3>n-Fibonacci Numbers: Generalizing the Sequence</h3>
+                    <p>The standard Fibonacci sequence can be generalized. In the <strong>n-Fibonacci
+                            numbers</strong> (also known as <a
+                            href="https://en.wikipedia.org/wiki/Generalizations_of_Fibonacci_numbers">generalized
+                            Fibonacci sequences</a>), each term is the sum of
+                        the previous <em>n</em> terms.</p>
+
+                    <h4>3-Fibonacci (Tribonacci) Numbers</h4>
+                    <p class="formula-box"><strong>T(n) = T(n−1) + T(n−2) + T(n−3)</strong> with T(0) = 0, T(1) = 1,
+                        T(2) = 1
+                    </p>
+
+                    <h4>4-Fibonacci (Tetranacci) Numbers</h4>
+                    <p class="formula-box"><strong>Q(n) = Q(n−1) + Q(n−2) + Q(n−3) + Q(n−4)</strong> with Q(0) = 0, Q(1)
+                        = 1,
+                        Q(2) = 1, Q(3) = 2</p>
+
+                    <p>These sequences reveal interesting combinatorial and computational properties.</p>
+                </section>
+
+                <section>
+                    <h3>The Wythoff Array</h3>
+                    <p>
+                        The <a href="https://en.wikipedia.org/wiki/Wythoff_array">Wythoff
+                            array</a> is a two-dimensional array constructed using the golden ratio and
+                        closely related to Fibonacci numbers. The elements are computed using:
+                    </p>
+                    <p class="formula-box"><strong>W(n, m) = ⌊n × φ⌋ + ⌊m × φ⌋</strong></p>
+                    <p>Each row contains a Fibonacci-like sequence, and the array has connections to <a
+                            href="https://en.wikipedia.org/wiki/Wythoff's_game">Wythoff's game</a>,
+                        number theory, and <a
+                            href="https://en.wikipedia.org/wiki/Sprague%E2%80%93Grundy_theorem">combinatorial game
+                            theory</a>.</p>
+                </section>
+
+                <div class="section-divider"></div>
+
+                <section>
+                    <h3>Visualizing Fibonacci Numbers</h3>
+                    <p>Several visual tools help illustrate the beauty and structure of Fibonacci numbers:
+                    </p>
+                    <ul>
+                        <li><strong>Fibonacci spiral:</strong> Based on golden rectangles, visible in shells
+                            and galaxies</li>
+                        <li><strong>Fibonacci tiling:</strong> Squares with side lengths based on Fibonacci
+                            numbers</li>
+                        <li><strong>Fibonacci trees:</strong> Recursive branching structures</li>
+                        <li><strong>Fibonacci graphs:</strong> Graphs representing additive structure</li>
+                    </ul>
+                </section>
+
+                <section>
+                    <h3>Algorithmic Computation</h3>
+                    <p>Fibonacci numbers can be computed using several algorithms:</p>
+                    <ul>
+                        <li><strong>Recursive algorithm:</strong> Simple but inefficient (exponential time)
+                        </li>
+                        <li><strong>Iterative algorithm:</strong> Efficient linear-time computation</li>
+                        <li><strong>Matrix exponentiation:</strong> Fast logarithmic-time method</li>
+                        <li><strong>Closed-form expression:</strong> <a
+                                href="https://en.wikipedia.org/wiki/Binet%27s_formula">Binet's
+                                formula</a> derives Fibonacci numbers algebraically
+                        </li>
+                        <li><strong>Fast doubling method:</strong> Optimal approach for large indices</li>
+                    </ul>
+                </section>
+
+                <section>
+                    <h3>Applications in Diverse Fields</h3>
+                    <ul>
+                        <li><strong>Biology:</strong> Growth patterns in sunflowers, pinecones, and shells
+                        </li>
+                        <li><strong>Computer science:</strong> Hashing, heaps, and <a
+                                href="https://en.wikipedia.org/wiki/Fibonacci_heap">Fibonacci
+                                heaps</a></li>
+                        <li><strong>Finance:</strong> Fibonacci retracements in technical analysis</li>
+                        <li><strong>Cryptography:</strong> Pseudorandom number generation</li>
+                        <li><strong>Combinatorics and game theory:</strong> Counting problems,
+                            Sprague-Grundy numbers</li>
+                    </ul>
+                </section>
+
+                <div class="section-divider"></div>
+
+                <section>
+                    <h3>Historical and Contemporary Contributions</h3>
+                    <ul>
+                        <li><strong>Leonardo of Pisa (Fibonacci)</strong> – Introduced the sequence in
+                            <em>Liber Abaci</em>
+                        </li>
+                        <li><strong>Édouard Lucas</strong> – Studied related sequences and properties</li>
+                        <li><strong>Donald Knuth</strong> – Explored Fibonacci numbers in algorithmic
+                            analysis</li>
+                        <li><strong>Robert Sedgewick & Robert Griesemer</strong> – Efficient algorithms
+                            using Fibonacci numbers</li>
+                    </ul>
+                </section>
+
+                <section>
+                    <h3>Fibonacci in Art, Culture, and Nature</h3>
+                    <p>
+                        The influence of Fibonacci numbers extends into music, visual design, poetry, and
+                        classical architecture.
+                        Composers like <a href="https://fr.wikipedia.org/wiki/B%C3%A9la_Bart%C3%B3k">Bartók</a>
+                        structured compositions based on Fibonacci sequences, and
+                        visual artists embraced the Fibonacci spiral for its pleasing proportions.
+                        Nature is replete with patterns aligned with Fibonacci numbers—from flower petals to
+                        hurricane spirals and animal horns.
+                    </p>
+                </section>
+
+                <section>
+                    <h3>Further Generalizations</h3>
+                    <p>Fibonacci numbers can also be extended into areas such as:</p>
+                    <ul>
+                        <li><strong>Complex numbers:</strong> Using the same recurrence formula F(z) =
+                            F(z−1) + F(z−2)</li>
+                        <li><strong>Z-sequences and Zeckendorf representation:</strong> Every integer can be
+                            uniquely represented as the sum of non-consecutive Fibonacci numbers</li>
+                    </ul>
+                </section>
+
+                <footer>
+                    <h4>References</h4>
+                    <ol>
+                        <li><em><a href="https://en.wikipedia.org/wiki/Fibonacci_number">Fibonacci
+                                    number</a></em>. Wikipedia.</li>
+                        <li><em><a href="https://en.wikipedia.org/wiki/Golden_ratio">Golden
+                                    ratio</a></em>. Wikipedia.</li>
+                        <li><em><a href="https://oeis.org/A000045">Fibonacci Numbers
+                                    (A000045)</a></em>. The On-Line Encyclopedia
+                            of Integer Sequences.</li>
+                        <li><em><a href="https://mathworld.wolfram.com/FibonacciNumber.html">Fibonacci
+                                    number</a></em>. Wolfram Research.</li>
+                        <li>Knuth, D. E. (1997). <em>The Art of Computer Programming</em>, Vol. 1: Fundamental
+                            Algorithms. Addison-Wesley.</li>
+                        <li>Griesemer, R. (2004). Efficient computation of Fibonacci sequences. <em>IBM
+                                Systems Journal</em>, 43(2), 207–221.</li>
+                    </ol>
+                </footer>
+            </article>
+        </main>
+
+        <!-- Page Footer -->
+        <footer class="page-footer">
+            <div class="footer-container">
+                <div class="footer-links">
+                    <a href="../index.html">Home</a>
+                    <a href="../research/research.html">Research</a>
+                    <a href="../about.html">About</a>
                 </div>
-                <div class="subtitle">
-                    <h4><a href="../about.html">John Samuel</a></h4>
-                </div>
+                <p class="copyright">© John Samuel</p>
             </div>
-
-            <div class="content">
-                <article>
-                    <header>
-                        <h2>Fibonacci Numbers: A Mathematical Journey Across Nature, Art, and Science</h2>
-                    </header>
-
-                    <section>
-                        <h3>Fibonacci Numbers</h3>
-                        <p>
-                            Fibonacci numbers are a sequence of integers where each number is the sum of the two
-                            preceding ones,
-                            typically starting with 0 and 1. The sequence unfolds as follows: 0, 1, 1, 2, 3, 5,
-                            8, 13, 21, 34, and so on.
-                            Mathematically, the Fibonacci sequence is defined by the recurrence relation:
-                        </p>
-                        <p>
-                            <strong>F(n) = F(n−1) + F(n−2), with F(0) = 0 and F(1) = 1</strong>
-                        </p>
-                        <p>
-                            The sequence is named after <a href="https://en.wikipedia.org/wiki/Fibonacci">Leonardo
-                                Bonacci</a>,
-                            known as Fibonacci, a 13th-century Italian mathematician who popularized these
-                            numbers in his groundbreaking work
-                            <em><a href="https://en.wikipedia.org/wiki/Liber_Abaci">Liber
-                                    Abaci</a></em> (1202).
-                        </p>
-                    </section>
-
-                    <section>
-                        <h3>Examples of Fibonacci Numbers</h3>
-                        <p>The first few Fibonacci numbers are:</p>
-                        <ul>
-                            <li>F(0) = 0</li>
-                            <li>F(1) = 1</li>
-                            <li>F(2) = 1</li>
-                            <li>F(3) = 2</li>
-                            <li>F(4) = 3</li>
-                            <li>F(5) = 5</li>
-                            <li>F(6) = 8</li>
-                            <li>F(7) = 13</li>
-                            <li>F(8) = 21</li>
-                            <li>F(9) = 34</li>
-                            <li>F(10) = 55</li>
-                        </ul>
-                    </section>
-
-                    <section>
-                        <h3>Applications in Mathematics and Science</h3>
-                        <p>Fibonacci numbers are not just an abstract curiosity—they permeate diverse areas of
-                            science and applied mathematics, including:</p>
-                        <ul>
-                            <li><strong>Combinatorics:</strong> Counting ways to tile spaces or compose words
-                                from certain rules</li>
-                            <li><strong>Number theory:</strong> Properties of primes, modular arithmetic, and
-                                divisibility sequences</li>
-                            <li><strong>Geometry:</strong> Spirals and ratios in shapes</li>
-                            <li><strong>Computer science:</strong> Algorithm analysis, data structures like
-                                heaps and trees</li>
-                            <li><strong>Biology:</strong> Phyllotaxis (leaf arrangements), branching in trees,
-                                and population models</li>
-                            <li><strong>Art and architecture:</strong> Golden rectangles, classical proportions,
-                                and patterns of growth</li>
-                        </ul>
-                    </section>
-
-                    <section>
-                        <h3>Negative Fibonacci Numbers</h3>
-                        <p>
-                            The Fibonacci sequence can be extended to negative indices using the recurrence
-                            relation:
-                        </p>
-                        <p>
-                            <strong>F(−n) = (−1)<sup>n+1</sup> × F(n)</strong>
-                        </p>
-                        <p>This extended version is known as the <em>negafibonacci</em> sequence.</p>
-                        <ul>
-                            <li>F(−1) = 1</li>
-                            <li>F(−2) = −1</li>
-                            <li>F(−3) = 2</li>
-                            <li>F(−4) = −3</li>
-                            <li>F(−5) = 5</li>
-                        </ul>
-                    </section>
-
-                    <section>
-                        <h3>Lucas Numbers: Fibonacci’s Sibling Sequence</h3>
-                        <p>
-                            Closely related to Fibonacci numbers are the <a
-                                href="https://en.wikipedia.org/wiki/Lucas_number">Lucas
-                                numbers</a>,
-                            defined by the same recurrence relation:
-                        </p>
-                        <p><strong>L(n) = L(n−1) + L(n−2)</strong>, with seed values <strong>L(0) = 2</strong>
-                            and <strong>L(1) = 1</strong>.</p>
-                        <p>Examples of Lucas numbers:</p>
-                        <ul>
-                            <li>L(0) = 2</li>
-                            <li>L(1) = 1</li>
-                            <li>L(2) = 3</li>
-                            <li>L(3) = 4</li>
-                            <li>L(4) = 7</li>
-                            <li>L(5) = 11</li>
-                            <li>L(6) = 18</li>
-                            <li>L(7) = 29</li>
-                        </ul>
-                        <p>The Lucas numbers are closely connected to Fibonacci numbers, satisfying:</p>
-                        <p><strong>L(n) = F(n) + 2 × F(n−1)</strong></p>
-                    </section>
-
-                    <section>
-                        <h3>The Golden Ratio and Continued Fractions</h3>
-                        <p>
-                            The limit of the ratio of consecutive Fibonacci numbers approaches the <a
-                                href="https://en.wikipedia.org/wiki/Golden_ratio">golden
-                                ratio</a>, denoted φ (phi):
-                        </p>
-                        <p><strong>φ = (1 + √5) / 2 ≈ 1.6180339887...</strong></p>
-                        <p>This ratio appears in various fields such as design, biology, and architecture.
-                            Fibonacci numbers also approximate golden ratio-related continued fractions and
-                            serve as convergents for <a
-                                href="https://en.wikipedia.org/wiki/Continued_fraction">continued fraction
-                                expansions</a>.</p>
-                    </section>
-
-                    <section>
-                        <h3>n-Fibonacci Numbers: Generalizing the Sequence</h3>
-                        <p>The standard Fibonacci sequence can be generalized. In the <strong>n-Fibonacci
-                                numbers</strong> (also known as <a
-                                href="https://en.wikipedia.org/wiki/Generalizations_of_Fibonacci_numbers">generalized
-                                Fibonacci sequences</a>), each term is the sum of
-                            the previous <em>n</em> terms.</p>
-
-                        <h4>3-Fibonacci (Tribonacci) Numbers</h4>
-                        <p><strong>T(n) = T(n−1) + T(n−2) + T(n−3)</strong> with T(0) = 0, T(1) = 1, T(2) = 1
-                        </p>
-
-                        <h4>4-Fibonacci (Tetranacci) Numbers</h4>
-                        <p><strong>Q(n) = Q(n−1) + Q(n−2) + Q(n−3) + Q(n−4)</strong> with Q(0) = 0, Q(1) = 1,
-                            Q(2) = 1, Q(3) = 2</p>
-
-                        <p>These sequences reveal interesting combinatorial and computational properties.</p>
-                    </section>
-
-                    <section>
-                        <h3>The Wythoff Array</h3>
-                        <p>
-                            The <a href="https://en.wikipedia.org/wiki/Wythoff_array">Wythoff
-                                array</a> is a two-dimensional array constructed using the golden ratio and
-                            closely related to Fibonacci numbers. The elements are computed using:
-                        </p>
-                        <p><strong>W(n, m) = ⌊n × φ⌋ + ⌊m × φ⌋</strong></p>
-                        <p>Each row contains a Fibonacci-like sequence, and the array has connections to <a
-                                href="https://en.wikipedia.org/wiki/Wythoff's_game">Wythoff’s game</a>,
-                            number theory, and <a
-                                href="https://en.wikipedia.org/wiki/Sprague%E2%80%93Grundy_theorem">combinatorial game
-                                theory</a>.</p>
-                    </section>
-
-                    <section>
-                        <h3>Visualizing Fibonacci Numbers</h3>
-                        <p>Several visual tools help illustrate the beauty and structure of Fibonacci numbers:
-                        </p>
-                        <ul>
-                            <li><strong>Fibonacci spiral:</strong> Based on golden rectangles, visible in shells
-                                and galaxies</li>
-                            <li><strong>Fibonacci tiling:</strong> Squares with side lengths based on Fibonacci
-                                numbers</li>
-                            <li><strong>Fibonacci trees:</strong> Recursive branching structures</li>
-                            <li><strong>Fibonacci graphs:</strong> Graphs representing additive structure</li>
-                        </ul>
-                    </section>
-
-                    <section>
-                        <h3>Algorithmic Computation</h3>
-                        <p>Fibonacci numbers can be computed using several algorithms:</p>
-                        <ul>
-                            <li><strong>Recursive algorithm:</strong> Simple but inefficient (exponential time)
-                            </li>
-                            <li><strong>Iterative algorithm:</strong> Efficient linear-time computation</li>
-                            <li><strong>Matrix exponentiation:</strong> Fast logarithmic-time method</li>
-                            <li><strong>Closed-form expression:</strong> <a
-                                    href="https://en.wikipedia.org/wiki/Binet%27s_formula">Binet's
-                                    formula</a> derives Fibonacci numbers algebraically
-                            </li>
-                            <li><strong>Fast doubling method:</strong> Optimal approach for large indices</li>
-                        </ul>
-                    </section>
-
-                    <section>
-                        <h3>Applications in Diverse Fields</h3>
-                        <ul>
-                            <li><strong>Biology:</strong> Growth patterns in sunflowers, pinecones, and shells
-                            </li>
-                            <li><strong>Computer science:</strong> Hashing, heaps, and <a
-                                    href="https://en.wikipedia.org/wiki/Fibonacci_heap">Fibonacci
-                                    heaps</a></li>
-                            <li><strong>Finance:</strong> Fibonacci retracements in technical analysis</li>
-                            <li><strong>Cryptography:</strong> Pseudorandom number generation</li>
-                            <li><strong>Combinatorics and game theory:</strong> Counting problems,
-                                Sprague-Grundy numbers</li>
-                        </ul>
-                    </section>
-
-                    <section>
-                        <h3>Historical and Contemporary Contributions</h3>
-                        <ul>
-                            <li><strong>Leonardo of Pisa (Fibonacci)</strong> – Introduced the sequence in
-                                <em>Liber Abaci</em>
-                            </li>
-                            <li><strong>Édouard Lucas</strong> – Studied related sequences and properties</li>
-                            <li><strong>Donald Knuth</strong> – Explored Fibonacci numbers in algorithmic
-                                analysis</li>
-                            <li><strong>Robert Sedgewick & Robert Griesemer</strong> – Efficient algorithms
-                                using Fibonacci numbers</li>
-                        </ul>
-                    </section>
-
-                    <section>
-                        <h3>Fibonacci in Art, Culture, and Nature</h3>
-                        <p>
-                            The influence of Fibonacci numbers extends into music, visual design, poetry, and
-                            classical architecture.
-                            Composers like <a href="https://fr.wikipedia.org/wiki/B%C3%A9la_Bart%C3%B3k">Bartók</a>
-                            structured compositions based on Fibonacci sequences, and
-                            visual artists embraced the Fibonacci spiral for its pleasing proportions.
-                            Nature is replete with patterns aligned with Fibonacci numbers—from flower petals to
-                            hurricane spirals and animal horns.
-                        </p>
-                    </section>
-
-                    <section>
-                        <h3>Further Generalizations</h3>
-                        <p>Fibonacci numbers can also be extended into areas such as:</p>
-                        <ul>
-                            <li><strong>Complex numbers:</strong> Using the same recurrence formula F(z) =
-                                F(z−1) + F(z−2)</li>
-                            <li><strong>Z-sequences and Zeckendorf representation:</strong> Every integer can be
-                                uniquely represented as the sum of non-consecutive Fibonacci numbers</li>
-                        </ul>
-                    </section>
-
-                    <footer>
-                        <h4>References</h4>
-                        <ol>
-                            <li><em><a href="https://en.wikipedia.org/wiki/Fibonacci_number">Fibonacci
-                                        number</a></em>. Wikipedia.</li>
-                            <li><em><a href="https://en.wikipedia.org/wiki/Golden_ratio">Golden
-                                        ratio</a></em>. Wikipedia.</li>
-                            <li><em><a href="https://oeis.org/A000045">Fibonacci Numbers
-                                        (A000045)</a></em>. The On-Line Encyclopedia
-                                of Integer Sequences.</li>
-                            <li><em><a href="https://mathworld.wolfram.com/FibonacciNumber.html">Fibonacci
-                                        number</a></em>. Wolfram Research.</li>
-                            <li>Knuth, D. E. (1997). <em>The Art of Computer Programming</em>, Vol. 1: Fundamental
-                                Algorithms. Addison-Wesley.</li>
-                            <li>Griesemer, R. (2004). Efficient computation of Fibonacci sequences. <em>IBM
-                                    Systems Journal</em>, 43(2), 207–221.</li>
-                        </ol>
-                    </footer>
-                </article>
-            </div>
-        </div>
+        </footer>
     </body>
 
 </html>
