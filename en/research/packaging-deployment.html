@@ -3,794 +3,1471 @@
 
     <head>
         <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <meta http-equiv="Content-Language" content="en" />
         <link rel="shortcut icon" href="../../images/logo/favicon.png" />
         <title>Packaging and Deployment: John Samuel</title>
-        <style type="text/css">
-            body {
-                background-color: #FFFFFF;
+        <style>
+            /* ===============================================
+           DESIGN TOKENS - DevOps Deployment Theme
+           =============================================== */
+            :root {
+                /* DevOps Color Palette - Pipeline Theme */
+                --color-base-bg: #f8f9fb;
+                --color-base-surface: #ffffff;
+                --color-base-text: #1e293b;
+                --color-base-text-muted: #475569;
+
+                /* Deployment Pipeline Accents */
+                --color-accent-1: #7c3aed;
+                /* Purple - development */
+                --color-accent-2: #2563eb;
+                /* Blue - testing */
+                --color-accent-3: #059669;
+                /* Green - production */
+                --color-accent-4: #dc2626;
+                /* Red - alerts */
+                --color-accent-5: #f59e0b;
+                /* Amber - staging */
+                --color-accent-light: #f5f3ff;
+
+                /* Functional Colors */
+                --color-shadow: rgba(124, 58, 237, 0.15);
+                --color-border: rgba(124, 58, 237, 0.12);
+                --color-hover: rgba(124, 58, 237, 0.06);
+
+                /* Gradients */
+                --gradient-primary: linear-gradient(135deg, #7c3aed 0%, #2563eb 100%);
+                --gradient-secondary: linear-gradient(135deg, #2563eb 0%, #059669 100%);
+                --gradient-pipeline: linear-gradient(135deg, #7c3aed 0%, #2563eb 50%, #059669 100%);
+                --gradient-subtle: linear-gradient(180deg, #f8f9fb 0%, #f5f3ff 100%);
+                --gradient-hero: linear-gradient(135deg, #6d28d9 0%, #7c3aed 30%, #2563eb 70%, #059669 100%);
+
+                /* Spacing Scale */
+                --space-xs: 0.25rem;
+                --space-sm: 0.5rem;
+                --space-md: 1rem;
+                --space-lg: 1.5rem;
+                --space-xl: 2rem;
+                --space-2xl: 3rem;
+                --space-3xl: 4rem;
+                --space-4xl: 6rem;
+
+                /* Border Radius */
+                --radius-sm: 6px;
+                --radius-md: 10px;
+                --radius-lg: 16px;
+                --radius-xl: 20px;
+                --radius-2xl: 28px;
+                --radius-full: 9999px;
+
+                /* Shadows */
+                --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.04), 0 1px 2px rgba(0, 0, 0, 0.06);
+                --shadow-md: 0 4px 8px rgba(0, 0, 0, 0.06), 0 2px 4px rgba(0, 0, 0, 0.08);
+                --shadow-lg: 0 12px 28px rgba(0, 0, 0, 0.1), 0 6px 12px rgba(0, 0, 0, 0.08);
+                --shadow-xl: 0 24px 48px rgba(0, 0, 0, 0.14), 0 12px 24px rgba(0, 0, 0, 0.1);
+                --shadow-theme: 0 12px 32px var(--color-shadow), 0 4px 12px rgba(0, 0, 0, 0.08);
+
+                /* Typography */
+                --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+                --font-mono: 'SF Mono', Monaco, 'Cascadia Code', 'Consolas', 'Courier New', monospace;
+
+                --text-xs: clamp(0.75rem, 0.7rem + 0.25vw, 0.875rem);
+                --text-sm: clamp(0.875rem, 0.8rem + 0.35vw, 1rem);
+                --text-base: clamp(1rem, 0.95rem + 0.25vw, 1.125rem);
+                --text-lg: clamp(1.125rem, 1.05rem + 0.35vw, 1.25rem);
+                --text-xl: clamp(1.25rem, 1.15rem + 0.5vw, 1.5rem);
+                --text-2xl: clamp(1.5rem, 1.3rem + 1vw, 2rem);
+                --text-3xl: clamp(2rem, 1.6rem + 2vw, 2.75rem);
+                --text-4xl: clamp(2.5rem, 2rem + 2.5vw, 3.5rem);
+
+                --weight-normal: 400;
+                --weight-medium: 500;
+                --weight-semibold: 600;
+                --weight-bold: 700;
+
+                --leading-tight: 1.25;
+                --leading-snug: 1.375;
+                --leading-normal: 1.5;
+                --leading-relaxed: 1.625;
             }
 
-            #sidebar {
-                position: fixed;
-                background-color: #1B80CF;
-                top: 0;
-                left: 0;
-                bottom: 0;
-                width: 30vw;
-            }
-
-            #sidebar .title {
-                position: relative;
-                text-align: center;
-                line-height: 4vmax;
-                font-size: 1.4vmax;
-                font-family: 'Arial';
-                margin-top: 25vh;
-            }
-
-            #sidebar .title a:link,
-            #sidebar .title a:visited {
-                color: #FFFFFF;
-                text-decoration: none;
-            }
-
-            .subtitle {
-                top: 50vh;
-                text-align: center;
-                line-height: 1.3vmax;
-                font-family: 'Arial';
-                font-size: 1.5vmax;
-                color: #FFFFFF;
-            }
-
-            .subtitle a:link,
-            .subtitle a:visited {
-                color: #FFFFFF;
-                text-decoration: none;
-            }
-
-            .licence {
-                position: fixed;
-                text-align: right;
-                bottom: 0;
-                right: 0;
-            }
-
-            .home {
-                position: fixed;
-                text-align: left;
-                font-family: 'Arial';
-                color: #D3D3D3;
-                z-index: 100;
-                width: 100%;
-                background-color: #FFFFFF;
-                top: 0px;
-                margin-bottom: 10px;
-                padding-bottom: 10px;
-            }
-
-            .home a:link,
-            .home a:visited {
-                text-decoration: none;
-                color: #D3D3D3;
-            }
-
-            .home ul {
+            /* ===============================================
+           RESET & BASE STYLES
+           =============================================== */
+            *,
+            *::before,
+            *::after {
                 margin: 0;
                 padding: 0;
-                text-align: left;
-                list-style: none;
+                box-sizing: border-box;
             }
 
-            .home li {
-                position: relative;
-                float: left;
-                padding-top: 15px;
-                margin-right: 1em;
-                font-family: 'Arial';
+            html {
+                scroll-behavior: smooth;
+                scroll-padding-top: 100px;
             }
 
-            .home li:hover {
-                display: block;
+            body {
+                font-family: var(--font-sans);
+                font-size: var(--text-base);
+                line-height: var(--leading-normal);
+                color: var(--color-base-text);
+                background: var(--gradient-subtle);
+                background-attachment: fixed;
+                -webkit-font-smoothing: antialiased;
+                -moz-osx-font-smoothing: grayscale;
+                overflow-x: hidden;
             }
 
-            .home a:link,
-            .home a:visited {
-                color: #D3D3D3;
-            }
-
-            .home li:hover a:link,
-            .home li:hover a:visited {
+            /* Skip Link for Accessibility */
+            .skip-link {
+                position: absolute;
+                top: -100px;
+                left: var(--space-md);
+                background: var(--color-accent-1);
+                color: white;
+                padding: var(--space-sm) var(--space-lg);
+                border-radius: var(--radius-md);
                 text-decoration: none;
-                padding: 15px;
-                color: #FFFFFF;
-                background-color: #1B80CF;
+                font-weight: var(--weight-semibold);
+                z-index: 10000;
+                transition: top 0.3s;
             }
 
-            .content {
-                line-height: 1.8vmax;
-                font-size: 1.2vmax;
-                font-family: 'Arial';
-                margin-top: 15vh;
-                width: 90%;
+            .skip-link:focus {
+                top: var(--space-md);
             }
 
-            .content h2,
-            h3,
-            h4 {
-                color: #1B80CF;
+            /* ===============================================
+           LAYOUT CONTAINER
+           =============================================== */
+            .page-container {
+                min-height: 100vh;
+                position: relative;
             }
 
-            .content a:link,
-            .content a:visited {
-                color: #1B80CF;
-            }
-
-            .content h3 {
-                color: #1B80CF;
-            }
-
-            .content h2::before,
-            .content h3::before {
-                display: block;
-                content: " ";
-                visibility: hidden;
-                height: 50px;
-                margin-top: -50px;
+            /* Animated Background Pattern - Pipeline Flow */
+            .page-container::before {
+                content: '';
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background-image:
+                    linear-gradient(90deg, rgba(124, 58, 237, 0.03) 1px, transparent 1px),
+                    linear-gradient(rgba(124, 58, 237, 0.03) 1px, transparent 1px);
+                background-size: 50px 50px;
                 pointer-events: none;
-                background-color: #FFFFFF;
+                z-index: 0;
+                animation: flowPattern 30s linear infinite;
             }
 
-            .content a:link,
-            .content a:visited {
-                color: #1B80CF;
+            @keyframes flowPattern {
+                0% {
+                    transform: translate(0, 0);
+                }
+
+                100% {
+                    transform: translate(50px, 50px);
+                }
             }
 
-            .content li {
-                margin: 5px;
+            /* Floating Particles */
+            .page-container::after {
+                content: '';
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background-image:
+                    radial-gradient(circle at 20% 30%, rgba(124, 58, 237, 0.05) 0%, transparent 50%),
+                    radial-gradient(circle at 80% 70%, rgba(37, 99, 235, 0.05) 0%, transparent 50%),
+                    radial-gradient(circle at 40% 80%, rgba(5, 150, 105, 0.05) 0%, transparent 50%);
+                pointer-events: none;
+                z-index: 0;
             }
 
-            .page {
-                width: 65vw;
-                height: 100%;
-                margin-left: 30vw;
+            /* ===============================================
+           NAVIGATION
+           =============================================== */
+            .navigation {
+                position: sticky;
+                top: 0;
+                z-index: 1000;
+                background: rgba(255, 255, 255, 0.85);
+                -webkit-backdrop-filter: blur(16px) saturate(180%);
+                backdrop-filter: blur(16px) saturate(180%);
+                border-bottom: 1px solid var(--color-border);
+                box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
+                animation: slideDown 0.6s ease-out;
+            }
+
+            @keyframes slideDown {
+                from {
+                    transform: translateY(-100%);
+                    opacity: 0;
+                }
+
+                to {
+                    transform: translateY(0);
+                    opacity: 1;
+                }
+            }
+
+            .nav-container {
+                max-width: 1400px;
+                margin: 0 auto;
+                padding: var(--space-lg) var(--space-xl);
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                gap: var(--space-xl);
+            }
+
+            .site-name {
+                font-size: var(--text-xl);
+                font-weight: var(--weight-bold);
+                letter-spacing: -0.02em;
+            }
+
+            .site-name a {
+                color: var(--color-base-text);
+                text-decoration: none;
+                background: var(--gradient-primary);
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                background-clip: text;
+                transition: all 0.3s ease;
+                position: relative;
+            }
+
+            .site-name a::after {
+                content: '';
+                position: absolute;
+                bottom: -4px;
+                left: 0;
+                width: 100%;
+                height: 3px;
+                background: var(--gradient-primary);
+                transform: scaleX(0);
+                transform-origin: right;
+                transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+                border-radius: 2px;
+            }
+
+            .site-name a:hover::after {
+                transform: scaleX(1);
+                transform-origin: left;
+            }
+
+            .breadcrumbs {
+                display: flex;
+                align-items: center;
+                gap: var(--space-sm);
+                list-style: none;
+                flex-wrap: wrap;
+            }
+
+            .breadcrumbs li {
+                display: flex;
+                align-items: center;
+                font-size: var(--text-sm);
+            }
+
+            .breadcrumbs li:not(:last-child)::after {
+                content: '→';
+                margin-left: var(--space-sm);
+                color: var(--color-accent-1);
+                font-weight: var(--weight-bold);
+            }
+
+            .breadcrumbs a {
+                color: var(--color-base-text-muted);
+                text-decoration: none;
+                padding: var(--space-xs) var(--space-md);
+                border-radius: var(--radius-sm);
+                transition: all 0.3s ease;
+                position: relative;
+            }
+
+            .breadcrumbs a:hover {
+                color: var(--color-accent-1);
+                background: var(--color-hover);
+            }
+
+            /* ===============================================
+           HERO SECTION
+           =============================================== */
+            .hero {
+                position: relative;
+                max-width: 1400px;
+                margin: 0 auto;
+                padding: var(--space-4xl) var(--space-xl) var(--space-3xl);
                 overflow: hidden;
-                padding: 0 1em;
-                font-family: 'Arial';
             }
 
-            .page img {
-                max-width: 100%;
-                max-height: 100%;
+            .hero-content {
+                position: relative;
+                z-index: 2;
+                text-align: center;
+                max-width: 900px;
+                margin: 0 auto;
+                animation: fadeInUp 0.8s ease-out 0.2s both;
+            }
+
+            @keyframes fadeInUp {
+                from {
+                    opacity: 0;
+                    transform: translateY(30px);
+                }
+
+                to {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            }
+
+            .page-title {
+                font-size: var(--text-4xl);
+                font-weight: var(--weight-bold);
+                letter-spacing: -0.03em;
+                line-height: var(--leading-tight);
+                margin-bottom: var(--space-lg);
+                background: var(--gradient-hero);
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                background-clip: text;
+                background-size: 200% 200%;
+                animation: gradientShift 8s ease infinite;
+            }
+
+            @keyframes gradientShift {
+
+                0%,
+                100% {
+                    background-position: 0% 50%;
+                }
+
+                50% {
+                    background-position: 100% 50%;
+                }
+            }
+
+            .page-subtitle {
+                font-size: var(--text-lg);
+                color: var(--color-base-text-muted);
+                line-height: var(--leading-relaxed);
+                max-width: 800px;
+                margin: 0 auto var(--space-2xl);
+            }
+
+            /* SVG Illustration Container */
+            .hero-illustration {
+                max-width: 800px;
+                margin: var(--space-3xl) auto 0;
+                animation: fadeInUp 1s ease-out 0.4s both;
+            }
+
+            /* ===============================================
+           MAIN CONTENT
+           =============================================== */
+            .main-content {
+                max-width: 1400px;
+                margin: 0 auto;
+                padding: 0 var(--space-xl) var(--space-4xl);
+                position: relative;
+                z-index: 1;
+            }
+
+            /* Intro Section */
+            .section-intro {
+                background: rgba(255, 255, 255, 0.8);
+                -webkit-backdrop-filter: blur(12px) saturate(180%);
+                backdrop-filter: blur(12px) saturate(180%);
+                border: 1px solid var(--color-border);
+                border-radius: var(--radius-2xl);
+                padding: var(--space-2xl);
+                margin-bottom: var(--space-3xl);
+                box-shadow: var(--shadow-theme);
+                font-size: var(--text-lg);
+                line-height: var(--leading-relaxed);
+                color: var(--color-base-text-muted);
+                border-left: 4px solid var(--color-accent-1);
+            }
+
+            /* Section Styling */
+            .content-section {
+                background: rgba(255, 255, 255, 0.7);
+                -webkit-backdrop-filter: blur(12px) saturate(180%);
+                backdrop-filter: blur(12px) saturate(180%);
+                border: 1px solid rgba(255, 255, 255, 0.3);
+                border-radius: var(--radius-2xl);
+                padding: var(--space-3xl) var(--space-2xl);
+                margin-bottom: var(--space-2xl);
+                box-shadow: var(--shadow-theme);
+                transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+                animation: fadeInUp 0.8s ease-out both;
+            }
+
+            .content-section:hover {
+                transform: translateY(-4px);
+                box-shadow: 0 16px 40px var(--color-shadow), 0 8px 16px rgba(0, 0, 0, 0.1);
+            }
+
+            /* Section Headings */
+            h2 {
+                font-size: var(--text-3xl);
+                font-weight: var(--weight-bold);
+                letter-spacing: -0.02em;
+                color: var(--color-base-text);
+                margin-bottom: var(--space-2xl);
+                position: relative;
+                display: inline-block;
+            }
+
+            h2::after {
+                content: '';
+                position: absolute;
+                bottom: -8px;
+                left: 0;
+                width: 60%;
+                height: 4px;
+                background: var(--gradient-primary);
+                border-radius: var(--radius-full);
+            }
+
+            h3 {
+                font-size: var(--text-xl);
+                font-weight: var(--weight-semibold);
+                color: var(--color-base-text);
+                margin: var(--space-2xl) 0 var(--space-lg);
+                display: flex;
+                align-items: center;
+                gap: var(--space-md);
+            }
+
+            h3::before {
+                content: '';
+                width: 6px;
+                height: 24px;
+                background: var(--gradient-pipeline);
+                border-radius: var(--radius-full);
+                flex-shrink: 0;
+            }
+
+            /* Paragraph Styling */
+            p {
+                margin-bottom: var(--space-lg);
+                line-height: var(--leading-relaxed);
+                color: var(--color-base-text-muted);
+            }
+
+            /* List Styling */
+            ul,
+            ol {
+                margin: var(--space-lg) 0;
+                padding-left: var(--space-xl);
+            }
+
+            li {
+                margin-bottom: var(--space-md);
+                line-height: var(--leading-relaxed);
+                color: var(--color-base-text-muted);
+            }
+
+            strong {
+                color: var(--color-accent-1);
+                font-weight: var(--weight-semibold);
+            }
+
+            em {
+                color: var(--color-accent-2);
+                font-style: normal;
+                font-weight: var(--weight-medium);
+            }
+
+            code {
+                font-family: var(--font-mono);
+                font-size: 0.9em;
+                background: linear-gradient(135deg, rgba(124, 58, 237, 0.08), rgba(37, 99, 235, 0.08));
+                padding: 0.2em 0.5em;
+                border-radius: var(--radius-sm);
+                color: var(--color-accent-1);
+            }
+
+            /* Special Boxes */
+            .key-points,
+            .best-practices,
+            .warning {
+                background: linear-gradient(135deg, rgba(124, 58, 237, 0.05), rgba(37, 99, 235, 0.05));
+                border-left: 4px solid var(--color-accent-1);
+                border-radius: var(--radius-lg);
+                padding: var(--space-xl);
+                margin: var(--space-xl) 0;
             }
 
             .best-practices {
-                background: #f0f8f0;
-                padding: 15px;
-                border-left: 4px solid #27ae60;
-                margin: 20px 0;
+                border-left-color: var(--color-accent-3);
+                background: linear-gradient(135deg, rgba(5, 150, 105, 0.05), rgba(37, 99, 235, 0.05));
             }
 
+            .warning {
+                border-left-color: var(--color-accent-4);
+                background: linear-gradient(135deg, rgba(220, 38, 38, 0.05), rgba(245, 158, 11, 0.05));
+            }
+
+            .key-points h3,
+            .best-practices h3 {
+                margin-top: 0;
+            }
+
+            .key-points h3::before,
+            .best-practices h3::before {
+                display: none;
+            }
+
+            /* Code Examples */
             .code-example {
-                background: #f4f4f4;
-                padding: 5px;
-                border-radius: 5px;
-                margin: 5px 0;
-                font-family: 'Courier New', monospace;
-                border-left: 4px solid #27ae60;
+                font-family: var(--font-mono);
+                font-size: var(--text-sm);
+                background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+                color: #e2e8f0;
+                padding: var(--space-xl);
+                border-radius: var(--radius-lg);
+                overflow-x: auto;
+                margin: var(--space-xl) 0;
+                box-shadow: var(--shadow-lg);
+                line-height: 1.6;
+                border: 1px solid rgba(124, 58, 237, 0.2);
             }
 
+            /* Tables */
             table {
                 width: 100%;
                 border-collapse: collapse;
-                margin: 20px 0;
-            }
-
-            th,
-            td {
-                border: 1px solid #ddd;
-                padding: 12px;
-                text-align: left;
+                margin: var(--space-xl) 0;
+                background: rgba(255, 255, 255, 0.5);
+                border-radius: var(--radius-lg);
+                overflow: hidden;
+                box-shadow: var(--shadow-md);
             }
 
             th {
-                background-color: #3498db;
+                background: var(--gradient-primary);
                 color: white;
+                padding: var(--space-lg);
+                text-align: left;
+                font-weight: var(--weight-semibold);
             }
 
-            @media (max-width: 640px),
-            screen and (orientation: portrait) {
-                body {
-                    max-width: 100%;
-                    max-height: 100%;
-                }
+            td {
+                padding: var(--space-lg);
+                border-bottom: 1px solid rgba(124, 58, 237, 0.1);
+            }
 
-                #sidebar {
-                    position: fixed;
-                    background-color: #1B80CF;
-                    top: 0;
-                    left: 0;
-                    bottom: 80vh;
-                    width: 100vw;
-                }
+            tr:hover {
+                background: rgba(124, 58, 237, 0.03);
+            }
 
-                #sidebar .title {
+            /* References */
+            .references {
+                background: rgba(255, 255, 255, 0.6);
+                -webkit-backdrop-filter: blur(12px) saturate(180%);
+                backdrop-filter: blur(12px) saturate(180%);
+                border: 1px solid var(--color-border);
+                border-radius: var(--radius-2xl);
+                padding: var(--space-3xl) var(--space-2xl);
+                margin-top: var(--space-4xl);
+                box-shadow: var(--shadow-lg);
+            }
+
+            .references li {
+                margin-bottom: var(--space-md);
+            }
+
+            .references a {
+                color: var(--color-accent-1);
+                text-decoration: none;
+                font-weight: var(--weight-medium);
+                transition: all 0.3s ease;
+            }
+
+            .references a:hover {
+                color: var(--color-accent-2);
+                text-decoration: underline;
+            }
+
+            /* ===============================================
+           FOOTER
+           =============================================== */
+            .footer {
+                background: rgba(255, 255, 255, 0.9);
+                -webkit-backdrop-filter: blur(16px) saturate(180%);
+                backdrop-filter: blur(16px) saturate(180%);
+                border-top: 1px solid var(--color-border);
+                padding: var(--space-2xl) var(--space-xl);
+                margin-top: var(--space-4xl);
+                position: relative;
+                z-index: 10;
+            }
+
+            .footer-container {
+                max-width: 1400px;
+                margin: 0 auto;
+                text-align: center;
+            }
+
+            .footer-content {
+                font-size: var(--text-sm);
+                color: var(--color-base-text-muted);
+                margin-bottom: var(--space-lg);
+            }
+
+            .language-selector {
+                display: flex;
+                gap: var(--space-md);
+                justify-content: center;
+                flex-wrap: wrap;
+                margin-top: var(--space-lg);
+            }
+
+            .language-link {
+                padding: var(--space-sm) var(--space-lg);
+                background: linear-gradient(135deg, rgba(124, 58, 237, 0.1), rgba(37, 99, 235, 0.1));
+                border: 1px solid var(--color-border);
+                border-radius: var(--radius-full);
+                color: var(--color-accent-1);
+                text-decoration: none;
+                font-size: var(--text-sm);
+                font-weight: var(--weight-medium);
+                transition: all 0.3s ease;
+            }
+
+            .language-link:hover {
+                background: var(--gradient-primary);
+                color: white;
+                transform: translateY(-2px);
+                box-shadow: var(--shadow-md);
+            }
+
+            /* ===============================================
+           RESPONSIVE DESIGN
+           =============================================== */
+            @media (max-width: 768px) {
+                .nav-container {
+                    flex-direction: column;
+                    gap: var(--space-md);
                     text-align: center;
-                    position: fixed;
-                    margin-top: 6vh;
-                    left: 0px;
-                    right: 0px;
-                    line-height: 3.5vmax;
-                    font-size: 1.5vmax;
-                    font-family: 'Arial';
                 }
 
-                #sidebar .subtitle {
-                    text-align: center;
-                    top: 5vh;
-                    left: 0px;
-                    right: 0px;
-                    position: fixed;
-                    margin-top: 10vh;
-                    font-size: 1.5vmax;
+                .breadcrumbs {
+                    justify-content: center;
                 }
 
-                #sidebar .title a:link,
-                #sidebar .title a:visited {
-                    text-align: center;
-                    color: #FFFFFF;
+                .hero {
+                    padding: var(--space-3xl) var(--space-lg) var(--space-2xl);
                 }
 
-                #sidebar .subtitle a:link,
-                #sidebar .subtitle a:visited {
-                    text-align: center;
-                    color: #FFFFFF;
+                .main-content {
+                    padding: 0 var(--space-lg) var(--space-3xl);
                 }
 
-                .home {
-                    z-index: 100;
-                    width: 100%;
-                    background-color: #1B80CF;
-                    font-size: 1.5vmax;
+                .content-section,
+                .section-intro {
+                    padding: var(--space-xl) var(--space-lg);
                 }
 
-                .home a:link,
-                .home a:visited {
-                    text-decoration: none;
-                    color: #FFFFFF;
+                .code-example {
+                    font-size: var(--text-xs);
+                    padding: var(--space-lg);
                 }
 
-                .content {
-                    line-height: 3.8vmax;
-                    font-size: 1.8vmax;
-                    font-family: 'Arial';
-                    margin-top: 22vh;
+                table {
+                    font-size: var(--text-sm);
                 }
 
-                .content a:link,
-                .content a:visited {
-                    color: #1B80CF;
+                th,
+                td {
+                    padding: var(--space-md);
                 }
+            }
 
-                .page {
-                    top: 40vh;
-                    width: 95%;
-                    margin-left: 0vw;
+            /* ===============================================
+           ACCESSIBILITY
+           =============================================== */
+            @media (prefers-reduced-motion: reduce) {
+
+                *,
+                *::before,
+                *::after {
+                    animation-duration: 0.01ms !important;
+                    animation-iteration-count: 1 !important;
+                    transition-duration: 0.01ms !important;
                 }
+            }
 
-                .page img {
-                    max-width: 100%;
-                    max-height: 100%;
-                    border: 0;
-                }
+            /* Focus States */
+            a:focus-visible,
+            button:focus-visible {
+                outline: 3px solid var(--color-accent-1);
+                outline-offset: 3px;
+                border-radius: var(--radius-sm);
+            }
 
-
+            /* Selection */
+            ::selection {
+                background: var(--color-accent-1);
+                color: white;
             }
         </style>
     </head>
 
-    <body vocab="http://schema.org/">
-        <div class="page">
-            <div class="home">
-                <ul typeof="BreadcrumbList">
-                    <li property="itemListElement" typeof="ListItem">
-                        <a property="item" typeof="WebPage" href="../index.html">
-                            <span property="name">Home</span>
-                        </a>
-                    </li>
-                    <li property="itemListElement" typeof="ListItem">
-                        <a property="item" typeof="WebPage" href="../research/research.html">
-                            <span property="name">Research</span>
-                        </a>
-                    </li>
-                </ul>
+    <body>
+        <a href="#main-content" class="skip-link">Skip to main content</a>
 
-            </div>
-            <div id="sidebar">
-                <div class="title">
-                    <h1><a href="./packaging-deployment.html">Packaging and Deployment</a></h1>
+        <div class="page-container">
+            <!-- Navigation -->
+            <nav class="navigation" role="navigation" aria-label="Main navigation">
+                <div class="nav-container">
+                    <div class="site-name">
+                        <a href="../index.html">John Samuel</a>
+                    </div>
+                    <ul class="breadcrumbs" vocab="http://schema.org/" typeof="BreadcrumbList">
+                        <li property="itemListElement" typeof="ListItem">
+                            <a property="item" typeof="WebPage" href="../index.html">
+                                <span property="name">Home</span>
+                            </a>
+                        </li>
+                        <li property="itemListElement" typeof="ListItem">
+                            <a property="item" typeof="WebPage" href="../research/research.html">
+                                <span property="name">Research</span>
+                            </a>
+                        </li>
+                        <li property="itemListElement" typeof="ListItem">
+                            <a property="item" typeof="WebPage" href="./packaging-deployment.html">
+                                <span property="name">Packaging and Deployment</span>
+                            </a>
+                        </li>
+                    </ul>
                 </div>
-                <div class="subtitle">
-                    <h3><a href="../about.html">John Samuel</a></h3>
+            </nav>
+
+            <!-- Hero Section -->
+            <header class="hero">
+                <div class="hero-content">
+                    <h1 class="page-title">Packaging and Deployment</h1>
+                    <p class="page-subtitle">Packaging and Deployment in Modern Software Development</p>
                 </div>
-            </div>
 
-            <div class="content">
-                <h2>Packaging and Deployment in Modern Software Development</h2>
+                <!-- SVG Illustration - CI/CD Pipeline -->
+                <div class="hero-illustration">
+                    <svg viewBox="0 0 800 300" xmlns="http://www.w3.org/2000/svg" role="img" aria-hidden="true">
+                        <defs>
+                            <!-- Gradients -->
+                            <linearGradient id="pipelineGrad1" x1="0%" y1="0%" x2="100%" y2="0%">
+                                <stop offset="0%" style="stop-color:#7c3aed;stop-opacity:1" />
+                                <stop offset="100%" style="stop-color:#2563eb;stop-opacity:1" />
+                            </linearGradient>
+                            <linearGradient id="pipelineGrad2" x1="0%" y1="0%" x2="100%" y2="0%">
+                                <stop offset="0%" style="stop-color:#2563eb;stop-opacity:1" />
+                                <stop offset="100%" style="stop-color:#059669;stop-opacity:1" />
+                            </linearGradient>
+                            <linearGradient id="pipelineGrad3" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" style="stop-color:#7c3aed;stop-opacity:1" />
+                                <stop offset="50%" style="stop-color:#2563eb;stop-opacity:1" />
+                                <stop offset="100%" style="stop-color:#059669;stop-opacity:1" />
+                            </linearGradient>
 
+                            <!-- Glow Filter -->
+                            <filter id="pipelineGlow">
+                                <feGaussianBlur stdDeviation="3" result="coloredBlur" />
+                                <feMerge>
+                                    <feMergeNode in="coloredBlur" />
+                                    <feMergeNode in="SourceGraphic" />
+                                </feMerge>
+                            </filter>
+                        </defs>
+
+                        <!-- Pipeline Flow Line -->
+                        <path d="M 50 150 L 750 150" stroke="url(#pipelineGrad3)" stroke-width="3" opacity="0.3"
+                            stroke-dasharray="10,5">
+                            <animate attributeName="stroke-dashoffset" from="0" to="15" dur="2s"
+                                repeatCount="indefinite" />
+                        </path>
+
+                        <!-- Stage 1: Development -->
+                        <g>
+                            <circle cx="100" cy="150" r="40" fill="url(#pipelineGrad1)" opacity="0.2"
+                                filter="url(#pipelineGlow)">
+                                <animate attributeName="r" values="40;45;40" dur="3s" repeatCount="indefinite" />
+                            </circle>
+                            <circle cx="100" cy="150" r="30" fill="white" stroke="url(#pipelineGrad1)"
+                                stroke-width="3" />
+                            <text x="100" y="155" text-anchor="middle" fill="#7c3aed" font-size="14"
+                                font-weight="600">DEV</text>
+                            <text x="100" y="200" text-anchor="middle" fill="#7c3aed" font-size="12">Development</text>
+
+                            <!-- Code Icon -->
+                            <path d="M 90 140 L 85 145 L 90 150" fill="none" stroke="#7c3aed" stroke-width="2"
+                                stroke-linecap="round" />
+                            <path d="M 110 140 L 115 145 L 110 150" fill="none" stroke="#7c3aed" stroke-width="2"
+                                stroke-linecap="round" />
+                        </g>
+
+                        <!-- Arrow 1 -->
+                        <g>
+                            <line x1="140" y1="150" x2="200" y2="150" stroke="url(#pipelineGrad1)" stroke-width="3"
+                                opacity="0.6">
+                                <animate attributeName="x2" values="140;200;140" dur="2s" repeatCount="indefinite" />
+                            </line>
+                            <polygon points="200,150 195,145 195,155" fill="#7c3aed" opacity="0.8">
+                                <animate attributeName="opacity" values="0.8;0.3;0.8" dur="2s"
+                                    repeatCount="indefinite" />
+                            </polygon>
+                        </g>
+
+                        <!-- Stage 2: Build -->
+                        <g>
+                            <circle cx="250" cy="150" r="40" fill="url(#pipelineGrad1)" opacity="0.2"
+                                filter="url(#pipelineGlow)">
+                                <animate attributeName="r" values="40;45;40" dur="3.5s" repeatCount="indefinite" />
+                            </circle>
+                            <circle cx="250" cy="150" r="30" fill="white" stroke="url(#pipelineGrad1)"
+                                stroke-width="3" />
+                            <text x="250" y="155" text-anchor="middle" fill="#2563eb" font-size="14"
+                                font-weight="600">BUILD</text>
+                            <text x="250" y="200" text-anchor="middle" fill="#2563eb" font-size="12">Packaging</text>
+
+                            <!-- Package Icon -->
+                            <rect x="240" y="140" width="20" height="20" fill="none" stroke="#2563eb" stroke-width="2"
+                                rx="2" />
+                            <line x1="240" y1="150" x2="260" y2="150" stroke="#2563eb" stroke-width="2" />
+                            <line x1="250" y1="140" x2="250" y2="160" stroke="#2563eb" stroke-width="2" />
+                        </g>
+
+                        <!-- Arrow 2 -->
+                        <g>
+                            <line x1="290" y1="150" x2="350" y2="150" stroke="url(#pipelineGrad1)" stroke-width="3"
+                                opacity="0.6">
+                                <animate attributeName="x2" values="290;350;290" dur="2.5s" repeatCount="indefinite" />
+                            </line>
+                            <polygon points="350,150 345,145 345,155" fill="#2563eb" opacity="0.8">
+                                <animate attributeName="opacity" values="0.8;0.3;0.8" dur="2.5s"
+                                    repeatCount="indefinite" />
+                            </polygon>
+                        </g>
+
+                        <!-- Stage 3: Test -->
+                        <g>
+                            <circle cx="400" cy="150" r="40" fill="url(#pipelineGrad2)" opacity="0.2"
+                                filter="url(#pipelineGlow)">
+                                <animate attributeName="r" values="40;45;40" dur="4s" repeatCount="indefinite" />
+                            </circle>
+                            <circle cx="400" cy="150" r="30" fill="white" stroke="url(#pipelineGrad2)"
+                                stroke-width="3" />
+                            <text x="400" y="155" text-anchor="middle" fill="#2563eb" font-size="14"
+                                font-weight="600">TEST</text>
+                            <text x="400" y="200" text-anchor="middle" fill="#2563eb" font-size="12">Validation</text>
+
+                            <!-- Checkmark Icon -->
+                            <path d="M 390 150 L 395 155 L 410 140" fill="none" stroke="#2563eb" stroke-width="2.5"
+                                stroke-linecap="round">
+                                <animate attributeName="opacity" values="0;1;0" dur="3s" repeatCount="indefinite" />
+                            </path>
+                        </g>
+
+                        <!-- Arrow 3 -->
+                        <g>
+                            <line x1="440" y1="150" x2="500" y2="150" stroke="url(#pipelineGrad2)" stroke-width="3"
+                                opacity="0.6">
+                                <animate attributeName="x2" values="440;500;440" dur="3s" repeatCount="indefinite" />
+                            </line>
+                            <polygon points="500,150 495,145 495,155" fill="#2563eb" opacity="0.8">
+                                <animate attributeName="opacity" values="0.8;0.3;0.8" dur="3s"
+                                    repeatCount="indefinite" />
+                            </polygon>
+                        </g>
+
+                        <!-- Stage 4: Deploy -->
+                        <g>
+                            <circle cx="550" cy="150" r="40" fill="url(#pipelineGrad2)" opacity="0.2"
+                                filter="url(#pipelineGlow)">
+                                <animate attributeName="r" values="40;45;40" dur="4.5s" repeatCount="indefinite" />
+                            </circle>
+                            <circle cx="550" cy="150" r="30" fill="white" stroke="url(#pipelineGrad2)"
+                                stroke-width="3" />
+                            <text x="550" y="155" text-anchor="middle" fill="#059669" font-size="14"
+                                font-weight="600">DEPLOY</text>
+                            <text x="550" y="200" text-anchor="middle" fill="#059669" font-size="12">Staging</text>
+
+                            <!-- Upload Icon -->
+                            <path d="M 550 155 L 550 145 M 545 148 L 550 143 L 555 148" fill="none" stroke="#059669"
+                                stroke-width="2" stroke-linecap="round" />
+                            <line x1="542" y1="157" x2="558" y2="157" stroke="#059669" stroke-width="2"
+                                stroke-linecap="round" />
+                        </g>
+
+                        <!-- Arrow 4 -->
+                        <g>
+                            <line x1="590" y1="150" x2="650" y2="150" stroke="url(#pipelineGrad2)" stroke-width="3"
+                                opacity="0.6">
+                                <animate attributeName="x2" values="590;650;590" dur="3.5s" repeatCount="indefinite" />
+                            </line>
+                            <polygon points="650,150 645,145 645,155" fill="#059669" opacity="0.8">
+                                <animate attributeName="opacity" values="0.8;0.3;0.8" dur="3.5s"
+                                    repeatCount="indefinite" />
+                            </polygon>
+                        </g>
+
+                        <!-- Stage 5: Production -->
+                        <g>
+                            <circle cx="700" cy="150" r="40" fill="url(#pipelineGrad2)" opacity="0.2"
+                                filter="url(#pipelineGlow)">
+                                <animate attributeName="r" values="40;45;40" dur="5s" repeatCount="indefinite" />
+                            </circle>
+                            <circle cx="700" cy="150" r="30" fill="white" stroke="url(#pipelineGrad2)"
+                                stroke-width="3" />
+                            <text x="700" y="155" text-anchor="middle" fill="#059669" font-size="14"
+                                font-weight="600">PROD</text>
+                            <text x="700" y="200" text-anchor="middle" fill="#059669" font-size="12">Production</text>
+
+                            <!-- Success Star -->
+                            <circle cx="700" cy="150" r="8" fill="none" stroke="#059669" stroke-width="2">
+                                <animate attributeName="r" values="6;10;6" dur="2s" repeatCount="indefinite" />
+                                <animate attributeName="opacity" values="1;0.4;1" dur="2s" repeatCount="indefinite" />
+                            </circle>
+                        </g>
+
+                        <!-- Container Icons Below Pipeline -->
+                        <g>
+                            <!-- Container 1 -->
+                            <rect x="120" y="240" width="50" height="40" rx="4" fill="url(#pipelineGrad1)"
+                                opacity="0.15" stroke="#7c3aed" stroke-width="2">
+                                <animate attributeName="y" values="240;235;240" dur="3s" repeatCount="indefinite" />
+                            </rect>
+                            <rect x="127" y="247" width="36" height="26" fill="none" stroke="#7c3aed" stroke-width="1.5"
+                                stroke-dasharray="2,2" />
+
+                            <!-- Container 2 -->
+                            <rect x="375" y="240" width="50" height="40" rx="4" fill="url(#pipelineGrad2)"
+                                opacity="0.15" stroke="#2563eb" stroke-width="2">
+                                <animate attributeName="y" values="240;237;240" dur="3.5s" repeatCount="indefinite" />
+                            </rect>
+                            <rect x="382" y="247" width="36" height="26" fill="none" stroke="#2563eb" stroke-width="1.5"
+                                stroke-dasharray="2,2" />
+
+                            <!-- Container 3 -->
+                            <rect x="630" y="240" width="50" height="40" rx="4" fill="url(#pipelineGrad2)"
+                                opacity="0.15" stroke="#059669" stroke-width="2">
+                                <animate attributeName="y" values="240;238;240" dur="4s" repeatCount="indefinite" />
+                            </rect>
+                            <rect x="637" y="247" width="36" height="26" fill="none" stroke="#059669" stroke-width="1.5"
+                                stroke-dasharray="2,2" />
+                        </g>
+
+                        <!-- Status Indicators -->
+                        <g>
+                            <circle cx="100" cy="100" r="5" fill="#7c3aed">
+                                <animate attributeName="opacity" values="1;0.3;1" dur="2s" repeatCount="indefinite" />
+                            </circle>
+                            <circle cx="250" cy="100" r="5" fill="#2563eb">
+                                <animate attributeName="opacity" values="1;0.3;1" dur="2.5s" repeatCount="indefinite" />
+                            </circle>
+                            <circle cx="400" cy="100" r="5" fill="#2563eb">
+                                <animate attributeName="opacity" values="1;0.3;1" dur="3s" repeatCount="indefinite" />
+                            </circle>
+                            <circle cx="550" cy="100" r="5" fill="#059669">
+                                <animate attributeName="opacity" values="1;0.3;1" dur="3.5s" repeatCount="indefinite" />
+                            </circle>
+                            <circle cx="700" cy="100" r="5" fill="#059669">
+                                <animate attributeName="opacity" values="1;0.3;1" dur="4s" repeatCount="indefinite" />
+                            </circle>
+                        </g>
+                    </svg>
+                </div>
+            </header>
+
+            <!-- Main Content -->
+            <main id="main-content" class="main-content">
                 <p class="section-intro">
-                    In today's rapidly evolving software landscape, effective packaging and deployment
-                    strategies are critical for DevOps engineers, software developers, and system
-                    administrators. This article explores both traditional package management
-                    systems and modern containerized deployment approaches, providing practical insights for
-                    enterprise-scale operations, cloud-native solutions, and cross-platform considerations.
+                    In today's rapidly evolving software landscape, effective packaging and deployment strategies are
+                    critical for DevOps engineers, software developers, and system administrators. This article explores
+                    both traditional package management systems and modern containerized deployment approaches,
+                    providing practical insights for enterprise-scale operations, cloud-native solutions, and
+                    cross-platform considerations.
                 </p>
 
-                <h3>1. Introduction to Package Management and Deployment</h3>
+                <section class="content-section">
+                    <h3>1. Introduction to Package Management and Deployment</h3>
 
-                <p>Package management and deployment form the backbone of modern software distribution and
-                    execution. A <strong>package manager</strong> is a collection of software tools that
-                    automates the process of installing, upgrading, configuring, and removing computer
-                    programs in a consistent manner. These systems handle packages—distributions of software
-                    and data in archive files containing metadata such as version numbers, dependencies, and
-                    installation instructions.</p>
+                    <p>Package management and deployment form the backbone of modern software distribution and
+                        execution. A <strong>package manager</strong> is a collection of software tools that automates
+                        the process of installing, upgrading, configuring, and removing computer programs in a
+                        consistent manner. These systems handle packages—distributions of software and data in archive
+                        files containing metadata such as version numbers, dependencies, and installation instructions.
+                    </p>
 
-                <p>Modern deployment encompasses everything from traditional system-level package
-                    installation to sophisticated containerized orchestration platforms. The evolution from
-                    monolithic deployments to microservices architectures has fundamentally transformed how
-                    we approach software packaging and distribution.</p>
+                    <p>Modern deployment encompasses everything from traditional system-level package installation to
+                        sophisticated containerized orchestration platforms. The evolution from monolithic deployments
+                        to microservices architectures has fundamentally transformed how we approach software packaging
+                        and distribution.</p>
 
-                <div class="key-points">
-                    <h3>Key Components of Modern Packaging Systems:</h3>
-                    <ul>
-                        <li><strong>Package Repositories:</strong> Centralized storage systems for software
-                            packages</li>
-                        <li><strong>Dependency Resolution:</strong> Automatic handling of software
-                            dependencies</li>
-                        <li><strong>Version Management:</strong> Tracking and managing software versions
+                    <div class="key-points">
+                        <h3>Key Components of Modern Packaging Systems:</h3>
+                        <ul>
+                            <li><strong>Package Repositories:</strong> Centralized storage systems for software packages
+                            </li>
+                            <li><strong>Dependency Resolution:</strong> Automatic handling of software dependencies</li>
+                            <li><strong>Version Management:</strong> Tracking and managing software versions</li>
+                            <li><strong>Security Verification:</strong> Digital signatures and checksum validation</li>
+                            <li><strong>Configuration Management:</strong> Handling installation and runtime
+                                configurations</li>
+                        </ul>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h3>2. Traditional Package Management Systems</h3>
+
+                    <h3>2.1 Linux-Based Systems: Debian Package Management</h3>
+
+                    <p>The Debian package management ecosystem, centered around <code>.deb</code> packages, represents
+                        one of the most mature and widely-adopted package management systems in the Linux ecosystem. The
+                        system utilizes several key tools:</p>
+
+                    <table>
+                        <tr>
+                            <th>Tool</th>
+                            <th>Purpose</th>
+                            <th>Use Case</th>
+                        </tr>
+                        <tr>
+                            <td><strong>dpkg</strong></td>
+                            <td>Low-level package management</td>
+                            <td>Direct package installation and removal</td>
+                        </tr>
+                        <tr>
+                            <td><strong>apt</strong></td>
+                            <td>High-level package management</td>
+                            <td>Repository management and dependency resolution</td>
+                        </tr>
+                        <tr>
+                            <td><strong>aptitude</strong></td>
+                            <td>Advanced package management</td>
+                            <td>Interactive dependency resolution and conflict management</td>
+                        </tr>
+                    </table>
+
+                    <pre class="code-example"># Basic APT operations
+sudo apt update                # Update package lists
+sudo apt upgrade               # Upgrade installed packages
+sudo apt install package-name  # Install new package
+sudo apt remove package-name   # Remove package
+sudo apt autoremove            # Remove unused dependencies
+sudo apt search keyword        # Search for packages
+sudo apt show package-name     # Display package information</pre>
+
+                    <h3>2.2 Red Hat Package Manager (RPM) Ecosystem</h3>
+
+                    <p>Red Hat-based distributions utilize the RPM package format with tools like <code>yum</code>,
+                        <code>dnf</code>, and <code>zypper</code>. These systems provide similar functionality to APT
+                        but with different syntax and repository structures optimized for enterprise environments.
+                    </p>
+
+                    <h3>2.3 Language-Specific Package Managers</h3>
+
+                    <p>Modern development relies heavily on language-specific package managers that handle libraries and
+                        frameworks within programming ecosystems:</p>
+
+                    <div class="key-points">
+                        <h3>Popular Language-Specific Package Managers (2024):</h3>
+                        <ul>
+                            <li><strong>Node.js:</strong> npm, Yarn, pnpm, and Bun (emerging)</li>
+                            <li><strong>Python:</strong> pip, conda, poetry, and pixi</li>
+                            <li><strong>R:</strong> CRAN, Bioconductor, and r-lib ecosystem</li>
+                            <li><strong>Java:</strong> Maven, Gradle, and SBT</li>
+                            <li><strong>C#/.NET:</strong> NuGet and .NET CLI tools</li>
+                            <li><strong>Rust:</strong> Cargo</li>
+                            <li><strong>Go:</strong> Go modules</li>
+                        </ul>
+                    </div>
+
+                    <h3>2.4 CRAN: The R Package Ecosystem</h3>
+
+                    <p>The Comprehensive R Archive Network (CRAN) serves as the primary repository for R packages,
+                        particularly crucial in scientific computing environments. CRAN maintains strict quality
+                        standards and provides automated testing across multiple platforms.</p>
+
+                    <pre class="code-example"># CRAN package management in R
+install.packages("package_name")       # Install from CRAN
+install.packages("devtools")           # Development tools
+devtools::install_github("user/repo")  # Install from GitHub
+library(package_name)                  # Load package
+update.packages()                      # Update all packages
+remove.packages("package_name")        # Remove package</pre>
+                </section>
+
+                <section class="content-section">
+                    <h3>3. Modern Containerization and Orchestration</h3>
+
+                    <h3>3.1 Docker: Containerization Foundation</h3>
+
+                    <p>Docker has revolutionized application deployment by providing lightweight, portable containers
+                        that encapsulate applications and their dependencies. Dockerfiles define the build process for
+                        creating container images, ensuring consistent environments across development, testing, and
+                        production.</p>
+
+                    <pre class="code-example"># Example Dockerfile for a Node.js application
+FROM node:18-alpine
+
+WORKDIR /app
+
+# Copy package files
+COPY package*.json ./
+
+# Install dependencies
+RUN npm ci --only=production
+
+# Copy application code
+COPY src/ ./src/
+
+# Create non-root user
+RUN addgroup -g 1001 -S nodejs && \
+    adduser -S nextjs -u 1001
+
+USER nextjs
+
+EXPOSE 3000
+
+CMD ["npm", "start"]</pre>
+
+                    <div class="best-practices">
+                        <h3>Docker Best Practices:</h3>
+                        <ul>
+                            <li>Use multi-stage builds to minimize image size</li>
+                            <li>Implement proper layer caching strategies</li>
+                            <li>Run containers as non-root users</li>
+                            <li>Use official base images when possible</li>
+                            <li>Implement health checks for container monitoring</li>
+                            <li>Minimize the number of layers in your images</li>
+                        </ul>
+                    </div>
+
+                    <h3>3.2 Kubernetes: Container Orchestration at Scale</h3>
+
+                    <p>Kubernetes has emerged as the de facto standard for container orchestration, providing automated
+                        deployment, scaling, and management of containerized applications. <em>Kubernetes builds upon 15
+                            years of experience running production workloads at Google</em> and can scale without
+                        significantly increasing operational overhead.</p>
+
+                    <p>Key Kubernetes components include:</p>
+
+                    <div class="key-points">
+                        <ul>
+                            <li><strong>Pods:</strong> Smallest deployable units containing one or more containers</li>
+                            <li><strong>Deployments:</strong> Manage sets of identical pods with declarative updates
+                            </li>
+                            <li><strong>Services:</strong> Provide stable network endpoints for pod communication</li>
+                            <li><strong>ConfigMaps and Secrets:</strong> Manage configuration and sensitive data</li>
+                            <li><strong>Ingress:</strong> Manage external access to services</li>
+                            <li><strong>Persistent Volumes:</strong> Handle stateful application data</li>
+                        </ul>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h3>4. Cross-Platform and Distribution-Specific Considerations</h3>
+
+                    <h3>4.1 Platform Variability Challenges</h3>
+
+                    <p>Different operating systems and distributions have varying packaging requirements that must be
+                        addressed in enterprise environments:</p>
+
+                    <table>
+                        <tr>
+                            <th>Platform</th>
+                            <th>Package Format</th>
+                            <th>Key Considerations</th>
+                        </tr>
+                        <tr>
+                            <td>Ubuntu/Debian</td>
+                            <td>.deb</td>
+                            <td>APT repository management, PPA handling</td>
+                        </tr>
+                        <tr>
+                            <td>RHEL/CentOS/Fedora</td>
+                            <td>.rpm</td>
+                            <td>YUM/DNF repositories, SELinux policies</td>
+                        </tr>
+                        <tr>
+                            <td>macOS</td>
+                            <td>.pkg, .dmg</td>
+                            <td>Code signing, notarization requirements</td>
+                        </tr>
+                        <tr>
+                            <td>Windows</td>
+                            <td>.msi, .exe</td>
+                            <td>Windows Installer service, registry management</td>
+                        </tr>
+                        <tr>
+                            <td>Universal</td>
+                            <td>Container images</td>
+                            <td>Runtime compatibility, orchestration requirements</td>
+                        </tr>
+                    </table>
+
+                    <h3>4.2 Universal Package Formats</h3>
+
+                    <p>Several universal package formats have emerged to address cross-platform compatibility:</p>
+
+                    <div class="key-points">
+                        <ul>
+                            <li><strong>Snap:</strong> Ubuntu's universal package system with sandboxing</li>
+                            <li><strong>Flatpak:</strong> Desktop application distribution with runtime isolation</li>
+                            <li><strong>AppImage:</strong> Portable application format requiring no installation</li>
+                            <li><strong>Container Images:</strong> Platform-agnostic application packaging</li>
+                        </ul>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h3>5. Enterprise Deployment Strategies</h3>
+
+                    <h3>5.1 Blue-Green Deployments</h3>
+
+                    <p>Blue-green deployment strategies maintain two identical production environments (blue and green),
+                        allowing for zero-downtime deployments and instant rollbacks. This approach is particularly
+                        valuable in enterprise environments where service availability is critical.</p>
+
+                    <h3>5.2 Canary Releases</h3>
+
+                    <p>Canary deployments gradually roll out changes to a subset of users, allowing for risk mitigation
+                        and performance monitoring before full deployment. This strategy is essential for large-scale
+                        applications where deployment failures could affect millions of users.</p>
+
+                    <h3>5.3 Rolling Updates</h3>
+
+                    <p>Rolling updates incrementally replace application instances, maintaining service availability
+                        throughout the deployment process. Kubernetes provides native support for rolling updates with
+                        configurable strategies.</p>
+                </section>
+
+                <section class="content-section">
+                    <h3>6. Cloud-Native Deployment Solutions</h3>
+
+                    <h3>6.1 Cloud Provider-Specific Services</h3>
+
+                    <p>Major cloud providers offer managed deployment services that integrate with their broader
+                        ecosystem:</p>
+
+                    <div class="key-points">
+                        <ul>
+                            <li><strong>AWS:</strong> Elastic Container Service (ECS), Elastic Kubernetes Service (EKS),
+                                Lambda</li>
+                            <li><strong>Azure:</strong> Azure Kubernetes Service (AKS), Azure Container Instances (ACI),
+                                Azure Functions</li>
+                            <li><strong>Google Cloud:</strong> Google Kubernetes Engine (GKE), Cloud Run, Cloud
+                                Functions</li>
+                        </ul>
+                    </div>
+
+                    <h3>6.2 Serverless and Function-as-a-Service (FaaS)</h3>
+
+                    <p>Serverless architectures abstract away infrastructure management, allowing developers to focus on
+                        code while the platform handles scaling, availability, and maintenance. This paradigm is
+                        particularly effective for event-driven applications and microservices.</p>
+                </section>
+
+                <section class="content-section">
+                    <h3>7. CI/CD Pipeline Integration</h3>
+
+                    <h3>7.1 Continuous Integration Considerations</h3>
+
+                    <p>Modern CI/CD pipelines must integrate package management and deployment strategies seamlessly.
+                        <em>Continuous deployment automates the process of deploying software changes to production
+                            environments</em>, requiring robust testing, security scanning, and rollback mechanisms.
+                    </p>
+
+                    <h3>7.2 Security Integration</h3>
+
+                    <p>Modern deployment pipelines must incorporate security scanning at multiple stages:</p>
+
+                    <div class="best-practices">
+                        <ul>
+                            <li><strong>Static Analysis:</strong> Code quality and security vulnerability scanning</li>
+                            <li><strong>Dependency Scanning:</strong> Known vulnerability detection in packages</li>
+                            <li><strong>Container Security:</strong> Base image and runtime security analysis</li>
+                            <li><strong>Infrastructure as Code:</strong> Security policy validation for deployment
+                                configurations</li>
+                            <li><strong>Runtime Monitoring:</strong> Continuous security monitoring in production</li>
+                        </ul>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h3>8. Scientific Computing Deployment Considerations</h3>
+
+                    <h3>8.1 High-Performance Computing (HPC) Environments</h3>
+
+                    <p>Scientific computing environments present unique packaging and deployment challenges, including
+                        complex dependency trees, specialized hardware requirements, and large-scale parallel processing
+                        needs. Package managers like Spack and EasyBuild have emerged specifically to address these
+                        requirements.</p>
+
+                    <h3>8.2 Reproducible Research Environments</h3>
+
+                    <p>Scientific applications require reproducible environments to ensure research validity.
+                        Containerization technologies combined with package managers like conda provide isolated,
+                        versioned environments that can be shared and reproduced across different computing
+                        environments.</p>
+
+                    <pre class="code-example"># Example conda environment for scientific computing
+name: scientific-env
+channels:
+  - conda-forge
+  - bioconda
+dependencies:
+  - python=3.9
+  - numpy=1.21.0
+  - scipy=1.7.0
+  - matplotlib=3.4.2
+  - pandas=1.3.0
+  - jupyter
+  - pip
+  - pip:
+    - custom-scientific-package==1.0.0</pre>
+                </section>
+
+                <section class="content-section">
+                    <h3>9. Emerging Technologies and Future Trends</h3>
+
+                    <h3>9.1 WebAssembly (WASM) Deployment</h3>
+
+                    <p>WebAssembly is emerging as a platform-agnostic deployment target, offering near-native
+                        performance with strong security isolation. WASM modules can run on various platforms and are
+                        increasingly used for serverless computing and edge deployment scenarios.</p>
+
+                    <h3>9.2 GitOps and Infrastructure as Code</h3>
+
+                    <p>GitOps practices treat infrastructure and deployment configurations as code, stored in version
+                        control systems and automatically applied to target environments. Tools like ArgoCD, Flux, and
+                        Terraform enable declarative infrastructure management and deployment automation.</p>
+
+                    <h3>9.3 Package Management Evolution</h3>
+
+                    <p>The package management landscape continues evolving with <em>enhanced vulnerability scanning and
+                            security features becoming standard</em> across package managers. <em>The package management
+                            solutions market is expected to grow from $1.2 billion in 2023 to $3 billion by 2032</em>,
+                        driven by increased adoption of DevOps practices and cloud-native architectures.</p>
+
+                    <div class="warning">
+                        <strong>Security Considerations:</strong> As package ecosystems grow, security becomes
+                        increasingly critical. Always verify package signatures, regularly audit dependencies for
+                        vulnerabilities, and implement automated security scanning in your deployment pipelines.
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h3>10. Best Practices and Recommendations</h3>
+
+                    <div class="best-practices">
+                        <h3>Universal Best Practices:</h3>
+                        <ul>
+                            <li><strong>Version Management:</strong> Use semantic versioning and maintain clear version
+                                histories</li>
+                            <li><strong>Dependency Management:</strong> Pin dependencies to specific versions in
+                                production</li>
+                            <li><strong>Security First:</strong> Implement vulnerability scanning at all stages</li>
+                            <li><strong>Automation:</strong> Automate testing, building, and deployment processes</li>
+                            <li><strong>Monitoring:</strong> Implement comprehensive logging and monitoring</li>
+                            <li><strong>Documentation:</strong> Maintain clear deployment and rollback procedures</li>
+                            <li><strong>Backup Strategies:</strong> Ensure reliable backup and recovery mechanisms</li>
+                            <li><strong>Environment Parity:</strong> Maintain consistency between development, staging,
+                                and production</li>
+                        </ul>
+                    </div>
+
+                    <h3>Conclusion</h3>
+
+                    <p>The landscape of packaging and deployment continues to evolve rapidly, driven by the increasing
+                        complexity of modern applications and the need for reliable, scalable deployment strategies.
+                        Success in this domain requires understanding both traditional package management systems and
+                        modern containerized orchestration platforms, along with their integration into comprehensive
+                        CI/CD pipelines.</p>
+
+                    <p>For DevOps engineers, software developers, and system administrators, staying current with these
+                        technologies and best practices is essential for building robust, scalable, and secure
+                        deployment infrastructures. The convergence of traditional package management, containerization,
+                        and cloud-native technologies provides powerful tools for addressing the challenges of modern
+                        software deployment across diverse computing environments.</p>
+                </section>
+
+                <!-- References -->
+                <aside class="references">
+                    <h3>References</h3>
+                    <ol>
+                        <li><a href="https://en.wikipedia.org/wiki/Package_manager" target="_blank"
+                                rel="noopener noreferrer">Package manager - Wikipedia</a></li>
+                        <li><a href="https://en.wikipedia.org/wiki/APT_(software)" target="_blank"
+                                rel="noopener noreferrer">APT (Advanced Package Tool) - Wikipedia</a></li>
+                        <li><a href="https://en.wikipedia.org/wiki/RPM_Package_Manager" target="_blank"
+                                rel="noopener noreferrer">RPM Package Manager - Wikipedia</a></li>
+                        <li><a href="https://cran.r-project.org/" target="_blank" rel="noopener noreferrer">The
+                                Comprehensive R Archive Network</a></li>
+                        <li><a href="https://docs.docker.com/" target="_blank" rel="noopener noreferrer">Docker
+                                Documentation</a></li>
+                        <li><a href="https://kubernetes.io/docs/" target="_blank" rel="noopener noreferrer">Kubernetes
+                                Documentation</a></li>
+                        <li><a href="https://en.wikipedia.org/wiki/DevOps" target="_blank"
+                                rel="noopener noreferrer">DevOps - Wikipedia</a></li>
+                        <li><a href="https://en.wikipedia.org/wiki/Continuous_integration" target="_blank"
+                                rel="noopener noreferrer">Continuous Integration - Wikipedia</a></li>
+                        <li><a href="https://en.wikipedia.org/wiki/Blue%E2%80%93green_deployment" target="_blank"
+                                rel="noopener noreferrer">Blue-green deployment - Wikipedia</a></li>
+                        <li><a href="https://en.wikipedia.org/wiki/WebAssembly" target="_blank"
+                                rel="noopener noreferrer">WebAssembly - Wikipedia</a></li>
+                        <li>Red Hat Inc. "Red Hat OpenShift Documentation." <a href="https://docs.openshift.com/"
+                                target="_blank" rel="noopener noreferrer">https://docs.openshift.com/</a></li>
+                        <li>Amazon Web Services "AWS Documentation." <a href="https://docs.aws.amazon.com/"
+                                target="_blank" rel="noopener noreferrer">https://docs.aws.amazon.com/</a></li>
+                        <li>Microsoft Corporation "Azure Documentation." <a href="https://docs.microsoft.com/azure/"
+                                target="_blank" rel="noopener noreferrer">https://docs.microsoft.com/azure/</a></li>
+                        <li>Google Cloud "Google Cloud Documentation." <a href="https://cloud.google.com/docs/"
+                                target="_blank" rel="noopener noreferrer">https://cloud.google.com/docs/</a></li>
+                        <li>The Linux Foundation "Cloud Native Computing Foundation Projects." <a
+                                href="https://www.cncf.io/" target="_blank"
+                                rel="noopener noreferrer">https://www.cncf.io/</a></li>
+                        <li>Apache Software Foundation "Apache Maven Documentation." <a
+                                href="https://maven.apache.org/guides/" target="_blank"
+                                rel="noopener noreferrer">https://maven.apache.org/guides/</a></li>
+                        <li>Node.js Foundation "Node.js Package Manager Documentation." <a
+                                href="https://docs.npmjs.com/" target="_blank"
+                                rel="noopener noreferrer">https://docs.npmjs.com/</a></li>
+                        <li>Python Software Foundation "Python Package Index (PyPI)." <a href="https://pypi.org/"
+                                target="_blank" rel="noopener noreferrer">https://pypi.org/</a></li>
+                        <li>Conda Community "Conda Documentation." <a href="https://conda.io/projects/conda/en/latest/"
+                                target="_blank" rel="noopener noreferrer">https://conda.io/projects/conda/en/latest/</a>
                         </li>
-                        <li><strong>Security Verification:</strong> Digital signatures and checksum
-                            validation</li>
-                        <li><strong>Configuration Management:</strong> Handling installation and runtime
-                            configurations</li>
-                    </ul>
+                        <li>Helm Community "Helm - The Kubernetes Package Manager." <a href="https://helm.sh/docs/"
+                                target="_blank" rel="noopener noreferrer">https://helm.sh/docs/</a></li>
+                    </ol>
+                </aside>
+            </main>
+
+            <!-- Footer -->
+            <footer class="footer">
+                <div class="footer-container">
+                    <div class="footer-content">
+                        <p>&copy; 2024 John Samuel. All content licensed under Creative Commons CC BY-SA 4.0.</p>
+                    </div>
+                    <nav class="language-selector" aria-label="Language selection">
+                        <a href="./packaging-deployment.html" class="language-link" lang="en">English</a>
+                    </nav>
                 </div>
-
-                <h3>2. Traditional Package Management Systems</h3>
-
-                <h3>2.1 Linux-Based Systems: Debian Package Management</h3>
-
-                <p>The Debian package management ecosystem, centered around <code>.deb</code> packages,
-                    represents one of the most mature and widely-adopted package management systems in the
-                    Linux ecosystem. The system utilizes several key tools:</p>
-
-                <table>
-                    <tr>
-                        <th>Tool</th>
-                        <th>Purpose</th>
-                        <th>Use Case</th>
-                    </tr>
-                    <tr>
-                        <td><strong>dpkg</strong></td>
-                        <td>Low-level package management</td>
-                        <td>Direct package installation and removal</td>
-                    </tr>
-                    <tr>
-                        <td><strong>apt</strong></td>
-                        <td>High-level package management</td>
-                        <td>Repository management and dependency resolution</td>
-                    </tr>
-                    <tr>
-                        <td><strong>aptitude</strong></td>
-                        <td>Advanced package management</td>
-                        <td>Interactive dependency resolution and conflict management</td>
-                    </tr>
-                </table>
-
-                <pre class="code-example">
-    # Basic APT operations
-    sudo apt update # Update package lists
-    sudo apt upgrade # Upgrade installed packages
-    sudo apt install package-name # Install new package
-    sudo apt remove package-name # Remove package
-    sudo apt autoremove # Remove unused dependencies
-    sudo apt search keyword # Search for packages
-    sudo apt show package-name # Display package information
-</pre>
-
-                <h3>2.2 Red Hat Package Manager (RPM) Ecosystem</h3>
-
-                <p>Red Hat-based distributions utilize the RPM package format with tools like
-                    <code>yum</code>, <code>dnf</code>, and <code>zypper</code>. These systems provide
-                    similar functionality to APT but with different syntax and repository structures
-                    optimized for enterprise environments.
-                </p>
-
-                <h3>2.3 Language-Specific Package Managers</h3>
-
-                <p>Modern development relies heavily on language-specific package managers that handle
-                    libraries and frameworks within programming ecosystems:</p>
-
-                <div class="key-points">
-                    <h3>Popular Language-Specific Package Managers (2024):</h3>
-                    <ul>
-                        <li><strong>Node.js:</strong> npm, Yarn, pnpm, and Bun (emerging)</li>
-                        <li><strong>Python:</strong> pip, conda, poetry, and pixi</li>
-                        <li><strong>R:</strong> CRAN, Bioconductor, and r-lib ecosystem</li>
-                        <li><strong>Java:</strong> Maven, Gradle, and SBT</li>
-                        <li><strong>C#/.NET:</strong> NuGet and .NET CLI tools</li>
-                        <li><strong>Rust:</strong> Cargo</li>
-                        <li><strong>Go:</strong> Go modules</li>
-                    </ul>
-                </div>
-
-                <h3>2.4 CRAN: The R Package Ecosystem</h3>
-
-                <p>The Comprehensive R Archive Network (CRAN) serves as the primary repository for R
-                    packages, particularly crucial in scientific computing environments. CRAN maintains
-                    strict quality standards and provides automated testing across multiple platforms.</p>
-
-                <pre class="code-example">
-    # CRAN package management in R
-    install.packages("package_name") # Install from CRAN
-    install.packages("devtools") # Development tools
-    devtools::install_github("user/repo") # Install from GitHub
-    library(package_name) # Load package
-    update.packages() # Update all packages
-    remove.packages("package_name") # Remove package
-</pre>
-
-                <h3>3. Modern Containerization and Orchestration</h3>
-
-                <h3>3.1 Docker: Containerization Foundation</h3>
-
-                <p>Docker has revolutionized application deployment by providing lightweight, portable
-                    containers that encapsulate applications and their dependencies. Dockerfiles define the
-                    build process for creating container images, ensuring consistent environments across
-                    development, testing, and production.</p>
-
-                <pre class="code-example">
-    # Example Dockerfile for a Node.js application
-    FROM node:18-alpine
-
-    WORKDIR /app
-
-    # Copy package files
-    COPY package*.json ./
-
-    # Install dependencies
-    RUN npm ci --only=production
-
-    # Copy application code
-    COPY src/ ./src/
-
-    # Create non-root user
-    RUN addgroup -g 1001 -S nodejs && \
-        adduser -S nextjs -u 1001
-
-    USER nextjs
-
-    EXPOSE 3000
-
-    CMD ["npm", "start"]
-</pre>
-
-                <div class="best-practices">
-                    <h3>Docker Best Practices:</h3>
-                    <ul>
-                        <li>Use multi-stage builds to minimize image size</li>
-                        <li>Implement proper layer caching strategies</li>
-                        <li>Run containers as non-root users</li>
-                        <li>Use official base images when possible</li>
-                        <li>Implement health checks for container monitoring</li>
-                        <li>Minimize the number of layers in your images</li>
-                    </ul>
-                </div>
-
-                <h3>3.2 Kubernetes: Container Orchestration at Scale</h3>
-
-                <p>Kubernetes has emerged as the de facto standard for container orchestration, providing
-                    automated deployment, scaling, and management of containerized applications.
-                    <em>Kubernetes builds upon 15 years of experience running production workloads at
-                        Google</em> and can scale without significantly increasing operational overhead.
-                </p>
-
-                <p>Key Kubernetes components include:</p>
-
-                <div class="key-points">
-                    <ul>
-                        <li><strong>Pods:</strong> Smallest deployable units containing one or more
-                            containers</li>
-                        <li><strong>Deployments:</strong> Manage sets of identical pods with declarative
-                            updates</li>
-                        <li><strong>Services:</strong> Provide stable network endpoints for pod
-                            communication</li>
-                        <li><strong>ConfigMaps and Secrets:</strong> Manage configuration and sensitive data
-                        </li>
-                        <li><strong>Ingress:</strong> Manage external access to services</li>
-                        <li><strong>Persistent Volumes:</strong> Handle stateful application data</li>
-                    </ul>
-                </div>
-
-                <h3>4. Cross-Platform and Distribution-Specific Considerations</h3>
-
-                <h3>4.1 Platform Variability Challenges</h3>
-
-                <p>Different operating systems and distributions have varying packaging requirements that
-                    must be addressed in enterprise environments:</p>
-
-                <table>
-                    <tr>
-                        <th>Platform</th>
-                        <th>Package Format</th>
-                        <th>Key Considerations</th>
-                    </tr>
-                    <tr>
-                        <td>Ubuntu/Debian</td>
-                        <td>.deb</td>
-                        <td>APT repository management, PPA handling</td>
-                    </tr>
-                    <tr>
-                        <td>RHEL/CentOS/Fedora</td>
-                        <td>.rpm</td>
-                        <td>YUM/DNF repositories, SELinux policies</td>
-                    </tr>
-                    <tr>
-                        <td>macOS</td>
-                        <td>.pkg, .dmg</td>
-                        <td>Code signing, notarization requirements</td>
-                    </tr>
-                    <tr>
-                        <td>Windows</td>
-                        <td>.msi, .exe</td>
-                        <td>Windows Installer service, registry management</td>
-                    </tr>
-                    <tr>
-                        <td>Universal</td>
-                        <td>Container images</td>
-                        <td>Runtime compatibility, orchestration requirements</td>
-                    </tr>
-                </table>
-
-                <h3>4.2 Universal Package Formats</h3>
-
-                <p>Several universal package formats have emerged to address cross-platform compatibility:
-                </p>
-
-                <div class="key-points">
-                    <ul>
-                        <li><strong>Snap:</strong> Ubuntu's universal package system with sandboxing</li>
-                        <li><strong>Flatpak:</strong> Desktop application distribution with runtime
-                            isolation</li>
-                        <li><strong>AppImage:</strong> Portable application format requiring no installation
-                        </li>
-                        <li><strong>Container Images:</strong> Platform-agnostic application packaging</li>
-                    </ul>
-                </div>
-
-                <h3>5. Enterprise Deployment Strategies</h3>
-
-                <h3>5.1 Blue-Green Deployments</h3>
-
-                <p>Blue-green deployment strategies maintain two identical production environments (blue and
-                    green), allowing for zero-downtime deployments and instant rollbacks. This approach is
-                    particularly valuable in enterprise environments where service availability is critical.
-                </p>
-
-                <h3>5.2 Canary Releases</h3>
-
-                <p>Canary deployments gradually roll out changes to a subset of users, allowing for risk
-                    mitigation and performance monitoring before full deployment. This strategy is essential
-                    for large-scale applications where deployment failures could affect millions of users.
-                </p>
-
-                <h3>5.3 Rolling Updates</h3>
-
-                <p>Rolling updates incrementally replace application instances, maintaining service
-                    availability throughout the deployment process. Kubernetes provides native support for
-                    rolling updates with configurable strategies.</p>
-
-                <h3>6. Cloud-Native Deployment Solutions</h3>
-
-                <h3>6.1 Cloud Provider-Specific Services</h3>
-
-                <p>Major cloud providers offer managed deployment services that integrate with their broader
-                    ecosystem:</p>
-
-                <div class="key-points">
-                    <ul>
-                        <li><strong>AWS:</strong> Elastic Container Service (ECS), Elastic Kubernetes
-                            Service (EKS), Lambda</li>
-                        <li><strong>Azure:</strong> Azure Kubernetes Service (AKS), Azure Container
-                            Instances (ACI), Azure Functions</li>
-                        <li><strong>Google Cloud:</strong> Google Kubernetes Engine (GKE), Cloud Run, Cloud
-                            Functions</li>
-                    </ul>
-                </div>
-
-                <h3>6.2 Serverless and Function-as-a-Service (FaaS)</h3>
-
-                <p>Serverless architectures abstract away infrastructure management, allowing developers to
-                    focus on code while the platform handles scaling, availability, and maintenance. This
-                    paradigm is particularly effective for event-driven applications and microservices.</p>
-
-                <h3>7. CI/CD Pipeline Integration</h3>
-
-                <h3>7.1 Continuous Integration Considerations</h3>
-
-                <p>Modern CI/CD pipelines must integrate package management and deployment strategies
-                    seamlessly. <em>Continuous deployment automates the process of deploying software
-                        changes to production environments</em>, requiring robust testing, security
-                    scanning, and rollback mechanisms.</p>
-
-                <h3>7.2 Security Integration</h3>
-
-                <p>Modern deployment pipelines must incorporate security scanning at multiple stages:</p>
-
-                <div class="best-practices">
-                    <ul>
-                        <li><strong>Static Analysis:</strong> Code quality and security vulnerability
-                            scanning</li>
-                        <li><strong>Dependency Scanning:</strong> Known vulnerability detection in packages
-                        </li>
-                        <li><strong>Container Security:</strong> Base image and runtime security analysis
-                        </li>
-                        <li><strong>Infrastructure as Code:</strong> Security policy validation for
-                            deployment configurations</li>
-                        <li><strong>Runtime Monitoring:</strong> Continuous security monitoring in
-                            production</li>
-                    </ul>
-                </div>
-
-                <h3>8. Scientific Computing Deployment Considerations</h3>
-
-                <h3>8.1 High-Performance Computing (HPC) Environments</h3>
-
-                <p>Scientific computing environments present unique packaging and deployment challenges,
-                    including complex dependency trees, specialized hardware requirements, and large-scale
-                    parallel processing needs. Package managers like Spack and EasyBuild have emerged
-                    specifically to address these requirements.</p>
-
-                <h3>8.2 Reproducible Research Environments</h3>
-
-                <p>Scientific applications require reproducible environments to ensure research validity.
-                    Containerization technologies combined with package managers like conda provide
-                    isolated, versioned environments that can be shared and reproduced across different
-                    computing environments.</p>
-
-                <pre class="code-example">
-    # Example conda environment for scientific computing
-    name: scientific-env
-    channels:
-    - conda-forge
-    - bioconda
-    dependencies:
-    - python=3.9
-    - numpy=1.21.0
-    - scipy=1.7.0
-    - matplotlib=3.4.2
-    - pandas=1.3.0
-    - jupyter
-    - pip
-    - pip:
-    - custom-scientific-package==1.0.0
-</pre>
-
-                <h3>9. Emerging Technologies and Future Trends</h3>
-
-                <h3>9.1 WebAssembly (WASM) Deployment</h3>
-
-                <p>WebAssembly is emerging as a platform-agnostic deployment target, offering near-native
-                    performance with strong security isolation. WASM modules can run on various platforms
-                    and are increasingly used for serverless computing and edge deployment scenarios.</p>
-
-                <h3>9.2 GitOps and Infrastructure as Code</h3>
-
-                <p>GitOps practices treat infrastructure and deployment configurations as code, stored in
-                    version control systems and automatically applied to target environments. Tools like
-                    ArgoCD, Flux, and Terraform enable declarative infrastructure management and deployment
-                    automation.</p>
-
-                <h3>9.3 Package Management Evolution</h3>
-
-                <p>The package management landscape continues evolving with <em>enhanced vulnerability
-                        scanning and security features becoming standard</em> across package managers.
-                    <em>The package management solutions market is expected to grow from $1.2 billion in
-                        2023 to $3 billion by 2032</em>, driven by increased adoption of DevOps practices
-                    and cloud-native architectures.
-                </p>
-
-                <div class="warning">
-                    <strong>Security Considerations:</strong> As package ecosystems grow, security becomes
-                    increasingly critical. Always verify package signatures, regularly audit dependencies
-                    for vulnerabilities, and implement automated security scanning in your deployment
-                    pipelines.
-                </div>
-
-                <h3>10. Best Practices and Recommendations</h3>
-
-                <div class="best-practices">
-                    <h3>Universal Best Practices:</h3>
-                    <ul>
-                        <li><strong>Version Management:</strong> Use semantic versioning and maintain clear
-                            version histories</li>
-                        <li><strong>Dependency Management:</strong> Pin dependencies to specific versions in
-                            production</li>
-                        <li><strong>Security First:</strong> Implement vulnerability scanning at all stages
-                        </li>
-                        <li><strong>Automation:</strong> Automate testing, building, and deployment
-                            processes</li>
-                        <li><strong>Monitoring:</strong> Implement comprehensive logging and monitoring</li>
-                        <li><strong>Documentation:</strong> Maintain clear deployment and rollback
-                            procedures</li>
-                        <li><strong>Backup Strategies:</strong> Ensure reliable backup and recovery
-                            mechanisms</li>
-                        <li><strong>Environment Parity:</strong> Maintain consistency between development,
-                            staging, and production</li>
-                    </ul>
-                </div>
-
-                <h3>Conclusion</h3>
-
-                <p>The landscape of packaging and deployment continues to evolve rapidly, driven by the
-                    increasing complexity of modern applications and the need for reliable, scalable
-                    deployment strategies. Success in this domain requires understanding both traditional
-                    package management systems and modern containerized orchestration platforms, along with
-                    their integration into comprehensive CI/CD pipelines.</p>
-
-                <p>For DevOps engineers, software developers, and system administrators, staying current
-                    with these technologies and best practices is essential for building robust, scalable,
-                    and secure deployment infrastructures. The convergence of traditional package
-                    management, containerization, and cloud-native technologies provides powerful tools for
-                    addressing the challenges of modern software deployment across diverse computing
-                    environments.</p>
-
-                <h3>References</h3>
-
-                <ol class="references">
-                    <li><a href="https://en.wikipedia.org/wiki/Package_manager">Package manager -
-                            Wikipedia</a></li>
-                    <li><a href="https://en.wikipedia.org/wiki/APT_(software)">APT (Advanced Package Tool) -
-                            Wikipedia</a></li>
-                    <li><a href="https://en.wikipedia.org/wiki/RPM_Package_Manager">RPM Package Manager -
-                            Wikipedia</a></li>
-                    <li><a href="https://cran.r-project.org/">The Comprehensive R Archive Network</a></li>
-                    <li><a href="https://docs.docker.com/">Docker Documentation</a></li>
-                    <li><a href="https://kubernetes.io/docs/">Kubernetes Documentation</a></li>
-                    <li><a href="https://en.wikipedia.org/wiki/DevOps">DevOps - Wikipedia</a></li>
-                    <li><a href="https://en.wikipedia.org/wiki/Continuous_integration">Continuous
-                            Integration - Wikipedia</a></li>
-                    <li><a href="https://en.wikipedia.org/wiki/Blue%E2%80%93green_deployment">Blue-green
-                            deployment - Wikipedia</a></li>
-                    <li><a href="https://en.wikipedia.org/wiki/WebAssembly">WebAssembly - Wikipedia</a></li>
-                    <li>Red Hat Inc. "Red Hat OpenShift Documentation." <a
-                            href="https://docs.openshift.com/">https://docs.openshift.com/</a></li>
-                    <li>Amazon Web Services "AWS Documentation." <a
-                            href="https://docs.aws.amazon.com/">https://docs.aws.amazon.com/</a></li>
-                    <li>Microsoft Corporation "Azure Documentation." <a
-                            href="https://docs.microsoft.com/azure/">https://docs.microsoft.com/azure/</a>
-                    </li>
-                    <li>Google Cloud "Google Cloud Documentation." <a
-                            href="https://cloud.google.com/docs/">https://cloud.google.com/docs/</a></li>
-                    <li>The Linux Foundation "Cloud Native Computing Foundation Projects." <a
-                            href="https://www.cncf.io/">https://www.cncf.io/</a></li>
-                    <li>Apache Software Foundation "Apache Maven Documentation." <a
-                            href="https://maven.apache.org/guides/">https://maven.apache.org/guides/</a>
-                    </li>
-                    <li>Node.js Foundation "Node.js Package Manager Documentation." <a
-                            href="https://docs.npmjs.com/">https://docs.npmjs.com/</a></li>
-                    <li>Python Software Foundation "Python Package Index (PyPI)." <a
-                            href="https://pypi.org/">https://pypi.org/</a></li>
-                    <li>Conda Community "Conda Documentation." <a
-                            href="https://conda.io/projects/conda/en/latest/">https://conda.io/projects/conda/en/latest/</a>
-                    </li>
-                    <li>Helm Community "Helm - The Kubernetes Package Manager." <a
-                            href="https://helm.sh/docs/">https://helm.sh/docs/</a></li>
-                </ol>
-            </div>
-
-        </div>
+            </footer>
         </div>
     </body>
 

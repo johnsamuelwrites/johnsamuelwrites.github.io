@@ -3,261 +3,782 @@
 
     <head>
         <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <meta http-equiv="Content-Language" content="en" />
         <link rel="shortcut icon" href="../../images/logo/favicon.png" />
         <title>Open Science: John Samuel</title>
-        <style type="text/css">
-            body {
-                background-color: #FFFFFF;
+        <style>
+            /* ===========================
+           Design Token System
+           =========================== */
+            :root {
+                /* Open Knowledge Theme Colors */
+                --color-base-bg: #f7f9fd;
+                --color-base-surface: #ffffff;
+                --color-base-text: #1a2744;
+                --color-base-text-muted: #4a5c78;
+
+                /* Openness & Connectivity Palette */
+                --color-accent-1: #0ea5e9;
+                /* Sky blue - openness */
+                --color-accent-2: #0c4a6e;
+                /* Deep ocean - depth */
+                --color-accent-3: #f59e0b;
+                /* Amber - illumination */
+                --color-accent-4: #06b6d4;
+                /* Cyan - flow */
+                --color-accent-light: #f0f9ff;
+                /* Pale sky */
+
+                /* Functional Colors */
+                --color-shadow: rgba(14, 165, 233, 0.12);
+                --color-border: rgba(14, 165, 233, 0.15);
+                --color-hover: rgba(14, 165, 233, 0.08);
+
+                /* Gradients */
+                --gradient-primary: linear-gradient(135deg, #0ea5e9 0%, #06b6d4 100%);
+                --gradient-hero: linear-gradient(135deg, #0c4a6e 0%, #0ea5e9 50%, #f59e0b 100%);
+                --gradient-knowledge: linear-gradient(135deg, #0ea5e9 0%, #f59e0b 100%);
+
+                /* Spacing Scale */
+                --space-xs: 0.25rem;
+                --space-sm: 0.5rem;
+                --space-md: 1rem;
+                --space-lg: 1.5rem;
+                --space-xl: 2rem;
+                --space-2xl: 3rem;
+                --space-3xl: 4rem;
+                --space-4xl: 6rem;
+
+                /* Border Radius */
+                --radius-sm: 4px;
+                --radius-md: 8px;
+                --radius-lg: 12px;
+                --radius-xl: 16px;
+                --radius-2xl: 24px;
+                --radius-full: 9999px;
+
+                /* Shadows */
+                --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.04), 0 1px 3px rgba(0, 0, 0, 0.06);
+                --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.05), 0 2px 4px rgba(0, 0, 0, 0.06);
+                --shadow-lg: 0 10px 24px rgba(0, 0, 0, 0.08), 0 4px 8px rgba(0, 0, 0, 0.06);
+                --shadow-theme: 0 10px 30px var(--color-shadow), 0 4px 10px rgba(0, 0, 0, 0.06);
+
+                /* Typography */
+                --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+
+                --text-xs: clamp(0.75rem, 0.7rem + 0.25vw, 0.875rem);
+                --text-sm: clamp(0.875rem, 0.8rem + 0.35vw, 1rem);
+                --text-base: clamp(1rem, 0.95rem + 0.25vw, 1.125rem);
+                --text-lg: clamp(1.125rem, 1.05rem + 0.35vw, 1.25rem);
+                --text-xl: clamp(1.25rem, 1.15rem + 0.5vw, 1.5rem);
+                --text-2xl: clamp(1.5rem, 1.3rem + 1vw, 2rem);
+                --text-3xl: clamp(2rem, 1.6rem + 2vw, 2.5rem);
+                --text-4xl: clamp(2.5rem, 2rem + 2.5vw, 3.5rem);
             }
 
-            #sidebar {
-                position: fixed;
-                background-color: #1B80CF;
-                top: 0;
-                left: 0;
-                bottom: 0;
-                width: 30vw;
-            }
-
-            #sidebar .title {
-                position: relative;
-                text-align: center;
-                line-height: 4vmax;
-                font-size: 1.4vmax;
-                font-family: 'Arial';
-                margin-top: 25vh;
-            }
-
-            #sidebar .title a:link,
-            #sidebar .title a:visited {
-                color: #FFFFFF;
-                text-decoration: none;
-            }
-
-            .subtitle {
-                top: 50vh;
-                text-align: center;
-                line-height: 1.3vmax;
-                font-family: 'Arial';
-                font-size: 1.5vmax;
-                color: #FFFFFF;
-            }
-
-            .subtitle a:link,
-            .subtitle a:visited {
-                color: #FFFFFF;
-                text-decoration: none;
-            }
-
-            .licence {
-                position: fixed;
-                text-align: right;
-                bottom: 0;
-                right: 0;
-            }
-
-            .home {
-                position: fixed;
-                text-align: left;
-                font-family: 'Arial';
-                color: #D3D3D3;
-                z-index: 100;
-                width: 100%;
-                background-color: #FFFFFF;
-                top: 0px;
-                margin-bottom: 10px;
-                padding-bottom: 10px;
-            }
-
-            .home a:link,
-            .home a:visited {
-                text-decoration: none;
-                color: #D3D3D3;
-            }
-
-            .home ul {
+            /* ===========================
+           Reset & Base Styles
+           =========================== */
+            *,
+            *::before,
+            *::after {
+                box-sizing: border-box;
                 margin: 0;
                 padding: 0;
-                text-align: left;
+            }
+
+            html {
+                scroll-behavior: smooth;
+                scroll-padding-top: 100px;
+            }
+
+            body {
+                font-family: var(--font-sans);
+                font-size: var(--text-base);
+                line-height: 1.7;
+                color: var(--color-base-text);
+                background: var(--color-base-bg);
+                position: relative;
+                overflow-x: hidden;
+            }
+
+            /* Skip Link for Accessibility */
+            .skip-link {
+                position: absolute;
+                top: -40px;
+                left: 0;
+                background: var(--color-accent-1);
+                color: white;
+                padding: var(--space-sm) var(--space-md);
+                text-decoration: none;
+                border-radius: var(--radius-md);
+                z-index: 100;
+            }
+
+            .skip-link:focus {
+                top: var(--space-sm);
+                left: var(--space-sm);
+            }
+
+            /* ===========================
+           Background Patterns
+           =========================== */
+            body::before {
+                content: '';
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background-image:
+                    radial-gradient(circle at 30% 20%, rgba(14, 165, 233, 0.04) 0%, transparent 50%),
+                    radial-gradient(circle at 70% 80%, rgba(6, 182, 212, 0.04) 0%, transparent 50%);
+                pointer-events: none;
+                z-index: 0;
+            }
+
+            /* Network mesh pattern */
+            body::after {
+                content: '';
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background-image:
+                    linear-gradient(90deg, transparent 98%, rgba(14, 165, 233, 0.03) 98%),
+                    linear-gradient(0deg, transparent 98%, rgba(14, 165, 233, 0.03) 98%);
+                background-size: 100px 100px;
+                pointer-events: none;
+                z-index: 0;
+                opacity: 0.6;
+            }
+
+            /* ===========================
+           Navigation Header
+           =========================== */
+            .site-header {
+                position: sticky;
+                top: 0;
+                z-index: 50;
+                background: rgba(255, 255, 255, 0.85);
+                -webkit-backdrop-filter: blur(12px) saturate(180%);
+                backdrop-filter: blur(12px) saturate(180%);
+                border-bottom: 1px solid var(--color-border);
+                box-shadow: var(--shadow-sm);
+            }
+
+            .nav-container {
+                max-width: 1400px;
+                margin: 0 auto;
+                padding: var(--space-md) var(--space-xl);
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                gap: var(--space-xl);
+                position: relative;
+                z-index: 1;
+            }
+
+            .site-brand {
+                font-size: var(--text-xl);
+                font-weight: 700;
+                letter-spacing: -0.02em;
+                background: var(--gradient-primary);
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                background-clip: text;
+                text-decoration: none;
+                transition: opacity 0.3s ease;
+            }
+
+            .site-brand:hover {
+                opacity: 0.8;
+            }
+
+            .breadcrumb-nav {
+                display: flex;
+                align-items: center;
+                gap: var(--space-sm);
+                list-style: none;
+                flex-wrap: wrap;
+            }
+
+            .breadcrumb-nav li {
+                display: flex;
+                align-items: center;
+                gap: var(--space-sm);
+            }
+
+            .breadcrumb-nav li:not(:last-child)::after {
+                content: '›';
+                color: var(--color-base-text-muted);
+                font-size: var(--text-lg);
+            }
+
+            .breadcrumb-nav a {
+                color: var(--color-base-text-muted);
+                text-decoration: none;
+                font-size: var(--text-sm);
+                transition: color 0.3s ease;
+            }
+
+            .breadcrumb-nav a:hover,
+            .breadcrumb-nav a:focus {
+                color: var(--color-accent-1);
+            }
+
+            /* ===========================
+           Main Container
+           =========================== */
+            .page-wrapper {
+                position: relative;
+                z-index: 1;
+            }
+
+            .container {
+                max-width: 1200px;
+                margin: 0 auto;
+                padding: var(--space-2xl) var(--space-xl);
+            }
+
+            /* ===========================
+           Hero Section
+           =========================== */
+            .hero-section {
+                position: relative;
+                padding: var(--space-4xl) 0 var(--space-3xl);
+                text-align: center;
+                overflow: hidden;
+            }
+
+            .hero-title {
+                font-size: var(--text-4xl);
+                font-weight: 800;
+                letter-spacing: -0.03em;
+                line-height: 1.2;
+                margin-bottom: var(--space-lg);
+                background: var(--gradient-hero);
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                background-clip: text;
+                animation: titleFadeIn 1s ease-out;
+            }
+
+            .hero-subtitle {
+                font-size: var(--text-lg);
+                color: var(--color-base-text-muted);
+                max-width: 600px;
+                margin: 0 auto var(--space-xl);
+                animation: subtitleFadeIn 1s ease-out 0.2s backwards;
+            }
+
+            /* Animated SVG Hero Illustration */
+            .hero-svg {
+                max-width: 650px;
+                margin: var(--space-2xl) auto 0;
+                animation: svgFadeIn 1.2s ease-out 0.4s backwards;
+            }
+
+            @keyframes titleFadeIn {
+                from {
+                    opacity: 0;
+                    transform: translateY(-20px);
+                }
+
+                to {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            }
+
+            @keyframes subtitleFadeIn {
+                from {
+                    opacity: 0;
+                    transform: translateY(-15px);
+                }
+
+                to {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            }
+
+            @keyframes svgFadeIn {
+                from {
+                    opacity: 0;
+                    transform: scale(0.9);
+                }
+
+                to {
+                    opacity: 1;
+                    transform: scale(1);
+                }
+            }
+
+            /* ===========================
+           Content Section
+           =========================== */
+            .content-section {
+                background: var(--color-base-surface);
+                border-radius: var(--radius-2xl);
+                padding: var(--space-3xl) var(--space-2xl);
+                box-shadow: var(--shadow-theme);
+                position: relative;
+                overflow: hidden;
+                animation: contentFadeIn 1s ease-out 0.6s backwards;
+            }
+
+            @keyframes contentFadeIn {
+                from {
+                    opacity: 0;
+                    transform: translateY(30px);
+                }
+
+                to {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            }
+
+            /* Open access icon decoration */
+            .content-section::before {
+                content: '⊕';
+                position: absolute;
+                top: var(--space-xl);
+                right: var(--space-xl);
+                font-size: 6rem;
+                color: var(--color-accent-1);
+                opacity: 0.04;
+                pointer-events: none;
+            }
+
+            .content-section h2 {
+                font-size: var(--text-3xl);
+                font-weight: 700;
+                color: var(--color-base-text);
+                margin-bottom: var(--space-lg);
+                letter-spacing: -0.02em;
+                position: relative;
+                z-index: 1;
+            }
+
+            .content-section h2::after {
+                content: '';
+                display: block;
+                width: 60px;
+                height: 4px;
+                background: var(--gradient-primary);
+                margin-top: var(--space-md);
+                border-radius: var(--radius-full);
+            }
+
+            .content-section h3 {
+                font-size: var(--text-xl);
+                font-weight: 600;
+                color: var(--color-base-text);
+                margin-top: var(--space-2xl);
+                margin-bottom: var(--space-md);
+                letter-spacing: -0.01em;
+            }
+
+            .content-section>p {
+                margin-bottom: var(--space-xl);
+                line-height: 1.8;
+                color: var(--color-base-text);
+                position: relative;
+                z-index: 1;
+            }
+
+            .content-section section {
+                margin-top: var(--space-3xl);
+            }
+
+            .content-section article {
+                background: var(--color-accent-light);
+                border-left: 3px solid var(--color-accent-1);
+                border-radius: var(--radius-md);
+                padding: var(--space-lg);
+                margin-bottom: var(--space-lg);
+                transition: all 0.3s ease;
+            }
+
+            .content-section article:hover {
+                transform: translateX(4px);
+                box-shadow: var(--shadow-md);
+                background: rgba(14, 165, 233, 0.06);
+            }
+
+            .content-section article h3 {
+                margin-top: 0;
+                font-size: var(--text-lg);
+                color: var(--color-accent-2);
+            }
+
+            .content-section article p {
+                margin-bottom: 0;
+                line-height: 1.7;
+            }
+
+            .content-section ul,
+            .content-section ol {
+                margin: var(--space-lg) 0;
+                padding-left: var(--space-xl);
+            }
+
+            .content-section li {
+                margin-bottom: var(--space-sm);
+                line-height: 1.7;
+            }
+
+            .content-section a {
+                color: var(--color-accent-1);
+                text-decoration: none;
+                font-weight: 500;
+                transition: color 0.3s ease;
+                border-bottom: 1px solid transparent;
+            }
+
+            .content-section a:hover,
+            .content-section a:focus {
+                color: var(--color-accent-2);
+                border-bottom-color: var(--color-accent-2);
+            }
+
+            /* References footer */
+            .content-section footer {
+                margin-top: var(--space-3xl);
+                padding-top: var(--space-2xl);
+                border-top: 2px solid var(--color-border);
+            }
+
+            .content-section footer h3 {
+                margin-top: 0;
+            }
+
+            .content-section footer ol {
+                counter-reset: reference-counter;
+                list-style: none;
+                padding-left: 0;
+            }
+
+            .content-section footer ol li {
+                counter-increment: reference-counter;
+                position: relative;
+                padding-left: var(--space-2xl);
+                margin-bottom: var(--space-md);
+            }
+
+            .content-section footer ol li::before {
+                content: "[" counter(reference-counter) "]";
+                position: absolute;
+                left: 0;
+                font-weight: 600;
+                color: var(--color-accent-1);
+            }
+
+            /* Section Divider */
+            .section-divider {
+                margin: var(--space-3xl) 0;
+                position: relative;
+                height: 2px;
+                background: linear-gradient(90deg,
+                        transparent 0%,
+                        var(--color-accent-1) 20%,
+                        var(--color-accent-4) 50%,
+                        var(--color-accent-3) 80%,
+                        transparent 100%);
+                opacity: 0.4;
+            }
+
+            /* Connection nodes on divider */
+            .connection-node {
+                position: absolute;
+                top: 50%;
+                transform: translateY(-50%);
+                width: 8px;
+                height: 8px;
+                background: var(--color-accent-1);
+                border-radius: 50%;
+                animation: nodeGlow 2s ease-in-out infinite;
+            }
+
+            .connection-node:nth-child(1) {
+                left: 15%;
+                animation-delay: 0s;
+            }
+
+            .connection-node:nth-child(2) {
+                left: 35%;
+                animation-delay: 0.5s;
+            }
+
+            .connection-node:nth-child(3) {
+                left: 50%;
+                animation-delay: 1s;
+            }
+
+            .connection-node:nth-child(4) {
+                left: 65%;
+                animation-delay: 1.5s;
+            }
+
+            .connection-node:nth-child(5) {
+                left: 85%;
+                animation-delay: 2s;
+            }
+
+            @keyframes nodeGlow {
+
+                0%,
+                100% {
+                    transform: translateY(-50%) scale(1);
+                    box-shadow: 0 0 0 0 rgba(14, 165, 233, 0.7);
+                }
+
+                50% {
+                    transform: translateY(-50%) scale(1.3);
+                    box-shadow: 0 0 0 8px rgba(14, 165, 233, 0);
+                }
+            }
+
+            /* ===========================
+           Footer
+           =========================== */
+            .site-footer {
+                position: relative;
+                z-index: 1;
+                margin-top: var(--space-4xl);
+                padding: var(--space-2xl) var(--space-xl);
+                background: rgba(255, 255, 255, 0.6);
+                -webkit-backdrop-filter: blur(12px) saturate(180%);
+                backdrop-filter: blur(12px) saturate(180%);
+                border-top: 1px solid var(--color-border);
+            }
+
+            .footer-content {
+                max-width: 1400px;
+                margin: 0 auto;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                gap: var(--space-lg);
+                text-align: center;
+            }
+
+            .footer-links {
+                display: flex;
+                gap: var(--space-xl);
+                flex-wrap: wrap;
+                justify-content: center;
                 list-style: none;
             }
 
-            .home li {
-                position: relative;
-                float: left;
-                padding-top: 15px;
-                margin-right: 1em;
-                font-family: 'Arial';
-            }
-
-            .home li:hover {
-                display: block;
-            }
-
-            .home a:link,
-            .home a:visited {
-                color: #D3D3D3;
-            }
-
-            .home li:hover a:link,
-            .home li:hover a:visited {
+            .footer-links a {
+                color: var(--color-base-text-muted);
                 text-decoration: none;
-                padding: 15px;
-                color: #FFFFFF;
-                background-color: #1B80CF;
+                font-size: var(--text-sm);
+                transition: all 0.3s ease;
+                padding: var(--space-xs) var(--space-sm);
+                border-radius: var(--radius-sm);
             }
 
-            .content {
-                line-height: 1.8vmax;
-                font-size: 1.2vmax;
-                font-family: 'Arial';
-                margin-top: 15vh;
-                width: 90%;
+            .footer-links a:hover,
+            .footer-links a:focus {
+                color: var(--color-accent-1);
+                background: var(--color-hover);
             }
 
-            .content h2,
-            h3,
-            h4 {
-                color: #1B80CF;
+            .footer-copyright {
+                font-size: var(--text-sm);
+                color: var(--color-base-text-muted);
             }
 
-            .content a:link,
-            .content a:visited {
-                color: #1B80CF;
+            /* Language Selector in Footer */
+            .language-selector {
+                display: flex;
+                gap: var(--space-md);
+                flex-wrap: wrap;
+                justify-content: center;
             }
 
-            .content h3 {
-                color: #1B80CF;
+            .language-selector a {
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                padding: var(--space-xs) var(--space-md);
+                background: rgba(14, 165, 233, 0.08);
+                color: var(--color-accent-1);
+                text-decoration: none;
+                border-radius: var(--radius-md);
+                font-size: var(--text-sm);
+                font-weight: 500;
+                transition: all 0.3s ease;
+                border: 1px solid var(--color-border);
             }
 
-            .content h2::before,
-            .content h3::before {
-                display: block;
-                content: " ";
-                visibility: hidden;
-                height: 50px;
-                margin-top: -50px;
-                pointer-events: none;
-                background-color: #FFFFFF;
+            .language-selector a:hover,
+            .language-selector a:focus {
+                background: var(--color-accent-1);
+                color: white;
+                transform: translateY(-2px);
+                box-shadow: var(--shadow-md);
             }
 
-            .content a:link,
-            .content a:visited {
-                color: #1B80CF;
+            /* ===========================
+           Responsive Design
+           =========================== */
+            @media (max-width: 768px) {
+                .nav-container {
+                    flex-direction: column;
+                    gap: var(--space-md);
+                    padding: var(--space-md);
+                }
+
+                .hero-section {
+                    padding: var(--space-2xl) 0;
+                }
+
+                .content-section {
+                    padding: var(--space-xl) var(--space-lg);
+                }
+
+                .footer-links {
+                    flex-direction: column;
+                    gap: var(--space-md);
+                }
+
+                .language-selector {
+                    gap: var(--space-sm);
+                }
+
+                .content-section article {
+                    padding: var(--space-md);
+                }
             }
 
-            .content li {
-                margin: 5px;
+            /* ===========================
+           Accessibility Features
+           =========================== */
+            @media (prefers-reduced-motion: reduce) {
+
+                *,
+                *::before,
+                *::after {
+                    animation-duration: 0.01ms !important;
+                    animation-iteration-count: 1 !important;
+                    transition-duration: 0.01ms !important;
+                }
             }
 
-            .page {
-                width: 65vw;
-                height: 100%;
-                margin-left: 30vw;
-                overflow: hidden;
-                padding: 0 1em;
-                font-family: 'Arial';
+            /* Focus Styles */
+            *:focus {
+                outline: 2px solid var(--color-accent-1);
+                outline-offset: 2px;
             }
 
-            .page img {
-                max-width: 100%;
-                max-height: 100%;
+            *:focus:not(:focus-visible) {
+                outline: none;
             }
 
-            @media (max-width: 640px),
-            screen and (orientation: portrait) {
-                body {
-                    max-width: 100%;
-                    max-height: 100%;
+            /* ===========================
+           SVG Animations
+           =========================== */
+            .svg-network-node {
+                animation: networkPulse 3s ease-in-out infinite;
+            }
+
+            .svg-connection-line {
+                animation: dataFlow 4s linear infinite;
+                stroke-dasharray: 10 5;
+            }
+
+            .svg-knowledge-wave {
+                animation: waveFlow 6s ease-in-out infinite;
+            }
+
+            .svg-open-gate {
+                animation: gateOpen 8s ease-in-out infinite;
+            }
+
+            .svg-collaboration-ring {
+                animation: ringExpand 5s ease-in-out infinite;
+                transform-origin: center;
+            }
+
+            @keyframes networkPulse {
+
+                0%,
+                100% {
+                    opacity: 0.4;
+                    transform: scale(1);
                 }
 
-                #sidebar {
-                    position: fixed;
-                    background-color: #1B80CF;
-                    top: 0;
-                    left: 0;
-                    bottom: 80vh;
-                    width: 100vw;
+                50% {
+                    opacity: 1;
+                    transform: scale(1.2);
+                }
+            }
+
+            @keyframes dataFlow {
+                to {
+                    stroke-dashoffset: -30;
+                }
+            }
+
+            @keyframes waveFlow {
+
+                0%,
+                100% {
+                    transform: translateX(0);
+                    opacity: 0.6;
                 }
 
-                #sidebar .title {
-                    text-align: center;
-                    position: fixed;
-                    margin-top: 6vh;
-                    left: 0px;
-                    right: 0px;
-                    line-height: 3.5vmax;
-                    font-size: 1.5vmax;
-                    font-family: 'Arial';
+                50% {
+                    transform: translateX(20px);
+                    opacity: 1;
+                }
+            }
+
+            @keyframes gateOpen {
+
+                0%,
+                100% {
+                    transform: scaleX(1);
+                    opacity: 0.5;
                 }
 
-                #sidebar .subtitle {
-                    text-align: center;
-                    top: 5vh;
-                    left: 0px;
-                    right: 0px;
-                    position: fixed;
-                    margin-top: 10vh;
-                    font-size: 1.5vmax;
+                50% {
+                    transform: scaleX(1.2);
+                    opacity: 0.8;
+                }
+            }
+
+            @keyframes ringExpand {
+
+                0%,
+                100% {
+                    transform: scale(1);
+                    opacity: 0.6;
                 }
 
-                #sidebar .title a:link,
-                #sidebar .title a:visited {
-                    text-align: center;
-                    color: #FFFFFF;
-                }
-
-                #sidebar .subtitle a:link,
-                #sidebar .subtitle a:visited {
-                    text-align: center;
-                    color: #FFFFFF;
-                }
-
-                .home {
-                    z-index: 100;
-                    width: 100%;
-                    background-color: #1B80CF;
-                    font-size: 1.5vmax;
-                }
-
-                .home a:link,
-                .home a:visited {
-                    text-decoration: none;
-                    color: #FFFFFF;
-                }
-
-                .content {
-                    line-height: 3.8vmax;
-                    font-size: 1.8vmax;
-                    font-family: 'Arial';
-                    margin-top: 22vh;
-                }
-
-                .content a:link,
-                .content a:visited {
-                    color: #1B80CF;
-                }
-
-                .page {
-                    top: 40vh;
-                    width: 95%;
-                    margin-left: 0vw;
-                }
-
-                .page img {
-                    max-width: 100%;
-                    max-height: 100%;
-                    border: 0;
+                50% {
+                    transform: scale(1.15);
+                    opacity: 1;
                 }
             }
         </style>
     </head>
 
     <body vocab="http://schema.org/">
-        <div class="page">
-            <div class="home">
-                <ul typeof="BreadcrumbList">
+        <a href="#main-content" class="skip-link">Skip to main content</a>
+
+        <!-- Navigation Header -->
+        <header class="site-header">
+            <nav class="nav-container" role="navigation" aria-label="Main navigation">
+                <a href="../index.html" class="site-brand">John Samuel</a>
+                <ul class="breadcrumb-nav" typeof="BreadcrumbList">
                     <li property="itemListElement" typeof="ListItem">
                         <a property="item" typeof="WebPage" href="../index.html">
                             <span property="name">Home</span>
@@ -268,27 +789,166 @@
                             <span property="name">Research</span>
                         </a>
                     </li>
+                    <li property="itemListElement" typeof="ListItem">
+                        <span property="name">Open Science</span>
+                    </li>
                 </ul>
+            </nav>
+        </header>
 
-            </div>
-            <div id="sidebar">
-                <div class="title">
-                    <h1><a href="./open-science.html">Open Science</a></h1>
-                </div>
-                <div class="subtitle">
-                    <h3><a href="../about.html">John Samuel</a></h3>
-                </div>
-            </div>
+        <!-- Main Content -->
+        <main class="page-wrapper" id="main-content">
+            <div class="container">
+                <!-- Hero Section -->
+                <section class="hero-section">
+                    <h1 class="hero-title">Open Science</h1>
+                    <p class="hero-subtitle">
+                        Making scientific research, data, and knowledge accessible to all levels of society
+                    </p>
 
-            <div class="content">
-                <!DOCTYPE html>
-                <html lang="en">
+                    <!-- Hero SVG Illustration -->
+                    <svg class="hero-svg" viewBox="0 0 750 450" xmlns="http://www.w3.org/2000/svg" role="img"
+                        aria-label="Abstract illustration showing open access, knowledge networks, collaboration, and the free flow of information">
+                        <defs>
+                            <linearGradient id="openGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" style="stop-color:#0ea5e9;stop-opacity:0.8" />
+                                <stop offset="50%" style="stop-color:#06b6d4;stop-opacity:0.7" />
+                                <stop offset="100%" style="stop-color:#f59e0b;stop-opacity:0.8" />
+                            </linearGradient>
+                            <linearGradient id="flowGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                                <stop offset="0%" style="stop-color:#0c4a6e;stop-opacity:0.6" />
+                                <stop offset="100%" style="stop-color:#0ea5e9;stop-opacity:0.8" />
+                            </linearGradient>
+                            <radialGradient id="nodeGradient">
+                                <stop offset="0%" style="stop-color:#0ea5e9;stop-opacity:1" />
+                                <stop offset="100%" style="stop-color:#0ea5e9;stop-opacity:0.2" />
+                            </radialGradient>
+                        </defs>
+
+                        <!-- Central Open Access Symbol -->
+                        <g transform="translate(375, 225)">
+                            <circle cx="0" cy="0" r="60" fill="none" stroke="url(#openGradient)" stroke-width="4"
+                                opacity="0.6" class="svg-collaboration-ring" />
+                            <circle cx="0" cy="0" r="45" fill="none" stroke="url(#openGradient)" stroke-width="3"
+                                opacity="0.5" class="svg-collaboration-ring" style="animation-delay: 0.5s" />
+                            <circle cx="0" cy="0" r="30" fill="url(#nodeGradient)" opacity="0.7" />
+                            <!-- Open lock symbol -->
+                            <rect x="-12" y="-5" width="24" height="20" rx="2" fill="#0ea5e9" opacity="0.7" />
+                            <path d="M -10,-5 Q -10,-18 0,-18 Q 10,-18 10,-5" fill="none" stroke="#06b6d4"
+                                stroke-width="3" opacity="0.8" class="svg-open-gate" />
+                        </g>
+
+                        <!-- Network Nodes (Collaboration Points) -->
+                        <!-- Top nodes -->
+                        <circle class="svg-network-node" cx="200" cy="100" r="12" fill="url(#nodeGradient)"
+                            opacity="0.7" />
+                        <circle class="svg-network-node" cx="375" cy="80" r="12" fill="url(#nodeGradient)" opacity="0.7"
+                            style="animation-delay: 0.8s" />
+                        <circle class="svg-network-node" cx="550" cy="100" r="12" fill="url(#nodeGradient)"
+                            opacity="0.7" style="animation-delay: 1.6s" />
+
+                        <!-- Middle nodes -->
+                        <circle class="svg-network-node" cx="150" cy="225" r="12" fill="url(#nodeGradient)"
+                            opacity="0.7" style="animation-delay: 0.4s" />
+                        <circle class="svg-network-node" cx="600" cy="225" r="12" fill="url(#nodeGradient)"
+                            opacity="0.7" style="animation-delay: 1.2s" />
+
+                        <!-- Bottom nodes -->
+                        <circle class="svg-network-node" cx="200" cy="350" r="12" fill="url(#nodeGradient)"
+                            opacity="0.7" style="animation-delay: 2s" />
+                        <circle class="svg-network-node" cx="375" cy="370" r="12" fill="url(#nodeGradient)"
+                            opacity="0.7" style="animation-delay: 0.6s" />
+                        <circle class="svg-network-node" cx="550" cy="350" r="12" fill="url(#nodeGradient)"
+                            opacity="0.7" style="animation-delay: 1.4s" />
+
+                        <!-- Connection Lines (Data Flow) -->
+                        <line class="svg-connection-line" x1="200" y1="100" x2="315" y2="165" stroke="#0ea5e9"
+                            stroke-width="2" opacity="0.4" />
+                        <line class="svg-connection-line" x1="375" y1="80" x2="375" y2="165" stroke="#06b6d4"
+                            stroke-width="2" opacity="0.4" />
+                        <line class="svg-connection-line" x1="550" y1="100" x2="435" y2="165" stroke="#0ea5e9"
+                            stroke-width="2" opacity="0.4" />
+
+                        <line class="svg-connection-line" x1="150" y1="225" x2="315" y2="225" stroke="#06b6d4"
+                            stroke-width="2" opacity="0.4" />
+                        <line class="svg-connection-line" x1="600" y1="225" x2="435" y2="225" stroke="#0ea5e9"
+                            stroke-width="2" opacity="0.4" />
+
+                        <line class="svg-connection-line" x1="200" y1="350" x2="315" y2="285" stroke="#0ea5e9"
+                            stroke-width="2" opacity="0.4" />
+                        <line class="svg-connection-line" x1="375" y1="370" x2="375" y2="285" stroke="#06b6d4"
+                            stroke-width="2" opacity="0.4" />
+                        <line class="svg-connection-line" x1="550" y1="350" x2="435" y2="285" stroke="#0ea5e9"
+                            stroke-width="2" opacity="0.4" />
+
+                        <!-- Knowledge Wave Particles -->
+                        <g class="svg-knowledge-wave">
+                            <circle cx="100" cy="120" r="4" fill="#0ea5e9" opacity="0.6" />
+                            <circle cx="120" cy="130" r="3" fill="#06b6d4" opacity="0.5" />
+                            <circle cx="140" cy="125" r="4" fill="#f59e0b" opacity="0.6" />
+                        </g>
+
+                        <g class="svg-knowledge-wave" style="animation-delay: 2s">
+                            <circle cx="600" cy="280" r="4" fill="#0ea5e9" opacity="0.6" />
+                            <circle cx="620" cy="290" r="3" fill="#06b6d4" opacity="0.5" />
+                            <circle cx="640" cy="285" r="4" fill="#f59e0b" opacity="0.6" />
+                        </g>
+
+                        <!-- Open Book Symbol (Top Left) -->
+                        <g transform="translate(80, 60)">
+                            <path d="M 0,0 L -15,-5 L -15,15 L 0,20 Z" fill="#0ea5e9" opacity="0.4" />
+                            <path d="M 0,0 L 15,-5 L 15,15 L 0,20 Z" fill="#06b6d4" opacity="0.5" />
+                            <line x1="0" y1="0" x2="0" y2="20" stroke="#0c4a6e" stroke-width="2" opacity="0.6" />
+                        </g>
+
+                        <!-- Data Repository Symbol (Bottom Right) -->
+                        <g transform="translate(670, 380)">
+                            <rect x="-20" y="-15" width="40" height="30" rx="4" fill="none" stroke="#0ea5e9"
+                                stroke-width="2" opacity="0.5" />
+                            <line x1="-12" y1="-8" x2="12" y2="-8" stroke="#06b6d4" stroke-width="2" opacity="0.6" />
+                            <line x1="-12" y1="0" x2="12" y2="0" stroke="#06b6d4" stroke-width="2" opacity="0.6" />
+                            <line x1="-12" y1="8" x2="12" y2="8" stroke="#06b6d4" stroke-width="2" opacity="0.6" />
+                        </g>
+
+                        <!-- Collaboration Hands (Bottom Left) -->
+                        <g transform="translate(80, 380)">
+                            <circle cx="-10" cy="0" r="8" fill="#0ea5e9" opacity="0.5" />
+                            <circle cx="10" cy="0" r="8" fill="#06b6d4" opacity="0.5" />
+                            <line x1="-10" y1="0" x2="10" y2="0" stroke="#f59e0b" stroke-width="3" opacity="0.6" />
+                        </g>
+
+                        <!-- Transparency Grid (Top Right) -->
+                        <g transform="translate(650, 80)" opacity="0.3">
+                            <rect x="0" y="0" width="15" height="15" fill="none" stroke="#0ea5e9" stroke-width="1" />
+                            <rect x="15" y="0" width="15" height="15" fill="none" stroke="#0ea5e9" stroke-width="1" />
+                            <rect x="0" y="15" width="15" height="15" fill="none" stroke="#0ea5e9" stroke-width="1" />
+                            <rect x="15" y="15" width="15" height="15" fill="none" stroke="#0ea5e9" stroke-width="1" />
+                        </g>
+
+                        <!-- Orbital rings suggesting global reach -->
+                        <ellipse cx="375" cy="225" rx="180" ry="100" fill="none" stroke="#0ea5e9" stroke-width="1"
+                            opacity="0.2" stroke-dasharray="5,5" />
+                        <ellipse cx="375" cy="225" rx="220" ry="140" fill="none" stroke="#06b6d4" stroke-width="1"
+                            opacity="0.15" stroke-dasharray="8,8" />
+                    </svg>
+                </section>
+
+                <div class="section-divider">
+                    <span class="connection-node"></span>
+                    <span class="connection-node"></span>
+                    <span class="connection-node"></span>
+                    <span class="connection-node"></span>
+                    <span class="connection-node"></span>
+                </div>
+
+                <!-- Article Content -->
+                <article class="content-section">
                     <header>
                         <h2>Understanding Open Science: Principles, Practices, and Challenges</h2>
-                        <p><strong>Open Science</strong> is a global movement that seeks to make scientific
-                            research, data, methods, and dissemination accessible to all levels of society—whether
-                            academic, professional, or amateur. It aims to foster transparency, collaboration, and
-                            equitable access to knowledge.</p>
+                        <p><strong>Open Science</strong> is a global movement that seeks to make scientific research,
+                            data, methods, and dissemination accessible to all levels of society—whether academic,
+                            professional, or amateur. It aims to foster transparency, collaboration, and equitable
+                            access to knowledge.</p>
                     </header>
 
                     <section>
@@ -299,49 +959,49 @@
                             <li><strong>Budapest Open Access Initiative</strong> (2002): Called for free and
                                 unrestricted access to peer-reviewed research literature.</li>
                             <li><strong>Berlin Declaration on Open Access</strong> (2003): Promoted open access to
-                                knowledge in the sciences and humanities.
-                            </li>
-                            <li><strong>UNESCO Recommendation on Open Science</strong> (2021): Encourages member
-                                states to adopt open practices and infrastructures.</li>
-                            <li><strong>Horizon Europe</strong>: The EU's key funding program mandates open access
-                                and FAIR data principles across funded projects.</li>
+                                knowledge in the sciences and humanities.</li>
+                            <li><strong>UNESCO Recommendation on Open Science</strong> (2021): Encourages member states
+                                to adopt open practices and infrastructures.</li>
+                            <li><strong>Horizon Europe</strong>: The EU's key funding program mandates open access and
+                                FAIR data principles across funded projects.</li>
                         </ul>
                     </section>
 
                     <section>
                         <h3>Key Practices in Open Science</h3>
+
                         <article>
                             <h3>1. Open Annotation</h3>
-                            <p>Open annotation enables collaborative engagement with digital content, including
-                                texts, images, datasets, or videos. Using tools like <a
-                                    href="https://hypothes.is/">Hypothes.is</a>, researchers and readers can
-                                publicly or privately comment and contribute to scholarly discussions in real time.
-                            </p>
+                            <p>Open annotation enables collaborative engagement with digital content, including texts,
+                                images, datasets, or videos. Using tools like <a
+                                    href="https://hypothes.is/">Hypothes.is</a>, researchers and readers can publicly or
+                                privately comment and contribute to scholarly discussions in real time.</p>
                         </article>
 
                         <article>
                             <h3>2. Open Preprints</h3>
-                            <p>Preprints are research manuscripts shared publicly before peer review. Platforms such
-                                as <a href="https://arxiv.org/">arXiv</a>, <a
-                                    href="https://www.biorxiv.org/">bioRxiv</a>, and <a
-                                    href="https://osf.io/preprints/">OSF Preprints</a> support early dissemination,
-                                enabling feedback and rapid scientific progress.</p>
+                            <p>Preprints are research manuscripts shared publicly before peer review. Platforms such as
+                                <a href="https://arxiv.org/">arXiv</a>, <a href="https://www.biorxiv.org/">bioRxiv</a>,
+                                and <a href="https://osf.io/preprints/">OSF Preprints</a> support early dissemination,
+                                enabling feedback and rapid scientific progress.
+                            </p>
                         </article>
 
                         <article>
                             <h3>3. Open Access Journals</h3>
-                            <p>Open access journals provide unrestricted, free access to peer-reviewed articles.
-                                They are supported through models like Article Processing Charges (APCs),
-                                institutional subsidies, or diamond open access (no charges for authors or readers).
-                                Examples include <em>PLOS ONE</em> and <em>eLife</em>.</p>
+                            <p>Open access journals provide unrestricted, free access to peer-reviewed articles. They
+                                are supported through models like Article Processing Charges (APCs), institutional
+                                subsidies, or diamond open access (no charges for authors or readers). Examples include
+                                <em>PLOS ONE</em> and <em>eLife</em>.
+                            </p>
                         </article>
 
                         <article>
                             <h3>4. Open Peer Review</h3>
-                            <p>Open peer review increases transparency by disclosing reviewer and author identities
-                                or making reviews publicly available. It aims to improve review quality and
-                                accountability. See practices at <a href="https://f1000research.com/">F1000Research</a>
-                                and <a href="https://openresearch-europe.ec.europa.eu/">Open Research Europe</a>.</p>
+                            <p>Open peer review increases transparency by disclosing reviewer and author identities or
+                                making reviews publicly available. It aims to improve review quality and accountability.
+                                See practices at <a href="https://f1000research.com/">F1000Research</a> and <a
+                                    href="https://openresearch-europe.ec.europa.eu/">Open Research Europe</a>.</p>
                         </article>
 
                         <article>
@@ -357,8 +1017,8 @@
                             <p>Open source software, with licenses such as <a
                                     href="https://opensource.org/licenses/MIT">MIT</a>, <a
                                     href="https://www.gnu.org/licenses/gpl-3.0.html">GPL</a>, and <a
-                                    href="https://www.apache.org/licenses/LICENSE-2.0">Apache</a>, ensures that code
-                                is freely available for reuse and improvement. Platforms like <a
+                                    href="https://www.apache.org/licenses/LICENSE-2.0">Apache</a>, ensures that code is
+                                freely available for reuse and improvement. Platforms like <a
                                     href="https://github.com/">GitHub</a> and <a href="https://gitlab.com/">GitLab</a>
                                 support collaborative development.</p>
                         </article>
@@ -367,8 +1027,8 @@
                             <h3>7. Open Data</h3>
                             <p>Open data refers to research data shared in a manner that allows free use and reuse,
                                 ideally under licenses like <a
-                                    href="https://creativecommons.org/publicdomain/zero/1.0/">CC0</a>. Repositories
-                                such as <a href="https://zenodo.org/">Zenodo</a>, <a
+                                    href="https://creativecommons.org/publicdomain/zero/1.0/">CC0</a>. Repositories such
+                                as <a href="https://zenodo.org/">Zenodo</a>, <a
                                     href="https://dataverse.org/">Dataverse</a>, and <a
                                     href="https://datacite.org/">DataCite</a> promote FAIR (Findable, Accessible,
                                 Interoperable, Reusable) principles.</p>
@@ -378,8 +1038,8 @@
                             <h3>8. Open Citations</h3>
                             <p>Open citations are openly available references to scholarly works, often in
                                 machine-readable formats. Initiatives like <a
-                                    href="https://opencitations.net/">OpenCitations</a> promote transparency in
-                                citation networks and foster metrics beyond journal impact factors.</p>
+                                    href="https://opencitations.net/">OpenCitations</a> promote transparency in citation
+                                networks and foster metrics beyond journal impact factors.</p>
                         </article>
 
                         <article>
@@ -391,16 +1051,16 @@
                         <article>
                             <h3>10. Citizen Science</h3>
                             <p>Citizen science involves public participation in scientific research. Volunteers may
-                                collect, classify, or analyze data—enhancing public engagement and expanding
-                                research capacity. Projects like <a href="https://www.zooniverse.org/">Zooniverse</a>
-                                exemplify this practice.</p>
+                                collect, classify, or analyze data—enhancing public engagement and expanding research
+                                capacity. Projects like <a href="https://www.zooniverse.org/">Zooniverse</a> exemplify
+                                this practice.</p>
                         </article>
 
                         <article>
                             <h3>11. Open Educational Resources (OERs)</h3>
-                            <p>OERs are freely accessible, openly licensed educational materials that support
-                                teaching and learning. They are essential for equitable education and
-                                capacity-building in scientific literacy.</p>
+                            <p>OERs are freely accessible, openly licensed educational materials that support teaching
+                                and learning. They are essential for equitable education and capacity-building in
+                                scientific literacy.</p>
                         </article>
                     </section>
 
@@ -410,10 +1070,9 @@
                             software—can be reliably found and cited over time. Common PIDs include:</p>
                         <ul>
                             <li><strong>DOIs (Digital Object Identifiers):</strong> For publications, datasets, and
-                                software.
+                                software.</li>
+                            <li><strong>ARKs (Archival Resource Keys):</strong> Widely used in libraries and archives.
                             </li>
-                            <li><strong>ARKs (Archival Resource Keys):</strong> Widely used in libraries and
-                                archives.</li>
                             <li><strong>URNs (Uniform Resource Names):</strong> Persistent, location-independent
                                 identifiers.</li>
                             <li><strong>Handle System:</strong> Infrastructure used by repositories to resolve
@@ -442,18 +1101,18 @@
                             <li>Lack of standardized tools and policies across institutions</li>
                         </ul>
                     </section>
+
                     <section>
                         <h3>Related Articles</h3>
                         <ul>
-                            <li><a href="./next-gen-citation.html">Next-Generation citation sources</a>.</li>
+                            <li><a href="./next-gen-citation.html">Next-Generation citation sources</a></li>
                         </ul>
                     </section>
 
                     <footer>
                         <h3>References</h3>
                         <ol>
-                            <li><a href="https://en.wikipedia.org/wiki/Open_science">Open Science – Wikipedia</a>
-                            </li>
+                            <li><a href="https://en.wikipedia.org/wiki/Open_science">Open Science – Wikipedia</a></li>
                             <li><a href="https://www.budapestopenaccessinitiative.org/read">Budapest Open Access
                                     Initiative</a></li>
                             <li><a href="https://openaccess.mpg.de/Berlin-Declaration">Berlin Declaration on Open
@@ -467,7 +1126,7 @@
                                     Europe</a></li>
                             <li><a href="https://sparcopen.org/">SPARC</a></li>
                             <li><a href="https://www.nature.com/articles/d41586-024-00322-2">Nature: Open science —
-                                    embrace it before it’s too late</a></li>
+                                    embrace it before it's too late</a></li>
                             <li><a href="https://www.plos.org/open-science">PLOS: Open Science Initiatives</a></li>
                             <li><a href="https://openaire.eu/">OpenAIRE</a></li>
                             <li><a href="https://www.go-fair.org/fair-principles/">FAIR Principles</a></li>
@@ -476,13 +1135,28 @@
                                     Wikipedia</a></li>
                         </ol>
                     </footer>
-
-
+                </article>
             </div>
+        </main>
 
-            <br />
+        <!-- Footer -->
+        <footer class="site-footer">
+            <div class="footer-content">
+                <nav class="language-selector" aria-label="Language selection">
+                    <a href="open-science.html" hreflang="en">English</a>
+                </nav>
 
-        </div>
+                <ul class="footer-links">
+                    <li><a href="../index.html">Home</a></li>
+                    <li><a href="../research/research.html">Research</a></li>
+                    <li><a href="../about.html">About</a></li>
+                </ul>
+
+                <p class="footer-copyright">
+                    © 2024 John Samuel. All content licensed under Creative Commons CC BY-SA 4.0.
+                </p>
+            </div>
+        </footer>
     </body>
 
 </html>
