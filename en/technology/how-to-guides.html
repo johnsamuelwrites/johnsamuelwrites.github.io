@@ -2,299 +2,510 @@
 <html lang="en">
 
     <head>
-        <meta charset="utf-8" />
-        <meta http-equiv="Content-Language" content="en" />
+        <meta charset="utf-8">
+        <meta http-equiv="Content-Language" content="en">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <link rel="shortcut icon" href="../../images/logo/favicon.png" />
-        <title>How-to Guides: John Samuel</title>
-        <style type="text/css">
-            body {
-                background-color: #FFFFFF;
+        <link rel="shortcut icon" href="../../images/logo/favicon.png">
+        <title>How-to Guides | John Samuel</title>
+        <style>
+            /* =====================================================
+           DESIGN TOKENS & CSS CUSTOM PROPERTIES
+           ===================================================== */
+            :root {
+                /* Base Colors - Documentation Theme */
+                --color-base-bg: #f8f9fc;
+                --color-base-surface: #ffffff;
+                --color-base-text: #1e293b;
+                --color-base-text-muted: #64748b;
+
+                /* Theme Accents - Knowledge & Documentation */
+                --color-accent-1: #3b82f6;
+                /* Documentation blue */
+                --color-accent-2: #0ea5e9;
+                /* Sky blue - clarity */
+                --color-accent-3: #8b5cf6;
+                /* Purple - learning */
+                --color-accent-4: #10b981;
+                /* Green - success/growth */
+                --color-accent-light: rgba(59, 130, 246, 0.08);
+
+                /* Functional Colors */
+                --color-shadow: rgba(59, 130, 246, 0.15);
+                --color-border: rgba(59, 130, 246, 0.2);
+                --color-hover: rgba(59, 130, 246, 0.1);
+
+                /* Gradients */
+                --gradient-primary: linear-gradient(135deg, var(--color-accent-1) 0%, var(--color-accent-2) 50%, var(--color-accent-3) 100%);
+                --gradient-hero: linear-gradient(135deg, #3b82f6 0%, #0ea5e9 50%, #8b5cf6 100%);
+
+                /* Spacing Scale */
+                --space-xs: 0.25rem;
+                --space-sm: 0.5rem;
+                --space-md: 1rem;
+                --space-lg: 1.5rem;
+                --space-xl: 2rem;
+                --space-2xl: 3rem;
+                --space-3xl: 4rem;
+                --space-4xl: 6rem;
+
+                /* Border Radius */
+                --radius-sm: 6px;
+                --radius-md: 12px;
+                --radius-lg: 16px;
+                --radius-xl: 24px;
+
+                /* Shadows */
+                --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.05), 0 1px 2px rgba(0, 0, 0, 0.04);
+                --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.07), 0 2px 4px rgba(0, 0, 0, 0.05);
+                --shadow-lg: 0 10px 24px rgba(0, 0, 0, 0.1), 0 4px 8px rgba(0, 0, 0, 0.06);
+                --shadow-theme: 0 10px 30px var(--color-shadow);
+
+                /* Typography */
+                --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+                --text-xs: clamp(0.75rem, 0.7rem + 0.25vw, 0.875rem);
+                --text-sm: clamp(0.875rem, 0.8rem + 0.35vw, 1rem);
+                --text-base: clamp(1rem, 0.95rem + 0.25vw, 1.125rem);
+                --text-lg: clamp(1.125rem, 1.05rem + 0.35vw, 1.25rem);
+                --text-xl: clamp(1.25rem, 1.15rem + 0.5vw, 1.5rem);
+                --text-2xl: clamp(1.5rem, 1.3rem + 1vw, 2rem);
+                --text-3xl: clamp(2rem, 1.6rem + 2vw, 2.75rem);
+                --text-4xl: clamp(2.5rem, 2rem + 2.5vw, 4rem);
             }
 
-            #sidebar {
+            /* =====================================================
+           RESET & BASE STYLES
+           ===================================================== */
+            * {
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
+            }
+
+            html {
+                scroll-behavior: smooth;
+                scroll-padding-top: 100px;
+            }
+
+            body {
+                font-family: var(--font-sans);
+                font-size: var(--text-base);
+                line-height: 1.7;
+                color: var(--color-base-text);
+                background: var(--color-base-bg);
+                overflow-x: hidden;
+                -webkit-font-smoothing: antialiased;
+                -moz-osx-font-smoothing: grayscale;
+            }
+
+            /* Animated background pattern */
+            body::before {
+                content: '';
                 position: fixed;
-                background-color: #8E44AD;
                 top: 0;
                 left: 0;
+                right: 0;
                 bottom: 0;
-                width: 30vw;
+                background:
+                    radial-gradient(circle at 15% 25%, rgba(59, 130, 246, 0.08) 0%, transparent 40%),
+                    radial-gradient(circle at 85% 75%, rgba(14, 165, 233, 0.08) 0%, transparent 40%),
+                    radial-gradient(circle at 50% 50%, rgba(139, 92, 246, 0.06) 0%, transparent 50%);
+                z-index: -1;
+                animation: backgroundFlow 20s ease-in-out infinite;
             }
 
-            #sidebar .title {
-                position: relative;
-                text-align: center;
-                line-height: 4vmax;
-                font-size: 1.4vmax;
-                font-family: 'Arial';
-                margin-top: 25vh;
+            @keyframes backgroundFlow {
+
+                0%,
+                100% {
+                    opacity: 1;
+                    transform: scale(1);
+                }
+
+                50% {
+                    opacity: 0.8;
+                    transform: scale(1.05);
+                }
             }
 
-            #sidebar .title a:link,
-            #sidebar .title a:visited {
-                color: #FFFFFF;
+            /* Document lines pattern */
+            body::after {
+                content: '';
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background-image: repeating-linear-gradient(0deg,
+                        transparent,
+                        transparent 39px,
+                        rgba(59, 130, 246, 0.03) 39px,
+                        rgba(59, 130, 246, 0.03) 40px);
+                z-index: -1;
+                pointer-events: none;
+            }
+
+            /* =====================================================
+           SKIP LINK (Accessibility)
+           ===================================================== */
+            .skip-link {
+                position: absolute;
+                top: -40px;
+                left: 0;
+                background: var(--color-accent-1);
+                color: white;
+                padding: var(--space-sm) var(--space-md);
                 text-decoration: none;
+                border-radius: var(--radius-sm);
+                z-index: 1000;
+            }
+
+            .skip-link:focus {
+                top: var(--space-sm);
+                left: var(--space-sm);
+            }
+
+            /* =====================================================
+           NAVIGATION
+           ===================================================== */
+            nav {
+                position: sticky;
+                top: 0;
+                z-index: 100;
+                background: rgba(255, 255, 255, 0.9);
+                -webkit-backdrop-filter: blur(20px) saturate(180%);
+                backdrop-filter: blur(20px) saturate(180%);
+                border-bottom: 1px solid var(--color-border);
+                box-shadow: var(--shadow-sm);
+            }
+
+            .nav-container {
+                max-width: 1400px;
+                margin: 0 auto;
+                padding: var(--space-lg) var(--space-xl);
+                display: flex;
+                align-items: center;
+                gap: var(--space-xl);
+            }
+
+            .site-name {
+                font-size: var(--text-xl);
+                font-weight: 700;
+                background: var(--gradient-primary);
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                background-clip: text;
+                text-decoration: none;
+                white-space: nowrap;
+                letter-spacing: -0.02em;
+                position: relative;
+            }
+
+            .site-name::after {
+                content: '';
+                position: absolute;
+                bottom: -4px;
+                left: 0;
+                width: 100%;
+                height: 2px;
+                background: var(--gradient-primary);
+                transform: scaleX(0);
+                transition: transform 0.3s ease;
+            }
+
+            .site-name:hover::after {
+                transform: scaleX(1);
+            }
+
+            .breadcrumbs {
+                display: flex;
+                gap: var(--space-sm);
+                align-items: center;
+                flex-wrap: wrap;
+                list-style: none;
+                font-size: var(--text-sm);
+            }
+
+            .breadcrumbs li {
+                display: flex;
+                align-items: center;
+                gap: var(--space-sm);
+            }
+
+            .breadcrumbs li:not(:last-child)::after {
+                content: '→';
+                color: var(--color-accent-1);
+                font-weight: 600;
+            }
+
+            .breadcrumbs a {
+                color: var(--color-base-text-muted);
+                text-decoration: none;
+                transition: all 0.3s ease;
+            }
+
+            .breadcrumbs a:hover {
+                color: var(--color-accent-1);
+            }
+
+            /* =====================================================
+           HEADER SECTION
+           ===================================================== */
+            .header-section {
+                max-width: 1400px;
+                margin: var(--space-4xl) auto var(--space-3xl);
+                padding: 0 var(--space-xl);
+            }
+
+            h1 {
+                font-size: var(--text-4xl);
+                font-weight: 800;
+                line-height: 1.15;
+                letter-spacing: -0.03em;
+                margin-bottom: var(--space-lg);
+                background: var(--gradient-primary);
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                background-clip: text;
+                animation: fadeInUp 0.8s ease 0.2s both;
             }
 
             .subtitle {
-                top: 50vh;
-                text-align: center;
-                line-height: 1.3vmax;
-                font-family: 'Arial';
-                font-size: 1.5vmax;
-                color: #FFFFFF;
+                font-size: var(--text-lg);
+                color: var(--color-base-text-muted);
+                margin-bottom: var(--space-2xl);
+                animation: fadeInUp 0.8s ease 0.4s both;
             }
 
-            .subtitle a:link,
-            .subtitle a:visited {
-                color: #FFFFFF;
+            .subtitle a {
+                color: var(--color-accent-2);
                 text-decoration: none;
+                font-weight: 600;
+                transition: color 0.3s ease;
             }
 
-            .licence {
-                position: fixed;
-                text-align: right;
-                bottom: 0;
-                right: 0;
+            .subtitle a:hover {
+                color: var(--color-accent-3);
             }
 
-            .home {
-                position: fixed;
-                text-align: left;
-                font-family: 'Arial';
-                color: #D3D3D3;
-                z-index: 100;
+            @keyframes fadeInUp {
+                from {
+                    opacity: 0;
+                    transform: translateY(30px);
+                }
+
+                to {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            }
+
+            /* =====================================================
+           HERO SVG ILLUSTRATION
+           ===================================================== */
+            .hero-illustration {
                 width: 100%;
-                background-color: #FFFFFF;
-                top: 0px;
-                margin-bottom: 10px;
-                padding-bottom: 10px;
+                max-width: 700px;
+                margin: 0 auto var(--space-3xl);
+                animation: fadeInUp 1s ease 0.6s both;
             }
 
-            .home a:link,
-            .home a:visited {
+            /* =====================================================
+           MAIN CONTENT
+           ===================================================== */
+            main {
+                max-width: 900px;
+                margin: 0 auto;
+                padding: 0 var(--space-xl) var(--space-4xl);
+            }
+
+            p {
+                margin-bottom: var(--space-xl);
+                color: var(--color-base-text);
+                line-height: 1.8;
+            }
+
+            a {
+                color: var(--color-accent-1);
                 text-decoration: none;
-                color: #D3D3D3;
+                border-bottom: 1px solid transparent;
+                transition: all 0.3s ease;
             }
 
-            .home ul {
-                margin: 0;
-                padding: 0;
-                text-align: left;
-                list-style: none;
+            a:hover {
+                color: var(--color-accent-2);
+                border-bottom-color: var(--color-accent-2);
             }
 
-            .home li {
+            /* =====================================================
+           CONTENT CARDS (Visual Enhancement)
+           ===================================================== */
+            .content-highlight {
+                margin: var(--space-2xl) 0;
+                padding: var(--space-xl);
+                background: white;
+                border-radius: var(--radius-lg);
+                box-shadow: var(--shadow-md);
+                border-left: 4px solid var(--color-accent-1);
                 position: relative;
-                float: left;
-                padding-top: 15px;
-                margin-right: 1em;
-                font-family: 'Arial';
-            }
-
-            .home li:hover {
-                display: block;
-            }
-
-            .home a:link,
-            .home a:visited {
-                color: #D3D3D3;
-            }
-
-            .home li:hover a:link,
-            .home li:hover a:visited {
-                text-decoration: none;
-                padding: 15px;
-                color: #FFFFFF;
-                background-color: #8E44AD;
-            }
-
-            #langlist {
-                padding-left: 0;
-                border-radius: 1.2em;
-                background-color: #8E44AD;
-                display: inline-block;
-            }
-
-            #langlist li {
-                list-style: none;
-                display: inline-block;
-                padding: 0.5em;
-                margin-left: 0.3em;
-                margin-right: 0.3em;
-                font-family: 'Arial';
-            }
-
-            #langlist a {
-                text-decoration: none;
-                color: #FFFFFF;
-            }
-
-            #langlist .highlight {
-                border-radius: 1em;
-                padding-top: 0.3em;
-                padding-bottom: 0.3em;
-                background-color: #FFFFFF;
-            }
-
-            #langlist .highlight a {
-                color: #8E44AD;
-            }
-
-            .content {
-                line-height: 1.8vmax;
-                font-size: 1.2vmax;
-                font-family: 'Arial';
-                margin-top: 15vh;
-                width: 90%;
-            }
-
-            .content h2,
-            h3,
-            h4 {
-                color: #8E44AD;
-            }
-
-            .content a:link,
-            .content a:visited {
-                color: #8E44AD;
-            }
-
-            .content h3 {
-                color: #8E44AD;
-            }
-
-            .content h2::before,
-            .content h3::before {
-                display: block;
-                content: " ";
-                visibility: hidden;
-                height: 50px;
-                margin-top: -50px;
-                pointer-events: none;
-                background-color: #FFFFFF;
-            }
-
-            .content p {
-                text-align: justify;
-            }
-
-            .content a:link,
-            .content a:visited {
-                color: #8E44AD;
-            }
-
-            .content li {
-                margin: 5px;
-            }
-
-            .page {
-                width: 65vw;
-                height: 100%;
-                margin-left: 30vw;
                 overflow: hidden;
-                padding: 0 1em;
-                font-family: 'Arial';
             }
 
-            .page img {
-                max-width: 100%;
-                max-height: 100%;
+            .content-highlight::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                right: 0;
+                width: 200px;
+                height: 200px;
+                background: radial-gradient(circle, var(--color-accent-light) 0%, transparent 70%);
+                border-radius: 50%;
+                transform: translate(50%, -50%);
             }
 
-            @media (max-width: 640px),
-            screen and (orientation: portrait) {
+            /* =====================================================
+           FOOTER
+           ===================================================== */
+            footer {
+                margin-top: var(--space-4xl);
+                padding: var(--space-3xl) var(--space-xl);
+                background: white;
+                border-top: 1px solid var(--color-border);
+                box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.03);
+            }
+
+            .footer-content {
+                max-width: 1400px;
+                margin: 0 auto;
+                display: flex;
+                flex-direction: column;
+                gap: var(--space-xl);
+            }
+
+            .language-selector {
+                display: flex;
+                gap: var(--space-lg);
+                flex-wrap: wrap;
+            }
+
+            .language-selector h3 {
+                width: 100%;
+                font-size: var(--text-lg);
+                color: var(--color-base-text-muted);
+                margin: 0 0 var(--space-md);
+                font-weight: 600;
+            }
+
+            .lang-link {
+                padding: var(--space-sm) var(--space-lg);
+                background: var(--color-accent-light);
+                border: 1px solid var(--color-border);
+                border-radius: var(--radius-md);
+                color: var(--color-base-text);
+                text-decoration: none;
+                font-weight: 500;
+                transition: all 0.3s ease;
+                display: inline-flex;
+                align-items: center;
+                gap: var(--space-sm);
+            }
+
+            .lang-link.active {
+                background: var(--gradient-primary);
+                border-color: transparent;
+                color: white;
+            }
+
+            .lang-link:not(.active):hover {
+                background: var(--color-hover);
+                border-color: var(--color-accent-1);
+                transform: translateY(-2px);
+                box-shadow: var(--shadow-sm);
+            }
+
+            .lang-link::before {
+                content: '🌐';
+            }
+
+            .copyright {
+                text-align: center;
+                color: var(--color-base-text-muted);
+                font-size: var(--text-sm);
+                padding-top: var(--space-xl);
+                border-top: 1px solid var(--color-border);
+            }
+
+            /* =====================================================
+           RESPONSIVE DESIGN
+           ===================================================== */
+            @media (max-width: 768px) {
+                .nav-container {
+                    flex-direction: column;
+                    align-items: flex-start;
+                    gap: var(--space-md);
+                    padding: var(--space-md) var(--space-lg);
+                }
+
+                .breadcrumbs {
+                    font-size: var(--text-xs);
+                }
+
+                .header-section {
+                    margin: var(--space-2xl) auto var(--space-xl);
+                    padding: 0 var(--space-lg);
+                }
+
+                main {
+                    padding: 0 var(--space-lg) var(--space-3xl);
+                }
+
+                h1 {
+                    font-size: var(--text-3xl);
+                }
+            }
+
+            /* =====================================================
+           ACCESSIBILITY - REDUCED MOTION
+           ===================================================== */
+            @media (prefers-reduced-motion: reduce) {
+
+                *,
+                *::before,
+                *::after {
+                    animation-duration: 0.01ms !important;
+                    animation-iteration-count: 1 !important;
+                    transition-duration: 0.01ms !important;
+                }
+            }
+
+            /* =====================================================
+           PRINT STYLES
+           ===================================================== */
+            @media print {
                 body {
+                    background: white;
+                    color: black;
+                }
+
+                nav,
+                footer,
+                .hero-illustration {
+                    display: none;
+                }
+
+                main {
                     max-width: 100%;
-                    max-height: 100%;
-                }
-
-                #sidebar {
-                    position: fixed;
-                    background-color: #8E44AD;
-                    top: 0;
-                    left: 0;
-                    bottom: 80vh;
-                    width: 100vw;
-                }
-
-                #sidebar .title {
-                    text-align: center;
-                    position: fixed;
-                    margin-top: 6vh;
-                    left: 0px;
-                    right: 0px;
-                    line-height: 3.5vmax;
-                    font-size: 1.5vmax;
-                    font-family: 'Arial';
-                }
-
-                #sidebar .subtitle {
-                    text-align: center;
-                    top: 5vh;
-                    left: 0px;
-                    right: 0px;
-                    position: fixed;
-                    margin-top: 10vh;
-                    font-size: 1.5vmax;
-                }
-
-                #sidebar .title a:link,
-                #sidebar .title a:visited {
-                    text-align: center;
-                    color: #FFFFFF;
-                }
-
-                #sidebar .subtitle a:link,
-                #sidebar .subtitle a:visited {
-                    text-align: center;
-                    color: #FFFFFF;
-                }
-
-                .home {
-                    z-index: 100;
-                    width: 100%;
-                    background-color: #8E44AD;
-                    font-size: 1.5vmax;
-                }
-
-                .home a:link,
-                .home a:visited {
-                    text-decoration: none;
-                    color: #FFFFFF;
-                }
-
-                .content {
-                    line-height: 3.8vmax;
-                    font-size: 1.8vmax;
-                    font-family: 'Arial';
-                    margin-top: 22vh;
-                }
-
-                .content a:link,
-                .content a:visited {
-                    color: #8E44AD;
-                }
-
-                .page {
-                    top: 40vh;
-                    width: 95%;
-                    margin-left: 0vw;
-                }
-
-                .page img {
-                    max-width: 100%;
-                    max-height: 100%;
-                    border: 0;
                 }
             }
         </style>
     </head>
 
     <body vocab="http://schema.org/">
-        <div class="page">
-            <div class="home">
-                <ul typeof="BreadcrumbList">
+        <a href="#main-content" class="skip-link">Skip to main content</a>
+
+        <nav role="navigation" aria-label="Main navigation">
+            <div class="nav-container">
+                <a href="../about.html" class="site-name">John Samuel</a>
+                <ul class="breadcrumbs" typeof="BreadcrumbList">
                     <li property="itemListElement" typeof="ListItem">
                         <a property="item" typeof="WebPage" href="../index.html">
                             <span property="name">Home</span>
@@ -306,91 +517,249 @@
                         </a>
                     </li>
                 </ul>
-
             </div>
-            <div id="sidebar">
-                <div class="title">
-                    <h1><a href="./how-to-guides.html">How-to Guides</a></h1>
+        </nav>
+
+        <header class="header-section">
+            <h1>How-to Guides</h1>
+
+            <div class="subtitle">
+                By <a href="../about.html">John Samuel</a>
+            </div>
+
+            <svg class="hero-illustration" viewBox="0 0 800 400" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                <!-- Background document pages -->
+                <defs>
+                    <linearGradient id="gradientDoc" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" style="stop-color:#3b82f6;stop-opacity:1" />
+                        <stop offset="50%" style="stop-color:#0ea5e9;stop-opacity:1" />
+                        <stop offset="100%" style="stop-color:#8b5cf6;stop-opacity:1" />
+                    </linearGradient>
+                    <linearGradient id="gradientAccent" x1="0%" y1="0%" x2="0%" y2="100%">
+                        <stop offset="0%" style="stop-color:#10b981;stop-opacity:1" />
+                        <stop offset="100%" style="stop-color:#3b82f6;stop-opacity:1" />
+                    </linearGradient>
+                    <filter id="docShadow">
+                        <feGaussianBlur in="SourceAlpha" stdDeviation="3" />
+                        <feOffset dx="2" dy="4" result="offsetblur" />
+                        <feComponentTransfer>
+                            <feFuncA type="linear" slope="0.3" />
+                        </feComponentTransfer>
+                        <feMerge>
+                            <feMergeNode />
+                            <feMergeNode in="SourceGraphic" />
+                        </feMerge>
+                    </filter>
+                </defs>
+
+                <!-- Central book/guide metaphor -->
+                <g transform="translate(400, 200)">
+                    <!-- Open book pages -->
+                    <g filter="url(#docShadow)">
+                        <!-- Left page -->
+                        <rect x="-140" y="-120" width="130" height="180" rx="4" fill="white" stroke="url(#gradientDoc)"
+                            stroke-width="2" opacity="0.95">
+                            <animate attributeName="opacity" values="0.95;1;0.95" dur="4s" repeatCount="indefinite" />
+                        </rect>
+                        <!-- Document lines on left page -->
+                        <line x1="-125" y1="-100" x2="-25" y2="-100" stroke="#3b82f6" stroke-width="2" opacity="0.3" />
+                        <line x1="-125" y1="-80" x2="-25" y2="-80" stroke="#3b82f6" stroke-width="2" opacity="0.3" />
+                        <line x1="-125" y1="-60" x2="-25" y2="-60" stroke="#3b82f6" stroke-width="2" opacity="0.3" />
+                        <line x1="-125" y1="-40" x2="-25" y2="-40" stroke="#3b82f6" stroke-width="2" opacity="0.3" />
+                        <line x1="-125" y1="-20" x2="-25" y2="-20" stroke="#3b82f6" stroke-width="2" opacity="0.3" />
+                        <line x1="-125" y1="0" x2="-40" y2="0" stroke="#3b82f6" stroke-width="2" opacity="0.3" />
+
+                        <!-- Right page -->
+                        <rect x="10" y="-120" width="130" height="180" rx="4" fill="white" stroke="url(#gradientDoc)"
+                            stroke-width="2" opacity="0.95">
+                            <animate attributeName="opacity" values="0.95;1;0.95" dur="4.5s" repeatCount="indefinite" />
+                        </rect>
+                        <!-- Document lines on right page -->
+                        <line x1="25" y1="-100" x2="125" y2="-100" stroke="#0ea5e9" stroke-width="2" opacity="0.3" />
+                        <line x1="25" y1="-80" x2="125" y2="-80" stroke="#0ea5e9" stroke-width="2" opacity="0.3" />
+                        <line x1="25" y1="-60" x2="125" y2="-60" stroke="#0ea5e9" stroke-width="2" opacity="0.3" />
+                        <line x1="25" y1="-40" x2="125" y2="-40" stroke="#0ea5e9" stroke-width="2" opacity="0.3" />
+                        <line x1="25" y1="-20" x2="125" y2="-20" stroke="#0ea5e9" stroke-width="2" opacity="0.3" />
+                        <line x1="25" y1="0" x2="110" y2="0" stroke="#0ea5e9" stroke-width="2" opacity="0.3" />
+
+                        <!-- Book spine -->
+                        <rect x="-10" y="-120" width="20" height="180" fill="url(#gradientDoc)" />
+                    </g>
+
+                    <!-- Floating documentation icons -->
+                    <g opacity="0.7">
+                        <!-- Question mark (FAQ) -->
+                        <g transform="translate(-200, -80)">
+                            <circle cx="0" cy="0" r="20" fill="none" stroke="url(#gradientDoc)" stroke-width="2">
+                                <animate attributeName="cy" values="0;-10;0" dur="3s" repeatCount="indefinite" />
+                            </circle>
+                            <text x="0" y="8" font-size="28" font-weight="bold" fill="#3b82f6"
+                                text-anchor="middle">?</text>
+                        </g>
+
+                        <!-- Lightbulb (knowledge) -->
+                        <g transform="translate(200, -80)">
+                            <ellipse cx="0" cy="-5" rx="15" ry="20" fill="none" stroke="url(#gradientAccent)"
+                                stroke-width="2">
+                                <animate attributeName="cy" values="-5;-15;-5" dur="3.5s" repeatCount="indefinite" />
+                            </ellipse>
+                            <rect x="-6" y="10" width="12" height="6" rx="2" fill="url(#gradientAccent)">
+                                <animate attributeName="y" values="10;0;10" dur="3.5s" repeatCount="indefinite" />
+                            </rect>
+                            <line x1="0" y1="-25" x2="0" y2="-30" stroke="#10b981" stroke-width="2">
+                                <animate attributeName="opacity" values="0.5;1;0.5" dur="1.5s"
+                                    repeatCount="indefinite" />
+                                <animate attributeName="y1" values="-25;-35;-25" dur="3.5s" repeatCount="indefinite" />
+                                <animate attributeName="y2" values="-30;-40;-30" dur="3.5s" repeatCount="indefinite" />
+                            </line>
+                        </g>
+
+                        <!-- Checkmark (completion) -->
+                        <g transform="translate(-200, 100)">
+                            <circle cx="0" cy="0" r="20" fill="none" stroke="#10b981" stroke-width="2">
+                                <animate attributeName="cy" values="0;10;0" dur="4s" repeatCount="indefinite" />
+                            </circle>
+                            <path d="M -8,0 L -3,8 L 10,-8" fill="none" stroke="#10b981" stroke-width="3"
+                                stroke-linecap="round">
+                                <animate attributeName="opacity" values="0.7;1;0.7" dur="2s" repeatCount="indefinite" />
+                            </path>
+                        </g>
+
+                        <!-- Gear (settings/options) -->
+                        <g transform="translate(200, 100)">
+                            <circle cx="0" cy="0" r="12" fill="none" stroke="url(#gradientDoc)" stroke-width="2">
+                                <animateTransform attributeName="transform" type="rotate" from="0 0 0" to="360 0 0"
+                                    dur="8s" repeatCount="indefinite" />
+                            </circle>
+                            <circle cx="0" cy="0" r="5" fill="#8b5cf6" />
+                            <!-- Gear teeth -->
+                            <rect x="-2" y="-18" width="4" height="6" fill="#8b5cf6">
+                                <animateTransform attributeName="transform" type="rotate" from="0 0 0" to="360 0 0"
+                                    dur="8s" repeatCount="indefinite" />
+                            </rect>
+                            <rect x="-2" y="12" width="4" height="6" fill="#8b5cf6">
+                                <animateTransform attributeName="transform" type="rotate" from="0 0 0" to="360 0 0"
+                                    dur="8s" repeatCount="indefinite" />
+                            </rect>
+                            <rect x="-18" y="-2" width="6" height="4" fill="#8b5cf6">
+                                <animateTransform attributeName="transform" type="rotate" from="0 0 0" to="360 0 0"
+                                    dur="8s" repeatCount="indefinite" />
+                            </rect>
+                            <rect x="12" y="-2" width="6" height="4" fill="#8b5cf6">
+                                <animateTransform attributeName="transform" type="rotate" from="0 0 0" to="360 0 0"
+                                    dur="8s" repeatCount="indefinite" />
+                            </rect>
+                        </g>
+                    </g>
+
+                    <!-- Animated cursor/pointer (user interaction) -->
+                    <g transform="translate(-80, 30)">
+                        <path d="M 0,0 L 0,20 L 6,14 L 10,22 L 14,20 L 10,12 L 18,12 Z" fill="url(#gradientDoc)"
+                            opacity="0.8">
+                            <animateTransform attributeName="transform" type="translate" values="0,0; 40,20; 0,0"
+                                dur="6s" repeatCount="indefinite" />
+                            <animate attributeName="opacity" values="0.8;1;0.8" dur="6s" repeatCount="indefinite" />
+                        </path>
+                    </g>
+
+                    <!-- Connection lines between elements -->
+                    <g opacity="0.2">
+                        <line x1="-200" y1="-80" x2="-140" y2="-60" stroke="url(#gradientDoc)" stroke-width="1"
+                            stroke-dasharray="4 4">
+                            <animate attributeName="stroke-dashoffset" from="0" to="8" dur="1s"
+                                repeatCount="indefinite" />
+                        </line>
+                        <line x1="200" y1="-80" x2="140" y2="-60" stroke="url(#gradientDoc)" stroke-width="1"
+                            stroke-dasharray="4 4">
+                            <animate attributeName="stroke-dashoffset" from="0" to="8" dur="1s"
+                                repeatCount="indefinite" />
+                        </line>
+                        <line x1="-200" y1="100" x2="-140" y2="60" stroke="url(#gradientDoc)" stroke-width="1"
+                            stroke-dasharray="4 4">
+                            <animate attributeName="stroke-dashoffset" from="0" to="8" dur="1s"
+                                repeatCount="indefinite" />
+                        </line>
+                        <line x1="200" y1="100" x2="140" y2="60" stroke="url(#gradientDoc)" stroke-width="1"
+                            stroke-dasharray="4 4">
+                            <animate attributeName="stroke-dashoffset" from="0" to="8" dur="1s"
+                                repeatCount="indefinite" />
+                        </line>
+                    </g>
+
+                    <!-- Multilingual text indicators -->
+                    <g transform="translate(0, 140)">
+                        <text x="-60" y="0" font-size="14" fill="#3b82f6" opacity="0.6">EN</text>
+                        <text x="-20" y="0" font-size="14" fill="#0ea5e9" opacity="0.6">FR</text>
+                        <text x="20" y="0" font-size="14" fill="#8b5cf6" opacity="0.6">DE</text>
+                        <text x="60" y="0" font-size="14" fill="#10b981" opacity="0.6">ES</text>
+                        <animate attributeName="opacity" values="0.4;0.8;0.4" dur="5s" repeatCount="indefinite" />
+                    </g>
+                </g>
+
+                <!-- Version evolution indicators -->
+                <g transform="translate(100, 80)">
+                    <text font-size="12" fill="#64748b" opacity="0.5">v1.0 → v2.0 → v3.0</text>
+                    <animate attributeName="opacity" values="0.3;0.6;0.3" dur="6s" repeatCount="indefinite" />
+                </g>
+            </svg>
+        </header>
+
+        <main id="main-content">
+            <p>No day goes by without the release of new tools, services, programming languages, and software libraries,
+                if not the latest version of any of these. It is easy to get overwhelmed, but what makes this rapidly
+                changing technosphere further challenging is missing or proper documentation. Well-documented works make
+                it easy for users and contributors to explore the solutions. However, non-documented solutions often
+                fail to reach the targeted audience. It is indeed hard to properly document the different technological
+                solutions. Furthermore, documentation of many small software solutions often gives the impression of
+                software by the developers and for the developers.</p>
+
+            <p>What is the best way to document? How to attract the attention of new users or contributors? How to
+                maintain up-to-date documentation? Often choices have to be made to reduce the number of options in
+                software to simplify the usage and provide a minimalistic interface to the end-users. Such an approach
+                reduces the need for maintaining the user interface documentation. Take, for example, the user interface
+                of search engines. It is crucial to state that there are advanced options like the use of filters,
+                especially aimed at power users. Nonetheless, in the case of simpler user interfaces, newer options are
+                frowned upon by the users. Thus a compromise is required between a simple user interface and an
+                interface with more advanced options.</p>
+
+            <p>As software or web services evolve, there is a tendency to add multiple options, rethink the user menus,
+                etc. Often users end up complaining about minute changes in the user interface. What may look like a
+                slight displacement of a button from the developer's point of view, may affect the way the user's brain
+                had been programmed with the daily routine or habit, thereby creating a disruption. For the user, the
+                new location of options has to be discovered.</p>
+
+            <p>This brings us to the importance of 'how-to guides' for software and technological solutions. Even though
+                companies with resources provide 'FAQ' (frequently asked questions) to respond to the different
+                questions related to working with their products. These answers are often limited to very few human
+                languages, like English. Moreover, if a product has a more global reach, the translation requires help
+                from multiple translators. As discussed above, the task becomes difficult when software evolves very
+                rapidly, often leading to outdated documentation in many translated documents.</p>
+
+            <p>There have been several attempts to generate automated documentation. Static pages or dynamically
+                generated pages are automatically generated for the application programming interface (API) or the
+                software development kit (SDK) of service and software products. Static pages are well indexed by most
+                search engines, while the indexation of dynamically generated pages is limited to some popular search
+                engines. For a large product, API, or SDK, dynamically generated pages can handle a multitude of
+                options. Nevertheless, it is better to periodically generate static pages from them.</p>
+
+            <p>Automated documentation does not yet cover the end-user interface (or front-end). It is long overdue that
+                developers consider the significance of linking the user end options to their code to ensure that
+                'how-to guides' or FAQs reflect any minute modifications. The users may not need to struggle to find a
+                particular feature after the release of a newer version.</p>
+        </main>
+
+        <footer role="contentinfo">
+            <div class="footer-content">
+                <div class="language-selector">
+                    <h3>Available Languages</h3>
+                    <a href="../../en/technology/how-to-guides.html" class="lang-link active" lang="en">English</a>
+                    <a href="../../fr/technologie/guides-pratiques.html" class="lang-link" lang="fr">Français</a>
                 </div>
-                <div class="subtitle">
-                    <h3><a href="../about.html">John Samuel</a></h3>
+                <div class="copyright">
+                    <p>&copy; 2025 John Samuel. All rights reserved.</p>
                 </div>
             </div>
-
-            <div class="content">
-                <ul id="langlist">
-                    <li class="highlight" id="enpage" rel="hasPart" resource="#enpage"> <span lang="en"><a
-                                href="../../en/technology/how-to-guides.html" class="langlink" property="url"
-                                typeof="WebPage"><span property="inLanguage">English</span></a> </span>
-                    </li>
-                    <li id="frpage" rel="hasPart" resource="#frpage"> <span lang="fr"><a class="langlink"
-                                href="../../fr/technologie/guides-pratiques.html" property="url" typeof="WebPage"><span
-                                    property="inLanguage">Fran&#xE7;ais</span></a>
-                        </span> </li>
-                </ul>
-                <p>
-                    No day goes by without the release of new tools, services, programming languages, and software
-                    libraries, if not the latest version of any of these. It is easy to get overwhelmed, but what makes
-                    this rapidly changing technosphere further challenging is
-                    missing or proper documentation. Well-documented works make it easy for users and contributors to
-                    explore the solutions. However, non-documented solutions often fail to reach the targeted audience.
-                    It is indeed hard to properly document
-                    the different technological solutions. Furthermore, documentation of many small software solutions
-                    often gives the impression of software by the developers and for the developers.
-                </p>
-
-                <p>
-                    What is the best way to document? How to attract the attention of new users or contributors? How to
-                    maintain up-to-date documentation? Often choices have to be made to reduce the number of options in
-                    software to simplify the usage and provide a minimalistic
-                    interface to the end-users. Such an approach reduces the need for maintaining the user interface
-                    documentation. Take, for example, the user interface of search engines. It is crucial to state that
-                    there are advanced options like the use
-                    of filters, especially aimed at power users. Nonetheless, in the case of simpler user interfaces,
-                    newer options are frowned upon by the users. Thus a compromise is required between a simple user
-                    interface and an interface with more advanced
-                    options.
-                </p>
-
-                <p>
-                    As software or web services evolve, there is a tendency to add multiple options, rethink the user
-                    menus, etc. Often users end up complaining about minute changes in the user interface. What may look
-                    like a slight displacement of a button from the developer’s
-                    point of view, may affect the way the user’s brain had been programmed with the daily routine or
-                    habit, thereby creating a disruption. For the user, the new location of options has to be
-                    discovered.
-                </p>
-
-                <p>
-                    This brings us to the importance of ‘how-to guides’ for software and technological solutions. Even
-                    though companies with resources provide ‘FAQ’ (frequently asked questions) to respond to the
-                    different questions related to working with their products.
-                    These answers are often limited to very few human languages, like English. Moreover, if a product
-                    has a more global reach, the translation requires help from multiple translators. As discussed
-                    above, the task becomes difficult when software
-                    evolves very rapidly, often leading to outdated documentation in many translated documents.
-                </p>
-
-                <p>
-                    There have been several attempts to generate automated documentation. Static pages or dynamically
-                    generated pages are automatically generated for the application programming interface (API) or the
-                    software development kit (SDK) of service and software
-                    products. Static pages are well indexed by most search engines, while the indexation of dynamically
-                    generated pages is limited to some popular search engines. For a large product, API, or SDK,
-                    dynamically generated pages can handle a multitude
-                    of options. Nevertheless, it is better to periodically generate static pages from them.
-                </p>
-
-                <p>
-                    Automated documentation does not yet cover the end-user interface (or front-end). It is long overdue
-                    that developers consider the significance of linking the user end options to their code to ensure
-                    that ‘how-to guides’ or FAQs reflect any minute modifications.
-                    The users may not need to struggle to find a particular feature after the release of a newer
-                    version.
-                </p>
-
-            </div>
-        </div>
+        </footer>
     </body>
 
 </html>

@@ -2,300 +2,481 @@
 <html lang="en">
 
     <head>
-        <meta charset="utf-8" />
-        <meta http-equiv="Content-Language" content="en" />
+        <meta charset="utf-8">
+        <meta http-equiv="Content-Language" content="en">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <link rel="shortcut icon" href="../../images/logo/favicon.png" />
-        <title>Learning Timeline: John Samuel</title>
-        <style type="text/css">
-            body {
-                background-color: #FFFFFF;
+        <link rel="shortcut icon" href="../../images/logo/favicon.png">
+        <title>Learning Timeline | John Samuel</title>
+        <style>
+            /* =====================================================
+           DESIGN TOKENS & CSS CUSTOM PROPERTIES
+           ===================================================== */
+            :root {
+                /* Base Colors - Evolution/Time Theme */
+                --color-base-bg: #0f1419;
+                --color-base-surface: #1a1f2e;
+                --color-base-text: #e2e8f0;
+                --color-base-text-muted: #94a3b8;
+
+                /* Theme Accents - Timeline & Evolution */
+                --color-accent-1: #f59e0b;
+                /* Amber - past/warmth */
+                --color-accent-2: #3b82f6;
+                /* Blue - present/knowledge */
+                --color-accent-3: #a855f7;
+                /* Purple - future/innovation */
+                --color-accent-4: #10b981;
+                /* Green - growth/learning */
+                --color-accent-light: rgba(245, 158, 11, 0.1);
+
+                /* Functional Colors */
+                --color-shadow: rgba(245, 158, 11, 0.2);
+                --color-border: rgba(245, 158, 11, 0.25);
+                --color-hover: rgba(245, 158, 11, 0.15);
+
+                /* Gradients */
+                --gradient-primary: linear-gradient(135deg, var(--color-accent-1) 0%, var(--color-accent-2) 50%, var(--color-accent-3) 100%);
+                --gradient-timeline: linear-gradient(90deg, #f59e0b 0%, #3b82f6 50%, #a855f7 100%);
+
+                /* Spacing Scale */
+                --space-xs: 0.25rem;
+                --space-sm: 0.5rem;
+                --space-md: 1rem;
+                --space-lg: 1.5rem;
+                --space-xl: 2rem;
+                --space-2xl: 3rem;
+                --space-3xl: 4rem;
+                --space-4xl: 6rem;
+
+                /* Border Radius */
+                --radius-sm: 6px;
+                --radius-md: 12px;
+                --radius-lg: 16px;
+                --radius-xl: 24px;
+
+                /* Shadows */
+                --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.4);
+                --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.5);
+                --shadow-lg: 0 10px 30px rgba(0, 0, 0, 0.6);
+                --shadow-theme: 0 10px 40px var(--color-shadow);
+
+                /* Typography */
+                --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+                --text-xs: clamp(0.75rem, 0.7rem + 0.25vw, 0.875rem);
+                --text-sm: clamp(0.875rem, 0.8rem + 0.35vw, 1rem);
+                --text-base: clamp(1rem, 0.95rem + 0.25vw, 1.125rem);
+                --text-lg: clamp(1.125rem, 1.05rem + 0.35vw, 1.25rem);
+                --text-xl: clamp(1.25rem, 1.15rem + 0.5vw, 1.5rem);
+                --text-2xl: clamp(1.5rem, 1.3rem + 1vw, 2rem);
+                --text-3xl: clamp(2rem, 1.6rem + 2vw, 2.75rem);
+                --text-4xl: clamp(2.5rem, 2rem + 2.5vw, 4rem);
             }
 
-            #sidebar {
+            /* =====================================================
+           RESET & BASE STYLES
+           ===================================================== */
+            * {
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
+            }
+
+            html {
+                scroll-behavior: smooth;
+                scroll-padding-top: 100px;
+            }
+
+            body {
+                font-family: var(--font-sans);
+                font-size: var(--text-base);
+                line-height: 1.7;
+                color: var(--color-base-text);
+                background: var(--color-base-bg);
+                overflow-x: hidden;
+                -webkit-font-smoothing: antialiased;
+                -moz-osx-font-smoothing: grayscale;
+            }
+
+            /* Animated background - flowing time */
+            body::before {
+                content: '';
                 position: fixed;
-                background-color: #8E44AD;
                 top: 0;
                 left: 0;
+                right: 0;
                 bottom: 0;
-                width: 30vw;
+                background:
+                    radial-gradient(circle at 20% 20%, rgba(245, 158, 11, 0.12) 0%, transparent 50%),
+                    radial-gradient(circle at 80% 80%, rgba(59, 130, 246, 0.12) 0%, transparent 50%),
+                    radial-gradient(circle at 50% 50%, rgba(168, 85, 247, 0.08) 0%, transparent 60%);
+                z-index: -1;
+                animation: timeFlow 25s ease-in-out infinite alternate;
             }
 
-            #sidebar .title {
-                position: relative;
-                text-align: center;
-                line-height: 4vmax;
-                font-size: 1.4vmax;
-                font-family: 'Arial';
-                margin-top: 25vh;
+            @keyframes timeFlow {
+                0% {
+                    transform: translateX(0) scale(1);
+                    opacity: 0.8;
+                }
+
+                100% {
+                    transform: translateX(-5%) scale(1.1);
+                    opacity: 1;
+                }
             }
 
-            #sidebar .title a:link,
-            #sidebar .title a:visited {
-                color: #FFFFFF;
+            /* Subtle dot pattern */
+            body::after {
+                content: '';
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background-image: radial-gradient(circle, rgba(245, 158, 11, 0.05) 1px, transparent 1px);
+                background-size: 40px 40px;
+                z-index: -1;
+                pointer-events: none;
+            }
+
+            /* =====================================================
+           SKIP LINK (Accessibility)
+           ===================================================== */
+            .skip-link {
+                position: absolute;
+                top: -40px;
+                left: 0;
+                background: var(--color-accent-1);
+                color: var(--color-base-bg);
+                padding: var(--space-sm) var(--space-md);
                 text-decoration: none;
+                border-radius: var(--radius-sm);
+                z-index: 1000;
+                font-weight: 600;
+            }
+
+            .skip-link:focus {
+                top: var(--space-sm);
+                left: var(--space-sm);
+            }
+
+            /* =====================================================
+           NAVIGATION
+           ===================================================== */
+            nav {
+                position: sticky;
+                top: 0;
+                z-index: 100;
+                background: rgba(26, 31, 46, 0.9);
+                -webkit-backdrop-filter: blur(20px) saturate(180%);
+                backdrop-filter: blur(20px) saturate(180%);
+                border-bottom: 1px solid var(--color-border);
+                box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+            }
+
+            .nav-container {
+                max-width: 1400px;
+                margin: 0 auto;
+                padding: var(--space-lg) var(--space-xl);
+                display: flex;
+                align-items: center;
+                gap: var(--space-xl);
+            }
+
+            .site-name {
+                font-size: var(--text-xl);
+                font-weight: 700;
+                background: var(--gradient-primary);
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                background-clip: text;
+                text-decoration: none;
+                white-space: nowrap;
+                letter-spacing: -0.02em;
+                position: relative;
+            }
+
+            .site-name::after {
+                content: '';
+                position: absolute;
+                bottom: -4px;
+                left: 0;
+                width: 100%;
+                height: 2px;
+                background: var(--gradient-primary);
+                transform: scaleX(0);
+                transition: transform 0.3s ease;
+            }
+
+            .site-name:hover::after {
+                transform: scaleX(1);
+            }
+
+            .breadcrumbs {
+                display: flex;
+                gap: var(--space-sm);
+                align-items: center;
+                flex-wrap: wrap;
+                list-style: none;
+                font-size: var(--text-sm);
+            }
+
+            .breadcrumbs li {
+                display: flex;
+                align-items: center;
+                gap: var(--space-sm);
+            }
+
+            .breadcrumbs li:not(:last-child)::after {
+                content: '→';
+                color: var(--color-accent-1);
+                font-weight: 600;
+            }
+
+            .breadcrumbs a {
+                color: var(--color-base-text-muted);
+                text-decoration: none;
+                transition: all 0.3s ease;
+            }
+
+            .breadcrumbs a:hover {
+                color: var(--color-accent-1);
+            }
+
+            /* =====================================================
+           HEADER SECTION
+           ===================================================== */
+            .header-section {
+                max-width: 1400px;
+                margin: var(--space-4xl) auto var(--space-3xl);
+                padding: 0 var(--space-xl);
+            }
+
+            h1 {
+                font-size: var(--text-4xl);
+                font-weight: 800;
+                line-height: 1.15;
+                letter-spacing: -0.03em;
+                margin-bottom: var(--space-lg);
+                background: var(--gradient-primary);
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                background-clip: text;
+                animation: fadeInUp 0.8s ease 0.2s both;
             }
 
             .subtitle {
-                top: 50vh;
-                text-align: center;
-                line-height: 1.3vmax;
-                font-family: 'Arial';
-                font-size: 1.5vmax;
-                color: #FFFFFF;
+                font-size: var(--text-lg);
+                color: var(--color-base-text-muted);
+                margin-bottom: var(--space-2xl);
+                animation: fadeInUp 0.8s ease 0.4s both;
             }
 
-            .subtitle a:link,
-            .subtitle a:visited {
-                color: #FFFFFF;
+            .subtitle a {
+                color: var(--color-accent-2);
                 text-decoration: none;
+                font-weight: 600;
+                transition: color 0.3s ease;
             }
 
-            .licence {
-                position: fixed;
-                text-align: right;
-                bottom: 0;
-                right: 0;
+            .subtitle a:hover {
+                color: var(--color-accent-3);
             }
 
-            .home {
-                position: fixed;
-                text-align: left;
-                font-family: 'Arial';
-                color: #D3D3D3;
-                z-index: 100;
+            @keyframes fadeInUp {
+                from {
+                    opacity: 0;
+                    transform: translateY(30px);
+                }
+
+                to {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            }
+
+            /* =====================================================
+           HERO SVG ILLUSTRATION
+           ===================================================== */
+            .hero-illustration {
                 width: 100%;
-                background-color: #FFFFFF;
-                top: 0px;
-                margin-bottom: 10px;
-                padding-bottom: 10px;
+                max-width: 800px;
+                margin: 0 auto var(--space-3xl);
+                animation: fadeInUp 1s ease 0.6s both;
             }
 
-            .home a:link,
-            .home a:visited {
+            /* =====================================================
+           MAIN CONTENT
+           ===================================================== */
+            main {
+                max-width: 900px;
+                margin: 0 auto;
+                padding: 0 var(--space-xl) var(--space-4xl);
+            }
+
+            p {
+                margin-bottom: var(--space-xl);
+                color: var(--color-base-text);
+                line-height: 1.8;
+            }
+
+            a {
+                color: var(--color-accent-1);
                 text-decoration: none;
-                color: #D3D3D3;
+                border-bottom: 1px solid transparent;
+                transition: all 0.3s ease;
             }
 
-            .home ul {
-                margin: 0;
-                padding: 0;
-                text-align: left;
-                list-style: none;
+            a:hover {
+                color: var(--color-accent-2);
+                border-bottom-color: var(--color-accent-2);
             }
 
-            .home li {
-                position: relative;
-                float: left;
-                padding-top: 15px;
-                margin-right: 1em;
-                font-family: 'Arial';
+            /* =====================================================
+           FOOTER
+           ===================================================== */
+            footer {
+                margin-top: var(--space-4xl);
+                padding: var(--space-3xl) var(--space-xl);
+                background: rgba(26, 31, 46, 0.8);
+                border-top: 1px solid var(--color-border);
+                -webkit-backdrop-filter: blur(20px);
+                backdrop-filter: blur(20px);
             }
 
-            .home li:hover {
-                display: block;
+            .footer-content {
+                max-width: 1400px;
+                margin: 0 auto;
+                display: flex;
+                flex-direction: column;
+                gap: var(--space-xl);
             }
 
-            .home a:link,
-            .home a:visited {
-                color: #D3D3D3;
+            .language-selector {
+                display: flex;
+                gap: var(--space-lg);
+                flex-wrap: wrap;
             }
 
-            .home li:hover a:link,
-            .home li:hover a:visited {
+            .language-selector h3 {
+                width: 100%;
+                font-size: var(--text-lg);
+                color: var(--color-base-text-muted);
+                margin: 0 0 var(--space-md);
+                font-weight: 600;
+            }
+
+            .lang-link {
+                padding: var(--space-sm) var(--space-lg);
+                background: rgba(245, 158, 11, 0.1);
+                border: 1px solid var(--color-border);
+                border-radius: var(--radius-md);
+                color: var(--color-base-text);
                 text-decoration: none;
-                padding: 15px;
-                color: #FFFFFF;
-                background-color: #8E44AD;
+                font-weight: 500;
+                transition: all 0.3s ease;
+                display: inline-flex;
+                align-items: center;
+                gap: var(--space-sm);
             }
 
-            #langlist {
-                padding-left: 0;
-                border-radius: 1.2em;
-                background-color: #8E44AD;
-                display: inline-block;
+            .lang-link.active {
+                background: var(--gradient-primary);
+                border-color: transparent;
+                color: white;
             }
 
-            #langlist li {
-                list-style: none;
-                display: inline-block;
-                padding: 0.5em;
-                margin-left: 0.3em;
-                margin-right: 0.3em;
-                font-family: 'Arial';
+            .lang-link:not(.active):hover {
+                background: rgba(245, 158, 11, 0.2);
+                border-color: var(--color-accent-1);
+                transform: translateY(-2px);
+                box-shadow: var(--shadow-sm);
             }
 
-            #langlist a {
-                text-decoration: none;
-                color: #FFFFFF;
+            .lang-link::before {
+                content: '🌐';
             }
 
-            #langlist .highlight {
-                border-radius: 1em;
-                padding-top: 0.3em;
-                padding-bottom: 0.3em;
-                background-color: #FFFFFF;
+            .copyright {
+                text-align: center;
+                color: var(--color-base-text-muted);
+                font-size: var(--text-sm);
+                padding-top: var(--space-xl);
+                border-top: 1px solid var(--color-border);
             }
 
-            #langlist .highlight a {
-                color: #8E44AD;
+            /* =====================================================
+           RESPONSIVE DESIGN
+           ===================================================== */
+            @media (max-width: 768px) {
+                .nav-container {
+                    flex-direction: column;
+                    align-items: flex-start;
+                    gap: var(--space-md);
+                    padding: var(--space-md) var(--space-lg);
+                }
+
+                .breadcrumbs {
+                    font-size: var(--text-xs);
+                }
+
+                .header-section {
+                    margin: var(--space-2xl) auto var(--space-xl);
+                    padding: 0 var(--space-lg);
+                }
+
+                main {
+                    padding: 0 var(--space-lg) var(--space-3xl);
+                }
+
+                h1 {
+                    font-size: var(--text-3xl);
+                }
             }
 
-            .content {
-                line-height: 1.8vmax;
-                font-size: 1.2vmax;
-                font-family: 'Arial';
-                margin-top: 15vh;
-                width: 90%;
+            /* =====================================================
+           ACCESSIBILITY - REDUCED MOTION
+           ===================================================== */
+            @media (prefers-reduced-motion: reduce) {
+
+                *,
+                *::before,
+                *::after {
+                    animation-duration: 0.01ms !important;
+                    animation-iteration-count: 1 !important;
+                    transition-duration: 0.01ms !important;
+                }
             }
 
-            .content h2,
-            h3,
-            h4 {
-                color: #8E44AD;
-            }
-
-            .content a:link,
-            .content a:visited {
-                color: #8E44AD;
-            }
-
-            .content h3 {
-                color: #8E44AD;
-            }
-
-            .content h2::before,
-            .content h3::before {
-                display: block;
-                content: " ";
-                visibility: hidden;
-                height: 50px;
-                margin-top: -50px;
-                pointer-events: none;
-                background-color: #FFFFFF;
-            }
-
-            .content p {
-                text-align: justify;
-
-            }
-
-            .content a:link,
-            .content a:visited {
-                color: #8E44AD;
-            }
-
-            .content li {
-                margin: 5px;
-            }
-
-            .page {
-                width: 65vw;
-                height: 100%;
-                margin-left: 30vw;
-                overflow: hidden;
-                padding: 0 1em;
-                font-family: 'Arial';
-            }
-
-            .page img {
-                max-width: 100%;
-                max-height: 100%;
-            }
-
-            @media (max-width: 640px),
-            screen and (orientation: portrait) {
+            /* =====================================================
+           PRINT STYLES
+           ===================================================== */
+            @media print {
                 body {
+                    background: white;
+                    color: black;
+                }
+
+                nav,
+                footer,
+                .hero-illustration {
+                    display: none;
+                }
+
+                main {
                     max-width: 100%;
-                    max-height: 100%;
-                }
-
-                #sidebar {
-                    position: fixed;
-                    background-color: #8E44AD;
-                    top: 0;
-                    left: 0;
-                    bottom: 80vh;
-                    width: 100vw;
-                }
-
-                #sidebar .title {
-                    text-align: center;
-                    position: fixed;
-                    margin-top: 6vh;
-                    left: 0px;
-                    right: 0px;
-                    line-height: 3.5vmax;
-                    font-size: 1.5vmax;
-                    font-family: 'Arial';
-                }
-
-                #sidebar .subtitle {
-                    text-align: center;
-                    top: 5vh;
-                    left: 0px;
-                    right: 0px;
-                    position: fixed;
-                    margin-top: 10vh;
-                    font-size: 1.5vmax;
-                }
-
-                #sidebar .title a:link,
-                #sidebar .title a:visited {
-                    text-align: center;
-                    color: #FFFFFF;
-                }
-
-                #sidebar .subtitle a:link,
-                #sidebar .subtitle a:visited {
-                    text-align: center;
-                    color: #FFFFFF;
-                }
-
-                .home {
-                    z-index: 100;
-                    width: 100%;
-                    background-color: #8E44AD;
-                    font-size: 1.5vmax;
-                }
-
-                .home a:link,
-                .home a:visited {
-                    text-decoration: none;
-                    color: #FFFFFF;
-                }
-
-                .content {
-                    line-height: 3.8vmax;
-                    font-size: 1.8vmax;
-                    font-family: 'Arial';
-                    margin-top: 22vh;
-                }
-
-                .content a:link,
-                .content a:visited {
-                    color: #8E44AD;
-                }
-
-                .page {
-                    top: 40vh;
-                    width: 95%;
-                    margin-left: 0vw;
-                }
-
-                .page img {
-                    max-width: 100%;
-                    max-height: 100%;
-                    border: 0;
                 }
             }
         </style>
     </head>
 
     <body vocab="http://schema.org/">
-        <div class="page">
-            <div class="home">
-                <ul typeof="BreadcrumbList">
+        <a href="#main-content" class="skip-link">Skip to main content</a>
+
+        <nav role="navigation" aria-label="Main navigation">
+            <div class="nav-container">
+                <a href="../about.html" class="site-name">John Samuel</a>
+                <ul class="breadcrumbs" typeof="BreadcrumbList">
                     <li property="itemListElement" typeof="ListItem">
                         <a property="item" typeof="WebPage" href="../index.html">
                             <span property="name">Home</span>
@@ -307,84 +488,273 @@
                         </a>
                     </li>
                 </ul>
-
             </div>
-            <div id="sidebar">
-                <div class="title">
-                    <h1><a href="./learning-timeline.html">Learning Timeline</a></h1>
+        </nav>
+
+        <header class="header-section">
+            <h1>Learning Timeline</h1>
+
+            <div class="subtitle">
+                By <a href="../about.html">John Samuel</a>
+            </div>
+
+            <svg class="hero-illustration" viewBox="0 0 900 400" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                <defs>
+                    <linearGradient id="timelineGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                        <stop offset="0%" style="stop-color:#f59e0b;stop-opacity:1" />
+                        <stop offset="50%" style="stop-color:#3b82f6;stop-opacity:1" />
+                        <stop offset="100%" style="stop-color:#a855f7;stop-opacity:1" />
+                    </linearGradient>
+                    <linearGradient id="glowGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" style="stop-color:#f59e0b;stop-opacity:0.6" />
+                        <stop offset="100%" style="stop-color:#a855f7;stop-opacity:0.6" />
+                    </linearGradient>
+                    <filter id="glow">
+                        <feGaussianBlur stdDeviation="4" result="coloredBlur" />
+                        <feMerge>
+                            <feMergeNode in="coloredBlur" />
+                            <feMergeNode in="SourceGraphic" />
+                        </feMerge>
+                    </filter>
+                </defs>
+
+                <!-- Main timeline -->
+                <line x1="50" y1="200" x2="850" y2="200" stroke="url(#timelineGradient)" stroke-width="4"
+                    stroke-linecap="round">
+                    <animate attributeName="stroke-dasharray" values="0,800;800,0" dur="3s" fill="freeze" />
+                </line>
+
+                <!-- Timeline arrow -->
+                <polygon points="850,200 835,195 835,205" fill="url(#timelineGradient)">
+                    <animate attributeName="opacity" values="0;1" dur="3s" fill="freeze" />
+                </polygon>
+
+                <!-- Past Era (Left) -->
+                <g transform="translate(150, 200)">
+                    <!-- Past marker -->
+                    <circle cx="0" cy="0" r="12" fill="#f59e0b" filter="url(#glow)">
+                        <animate attributeName="r" values="0;12" dur="0.5s" begin="0.5s" fill="freeze" />
+                    </circle>
+
+                    <!-- Old technology icons -->
+                    <g opacity="0">
+                        <animate attributeName="opacity" values="0;0.8" dur="0.5s" begin="1s" fill="freeze" />
+
+                        <!-- Bulky computer -->
+                        <rect x="-25" y="-80" width="50" height="35" rx="3" fill="none" stroke="#f59e0b"
+                            stroke-width="2" />
+                        <rect x="-20" y="-100" width="40" height="15" rx="2" fill="#f59e0b" opacity="0.3" />
+
+                        <!-- Floppy disk -->
+                        <rect x="-25" y="50" width="30" height="28" rx="2" fill="none" stroke="#f59e0b"
+                            stroke-width="2" />
+                        <rect x="-18" y="53" width="16" height="8" fill="#f59e0b" opacity="0.4" />
+                        <line x1="-10" y1="68" x2="-10" y2="73" stroke="#f59e0b" stroke-width="2" />
+                    </g>
+
+                    <!-- Label -->
+                    <text x="0" y="120" text-anchor="middle" fill="#f59e0b" font-size="14" font-weight="600"
+                        opacity="0">
+                        <animate attributeName="opacity" values="0;1" dur="0.5s" begin="1.5s" fill="freeze" />
+                        Past
+                    </text>
+                </g>
+
+                <!-- Present Era (Center) -->
+                <g transform="translate(450, 200)">
+                    <!-- Present marker -->
+                    <circle cx="0" cy="0" r="14" fill="#3b82f6" filter="url(#glow)">
+                        <animate attributeName="r" values="0;14" dur="0.5s" begin="1.5s" fill="freeze" />
+                        <animate attributeName="r" values="14;16;14" dur="2s" begin="2s" repeatCount="indefinite" />
+                    </circle>
+
+                    <!-- Modern technology icons -->
+                    <g opacity="0">
+                        <animate attributeName="opacity" values="0;0.9" dur="0.5s" begin="2s" fill="freeze" />
+
+                        <!-- Laptop -->
+                        <rect x="-30" y="-75" width="60" height="40" rx="2" fill="none" stroke="#3b82f6"
+                            stroke-width="2" />
+                        <line x1="-30" y1="-40" x2="30" y2="-40" stroke="#3b82f6" stroke-width="2" />
+                        <rect x="-35" y="-40" width="70" height="3" fill="#3b82f6" opacity="0.5" />
+
+                        <!-- Mobile phone -->
+                        <rect x="-12" y="45" width="24" height="42" rx="4" fill="none" stroke="#3b82f6"
+                            stroke-width="2" />
+                        <circle cx="0" cy="81" r="3" fill="#3b82f6" />
+                        <line x1="-8" y1="49" x2="8" y2="49" stroke="#3b82f6" stroke-width="1.5" />
+                    </g>
+
+                    <!-- Label -->
+                    <text x="0" y="120" text-anchor="middle" fill="#3b82f6" font-size="14" font-weight="600"
+                        opacity="0">
+                        <animate attributeName="opacity" values="0;1" dur="0.5s" begin="2.5s" fill="freeze" />
+                        Present
+                    </text>
+                </g>
+
+                <!-- Future Era (Right) -->
+                <g transform="translate(750, 200)">
+                    <!-- Future marker -->
+                    <circle cx="0" cy="0" r="12" fill="#a855f7" filter="url(#glow)">
+                        <animate attributeName="r" values="0;12" dur="0.5s" begin="2.5s" fill="freeze" />
+                    </circle>
+
+                    <!-- Future technology concepts -->
+                    <g opacity="0">
+                        <animate attributeName="opacity" values="0;0.7" dur="0.5s" begin="3s" fill="freeze" />
+
+                        <!-- Holographic display -->
+                        <path d="M -25,-80 L -10,-50 L 10,-50 L 25,-80 Z" fill="none" stroke="#a855f7" stroke-width="2"
+                            opacity="0.6">
+                            <animate attributeName="opacity" values="0.6;1;0.6" dur="3s" repeatCount="indefinite" />
+                        </path>
+                        <circle cx="0" cy="-65" r="8" fill="#a855f7" opacity="0.3">
+                            <animate attributeName="r" values="8;12;8" dur="2s" repeatCount="indefinite" />
+                        </circle>
+
+                        <!-- AI brain/neural -->
+                        <circle cx="0" cy="65" r="15" fill="none" stroke="#a855f7" stroke-width="2" />
+                        <path d="M -10,60 Q 0,70 10,60" fill="none" stroke="#a855f7" stroke-width="2" />
+                        <path d="M -10,70 Q 0,60 10,70" fill="none" stroke="#a855f7" stroke-width="2" />
+                        <circle cx="-6" cy="62" r="2" fill="#a855f7" />
+                        <circle cx="6" cy="62" r="2" fill="#a855f7" />
+                    </g>
+
+                    <!-- Label -->
+                    <text x="0" y="120" text-anchor="middle" fill="#a855f7" font-size="14" font-weight="600"
+                        opacity="0">
+                        <animate attributeName="opacity" values="0;1" dur="0.5s" begin="3.5s" fill="freeze" />
+                        Future
+                    </text>
+                </g>
+
+                <!-- Connecting concepts - Learning paths -->
+                <g opacity="0.4">
+                    <animate attributeName="opacity" values="0;0.4" dur="1s" begin="4s" fill="freeze" />
+
+                    <!-- Arrow curves showing evolution -->
+                    <path d="M 150,140 Q 300,80 450,140" fill="none" stroke="url(#glowGradient)" stroke-width="2"
+                        stroke-dasharray="5,5">
+                        <animate attributeName="stroke-dashoffset" from="0" to="-10" dur="2s"
+                            repeatCount="indefinite" />
+                    </path>
+                    <path d="M 450,140 Q 600,80 750,140" fill="none" stroke="url(#glowGradient)" stroke-width="2"
+                        stroke-dasharray="5,5">
+                        <animate attributeName="stroke-dashoffset" from="0" to="-10" dur="2s"
+                            repeatCount="indefinite" />
+                    </path>
+
+                    <!-- Unlearning paths (downward curves) -->
+                    <path d="M 150,260 Q 300,320 450,260" fill="none" stroke="#f59e0b" stroke-width="1.5"
+                        stroke-dasharray="3,3" opacity="0.3">
+                        <animate attributeName="stroke-dashoffset" from="0" to="-6" dur="1.5s"
+                            repeatCount="indefinite" />
+                    </path>
+                    <path d="M 450,260 Q 600,320 750,260" fill="none" stroke="#3b82f6" stroke-width="1.5"
+                        stroke-dasharray="3,3" opacity="0.3">
+                        <animate attributeName="stroke-dashoffset" from="0" to="-6" dur="1.5s"
+                            repeatCount="indefinite" />
+                    </path>
+                </g>
+
+                <!-- Process labels -->
+                <g opacity="0">
+                    <animate attributeName="opacity" values="0;0.6" dur="0.8s" begin="4.5s" fill="freeze" />
+
+                    <text x="300" y="100" text-anchor="middle" fill="#10b981" font-size="12"
+                        font-style="italic">Learning</text>
+                    <text x="600" y="100" text-anchor="middle" fill="#10b981" font-size="12"
+                        font-style="italic">Learning</text>
+
+                    <text x="300" y="310" text-anchor="middle" fill="#94a3b8" font-size="11" font-style="italic"
+                        opacity="0.6">Unlearning</text>
+                    <text x="600" y="310" text-anchor="middle" fill="#94a3b8" font-size="11" font-style="italic"
+                        opacity="0.6">Unlearning</text>
+                </g>
+
+                <!-- Floating particles showing constant change -->
+                <g opacity="0.5">
+                    <circle cx="200" cy="180" r="3" fill="#f59e0b">
+                        <animate attributeName="cy" values="180;120;180" dur="4s" repeatCount="indefinite" />
+                        <animate attributeName="opacity" values="0.5;0.8;0.5" dur="4s" repeatCount="indefinite" />
+                    </circle>
+                    <circle cx="350" cy="190" r="2.5" fill="#3b82f6">
+                        <animate attributeName="cy" values="190;140;190" dur="5s" repeatCount="indefinite" />
+                        <animate attributeName="opacity" values="0.5;0.9;0.5" dur="5s" repeatCount="indefinite" />
+                    </circle>
+                    <circle cx="550" cy="185" r="3" fill="#a855f7">
+                        <animate attributeName="cy" values="185;130;185" dur="4.5s" repeatCount="indefinite" />
+                        <animate attributeName="opacity" values="0.5;0.8;0.5" dur="4.5s" repeatCount="indefinite" />
+                    </circle>
+                    <circle cx="700" cy="195" r="2" fill="#10b981">
+                        <animate attributeName="cy" values="195;145;195" dur="5.5s" repeatCount="indefinite" />
+                        <animate attributeName="opacity" values="0.5;0.9;0.5" dur="5.5s" repeatCount="indefinite" />
+                    </circle>
+                </g>
+
+                <!-- Time labels at bottom -->
+                <g opacity="0">
+                    <animate attributeName="opacity" values="0;0.5" dur="0.5s" begin="5s" fill="freeze" />
+                    <text x="50" y="370" fill="#94a3b8" font-size="11">2000s</text>
+                    <text x="850" y="370" text-anchor="end" fill="#94a3b8" font-size="11">2030s+</text>
+                </g>
+            </svg>
+        </header>
+
+        <main id="main-content">
+            <p>It is interesting and not surprising how as years pass by, the technologies that we use evolve and how
+                our viewpoints evolve. Growing up, I have seen big bulky computers to lightweight laptops, fixed
+                landlines to mobile phones, loudspeakers to headsets, floppy disks to USB keys. The list is too long to
+                write it here. However, this evolution somehow hides the way we use energy and resources. In the process
+                of learning new technologies, we also participate in the process of unlearning. We often talk about this
+                timeline of the learning process, but quite rarely that of the unlearning process.</p>
+
+            <p>As we shifted from physical books, magazines, and bookshelves to their virtual equivalents, we lost along
+                with them the notion of space. As humans, we have been used to navigating in spaces and our brains
+                orient ourselves to the right place while looking for a book in a physical library or an object in a
+                grocery store. However, now we are confined to the screen in our hands and we have lost the notion of
+                space. We search for the relevant information with words or make use of filters, and the books or
+                objects that we were searching for appear on the screen. Over the years, and especially the next
+                generation may completely lose this notion of space for finding the day-to-day objects because they are
+                and will continue using words to guide them.</p>
+
+            <p>In the last few years, with the growing availability of mobile devices, we are observing another major
+                change. Instead of typing words, buttons guide us and we have shifted from clicking on the buttons using
+                pointing devices, like a mouse to touching these buttons with our fingers. And we are in between the
+                phase of learning to use touchscreens and the older machines with pointing devices. I have now this
+                constant instinct of considering big screens as touch screen devices instead of other forms of
+                interactions.</p>
+
+            <p>As a programmer and as a person giving programming classes, I feel that we are facing these questions and
+                challenges related to choosing the latest technologies and learning new programming languages, new
+                frameworks, new programming paradigms as well as new techniques to handle user interactions. This also
+                means that what we used to call 'fundamentals of programming' has now shifted to a whole new realm. We
+                are now constantly facing decisions to include or exclude certain topics with the rapid evolution of
+                technologies. I hope that some technological historians will provide us with a deeper analysis of the
+                changes that we have undergone since 2000, both as the users and developers of technologies.</p>
+
+            <p>It is disheartening to see that we may lose some of our inherent capacities with some new technologies. I
+                wish that the upcoming years will simplify the way we use technologies and provide us with solutions
+                that makes use of all our human senses and capabilities. I hope that we make use of all the lessons
+                learned during this rapid technological evolution and also give opportunities to our future generations
+                to explore the older solutions. Who knows if they come up with better ideas to use the older solutions
+                augmented with newer approaches?</p>
+        </main>
+
+        <footer role="contentinfo">
+            <div class="footer-content">
+                <div class="language-selector">
+                    <h3>Available Languages</h3>
+                    <a href="../../en/technology/learning-timeline.html" class="lang-link active" lang="en">English</a>
+                    <a href="../../fr/technologie/chronologie-apprentissage.html" class="lang-link"
+                        lang="fr">Français</a>
                 </div>
-                <div class="subtitle">
-                    <h3><a href="../about.html">John Samuel</a></h3>
+                <div class="copyright">
+                    <p>&copy; 2025 John Samuel. All rights reserved.</p>
                 </div>
             </div>
-
-            <div class="content">
-                <ul id="langlist">
-                    <li id="enpage" rel="hasPart" resource="#enpage"> <span lang="en"><a
-                                href="../../en/technology/learning-timeline.html" class="langlink" property="url"
-                                typeof="WebPage"><span property="inLanguage">English</span></a> </span> </li>
-                    <li class="highlight" id="frpage" rel="hasPart" resource="#frpage"> <span lang="fr"><a
-                                class="langlink" href="../../fr/technologie/chronologie-apprentissage.html"
-                                property="url" typeof="WebPage"><span property="inLanguage">Fran&#xE7;ais</span></a>
-                        </span> </li>
-                </ul>
-                <p>
-                    It is interesting and not surprising how as years pass by, the technologies that we use evolve and
-                    how our viewpoints evolve. Growing up, I have seen big bulky computers to lightweight laptops, fixed
-                    landlines to mobile phones, loudspeakers to headsets,
-                    floppy disks to USB keys. The list is too long to write it here. However, this evolution somehow
-                    hides the way we use energy and resources. In the process of learning new technologies, we also
-                    participate in the process of unlearning.
-                    We often talk about this timeline of the learning process, but quite rarely that of the unlearning
-                    process.
-                </p>
-
-                <p>
-                    As we shifted from physical books, magazines, and bookshelves to their virtual equivalents, we lost
-                    along with them the notion of space. As humans, we have been used to navigating in spaces and our
-                    brains orient ourselves to the right place while looking
-                    for a book in a physical library or an object in a grocery store. However, now we are confined to
-                    the screen in our hands and we have lost the notion of space. We search for the relevant information
-                    with words or make use of filters, and
-                    the books or objects that we were searching for appear on the screen. Over the years, and especially
-                    the next generation may completely lose this notion of space for finding the day-to-day objects
-                    because they are and will continue using
-                    words to guide them.
-                </p>
-
-                <p>
-                    In the last few years, with the growing availability of mobile devices, we are observing another
-                    major change. Instead of typing words, buttons guide us and we have shifted from clicking on the
-                    buttons using pointing devices, like a mouse to touching
-                    these buttons with our fingers. And we are in between the phase of learning to use touchscreens and
-                    the older machines with pointing devices. I have now this constant instinct of considering big
-                    screens as touch screen devices instead
-                    of other forms of interactions.
-                </p>
-
-                <p>
-                    As a programmer and as a person giving programming classes, I feel that we are facing these
-                    questions and challenges related to choosing the latest technologies and learning new programming
-                    languages, new frameworks, new programming paradigms as well
-                    as new techniques to handle user interactions. This also means that what we used to call
-                    ‘fundamentals of programming’ has now shifted to a whole new realm. We are now constantly facing
-                    decisions to include or exclude certain topics with
-                    the rapid evolution of technologies. I hope that some technological historians will provide us with
-                    a deeper analysis of the changes that we have undergone since 2000, both as the users and developers
-                    of technologies.
-                </p>
-
-                <p>
-                    It is disheartening to see that we may lose some of our inherent capacities with some new
-                    technologies. I wish that the upcoming years will simplify the way we use technologies and provide
-                    us with solutions that makes use of all our human senses and capabilities.
-                    I hope that we make use of all the lessons learned during this rapid technological evolution and
-                    also give opportunities to our future generations to explore the older solutions. Who knows if they
-                    come up with better ideas to use the older
-                    solutions augmented with newer approaches?
-                </p>
-            </div>
-        </div>
+        </footer>
     </body>
 
 </html>
