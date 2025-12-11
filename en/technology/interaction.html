@@ -7,404 +7,917 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <link rel="shortcut icon" href="../../images/logo/favicon.png" />
         <title>Interaction: John Samuel</title>
-        <style type="text/css">
-            body {
-                background-color: #FFFFFF;
+        <style>
+            /* ===========================
+           DESIGN TOKENS & VARIABLES
+           =========================== */
+            :root {
+                /* Interaction Theme - Connectivity & Bridges Palette */
+                --color-base-bg: #faf8f6;
+                --color-surface-dark: #ffffff;
+                --color-surface-light: #f8f6f4;
+                --color-base-text: #1a1a1a;
+                --color-text-muted: #666666;
+
+                /* Connection-inspired accent colors */
+                --color-accent-1: #f97316;
+                /* Warm connection orange */
+                --color-accent-2: #06b6d4;
+                /* Communication cyan */
+                --color-accent-3: #8b5cf6;
+                /* Knowledge purple */
+                --color-accent-4: #10b981;
+                /* Growth green */
+                --color-accent-light: #fff7ed;
+                /* Soft orange tint */
+
+                /* Functional colors */
+                --color-shadow: rgba(249, 115, 22, 0.15);
+                --color-border: rgba(249, 115, 22, 0.15);
+                --color-hover: rgba(249, 115, 22, 0.08);
+                --color-glass-bg: rgba(255, 255, 255, 0.9);
+
+                /* Gradients */
+                --gradient-primary: linear-gradient(135deg, var(--color-accent-1) 0%, var(--color-accent-2) 50%, var(--color-accent-3) 100%);
+                --gradient-warm: linear-gradient(135deg, #ff6b35 0%, #f97316 50%, #fb923c 100%);
+                --gradient-cool: linear-gradient(135deg, var(--color-accent-2) 0%, var(--color-accent-3) 100%);
+
+                /* Spacing scale */
+                --space-xs: 0.25rem;
+                --space-sm: 0.5rem;
+                --space-md: 1rem;
+                --space-lg: 1.5rem;
+                --space-xl: 2rem;
+                --space-2xl: 3rem;
+                --space-3xl: 4rem;
+                --space-4xl: 6rem;
+
+                /* Typography */
+                --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+                --text-xs: clamp(0.75rem, 0.7rem + 0.25vw, 0.875rem);
+                --text-sm: clamp(0.875rem, 0.8rem + 0.35vw, 1rem);
+                --text-base: clamp(1rem, 0.95rem + 0.25vw, 1.125rem);
+                --text-lg: clamp(1.125rem, 1.05rem + 0.35vw, 1.25rem);
+                --text-xl: clamp(1.25rem, 1.15rem + 0.5vw, 1.5rem);
+                --text-2xl: clamp(1.5rem, 1.3rem + 1vw, 2rem);
+                --text-3xl: clamp(2rem, 1.6rem + 2vw, 2.5rem);
+
+                /* Shadows */
+                --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.04), 0 1px 3px rgba(249, 115, 22, 0.08);
+                --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.05), 0 2px 4px rgba(249, 115, 22, 0.1);
+                --shadow-lg: 0 10px 24px rgba(0, 0, 0, 0.08), 0 4px 8px rgba(249, 115, 22, 0.15);
+                --shadow-xl: 0 20px 40px rgba(0, 0, 0, 0.12), 0 8px 16px rgba(249, 115, 22, 0.2);
+
+                /* Border radius */
+                --radius-sm: 4px;
+                --radius-md: 8px;
+                --radius-lg: 12px;
+                --radius-xl: 16px;
+                --radius-2xl: 24px;
+                --radius-organic: 63% 37% 54% 46% / 45% 62% 38% 55%;
             }
 
-            #sidebar {
-                position: fixed;
-                background-color: #8E44AD;
-                top: 0;
-                left: 0;
-                bottom: 0;
-                width: 30vw;
-            }
-
-            #sidebar .title {
-                position: relative;
-                text-align: center;
-                line-height: 4vmax;
-                font-size: 1.4vmax;
-                font-family: 'Arial';
-                margin-top: 25vh;
-            }
-
-            #sidebar .title a:link,
-            #sidebar .title a:visited {
-                color: #FFFFFF;
-                text-decoration: none;
-            }
-
-            .subtitle {
-                top: 50vh;
-                text-align: center;
-                line-height: 1.3vmax;
-                font-family: 'Arial';
-                font-size: 1.5vmax;
-                color: #FFFFFF;
-            }
-
-            .subtitle a:link,
-            .subtitle a:visited {
-                color: #FFFFFF;
-                text-decoration: none;
-            }
-
-            .licence {
-                position: fixed;
-                text-align: right;
-                bottom: 0;
-                right: 0;
-            }
-
-            .home {
-                position: fixed;
-                text-align: left;
-                font-family: 'Arial';
-                color: #D3D3D3;
-                z-index: 100;
-                width: 100%;
-                background-color: #FFFFFF;
-                top: 0px;
-                margin-bottom: 10px;
-                padding-bottom: 10px;
-            }
-
-            .home a:link,
-            .home a:visited {
-                text-decoration: none;
-                color: #D3D3D3;
-            }
-
-            .home ul {
+            /* ===========================
+           RESET & BASE STYLES
+           =========================== */
+            * {
                 margin: 0;
                 padding: 0;
-                text-align: left;
-                list-style: none;
+                box-sizing: border-box;
             }
 
-            .home li {
-                position: relative;
-                float: left;
-                padding-top: 15px;
-                margin-right: 1em;
-                font-family: 'Arial';
+            html {
+                scroll-behavior: smooth;
+                scroll-padding-top: 100px;
             }
 
-            .home li:hover {
-                display: block;
+            body {
+                font-family: var(--font-sans);
+                font-size: var(--text-base);
+                line-height: 1.7;
+                color: var(--color-base-text);
+                background: var(--color-base-bg);
+                overflow-x: hidden;
+                letter-spacing: -0.01em;
             }
 
-            .home a:link,
-            .home a:visited {
-                color: #D3D3D3;
-            }
-
-            .home li:hover a:link,
-            .home li:hover a:visited {
-                text-decoration: none;
-                padding: 15px;
-                color: #FFFFFF;
-                background-color: #8E44AD;
-            }
-
-            #langlist {
-                padding-left: 0;
-                border-radius: 1.2em;
-                background-color: #8E44AD;
-                display: inline-block;
-            }
-
-            #langlist li {
-                list-style: none;
-                display: inline-block;
-                padding: 0.5em;
-                margin-left: 0.3em;
-                margin-right: 0.3em;
-                font-family: 'Arial';
-            }
-
-            #langlist a {
-                text-decoration: none;
-                color: #FFFFFF;
-            }
-
-            #langlist .highlight {
-                border-radius: 1em;
-                padding-top: 0.3em;
-                padding-bottom: 0.3em;
-                background-color: #FFFFFF;
-            }
-
-            #langlist .highlight a {
-                color: #8E44AD;
-            }
-
-            .content {
-                line-height: 1.8vmax;
-                font-size: 1.2vmax;
-                font-family: 'Arial';
-                margin-top: 15vh;
-                width: 90%;
-            }
-
-            .content h2,
-            h3,
-            h4 {
-                color: #8E44AD;
-            }
-
-            .content a:link,
-            .content a:visited {
-                color: #8E44AD;
-            }
-
-            .content h3 {
-                color: #8E44AD;
-            }
-
-            .content h2::before,
-            .content h3::before {
-                display: block;
-                content: " ";
-                visibility: hidden;
-                height: 50px;
-                margin-top: -50px;
-                pointer-events: none;
-                background-color: #FFFFFF;
-            }
-
-            .content p {
-                text-align: justify;
-            }
-
-            .content a:link,
-            .content a:visited {
-                color: #8E44AD;
-            }
-
-            .content li {
-                margin: 5px;
-            }
-
-            .page {
-                width: 65vw;
+            /* Animated gradient background */
+            body::before {
+                content: '';
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
                 height: 100%;
-                margin-left: 30vw;
+                background:
+                    radial-gradient(circle at 15% 20%, rgba(249, 115, 22, 0.06) 0%, transparent 40%),
+                    radial-gradient(circle at 85% 30%, rgba(6, 182, 212, 0.05) 0%, transparent 40%),
+                    radial-gradient(circle at 50% 80%, rgba(139, 92, 246, 0.04) 0%, transparent 40%),
+                    radial-gradient(circle at 30% 60%, rgba(16, 185, 129, 0.04) 0%, transparent 40%);
+                animation: backgroundFlow 25s ease-in-out infinite;
+                pointer-events: none;
+                z-index: 0;
+            }
+
+            @keyframes backgroundFlow {
+
+                0%,
+                100% {
+                    opacity: 0.5;
+                    transform: scale(1);
+                }
+
+                50% {
+                    opacity: 0.8;
+                    transform: scale(1.05);
+                }
+            }
+
+            /* Connection mesh pattern */
+            body::after {
+                content: '';
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background-image:
+                    radial-gradient(circle at 2px 2px, rgba(249, 115, 22, 0.08) 1px, transparent 1px);
+                background-size: 40px 40px;
+                pointer-events: none;
+                z-index: 0;
+                opacity: 0.4;
+            }
+
+            /* ===========================
+           LAYOUT CONTAINER
+           =========================== */
+            .page {
+                position: relative;
+                z-index: 1;
+                min-height: 100vh;
+                display: flex;
+                flex-direction: column;
+            }
+
+            /* ===========================
+           HEADER & NAVIGATION
+           =========================== */
+            .site-header {
+                position: sticky;
+                top: 0;
+                z-index: 100;
+                background: var(--color-glass-bg);
+                -webkit-backdrop-filter: blur(16px) saturate(180%);
+                backdrop-filter: blur(16px) saturate(180%);
+                border-bottom: 1px solid var(--color-border);
+                box-shadow: var(--shadow-md);
+            }
+
+            .header-container {
+                max-width: 1400px;
+                margin: 0 auto;
+                padding: var(--space-lg) var(--space-xl);
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                gap: var(--space-xl);
+            }
+
+            .site-name {
+                font-size: var(--text-xl);
+                font-weight: 700;
+                letter-spacing: -0.02em;
+                position: relative;
+            }
+
+            .site-name a {
+                color: var(--color-base-text);
+                text-decoration: none;
+                display: inline-flex;
+                align-items: center;
+                gap: var(--space-sm);
+                transition: all 0.3s ease;
+            }
+
+            .site-name a::before {
+                content: '';
+                width: 8px;
+                height: 8px;
+                background: var(--gradient-warm);
+                border-radius: 50%;
+                box-shadow: 0 0 20px var(--color-accent-1);
+                animation: pulse 2s ease-in-out infinite;
+            }
+
+            @keyframes pulse {
+
+                0%,
+                100% {
+                    transform: scale(1);
+                    opacity: 1;
+                }
+
+                50% {
+                    transform: scale(1.3);
+                    opacity: 0.7;
+                }
+            }
+
+            .site-name a:hover {
+                color: var(--color-accent-1);
+                transform: translateX(4px);
+            }
+
+            .breadcrumb-nav {
+                display: flex;
+                align-items: center;
+                gap: var(--space-md);
+                flex-wrap: wrap;
+            }
+
+            .breadcrumb-nav ul {
+                display: flex;
+                align-items: center;
+                gap: var(--space-sm);
+                list-style: none;
+            }
+
+            .breadcrumb-nav li {
+                display: flex;
+                align-items: center;
+                gap: var(--space-sm);
+            }
+
+            .breadcrumb-nav li:not(:last-child)::after {
+                content: '→';
+                color: var(--color-accent-1);
+                font-weight: 600;
+                opacity: 0.5;
+            }
+
+            .breadcrumb-nav a {
+                color: var(--color-text-muted);
+                text-decoration: none;
+                font-size: var(--text-sm);
+                padding: var(--space-xs) var(--space-md);
+                border-radius: var(--radius-sm);
+                transition: all 0.3s ease;
+                position: relative;
+            }
+
+            .breadcrumb-nav a::before {
+                content: '';
+                position: absolute;
+                bottom: 0;
+                left: 50%;
+                width: 0;
+                height: 2px;
+                background: var(--gradient-warm);
+                transform: translateX(-50%);
+                transition: width 0.3s ease;
+            }
+
+            .breadcrumb-nav a:hover {
+                color: var(--color-accent-1);
+                background: var(--color-hover);
+            }
+
+            .breadcrumb-nav a:hover::before {
+                width: 80%;
+            }
+
+            /* ===========================
+           HERO SECTION
+           =========================== */
+            .hero-section {
+                max-width: 1400px;
+                margin: 0 auto;
+                padding: var(--space-4xl) var(--space-xl) var(--space-3xl);
+                position: relative;
+            }
+
+            .hero-content {
+                text-align: center;
+                position: relative;
+                z-index: 2;
+            }
+
+            .hero-title {
+                font-size: var(--text-3xl);
+                font-weight: 800;
+                letter-spacing: -0.03em;
+                margin-bottom: var(--space-lg);
+                background: var(--gradient-primary);
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                background-clip: text;
+                animation: titleShimmer 4s ease-in-out infinite;
+            }
+
+            @keyframes titleShimmer {
+
+                0%,
+                100% {
+                    filter: brightness(1);
+                }
+
+                50% {
+                    filter: brightness(1.2);
+                }
+            }
+
+            .hero-subtitle {
+                font-size: var(--text-lg);
+                color: var(--color-text-muted);
+                font-weight: 500;
+                margin-bottom: var(--space-2xl);
+                max-width: 700px;
+                margin-left: auto;
+                margin-right: auto;
+            }
+
+            /* Hero SVG Illustration */
+            .hero-visual {
+                max-width: 900px;
+                margin: var(--space-2xl) auto 0;
+                position: relative;
+            }
+
+            .hero-svg {
+                width: 100%;
+                height: auto;
+                filter: drop-shadow(0 10px 30px rgba(249, 115, 22, 0.2));
+            }
+
+            /* ===========================
+           MAIN CONTENT AREA
+           =========================== */
+            .main-content {
+                max-width: 900px;
+                margin: 0 auto;
+                padding: var(--space-3xl) var(--space-xl);
+                flex: 1;
+            }
+
+            .content-section {
+                background: var(--color-surface-dark);
+                border: 1px solid var(--color-border);
+                border-radius: var(--radius-2xl);
+                padding: var(--space-2xl) var(--space-xl);
+                box-shadow: var(--shadow-lg);
+                position: relative;
                 overflow: hidden;
-                padding: 0 1em;
-                font-family: 'Arial';
             }
 
-            .page img {
-                max-width: 100%;
-                max-height: 100%;
+            /* Decorative corner elements */
+            .content-section::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 120px;
+                height: 3px;
+                background: var(--gradient-warm);
+                opacity: 0.6;
             }
 
-            @media (max-width: 640px),
-            screen and (orientation: portrait) {
-                body {
-                    max-width: 100%;
-                    max-height: 100%;
+            .content-section::after {
+                content: '';
+                position: absolute;
+                top: 0;
+                right: 0;
+                width: 3px;
+                height: 120px;
+                background: var(--gradient-cool);
+                opacity: 0.6;
+            }
+
+            .content-section p {
+                margin-bottom: var(--space-xl);
+                color: var(--color-base-text);
+                line-height: 1.8;
+                position: relative;
+            }
+
+            /* Connection indicator for first paragraph */
+            .content-section p:first-of-type::before {
+                content: '';
+                position: absolute;
+                left: -24px;
+                top: 8px;
+                width: 12px;
+                height: 12px;
+                background: var(--gradient-warm);
+                border-radius: 50%;
+                box-shadow: 0 0 15px var(--color-accent-1);
+            }
+
+            .content-section p:last-of-type {
+                margin-bottom: 0;
+            }
+
+            /* ===========================
+           FOOTER
+           =========================== */
+            .site-footer {
+                background: var(--color-surface-light);
+                border-top: 1px solid var(--color-border);
+                margin-top: auto;
+            }
+
+            .footer-container {
+                max-width: 1400px;
+                margin: 0 auto;
+                padding: var(--space-2xl) var(--space-xl);
+                display: flex;
+                flex-direction: column;
+                gap: var(--space-xl);
+            }
+
+            .language-selector {
+                display: flex;
+                gap: var(--space-md);
+                justify-content: center;
+                flex-wrap: wrap;
+            }
+
+            .language-selector h4 {
+                width: 100%;
+                text-align: center;
+                font-size: var(--text-sm);
+                font-weight: 600;
+                color: var(--color-text-muted);
+                text-transform: uppercase;
+                letter-spacing: 0.05em;
+                margin-bottom: var(--space-sm);
+            }
+
+            .language-link {
+                display: inline-flex;
+                align-items: center;
+                gap: var(--space-sm);
+                padding: var(--space-sm) var(--space-lg);
+                background: var(--color-surface-dark);
+                border: 1px solid var(--color-border);
+                border-radius: var(--radius-md);
+                color: var(--color-base-text);
+                text-decoration: none;
+                font-size: var(--text-sm);
+                font-weight: 500;
+                transition: all 0.3s ease;
+                position: relative;
+                overflow: hidden;
+            }
+
+            .language-link::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: -100%;
+                width: 100%;
+                height: 100%;
+                background: var(--gradient-warm);
+                opacity: 0.1;
+                transition: left 0.3s ease;
+            }
+
+            .language-link:hover::before {
+                left: 0;
+            }
+
+            .language-link:hover {
+                border-color: var(--color-accent-1);
+                transform: translateY(-2px);
+                box-shadow: var(--shadow-md);
+            }
+
+            .language-link.active {
+                background: var(--gradient-warm);
+                border-color: transparent;
+                color: white;
+                font-weight: 600;
+            }
+
+            .language-link::after {
+                content: '→';
+                opacity: 0;
+                transform: translateX(-8px);
+                transition: all 0.3s ease;
+            }
+
+            .language-link:hover::after {
+                opacity: 1;
+                transform: translateX(0);
+            }
+
+            .footer-info {
+                text-align: center;
+                padding-top: var(--space-lg);
+                border-top: 1px solid var(--color-border);
+                color: var(--color-text-muted);
+                font-size: var(--text-sm);
+            }
+
+            /* ===========================
+           RESPONSIVE DESIGN
+           =========================== */
+            @media (max-width: 768px) {
+                .header-container {
+                    flex-direction: column;
+                    align-items: flex-start;
+                    gap: var(--space-md);
                 }
 
-                #sidebar {
-                    position: fixed;
-                    background-color: #8E44AD;
-                    top: 0;
-                    left: 0;
-                    bottom: 80vh;
-                    width: 100vw;
-                }
-
-                #sidebar .title {
-                    text-align: center;
-                    position: fixed;
-                    margin-top: 6vh;
-                    left: 0px;
-                    right: 0px;
-                    line-height: 3.5vmax;
-                    font-size: 1.5vmax;
-                    font-family: 'Arial';
-                }
-
-                #sidebar .subtitle {
-                    text-align: center;
-                    top: 5vh;
-                    left: 0px;
-                    right: 0px;
-                    position: fixed;
-                    margin-top: 10vh;
-                    font-size: 1.5vmax;
-                }
-
-                #sidebar .title a:link,
-                #sidebar .title a:visited {
-                    text-align: center;
-                    color: #FFFFFF;
-                }
-
-                #sidebar .subtitle a:link,
-                #sidebar .subtitle a:visited {
-                    text-align: center;
-                    color: #FFFFFF;
-                }
-
-                .home {
-                    z-index: 100;
+                .breadcrumb-nav {
                     width: 100%;
-                    background-color: #8E44AD;
-                    font-size: 1.5vmax;
                 }
 
-                .home a:link,
-                .home a:visited {
-                    text-decoration: none;
-                    color: #FFFFFF;
+                .hero-section {
+                    padding: var(--space-2xl) var(--space-md) var(--space-xl);
                 }
 
-                .content {
-                    line-height: 3.8vmax;
-                    font-size: 1.8vmax;
-                    font-family: 'Arial';
-                    margin-top: 22vh;
+                .main-content {
+                    padding: var(--space-xl) var(--space-md);
                 }
 
-                .content a:link,
-                .content a:visited {
-                    color: #8E44AD;
+                .content-section {
+                    padding: var(--space-xl) var(--space-md);
                 }
 
-                .page {
-                    top: 40vh;
-                    width: 95%;
-                    margin-left: 0vw;
+                .content-section p:first-of-type::before {
+                    left: -16px;
+                    width: 8px;
+                    height: 8px;
                 }
 
-                .page img {
-                    max-width: 100%;
-                    max-height: 100%;
-                    border: 0;
+                .footer-container {
+                    padding: var(--space-xl) var(--space-md);
                 }
+            }
+
+            /* ===========================
+           ACCESSIBILITY
+           =========================== */
+            @media (prefers-reduced-motion: reduce) {
+                * {
+                    animation-duration: 0.01ms !important;
+                    animation-iteration-count: 1 !important;
+                    transition-duration: 0.01ms !important;
+                }
+            }
+
+            :focus-visible {
+                outline: 2px solid var(--color-accent-1);
+                outline-offset: 4px;
+                border-radius: var(--radius-sm);
+            }
+
+            /* Skip to main content link */
+            .skip-link {
+                position: absolute;
+                top: -40px;
+                left: 0;
+                background: var(--color-accent-1);
+                color: white;
+                padding: var(--space-sm) var(--space-lg);
+                text-decoration: none;
+                border-radius: 0 0 var(--radius-md) 0;
+                z-index: 1000;
+                transition: top 0.3s ease;
+            }
+
+            .skip-link:focus {
+                top: 0;
             }
         </style>
     </head>
 
     <body vocab="http://schema.org/">
+        <a href="#main-content" class="skip-link">Skip to main content</a>
+
         <div class="page">
-            <div class="home">
-                <ul typeof="BreadcrumbList">
-                    <li property="itemListElement" typeof="ListItem">
-                        <a property="item" typeof="WebPage" href="../index.html">
-                            <span property="name">Home</span>
-                        </a>
-                    </li>
-                    <li property="itemListElement" typeof="ListItem">
-                        <a property="item" typeof="WebPage" href="../research/research.html">
-                            <span property="name">Research</span>
-                        </a>
-                    </li>
-                </ul>
-
-            </div>
-            <div id="sidebar">
-                <div class="title">
-                    <h1><a href="./interaction.html">Interaction</a></h1>
+            <!-- Header & Navigation -->
+            <header class="site-header">
+                <div class="header-container">
+                    <div class="site-name">
+                        <a href="../about.html">John Samuel</a>
+                    </div>
+                    <nav class="breadcrumb-nav" aria-label="Breadcrumb">
+                        <ul typeof="BreadcrumbList">
+                            <li property="itemListElement" typeof="ListItem">
+                                <a property="item" typeof="WebPage" href="../index.html">
+                                    <span property="name">Home</span>
+                                </a>
+                            </li>
+                            <li property="itemListElement" typeof="ListItem">
+                                <a property="item" typeof="WebPage" href="../research/research.html">
+                                    <span property="name">Research</span>
+                                </a>
+                            </li>
+                            <li property="itemListElement" typeof="ListItem">
+                                <span property="name">Interaction</span>
+                            </li>
+                        </ul>
+                    </nav>
                 </div>
-                <div class="subtitle">
-                    <h3><a href="../about.html">John Samuel</a></h3>
+            </header>
+
+            <!-- Hero Section -->
+            <section class="hero-section">
+                <div class="hero-content">
+                    <h1 class="hero-title">Interaction</h1>
+                    <p class="hero-subtitle">Bridging Domains Through Communication and Shared Understanding</p>
+
+                    <div class="hero-visual">
+                        <svg class="hero-svg" viewBox="0 0 900 400" xmlns="http://www.w3.org/2000/svg"
+                            aria-hidden="true">
+                            <!-- Gradient definitions -->
+                            <defs>
+                                <linearGradient id="orangeGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                                    <stop offset="0%" style="stop-color:#ff6b35;stop-opacity:1" />
+                                    <stop offset="50%" style="stop-color:#f97316;stop-opacity:1" />
+                                    <stop offset="100%" style="stop-color:#fb923c;stop-opacity:1" />
+                                </linearGradient>
+
+                                <linearGradient id="cyanGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                                    <stop offset="0%" style="stop-color:#06b6d4;stop-opacity:1" />
+                                    <stop offset="100%" style="stop-color:#0891b2;stop-opacity:1" />
+                                </linearGradient>
+
+                                <linearGradient id="purpleGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                                    <stop offset="0%" style="stop-color:#8b5cf6;stop-opacity:1" />
+                                    <stop offset="100%" style="stop-color:#7c3aed;stop-opacity:1" />
+                                </linearGradient>
+
+                                <linearGradient id="greenGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                                    <stop offset="0%" style="stop-color:#10b981;stop-opacity:1" />
+                                    <stop offset="100%" style="stop-color:#059669;stop-opacity:1" />
+                                </linearGradient>
+
+                                <filter id="glow">
+                                    <feGaussianBlur stdDeviation="4" result="coloredBlur" />
+                                    <feMerge>
+                                        <feMergeNode in="coloredBlur" />
+                                        <feMergeNode in="SourceGraphic" />
+                                    </feMerge>
+                                </filter>
+
+                                <radialGradient id="nodeGlow">
+                                    <stop offset="0%" style="stop-color:#f97316;stop-opacity:0.4" />
+                                    <stop offset="100%" style="stop-color:#f97316;stop-opacity:0" />
+                                </radialGradient>
+                            </defs>
+
+                            <!-- Background connection mesh -->
+                            <g opacity="0.1" stroke="#f97316" stroke-width="0.5">
+                                <line x1="100" y1="150" x2="800" y2="150" />
+                                <line x1="100" y1="250" x2="800" y2="250" />
+                                <line x1="200" y1="50" x2="200" y2="350" />
+                                <line x1="450" y1="50" x2="450" y2="350" />
+                                <line x1="700" y1="50" x2="700" y2="350" />
+                            </g>
+
+                            <!-- Domain clusters -->
+                            <!-- Left cluster - Computer Science -->
+                            <g filter="url(#glow)">
+                                <circle cx="150" cy="200" r="60" fill="url(#nodeGlow)" opacity="0.6">
+                                    <animate attributeName="r" values="60;70;60" dur="5s" repeatCount="indefinite" />
+                                </circle>
+                                <circle cx="150" cy="200" r="45" fill="url(#orangeGrad)" opacity="0.9">
+                                    <animate attributeName="opacity" values="0.9;1;0.9" dur="4s"
+                                        repeatCount="indefinite" />
+                                </circle>
+                                <circle cx="120" cy="160" r="20" fill="url(#cyanGrad)" opacity="0.8" />
+                                <circle cx="180" cy="160" r="18" fill="url(#purpleGrad)" opacity="0.8" />
+                                <circle cx="120" cy="240" r="22" fill="url(#greenGrad)" opacity="0.8" />
+                                <circle cx="180" cy="240" r="19" fill="url(#orangeGrad)" opacity="0.7" />
+                            </g>
+
+                            <!-- Right cluster - Other Domains -->
+                            <g filter="url(#glow)">
+                                <circle cx="750" cy="200" r="60" fill="url(#nodeGlow)" opacity="0.6">
+                                    <animate attributeName="r" values="60;70;60" dur="4.5s" repeatCount="indefinite" />
+                                </circle>
+                                <circle cx="750" cy="200" r="45" fill="url(#cyanGrad)" opacity="0.9">
+                                    <animate attributeName="opacity" values="0.9;1;0.9" dur="4.5s"
+                                        repeatCount="indefinite" />
+                                </circle>
+                                <circle cx="720" cy="160" r="19" fill="url(#purpleGrad)" opacity="0.8" />
+                                <circle cx="780" cy="160" r="21" fill="url(#greenGrad)" opacity="0.8" />
+                                <circle cx="720" cy="240" r="20" fill="url(#orangeGrad)" opacity="0.8" />
+                                <circle cx="780" cy="240" r="18" fill="url(#cyanGrad)" opacity="0.7" />
+                            </g>
+
+                            <!-- Top cluster - Artists/Creative -->
+                            <g filter="url(#glow)">
+                                <circle cx="450" cy="80" r="50" fill="url(#nodeGlow)" opacity="0.5">
+                                    <animate attributeName="r" values="50;60;50" dur="4.8s" repeatCount="indefinite" />
+                                </circle>
+                                <circle cx="450" cy="80" r="38" fill="url(#purpleGrad)" opacity="0.9">
+                                    <animate attributeName="opacity" values="0.9;1;0.9" dur="3.8s"
+                                        repeatCount="indefinite" />
+                                </circle>
+                                <circle cx="425" cy="60" r="15" fill="url(#orangeGrad)" opacity="0.8" />
+                                <circle cx="475" cy="60" r="16" fill="url(#cyanGrad)" opacity="0.8" />
+                                <circle cx="425" cy="100" r="14" fill="url(#greenGrad)" opacity="0.7" />
+                            </g>
+
+                            <!-- Bottom cluster - Language/Education -->
+                            <g filter="url(#glow)">
+                                <circle cx="450" cy="320" r="50" fill="url(#nodeGlow)" opacity="0.5">
+                                    <animate attributeName="r" values="50;60;50" dur="5.2s" repeatCount="indefinite" />
+                                </circle>
+                                <circle cx="450" cy="320" r="38" fill="url(#greenGrad)" opacity="0.9">
+                                    <animate attributeName="opacity" values="0.9;1;0.9" dur="4.2s"
+                                        repeatCount="indefinite" />
+                                </circle>
+                                <circle cx="425" cy="340" r="15" fill="url(#purpleGrad)" opacity="0.8" />
+                                <circle cx="475" cy="340" r="17" fill="url(#orangeGrad)" opacity="0.8" />
+                                <circle cx="450" cy="350" r="14" fill="url(#cyanGrad)" opacity="0.7" />
+                            </g>
+
+                            <!-- Connecting bridges (animated paths) -->
+                            <g opacity="0.4" stroke-width="2" fill="none">
+                                <path d="M 150 200 Q 300 150 450 80" stroke="url(#orangeGrad)">
+                                    <animate attributeName="stroke-opacity" values="0.4;0.9;0.4" dur="3s"
+                                        repeatCount="indefinite" />
+                                </path>
+                                <path d="M 150 200 Q 300 260 450 320" stroke="url(#cyanGrad)">
+                                    <animate attributeName="stroke-opacity" values="0.4;0.9;0.4" dur="3.5s"
+                                        repeatCount="indefinite" />
+                                </path>
+                                <path d="M 450 80 Q 600 140 750 200" stroke="url(#purpleGrad)">
+                                    <animate attributeName="stroke-opacity" values="0.4;0.9;0.4" dur="3.2s"
+                                        repeatCount="indefinite" />
+                                </path>
+                                <path d="M 450 320 Q 600 260 750 200" stroke="url(#greenGrad)">
+                                    <animate attributeName="stroke-opacity" values="0.4;0.9;0.4" dur="3.8s"
+                                        repeatCount="indefinite" />
+                                </path>
+                                <path d="M 150 200 L 750 200" stroke="url(#orangeGrad)" stroke-dasharray="10,5">
+                                    <animate attributeName="stroke-dashoffset" from="0" to="30" dur="2s"
+                                        repeatCount="indefinite" />
+                                </path>
+                            </g>
+
+                            <!-- Flowing particles along connections -->
+                            <g filter="url(#glow)">
+                                <circle r="4" fill="#f97316">
+                                    <animateMotion path="M 150 200 Q 300 150 450 80" dur="5s"
+                                        repeatCount="indefinite" />
+                                </circle>
+                                <circle r="4" fill="#06b6d4">
+                                    <animateMotion path="M 150 200 Q 300 260 450 320" dur="5.5s"
+                                        repeatCount="indefinite" />
+                                </circle>
+                                <circle r="4" fill="#8b5cf6">
+                                    <animateMotion path="M 450 80 Q 600 140 750 200" dur="5.2s"
+                                        repeatCount="indefinite" />
+                                </circle>
+                                <circle r="4" fill="#10b981">
+                                    <animateMotion path="M 450 320 Q 600 260 750 200" dur="5.8s"
+                                        repeatCount="indefinite" />
+                                </circle>
+                                <circle r="3" fill="#f97316">
+                                    <animateMotion path="M 150 200 L 750 200" dur="4s" repeatCount="indefinite" />
+                                </circle>
+                            </g>
+
+                            <!-- Central bridge/connection symbol -->
+                            <g filter="url(#glow)">
+                                <circle cx="450" cy="200" r="30" fill="none" stroke="url(#orangeGrad)" stroke-width="3"
+                                    opacity="0.6">
+                                    <animate attributeName="r" values="30;40;30" dur="4s" repeatCount="indefinite" />
+                                    <animate attributeName="opacity" values="0.6;1;0.6" dur="4s"
+                                        repeatCount="indefinite" />
+                                </circle>
+                                <circle cx="450" cy="200" r="8" fill="url(#orangeGrad)">
+                                    <animate attributeName="opacity" values="0.8;1;0.8" dur="2s"
+                                        repeatCount="indefinite" />
+                                </circle>
+                            </g>
+
+                            <!-- Domain labels -->
+                            <g font-family="sans-serif" font-size="11" font-weight="600" text-anchor="middle">
+                                <text x="150" y="285" fill="#f97316" opacity="0.7">Computer Science</text>
+                                <text x="750" y="285" fill="#06b6d4" opacity="0.7">Various Domains</text>
+                                <text x="450" y="30" fill="#8b5cf6" opacity="0.7">Arts & Creative</text>
+                                <text x="450" y="385" fill="#10b981" opacity="0.7">Education & Language</text>
+                            </g>
+                        </svg>
+                    </div>
                 </div>
-            </div>
+            </section>
 
-            <div class="content">
-                <ul id="langlist">
-                    <li class="highlight" id="enpage" rel="hasPart" resource="#enpage">
-                        <span lang="en"><a href="../../en/technology/interaction.html" class="langlink" property="url"
-                                typeof="WebPage"><span property="inLanguage">English</span></a>
-                        </span>
-                    </li>
-                    <li id="frpage" rel="hasPart" resource="#frpage">
-                        <span lang="fr"><a class="langlink" href="../../fr/technologie/interaction.html" property="url"
-                                typeof="WebPage"><span property="inLanguage">Fran&#xE7;ais</span></a>
-                        </span>
-                    </li>
-                </ul>
-                <p>
-                    Contributing to several software applications and open source communities gave me the possibility to
-                    interact with people from different domains. I recall the days when I assumed of certain universal
-                    concepts known to all. However, I learned an early
-                    lesson that such assumptions cannot be made. My interactions with people from diverse domains
-                    quickly removed the myth of 'universally' known fact or the phrases 'everybody knows that...’.
-                </p>
+            <!-- Main Content -->
+            <main id="main-content" class="main-content">
+                <article class="content-section">
+                    <p>
+                        Contributing to several software applications and open source communities gave me the
+                        possibility to
+                        interact with people from different domains. I recall the days when I assumed of certain
+                        universal
+                        concepts known to all. However, I learned an early lesson that such assumptions cannot be made.
+                        My interactions with people from diverse domains
+                        quickly removed the myth of 'universally' known fact or the phrases 'everybody knows that...'.
+                    </p>
 
-                <p>
-                    Having used some of the most popular social networking applications and blogging platforms, I
-                    assumed that “everybody” has heard about them. I still remember my first discussions years ago with
-                    some artists, when I discussed the possibility of sharing
-                    the photographs of their works online. I shared the names of some “popular” blogging platforms,
-                    which provide some simple interfaces to write articles and share photographs of their works and
-                    exhibitions. To my surprise, they did not know
-                    the names of any of those platforms. That is when I learned that ‘popular’ or ‘commonly used’
-                    platforms (in this case, blogging platforms) vary from place to place.
-                </p>
+                    <p>
+                        Having used some of the most popular social networking applications and blogging platforms, I
+                        assumed that "everybody" has heard about them. I still remember my first discussions years ago
+                        with
+                        some artists, when I discussed the possibility of sharing the photographs of their works online.
+                        I shared the names of some "popular" blogging platforms,
+                        which provide some simple interfaces to write articles and share photographs of their works and
+                        exhibitions. To my surprise, they did not know the names of any of those platforms. That is when
+                        I learned that 'popular' or 'commonly used'
+                        platforms (in this case, blogging platforms) vary from place to place.
+                    </p>
 
-                <p>
-                    Having done my studies in computer science, I wondered whether developing a website is difficult
-                    these days. I feel that it is now easy to start a new blog. Nevertheless, the above interactions
-                    made me realize the steep learning curve for people who are
-                    not accustomed to the jargon related to the computer science world. Even though numerous “simple”
-                    solutions exist, a generic solution may not be the answer to all our problems. We may require
-                    domain-specific solutions. Needless to say
-                    that some common underlying ideas related to the management of data from diverse domains exist. When
-                    a novice comes across a content management service website, they may be overwhelmed with tons of
-                    options that hinder them from further
-                    exploring the solution. They may not use the service, because they do not see the vocabulary of
-                    their domain. If I go back to my example, they may be looking to upload the photographs of their
-                    paintings or exhibitions and they come across
-                    the words ‘posts’, ‘media’, ‘tags’, ‘categories’, etc. Another example is the necessity of
-                    case-sensitive characters, the use of underscore instead of space characters for a given field in a
-                    form. These are part of the initial years of
-                    computer science lessons that make us assume their universality as well-known facts, but in fact,
-                    they are not. Another example is the way initial web solutions encouraged the use of keywords for
-                    search queries.
-                </p>
+                    <p>
+                        Having done my studies in computer science, I wondered whether developing a website is difficult
+                        these days. I feel that it is now easy to start a new blog. Nevertheless, the above interactions
+                        made me realize the steep learning curve for people who are not accustomed to the jargon related
+                        to the computer science world. Even though numerous "simple"
+                        solutions exist, a generic solution may not be the answer to all our problems. We may require
+                        domain-specific solutions. Needless to say that some common underlying ideas related to the
+                        management of data from diverse domains exist. When
+                        a novice comes across a content management service website, they may be overwhelmed with tons of
+                        options that hinder them from further exploring the solution. They may not use the service,
+                        because they do not see the vocabulary of
+                        their domain. If I go back to my example, they may be looking to upload the photographs of their
+                        paintings or exhibitions and they come across the words 'posts', 'media', 'tags', 'categories',
+                        etc. Another example is the necessity of
+                        case-sensitive characters, the use of underscore instead of space characters for a given field
+                        in a
+                        form. These are part of the initial years of computer science lessons that make us assume their
+                        universality as well-known facts, but in fact,
+                        they are not. Another example is the way initial web solutions encouraged the use of keywords
+                        for
+                        search queries.
+                    </p>
 
-                <p>
-                    Irrespective of the domain, there is a need for data management. Yet the vocabulary that the
-                    end-user looks for is not the same that we use. Does this mean that the underlying foundation of our
-                    data management must cater to providing different end-user
-                    interfaces for different users? We have seen the minimalistic approaches, i.e., a simpler interface
-                    for blogging platforms with very minimal features, so that the writers could focus on what they
-                    love- writing, without getting overwhelmed
-                    with unnecessary menus and options. However, there are other advanced users who mix and curate
-                    different media, who want to integrate not just regular media like photographs, audio, or videos,
-                    but also embedded media, including maps, social
-                    media posts, etc. This diversity of requirements makes the field of computer science interesting and
-                    challenging. No wonder our research on a global format has not found any single answer but a
-                    plethora of approaches.
-                </p>
+                    <p>
+                        Irrespective of the domain, there is a need for data management. Yet the vocabulary that the
+                        end-user looks for is not the same that we use. Does this mean that the underlying foundation of
+                        our
+                        data management must cater to providing different end-user interfaces for different users? We
+                        have seen the minimalistic approaches, i.e., a simpler interface
+                        for blogging platforms with very minimal features, so that the writers could focus on what they
+                        love- writing, without getting overwhelmed with unnecessary menus and options. However, there
+                        are other advanced users who mix and curate
+                        different media, who want to integrate not just regular media like photographs, audio, or
+                        videos,
+                        but also embedded media, including maps, social media posts, etc. This diversity of requirements
+                        makes the field of computer science interesting and
+                        challenging. No wonder our research on a global format has not found any single answer but a
+                        plethora of approaches.
+                    </p>
 
-                <p>
-                    To illustrate my point about the diversity of requirements, I recall another interaction with a
-                    language professor, who wanted to manage the learning progress of their students. You may once again
-                    respond to me that many software solutions do exist for
-                    the same. Unfortunately, the person before me did not find the answer. Or, they found some
-                    solutions, but the associated learning curve, accessibility, cost, or limited time to put the
-                    solution in place made them still yearn for simpler
-                    solutions.
-                </p>
+                    <p>
+                        To illustrate my point about the diversity of requirements, I recall another interaction with a
+                        language professor, who wanted to manage the learning progress of their students. You may once
+                        again
+                        respond to me that many software solutions do exist for the same. Unfortunately, the person
+                        before me did not find the answer. Or, they found some
+                        solutions, but the associated learning curve, accessibility, cost, or limited time to put the
+                        solution in place made them still yearn for simpler solutions.
+                    </p>
 
-                <p>
-                    My growing feeling is that our knowledge is still in silos. There is a lack of interaction between
-                    different domains, and because of differing vocabularies, we are not able to understand each other.
-                    Yet, a careful analysis of these multidisciplinary interactions
-                    proves that the people in one domain may have already found solutions or worked for years on the
-                    problem that the people in other domains are currently facing. It is time that we encourage more and
-                    more of these interactions for the benefit
-                    of each other and for building efficient solutions.
-                </p>
-            </div>
+                    <p>
+                        My growing feeling is that our knowledge is still in silos. There is a lack of interaction
+                        between
+                        different domains, and because of differing vocabularies, we are not able to understand each
+                        other.
+                        Yet, a careful analysis of these multidisciplinary interactions proves that the people in one
+                        domain may have already found solutions or worked for years on the
+                        problem that the people in other domains are currently facing. It is time that we encourage more
+                        and
+                        more of these interactions for the benefit of each other and for building efficient solutions.
+                    </p>
+                </article>
+            </main>
+
+            <!-- Footer -->
+            <footer class="site-footer">
+                <div class="footer-container">
+                    <nav class="language-selector" aria-label="Language selector">
+                        <h4>Available Languages</h4>
+                        <a href="../../en/technology/interaction.html" class="language-link active" lang="en"
+                            hreflang="en">
+                            <span>English</span>
+                        </a>
+                        <a href="../../fr/technologie/interaction.html" class="language-link" lang="fr" hreflang="fr">
+                            <span>Français</span>
+                        </a>
+                    </nav>
+
+                    <div class="footer-info">
+                        <p>&copy; 2025 John Samuel. All content licensed under Creative Commons CC BY-SA 4.0.</p>
+                    </div>
+                </div>
+            </footer>
         </div>
     </body>
 
