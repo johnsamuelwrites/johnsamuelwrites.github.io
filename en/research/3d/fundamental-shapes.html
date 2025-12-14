@@ -1,0 +1,807 @@
+<!DOCTYPE html>
+<html lang="en">
+
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta http-equiv="Content-Language" content="en" />
+        <link rel="shortcut icon" href="../../../images/logo/favicon.png" />
+        <title>Fundamental Shapes - Project 3D: John Samuel</title>
+
+        <!-- Load model-viewer for 3D previews -->
+        <script type="module" src="https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js"></script>
+        <script nomodule src="https://unpkg.com/@google/model-viewer/dist/model-viewer-legacy.js"></script>
+
+        <style type="text/css">
+            * {
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
+            }
+
+            :root {
+                /* Geometric Theme Color Palette */
+                --bg-dark: #0a0e27;
+                --bg-darker: #060913;
+                --surface-dark: #141829;
+                --surface-elevated: #1a1f3a;
+                --text-primary: #e2e8f0;
+                --text-secondary: #94a3b8;
+
+                /* Geometric-inspired colors */
+                --geo-orange: #ff8c42;
+                --geo-teal: #00d4aa;
+                --geo-violet: #8b5cf6;
+                --geo-gold: #fbbf24;
+                --geo-cyan: #06b6d4;
+                --glow-orange: rgba(255, 140, 66, 0.5);
+                --glow-teal: rgba(0, 212, 170, 0.5);
+                --glow-violet: rgba(139, 92, 246, 0.5);
+                --gradient-geo: linear-gradient(135deg, var(--geo-orange) 0%, var(--geo-teal) 50%, var(--geo-violet) 100%);
+
+                /* Design Tokens */
+                --space-xs: 0.25rem;
+                --space-sm: 0.5rem;
+                --space-md: 1rem;
+                --space-lg: 1.5rem;
+                --space-xl: 2rem;
+                --space-2xl: 3rem;
+                --space-3xl: 4rem;
+                --space-4xl: 6rem;
+
+                --radius-sm: 4px;
+                --radius-md: 8px;
+                --radius-lg: 12px;
+                --radius-xl: 16px;
+                --radius-2xl: 24px;
+
+                --text-base: clamp(1rem, 0.95rem + 0.25vw, 1.125rem);
+                --text-lg: clamp(1.125rem, 1.05rem + 0.35vw, 1.25rem);
+                --text-xl: clamp(1.25rem, 1.15rem + 0.5vw, 1.5rem);
+                --text-2xl: clamp(1.5rem, 1.3rem + 1vw, 2rem);
+                --text-3xl: clamp(2rem, 1.6rem + 2vw, 2.5rem);
+                --text-4xl: clamp(2.5rem, 2rem + 2.5vw, 3.5rem);
+            }
+
+            body {
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+                background: radial-gradient(ellipse at top, var(--bg-dark) 0%, var(--bg-darker) 100%);
+                background-attachment: fixed;
+                color: var(--text-primary);
+                line-height: 1.6;
+                overflow-x: hidden;
+                position: relative;
+            }
+
+            /* Animated background pattern - geometric shapes */
+            body::before {
+                content: '';
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background-image:
+                    radial-gradient(circle at 15% 85%, var(--glow-orange) 0%, transparent 50%),
+                    radial-gradient(circle at 85% 15%, var(--glow-violet) 0%, transparent 50%),
+                    radial-gradient(circle at 50% 50%, var(--glow-teal) 0%, transparent 50%);
+                pointer-events: none;
+                z-index: 0;
+                animation: ambientPulse 10s ease-in-out infinite;
+            }
+
+            @keyframes ambientPulse {
+
+                0%,
+                100% {
+                    opacity: 0.3;
+                    transform: scale(1);
+                }
+
+                50% {
+                    opacity: 0.5;
+                    transform: scale(1.05);
+                }
+            }
+
+            /* Geometric grid pattern */
+            .grid-pattern {
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background-image:
+                    linear-gradient(rgba(255, 140, 66, 0.08) 1px, transparent 1px),
+                    linear-gradient(90deg, rgba(255, 140, 66, 0.08) 1px, transparent 1px);
+                background-size: 60px 60px;
+                pointer-events: none;
+                z-index: 0;
+                opacity: 0.4;
+            }
+
+            /* Fixed Navigation */
+            .navigation {
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                background: rgba(20, 24, 41, 0.7);
+                -webkit-backdrop-filter: blur(20px) saturate(180%);
+                backdrop-filter: blur(20px) saturate(180%);
+                padding: 1.2rem 2rem;
+                z-index: 1000;
+                border-bottom: 1px solid rgba(255, 140, 66, 0.2);
+                box-shadow: 0 4px 24px rgba(0, 0, 0, 0.5), 0 0 40px rgba(255, 140, 66, 0.1);
+            }
+
+            .nav-content {
+                max-width: 1400px;
+                margin: 0 auto;
+                display: flex;
+                align-items: center;
+                gap: 2rem;
+            }
+
+            .nav-name {
+                font-size: 1.1rem;
+                font-weight: 700;
+                color: var(--geo-orange);
+                text-decoration: none;
+                transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+                position: relative;
+                text-shadow: 0 0 20px var(--glow-orange);
+            }
+
+            .nav-name::after {
+                content: '';
+                position: absolute;
+                bottom: -2px;
+                left: 0;
+                width: 0;
+                height: 2px;
+                background: var(--gradient-geo);
+                transition: width 0.3s ease;
+                box-shadow: 0 0 10px var(--glow-orange);
+            }
+
+            .nav-name:hover {
+                color: var(--geo-violet);
+                text-shadow: 0 0 30px var(--glow-violet);
+                transform: translateY(-1px);
+            }
+
+            .nav-name:hover::after {
+                width: 100%;
+            }
+
+            .breadcrumb {
+                display: flex;
+                gap: 0.5rem;
+                list-style: none;
+                font-size: 0.95rem;
+                flex-wrap: wrap;
+            }
+
+            .breadcrumb li {
+                display: flex;
+                align-items: center;
+                gap: 0.5rem;
+            }
+
+            .breadcrumb li:not(:last-child)::after {
+                content: '→';
+                color: var(--geo-orange);
+                opacity: 0.5;
+            }
+
+            .breadcrumb a {
+                color: var(--text-secondary);
+                text-decoration: none;
+                transition: all 0.3s ease;
+                padding: 0.3rem 0.8rem;
+                border-radius: var(--radius-md);
+            }
+
+            .breadcrumb a:hover {
+                background: rgba(255, 140, 66, 0.1);
+                color: var(--geo-orange);
+                text-shadow: 0 0 10px var(--glow-orange);
+            }
+
+            .breadcrumb span {
+                color: var(--text-primary);
+                opacity: 0.7;
+                padding: 0.3rem 0.8rem;
+            }
+
+            /* Hero Section */
+            .hero {
+                margin-top: 6rem;
+                padding: 3rem 2rem 5rem;
+                text-align: center;
+                max-width: 1400px;
+                margin-left: auto;
+                margin-right: auto;
+                position: relative;
+                z-index: 1;
+            }
+
+            .hero-title {
+                font-size: var(--text-4xl);
+                font-weight: 800;
+                letter-spacing: -0.03em;
+                margin-bottom: 1.5rem;
+                background: var(--gradient-geo);
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                background-clip: text;
+                animation: titleShimmer 8s ease-in-out infinite;
+                background-size: 200% 200%;
+                filter: drop-shadow(0 0 40px var(--glow-orange));
+            }
+
+            @keyframes titleShimmer {
+
+                0%,
+                100% {
+                    background-position: 0% 50%;
+                }
+
+                50% {
+                    background-position: 100% 50%;
+                }
+            }
+
+            .hero-subtitle {
+                font-size: var(--text-xl);
+                color: var(--text-secondary);
+                margin-bottom: 2.5rem;
+                font-weight: 500;
+            }
+
+            /* Hero SVG - Geometric Shapes */
+            .hero-svg {
+                width: 100%;
+                max-width: 600px;
+                height: 300px;
+                margin: 0 auto 2.5rem;
+                filter: drop-shadow(0 0 30px var(--glow-orange));
+            }
+
+            .hero-description {
+                max-width: 800px;
+                margin: 0 auto;
+                font-size: var(--text-lg);
+                line-height: 1.8;
+                color: var(--text-secondary);
+                background: rgba(20, 24, 41, 0.6);
+                -webkit-backdrop-filter: blur(20px);
+                backdrop-filter: blur(20px);
+                padding: 2rem;
+                border-radius: var(--radius-2xl);
+                box-shadow:
+                    0 10px 40px rgba(0, 0, 0, 0.5),
+                    0 0 40px var(--glow-orange),
+                    inset 0 0 0 1px rgba(255, 140, 66, 0.2);
+                border: 1px solid rgba(255, 140, 66, 0.2);
+            }
+
+            /* Section Styling */
+            .content-section {
+                max-width: 1400px;
+                margin: 0 auto;
+                padding: var(--space-3xl) var(--space-xl);
+                position: relative;
+                z-index: 1;
+            }
+
+            /* 3D Models Grid */
+            .models-grid {
+                display: grid;
+                grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+                gap: var(--space-2xl);
+                margin-bottom: var(--space-3xl);
+            }
+
+            .model-card {
+                background: rgba(20, 24, 41, 0.6);
+                -webkit-backdrop-filter: blur(20px);
+                backdrop-filter: blur(20px);
+                border-radius: var(--radius-2xl);
+                overflow: hidden;
+                box-shadow:
+                    0 20px 60px rgba(0, 0, 0, 0.6),
+                    0 0 40px var(--glow-orange),
+                    inset 0 0 0 1px rgba(255, 140, 66, 0.3);
+                border: 1px solid rgba(255, 140, 66, 0.2);
+                transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+                position: relative;
+            }
+
+            .model-card::before {
+                content: '';
+                position: absolute;
+                inset: -2px;
+                background: var(--gradient-geo);
+                border-radius: var(--radius-2xl);
+                z-index: -1;
+                opacity: 0;
+                transition: opacity 0.4s ease;
+                filter: blur(10px);
+            }
+
+            .model-card:hover {
+                transform: translateY(-12px);
+                box-shadow:
+                    0 30px 80px rgba(0, 0, 0, 0.8),
+                    0 0 60px var(--glow-violet);
+            }
+
+            .model-card:hover::before {
+                opacity: 0.8;
+            }
+
+            .model-preview {
+                width: 100%;
+                height: 350px;
+                background: linear-gradient(135deg, rgba(255, 140, 66, 0.05), rgba(139, 92, 246, 0.05));
+                position: relative;
+            }
+
+            .model-preview model-viewer {
+                width: 100%;
+                height: 100%;
+                --progress-bar-color: var(--geo-orange);
+            }
+
+            .model-info {
+                padding: var(--space-xl);
+                position: relative;
+            }
+
+            .model-name {
+                font-size: var(--text-2xl);
+                font-weight: 700;
+                color: var(--geo-orange);
+                margin-bottom: var(--space-sm);
+                text-shadow: 0 0 20px var(--glow-orange);
+            }
+
+            .model-description {
+                font-size: var(--text-base);
+                color: var(--text-secondary);
+                margin-bottom: var(--space-lg);
+                line-height: 1.6;
+            }
+
+            .model-link {
+                display: inline-flex;
+                align-items: center;
+                gap: var(--space-sm);
+                color: var(--geo-orange);
+                text-decoration: none;
+                font-size: var(--text-base);
+                font-weight: 600;
+                padding: var(--space-md) var(--space-xl);
+                background: rgba(255, 140, 66, 0.1);
+                border-radius: var(--radius-lg);
+                border: 1px solid rgba(255, 140, 66, 0.3);
+                transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+                position: relative;
+                overflow: hidden;
+            }
+
+            .model-link::after {
+                content: '→';
+                margin-left: 0.5rem;
+                transition: transform 0.3s ease;
+            }
+
+            .model-link::before {
+                content: '';
+                position: absolute;
+                inset: 0;
+                background: var(--gradient-geo);
+                opacity: 0;
+                transition: opacity 0.3s ease;
+            }
+
+            .model-link:hover {
+                color: white;
+                border-color: transparent;
+                box-shadow: 0 0 30px var(--glow-orange);
+                text-shadow: 0 0 10px white;
+            }
+
+            .model-link:hover::before {
+                opacity: 1;
+            }
+
+            .model-link:hover::after {
+                transform: translateX(4px);
+            }
+
+            .model-link span {
+                position: relative;
+                z-index: 1;
+            }
+
+            /* Back Link */
+            .back-link {
+                display: inline-flex;
+                align-items: center;
+                gap: 0.5rem;
+                color: var(--geo-teal);
+                text-decoration: none;
+                font-size: var(--text-lg);
+                font-weight: 600;
+                padding: var(--space-md) var(--space-xl);
+                background: rgba(0, 212, 170, 0.1);
+                border-radius: var(--radius-lg);
+                border: 1px solid rgba(0, 212, 170, 0.3);
+                transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+                margin-bottom: var(--space-2xl);
+            }
+
+            .back-link::before {
+                content: '←';
+            }
+
+            .back-link:hover {
+                background: rgba(0, 212, 170, 0.2);
+                transform: translateX(-4px);
+                box-shadow: 0 0 20px rgba(0, 212, 170, 0.3);
+            }
+
+            /* Footer */
+            .footer {
+                background: linear-gradient(135deg,
+                        rgba(255, 140, 66, 0.05) 0%,
+                        rgba(139, 92, 246, 0.05) 100%);
+                padding: var(--space-3xl) var(--space-xl);
+                margin-top: var(--space-4xl);
+                text-align: center;
+                position: relative;
+                z-index: 1;
+                border-top: 1px solid rgba(255, 140, 66, 0.2);
+            }
+
+            .footer-content {
+                max-width: 1400px;
+                margin: 0 auto;
+            }
+
+            .copyright {
+                font-size: 0.9rem;
+                color: var(--text-secondary);
+            }
+
+            /* Responsive Design */
+            @media (max-width: 768px) {
+                .nav-content {
+                    flex-direction: column;
+                    gap: var(--space-md);
+                    align-items: flex-start;
+                }
+
+                .breadcrumb {
+                    flex-wrap: wrap;
+                }
+
+                .hero {
+                    padding: var(--space-3xl) var(--space-md) var(--space-4xl);
+                }
+
+                .hero-svg {
+                    height: 200px;
+                }
+
+                .hero-description {
+                    padding: var(--space-lg);
+                }
+
+                .content-section {
+                    padding: var(--space-3xl) var(--space-md);
+                }
+
+                .models-grid {
+                    grid-template-columns: 1fr;
+                    gap: var(--space-lg);
+                }
+            }
+
+            @media (max-width: 480px) {
+                .navigation {
+                    padding: var(--space-md);
+                }
+
+                .hero {
+                    padding: var(--space-2xl) var(--space-md) var(--space-3xl);
+                }
+
+                .model-preview {
+                    height: 250px;
+                }
+            }
+
+            /* Accessibility: Reduced motion */
+            @media (prefers-reduced-motion: reduce) {
+
+                *,
+                *::before,
+                *::after {
+                    animation-duration: 0.01ms !important;
+                    animation-iteration-count: 1 !important;
+                    transition-duration: 0.01ms !important;
+                }
+            }
+
+            /* Focus styles for accessibility */
+            a:focus,
+            a:focus-visible {
+                outline: 3px solid var(--geo-orange);
+                outline-offset: 2px;
+                border-radius: var(--radius-sm);
+            }
+        </style>
+    </head>
+
+    <body vocab="http://schema.org/">
+        <!-- Decorative grid pattern -->
+        <div class="grid-pattern"></div>
+
+        <!-- Fixed Navigation -->
+        <nav class="navigation">
+            <div class="nav-content">
+                <a href="../../about.html" class="nav-name">John Samuel</a>
+                <ul class="breadcrumb" typeof="BreadcrumbList">
+                    <li property="itemListElement" typeof="ListItem">
+                        <a property="item" typeof="WebPage" href="../../index.html">
+                            <span property="name">Home</span>
+                        </a>
+                    </li>
+                    <li property="itemListElement" typeof="ListItem">
+                        <a property="item" typeof="WebPage" href="../../research/research.html">
+                            <span property="name">Research</span>
+                        </a>
+                    </li>
+                    <li property="itemListElement" typeof="ListItem">
+                        <a property="item" typeof="WebPage" href="../3d.html">
+                            <span property="name">Project 3D</span>
+                        </a>
+                    </li>
+                    <li property="itemListElement" typeof="ListItem">
+                        <span property="name">Fundamental Shapes</span>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+
+        <!-- Hero Section -->
+        <section class="hero">
+            <h1 class="hero-title">Fundamental Shapes</h1>
+            <p class="hero-subtitle">Building Blocks of Three-Dimensional Space</p>
+
+            <!-- SVG - Geometric Shapes Composition -->
+            <svg class="hero-svg" viewBox="0 0 600 300" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                    <linearGradient id="geoGrad1" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" style="stop-color:#ff8c42;stop-opacity:0.8" />
+                        <stop offset="100%" style="stop-color:#00d4aa;stop-opacity:0.8" />
+                    </linearGradient>
+                    <linearGradient id="geoGrad2" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" style="stop-color:#8b5cf6;stop-opacity:0.8" />
+                        <stop offset="100%" style="stop-color:#fbbf24;stop-opacity:0.8" />
+                    </linearGradient>
+                    <filter id="geoGlow">
+                        <feGaussianBlur stdDeviation="4" result="coloredBlur" />
+                        <feMerge>
+                            <feMergeNode in="coloredBlur" />
+                            <feMergeNode in="SourceGraphic" />
+                        </feMerge>
+                    </filter>
+                </defs>
+
+                <!-- Background circles -->
+                <circle cx="300" cy="150" r="120" fill="rgba(255, 140, 66, 0.05)" />
+                <circle cx="300" cy="150" r="90" fill="rgba(0, 212, 170, 0.05)" />
+
+                <!-- Sphere representation -->
+                <circle cx="150" cy="150" r="60" fill="url(#geoGrad1)" opacity="0.7" filter="url(#geoGlow)">
+                    <animate attributeName="r" values="60;65;60" dur="4s" repeatCount="indefinite" />
+                </circle>
+
+                <!-- Cube representation (isometric) -->
+                <g transform="translate(300, 150)" opacity="0.8" filter="url(#geoGlow)">
+                    <polygon points="-35,-20 15,-45 65,-20 15,5" fill="#ff8c42" opacity="0.9" />
+                    <polygon points="-35,-20 -35,50 15,75 15,5" fill="#00d4aa" opacity="0.7" />
+                    <polygon points="15,5 65,-20 65,50 15,75" fill="#8b5cf6" opacity="0.6" />
+                    <animateTransform attributeName="transform" type="rotate" values="0 300 150; 360 300 150" dur="20s"
+                        repeatCount="indefinite" />
+                </g>
+
+                <!-- Cone representation -->
+                <g transform="translate(450, 150)" opacity="0.75" filter="url(#geoGlow)">
+                    <ellipse cx="0" cy="50" rx="45" ry="15" fill="url(#geoGrad2)" opacity="0.8" />
+                    <polygon points="-45,50 0,-40 45,50" fill="url(#geoGrad1)" opacity="0.7" />
+                    <circle cx="0" cy="-40" r="5" fill="#fbbf24">
+                        <animate attributeName="r" values="5;7;5" dur="3s" repeatCount="indefinite" />
+                    </circle>
+                </g>
+
+                <!-- Connecting lines -->
+                <line x1="150" y1="150" x2="300" y2="150" stroke="rgba(255, 140, 66, 0.3)" stroke-width="2"
+                    stroke-dasharray="5,5">
+                    <animate attributeName="stroke-dashoffset" from="0" to="10" dur="1s" repeatCount="indefinite" />
+                </line>
+                <line x1="300" y1="150" x2="450" y2="150" stroke="rgba(0, 212, 170, 0.3)" stroke-width="2"
+                    stroke-dasharray="5,5">
+                    <animate attributeName="stroke-dashoffset" from="0" to="10" dur="1s" repeatCount="indefinite" />
+                </line>
+            </svg>
+
+            <div class="hero-description">
+                The fundamental shapes form the essential vocabulary of three-dimensional geometry. Each primitive—from
+                the perfect symmetry of the sphere to the angular precision of the cube—represents a unique exploration
+                of spatial properties: volume, surface area, symmetry, and curvature. These elemental forms serve as the
+                foundation for understanding more complex geometric structures and spatial relationships.
+            </div>
+        </section>
+
+        <!-- Models Section -->
+        <section class="content-section">
+            <a href="../3d.html" class="back-link">Back to Project 3D</a>
+
+            <div class="models-grid">
+                <!-- Plane -->
+                <article class="model-card">
+                    <div class="model-preview">
+                        <model-viewer src="../../../../models/plane.glb" alt="3D Plane" auto-rotate
+                            min-camera-orbit="auto auto 200%" max-camera-orbit="auto auto 500%" field-of-view="45deg"
+                            disable-zoom interaction-prompt="none">
+                        </model-viewer>
+                    </div>
+                    <div class="model-info">
+                        <h3 class="model-name">Plane</h3>
+                        <p class="model-description">
+                            Fundamental geometric surface in two dimensions, illustrating flatness, continuity, and
+                            orientation.
+                        </p>
+                        <a href="plane.html" class="model-link">
+                            <span>Explore Model</span>
+                        </a>
+                    </div>
+                </article>
+
+                <!-- Sphere -->
+                <article class="model-card">
+                    <div class="model-preview">
+                        <model-viewer src="../../../../models/sphere.glb" alt="3D Sphere" auto-rotate
+                            min-camera-orbit="auto auto 200%" max-camera-orbit="auto auto 500%" field-of-view="90deg"
+                            disable-zoom interaction-prompt="none">
+                        </model-viewer>
+                    </div>
+                    <div class="model-info">
+                        <h3 class="model-name">Sphere</h3>
+                        <p class="model-description">
+                            Perfect geometric primitive demonstrating spherical symmetry in three-dimensional space.
+                        </p>
+                        <a href="sphere.html" class="model-link">
+                            <span>Explore Model</span>
+                        </a>
+                    </div>
+                </article>
+
+                <!-- Cube -->
+                <article class="model-card">
+                    <div class="model-preview">
+                        <model-viewer src="../../../../models/cube.glb" alt="3D Cube" auto-rotate
+                            min-camera-orbit="auto auto 200%" max-camera-orbit="auto auto 500%" field-of-view="45deg"
+                            disable-zoom interaction-prompt="none">
+                        </model-viewer>
+                    </div>
+                    <div class="model-info">
+                        <h3 class="model-name">Cube</h3>
+                        <p class="model-description">
+                            Fundamental polyhedron with six square faces showcasing orthogonal geometry.
+                        </p>
+                        <a href="cube.html" class="model-link">
+                            <span>Explore Model</span>
+                        </a>
+                    </div>
+                </article>
+
+                <!-- Cone -->
+                <article class="model-card">
+                    <div class="model-preview">
+                        <model-viewer src="../../../../models/cone.glb" alt="3D Cone" auto-rotate
+                            min-camera-orbit="auto auto 200%" max-camera-orbit="auto auto 500%" field-of-view="45deg"
+                            disable-zoom interaction-prompt="none">
+                        </model-viewer>
+                    </div>
+                    <div class="model-info">
+                        <h3 class="model-name">Cone</h3>
+                        <p class="model-description">
+                            Fundamental geometric solid with a circular base and a single apex, illustrating radial
+                            symmetry and smooth tapering.
+                        </p>
+                        <a href="cone.html" class="model-link">
+                            <span>Explore Model</span>
+                        </a>
+                    </div>
+                </article>
+
+                <!-- Cylinder -->
+                <article class="model-card">
+                    <div class="model-preview">
+                        <model-viewer src="../../../../models/cylinder.glb" alt="3D Cylinder" auto-rotate
+                            min-camera-orbit="auto auto 200%" max-camera-orbit="auto auto 500%" field-of-view="45deg"
+                            disable-zoom interaction-prompt="none">
+                        </model-viewer>
+                    </div>
+                    <div class="model-info">
+                        <h3 class="model-name">Cylinder</h3>
+                        <p class="model-description">
+                            Fundamental geometric solid with two parallel circular bases connected by a curved surface,
+                            illustrating translational symmetry.
+                        </p>
+                        <a href="cylinder.html" class="model-link">
+                            <span>Explore Model</span>
+                        </a>
+                    </div>
+                </article>
+
+                <!-- Prism -->
+                <article class="model-card">
+                    <div class="model-preview">
+                        <model-viewer src="../../../../models/prism.glb" alt="3D Prism" auto-rotate
+                            min-camera-orbit="auto auto 200%" max-camera-orbit="auto auto 500%" field-of-view="45deg"
+                            disable-zoom interaction-prompt="none">
+                        </model-viewer>
+                    </div>
+                    <div class="model-info">
+                        <h3 class="model-name">Prism</h3>
+                        <p class="model-description">
+                            Fundamental geometric solid with two parallel and congruent polygonal bases connected by
+                            rectangular faces, illustrating uniform cross-section.
+                        </p>
+                        <a href="prism.html" class="model-link">
+                            <span>Explore Model</span>
+                        </a>
+                    </div>
+                </article>
+
+                <!-- Torus -->
+                <article class="model-card">
+                    <div class="model-preview">
+                        <model-viewer src="../../../../models/torus.glb" alt="3D Torus" auto-rotate
+                            min-camera-orbit="auto auto 200%" max-camera-orbit="auto auto 500%" field-of-view="45deg"
+                            disable-zoom interaction-prompt="none">
+                        </model-viewer>
+                    </div>
+                    <div class="model-info">
+                        <h3 class="model-name">Torus</h3>
+                        <p class="model-description">
+                            Fundamental geometric surface formed by revolving a circle around an axis, illustrating
+                            periodicity and circular symmetry.
+                        </p>
+                        <a href="torus.html" class="model-link">
+                            <span>Explore Model</span>
+                        </a>
+                    </div>
+                </article>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <div class="footer-content">
+                <p class="copyright">
+                    © 2024 John Samuel | Creative Commons License
+                </p>
+            </div>
+        </footer>
+    </body>
+
+</html>
