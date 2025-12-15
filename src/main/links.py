@@ -86,6 +86,7 @@ class LinkChecker:
         check_favicon: bool = True,
         check_styles: bool = True,
         check_scripts: bool = True,
+        exclude_dirs: Optional[List[str]] = None,
     ):
         """
         Initialize the LinkChecker
@@ -98,6 +99,7 @@ class LinkChecker:
             check_favicon: Whether to check favicon links
             check_styles: Whether to check stylesheet links
             check_scripts: Whether to check script links
+            exclude_dirs: List of directory names or paths to exclude from scanning
         """
         self.timeout = timeout
         self.check_external = check_external
@@ -105,6 +107,7 @@ class LinkChecker:
         self.check_favicon = check_favicon
         self.check_styles = check_styles
         self.check_scripts = check_scripts
+        self.exclude_dirs = set(exclude_dirs) if exclude_dirs else set()
         self.session = self._create_session(max_retries)
         self.checked_urls: Dict[str, int] = {}  # Cache for external URLs
 
@@ -129,6 +132,40 @@ class LinkChecker:
         )
 
         return session
+
+    def _is_excluded(self, path: Path) -> bool:
+        """
+        Check if a path should be excluded based on exclude_dirs
+
+        Args:
+            path: Path object to check
+
+        Returns:
+            True if path should be excluded, False otherwise
+        """
+        if not self.exclude_dirs:
+            return False
+
+        # Check each part of the path
+        path_parts = path.parts
+        for exclude_dir in self.exclude_dirs:
+            exclude_path = Path(exclude_dir)
+            exclude_parts = exclude_path.parts
+
+            # Check if any part of the path matches the exclusion
+            # Support both exact directory name match and full path match
+            if exclude_dir in path_parts:
+                return True
+
+            # Check if the path starts with the excluded path
+            try:
+                path.relative_to(exclude_path)
+                return True
+            except ValueError:
+                # Not relative to this excluded path
+                pass
+
+        return False
 
     def classify_link(
         self, href: str, element_type: str = "a", rel: Optional[str] = None
@@ -438,7 +475,11 @@ class LinkChecker:
                 continue
 
             if os.path.isfile(filepath):
-                # Single file
+                # Single file - check if it should be excluded
+                file_path = Path(filepath).resolve()
+                if self._is_excluded(file_path):
+                    logger.info(f"Skipping excluded file: {filepath}")
+                    continue
                 html_files.append(filepath)
             elif os.path.isdir(filepath):
                 # Directory - scan for HTML files
@@ -477,11 +518,19 @@ class LinkChecker:
             # Recursive scan
             for file_path in dir_path.rglob("*"):
                 if file_path.is_file() and file_path.suffix.lower() in html_extensions:
+                    # Check if this file should be excluded
+                    if self._is_excluded(file_path):
+                        logger.debug(f"Skipping excluded file: {file_path}")
+                        continue
                     html_files.append(str(file_path))
         else:
             # Non-recursive scan (only immediate directory)
             for file_path in dir_path.glob("*"):
                 if file_path.is_file() and file_path.suffix.lower() in html_extensions:
+                    # Check if this file should be excluded
+                    if self._is_excluded(file_path):
+                        logger.debug(f"Skipping excluded file: {file_path}")
+                        continue
                     html_files.append(str(file_path))
 
         return sorted(html_files)
@@ -589,6 +638,8 @@ Examples:
   %(prog)s --no-internal index.html
   %(prog)s --no-favicon --no-styles --no-scripts index.html
   %(prog)s --timeout 5 index.html
+  %(prog)s --exclude-dir node_modules --exclude-dir .git --recursive .
+  %(prog)s --exclude-dir build --exclude-dir dist --recursive src/
         """,
     )
 
@@ -605,6 +656,14 @@ Examples:
         "--recursive",
         action="store_true",
         help="Recursively scan directories for HTML files",
+    )
+
+    parser.add_argument(
+        "--exclude-dir",
+        action="append",
+        dest="exclude_dirs",
+        metavar="DIR",
+        help="Exclude directory from scanning (can be used multiple times)",
     )
 
     parser.add_argument(
@@ -663,6 +722,7 @@ Examples:
         check_favicon=not args.no_favicon,
         check_styles=not args.no_styles,
         check_scripts=not args.no_scripts,
+        exclude_dirs=args.exclude_dirs,
     )
 
     # Check files
