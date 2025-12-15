@@ -1,174 +1,939 @@
 <!DOCTYPE html>
 <html lang="en">
+
   <head>
-    <meta charset="utf-8"/>
-    <meta name="Description" content="Author: John Samuel"/>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="shortcut icon" href="images/logo/favicon.png"/>
-    <link rel="manifest" href="/manifest.json">
+    <meta charset="utf-8" />
+    <meta name="Description" content="Author: John Samuel" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="shortcut icon" href="images/logo/favicon.png" />
+    <link rel="apple-touch-icon" href="images/logo/favicon.png" />
+    <link rel="manifest" href="/manifest.json" />
     <link href="atom.xml" type="application/atom+xml" rel="alternate" title="Sitewide Atom feed" />
-    <link href="rss.xml" type="application/rss+xml" rel="alternate" title="Sitewide Atom feed" />
+    <link href="rss.xml" type="application/rss+xml" rel="alternate" title="Sitewide RSS feed" />
     <title>John Samuel</title>
     <style type="text/css">
-    body{
-      background-color: #FFFFFF;
-    }
-    #sidebar {
-      position: fixed;
-      background-color: #1873B9;
-      top: 0;
-      left: 0;
-      bottom: 0;
-      width:30vw;
-    }
-    #sidebar .title {
-      position:relative;
-      top: 40vh;
-      text-align: center;
-      line-height: 7vh;
-      font-size: 2.0vmax;
-      font-family: 'Arial';
-    }
-    #sidebar a:link,
-    #sidebar a:visited{
-      text-decoration:none;
-      color:#FFFFFF;
-    }
-    #langlist ul{
-      margin: 0;
-      padding: 0;
-      text-align: left;
-    }
-    #langlist li{
-     list-style:none;
-     position: relative;
-     float: left;
-     padding-top:15px;
-     margin-right: 1em;
-     font-family: 'Arial';
-    }
-    #langlist a{
-      text-decoration: none;
-    }
-    .license {
-      position:fixed;
-      text-align: right;
-      bottom:0;
-      right:0;
-    }
-    .content {
-      line-height: 1.6em;
-      font-size: 1.3em;
-      font-family: 'Arial';
-    }
-    .content a:link,
-    .content a:visited{
-      color:#1873B9;
-    }
-    .page {
-      position:fixed;
-      width:100%;
-      height:100%;
-      margin-left:30vw;
-      overflow: hidden;
-    }
-    #background {
-      clear:both;
-      float:left;
-    }
-    .page img {
-      max-width:50%;
-      max-height:50%;
-      border:0;
-    }
-    a.langlink:link:hover,
-    a.langlink:visited:hover{
-      border-radius: 20px;
-      text-decoration:none;
-      padding:15px;
-      color:#FFFFFF;
-      background-color: #1873B9;
-      transition: all 0.5s ease-out;
-    }
-    @media (max-width: 640px), screen and (orientation: portrait) {
-      body {
-        max-width:100%;
-        max-height:100%;
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
       }
-      #sidebar {
+
+      :root {
+        --bg-primary: #0a0e27;
+        --bg-secondary: #141b3d;
+        --accent-blue: #00d4ff;
+        --accent-cyan: #00ffcc;
+        --accent-purple: #a78bfa;
+        --text-primary: #ffffff;
+        --text-secondary: #94a3b8;
+        --card-bg: rgba(20, 27, 61, 0.6);
+        --glow-blue: rgba(0, 212, 255, 0.4);
+        --glow-cyan: rgba(0, 255, 204, 0.3);
+      }
+
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
+        background: var(--bg-primary);
+        color: var(--text-primary);
+        overflow-x: hidden;
+        position: relative;
+        min-height: 100vh;
+      }
+
+      /* Animated gradient background */
+      body::before {
+        content: '';
         position: fixed;
-        background-color: #1873B9;
         top: 0;
         left: 0;
-        bottom: 60vh;
-        width:100vw;
+        width: 100%;
+        height: 100%;
+        background:
+          radial-gradient(circle at 20% 30%, rgba(0, 212, 255, 0.08) 0%, transparent 50%),
+          radial-gradient(circle at 80% 70%, rgba(167, 139, 250, 0.08) 0%, transparent 50%),
+          radial-gradient(circle at 50% 50%, rgba(0, 255, 204, 0.05) 0%, transparent 60%);
+        animation: gradientShift 15s ease infinite;
+        pointer-events: none;
+        z-index: 0;
       }
-      #sidebar .title {
-        position:relative;
-        text-align: center;
-        top: 15vh;
-        line-height: 7vh;
-        font-size: 2.5vmax;
-        font-family: 'Arial';
-      }
-      #sidebar a:link,
-      #sidebar a:visited{
-        text-decoration:none;
-        color:#FFFFFF;
-      }
-      .content {
-        line-height: 3.8vmax;
-        font-size: 3.2vmax;
-        font-family: 'Arial';
-      }
-      .content a:link,
-      .content a:visited{
-        color:#1873B9;
-      }
-      .page {
-        top: 40vh;
-        margin-left:0vw;
-      }
-      .page img {
-        max-width:100%;
-        max-height:100%;
-        border:0;
-      }
-    }
 
+      @keyframes gradientShift {
+
+        0%,
+        100% {
+          opacity: 1;
+          transform: scale(1);
+        }
+
+        50% {
+          opacity: 0.8;
+          transform: scale(1.1);
+        }
+      }
+
+      /* Subtle grid overlay */
+      body::after {
+        content: '';
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-image:
+          linear-gradient(90deg, rgba(0, 212, 255, 0.03) 1px, transparent 1px),
+          linear-gradient(0deg, rgba(0, 212, 255, 0.03) 1px, transparent 1px);
+        background-size: 80px 80px;
+        pointer-events: none;
+        z-index: 0;
+      }
+
+      .content-wrapper {
+        position: relative;
+        z-index: 1;
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 3rem 2rem;
+      }
+
+      /* Main Container */
+      .main-container {
+        width: 100%;
+        max-width: 1100px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+      }
+
+      /* Hero Section */
+      .hero-section {
+        text-align: center;
+        padding: 2rem 0 3rem;
+        position: relative;
+      }
+
+      .logo-wrapper {
+        width: 400px;
+        height: auto;
+        margin: 0 auto 2.5rem;
+        position: relative;
+        filter: drop-shadow(0 0 30px var(--glow-cyan));
+        animation: floatAnimation 6s ease-in-out infinite;
+      }
+
+      @keyframes floatAnimation {
+
+        0%,
+        100% {
+          transform: translateY(0px);
+        }
+
+        50% {
+          transform: translateY(-15px);
+        }
+      }
+
+      .logo-wrapper img {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+      }
+
+      .site-title {
+        font-size: 4.5rem;
+        font-weight: 200;
+        letter-spacing: 18px;
+        text-transform: uppercase;
+        margin: 0 0 1rem;
+        background: linear-gradient(135deg, var(--accent-cyan), var(--accent-blue), var(--accent-purple));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        animation: titleGlow 4s ease-in-out infinite;
+        text-shadow: 0 0 40px var(--glow-blue);
+      }
+
+      @keyframes titleGlow {
+
+        0%,
+        100% {
+          filter: brightness(1);
+        }
+
+        50% {
+          filter: brightness(1.3);
+        }
+      }
+
+      .site-title a {
+        text-decoration: none;
+        color: inherit;
+        background: inherit;
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+      }
+
+      /* Enhanced Futuristic Network SVG */
+      .futuristic-svg {
+        width: 100%;
+        max-width: 700px;
+        height: 200px;
+        margin: 0 auto 2rem;
+        filter: drop-shadow(0 0 20px rgba(0, 255, 204, 0.2));
+      }
+
+      /* Central Hub - Multi-layered */
+      .hub-core {
+        fill: var(--accent-cyan);
+        filter: drop-shadow(0 0 15px var(--glow-cyan));
+        animation: pulse-core 2s ease-in-out infinite;
+      }
+
+      .hub-ring {
+        fill: none;
+        stroke: var(--accent-cyan);
+        stroke-width: 2;
+        opacity: 0.4;
+      }
+
+      .hub-outer-ring {
+        fill: none;
+        stroke: var(--accent-blue);
+        stroke-width: 1.5;
+        opacity: 0.3;
+      }
+
+      @keyframes pulse-core {
+
+        0%,
+        100% {
+          transform: scale(1);
+          opacity: 1;
+        }
+
+        50% {
+          transform: scale(1.08);
+          opacity: 0.85;
+        }
+      }
+
+      /* Connection Lines - Multiple types */
+      .connection-primary {
+        stroke: var(--accent-cyan);
+        stroke-width: 2;
+        opacity: 0.6;
+        stroke-linecap: round;
+        animation: pulse-line 3s ease-in-out infinite;
+      }
+
+      .connection-secondary {
+        stroke: var(--accent-blue);
+        stroke-width: 1.5;
+        opacity: 0.35;
+        stroke-linecap: round;
+        stroke-dasharray: 5, 5;
+        animation: dash-flow 20s linear infinite;
+      }
+
+      .connection-tertiary {
+        stroke: var(--accent-purple);
+        stroke-width: 1;
+        opacity: 0.25;
+        stroke-linecap: round;
+        stroke-dasharray: 3, 3;
+      }
+
+      @keyframes pulse-line {
+
+        0%,
+        100% {
+          opacity: 0.6;
+        }
+
+        50% {
+          opacity: 0.3;
+        }
+      }
+
+      @keyframes dash-flow {
+        0% {
+          stroke-dashoffset: 0;
+        }
+
+        100% {
+          stroke-dashoffset: 1000;
+        }
+      }
+
+      /* Node Types */
+      .node-primary {
+        fill: var(--accent-cyan);
+        filter: drop-shadow(0 0 8px var(--glow-cyan));
+        animation: node-pulse 2.5s ease-in-out infinite;
+      }
+
+      .node-secondary {
+        fill: var(--accent-blue);
+        filter: drop-shadow(0 0 6px var(--glow-blue));
+        animation: node-pulse 3s ease-in-out infinite 0.5s;
+      }
+
+      .node-tertiary {
+        fill: var(--accent-purple);
+        filter: drop-shadow(0 0 5px rgba(167, 139, 250, 0.4));
+        animation: node-pulse 3.5s ease-in-out infinite 1s;
+      }
+
+      .node-inner {
+        fill: rgba(255, 255, 255, 0.8);
+      }
+
+      @keyframes node-pulse {
+
+        0%,
+        100% {
+          opacity: 0.7;
+        }
+
+        50% {
+          opacity: 1;
+        }
+      }
+
+      /* Data Particles - Enhanced */
+      .data-particle {
+        fill: var(--accent-cyan);
+        filter: drop-shadow(0 0 4px var(--glow-cyan));
+      }
+
+      .particle-1 {
+        animation: travel-path-1 4s ease-in-out infinite;
+      }
+
+      .particle-2 {
+        animation: travel-path-2 5s ease-in-out infinite 0.5s;
+      }
+
+      .particle-3 {
+        animation: travel-path-3 4.5s ease-in-out infinite 1s;
+      }
+
+      .particle-4 {
+        animation: travel-path-4 5.5s ease-in-out infinite 1.5s;
+      }
+
+      .particle-5 {
+        animation: travel-path-5 4.8s ease-in-out infinite 2s;
+      }
+
+      .particle-6 {
+        animation: travel-path-6 5.2s ease-in-out infinite 2.5s;
+      }
+
+      /* Energy Wave Effects */
+      .energy-wave {
+        fill: none;
+        stroke: var(--accent-cyan);
+        stroke-width: 1;
+        opacity: 0;
+      }
+
+      /* Grid Background */
+      .grid-line {
+        stroke: var(--accent-cyan);
+        stroke-width: 0.5;
+        opacity: 0.08;
+      }
+
+      /* Particle Travel Paths */
+      @keyframes travel-path-1 {
+
+        0%,
+        100% {
+          cx: 350;
+          cy: 100;
+          opacity: 0;
+        }
+
+        10% {
+          opacity: 1;
+        }
+
+        50% {
+          cx: 180;
+          cy: 50;
+          opacity: 1;
+        }
+
+        90% {
+          opacity: 0;
+        }
+      }
+
+      @keyframes travel-path-2 {
+
+        0%,
+        100% {
+          cx: 350;
+          cy: 100;
+          opacity: 0;
+        }
+
+        10% {
+          opacity: 1;
+        }
+
+        25% {
+          cx: 280;
+          cy: 60;
+        }
+
+        50% {
+          cx: 150;
+          cy: 90;
+          opacity: 1;
+        }
+
+        75% {
+          cx: 280;
+          cy: 60;
+        }
+
+        90% {
+          opacity: 0;
+        }
+      }
+
+      @keyframes travel-path-3 {
+
+        0%,
+        100% {
+          cx: 350;
+          cy: 100;
+          opacity: 0;
+        }
+
+        10% {
+          opacity: 1;
+        }
+
+        50% {
+          cx: 520;
+          cy: 50;
+          opacity: 1;
+        }
+
+        90% {
+          opacity: 0;
+        }
+      }
+
+      @keyframes travel-path-4 {
+
+        0%,
+        100% {
+          cx: 350;
+          cy: 100;
+          opacity: 0;
+        }
+
+        10% {
+          opacity: 1;
+        }
+
+        25% {
+          cx: 420;
+          cy: 60;
+        }
+
+        50% {
+          cx: 550;
+          cy: 90;
+          opacity: 1;
+        }
+
+        75% {
+          cx: 420;
+          cy: 60;
+        }
+
+        90% {
+          opacity: 0;
+        }
+      }
+
+      @keyframes travel-path-5 {
+
+        0%,
+        100% {
+          cx: 350;
+          cy: 100;
+          opacity: 0;
+        }
+
+        10% {
+          opacity: 1;
+        }
+
+        50% {
+          cx: 250;
+          cy: 155;
+          opacity: 1;
+        }
+
+        90% {
+          opacity: 0;
+        }
+      }
+
+      @keyframes travel-path-6 {
+
+        0%,
+        100% {
+          cx: 350;
+          cy: 100;
+          opacity: 0;
+        }
+
+        10% {
+          opacity: 1;
+        }
+
+        50% {
+          cx: 450;
+          cy: 155;
+          opacity: 1;
+        }
+
+        90% {
+          opacity: 0;
+        }
+      }
+
+      /* Language Selection */
+      .language-section {
+        padding: 2rem 0;
+        width: 100%;
+        display: flex;
+        justify-content: center;
+      }
+
+      .language-section.primary-languages {
+        margin-bottom: 3rem;
+      }
+
+      #langlist {
+        list-style: none;
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 1.5rem;
+        padding: 0;
+        margin: 0;
+      }
+
+      #langlist li {
+        position: relative;
+      }
+
+      #langlist a {
+        display: block;
+        text-decoration: none;
+        color: var(--text-primary);
+        font-size: 1.3rem;
+        font-weight: 300;
+        letter-spacing: 2px;
+        padding: 1rem 2.5rem;
+        background: var(--card-bg);
+        -webkit-backdrop-filter: blur(10px);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(0, 212, 255, 0.2);
+        border-radius: 12px;
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        position: relative;
+        overflow: hidden;
+      }
+
+      #langlist a::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(0, 212, 255, 0.2), transparent);
+        transition: left 0.5s ease;
+      }
+
+      #langlist a:hover::before {
+        left: 100%;
+      }
+
+      #langlist a:hover {
+        background: rgba(20, 27, 61, 0.9);
+        border-color: var(--accent-cyan);
+        box-shadow:
+          0 0 30px var(--glow-cyan),
+          inset 0 0 20px rgba(0, 212, 255, 0.1);
+        transform: translateY(-5px) scale(1.05);
+        color: var(--accent-cyan);
+      }
+
+      /* Secondary languages styling */
+      .secondary-languages #langlist a {
+        background: rgba(20, 27, 61, 0.4);
+        border-color: rgba(148, 163, 184, 0.2);
+        color: var(--text-secondary);
+        font-size: 1.1rem;
+        padding: 0.8rem 2rem;
+      }
+
+      .secondary-languages #langlist a::before {
+        background: linear-gradient(90deg, transparent, rgba(148, 163, 184, 0.2), transparent);
+      }
+
+      .secondary-languages #langlist a:hover {
+        background: rgba(20, 27, 61, 0.7);
+        border-color: rgba(148, 163, 184, 0.5);
+        box-shadow:
+          0 0 20px rgba(148, 163, 184, 0.2),
+          inset 0 0 15px rgba(148, 163, 184, 0.05);
+        color: var(--text-primary);
+      }
+
+      /* License Badge */
+      .license {
+        position: fixed;
+        bottom: 1.5rem;
+        right: 1.5rem;
+        z-index: 100;
+        opacity: 0.6;
+        transition: all 0.3s ease;
+        filter: drop-shadow(0 4px 20px rgba(0, 212, 255, 0.3));
+      }
+
+      .license:hover {
+        opacity: 1;
+        transform: scale(1.1);
+      }
+
+      .license img {
+        width: 88px;
+        height: auto;
+      }
+
+      /* Responsive Design */
+      @media screen and (max-width: 968px) {
+        .site-title {
+          font-size: 3.2rem;
+          letter-spacing: 12px;
+        }
+
+        .logo-wrapper {
+          width: 220px;
+        }
+
+        .futuristic-svg {
+          height: 160px;
+        }
+
+        #langlist {
+          gap: 1.2rem;
+        }
+
+        #langlist a {
+          font-size: 1.15rem;
+          padding: 0.85rem 2rem;
+        }
+
+        .secondary-languages #langlist a {
+          font-size: 1rem;
+          padding: 0.7rem 1.7rem;
+        }
+      }
+
+      @media screen and (max-width: 600px) {
+        .content-wrapper {
+          padding: 2rem 1rem;
+        }
+
+        .hero-section {
+          padding: 1.5rem 0 2rem;
+        }
+
+        .site-title {
+          font-size: 2.2rem;
+          letter-spacing: 8px;
+        }
+
+        .logo-wrapper {
+          width: 180px;
+          margin-bottom: 2rem;
+        }
+
+        .futuristic-svg {
+          height: 140px;
+          margin-bottom: 3rem;
+        }
+
+        .language-section {
+          padding: 1.5rem 0;
+        }
+
+        .language-section.primary-languages {
+          margin-bottom: 2rem;
+        }
+
+        #langlist {
+          flex-direction: column;
+          align-items: center;
+          gap: 1rem;
+        }
+
+        #langlist a {
+          font-size: 1.1rem;
+          padding: 0.8rem 2rem;
+          width: 100%;
+          max-width: 280px;
+          text-align: center;
+        }
+
+        .secondary-languages #langlist a {
+          font-size: 1rem;
+          max-width: 240px;
+        }
+      }
     </style>
   </head>
-  <body vocab="http://schema.org/" typeof="Website"> 
-    <div id="sidebar">
-      <div class="title">
-        <h1 lang="en"><a href="./index.html" property="url" typeof="WebPage"><span typeof="WebPage" property="author">John Samuel</span></a></h1>
-      </div>
-    </div>
-    <div class="license">
-     <a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/"><img alt="Creative Commons License" style="border-width:0" src="./images/license.png"/></a>
-    </div>
-    <div class="page">
-      <div class="content">
-        <ul id="langlist">
-         <li id="enpage" rel="hasPart" resource="#enpage">
-          <span lang="en"><a href="./en/index.html" class="langlink" property="url" typeof="WebPage" ><span property="inLanguage">English</span></a></span>
-         </li>
-         <li id="frpage" rel="hasPart" resource="#frpage">
-          <span lang="fr"><a class="langlink" href="./fr/index.html" property="url" typeof="WebPage" ><span property="inLanguage">Fran&#xE7;ais</span></a></span>
-         </li>
-         <li id="mlpage" rel="hasPart" resource="#mlpage">
-          <span lang="ml"><a class="langlink" href="./ml/index.html" property="url" typeof="WebPage" ><span property="inLanguage">മലയാളം</span></a></span>
-         </li>
-         <li id="papage" rel="hasPart" resource="#papage">
-          <span lang="hi"><a class="langlink" href="./pa/index.html" property="url" typeof="WebPage" ><span property="inLanguage">ਪੰਜਾਬੀ</span></a></span>
-         </li>
-         <li id="hipage" rel="hasPart" resource="#hipage">
-          <span lang="hi"><a class="langlink" href="./hi/index.html" property="url" typeof="WebPage" ><span property="inLanguage">हिन्दी</span></a></span>
-         </li>
 
-        </ul>
-        <img id="background" property="image" src="./images/writings/coconut-trees-landscape.svg" style="opacity:0.7;" alt="Coconut trees"/>
+  <body vocab="http://schema.org/" typeof="Website">
+    <div class="license">
+      <a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/">
+        <img alt="Creative Commons License" style="border-width:0" src="./images/license.png" />
+      </a>
+    </div>
+
+    <div class="content-wrapper">
+      <div class="main-container">
+        <!-- Hero Section with Logo and Title -->
+        <section class="hero-section">
+          <h1 class="site-title">
+            <a href="./index.html" property="url" typeof="WebPage">
+              <span typeof="Person" property="author">
+                <span property="name">John Samuel</span>
+                <link property="sameAs" href="https://www.wikidata.org/wiki/Q42761025" />
+              </span>
+            </a>
+          </h1>
+
+          <!-- Enhanced Futuristic Knowledge Network SVG -->
+          <svg class="futuristic-svg" viewBox="0 0 700 210" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <!-- Gradient Definitions -->
+              <radialGradient id="hubGradient">
+                <stop offset="0%" style="stop-color:#00ffcc;stop-opacity:1" />
+                <stop offset="100%" style="stop-color:#00d4ff;stop-opacity:0.8" />
+              </radialGradient>
+            </defs>
+
+            <!-- Background Grid (subtle) -->
+            <line class="grid-line" x1="0" y1="100" x2="700" y2="100" />
+            <line class="grid-line" x1="350" y1="0" x2="350" y2="210" />
+
+            <!-- TERTIARY LEVEL NODES (Depth 3 - Outer periphery) -->
+            <circle class="node-tertiary" cx="100" cy="40" r="7" />
+            <circle class="node-tertiary" cx="130" cy="100" r="7" />
+            <circle class="node-tertiary" cx="100" cy="160" r="7" />
+            <circle class="node-tertiary" cx="570" cy="100" r="7" />
+            <circle class="node-tertiary" cx="600" cy="40" r="7" />
+            <circle class="node-tertiary" cx="600" cy="160" r="7" />
+
+            <!-- Tertiary Connections (node to node) -->
+            <line class="connection-tertiary" x1="100" y1="40" x2="130" y2="100" />
+            <line class="connection-tertiary" x1="130" y1="100" x2="100" y2="160" />
+            <line class="connection-tertiary" x1="570" y1="100" x2="600" y2="40" />
+            <line class="connection-tertiary" x1="570" y1="100" x2="600" y2="160" />
+
+            <!-- SECONDARY LEVEL CONNECTIONS (Depth 2) -->
+            <!-- Left side connections -->
+            <line class="connection-secondary" x1="180" y1="50" x2="100" y2="40" />
+            <line class="connection-secondary" x1="180" y1="50" x2="130" y2="100" />
+            <line class="connection-secondary" x1="150" y1="90" x2="130" y2="100" />
+            <line class="connection-secondary" x1="150" y1="90" x2="100" y2="160" />
+            <line class="connection-secondary" x1="220" y1="155" x2="100" y2="160" />
+
+            <!-- Right side connections -->
+            <line class="connection-secondary" x1="520" y1="50" x2="600" y2="40" />
+            <line class="connection-secondary" x1="520" y1="50" x2="570" y2="100" />
+            <line class="connection-secondary" x1="550" y1="90" x2="570" y2="100" />
+            <line class="connection-secondary" x1="550" y1="90" x2="600" y2="160" />
+            <line class="connection-secondary" x1="480" y1="155" x2="600" y2="160" />
+
+            <!-- Cross connections between secondary nodes -->
+            <line class="connection-secondary" x1="280" y1="60" x2="420" y2="60" />
+            <line class="connection-secondary" x1="250" y1="155" x2="450" y2="155" />
+            <line class="connection-secondary" x1="180" y1="50" x2="220" y2="155" />
+            <line class="connection-secondary" x1="520" y1="50" x2="480" y2="155" />
+
+            <!-- PRIMARY LEVEL CONNECTIONS (Depth 1 - Hub to Primary Nodes) -->
+            <line class="connection-primary" x1="350" y1="100" x2="180" y2="50" />
+            <line class="connection-primary" x1="350" y1="100" x2="280" y2="60" />
+            <line class="connection-primary" x1="350" y1="100" x2="420" y2="60" />
+            <line class="connection-primary" x1="350" y1="100" x2="520" y2="50" />
+            <line class="connection-primary" x1="350" y1="100" x2="150" y2="90" />
+            <line class="connection-primary" x1="350" y1="100" x2="550" y2="90" />
+            <line class="connection-primary" x1="350" y1="100" x2="250" y2="155" />
+            <line class="connection-primary" x1="350" y1="100" x2="450" y2="155" />
+            <line class="connection-primary" x1="350" y1="100" x2="220" y2="155" />
+            <line class="connection-primary" x1="350" y1="100" x2="480" y2="155" />
+            <line class="connection-primary" x1="350" y1="100" x2="350" y2="180" />
+            <line class="connection-primary" x1="350" y1="100" x2="350" y2="30" />
+
+            <!-- SECONDARY LEVEL NODES (Depth 2) -->
+            <circle class="node-secondary" cx="180" cy="50" r="11" />
+            <circle class="node-inner" cx="180" cy="50" r="4" />
+
+            <circle class="node-secondary" cx="280" cy="60" r="11" />
+            <circle class="node-inner" cx="280" cy="60" r="4" />
+
+            <circle class="node-secondary" cx="420" cy="60" r="11" />
+            <circle class="node-inner" cx="420" cy="60" r="4" />
+
+            <circle class="node-secondary" cx="520" cy="50" r="11" />
+            <circle class="node-inner" cx="520" cy="50" r="4" />
+
+            <circle class="node-secondary" cx="150" cy="90" r="11" />
+            <circle class="node-inner" cx="150" cy="90" r="4" />
+
+            <circle class="node-secondary" cx="550" cy="90" r="11" />
+            <circle class="node-inner" cx="550" cy="90" r="4" />
+
+            <circle class="node-secondary" cx="250" cy="155" r="11" />
+            <circle class="node-inner" cx="250" cy="155" r="4" />
+
+            <circle class="node-secondary" cx="450" cy="155" r="11" />
+            <circle class="node-inner" cx="450" cy="155" r="4" />
+
+            <circle class="node-secondary" cx="220" cy="155" r="11" />
+            <circle class="node-inner" cx="220" cy="155" r="4" />
+
+            <circle class="node-secondary" cx="480" cy="155" r="11" />
+            <circle class="node-inner" cx="480" cy="155" r="4" />
+
+            <!-- PRIMARY LEVEL NODES (Depth 1 - Major knowledge domains) -->
+            <circle class="node-primary" cx="280" cy="60" r="15" />
+            <circle class="node-inner" cx="280" cy="60" r="6" />
+
+            <circle class="node-primary" cx="420" cy="60" r="15" />
+            <circle class="node-inner" cx="420" cy="60" r="6" />
+
+            <circle class="node-primary" cx="250" cy="155" r="15" />
+            <circle class="node-inner" cx="250" cy="155" r="6" />
+
+            <circle class="node-primary" cx="450" cy="155" r="15" />
+            <circle class="node-inner" cx="450" cy="155" r="6" />
+
+            <circle class="node-primary" cx="350" cy="180" r="15" />
+            <circle class="node-inner" cx="350" cy="180" r="6" />
+
+            <circle class="node-primary" cx="350" cy="30" r="15" />
+            <circle class="node-inner" cx="350" cy="30" r="6" />
+
+            <!-- CENTRAL HUB (Core - Depth 0) -->
+            <!-- Energy Waves -->
+            <circle class="energy-wave" cx="350" cy="100" r="0">
+              <animate attributeName="r" values="0;50" dur="3s" repeatCount="indefinite" />
+              <animate attributeName="opacity" values="0.5;0" dur="3s" repeatCount="indefinite" />
+            </circle>
+            <circle class="energy-wave" cx="350" cy="100" r="0">
+              <animate attributeName="r" values="0;50" dur="3s" begin="1.5s" repeatCount="indefinite" />
+              <animate attributeName="opacity" values="0.5;0" dur="3s" begin="1.5s" repeatCount="indefinite" />
+            </circle>
+
+            <!-- Expanding Rings -->
+            <circle class="hub-outer-ring" cx="350" cy="100" r="28">
+              <animate attributeName="r" values="28;42" dur="3s" repeatCount="indefinite" />
+              <animate attributeName="opacity" values="0.3;0" dur="3s" repeatCount="indefinite" />
+            </circle>
+            <circle class="hub-ring" cx="350" cy="100" r="25">
+              <animate attributeName="r" values="25;38" dur="2.5s" repeatCount="indefinite" />
+              <animate attributeName="opacity" values="0.4;0" dur="2.5s" repeatCount="indefinite" />
+            </circle>
+
+            <!-- Core Hub -->
+            <circle class="hub-core" cx="350" cy="100" r="20" fill="url(#hubGradient)" />
+            <circle cx="350" cy="100" r="9" fill="rgba(255, 255, 255, 0.9)" />
+
+            <!-- Animated Data Particles -->
+            <circle class="data-particle particle-1" cx="350" cy="100" r="3" />
+            <circle class="data-particle particle-2" cx="350" cy="100" r="3" />
+            <circle class="data-particle particle-3" cx="350" cy="100" r="3" />
+            <circle class="data-particle particle-4" cx="350" cy="100" r="3" />
+            <circle class="data-particle particle-5" cx="350" cy="100" r="3" />
+            <circle class="data-particle particle-6" cx="350" cy="100" r="3" />
+          </svg>
+        </section>
+
+        <!-- Primary Languages Section -->
+        <section class="language-section primary-languages">
+          <ul id="langlist">
+            <li id="enpage" rel="hasPart" resource="#enpage">
+              <span lang="en">
+                <a href="./en/index.html" class="langlink" property="url" typeof="WebPage">
+                  <span property="inLanguage">English</span>
+                </a>
+              </span>
+            </li>
+            <li id="frpage" rel="hasPart" resource="#frpage">
+              <span lang="fr">
+                <a class="langlink" href="./fr/index.html" property="url" typeof="WebPage">
+                  <span property="inLanguage">Français</span>
+                </a>
+              </span>
+            </li>
+          </ul>
+        </section>
+        <div class="logo-wrapper">
+          <img id="background" property="image" src="./images/art/Iohannes.svg" alt="Iohannes" />
+        </div>
+        <!-- Secondary Languages Section -->
+        <section class="language-section secondary-languages">
+          <ul id="langlist">
+            <li id="lpage" rel="hasPart" resource="#lpage">
+              <span lang="en">
+                <a href="./Q315/index.html" class="langlink" property="url" typeof="WebPage">
+                  <span property="inLanguage">Q315</span>
+                </a>
+              </span>
+            </li>
+            <li id="mlpage" rel="hasPart" resource="#mlpage">
+              <span lang="ml">
+                <a class="langlink" href="./ml/index.html" property="url" typeof="WebPage">
+                  <span property="inLanguage">മലയാളം</span>
+                </a>
+              </span>
+            </li>
+            <li id="papage" rel="hasPart" resource="#papage">
+              <span lang="pa">
+                <a class="langlink" href="./pa/index.html" property="url" typeof="WebPage">
+                  <span property="inLanguage">ਪੰਜਾਬੀ</span>
+                </a>
+              </span>
+            </li>
+            <li id="hipage" rel="hasPart" resource="#hipage">
+              <span lang="hi">
+                <a class="langlink" href="./hi/index.html" property="url" typeof="WebPage">
+                  <span property="inLanguage">हिन्दी</span>
+                </a>
+              </span>
+            </li>
+          </ul>
+        </section>
       </div>
     </div>
   </body>
+
 </html>
