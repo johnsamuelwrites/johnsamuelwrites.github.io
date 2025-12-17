@@ -105,9 +105,7 @@ class BlogGenerator:
 
             # Get timestamps
             creation_time, modification_time = get_first_latest_modification(
-                filepath.replace("/mnt/user-data/uploads/", "").replace(
-                    "/home/claude/", ""
-                )
+                filepath, ""
             )
 
             # Determine language from filepath
