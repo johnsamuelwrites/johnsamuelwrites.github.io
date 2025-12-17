@@ -160,7 +160,7 @@ class BlogGenerator:
             <li property='itemListElement' typeof='ListItem' class="article-item" data-year="{article.year}">
                 <meta typeof="ListItem" property="position" content="{position}"/>
                 <div class="article-main">
-                    <a property='item' typeof='WebPage' href='../{article.filepath}' class="article-link">
+                    <a property='item' typeof='WebPage' href="../{article.filepath}" class="article-link">
                         <span property='name' class="article-title">{article.title}</span>
                     </a>
                     {updated_badge}
