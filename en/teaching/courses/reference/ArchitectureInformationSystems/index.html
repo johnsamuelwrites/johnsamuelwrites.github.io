@@ -2,296 +2,785 @@
 <html lang="en">
 
   <head>
-    <meta charset="utf-8" />
-    <meta http-equiv="Content-Language" content="en" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="shortcut icon" href="../../../../../images/logo/favicon.png" />
-    <title>Architecture of Information Systems (Reference Material): John Samuel</title>
-    <style type="text/css">
-      body {
-        background-color: #FFFFFF;
-      }
-
-      #sidebar {
-        position: fixed;
-        background-color: #1B80CF;
-        top: 0;
-        left: 0;
-        bottom: 0;
-        width: 30vw;
-      }
-
-      #sidebar .title {
-        position: relative;
-        text-align: center;
-        line-height: 4vmax;
-        font-size: 1.4vmax;
-        font-family: 'Arial';
-        margin-top: 25vh;
-      }
-
-      #sidebar .title a:link,
-      #sidebar .title a:visited {
-        color: #FFFFFF;
-        text-decoration: none;
-      }
-
-      .subtitle {
-        top: 50vh;
-        text-align: center;
-        line-height: 1.3vmax;
-        font-family: 'Arial';
-        font-size: 1.5vmax;
-        color: #FFFFFF;
-      }
-
-      .subtitle a:link,
-      .subtitle a:visited {
-        color: #FFFFFF;
-        text-decoration: none;
-      }
-
-      .licence {
-        position: fixed;
-        text-align: right;
-        bottom: 0;
-        right: 0;
-      }
-
-      .home {
-        position: fixed;
-        text-align: left;
-        font-family: 'Arial';
-        color: #D3D3D3;
-        z-index: 100;
-        width: 100%;
-        background-color: #FFFFFF;
-        top: 0px;
-        margin-bottom: 10px;
-        padding-bottom: 10px;
-      }
-
-      .home a:link,
-      .home a:visited {
-        text-decoration: none;
-        color: #D3D3D3;
-      }
-
-      .home ul {
+    <title>Architecture of Information Systems - John Samuel</title>
+    <style>
+      * {
         margin: 0;
         padding: 0;
-        text-align: left;
+        box-sizing: border-box;
+      }
+
+      :root {
+        --bg-primary: #f5fffa;
+        --bg-secondary: #ffffff;
+        --accent-system: #00897b;
+        --accent-arch: #00695c;
+        --accent-light: #4db6ac;
+        --accent-pulse: #26a69a;
+        --text-primary: #1a2332;
+        --text-secondary: #4a5568;
+        --shadow-system: rgba(0, 137, 123, 0.15);
+        --shadow-arch: rgba(0, 105, 92, 0.2);
+      }
+
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+        background: linear-gradient(135deg, var(--bg-primary) 0%, #e0f2f1 100%);
+        color: var(--text-primary);
+        line-height: 1.7;
+        min-height: 100vh;
+      }
+
+      /* Navigation */
+      nav {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        background: rgba(255, 255, 255, 0.92);
+        -webkit-backdrop-filter: blur(12px);
+        backdrop-filter: blur(12px);
+        padding: 1rem 2rem;
+        box-shadow: 0 2px 20px var(--shadow-system);
+        z-index: 1000;
+        border-bottom: 1px solid rgba(0, 137, 123, 0.1);
+      }
+
+      .nav-content {
+        max-width: 1400px;
+        margin: 0 auto;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 1rem;
+      }
+
+      .nav-title {
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: var(--accent-arch);
+        text-decoration: none;
+        letter-spacing: -0.01em;
+      }
+
+      .nav-links {
+        display: flex;
+        gap: 2rem;
         list-style: none;
       }
 
-      .home li {
-        position: relative;
-        float: left;
-        padding-top: 15px;
-        margin-right: 1em;
-        font-family: 'Arial';
-      }
-
-      .home li:hover {
-        display: block;
-      }
-
-      .home a:link,
-      .home a:visited {
-        color: #D3D3D3;
-      }
-
-      .home li:hover a:link,
-      .home li:hover a:visited {
+      .nav-links a {
+        color: var(--text-secondary);
         text-decoration: none;
-        padding: 15px;
-        color: #FFFFFF;
-        background-color: #1B80CF;
+        font-size: 0.95rem;
+        font-weight: 500;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        padding: 0.4rem 0.8rem;
+        border-radius: 6px;
       }
 
-      .content {
-        line-height: 1.8vmax;
-        font-size: 1.2vmax;
-        font-family: 'Arial';
-        margin-top: 15vh;
-        width: 90%;
+      .nav-links a:hover {
+        color: var(--accent-arch);
+        background: rgba(0, 137, 123, 0.08);
       }
 
-      .content h2,
-      h3,
-      h4 {
-        color: #1B80CF;
+      /* Hero Section */
+      .hero {
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 140px 2rem 80px;
+        display: grid;
+        grid-template-columns: 1fr 400px;
+        gap: 4rem;
+        align-items: center;
       }
 
-      .content a:link,
-      .content a:visited {
-        color: #1B80CF;
+      .hero-content h1 {
+        font-size: 4.5rem;
+        font-weight: 800;
+        color: var(--text-primary);
+        line-height: 1.1;
+        letter-spacing: -0.03em;
+        margin-bottom: 1rem;
+        background: linear-gradient(135deg, var(--accent-arch) 0%, var(--accent-system) 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
       }
 
-      .content h3 {
-        color: #1B80CF;
+      .hero-content .year {
+        font-size: 1.3rem;
+        color: var(--accent-system);
+        font-weight: 600;
+        margin-bottom: 2rem;
       }
 
-      .content h2::before,
-      .content h3::before {
-        display: block;
-        content: " ";
-        visibility: hidden;
+      .hero-description {
+        font-size: 1.15rem;
+        color: var(--text-secondary);
+        line-height: 1.8;
+        padding: 2rem;
+        background: rgba(255, 255, 255, 0.7);
+        border-radius: 16px;
+        border: 1px solid rgba(0, 137, 123, 0.1);
+        box-shadow: 0 4px 20px var(--shadow-system);
+      }
+
+      /* System Architecture SVG */
+      .hero-visual {
+        position: relative;
+      }
+
+      .architecture-svg {
+        width: 100%;
+        height: auto;
+        filter: drop-shadow(0 10px 30px var(--shadow-system));
+      }
+
+      /* Content Container */
+      .content-wrapper {
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 4rem 2rem;
+      }
+
+      /* Section Styling */
+      .section {
+        margin-bottom: 5rem;
+      }
+
+      .section-header {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        margin-bottom: 3rem;
+      }
+
+      .section-icon {
+        width: 50px;
         height: 50px;
-        margin-top: -50px;
-        pointer-events: none;
-        background-color: #FFFFFF;
+        background: linear-gradient(135deg, var(--accent-system), var(--accent-pulse));
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        animation: iconPulse 3s ease-in-out infinite;
       }
 
-      .content a:link,
-      .content a:visited {
-        color: #1B80CF;
+      @keyframes iconPulse {
+
+        0%,
+        100% {
+          transform: scale(1);
+          box-shadow: 0 4px 15px var(--shadow-system);
+        }
+
+        50% {
+          transform: scale(1.08);
+          box-shadow: 0 6px 25px var(--shadow-arch);
+        }
       }
 
-      .content li {
-        margin: 5px;
+      .section h2 {
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: var(--text-primary);
+        letter-spacing: -0.02em;
       }
 
-      .page {
-        width: 65vw;
-        height: 100%;
-        margin-left: 30vw;
+      /* Bento Grid Layout */
+      .bento-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+        gap: 2rem;
+        margin-bottom: 2rem;
+      }
+
+      .card {
+        background: var(--bg-secondary);
+        border-radius: 20px;
+        padding: 2.5rem;
+        border: 2px solid rgba(0, 137, 123, 0.1);
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        position: relative;
         overflow: hidden;
-        padding: 0 1em;
-        font-family: 'Arial';
       }
 
-      .page img {
-        max-width: 100%;
-        max-height: 100%;
+      .card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background:
+          radial-gradient(circle at 20% 50%, rgba(0, 137, 123, 0.03) 0%, transparent 50%),
+          radial-gradient(circle at 80% 80%, rgba(38, 166, 154, 0.03) 0%, transparent 50%);
+        opacity: 0;
+        transition: opacity 0.4s ease;
+        pointer-events: none;
+        z-index: 0;
       }
 
-      @media (max-width: 640px),
-      screen and (orientation: portrait) {
-        body {
-          max-width: 100%;
-          max-height: 100%;
+      .card:hover::before {
+        opacity: 1;
+      }
+
+      .card:hover {
+        transform: translateY(-12px) scale(1.02);
+        border-color: var(--accent-system);
+        box-shadow:
+          0 20px 40px var(--shadow-system),
+          0 10px 20px var(--shadow-arch);
+      }
+
+      .card-icon {
+        width: 90px;
+        height: 90px;
+        background: linear-gradient(135deg, var(--accent-light), var(--accent-system));
+        border-radius: 50% 40% 50% 40%;
+        margin-bottom: 1.5rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        animation: morphShape 6s ease-in-out infinite;
+        transition: all 0.4s ease;
+        position: relative;
+        z-index: 1;
+      }
+
+      .card:hover .card-icon {
+        transform: scale(1.15) rotate(10deg);
+        border-radius: 40% 50% 40% 50%;
+      }
+
+      @keyframes morphShape {
+
+        0%,
+        100% {
+          border-radius: 50% 40% 50% 40%;
         }
 
-        #sidebar {
-          position: fixed;
-          background-color: #1B80CF;
-          top: 0;
-          left: 0;
-          bottom: 80vh;
-          width: 100vw;
+        25% {
+          border-radius: 40% 50% 45% 55%;
         }
 
-        #sidebar .title {
+        50% {
+          border-radius: 55% 45% 50% 40%;
+        }
+
+        75% {
+          border-radius: 45% 55% 40% 50%;
+        }
+      }
+
+      .card-badge {
+        display: inline-block;
+        padding: 0.4rem 1rem;
+        background: rgba(0, 137, 123, 0.1);
+        color: var(--accent-arch);
+        border-radius: 20px;
+        font-size: 0.85rem;
+        font-weight: 600;
+        margin-bottom: 1rem;
+        letter-spacing: 0.02em;
+        position: relative;
+        z-index: 1;
+      }
+
+      .card h3 {
+        font-size: 1.6rem;
+        font-weight: 700;
+        color: var(--text-primary);
+        margin-bottom: 0.8rem;
+        letter-spacing: -0.01em;
+        position: relative;
+        z-index: 1;
+      }
+
+      .card p {
+        font-size: 1.05rem;
+        color: var(--text-secondary);
+        line-height: 1.7;
+        margin-bottom: 1.5rem;
+        position: relative;
+        z-index: 1;
+      }
+
+      .card a {
+        color: var(--accent-arch);
+        text-decoration: none;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        transition: all 0.3s ease;
+        position: relative;
+        z-index: 1;
+      }
+
+      .card a:hover {
+        color: var(--accent-system);
+        gap: 0.8rem;
+      }
+
+      .card a::after {
+        content: '→';
+        font-size: 1.2rem;
+        transition: transform 0.3s ease;
+      }
+
+      .card a:hover::after {
+        transform: translateX(4px);
+      }
+
+      /* Footer */
+      footer {
+        background: rgba(255, 255, 255, 0.7);
+        -webkit-backdrop-filter: blur(12px);
+        backdrop-filter: blur(12px);
+        padding: 3rem 2rem;
+        margin-top: 6rem;
+        border-top: 2px solid rgba(0, 137, 123, 0.1);
+      }
+
+      .footer-content {
+        max-width: 1400px;
+        margin: 0 auto;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 2rem;
+      }
+
+      .footer-links {
+        display: flex;
+        gap: 2rem;
+      }
+
+      .footer-links a {
+        color: var(--text-secondary);
+        text-decoration: none;
+        font-weight: 500;
+        transition: all 0.3s ease;
+        padding: 0.5rem 1rem;
+        border-radius: 8px;
+      }
+
+      .footer-links a:hover {
+        color: var(--accent-arch);
+        background: rgba(0, 137, 123, 0.08);
+      }
+
+      .copyright {
+        color: var(--text-secondary);
+        font-size: 0.95rem;
+      }
+
+      /* Responsive Design */
+      @media (max-width: 1200px) {
+        .hero {
+          grid-template-columns: 1fr;
+          gap: 3rem;
+        }
+
+        .hero-visual {
+          max-width: 400px;
+          margin: 0 auto;
+        }
+      }
+
+      @media (max-width: 768px) {
+        .hero-content h1 {
+          font-size: 2.75rem;
+        }
+
+        .hero-content .year {
+          font-size: 1.1rem;
+        }
+
+        .section h2 {
+          font-size: 1.8rem;
+        }
+
+        .bento-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .nav-content {
+          flex-direction: column;
+          align-items: flex-start;
+        }
+
+        .nav-links {
+          flex-wrap: wrap;
+          gap: 1rem;
+        }
+
+        .footer-content {
+          flex-direction: column;
           text-align: center;
-          position: fixed;
-          margin-top: 6vh;
-          left: 0px;
-          right: 0px;
-          line-height: 3.5vmax;
-          font-size: 1.5vmax;
-          font-family: 'Arial';
-        }
-
-        #sidebar .subtitle {
-          text-align: center;
-          top: 5vh;
-          left: 0px;
-          right: 0px;
-          position: fixed;
-          margin-top: 10vh;
-          font-size: 1.5vmax;
-        }
-
-        #sidebar .title a:link,
-        #sidebar .title a:visited {
-          text-align: center;
-          color: #FFFFFF;
-        }
-
-        #sidebar .subtitle a:link,
-        #sidebar .subtitle a:visited {
-          text-align: center;
-          color: #FFFFFF;
-        }
-
-        .home {
-          z-index: 100;
-          width: 100%;
-          background-color: #1B80CF;
-          font-size: 1.5vmax;
-        }
-
-        .home a:link,
-        .home a:visited {
-          text-decoration: none;
-          color: #FFFFFF;
-        }
-
-        .content {
-          line-height: 3.8vmax;
-          font-size: 1.8vmax;
-          font-family: 'Arial';
-          margin-top: 22vh;
-        }
-
-        .content a:link,
-        .content a:visited {
-          color: #1B80CF;
-        }
-
-        .page {
-          top: 40vh;
-          width: 95%;
-          margin-left: 0vw;
-        }
-
-        .page img {
-          max-width: 100%;
-          max-height: 100%;
-          border: 0;
         }
       }
     </style>
   </head>
 
-  <body vocab="http://schema.org/">
-    <div id="sidebar">
-      <div class="title">
-        <h1><a href="./index.html">Architecture of Information Systems</a></h1>
-      </div>
-      <div class="subtitle">
-        <h3><a href="../../../../about.html">John Samuel</a></h3>
-      </div>
-    </div>
-    <div class="licence"><a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/"><img
-          alt="Creative Commons License" style="border-width:0" src="../../.././../../images/license.png" /></a>
-    </div>
-    <div class="page">
-      <div class="home">
-        <ul typeof="BreadcrumbList">
-          <li property="itemListElement" typeof="ListItem">
-            <a property="item" typeof="WebPage" href="../../../../index.html">
-              <span property="name">Home</span>
-            </a>
-          </li>
-          <li property="itemListElement" typeof="ListItem">
-            <a property="item" typeof="WebPage" href="../../../index.html">
-              <span property="name">Teaching</span>
-            </a>
-          </li>
+  <body>
+    <!-- Navigation -->
+    <nav>
+      <div class="nav-content">
+        <div><a href="../../../../about.html" class="nav-title">John Samuel</a></div>
+        <ul class="nav-links">
+          <li><a href="../../../../index.html">Home</a></li>
+          <li><a href="../../../index.html">Teaching</a></li>
+          <li><a href="../../../../about.html">About</a></li>
         </ul>
       </div>
-      <div class="content">
-        <h2>Architecture of Information Systems</h2>
-        <h3>Academic year: 2019-2020</h3>
-        <h4>Classes</h4>
-        <ul>
-          <li><a href="../../../../../fr/enseignement/cours/2019/ArchitectureSystemeInformation/cours1.html">Search
-              engine</a>, ETI,5<sup>th</sup> year, CPE Lyon</li>
-          <li><a href="../../../../../fr/enseignement/cours/2019/ArchitectureSystemeInformation/cours1.html">Search
-              engine</a>, IRC, 5<sup>th</sup> year, CPE Lyon</li>
-        </ul>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero">
+      <div class="hero-content">
+        <h1>Architecture of Information Systems</h1>
+        <p class="year">Reference Material</p>
+        <div class="hero-description">
+          Advanced course exploring the design and implementation of information systems architecture,
+          focusing on search engine technologies, distributed systems, and scalable information retrieval.
+        </div>
       </div>
+      <div class="hero-visual">
+        <svg class="architecture-svg" viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg">
+          <!-- Background Grid -->
+          <defs>
+            <pattern id="systemGrid" width="40" height="40" patternUnits="userSpaceOnUse">
+              <path d="M 40 0 L 0 0 0 40" fill="none" stroke="rgba(0, 137, 123, 0.08)" stroke-width="1" />
+            </pattern>
+            <linearGradient id="systemGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" style="stop-color:#00897b;stop-opacity:1" />
+              <stop offset="100%" style="stop-color:#00695c;stop-opacity:1" />
+            </linearGradient>
+            <linearGradient id="dataFlow" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" style="stop-color:#26a69a;stop-opacity:0">
+                <animate attributeName="stop-opacity" values="0;1;0" dur="3s" repeatCount="indefinite" />
+              </stop>
+              <stop offset="50%" style="stop-color:#26a69a;stop-opacity:1">
+                <animate attributeName="stop-opacity" values="0;1;0" dur="3s" repeatCount="indefinite" />
+              </stop>
+              <stop offset="100%" style="stop-color:#26a69a;stop-opacity:0">
+                <animate attributeName="stop-opacity" values="0;1;0" dur="3s" repeatCount="indefinite" />
+              </stop>
+            </linearGradient>
+
+            <!-- Glow filter -->
+            <filter id="glow">
+              <feGaussianBlur stdDeviation="2.5" result="coloredBlur" />
+              <feMerge>
+                <feMergeNode in="coloredBlur" />
+                <feMergeNode in="SourceGraphic" />
+              </feMerge>
+            </filter>
+          </defs>
+
+          <rect width="400" height="400" fill="url(#systemGrid)" />
+
+          <!-- Multi-tier Architecture -->
+
+          <!-- Presentation Layer (Top) -->
+          <rect x="50" y="50" width="300" height="60" rx="8" fill="url(#systemGradient)" opacity="0.9"
+            filter="url(#glow)">
+            <animate attributeName="opacity" values="0.9;1;0.9" dur="4s" repeatCount="indefinite" />
+          </rect>
+          <text x="200" y="75" fill="white" font-size="13" font-weight="700" text-anchor="middle">Presentation
+            Layer</text>
+          <text x="200" y="95" fill="white" font-size="11" font-weight="500" text-anchor="middle" opacity="0.9">User
+            Interface</text>
+
+          <!-- Client nodes -->
+          <circle cx="100" cy="80" r="8" fill="#4db6ac" opacity="0.8">
+            <animate attributeName="r" values="8;10;8" dur="3s" repeatCount="indefinite" />
+          </circle>
+          <circle cx="200" cy="80" r="8" fill="#4db6ac" opacity="0.8">
+            <animate attributeName="r" values="8;10;8" dur="3.5s" repeatCount="indefinite" />
+          </circle>
+          <circle cx="300" cy="80" r="8" fill="#4db6ac" opacity="0.8">
+            <animate attributeName="r" values="8;10;8" dur="4s" repeatCount="indefinite" />
+          </circle>
+
+          <!-- Data flow lines from Presentation to Application -->
+          <line x1="100" y1="110" x2="120" y2="155" stroke="rgba(0, 137, 123, 0.3)" stroke-width="2">
+            <animate attributeName="stroke-opacity" values="0.3;0.8;0.3" dur="4s" repeatCount="indefinite" />
+          </line>
+          <line x1="200" y1="110" x2="200" y2="155" stroke="rgba(0, 137, 123, 0.3)" stroke-width="2">
+            <animate attributeName="stroke-opacity" values="0.3;0.8;0.3" dur="4.5s" repeatCount="indefinite" />
+          </line>
+          <line x1="300" y1="110" x2="280" y2="155" stroke="rgba(0, 137, 123, 0.3)" stroke-width="2">
+            <animate attributeName="stroke-opacity" values="0.3;0.8;0.3" dur="5s" repeatCount="indefinite" />
+          </line>
+
+          <!-- Application/Business Logic Layer (Middle) -->
+          <rect x="50" y="165" width="300" height="60" rx="8" fill="url(#systemGradient)" opacity="0.85"
+            filter="url(#glow)">
+            <animate attributeName="opacity" values="0.85;1;0.85" dur="4.5s" repeatCount="indefinite" />
+          </rect>
+          <text x="200" y="190" fill="white" font-size="13" font-weight="700" text-anchor="middle">Application
+            Layer</text>
+          <text x="200" y="210" fill="white" font-size="11" font-weight="500" text-anchor="middle"
+            opacity="0.9">Business Logic</text>
+
+          <!-- Application servers -->
+          <rect x="90" y="185" width="35" height="25" rx="3" fill="#4db6ac" opacity="0.7">
+            <animate attributeName="opacity" values="0.7;1;0.7" dur="3s" repeatCount="indefinite" />
+          </rect>
+          <rect x="182" y="185" width="35" height="25" rx="3" fill="#4db6ac" opacity="0.7">
+            <animate attributeName="opacity" values="0.7;1;0.7" dur="3.5s" repeatCount="indefinite" />
+          </rect>
+          <rect x="275" y="185" width="35" height="25" rx="3" fill="#4db6ac" opacity="0.7">
+            <animate attributeName="opacity" values="0.7;1;0.7" dur="4s" repeatCount="indefinite" />
+          </rect>
+
+          <!-- Data flow lines from Application to Data -->
+          <line x1="120" y1="225" x2="140" y2="270" stroke="rgba(0, 137, 123, 0.3)" stroke-width="2">
+            <animate attributeName="stroke-opacity" values="0.3;0.8;0.3" dur="5s" repeatCount="indefinite" />
+          </line>
+          <line x1="200" y1="225" x2="200" y2="270" stroke="rgba(0, 137, 123, 0.3)" stroke-width="2">
+            <animate attributeName="stroke-opacity" values="0.3;0.8;0.3" dur="5.5s" repeatCount="indefinite" />
+          </line>
+          <line x1="280" y1="225" x2="260" y2="270" stroke="rgba(0, 137, 123, 0.3)" stroke-width="2">
+            <animate attributeName="stroke-opacity" values="0.3;0.8;0.3" dur="6s" repeatCount="indefinite" />
+          </line>
+
+          <!-- Data Layer (Bottom) -->
+          <rect x="50" y="280" width="300" height="60" rx="8" fill="url(#systemGradient)" opacity="0.8"
+            filter="url(#glow)">
+            <animate attributeName="opacity" values="0.8;1;0.8" dur="5s" repeatCount="indefinite" />
+          </rect>
+          <text x="200" y="305" fill="white" font-size="13" font-weight="700" text-anchor="middle">Data Layer</text>
+          <text x="200" y="325" fill="white" font-size="11" font-weight="500" text-anchor="middle" opacity="0.9">Storage
+            & Databases</text>
+
+          <!-- Database cylinders -->
+          <g opacity="0.8">
+            <ellipse cx="110" cy="305" rx="15" ry="5" fill="#4db6ac" />
+            <rect x="95" y="305" width="30" height="25" fill="#4db6ac" />
+            <ellipse cx="110" cy="330" rx="15" ry="5" fill="#26a69a" />
+            <animate attributeName="opacity" values="0.8;1;0.8" dur="4s" repeatCount="indefinite" />
+          </g>
+          <g opacity="0.8">
+            <ellipse cx="200" cy="305" rx="15" ry="5" fill="#4db6ac" />
+            <rect x="185" y="305" width="30" height="25" fill="#4db6ac" />
+            <ellipse cx="200" cy="330" rx="15" ry="5" fill="#26a69a" />
+            <animate attributeName="opacity" values="0.8;1;0.8" dur="4.5s" repeatCount="indefinite" />
+          </g>
+          <g opacity="0.8">
+            <ellipse cx="290" cy="305" rx="15" ry="5" fill="#4db6ac" />
+            <rect x="275" y="305" width="30" height="25" fill="#4db6ac" />
+            <ellipse cx="290" cy="330" rx="15" ry="5" fill="#26a69a" />
+            <animate attributeName="opacity" values="0.8;1;0.8" dur="5s" repeatCount="indefinite" />
+          </g>
+
+          <!-- Data flow particles moving through layers -->
+          <circle r="4" fill="url(#dataFlow)">
+            <animateMotion dur="6s" repeatCount="indefinite" path="M 100,110 L 120,165 L 140,225 L 110,280" />
+          </circle>
+          <circle r="4" fill="url(#dataFlow)">
+            <animateMotion dur="6s" repeatCount="indefinite" begin="1s"
+              path="M 200,110 L 200,165 L 200,225 L 200,280" />
+          </circle>
+          <circle r="4" fill="url(#dataFlow)">
+            <animateMotion dur="6s" repeatCount="indefinite" begin="2s"
+              path="M 300,110 L 280,165 L 260,225 L 290,280" />
+          </circle>
+
+          <!-- Search Engine Icon (side decoration) -->
+          <g transform="translate(30, 360)" opacity="0.4">
+            <circle cx="15" cy="15" r="12" fill="none" stroke="#00897b" stroke-width="3" />
+            <line x1="24" y1="24" x2="32" y2="32" stroke="#00897b" stroke-width="3" stroke-linecap="round" />
+          </g>
+
+          <!-- Server rack icon (side decoration) -->
+          <g transform="translate(340, 360)" opacity="0.4">
+            <rect x="0" y="0" width="30" height="8" rx="1" fill="#00897b" />
+            <rect x="0" y="10" width="30" height="8" rx="1" fill="#00897b" />
+            <rect x="0" y="20" width="30" height="8" rx="1" fill="#00897b" />
+            <circle cx="5" cy="4" r="1.5" fill="white" />
+            <circle cx="5" cy="14" r="1.5" fill="white" />
+            <circle cx="5" cy="24" r="1.5" fill="white" />
+          </g>
+
+          <!-- Floating data particles -->
+          <circle cx="370" cy="130" r="3" fill="#4db6ac" opacity="0.5">
+            <animate attributeName="cy" values="130;300;130" dur="10s" repeatCount="indefinite" />
+            <animate attributeName="opacity" values="0.5;0.2;0.5" dur="10s" repeatCount="indefinite" />
+          </circle>
+          <circle cx="30" cy="250" r="3" fill="#26a69a" opacity="0.5">
+            <animate attributeName="cy" values="250;100;250" dur="12s" repeatCount="indefinite" />
+            <animate attributeName="opacity" values="0.5;0.2;0.5" dur="12s" repeatCount="indefinite" />
+          </circle>
+          <circle cx="370" cy="200" r="2.5" fill="#00897b" opacity="0.4">
+            <animate attributeName="cx" values="370;30;370" dur="14s" repeatCount="indefinite" />
+            <animate attributeName="opacity" values="0.4;0.15;0.4" dur="14s" repeatCount="indefinite" />
+          </circle>
+
+          <!-- System labels -->
+          <text x="25" y="25" fill="#00897b" font-size="10" opacity="0.3" font-weight="600">CLIENT</text>
+          <text x="340" y="355" fill="#00897b" font-size="10" opacity="0.3" font-weight="600">SERVER</text>
+        </svg>
+      </div>
+    </section>
+
+    <!-- Content -->
+    <div class="content-wrapper">
+
+      <!-- Course Materials Section -->
+      <section class="section">
+        <div class="section-header">
+          <div class="section-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
+              <circle cx="11" cy="11" r="8" />
+              <path d="m21 21-4.35-4.35" />
+            </svg>
+          </div>
+          <h2>Course Materials</h2>
+        </div>
+
+        <div class="bento-grid">
+          <!-- Search Engine - ETI -->
+          <div class="card">
+            <div class="card-badge">5th Year ETI</div>
+            <div class="card-icon">
+              <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
+                <circle cx="11" cy="11" r="8" />
+                <path d="m21 21-4.35-4.35" />
+                <circle cx="11" cy="11" r="3" />
+              </svg>
+            </div>
+            <h3>Search Engine Architecture</h3>
+            <p>Comprehensive study of search engine design, implementation, and optimization. Topics include indexing
+              strategies, ranking algorithms, query processing, and distributed search architectures for the ETI
+              program.</p>
+            <a href="../../../../../fr/enseignement/cours/2019/ArchitectureSystemeInformation/cours1.html">View Course
+            </a>
+          </div>
+
+          <!-- Search Engine - IRC -->
+          <div class="card">
+            <div class="card-badge">5th Year IRC</div>
+            <div class="card-icon">
+              <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
+                <rect x="2" y="7" width="20" height="14" rx="2" />
+                <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16" />
+                <circle cx="9" cy="13" r="1" />
+                <circle cx="15" cy="13" r="1" />
+              </svg>
+            </div>
+            <h3>Search Engine Systems</h3>
+            <p>Advanced exploration of information retrieval systems and search technologies. Covers web crawling,
+              indexing mechanisms, relevance scoring, scalability challenges, and modern search architectures for the
+              IRC program.</p>
+            <a href="../../../../../fr/enseignement/cours/2019/ArchitectureSystemeInformation/cours1.html">View Course
+            </a>
+          </div>
+        </div>
+      </section>
+
+      <!-- Key Topics Overview -->
+      <section class="section">
+        <div class="section-header">
+          <div class="section-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
+              <path d="M12 2v20M2 12h20" />
+              <circle cx="12" cy="12" r="9" />
+            </svg>
+          </div>
+          <h2>Architecture Components</h2>
+        </div>
+
+        <div class="bento-grid">
+          <!-- Web Crawling -->
+          <div class="card">
+            <div class="card-badge">Fundamentals</div>
+            <div class="card-icon">
+              <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
+                <circle cx="12" cy="12" r="10" />
+                <path
+                  d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
+              </svg>
+            </div>
+            <h3>Web Crawling</h3>
+            <p>Distributed web crawlers, politeness policies, URL frontier management, and content extraction
+              techniques.</p>
+          </div>
+
+          <!-- Indexing -->
+          <div class="card">
+            <div class="card-badge">Core Technology</div>
+            <div class="card-icon">
+              <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
+                <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" />
+                <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" />
+                <line x1="10" y1="10" x2="16" y2="10" />
+                <line x1="10" y1="14" x2="16" y2="14" />
+              </svg>
+            </div>
+            <h3>Indexing Systems</h3>
+            <p>Inverted indices, posting lists, compression techniques, and incremental indexing for real-time updates.
+            </p>
+          </div>
+
+          <!-- Query Processing -->
+          <div class="card">
+            <div class="card-badge">Performance</div>
+            <div class="card-icon">
+              <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
+                <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />
+              </svg>
+            </div>
+            <h3>Query Processing</h3>
+            <p>Query optimization, parallel processing, caching strategies, and efficient result retrieval algorithms.
+            </p>
+          </div>
+
+          <!-- Ranking -->
+          <div class="card">
+            <div class="card-badge">Advanced</div>
+            <div class="card-icon">
+              <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
+                <line x1="12" y1="20" x2="12" y2="10" />
+                <line x1="18" y1="20" x2="18" y2="4" />
+                <line x1="6" y1="20" x2="6" y2="16" />
+              </svg>
+            </div>
+            <h3>Ranking Algorithms</h3>
+            <p>PageRank, TF-IDF, BM25, learning to rank, and modern relevance scoring mechanisms.</p>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+      <div class="footer-content">
+        <div class="copyright">
+          <p>© 2025 John Samuel</p>
+          <p style="margin-top: 0.5rem;">
+            <a href="http://creativecommons.org/licenses/by-sa/4.0/" target="_blank" rel="noopener"
+              style="color: var(--accent-system); text-decoration: none;">
+              Creative Commons BY-SA 4.0
+            </a>
+          </p>
+        </div>
+        <div class="footer-links">
+          <a href="../../../../index.html">Home</a>
+          <a href="../../../index.html">Teaching</a>
+          <a href="../../../../about.html">About</a>
+        </div>
+      </div>
+    </footer>
   </body>
 
 </html>
