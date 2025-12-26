@@ -1,0 +1,1673 @@
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <title>Principes des Langages de Programmation : la chaine de compilation (2025-2026): John Samuel</title>
+    <link rel="shortcut icon" href="../../../../../images/logo/favicon.png" />
+    <style type="text/css">
+        body {
+            height: 100%;
+            width: 100%;
+            background-color: white;
+            margin: 0;
+            overflow: hidden;
+            font-family: Arial;
+        }
+
+        .slide {
+            height: 100%;
+            width: 100%;
+        }
+
+        .content {
+            height: 79%;
+            width: 95vw;
+            display: flex;
+            line-height: 1.7em;
+            flex-direction: column;
+            align-items: flex-start;
+            margin: 0 auto;
+            color: #000000;
+            text-align: left;
+            padding-left: 1.5vmax;
+            padding-top: 1.5vmax;
+            overflow-x: auto;
+            font-size: 2.8vmin;
+            flex-wrap: wrap;
+        }
+
+        .content h1,
+        h2,
+        h3,
+        h4 {
+            color: #1B80CF;
+        }
+
+        .content .topichighlight {
+            background-color: #78002E;
+            color: #FFFFFF;
+        }
+
+        .content .topicheading {
+            background-color: #1B80CF;
+            color: #FFFFFF;
+            vertical-align: middle;
+            border-radius: 0 2vmax 2vmax 0%;
+            height: 4vmax;
+            line-height: 4vmax;
+            padding-left: 1vmax;
+            margin: 0.1vmax;
+            width: 50%;
+            margin-bottom: 1vmax;
+        }
+
+        .content .flexcontent {
+            display: flex;
+            overflow-y: auto;
+            font-size: 2.8vmin;
+            flex-wrap: wrap;
+        }
+
+        .content .gridcontent {
+            display: grid;
+            grid-template-columns: auto auto auto auto;
+            grid-column-gap: 0px;
+            grid-row-gap: 0px;
+            grid-gap: 0px;
+        }
+
+        .content .topicsubheading {
+            background-color: #1B80CF;
+            color: #FFFFFF;
+            vertical-align: middle;
+            border-radius: 0 1.5vmax 1.5vmax 0%;
+            height: 3vmax;
+            margin: 0.1vmax;
+            font-size: 90%;
+            line-height: 3vmax;
+            padding-left: 1vmax;
+            width: 50%;
+            margin-bottom: 1vmax;
+        }
+
+        .content table {
+            color: #000000;
+            font-size: 100%;
+            width: 100%;
+        }
+
+        .content a:link,
+        .content a:visited {
+            color: #1B80CF;
+            text-decoration: none;
+        }
+
+        .content th {
+            color: #FFFFFF;
+            background-color: #1B80CF;
+            border-radius: 2vmax 2vmax 2vmax 2vmax;
+            font-size: 120%;
+            padding: 15px;
+        }
+
+        .content figure {
+            max-width: 90%;
+            max-height: 90%;
+        }
+
+        .content .fullwidth img {
+            max-width: 90%;
+            max-height: 90%;
+        }
+
+        .content figure img {
+            max-width: 50vmin;
+            max-height: 50vmin;
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .content figure figcaption {
+            max-width: 90%;
+            max-height: 90%;
+            margin: 0.1vmax;
+            font-size: 90%;
+            text-align: center;
+            padding: 0.5vmax;
+            background-color: #E1F5FE;
+            border-radius: 2vmax 2vmax 2vmax 2vmax;
+        }
+
+        .content figure .source {
+            font-size: 2vmin;
+        }
+
+        .content td {
+            color: #000000;
+            width: 8%;
+            padding-left: 3vmax;
+            padding-top: 1vmax;
+            padding-bottom: 1vmax;
+            background-color: #E1F5FE;
+            border-radius: 2vmax 2vmax 2vmax 2vmax;
+        }
+
+        .content li {
+            line-height: 1.7em;
+        }
+
+        .content {
+            line-height: 1.5em;
+        }
+
+        .header {
+            color: #ffffff;
+            background-color: #00549d;
+            height: 5vmax;
+        }
+
+        .header h1 {
+            text-align: center;
+            vertical-align: middle;
+            font-size: 3vmax;
+            line-height: 4vmax;
+            margin: 0;
+        }
+
+        .footer {
+            height: 3vmax;
+            line-height: 3vmax;
+            vertical-align: middle;
+            color: #ffffff;
+            background-color: #00549d;
+            margin: 0;
+            padding: .3vmax;
+            overflow: hidden;
+        }
+
+        .footer .contact {
+            float: left;
+            color: #ffffff;
+            text-align: left;
+            font-size: 3.2vmin;
+        }
+
+        .footer .navigation {
+            float: right;
+            text-align: right;
+            width: 8vw;
+            font-size: 3vmin;
+        }
+
+        .footer .navigation .next,
+        .prev {
+            font-size: 3vmin;
+            color: #ffffff;
+            text-decoration: none;
+        }
+
+        .footer .navigation .next::after {
+            content: "| >";
+        }
+
+        .footer .navigation .prev::after {
+            content: "< ";
+        }
+
+        /* Using same Jupyter CSS
+     */
+
+        .highlight {
+            background: #f8f8f8;
+        }
+
+        .highlight .c {
+            color: #408080;
+            font-style: italic
+        }
+
+        /* Comment */
+
+        .highlight .err {
+            border: 1px solid #FF0000
+        }
+
+        /* Error */
+
+        .highlight .k {
+            color: #008000;
+            font-weight: bold
+        }
+
+        /* Keyword */
+
+        .highlight .o {
+            color: #666666
+        }
+
+        /* Operator */
+
+        .highlight .ch {
+            color: #408080;
+            font-style: italic
+        }
+
+        /* Comment.Hashbang */
+
+        .highlight .c1 {
+            color: #408080;
+            font-style: italic
+        }
+
+        /* Comment.Single */
+
+        .highlight .cs {
+            color: #408080;
+            font-style: italic
+        }
+
+        /* Comment.Special */
+
+        .highlight .cm {
+            color: #408080;
+            font-style: italic
+        }
+
+        /* Comment.Multiline */
+
+        .highlight .nn {
+            color: #0000FF;
+            font-weight: bold
+        }
+
+        /* Name.Namespace */
+
+        .highlight .k {
+            color: #008000;
+            font-weight: bold
+        }
+
+        /* Keyword */
+
+        .highlight .s2 {
+            color: #BA2121
+        }
+
+        /* Literal.String.Double */
+
+        .highlight .s1 {
+            color: #BA2121
+        }
+
+        /* Literal.String.Single */
+
+        .highlight .kn {
+            color: #008000;
+            font-weight: bold
+        }
+
+        /* Keyword.Namespace */
+
+        .highlight .nb {
+            color: #008000
+        }
+
+        /* Name.Builtin */
+
+        .highlight .mb {
+            color: #666666
+        }
+
+        /* Literal.Number.Bin */
+
+        .highlight .mf {
+            color: #666666
+        }
+
+        /* Literal.Number.Float */
+
+        .highlight .mh {
+            color: #666666
+        }
+
+        /* Literal.Number.Hex */
+
+        .highlight .mi {
+            color: #666666
+        }
+
+        /* Literal.Number.Integer */
+
+        .highlight .mo {
+            color: #666666
+        }
+
+        /* Literal.Number.Oct */
+
+        @media (max-width: 640px),
+        screen and (orientation: portrait) {
+            body {
+                max-width: 100%;
+                max-height: 100%;
+            }
+
+            .slide {
+                height: 100%;
+                width: 100%;
+            }
+
+            .content {
+                width: 100%;
+                height: 92%;
+                display: flex;
+                flex-direction: row;
+                text-align: left;
+                padding: 1vw;
+                line-height: 3.8vmax;
+                font-size: 1.8vmax;
+                flex-wrap: wrap;
+            }
+
+            .content .topicheading {
+                width: 90%;
+            }
+
+            .content h1,
+            h2,
+            h3,
+            h4 {
+                width: 100%;
+            }
+
+            .content figure img {
+                max-width: 80vmin;
+                max-height: 50vmin;
+            }
+
+            .content figure figcaption {
+                max-width: 90%;
+                max-height: 90%;
+            }
+        }
+
+        @media print {
+            body {
+                max-width: 100%;
+                max-height: 100%;
+            }
+
+            .content {
+                font-size: 2.5vmin;
+            }
+
+            .content .flexcontent {
+                font-size: 2.5vmin;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <section class="slide" id="slide1">
+        <div class="header">
+        </div>
+        <div class="content">
+            <h1 style="font-size:3.5vmin">Principes des Langages de Programmation</br>
+                <span style="line-height:3.5vmax;font-size:3.0vmin">
+                    La chaine de compilation<span>
+            </h1>
+            <p><b>John Samuel</b></br>
+                CPE Lyon<br /><br />
+                <b>Année</b>: 2025-2026<br />
+                <b>Courriel</b>: john.samuel@cpe.fr</br>
+                <a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/"><img
+                        alt="Creative Commons License" style="border-width:0"
+                        src="../../../../../en/teaching/courses/2017/C/88x31.png" /></a>
+            </p>
+        </div>
+        <div class="footer">
+            <div class="contact">Principes des Langages de Programmation | John Samuel</div>
+            <div class="navigation">1
+
+                <a class="next" href="#slide2"></a>
+            </div>
+        </div>
+    </section>
+    <section class="slide" id="slide2">
+        <div class="header">
+            <h1>3. Principes des Langages de Programmation : Objectifs</h1>
+        </div>
+        <div class="content">
+            <h3 class="topicsubheading">Objectifs</h3>
+            <ul>
+                <li>La chaine de compilation</li>
+                <li>Préprocesseur</li>
+                <li>Langage intermédiaire</li>
+                <li>Optimisation de code</li>
+                <li>Génération de code natif</li>
+                <li>Code objet</li>
+            </ul>
+        </div>
+        <div class="footer">
+            <div class="contact">Principes des Langages de Programmation | John Samuel</div>
+            <div class="navigation">2
+                <a class="prev" href="#slide1"></a>
+                <a class="next" href="#slide3"></a>
+            </div>
+        </div>
+    </section>
+    <section class="slide" id="slide3">
+        <div class="header">
+            <h1>3.1. La chaine de compilation</h1>
+        </div>
+        <div class="content">
+            <h3 class="topicsubheading">6 étapes de la chaine de compilation</h3>
+            <figure>
+                <img src="../../../../../en/teaching/courses/2017/C/images/compiler.svg" height="400vh" />
+            </figure>
+        </div>
+        <div class="footer">
+            <div class="contact">Principes des Langages de Programmation | John Samuel</div>
+            <div class="navigation">3
+                <a class="prev" href="#slide2"></a>
+                <a class="next" href="#slide4"></a>
+            </div>
+        </div>
+    </section>
+    <section class="slide" id="slide4">
+        <div class="header">
+            <h1>3.1. La chaine de compilation</h1>
+        </div>
+        <div class="content">
+            <h3 class="topicsubheading">6 étapes de la chaine de compilation</h3>
+            <p><strong>1. Prétraitement (Étape 1)</strong></p>
+            <ul>
+                <li><strong>Expansion des macros</strong> : Le préprocesseur remplace les macros par leurs formes
+                    développées.</li>
+                <li><strong>Inclusion de fichiers</strong> : Le préprocesseur inclut les fichiers spécifiés par les
+                    directives <code>#include</code>, qui peuvent être des fichiers d’en-tête ou des fragments de code
+                    source.</li>
+                <li><strong>Compilation conditionnelle</strong> : Le préprocesseur permet la compilation conditionnelle
+                    en fonction des directives <code>#ifdef</code>, <code>#ifndef</code>, <code>#else</code> et
+                    <code>#endif</code>.
+                </li>
+            </ul>
+            <p>La sortie du prétraitement est une version modifiée du code source original, qui est ensuite transmise à
+                l’étape suivante.</p>
+        </div>
+        <div class="footer">
+            <div class="contact">Principes des Langages de Programmation | John Samuel</div>
+            <div class="navigation">4
+                <a class="prev" href="#slide3"></a>
+                <a class="next" href="#slide5"></a>
+            </div>
+        </div>
+    </section>
+    <section class="slide" id="slide5">
+        <div class="header">
+            <h1>3.1. La chaine de compilation</h1>
+        </div>
+        <div class="content">
+            <h3 class="topicsubheading">6 étapes de la chaine de compilation</h3>
+            <p><strong>2. Analyse lexicale (Étape 2)</strong></p>
+            <ul>
+                <li><strong>Tokenisation</strong> : L’analyseur lexical divise le code source en jetons individuels,
+                    tels que des mots-clés, des identificateurs, des littéraux et des symboles.</li>
+                <li><strong>Classification des caractères</strong> : L’analyseur lexical classe les caractères en
+                    différentes catégories en fonction de leur signification dans le code source.</li>
+            </ul>
+            <p>La sortie de l’analyse lexicale est une liste de jetons, qui est ensuite transmise à l’analyseur
+                syntaxique pour un traitement ultérieur.</p>
+
+        </div>
+        <div class="footer">
+            <div class="contact">Principes des Langages de Programmation | John Samuel</div>
+            <div class="navigation">5
+                <a class="prev" href="#slide4"></a>
+                <a class="next" href="#slide6"></a>
+            </div>
+        </div>
+    </section>
+    <section class="slide" id="slide6">
+        <div class="header">
+            <h1>3.1. La chaine de compilation</h1>
+        </div>
+        <div class="content">
+            <h3 class="topicsubheading">6 étapes de la chaine de compilation</h3>
+            <p><strong>3. Analyse syntaxique (Étape 3)</strong></p>
+            <ul>
+                <li><strong>Génération de l’arbre syntaxique</strong> : L’analyseur syntaxique construit un arbre
+                    syntaxique abstrait (AST) à partir du flux de jetons.</li>
+                <li><strong>Détection et rapport d’erreurs</strong> : L’analyseur syntaxique identifie les erreurs de
+                    syntaxe dans le code source et les signale à l’utilisateur.</li>
+            </ul>
+            <p>La sortie de l’analyse syntaxique est un AST validé, qui représente la structure syntaxique du programme.
+                Cette étape garantit que le code source respecte les règles de syntaxe du langage.</p>
+
+        </div>
+        <div class="footer">
+            <div class="contact">Principes des Langages de Programmation | John Samuel</div>
+            <div class="navigation">6
+                <a class="prev" href="#slide5"></a>
+                <a class="next" href="#slide7"></a>
+            </div>
+        </div>
+    </section>
+    <section class="slide" id="slide7">
+        <div class="header">
+            <h1>3.1. La chaine de compilation</h1>
+        </div>
+        <div class="content">
+            <h3 class="topicsubheading">6 étapes de la chaine de compilation</h3>
+            <p><strong>4. Analyse sémantique (Étape 4)</strong></p>
+            <ul>
+                <li><strong>Vérification des types</strong> : L’analyseur sémantique vérifie que les types des variables
+                    et des expressions correspondent aux types attendus.</li>
+                <li><strong>Analyse de portée</strong> : L’analyseur sémantique résout les déclarations de variables,
+                    les appels de fonctions et les autres problèmes de portée.</li>
+                <li><strong>Propagation des contraintes</strong> : L’analyseur sémantique propage les contraintes et les
+                    informations entre les différentes parties du programme.</li>
+            </ul>
+            <p>La sortie de l’analyse sémantique est un AST validé avec des informations de type et de portée. Cette
+                étape garantit que le code source respecte les règles sémantiques du langage.</p>
+
+        </div>
+        <div class="footer">
+            <div class="contact">Principes des Langages de Programmation | John Samuel</div>
+            <div class="navigation">7
+                <a class="prev" href="#slide6"></a>
+                <a class="next" href="#slide8"></a>
+            </div>
+        </div>
+    </section>
+    <section class="slide" id="slide8">
+        <div class="header">
+            <h1>3.1. La chaine de compilation</h1>
+        </div>
+        <div class="content">
+            <h3 class="topicsubheading">6 étapes de la chaine de compilation</h3>
+            <p><strong>5. Génération de code intermédiaire (Étape 5)</strong></p>
+            <ul>
+                <li><strong>Traduction de l’arbre syntaxique abstrait</strong> : Le générateur de code intermédiaire
+                    traduit l’AST validé en une représentation intermédiaire, telle que du bytecode ou des arbres
+                    syntaxiques abstraits.</li>
+                <li><strong>Identification des opportunités d’optimisation</strong> : Le générateur de code
+                    intermédiaire identifie les opportunités d’optimisation potentielles dans le programme.</li>
+            </ul>
+            <p>La sortie de la génération de code intermédiaire est une représentation intermédiaire indépendante de la
+                plate-forme, qui peut être exécutée par un environnement d’exécution. Cette étape garantit que le code
+                source est converti en une forme qui peut être exécutée de manière efficace.</p>
+        </div>
+        <div class="footer">
+            <div class="contact">Principes des Langages de Programmation | John Samuel</div>
+            <div class="navigation">8
+                <a class="prev" href="#slide7"></a>
+                <a class="next" href="#slide9"></a>
+            </div>
+        </div>
+    </section>
+    <section class="slide" id="slide9">
+        <div class="header">
+            <h1>3.1. La chaine de compilation</h1>
+        </div>
+        <div class="content">
+            <h3 class="topicsubheading">6 étapes de la chaine de compilation</h3>
+            <p><strong>6. Génération de code natif (Étape 6)</strong></p>
+            <ul>
+                <li><strong>Optimisation du code</strong> : Le générateur de code natif applique diverses optimisations
+                    pour améliorer les performances, telles que l’élimination de code mort et l’allocation de registres.
+                </li>
+                <li><strong>Génération d’instructions natives</strong> : Le générateur de code natif génère des
+                    instructions spécifiques à la machine à partir de la représentation intermédiaire.</li>
+            </ul>
+            <p>La sortie de la génération de code natif est le code exécutable final qui peut être exécuté directement
+                sur la plate-forme cible. Cette étape garantit que le code source est traduit en code machine optimisé
+                pour l’exécution.</p>
+        </div>
+        <div class="footer">
+            <div class="contact">Principes des Langages de Programmation | John Samuel</div>
+            <div class="navigation">9
+                <a class="prev" href="#slide8"></a>
+                <a class="next" href="#slide10"></a>
+            </div>
+        </div>
+    </section>
+    <section class="slide" id="slide10">
+        <div class="header">
+            <h1>3.1. La chaine de compilation</h1>
+        </div>
+        <div class="content">
+            <h3 class="topicsubheading">6 étapes de la chaine de compilation</h3>
+            <p>Supposons que nous ayons un programme “Hello, World!” simple écrit en C :</p>
+            <div class="highlight">
+                <pre><span></span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;stdio.h&gt;</span><span class="cp"></span>
+
+<span class="kt">int</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="n">printf</span><span class="p">(</span><span class="s">&quot;Bonjour le monde !!!</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+</pre>
+            </div>
+
+
+        </div>
+        <div class="footer">
+            <div class="contact">Principes des Langages de Programmation | John Samuel</div>
+            <div class="navigation">10
+                <a class="prev" href="#slide9"></a>
+                <a class="next" href="#slide11"></a>
+            </div>
+        </div>
+    </section>
+    <section class="slide" id="slide11">
+        <div class="header">
+            <h1>3.1. La chaine de compilation</h1>
+        </div>
+        <div class="content">
+            <h3 class="topicsubheading">6 étapes de la chaine de compilation</h3>
+            <p>Le processus de compilation se déroulerait comme suit :</p>
+            <ol type="1">
+                <li><strong>Prétraitement</strong> : Le préprocesseur développe la directive <code>#include</code> pour
+                    inclure le fichier d’en-tête de la bibliothèque standard.</li>
+                <li><strong>Analyse lexicale</strong> : L’analyseur lexical divise le code source en jetons individuels,
+                    tels que des mots-clés, des identificateurs, des littéraux et des symboles.</li>
+                <li><strong>Analyse syntaxique</strong> : L’analyseur syntaxique construit un arbre syntaxique abstrait
+                    (AST) à partir du flux de jetons, qui représente la structure syntaxique du programme.</li>
+            </ol>
+        </div>
+        <div class="footer">
+            <div class="contact">Principes des Langages de Programmation | John Samuel</div>
+            <div class="navigation">11
+                <a class="prev" href="#slide10"></a>
+                <a class="next" href="#slide12"></a>
+            </div>
+        </div>
+    </section>
+    <section class="slide" id="slide12">
+        <div class="header">
+            <h1>3.1. La chaine de compilation</h1>
+        </div>
+        <div class="content">
+            <h3 class="topicsubheading">6 étapes de la chaine de compilation</h3>
+            <ol start="4">
+                <li><strong>Analyse sémantique</strong> : L’analyseur sémantique vérifie que les types des variables et
+                    des expressions correspondent aux types attendus et résout les problèmes de portée.</li>
+                <li><strong>Génération de code intermédiaire</strong> : Le générateur de code intermédiaire traduit
+                    l’AST validé en bytecode ou en arbres syntaxiques abstraits.</li>
+                <li><strong>Génération de code natif</strong> : Le générateur de code natif applique des optimisations
+                    et génère des instructions spécifiques à la machine à partir de la représentation intermédiaire.
+                </li>
+            </ol>
+            <p>La sortie finale est le code exécutable qui peut être exécuté directement sur la plate-forme cible.</p>
+
+
+        </div>
+        <div class="footer">
+            <div class="contact">Principes des Langages de Programmation | John Samuel</div>
+            <div class="navigation">12
+                <a class="prev" href="#slide11"></a>
+                <a class="next" href="#slide13"></a>
+            </div>
+        </div>
+    </section>
+    <section class="slide" id="slide13">
+        <div class="header">
+            <h1>3.1. La chaine de compilation</h1>
+        </div>
+        <div class="content">
+            <h3 class="topicsubheading">1. Préprocesseur</h3>
+            <p>Cette étape consiste à traiter les directives de préprocesseur contenues dans le code source, telles que
+                les directives d'inclusion (#include) et de remplacement de macros (#define). Le résultat est
+                généralement un fichier source modifié avec ces directives résolues.</p>
+            <h3>cercle.c</h3>
+            <code><span style="color:purple">#ifndef</span> PI</br>
+			<span style="color:purple">#define</span> PI 3.14159</br>
+			<span style="color:purple">#endif</span></br></br>
+
+			<span style="color:green">float</span> <span style="color:blue">aire</span>(
+			<span style="color:green">float</span> <span style="color:blue">rayon</span>) { <br>
+			&nbsp;<span style="color:green">return</span>(PI * <span style="color:blue">rayon</span>
+						* <span style="color:blue">rayon</span>);<br>
+			}<br>
+                        </code>
+        </div>
+        <div class="footer">
+            <div class="contact">Principes des Langages de Programmation | John Samuel</div>
+            <div class="navigation">13
+                <a class="prev" href="#slide12"></a>
+                <a class="next" href="#slide14"></a>
+            </div>
+        </div>
+    </section>
+    <section class="slide" id="slide14">
+        <div class="header">
+            <h1>3.1. La chaine de compilation</h1>
+        </div>
+        <div class="content">
+            <h3 class="topicsubheading">1. Préprocesseur</h3>
+            <code>
+                  $ gcc -E cercle.c
+		  # 1 "cercle.c"</br>
+# 1 "<built-in>"</br>
+# 1 "<command-line>"</br>
+# 31 "<command-line>"</br>
+# 1 "/usr/include/stdc-predef.h" 1 3 4</br>
+# 32 "<command-line>" 2</br>
+# 1 "cercle.c"</br>
+</br>
+float aire(float rayon) {</br>
+  return(3.14 * rayon * rayon);</br>
+}</br>
+                  </code>
+            <p>Le résultat affiche le code source après le traitement des directives de préprocesseur. Cela peut inclure
+                des inclusions de fichiers, la résolution de macros et d'autres transformations avant la compilation
+                proprement dite.</p>
+        </div>
+        <div class="footer">
+            <div class="contact">Principes des Langages de Programmation | John Samuel</div>
+            <div class="navigation">14
+                <a class="prev" href="#slide13"></a>
+                <a class="next" href="#slide15"></a>
+            </div>
+        </div>
+    </section>
+    <section class="slide" id="slide15">
+        <div class="header">
+            <h1>3.1. La chaine de compilation</h1>
+        </div>
+        <div class="content">
+            <h3 class="topicsubheading">2. Langage intermédiaire</h3>
+            <p>Ces étapes montrent comment le code source est transformé en diverses représentations intermédiaires
+                avant d'atteindre le code machine final. Chacune de ces étapes permet une analyse et une optimisation du
+                code à différents niveaux.</p>
+            <code>
+                  $ gcc -v bonjour.c # les étapes importantes</br>
+                  $ gcc -save-temps -v bonjour.c # les fichiers *.i, *.s</br>
+                  $ gcc -fdump-tree-all bonjour.c</br>
+                  $ gcc -fdump-rtl-all bonjour.c</br>
+                  </code>
+        </div>
+        <div class="footer">
+            <div class="contact">Principes des Langages de Programmation | John Samuel</div>
+            <div class="navigation">15
+                <a class="prev" href="#slide14"></a>
+                <a class="next" href="#slide16"></a>
+            </div>
+        </div>
+    </section>
+    <section class="slide" id="slide16">
+        <div class="header">
+            <h1>3.1. La chaine de compilation</h1>
+        </div>
+        <div class="content">
+            <h3 class="topicsubheading">2. Langage intermédiaire</h3>
+            <p>Ce code généré montre comment les opérations mathématiques sont exprimées en AST (Abstract Syntax Tree -
+                arbre de syntaxe abstraite).</p>
+            <code>
+                  $ gcc -fdump-tree-all -c cercle.c</br>
+		  $ cat cercle.c.005t.gimple</br>
+aire (float rayon)</br>
+{</br>
+  float D.1914;</br>
+  _1 = (double) rayon;</br>
+  _2 = _1 * 3.140000000000000124344978758017532527446746826171875e+0;</br>
+  _3 = (double) rayon;</br>
+  _4 = _2 * _3;</br>
+  D.1914 = (float) _4;</br>
+  return D.1914;</br>
+}
+                  </code>
+        </div>
+        <div class="footer">
+            <div class="contact">Principes des Langages de Programmation | John Samuel</div>
+            <div class="navigation">16
+                <a class="prev" href="#slide15"></a>
+                <a class="next" href="#slide17"></a>
+            </div>
+        </div>
+    </section>
+    <section class="slide" id="slide17">
+        <div class="header">
+            <h1>3.1. La chaine de compilation</h1>
+        </div>
+        <div class="content">
+            <h3 class="topicsubheading">3. Optimisation de code</h3>
+            <code>
+                  $ gcc -O2 bonjour.c</br>
+                  </code>
+            <ul>
+                <li>-O1 : Niveau d'optimisation 1. Il applique des optimisations
+                    de base pour améliorer les performances tout en maintenant une bonne
+                    expérience de débogage.</li>
+                <li>-O2 : Niveau d'optimisation 2. Il applique des optimisations
+                    plus avancées, ce qui peut entraîner une meilleure performance, mais la
+                    compilation peut prendre plus de temps. </li>
+                <li>-O3 : Niveau d'optimisation 3. Il applique des optimisations
+                    plus agressives que -O2, ce qui peut donner de meilleures performances,
+                    mais la compilation peut prendre plus de temps et la taille du fichier
+                    exécutable peut augmenter.</li>
+                <li>-Os : Optimisation de la taille du binaire. Il cherche à
+                    réduire la taille du fichier exécutable, ce qui peut être utile dans des
+                    environnements avec des contraintes de stockage.</li>
+                <li>-Ofast : Niveau d'optimisation élevé. Il applique des
+                    optimisations maximales, souvent au détriment de la taille du fichier
+                    exécutable. Utilisé pour obtenir la meilleure performance possible.</li>
+                <li>-Og : Optimisation pour le débogage. Il optimise le code
+                    tout en conservant des informations de débogage utiles. </li>
+            </ul>
+
+        </div>
+        <div class="footer">
+            <div class="contact">Principes des Langages de Programmation | John Samuel</div>
+            <div class="navigation">17
+                <a class="prev" href="#slide16"></a>
+                <a class="next" href="#slide18"></a>
+            </div>
+        </div>
+    </section>
+    <section class="slide" id="slide18">
+        <div class="header">
+            <h1>3.1. La chaine de compilation</h1>
+        </div>
+        <div class="content">
+            <h3 class="topicsubheading">4. Génération de code natif</h3>
+            <p>L'option -S indique au compilateur de produire le code assembleur au lieu de générer un exécutable. Le
+                résultat de cette étape est un fichier avec l'extension .s, qui contient le code assembleur généré.</p>
+            <code>
+                  $ gcc -S bonjour.c</br>
+                  $ cat bonjour.s
+                  </code>
+        </div>
+        <div class="footer">
+            <div class="contact">Principes des Langages de Programmation | John Samuel</div>
+            <div class="navigation">18
+                <a class="prev" href="#slide17"></a>
+                <a class="next" href="#slide19"></a>
+            </div>
+        </div>
+    </section>
+    <section class="slide" id="slide19">
+        <div class="header">
+            <h1>3.1. La chaine de compilation</h1>
+        </div>
+        <div class="content">
+            <h3 class="topicsubheading">4. Génération de code natif et l'optimisation de code</h3>
+            <code style="width:40%">
+                  <span style="color: green">int</span> <span style="color:blue">main</span>() {</br>
+                  &nbsp;&nbsp;<span style="color: green">int</span> <span style="color: blue">num</span> = 2 + 3;</br>
+                  &nbsp;&nbsp;<span style="color: green">return</span>(0);</br>
+                  }
+                  </code>
+            <h3>Compilation (Pas d'optimisations)</h3>
+            <code style="width:40%">
+                  $ gcc -O0 -S somme.c
+                  </code>
+            <p style="width:40%">L'absence d'optimisation (-O0) signifie que le compilateur n'a pas appliqué
+                d'optimisations particulières, ce qui permet d'obtenir un code assembleur directement équivalent au code
+                C source. </p>
+        </div>
+        <div class="footer">
+            <div class="contact">Principes des Langages de Programmation | John Samuel</div>
+            <div class="navigation">19
+                <a class="prev" href="#slide18"></a>
+                <a class="next" href="#slide20"></a>
+            </div>
+        </div>
+    </section>
+    <section class="slide" id="slide20">
+        <div class="header">
+            <h1>3.1. La chaine de compilation</h1>
+        </div>
+        <div class="content">
+            <h3 class="topicsubheading">4. Génération de code natif et l'optimisation de code</h3>
+            <h3 style="width:40%">somme.s</h3>
+            <code style="width:40%">
+                    main:</br>
+                    .LFB0:</br>
+                    &nbsp;&nbsp;.cfi_startproc</br>
+                    &nbsp;&nbsp;pushq   %rbp</br>
+                    &nbsp;&nbsp;.cfi_def_cfa_offset 16</br>
+                    &nbsp;&nbsp;.cfi_offset 6, -16</br>
+                    &nbsp;&nbsp;movq    %rsp, %rbp</br>
+                    &nbsp;&nbsp;.cfi_def_cfa_register 6</br>
+                    &nbsp;&nbsp;movl    $5, -4(%rbp)</br>
+                    &nbsp;&nbsp;movl    $0, %eax</br>
+                    &nbsp;&nbsp;popq    %rbp</br>
+                    &nbsp;&nbsp;.cfi_def_cfa 7, 8</br>
+                    &nbsp;&nbsp;ret</br>
+                    &nbsp;&nbsp;.cfi_endproc</br>
+                  </code>
+        </div>
+        <div class="footer">
+            <div class="contact">Principes des Langages de Programmation | John Samuel</div>
+            <div class="navigation">20
+                <a class="prev" href="#slide19"></a>
+                <a class="next" href="#slide21"></a>
+            </div>
+        </div>
+    </section>
+    <section class="slide" id="slide21">
+        <div class="header">
+            <h1>3.1. La chaine de compilation</h1>
+        </div>
+        <div class="content">
+            <h3 class="topicsubheading">4. Génération de code natif et l'optimisation de code</h3>
+            <code style="width:30%">
+                  <span style="color: green">int</span> <span style="color:blue">main</span>() {</br>
+                  &nbsp;&nbsp;<span style="color: green">int</span> <span style="color: blue">num</span> = 2 + 3;</br>
+                  &nbsp;&nbsp;<span style="color: green">return</span>(0);</br>
+                  }
+                  </code>
+            <code style="width:20%">
+                  $ gcc -O2 -S somme.c
+                  </code>
+            <code style="width:20%">
+                  <h3>somme.s</h3>
+                    main:</br>
+                    .LFB0:</br>
+                    &nbsp;&nbsp;.cfi_startproc</br>
+                    &nbsp;&nbsp;xorl    %eax, %eax</br>
+                    &nbsp;&nbsp;ret</br>
+                    &nbsp;&nbsp;.cfi_endproc</br>
+                  </code>
+            <p style="width:40%">
+                <b>Compilation (optimisation: 2)</b> :
+                L'optimisation de niveau 2 a permis au compilateur de reconnaître que l'addition 2 + 3 est constante et
+                que la valeur de retour de la fonction est toujours 0. Par conséquent, le calcul inutile est éliminé, ce
+                qui donne un code assembleur très efficace et court. Cette optimisation est typique des optimisations de
+                constantes que le compilateur peut effectuer pour améliorer les performances du code.
+            </p>
+        </div>
+        <div class="footer">
+            <div class="contact">Principes des Langages de Programmation | John Samuel</div>
+            <div class="navigation">21
+                <a class="prev" href="#slide20"></a>
+                <a class="next" href="#slide22"></a>
+            </div>
+        </div>
+    </section>
+    <section class="slide" id="slide22">
+        <div class="header">
+            <h1>3.1. La chaine de compilation</h1>
+        </div>
+        <div class="content">
+            <h3 class="topicsubheading">4. Génération de code</h3>
+            <h4>sur une machine d'architecture 64 bits</h4>
+            <code>
+                  $ gcc bonjour.c</br>
+                  $ file a.out </br>
+                  &nbsp;a.out: ELF 64-bit LSB shared object, x86-64</br>
+                  </code>
+            <p>Cela signifie que le programme compilé est conçu pour être exécuté sur une machine d'architecture 64
+                bits, spécifiquement une architecture x86-64.</p>
+        </div>
+        <div class="footer">
+            <div class="contact">Principes des Langages de Programmation | John Samuel</div>
+            <div class="navigation">22
+                <a class="prev" href="#slide21"></a>
+                <a class="next" href="#slide23"></a>
+            </div>
+        </div>
+    </section>
+    <section class="slide" id="slide23">
+        <div class="header">
+            <h1>3.1. La chaine de compilation</h1>
+        </div>
+        <div class="content">
+            <h3 class="topicsubheading">4. Génération de code</h3>
+            <h4>sur une machine d'architecture 64 bits</h4>
+            <p>Cette commande indique au compilateur GCC de générer un exécutable 32 bits en utilisant l'architecture
+                i686 (Intel 80386). L'option -m32 spécifie que l'exécutable doit être compilé en tant qu'application 32
+                bits.</p>
+            <code>
+                  $ gcc -march=i686 -m32 bonjour.c</br>
+            </code>
+            <p>Cette commande est similaire à la précédente, mais elle génère également le code assembleur (-S) pour le
+                programme.</p>
+            <code>
+                  $ gcc -S -march=i686 -m32 bonjour.c</br>
+                  $ file ./a.out </br>
+                  &nbsp;./a.out: ELF 32-bit LSB shared object, Intel 80386</br>
+                  </code>
+        </div>
+        <div class="footer">
+            <div class="contact">Principes des Langages de Programmation | John Samuel</div>
+            <div class="navigation">23
+                <a class="prev" href="#slide22"></a>
+                <a class="next" href="#slide24"></a>
+            </div>
+        </div>
+    </section>
+    <section class="slide" id="slide24">
+        <div class="header">
+            <h1>3.1. La chaine de compilation</h1>
+        </div>
+        <div class="content">
+            <h3 class="topicsubheading">5. Code objet</h3>
+            <p>Cette commande compile le fichier source "client.c" en un fichier objet "client.o". L'option -c indique
+                au compilateur de générer uniquement le fichier objet sans produire d'exécutable. Cela permet de diviser
+                le processus de compilation en deux étapes.</p>
+            <code>
+                $ gcc -c client.c </br>
+                $ gcc -c color.c </br>
+            </code>
+            <p>Cette commande prend les fichiers objets "color.o" et "client.o" et les compile en un exécutable nommé
+                "color". Le compilateur lie les fichiers objets pour créer l'exécutable final.</p>
+            <code>
+                $ gcc -o color color.o client.o </br>
+                </code>
+            <p>Cette approche est couramment utilisée pour séparer la compilation en plusieurs étapes, ce qui peut être
+                utile dans des projets plus importants où différentes parties du programme sont gérées séparément avant
+                d'être liées ensemble pour former l'exécutable final.</p>
+        </div>
+        <div class="footer">
+            <div class="contact">Principes des Langages de Programmation | John Samuel</div>
+            <div class="navigation">24
+                <a class="prev" href="#slide23"></a>
+                <a class="next" href="#slide25"></a>
+            </div>
+        </div>
+    </section>
+    <section class="slide" id="slide25">
+        <div class="header">
+            <h1>3.1. La chaine de compilation</h1>
+        </div>
+        <div class="content">
+            <h3>5. Code objet (Modifications et recompilation)</h3>
+            <code>
+		                    $ gcc -c client.c color.c <br>
+                $ gcc -o client client.o color.o <br>
+                $ vim client.c <span style="color: blue"> # Modification du fichier </span><br>
+                $ gcc -c client.c <br>
+                $ vim client.c <span style="color: blue"> # Modification du fichier </span><br>
+                $ gcc -c client.c <br>
+                $ gcc -o client client.o color.o <br>
+                </code>
+            <p>L'objectif de cette séquence de commandes est de compiler des fichiers source en fichiers objet, puis de
+                recompiler le programme avec des modifications apportées au fichier source "client.c". Cela permet de
+                mettre à jour le programme en reflétant les changements apportés au code source sans avoir à recompiler
+                entièrement toutes les sources. Cela peut accélérer le processus de développement en évitant de
+                recompiler inutilement les parties du programme qui n'ont pas changé.
+            </p>
+        </div>
+        <div class="footer">
+            <div class="contact">Principes des Langages de Programmation | John Samuel</div>
+            <div class="navigation">25
+                <a class="prev" href="#slide24"></a>
+                <a class="next" href="#slide26"></a>
+            </div>
+        </div>
+    </section>
+    <section class="slide" id="slide26">
+        <div class="header">
+            <h1>3.2. L’interprétation de Python</h1>
+        </div>
+        <div class="content">
+            <h3>Le processus d’interprétation :</h3>
+            <p>L’interprétation de Python suit un processus multi-étapes qui permet de transformer le code source en
+                exécution sur la machine. Voici les étapes importantes :</p>
+            <ol type="1">
+                <li><strong>Lexing</strong> : Le code source est converti en une séquence de tokens.</li>
+                <li><strong>Parsing</strong> : Les tokens sont organisés en un arbre syntaxique abstrait (AST).</li>
+                <li><strong>Compilation</strong> : L’AST est compilé en bytecode (code intermédiaire).</li>
+                <li><strong>Exécution</strong> : Le bytecode est interprété et exécuté par la machine virtuelle Python
+                    (PVM).</li>
+        </div>
+        <div class="footer">
+            <div class="contact">Principes des Langages de Programmation | John Samuel</div>
+            <div class="navigation">26
+                <a class="prev" href="#slide25"></a>
+                <a class="next" href="#slide27"></a>
+            </div>
+        </div>
+    </section>
+    <section class="slide" id="slide27">
+        <div class="header">
+            <h1>3.2. L’interprétation de Python</h1>
+        </div>
+        <div class="content">
+            <h3>1. <strong>Analyse lexicale (Lexing)</strong></h3>
+            <p>Lors de l’analyse lexicale, le code source (fichier <code>.py</code>) est lu et divisé en
+                <strong>tokens</strong>, les plus petites unités significatives du code. Un token représente
+                généralement des éléments comme :
+            </p>
+            <ul>
+                <li>Les <strong>mots-clés</strong> (par exemple, <code>def</code>, <code>if</code>, <code>else</code>)
+                </li>
+                <li>Les <strong>identificateurs</strong> (noms de variables et fonctions)</li>
+                <li>Les <strong>littéraux</strong> (valeurs numériques, chaînes de caractères, etc.)</li>
+                <li>Les <strong>opérateurs</strong> (comme <code>+</code>, <code>-</code>, <code>=</code>, etc.)</li>
+                <li>Les <strong>séparateurs</strong> (comme les parenthèses <code>()</code>, crochets <code>[]</code>,
+                    etc.)</li>
+            </ul>
+            <p>L’analyse lexicale est gérée par un <strong>lexeur</strong> qui scanne le texte ligne par ligne pour
+                générer des tokens. Si une erreur de syntaxe est trouvée, une exception est levée à ce stade.</p>
+        </div>
+        <div class="footer">
+            <div class="contact">Principes des Langages de Programmation | John Samuel</div>
+            <div class="navigation">27
+                <a class="prev" href="#slide26"></a>
+                <a class="next" href="#slide28"></a>
+            </div>
+        </div>
+    </section>
+    <section class="slide" id="slide28">
+        <div class="header">
+            <h1>3.2. L’interprétation de Python</h1>
+        </div>
+        <div class="content">
+            <h3>1. <strong>Analyse lexicale (Lexing)</strong></h3>
+            <h4 id="exemple">Exemple :</h4>
+            <p>Pour le code <code>x = 5 + 10</code>, les tokens générés seront </p>
+            <ul>
+                <li>Identificateur : <code>x</code></li>
+                <li>Symbole : <code>=</code></li>
+                <li>Nombre : <code>5</code></li>
+                <li>Symbole : <code>+</code></li>
+                <li>Nombre : <code>10</code></li>
+            </ul>
+        </div>
+        <div class="footer">
+            <div class="contact">Principes des Langages de Programmation | John Samuel</div>
+            <div class="navigation">28
+                <a class="prev" href="#slide27"></a>
+                <a class="next" href="#slide29"></a>
+            </div>
+        </div>
+    </section>
+    <section class="slide" id="slide29">
+        <div class="header">
+            <h1>3.2. L’interprétation de Python</h1>
+        </div>
+        <div class="content">
+            <h3>1. <strong>Analyse lexicale (Lexing)</strong></h3>
+            <div class="highlight">
+                <pre><span></span><span class="kn">import</span> <span class="nn">tokenize</span>
+<span class="kn">from</span> <span class="nn">io</span> <span class="kn">import</span> <span class="n">BytesIO</span>
+
+<span class="n">code</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">def somme(a, b):</span>
+<span class="s2">    return a + b</span>
+<span class="s2">&quot;&quot;&quot;</span>
+<span class="c1"># Convertir le code en flux de bytes pour le tokenizer</span>
+<span class="n">code_bytes</span> <span class="o">=</span> <span class="n">BytesIO</span><span class="p">(</span><span class="n">code</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">))</span><span class="o">.</span><span class="n">readline</span>
+<span class="c1"># Tokenizer le code</span>
+<span class="n">tokens</span> <span class="o">=</span> <span class="n">tokenize</span><span class="o">.</span><span class="n">tokenize</span><span class="p">(</span><span class="n">code_bytes</span><span class="p">)</span>
+<span class="c1"># Afficher les tokens</span>
+<span class="k">for</span> <span class="n">token</span> <span class="ow">in</span> <span class="n">tokens</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">token</span><span class="p">)</span>
+</pre>
+            </div>
+        </div>
+        <div class="footer">
+            <div class="contact">Principes des Langages de Programmation | John Samuel</div>
+            <div class="navigation">29
+                <a class="prev" href="#slide28"></a>
+                <a class="next" href="#slide30"></a>
+            </div>
+        </div>
+    </section>
+    <section class="slide" id="slide30">
+        <div class="header">
+            <h1>3.2. L’interprétation de Python</h1>
+        </div>
+        <div class="content">
+            <h3>1. <strong>Analyse lexicale (Lexing)</strong></h3>
+            <div class="highlight">
+                <pre><span></span><span class="n">TokenInfo</span><span class="p">(</span><span class="nb">type</span><span class="o">=</span><span class="mi">63</span> <span class="p">(</span><span class="n">ENCODING</span><span class="p">),</span> <span class="n">string</span><span class="o">=</span><span class="s1">&#39;utf-8&#39;</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="n">end</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="n">line</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
+<span class="n">TokenInfo</span><span class="p">(</span><span class="nb">type</span><span class="o">=</span><span class="mi">62</span> <span class="p">(</span><span class="n">NL</span><span class="p">),</span> <span class="n">string</span><span class="o">=</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="n">end</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="n">line</span><span class="o">=</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+<span class="n">TokenInfo</span><span class="p">(</span><span class="nb">type</span><span class="o">=</span><span class="mi">1</span> <span class="p">(</span><span class="n">NAME</span><span class="p">),</span> <span class="n">string</span><span class="o">=</span><span class="s1">&#39;def&#39;</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="n">end</span><span class="o">=</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span> <span class="n">line</span><span class="o">=</span><span class="s1">&#39;def somme(a, b):</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+<span class="n">TokenInfo</span><span class="p">(</span><span class="nb">type</span><span class="o">=</span><span class="mi">1</span> <span class="p">(</span><span class="n">NAME</span><span class="p">),</span> <span class="n">string</span><span class="o">=</span><span class="s1">&#39;somme&#39;</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">4</span><span class="p">),</span> <span class="n">end</span><span class="o">=</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">9</span><span class="p">),</span> <span class="n">line</span><span class="o">=</span><span class="s1">&#39;def somme(a, b):</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+<span class="n">TokenInfo</span><span class="p">(</span><span class="nb">type</span><span class="o">=</span><span class="mi">54</span> <span class="p">(</span><span class="n">OP</span><span class="p">),</span> <span class="n">string</span><span class="o">=</span><span class="s1">&#39;(&#39;</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">9</span><span class="p">),</span> <span class="n">end</span><span class="o">=</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">10</span><span class="p">),</span> <span class="n">line</span><span class="o">=</span><span class="s1">&#39;def somme(a, b):</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+<span class="n">TokenInfo</span><span class="p">(</span><span class="nb">type</span><span class="o">=</span><span class="mi">1</span> <span class="p">(</span><span class="n">NAME</span><span class="p">),</span> <span class="n">string</span><span class="o">=</span><span class="s1">&#39;a&#39;</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">10</span><span class="p">),</span> <span class="n">end</span><span class="o">=</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">11</span><span class="p">),</span> <span class="n">line</span><span class="o">=</span><span class="s1">&#39;def somme(a, b):</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+<span class="n">TokenInfo</span><span class="p">(</span><span class="nb">type</span><span class="o">=</span><span class="mi">54</span> <span class="p">(</span><span class="n">OP</span><span class="p">),</span> <span class="n">string</span><span class="o">=</span><span class="s1">&#39;,&#39;</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">11</span><span class="p">),</span> <span class="n">end</span><span class="o">=</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">12</span><span class="p">),</span> <span class="n">line</span><span class="o">=</span><span class="s1">&#39;def somme(a, b):</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+<span class="n">TokenInfo</span><span class="p">(</span><span class="nb">type</span><span class="o">=</span><span class="mi">1</span> <span class="p">(</span><span class="n">NAME</span><span class="p">),</span> <span class="n">string</span><span class="o">=</span><span class="s1">&#39;b&#39;</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">13</span><span class="p">),</span> <span class="n">end</span><span class="o">=</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">14</span><span class="p">),</span> <span class="n">line</span><span class="o">=</span><span class="s1">&#39;def somme(a, b):</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+<span class="n">TokenInfo</span><span class="p">(</span><span class="nb">type</span><span class="o">=</span><span class="mi">54</span> <span class="p">(</span><span class="n">OP</span><span class="p">),</span> <span class="n">string</span><span class="o">=</span><span class="s1">&#39;)&#39;</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">14</span><span class="p">),</span> <span class="n">end</span><span class="o">=</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">15</span><span class="p">),</span> <span class="n">line</span><span class="o">=</span><span class="s1">&#39;def somme(a, b):</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+<span class="n">TokenInfo</span><span class="p">(</span><span class="nb">type</span><span class="o">=</span><span class="mi">54</span> <span class="p">(</span><span class="n">OP</span><span class="p">),</span> <span class="n">string</span><span class="o">=</span><span class="s1">&#39;:&#39;</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">15</span><span class="p">),</span> <span class="n">end</span><span class="o">=</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">16</span><span class="p">),</span> <span class="n">line</span><span class="o">=</span><span class="s1">&#39;def somme(a, b):</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+<span class="n">TokenInfo</span><span class="p">(</span><span class="nb">type</span><span class="o">=</span><span class="mi">4</span> <span class="p">(</span><span class="n">NEWLINE</span><span class="p">),</span> <span class="n">string</span><span class="o">=</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">16</span><span class="p">),</span> <span class="n">end</span><span class="o">=</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">17</span><span class="p">),</span> <span class="n">line</span><span class="o">=</span><span class="s1">&#39;def somme(a, b):</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+<span class="n">TokenInfo</span><span class="p">(</span><span class="nb">type</span><span class="o">=</span><span class="mi">5</span> <span class="p">(</span><span class="n">INDENT</span><span class="p">),</span> <span class="n">string</span><span class="o">=</span><span class="s1">&#39;    &#39;</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="n">end</span><span class="o">=</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">),</span> <span class="n">line</span><span class="o">=</span><span class="s1">&#39;    return a + b</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+<span class="n">TokenInfo</span><span class="p">(</span><span class="nb">type</span><span class="o">=</span><span class="mi">1</span> <span class="p">(</span><span class="n">NAME</span><span class="p">),</span> <span class="n">string</span><span class="o">=</span><span class="s1">&#39;return&#39;</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">),</span> <span class="n">end</span><span class="o">=</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">10</span><span class="p">),</span> <span class="n">line</span><span class="o">=</span><span class="s1">&#39;    return a + b</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+</pre>
+            </div>
+        </div>
+        <div class="footer">
+            <div class="contact">Principes des Langages de Programmation | John Samuel</div>
+            <div class="navigation">30
+                <a class="prev" href="#slide29"></a>
+                <a class="next" href="#slide31"></a>
+            </div>
+        </div>
+    </section>
+    <section class="slide" id="slide31">
+        <div class="header">
+            <h1>3.2. L’interprétation de Python</h1>
+        </div>
+        <div class="content">
+            <h3>1. <strong>Analyse lexicale (Lexing)</strong></h3>
+            <p>Inspecter les tokens à partir d'un fichier</p>
+            <div class="highlight">
+                <pre><span></span><span class="kn">import</span> <span class="nn">tokenize</span>
+
+<span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s1">&#39;bonjour.py&#39;</span><span class="p">,</span> <span class="s1">&#39;rb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fichier</span><span class="p">:</span>
+    <span class="n">tokens</span> <span class="o">=</span> <span class="n">tokenize</span><span class="o">.</span><span class="n">tokenize</span><span class="p">(</span><span class="n">fichier</span><span class="o">.</span><span class="n">readline</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">token</span> <span class="ow">in</span> <span class="n">tokens</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">token</span><span class="p">)</span>
+</pre>
+            </div>
+        </div>
+        <div class="footer">
+            <div class="contact">Principes des Langages de Programmation | John Samuel</div>
+            <div class="navigation">31
+                <a class="prev" href="#slide30"></a>
+                <a class="next" href="#slide32"></a>
+            </div>
+        </div>
+    </section>
+    <section class="slide" id="slide32">
+        <div class="header">
+            <h1>3.2. L’interprétation de Python</h1>
+        </div>
+        <div class="content">
+            <h3>2. <strong>Analyse syntaxique (Parsing)</strong></h3>
+            <p>Une fois les tokens générés, ils sont passés à l’analyse syntaxique qui construit un <strong>arbre
+                    syntaxique abstrait (AST)</strong>. L’AST représente la structure hiérarchique du programme en
+                termes de nœuds.</p>
+            <p>Chaque nœud de l’AST correspond à une construction syntaxique dans le code source, comme une affectation,
+                une fonction, ou une boucle. Le rôle de l’analyse syntaxique est de vérifier que les tokens respectent
+                les règles syntaxiques du langage Python (par exemple, l’ordre des déclarations, l’utilisation correcte
+                des parenthèses, etc.).</p>
+        </div>
+        <div class="footer">
+            <div class="contact">Principes des Langages de Programmation | John Samuel</div>
+            <div class="navigation">32
+                <a class="prev" href="#slide31"></a>
+                <a class="next" href="#slide33"></a>
+            </div>
+        </div>
+    </section>
+    <section class="slide" id="slide33">
+        <div class="header">
+            <h1>3.2. L’interprétation de Python</h1>
+        </div>
+        <div class="content">
+            <h3>2. <strong>Analyse syntaxique (Parsing)</strong></h3>
+            <h4 id="exemple-1">Exemple :</h4>
+            <p>Pour <code>x = 5 + 10</code>, l’AST pourrait ressembler à ceci :</p>
+            <p><code>Assign</code> (Affectation) </p>
+            <ul>
+                <li><code>Target</code>: <code>x</code> (variable)</li>
+                <li><code>Value</code>: <code>Add</code> (addition)
+                    <ul>
+                        <li><code>5</code> (nombre)</li>
+                        <li><code>10</code> (nombre)</li>
+                    </ul>
+                </li>
+            </ul>
+            <p>Si une erreur syntaxique est détectée (comme des parenthèses mal fermées), une <strong>erreur de
+                    syntaxe</strong> est levée ici.</p>
+        </div>
+        <div class="footer">
+            <div class="contact">Principes des Langages de Programmation | John Samuel</div>
+            <div class="navigation">33
+                <a class="prev" href="#slide32"></a>
+                <a class="next" href="#slide34"></a>
+            </div>
+        </div>
+    </section>
+    <section class="slide" id="slide34">
+        <div class="header">
+            <h1>3.2. L’interprétation de Python</h1>
+        </div>
+        <div class="content">
+            <h3>2. <strong>Analyse syntaxique (Parsing)</strong></h3>
+            <div class="highlight">
+                <pre><span></span><span class="kn">import</span> <span class="nn">ast</span>
+<span class="kn">import</span> <span class="nn">astpretty</span>
+
+<span class="n">code</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">def somme(a, b):</span>
+<span class="s2">    return a + b</span>
+<span class="s2">&quot;&quot;&quot;</span>
+
+<span class="c1"># Parser le code en AST</span>
+<span class="n">arbre</span> <span class="o">=</span> <span class="n">ast</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">code</span><span class="p">)</span>
+
+<span class="c1"># Afficher l&#39;AST avec indentation</span>
+<span class="n">astpretty</span><span class="o">.</span><span class="n">pprint</span><span class="p">(</span><span class="n">arbre</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
+</pre>
+            </div>
+        </div>
+        <div class="footer">
+            <div class="contact">Principes des Langages de Programmation | John Samuel</div>
+            <div class="navigation">34
+                <a class="prev" href="#slide33"></a>
+                <a class="next" href="#slide35"></a>
+            </div>
+        </div>
+    </section>
+    <section class="slide" id="slide35">
+        <div class="header">
+            <h1>3.2. L’interprétation de Python</h1>
+        </div>
+        <div class="content">
+            <h3>2. <strong>Analyse syntaxique (Parsing)</strong></h3>
+            <div class="highlight">
+                <pre><span></span><span class="n">Module</span><span class="p">(</span>
+    <span class="n">body</span><span class="o">=</span><span class="p">[</span>
+        <span class="n">FunctionDef</span><span class="p">(</span>
+            <span class="n">lineno</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+            <span class="n">col_offset</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+            <span class="n">end_lineno</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
+            <span class="n">end_col_offset</span><span class="o">=</span><span class="mi">16</span><span class="p">,</span>
+            <span class="n">name</span><span class="o">=</span><span class="s1">&#39;somme&#39;</span><span class="p">,</span>
+            <span class="n">args</span><span class="o">=</span><span class="n">arguments</span><span class="p">(</span>
+                <span class="n">posonlyargs</span><span class="o">=</span><span class="p">[],</span>
+                <span class="n">args</span><span class="o">=</span><span class="p">[</span>
+                    <span class="n">arg</span><span class="p">(</span><span class="n">lineno</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">col_offset</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">end_lineno</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">end_col_offset</span><span class="o">=</span><span class="mi">11</span><span class="p">,</span> <span class="n">arg</span><span class="o">=</span><span class="s1">&#39;a&#39;</span><span class="p">,</span> <span class="n">annotation</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">type_comment</span><span class="o">=</span><span class="kc">None</span><span class="p">),</span>
+                    <span class="n">arg</span><span class="p">(</span><span class="n">lineno</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">col_offset</span><span class="o">=</span><span class="mi">13</span><span class="p">,</span> <span class="n">end_lineno</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">end_col_offset</span><span class="o">=</span><span class="mi">14</span><span class="p">,</span> <span class="n">arg</span><span class="o">=</span><span class="s1">&#39;b&#39;</span><span class="p">,</span> <span class="n">annotation</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">type_comment</span><span class="o">=</span><span class="kc">None</span><span class="p">),</span>
+                <span class="p">],</span>
+</pre>
+            </div>
+        </div>
+        <div class="footer">
+            <div class="contact">Principes des Langages de Programmation | John Samuel</div>
+            <div class="navigation">35
+                <a class="prev" href="#slide34"></a>
+                <a class="next" href="#slide36"></a>
+            </div>
+        </div>
+    </section>
+    <section class="slide" id="slide36">
+        <div class="header">
+            <h1>3.2. L’interprétation de Python</h1>
+        </div>
+        <div class="content">
+            <h3>3. <strong>Compilation en bytecode</strong></h3>
+            <p>Une fois l’AST validé, Python compile cet arbre en <strong>bytecode</strong>, un ensemble d’instructions
+                de bas niveau que la machine virtuelle Python peut exécuter. Le bytecode est indépendant de la machine,
+                ce qui permet à Python d’être portable sur différentes plateformes (Windows, Linux, macOS, etc.).</p>
+            <p>Le bytecode est stocké dans des fichiers <strong><code>.pyc</code></strong> (ou <code>.pyo</code> pour
+                les fichiers optimisés) dans un répertoire <code>__pycache__</code>. Ces fichiers permettent d’éviter
+                une recompilation lors des exécutions ultérieures, accélérant ainsi le démarrage des programmes.</p>
+        </div>
+        <div class="footer">
+            <div class="contact">Principes des Langages de Programmation | John Samuel</div>
+            <div class="navigation">36
+                <a class="prev" href="#slide35"></a>
+                <a class="next" href="#slide37"></a>
+            </div>
+        </div>
+    </section>
+    <section class="slide" id="slide37">
+        <div class="header">
+            <h1>3.2. L’interprétation de Python</h1>
+        </div>
+        <div class="content">
+            <h3>3. <strong>Compilation en bytecode</strong></h3>
+            <h4 id="exemple-de-bytecode-simplifié">Exemple de bytecode (simplifié) :</h4>
+            <p>Pour <code>x = 5 + 10</code>, le bytecode pourrait ressembler à ceci :</p>
+            <p><code>LOAD_CONST 5</code>
+                <br><code>LOAD_CONST 10</code>
+                <br> <code>BINARY_ADD</code>
+                <br><code>STORE_NAME x</code>
+            </p>
+        </div>
+        <div class="footer">
+            <div class="contact">Principes des Langages de Programmation | John Samuel</div>
+            <div class="navigation">37
+                <a class="prev" href="#slide36"></a>
+                <a class="next" href="#slide38"></a>
+            </div>
+        </div>
+    </section>
+    <section class="slide" id="slide38">
+        <div class="header">
+            <h1>3.2. L’interprétation de Python</h1>
+        </div>
+        <div class="content">
+            <h3>3. <strong>Compilation en bytecode</strong></h3>
+            <p>Vous pouvez voir le bytecode généré pour un script en utilisant le module
+                <strong><code>dis</code></strong> :
+            </p>
+            <div class="highlight">
+                <pre><span></span><span class="kn">import</span> <span class="nn">dis</span>
+<span class="k">def</span> <span class="nf">somme</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">a</span> <span class="o">+</span> <span class="n">b</span>
+
+<span class="n">dis</span><span class="o">.</span><span class="n">dis</span><span class="p">(</span><span class="n">somme</span><span class="p">)</span>
+</pre>
+            </div>
+        </div>
+        <div class="footer">
+            <div class="contact">Principes des Langages de Programmation | John Samuel</div>
+            <div class="navigation">38
+                <a class="prev" href="#slide37"></a>
+                <a class="next" href="#slide39"></a>
+            </div>
+        </div>
+    </section>
+    <section class="slide" id="slide39">
+        <div class="header">
+            <h1>3.2. L’interprétation de Python</h1>
+        </div>
+        <div class="content">
+            <h3>3. <strong>Compilation en bytecode</strong></h3>
+            <div class="highlight">
+                <pre><span></span>  3           0 LOAD_FAST                0 (a)
+              2 LOAD_FAST                1 (b)
+              4 BINARY_ADD
+              6 RETURN_VALUE
+</pre>
+            </div>
+        </div>
+        <div class="footer">
+            <div class="contact">Principes des Langages de Programmation | John Samuel</div>
+            <div class="navigation">39
+                <a class="prev" href="#slide38"></a>
+                <a class="next" href="#slide40"></a>
+            </div>
+        </div>
+    </section>
+    <section class="slide" id="slide40">
+        <div class="header">
+            <h1>3.2. L’interprétation de Python</h1>
+        </div>
+        <div class="content">
+            <h3>4. <strong>Exécution par la machine virtuelle Python (PVM)</strong></h3>
+            <p>Le bytecode généré est ensuite exécuté par la <strong>machine virtuelle Python (PVM)</strong>, qui est
+                une boucle d’interprétation lisant les instructions du bytecode et les exécutant une par une.</p>
+            <p>La PVM gère des tâches comme : - L’allocation de la mémoire pour les variables et objets - L’exécution
+                des opérations (comme les calculs mathématiques ou les appels de fonctions) - La gestion du contrôle de
+                flux (boucles, conditions, etc.)</p>
+            <p>La machine virtuelle Python fait abstraction du matériel sous-jacent (processeur, architecture, etc.), ce
+                qui garantit la portabilité de Python sur diverses plateformes.</p>
+        </div>
+        <div class="footer">
+            <div class="contact">Principes des Langages de Programmation | John Samuel</div>
+            <div class="navigation">40
+                <a class="prev" href="#slide39"></a>
+                <a class="next" href="#slide41"></a>
+            </div>
+        </div>
+    </section>
+    <section class="slide" id="slide41">
+        <div class="header">
+            <h1>3.2. L’interprétation de Python</h1>
+        </div>
+        <div class="content">
+            <h3>5. <strong>Gestion des exceptions</strong></h3>
+            <p>Pendant l’exécution, Python surveille constamment les erreurs à l’aide de son <strong>gestionnaire
+                    d’exceptions</strong>. Si une erreur se produit (comme une division par zéro ou une tentative
+                d’accès à une variable non définie), une exception est levée. Si elle n’est pas capturée par un bloc
+                <code>try-except</code>, le programme s’arrête et affiche une trace d’erreur.
+            </p>
+        </div>
+        <div class="footer">
+            <div class="contact">Principes des Langages de Programmation | John Samuel</div>
+            <div class="navigation">41
+                <a class="prev" href="#slide40"></a>
+                <a class="next" href="#slide42"></a>
+            </div>
+        </div>
+    </section>
+    <section class="slide" id="slide42">
+        <div class="header">
+            <h1>3.2. L’interprétation de Python</h1>
+        </div>
+        <div class="content">
+            <h3>6. <strong>Collecte des objets non utilisés (Garbage Collection)</strong></h3>
+            <p>Python utilise un mécanisme de <strong>ramasse-miettes</strong> (garbage collector) pour gérer la
+                mémoire. Lorsque des objets ne sont plus utilisés (aucune référence active à eux), Python libère
+                automatiquement la mémoire qu’ils occupent. Cela se fait en arrière-plan pendant l’exécution du
+                programme et garantit que la mémoire est utilisée efficacement.</p>
+        </div>
+        <div class="footer">
+            <div class="contact">Principes des Langages de Programmation | John Samuel</div>
+            <div class="navigation">42
+                <a class="prev" href="#slide41"></a>
+                <a class="next" href="#slide43"></a>
+            </div>
+        </div>
+    </section>
+    <section class="slide" id="slide43">
+        <div class="header">
+            <h1>3.2. L’interprétation de Python</h1>
+        </div>
+        <div class="content">
+            <h3><strong>Exécution avec des débogueurs</strong></h3>
+            <div class="highlight">
+                <pre><span></span><span class="kn">import</span> <span class="nn">pdb</span>
+
+<span class="k">def</span> <span class="nf">somme</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">):</span>
+    <span class="n">pdb</span><span class="o">.</span><span class="n">set_trace</span><span class="p">()</span>  <span class="c1"># Déclencher le débogueur ici</span>
+    <span class="k">return</span> <span class="n">a</span> <span class="o">+</span> <span class="n">b</span>
+
+<span class="c1"># Appel de la fonction</span>
+<span class="n">somme</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span>
+</pre>
+            </div>
+        </div>
+        <div class="footer">
+            <div class="contact">Principes des Langages de Programmation | John Samuel</div>
+            <div class="navigation">43
+                <a class="prev" href="#slide42"></a>
+                <a class="next" href="#slide44"></a>
+            </div>
+        </div>
+    </section>
+    <section class="slide" id="slide44">
+        <div class="header">
+            <h1>3.2. L’interprétation de Python</h1>
+        </div>
+        <div class="content">
+            <h3><strong>Bytecode Python précompilé</strong></h3>
+            <p>Les fichiers <code>.pyc</code> sont des fichiers contenant le bytecode Python précompilé, et ils sont
+                générés automatiquement par Python lors de l'exécution d'un script pour accélérer les futures
+                exécutions. </p>
+            <div class="highlight">
+                <pre><span></span>python -m py_compile mon_script.py
+</pre>
+            </div>
+            <p>Les fichiers <code>.pyc</code> sont généralement stockés dans un dossier nommé <code>__pycache__</code>
+                dans le même répertoire que le fichier source. Leur nom inclut une partie indiquant la version de Python
+                utilisée, par exemple <code>mon_script.cpython-310.pyc</code> pour Python 3.10.</p>
+            <p>Pour exécuter un fichier <code>.pyc</code>, vous pouvez utiliser directement la commande python en
+                spécifiant le fichier </code>.pyc</code>.</p>
+            <div class="highlight">
+                <pre><span></span>python __pycache__/mon_script.cpython-310.pyc
+</pre>
+            </div>
+        </div>
+        <div class="footer">
+            <div class="contact">Principes des Langages de Programmation | John Samuel</div>
+            <div class="navigation">44
+                <a class="prev" href="#slide43"></a>
+                <a class="next" href="#slide45"></a>
+            </div>
+        </div>
+    </section>
+    <section class="slide" id="slide45">
+        <div class="header">
+            <h1>3. Principes des Langages de Programmation : Références</h1>
+        </div>
+        <div class="content">
+            <h1>Références</h1>
+            <ul>
+                <li>Langage C, Claude Delannoy</li>
+                <li><a
+                        href="https://fr.wikipedia.org/wiki/Alignement_en_m%C3%A9moire">https://fr.wikipedia.org/wiki/Alignement_en_mémoire</a>
+                </li>
+                <li><a href="https://fr.wikipedia.org/wiki/Compilateur">https://fr.wikipedia.org/wiki/Compilateur</a>
+                </li>
+                <li><a
+                        href="https://fr.wikipedia.org/wiki/G%C3%A9n%C3%A9ration_de_code_natif">https://fr.wikipedia.org/wiki/G%C3%A9n%C3%A9ration_de_code_natif</a>
+                </li>
+            </ul>
+            <h1>Crédits d'images</h1>
+            <ul>
+                <li><a href="https://commons.wikimedia.org/wiki/Main_Page">Wikimedia Commons</a></li>
+            </ul>
+        </div>
+        <div class="footer">
+            <div class="contact">Principes des Langages de Programmation | John Samuel</div>
+            <div class="navigation">45
+                <a class="prev" href="#slide44"></a>
+            </div>
+        </div>
+    </section>
+
+    <script>
+        function changeCurrentURLSlideNumber(isIncrement) {
+            url = window.location.href;
+            position = url.indexOf("#slide");
+            if (position != -1) { // Not on the first page
+                slideIdString = url.substr(position + 6);
+                if (!Number.isNaN(slideIdString)) {
+                    slideId = parseInt(slideIdString);
+                    if (isIncrement) {
+                        if (slideId < 45) {
+                            slideId = slideId + 1;
+                        }
+                    } else {
+                        if (slideId > 1) {
+                            slideId = slideId - 1;
+                        }
+                    }
+                    url = url.replace(/#slide\d+/g, "#slide" + slideId);
+                    window.location.href = url;
+                }
+            } else {
+                window.location.href = url + "#slide2";
+            }
+        }
+        document.onkeydown = function (event) {
+
+            event.preventDefault();
+            /* This will ensure the default behavior of
+                                                            page scroll behaviour (up, down, right, left)*/
+
+            event = event || window.event;
+            if (event.keyCode == '37') {
+                // left
+                changeCurrentURLSlideNumber(false);
+            } else if (event.keyCode == '38') {
+                // up
+                changeCurrentURLSlideNumber(false);
+            } else if (event.keyCode == '39') {
+                // right
+                changeCurrentURLSlideNumber(true);
+            } else if (event.keyCode == '40') {
+                // down
+                changeCurrentURLSlideNumber(true);
+            }
+        }
+        document.body.onmouseup = function (event) {
+            event = event || window.event;
+            event.preventDefault();
+            changeCurrentURLSlideNumber(true);
+        }
+    </script>
+</body>
+
+</html>

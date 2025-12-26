@@ -1,0 +1,1062 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+    <head>
+        <meta charset="UTF-8">
+        <link rel="shortcut icon" href="../../../../../images/logo/favicon.png" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Approfondissement Python - Traitement de données : Introduction (2025-2026): John Samuel</title>
+        <style>
+            * {
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
+            }
+
+            :root {
+                --bg-primary: #f0f4ff;
+                --bg-secondary: #ffffff;
+                --accent-primary: #4f46e5;
+                --accent-secondary: #06b6d4;
+                --accent-tertiary: #8b5cf6;
+                --text-primary: #1e293b;
+                --text-secondary: #475569;
+                --header-bg: linear-gradient(135deg, #4f46e5 0%, #06b6d4 100%);
+                --footer-bg: linear-gradient(135deg, #4f46e5 0%, #06b6d4 100%);
+            }
+
+            body {
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+                background: var(--bg-primary);
+                color: var(--text-primary);
+                margin: 0;
+                overflow: hidden;
+                height: 100vh;
+                width: 100vw;
+            }
+
+            .slide {
+                height: 100vh;
+                width: 100vw;
+                display: flex;
+                flex-direction: column;
+            }
+
+            /* Header */
+            .header {
+                background: var(--header-bg);
+                color: white;
+                height: 10vh;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                box-shadow: 0 4px 20px rgba(79, 70, 229, 0.2);
+                position: relative;
+                overflow: hidden;
+            }
+
+            .header::before {
+                content: '';
+                position: absolute;
+                top: -50%;
+                right: -10%;
+                width: 300px;
+                height: 300px;
+                background: rgba(255, 255, 255, 0.1);
+                border-radius: 50%;
+                animation: float 6s ease-in-out infinite;
+            }
+
+            .header::after {
+                content: '';
+                position: absolute;
+                bottom: -30%;
+                left: -5%;
+                width: 200px;
+                height: 200px;
+                background: rgba(255, 255, 255, 0.08);
+                border-radius: 50%;
+                animation: float 8s ease-in-out infinite reverse;
+            }
+
+            .header h1 {
+                font-size: 3vmax;
+                font-weight: 700;
+                letter-spacing: -0.02em;
+                text-align: center;
+                margin: 0;
+                padding: 0 2rem;
+                position: relative;
+                z-index: 1;
+            }
+
+            /* Content */
+            .content {
+                flex: 1;
+                padding: 3vh 4vw;
+                overflow-y: auto;
+                display: flex;
+                flex-direction: column;
+                justify-content: flex-start;
+                font-size: 1.4vmax;
+                line-height: 1.7;
+            }
+
+            .content h1 {
+                font-size: 3vmax;
+                color: var(--accent-primary);
+                margin-bottom: 2vh;
+                font-weight: 700;
+                letter-spacing: -0.02em;
+            }
+
+            .content h2 {
+                font-size: 2.5vmax;
+                color: var(--accent-secondary);
+                margin-bottom: 1.5vh;
+                font-weight: 600;
+            }
+
+            .content h3 {
+                font-size: 2vmax;
+                color: var(--accent-tertiary);
+                margin-bottom: 1vh;
+                font-weight: 600;
+            }
+
+            .content h4 {
+                font-size: 1.8vmax;
+                color: var(--accent-primary);
+                margin-bottom: 1vh;
+                font-weight: 600;
+            }
+
+            .content ul {
+                list-style: none;
+                padding-left: 0;
+                margin: 1.5vh 0;
+            }
+
+            .content li {
+                padding: 1vh 0 1vh 2.5vw;
+                position: relative;
+                line-height: 1.7;
+            }
+
+            .content li::before {
+                content: '▸';
+                position: absolute;
+                left: 0.5vw;
+                color: var(--accent-primary);
+                font-size: 1.5vmax;
+                font-weight: 700;
+            }
+
+            .content ul ul {
+                margin-left: 2vw;
+            }
+
+            .content ul ul li::before {
+                content: '◦';
+                color: var(--accent-secondary);
+            }
+
+            /* Topic Headings */
+            .topicheading {
+                background: var(--header-bg);
+                color: white !important;
+                padding: 1.5vh 2vw;
+                border-radius: 0 2vmax 2vmax 0;
+                margin: 2vh 0 2vh -2vw;
+                font-size: 2.2vmax !important;
+                font-weight: 700 !important;
+                width: 60%;
+                display: flex;
+                align-items: center;
+                box-shadow: 0 4px 15px rgba(79, 70, 229, 0.2);
+            }
+
+            .topicsubheading {
+                background: linear-gradient(135deg, #8b5cf6 0%, #ec4899 100%);
+                color: white !important;
+                padding: 1vh 2vw;
+                border-radius: 0 1.5vmax 1.5vmax 0;
+                margin: 1.5vh 0 1.5vh -2vw;
+                font-size: 1.8vmax !important;
+                font-weight: 600 !important;
+                width: 50%;
+                box-shadow: 0 4px 12px rgba(139, 92, 246, 0.2);
+            }
+
+            /* Tables */
+            .content table {
+                width: 90%;
+                margin: 3vh auto;
+                border-collapse: separate;
+                border-spacing: 0 1vh;
+            }
+
+            .content th {
+                background: var(--header-bg);
+                color: white;
+                padding: 2vh 2vw;
+                font-size: 1.6vmax;
+                font-weight: 600;
+                text-align: left;
+                border-radius: 1.5vmax;
+                box-shadow: 0 4px 12px rgba(79, 70, 229, 0.2);
+            }
+
+            .content td {
+                background: var(--bg-secondary);
+                color: var(--text-primary);
+                padding: 2vh 2vw;
+                border-radius: 1.5vmax;
+                box-shadow: 0 2px 8px rgba(79, 70, 229, 0.08);
+                border: 2px solid rgba(79, 70, 229, 0.1);
+                transition: all 0.3s ease;
+            }
+
+            .content tr:hover td {
+                transform: translateY(-2px);
+                box-shadow: 0 4px 15px rgba(79, 70, 229, 0.15);
+            }
+
+            /* Figures */
+            .content figure {
+                text-align: center;
+                margin: 3vh auto;
+                max-width: 90%;
+            }
+
+            .content figure img {
+                max-width: 50vmin;
+                max-height: 50vmin;
+                border-radius: 1.5vmax;
+                box-shadow: 0 8px 24px rgba(79, 70, 229, 0.15);
+                transition: transform 0.3s ease;
+            }
+
+            .content figure img:hover {
+                transform: scale(1.05);
+            }
+
+            .content figure figcaption {
+                margin-top: 1.5vh;
+                padding: 1vh 2vw;
+                background: rgba(79, 70, 229, 0.08);
+                border-radius: 1vmax;
+                font-size: 1.2vmax;
+                color: var(--text-secondary);
+            }
+
+            /* Code blocks */
+            .content code {
+                display: block;
+                background: #1e293b;
+                color: #10b981;
+                padding: 2vh 2vw;
+                border-radius: 1.5vmax;
+                font-family: 'Courier New', monospace;
+                font-size: 1.3vmax;
+                line-height: 1.6;
+                margin: 2vh 0;
+                box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+                overflow-x: auto;
+            }
+
+            .content code pre {
+                margin: 0;
+                white-space: pre-wrap;
+            }
+
+            .content a {
+                color: var(--accent-primary);
+                text-decoration: none;
+                font-weight: 600;
+                transition: all 0.3s ease;
+                border-bottom: 2px solid transparent;
+            }
+
+            .content a:hover {
+                border-bottom-color: var(--accent-primary);
+            }
+
+            /* Flexcontent for side-by-side layouts */
+            .flexcontent {
+                display: flex;
+                gap: 3vw;
+                align-items: flex-start;
+                flex-wrap: wrap;
+                margin: 2vh 0;
+            }
+
+            .flexcontent figure {
+                flex: 0 0 30vw;
+            }
+
+            .flexcontent ul {
+                flex: 1;
+                min-width: 40vw;
+            }
+
+            /* Footer */
+            .footer {
+                background: var(--footer-bg);
+                color: white;
+                height: 6vh;
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                padding: 0 3vw;
+                box-shadow: 0 -4px 20px rgba(79, 70, 229, 0.2);
+                position: relative;
+            }
+
+            .footer .contact {
+                font-size: 1.3vmax;
+                font-weight: 500;
+            }
+
+            .footer .navigation {
+                display: flex;
+                align-items: center;
+                gap: 2vw;
+                font-size: 1.4vmax;
+                font-weight: 600;
+            }
+
+            .footer .navigation a {
+                color: white;
+                text-decoration: none;
+                font-size: 2vmax;
+                transition: all 0.3s ease;
+                padding: 0.5vh 1vw;
+                border-radius: 0.5vmax;
+            }
+
+            .footer .navigation a:hover {
+                background: rgba(255, 255, 255, 0.2);
+                transform: scale(1.1);
+            }
+
+            .footer .navigation .prev::before {
+                content: "◀ ";
+            }
+
+            .footer .navigation .next::after {
+                content: " ▶";
+            }
+
+            /* First slide special styling */
+            #slide1 .content {
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                align-items: center;
+                text-align: center;
+            }
+
+            #slide1 h1 {
+                font-size: 4vmax;
+                background: var(--header-bg);
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                background-clip: text;
+                margin-bottom: 2vh;
+            }
+
+            #slide1 h2 {
+                font-size: 2.5vmax;
+                color: var(--accent-tertiary);
+                margin-bottom: 3vh;
+            }
+
+            #slide1 p {
+                font-size: 1.5vmax;
+                line-height: 2;
+                max-width: 60vw;
+            }
+
+            #slide1 b {
+                color: var(--accent-primary);
+                font-weight: 700;
+            }
+
+            #slide1 img {
+                margin-top: 2vh;
+                border-radius: 1vmax;
+            }
+
+            /* Portrait image styling */
+            .content img[src*="portrait"] {
+                border-radius: 50%;
+                border: 4px solid var(--accent-primary);
+                box-shadow: 0 8px 24px rgba(79, 70, 229, 0.3);
+            }
+
+            /* Highlight syntax */
+            .highlight {
+                background: #1e293b;
+                padding: 0.2em 0.4em;
+                border-radius: 0.3em;
+            }
+
+            .highlight .k {
+                color: #06b6d4;
+                font-weight: bold;
+            }
+
+            .highlight .s1,
+            .highlight .s2 {
+                color: #10b981;
+            }
+
+            .highlight .nn,
+            .highlight .nb {
+                color: #8b5cf6;
+            }
+
+            .highlight .mi,
+            .highlight .mf {
+                color: #f59e0b;
+            }
+
+            /* Animations */
+            @keyframes float {
+
+                0%,
+                100% {
+                    transform: translateY(0) rotate(0deg);
+                }
+
+                50% {
+                    transform: translateY(-20px) rotate(5deg);
+                }
+            }
+
+            @keyframes fadeIn {
+                from {
+                    opacity: 0;
+                    transform: translateY(20px);
+                }
+
+                to {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            }
+
+            .slide {
+                animation: fadeIn 0.5s ease-out;
+            }
+
+            /* Responsive */
+            @media (max-width: 768px) {
+                .header h1 {
+                    font-size: 4vmax;
+                }
+
+                .content {
+                    font-size: 2vmax;
+                    padding: 2vh 3vw;
+                }
+
+                .content h1 {
+                    font-size: 4vmax;
+                }
+
+                .topicheading {
+                    width: 90%;
+                    font-size: 3vmax !important;
+                }
+
+                .topicsubheading {
+                    width: 80%;
+                    font-size: 2.5vmax !important;
+                }
+
+                .flexcontent {
+                    flex-direction: column;
+                }
+
+                .flexcontent figure,
+                .flexcontent ul {
+                    flex: 1 1 100%;
+                    width: 100%;
+                }
+
+                .footer .contact {
+                    font-size: 2vmax;
+                }
+
+                .footer .navigation {
+                    font-size: 2.5vmax;
+                }
+            }
+
+            @media print {
+                .slide {
+                    page-break-after: always;
+                }
+            }
+        </style>
+    </head>
+
+    <body>
+        <section class="slide" id="slide1">
+            <div class="header"></div>
+            <div class="content">
+                <h1>Approfondissement Python : Traitement de données</h1>
+                <h2>PSM</h2>
+                <p><b>John Samuel</b><br>
+                    CPE Lyon<br><br>
+                    <b>Année</b>: 2025-2026<br>
+                    <b>Courriel</b>: john.samuel@cpe.fr<br><br>
+                    <a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/">
+                        <img alt="Creative Commons License" style="border-width:0"
+                            src="../../../../../en/teaching/courses/2017/C/88x31.png" />
+                    </a>
+                </p>
+            </div>
+            <div class="footer">
+                <div class="contact">Approfondissement Python - Traitement de données | John Samuel</div>
+                <div class="navigation">1
+                    <a class="next" href="#slide2"></a>
+                </div>
+            </div>
+        </section>
+
+        <section class="slide" id="slide2">
+            <div class="header">
+                <h1>John SAMUEL</h1>
+            </div>
+            <div class="content">
+                <div class="flexcontent">
+                    <figure style="width:30vw">
+                        <img src="../../../../../images/portrait.jpg" width="300vw" style="background:#ffffff"
+                            alt="portrait auteur" />
+                    </figure>
+                    <ul style="width:40vw">
+                        <li><b>Enseignant-Chercheur</b>, Conception Logicielle et Big Data, CPE Lyon</li>
+                        <li><b>Intérêts et thèmes de recherche</b>: Représentation de connaissances, le web sémantique,
+                            les services web, l'intégration de données, l'entrepôt de données, les systèmes distribués,
+                            système d'information géographique</li>
+                        <li><b>Cours</b>: Programmation en C, Algorithmes en C, Data Mining et Machine Learning,
+                            Intelligence Artificielle et Deep Learning, Systèmes d'exploitation et Programmation
+                            Concurrente, Langages Web</li>
+                        <li><b>Thèse</b>: Intégration des données issues de services web</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer">
+                <div class="contact">Approfondissement Python - Traitement de données | John Samuel</div>
+                <div class="navigation">2
+                    <a class="prev" href="#slide1"></a>
+                    <a class="next" href="#slide3"></a>
+                </div>
+            </div>
+        </section>
+
+        <section class="slide" id="slide3">
+            <div class="header">
+                <h1>Approfondissement Python</h1>
+            </div>
+            <div class="content">
+                <h1>Objectifs</h1>
+                <ul>
+                    <li>Intégrer les <b>données ouvertes liées</b> dans vos analyses pour enrichir vos résultats.</li>
+                    <li>Maîtriser les techniques de <b>représentation, manipulation et prétraitement</b> des données
+                        pour en optimiser l'utilisation.</li>
+                    <li>Appliquer des méthodes avancées de <b>traitement des données</b> pour extraire des informations
+                        pertinentes et exploitables.</li>
+                </ul>
+            </div>
+            <div class="footer">
+                <div class="contact">Approfondissement Python - Traitement de données | John Samuel</div>
+                <div class="navigation">3
+                    <a class="prev" href="#slide2"></a>
+                    <a class="next" href="#slide4"></a>
+                </div>
+            </div>
+        </section>
+
+        <section class="slide" id="slide4">
+            <div class="header">
+                <h1>Approfondissement Python</h1>
+            </div>
+            <div class="content">
+                <h1>Composition du module:</h1>
+                <ul>
+                    <li>Cours : 2h</li>
+                    <li>Travaux pratiques : 6h</li>
+                </ul>
+            </div>
+            <div class="footer">
+                <div class="contact">Approfondissement Python - Traitement de données | John Samuel</div>
+                <div class="navigation">4
+                    <a class="prev" href="#slide3"></a>
+                    <a class="next" href="#slide5"></a>
+                </div>
+            </div>
+        </section>
+
+        <section class="slide" id="slide5">
+            <div class="header">
+                <h1>Approfondissement Python</h1>
+            </div>
+            <div class="content">
+                <h1 class="topicheading">Environnement de programmation:</h1>
+                <ul>
+                    <li>Système d'exploitation: Linux
+                        <ul>
+                            <li>Ubuntu</li>
+                            <li>Machine virtuelle (VirtualBox) + Ubuntu</li>
+                        </ul>
+                    </li>
+                    <li>Éditeur: Jupyter</li>
+                    <li>Logiciels: pandas, matplotlib, scikit-learn</li>
+                </ul>
+            </div>
+            <div class="footer">
+                <div class="contact">Approfondissement Python - Traitement de données | John Samuel</div>
+                <div class="navigation">5
+                    <a class="prev" href="#slide4"></a>
+                    <a class="next" href="#slide6"></a>
+                </div>
+            </div>
+        </section>
+
+        <section class="slide" id="slide6">
+            <div class="header">
+                <h1>Approfondissement Python</h1>
+            </div>
+            <div class="content">
+                <h3 class="topicsubheading">Cours:</h3>
+                <ul>
+                    <li>Interactifs</li>
+                    <li>Les questions: chaque 20-30 mins</li>
+                </ul>
+                <h3 class="topicsubheading">Travaux pratiques</h3>
+                <ul>
+                    <li>2 travaux pratiques</li>
+                    <li>Soumission en ligne</li>
+                </ul>
+            </div>
+            <div class="footer">
+                <div class="contact">Approfondissement Python - Traitement de données | John Samuel</div>
+                <div class="navigation">6
+                    <a class="prev" href="#slide5"></a>
+                    <a class="next" href="#slide7"></a>
+                </div>
+            </div>
+        </section>
+
+        <section class="slide" id="slide7">
+            <div class="header">
+                <h1>Approfondissement Python</h1>
+            </div>
+            <div class="content">
+                <table>
+                    <tr>
+                        <th>Cours</th>
+                        <th>Dates</th>
+                    </tr>
+                    <tr>
+                        <td>Cours 1 (1 h)</td>
+                        <td>10 novembre</td>
+                    </tr>
+                    <tr>
+                        <td>Cours 2 (1 h)</td>
+                        <td>17 novembre</td>
+                    </tr>
+                </table>
+            </div>
+            <div class="footer">
+                <div class="contact">Approfondissement Python - Traitement de données | John Samuel</div>
+                <div class="navigation">7
+                    <a class="prev" href="#slide6"></a>
+                    <a class="next" href="#slide8"></a>
+                </div>
+            </div>
+        </section>
+
+        <section class="slide" id="slide8">
+            <div class="header">
+                <h1>Approfondissement Python</h1>
+            </div>
+            <div class="content">
+                <table>
+                    <tr>
+                        <th>Travaux pratiques</th>
+                        <th>Dates</th>
+                    </tr>
+                    <tr>
+                        <td>TP 1</td>
+                        <td>10 et 17 novembre</td>
+                    </tr>
+                    <tr>
+                        <td>TP 2</td>
+                        <td>17 novembre</td>
+                    </tr>
+                </table>
+            </div>
+            <div class="footer">
+                <div class="contact">Approfondissement Python - Traitement de données | John Samuel</div>
+                <div class="navigation">8
+                    <a class="prev" href="#slide7"></a>
+                    <a class="next" href="#slide9"></a>
+                </div>
+            </div>
+        </section>
+
+        <section class="slide" id="slide9">
+            <div class="header">
+                <h1>Approfondissement Python</h1>
+            </div>
+            <div class="content">
+                <h1>Travaux pratiques</h1>
+                <ul>
+                    <li>Exploration approfondie de <b>Jupyter</b>, une plateforme interactive prisée pour l'analyse de
+                        données. Création de notebooks interactifs, intégration de code et de visualisations pour une
+                        analyse interactive des données.</li>
+                    <li>Expérience pratique avec des jeux de <b>données ouvertes</b>, permettant une compréhension
+                        concrète des enjeux liés au traitement de données. Application de techniques avancées pour
+                        extraire des insights significatifs à partir de données hétérogènes.</li>
+                </ul>
+                <figure>
+                    <img width="100px"
+                        src="../../../../../en/teaching/courses/2018/DataMining/250px-Jupyter_logo.svg.png"
+                        alt="Logo Jupyter" />
+                    <img width="100px"
+                        src="../../../../../fr/enseignement/cours/2017/BigData/images/Open_Definition_logo.png"
+                        alt="Open Data" />
+                </figure>
+            </div>
+            <div class="footer">
+                <div class="contact">Approfondissement Python - Traitement de données | John Samuel</div>
+                <div class="navigation">9
+                    <a class="prev" href="#slide8"></a>
+                    <a class="next" href="#slide10"></a>
+                </div>
+            </div>
+        </section>
+
+        <section class="slide" id="slide10">
+            <div class="header">
+                <h1>Approfondissement Python</h1>
+            </div>
+            <div class="content">
+                <h1>Soumission: Travaux pratiques</h1>
+                <table>
+                    <tr>
+                        <th>TP</th>
+                        <th>Points</th>
+                    </tr>
+                    <tr>
+                        <td>TP 1</td>
+                        <td>✅ 10</td>
+                    </tr>
+                    <tr>
+                        <td>TP 2</td>
+                        <td>✅ 10</td>
+                    </tr>
+                </table>
+            </div>
+            <div class="footer">
+                <div class="contact">Approfondissement Python - Traitement de données | John Samuel</div>
+                <div class="navigation">10
+                    <a class="prev" href="#slide9"></a>
+                    <a class="next" href="#slide11"></a>
+                </div>
+            </div>
+        </section>
+
+        <section class="slide" id="slide11">
+            <div class="header">
+                <h1>Approfondissement Python</h1>
+            </div>
+            <div class="content">
+                <h1 class="topicheading">Travaux pratiques</h1>
+                <p>Chaque TP comporte plusieurs exercices. Chaque exercice est accompagné d'une indication de <b>niveau
+                        de difficulté</b> :</p>
+                <ul>
+                    <li><span style="color:#f59e0b; font-size:1.8vmax">★</span> Facile</li>
+                    <li><span style="color:#f59e0b; font-size:1.8vmax">★★</span> Difficulté moyenne</li>
+                    <li><span style="color:#f59e0b; font-size:1.8vmax">★★★</span> Difficile</li>
+                </ul>
+            </div>
+            <div class="footer">
+                <div class="contact">Approfondissement Python - Traitement de données | John Samuel</div>
+                <div class="navigation">11
+                    <a class="prev" href="#slide10"></a>
+                    <a class="next" href="#slide12"></a>
+                </div>
+            </div>
+        </section>
+
+        <section class="slide" id="slide12">
+            <div class="header">
+                <h1>Approfondissement Python</h1>
+            </div>
+            <div class="content">
+                <h1 class="topicheading">Liste de contrôle</h1>
+                <p>Avant de déposer vos TPs, vérifiez si vous respectez la liste de contrôle suivante:</p>
+                <ul>
+                    <li>✅ Vous avez respecté les noms de fichiers tels que spécifiés dans chaque exercice des travaux
+                        pratiques.</li>
+                    <li>✅ Votre code est accompagné de commentaires appropriés pour expliquer la logique et la
+                        fonctionnalité.</li>
+                    <li>✅ Votre code peut être exécuté sans générer d'erreurs, et dans la mesure du possible, sans
+                        générer d'avertissements.</li>
+                    <li><span style="color:#dc2626; font-weight:700">⚠ Pas de fichiers Python (*.py)</span></li>
+                </ul>
+            </div>
+            <div class="footer">
+                <div class="contact">Approfondissement Python - Traitement de données | John Samuel</div>
+                <div class="navigation">12
+                    <a class="prev" href="#slide11"></a>
+                    <a class="next" href="#slide13"></a>
+                </div>
+            </div>
+        </section>
+
+        <section class="slide" id="slide13">
+            <div class="header">
+                <h1>Approfondissement Python</h1>
+            </div>
+            <div class="content">
+                <h1 class="topicheading">Modèle de code</h1>
+                <p>Vous pouvez consulter <a
+                        href="https://github.com/johnsamuelwrites/Approfondissement-Python-TD">https://github.com/johnsamuelwrites/Approfondissement-Python-TD</a>
+                    en ligne<br />ou le cloner sur votre machine à l'aide du terminal en utilisant les commandes
+                    suivantes.</p>
+                <code><pre>$ git clone https://github.com/johnsamuelwrites/Approfondissement-Python-TD
+$ cd Approfondissement-Python-TD
+$ ls</pre></code>
+                <p>Et pour les dernières modifications:</p>
+                <code><pre>$ git pull</pre></code>
+            </div>
+            <div class="footer">
+                <div class="contact">Approfondissement Python - Traitement de données | John Samuel</div>
+                <div class="navigation">13
+                    <a class="prev" href="#slide12"></a>
+                    <a class="next" href="#slide14"></a>
+                </div>
+            </div>
+        </section>
+
+        <section class="slide" id="slide14">
+            <div class="header">
+                <h1>Approfondissement Python</h1>
+            </div>
+            <div class="content">
+                <h4>Travaux pratiques: Notebooks Jupyter</h4>
+                <figure>
+                    <img src="../../../../../en/teaching/courses/2017/DataMining/images/jupyternotebook.png"
+                        height="300px" alt="notebook Jupyter" />
+                </figure>
+                <ul>
+                    <li>Lorsque vous créez un nouveau notebook (onglet "New"), vous aurez la possibilité de choisir
+                        parmi plusieurs kernels.</li>
+                    <li>Assurez-vous de sélectionner le kernel "Python 3" ou "Python 3+" pour ce TP.</li>
+                </ul>
+            </div>
+            <div class="footer">
+                <div class="contact">Approfondissement Python - Traitement de données | John Samuel</div>
+                <div class="navigation">14
+                    <a class="prev" href="#slide13"></a>
+                    <a class="next" href="#slide15"></a>
+                </div>
+            </div>
+        </section>
+
+        <section class="slide" id="slide15">
+            <div class="header">
+                <h1>Approfondissement Python: Notebooks Jupyter</h1>
+            </div>
+            <div class="content">
+                <h4>Travaux pratiques: Notebooks Jupyter</h4>
+                <figure>
+                    <img src="../../../../../en/teaching/courses/2017/DataMining/images/jupyterprogram.png"
+                        width="950px" alt="code Jupyter" />
+                </figure>
+                <ul>
+                    <li><b>Découpage structuré</b> : Divisez le code en cellules, facilitant la compréhension, la
+                        modification, et le débogage par étapes.</li>
+                    <li><b>Interactivité</b> : Exécutez du code Python directement dans le notebook, permettant une
+                        exploration interactive des données.</li>
+                    <li><b>Avantages</b> - <b>Communication complète</b> : Combine explications, visualisations, et code
+                        dans un seul document, facilitant la compréhension et le partage avec d'autres.</li>
+                </ul>
+            </div>
+            <div class="footer">
+                <div class="contact">Approfondissement Python - Traitement de données | John Samuel</div>
+                <div class="navigation">15
+                    <a class="prev" href="#slide14"></a>
+                    <a class="next" href="#slide16"></a>
+                </div>
+            </div>
+        </section>
+
+        <section class="slide" id="slide16">
+            <div class="header">
+                <h1>Approfondissement Python: Notebooks Jupyter</h1>
+            </div>
+            <div class="content">
+                <h4>Travaux pratiques: notebook Jupyter</h4>
+                <figure>
+                    <img src="../../../../../en/teaching/courses/2017/DataMining/images/jupyterscikit.png"
+                        height="300px" alt="Jupyter et scikit-learn" />
+                </figure>
+                <ul>
+                    <li>Explorer l'utilisation de la bibliothèque scikit-learn pour la mise en œuvre de tâches
+                        d'apprentissage machine à l'aide de jeux de données intégrés.</li>
+                </ul>
+            </div>
+            <div class="footer">
+                <div class="contact">Approfondissement Python - Traitement de données | John Samuel</div>
+                <div class="navigation">16
+                    <a class="prev" href="#slide15"></a>
+                    <a class="next" href="#slide17"></a>
+                </div>
+            </div>
+        </section>
+
+        <section class="slide" id="slide17">
+            <div class="header">
+                <h1>Approfondissement Python: Notebooks Jupyter</h1>
+            </div>
+            <div class="content">
+                <h4>Travaux pratiques: Visualisation et notebook Jupyter</h4>
+                <figure>
+                    <img src="../../../../../en/teaching/courses/2017/DataMining/images/histogramsubplots.png"
+                        height="240px" alt="graphiques histogrammes" />
+                    <img src="../../../../../en/teaching/courses/2017/DataMining/images/piechart.png" height="220px"
+                        alt="Diagramme circulaire" />
+                </figure>
+            </div>
+            <div class="footer">
+                <div class="contact">Approfondissement Python - Traitement de données | John Samuel</div>
+                <div class="navigation">17
+                    <a class="prev" href="#slide16"></a>
+                    <a class="next" href="#slide18"></a>
+                </div>
+            </div>
+        </section>
+
+        <section class="slide" id="slide18">
+            <div class="header">
+                <h1>Approfondissement Python: Notebooks Jupyter</h1>
+            </div>
+            <div class="content">
+                <h4>Travaux pratiques: Visualisation et notebook Jupyter</h4>
+                <figure>
+                    <img src="../../../../../en/teaching/courses/2017/DataMining/images/subplots.png" height="460px"
+                        alt="sous-diagrammes" />
+                </figure>
+            </div>
+            <div class="footer">
+                <div class="contact">Approfondissement Python - Traitement de données | John Samuel</div>
+                <div class="navigation">18
+                    <a class="prev" href="#slide17"></a>
+                    <a class="next" href="#slide19"></a>
+                </div>
+            </div>
+        </section>
+
+        <section class="slide" id="slide19">
+            <div class="header">
+                <h1>Approfondissement Python</h1>
+            </div>
+            <div class="content">
+                <h4>Travaux pratiques: Wikidata (Open Data)</h4>
+                <figure>
+                    <img src="../../../../../en/teaching/courses/2017/DataMining/images/wikidataquery.png"
+                        height="300px" width="750px" alt="requête Wikidata" />
+                </figure>
+            </div>
+            <div class="footer">
+                <div class="contact">Approfondissement Python - Traitement de données | John Samuel</div>
+                <div class="navigation">19
+                    <a class="prev" href="#slide18"></a>
+                    <a class="next" href="#slide20"></a>
+                </div>
+            </div>
+        </section>
+
+        <section class="slide" id="slide20">
+            <div class="header">
+                <h1>Références</h1>
+            </div>
+            <div class="content">
+                <h1>Sites web</h1>
+                <ul>
+                    <li><a href="https://jupyter.org/">https://jupyter.org/</a></li>
+                    <li><a href="https://www.wikidata.org/">https://www.wikidata.org/</a></li>
+                </ul>
+                <h1>Couleurs</h1>
+                <ul>
+                    <li><a href="https://material.io/color/">Color Tool - Material Design</a></li>
+                </ul>
+                <h1>Images</h1>
+                <ul>
+                    <li><a href="https://commons.wikimedia.org/">Wikimedia Commons</a></li>
+                </ul>
+            </div>
+            <div class="footer">
+                <div class="contact">Approfondissement Python - Traitement de données | John Samuel</div>
+                <div class="navigation">20
+                    <a class="prev" href="#slide19"></a>
+                </div>
+            </div>
+        </section>
+
+        <script>
+            function changeCurrentURLSlideNumber(isIncrement) {
+                url = window.location.href;
+                position = url.indexOf("#slide");
+                if (position != -1) {
+                    slideIdString = url.substr(position + 6);
+                    if (!Number.isNaN(slideIdString)) {
+                        slideId = parseInt(slideIdString);
+                        if (isIncrement) {
+                            if (slideId < 20) {
+                                slideId = slideId + 1;
+                            }
+                        } else {
+                            if (slideId > 1) {
+                                slideId = slideId - 1;
+                            }
+                        }
+                        url = url.replace(/#slide\d+/g, "#slide" + slideId);
+                        window.location.href = url;
+                    }
+                } else {
+                    window.location.href = url + "#slide2";
+                }
+            }
+
+            document.onkeydown = function (event) {
+                event.preventDefault();
+                event = event || window.event;
+                if (event.keyCode == '37') {
+                    changeCurrentURLSlideNumber(false);
+                } else if (event.keyCode == '38') {
+                    changeCurrentURLSlideNumber(false);
+                } else if (event.keyCode == '39') {
+                    changeCurrentURLSlideNumber(true);
+                } else if (event.keyCode == '40') {
+                    changeCurrentURLSlideNumber(true);
+                }
+            }
+
+            document.body.onmouseup = function (event) {
+                event = event || window.event;
+                event.preventDefault();
+                changeCurrentURLSlideNumber(true);
+            }
+        </script>
+    </body>
+
+</html>

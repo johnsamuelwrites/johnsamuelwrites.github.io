@@ -1,0 +1,1579 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+    <head>
+        <meta charset="utf-8" />
+        <title>Approfondissement Python : Traitement de données (2025-2026): Données ouvertes liées: John Samuel</title>
+        <link rel="shortcut icon" href="../../../../../images/logo/favicon.png" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <style>
+            * {
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
+            }
+
+            :root {
+                --bg-primary: #f0f4ff;
+                --bg-secondary: #ffffff;
+                --accent-primary: #4f46e5;
+                --accent-secondary: #06b6d4;
+                --accent-tertiary: #8b5cf6;
+                --text-primary: #1e293b;
+                --text-secondary: #475569;
+                --header-bg: linear-gradient(135deg, #4f46e5 0%, #06b6d4 100%);
+                --footer-bg: linear-gradient(135deg, #4f46e5 0%, #06b6d4 100%);
+            }
+
+            body {
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+                background: var(--bg-primary);
+                color: var(--text-primary);
+                margin: 0;
+                overflow: hidden;
+                height: 100vh;
+                width: 100vw;
+            }
+
+            .slide {
+                height: 100vh;
+                width: 100vw;
+                display: flex;
+                flex-direction: column;
+            }
+
+            /* Header */
+            .header {
+                background: var(--header-bg);
+                color: white;
+                height: 10vh;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                box-shadow: 0 4px 20px rgba(79, 70, 229, 0.2);
+                position: relative;
+                overflow: hidden;
+            }
+
+            .header::before {
+                content: '';
+                position: absolute;
+                top: -50%;
+                right: -10%;
+                width: 300px;
+                height: 300px;
+                background: rgba(255, 255, 255, 0.1);
+                border-radius: 50%;
+                animation: float 6s ease-in-out infinite;
+            }
+
+            .header::after {
+                content: '';
+                position: absolute;
+                bottom: -30%;
+                left: -5%;
+                width: 200px;
+                height: 200px;
+                background: rgba(255, 255, 255, 0.08);
+                border-radius: 50%;
+                animation: float 8s ease-in-out infinite reverse;
+            }
+
+            .header h1 {
+                font-size: 3vmax;
+                font-weight: 700;
+                letter-spacing: -0.02em;
+                text-align: center;
+                margin: 0;
+                padding: 0 2rem;
+                position: relative;
+                z-index: 1;
+            }
+
+            /* Content */
+            .content {
+                flex: 1;
+                padding: 3vh 4vw;
+                overflow-y: auto;
+                display: flex;
+                flex-direction: column;
+                justify-content: flex-start;
+                font-size: 1.4vmax;
+                line-height: 1.7;
+            }
+
+            .content h1 {
+                font-size: 3vmax;
+                color: var(--accent-primary);
+                margin-bottom: 2vh;
+                font-weight: 700;
+                letter-spacing: -0.02em;
+            }
+
+            .content h2 {
+                font-size: 2.5vmax;
+                color: var(--accent-secondary);
+                margin-bottom: 1.5vh;
+                font-weight: 600;
+            }
+
+            .content h3 {
+                font-size: 2vmax;
+                color: var(--accent-tertiary);
+                margin-bottom: 1vh;
+                font-weight: 600;
+            }
+
+            .content h4 {
+                font-size: 1.8vmax;
+                color: var(--accent-primary);
+                margin-bottom: 1vh;
+                font-weight: 600;
+            }
+
+            /* Syntax highlighting for code blocks */
+            .content pre {
+                background: #1e293b;
+                color: #e2e8f0;
+                padding: 2vh 2vw;
+                border-radius: 1.5vmax;
+                font-family: 'Courier New', monospace;
+                font-size: 1.3vmax;
+                line-height: 1.6;
+                margin: 2vh 0;
+                box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+                overflow-x: auto;
+            }
+
+            /* Python syntax highlighting */
+            .content pre .kn {
+                color: #06b6d4;
+                font-weight: bold;
+            }
+
+            /* import keyword */
+            .content pre .nn {
+                color: #8b5cf6;
+                font-weight: bold;
+            }
+
+            /* module name */
+            .content pre .n {
+                color: #e2e8f0;
+            }
+
+            /* variable names */
+            .content pre .o {
+                color: #f59e0b;
+            }
+
+            /* operators */
+            .content pre .s2,
+            .content pre .s1,
+            .content pre .s {
+                color: #10b981;
+            }
+
+            /* strings */
+            .content pre .nb {
+                color: #ec4899;
+                font-weight: bold;
+            }
+
+            /* built-in functions */
+            .content pre .p {
+                color: #94a3b8;
+            }
+
+            /* punctuation */
+
+            /* SPARQL syntax highlighting */
+            .content pre .k {
+                color: #06b6d4;
+                font-weight: bold;
+            }
+
+            /* SELECT, WHERE, FILTER keywords */
+            .content pre .nv {
+                color: #a78bfa;
+            }
+
+            /* variables (?grandeville) */
+            .content pre .nt {
+                color: #fbbf24;
+            }
+
+            /* property/entity IDs (P31, Q142) */
+            .content pre .nf {
+                color: #ec4899;
+            }
+
+            /* functions (lang) */
+            .content pre .mi {
+                color: #34d399;
+            }
+
+            /* numbers */
+
+            /* Comments */
+            .content pre .c,
+            .content pre .c1,
+            .content pre .cm {
+                color: #64748b;
+                font-style: italic;
+            }
+
+            /* Make sure spans inherit proper styling */
+            .content pre span {
+                font-family: 'Courier New', monospace;
+            }
+
+            .content ul {
+                list-style: none;
+                padding-left: 0;
+                margin: 1.5vh 0;
+            }
+
+            .content li {
+                padding: 1vh 0 1vh 2.5vw;
+                position: relative;
+                line-height: 1.7;
+            }
+
+            .content li::before {
+                content: '▸';
+                position: absolute;
+                left: 0.5vw;
+                color: var(--accent-primary);
+                font-size: 1.5vmax;
+                font-weight: 700;
+            }
+
+            .content ul ul {
+                margin-left: 2vw;
+            }
+
+            .content ul ul li::before {
+                content: '◦';
+                color: var(--accent-secondary);
+            }
+
+            /* Topic Headings */
+            .topicheading {
+                background: var(--header-bg);
+                color: white !important;
+                padding: 1.5vh 2vw;
+                border-radius: 0 2vmax 2vmax 0;
+                margin: 2vh 0 2vh -2vw;
+                font-size: 2.2vmax !important;
+                font-weight: 700 !important;
+                width: 60%;
+                display: flex;
+                align-items: center;
+                box-shadow: 0 4px 15px rgba(79, 70, 229, 0.2);
+            }
+
+            .topicsubheading {
+                background: linear-gradient(135deg, #8b5cf6 0%, #ec4899 100%);
+                color: white !important;
+                padding: 1vh 2vw;
+                border-radius: 0 1.5vmax 1.5vmax 0;
+                margin: 1.5vh 0 1.5vh -2vw;
+                font-size: 1.8vmax !important;
+                font-weight: 600 !important;
+                width: 50%;
+                box-shadow: 0 4px 12px rgba(139, 92, 246, 0.2);
+            }
+
+            /* Tables */
+            .content table {
+                width: 90%;
+                margin: 3vh auto;
+                border-collapse: separate;
+                border-spacing: 0 1vh;
+            }
+
+            .content th {
+                background: var(--header-bg);
+                color: white;
+                padding: 2vh 2vw;
+                font-size: 1.6vmax;
+                font-weight: 600;
+                text-align: left;
+                border-radius: 1.5vmax;
+                box-shadow: 0 4px 12px rgba(79, 70, 229, 0.2);
+            }
+
+            .content td {
+                background: var(--bg-secondary);
+                color: var(--text-primary);
+                padding: 2vh 2vw;
+                border-radius: 1.5vmax;
+                box-shadow: 0 2px 8px rgba(79, 70, 229, 0.08);
+                border: 2px solid rgba(79, 70, 229, 0.1);
+                transition: all 0.3s ease;
+            }
+
+            .content tr:hover td {
+                transform: translateY(-2px);
+                box-shadow: 0 4px 15px rgba(79, 70, 229, 0.15);
+            }
+
+            /* Figures */
+            .content figure {
+                text-align: center;
+                margin: 3vh auto;
+                max-width: 90%;
+            }
+
+            .content figure img {
+                max-width: 50vmin;
+                max-height: 50vmin;
+                border-radius: 1.5vmax;
+                box-shadow: 0 8px 24px rgba(79, 70, 229, 0.15);
+                transition: transform 0.3s ease;
+            }
+
+            .content figure img:hover {
+                transform: scale(1.05);
+            }
+
+            .content figure figcaption {
+                margin-top: 1.5vh;
+                padding: 1vh 2vw;
+                background: rgba(79, 70, 229, 0.08);
+                border-radius: 1vmax;
+                font-size: 1.2vmax;
+                color: var(--text-secondary);
+            }
+
+            /* Code blocks */
+            .content code {
+                display: block;
+                background: #1e293b;
+                color: #10b981;
+                padding: 2vh 2vw;
+                border-radius: 1.5vmax;
+                font-family: 'Courier New', monospace;
+                font-size: 1.3vmax;
+                line-height: 1.6;
+                margin: 2vh 0;
+                box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+                overflow-x: auto;
+            }
+
+            .content code pre {
+                margin: 0;
+                white-space: pre-wrap;
+            }
+
+            .content a {
+                color: var(--accent-primary);
+                text-decoration: none;
+                font-weight: 600;
+                transition: all 0.3s ease;
+                border-bottom: 2px solid transparent;
+            }
+
+            .content a:hover {
+                border-bottom-color: var(--accent-primary);
+            }
+
+            /* Flexcontent for side-by-side layouts */
+            .flexcontent {
+                display: flex;
+                gap: 3vw;
+                align-items: flex-start;
+                flex-wrap: wrap;
+                margin: 2vh 0;
+            }
+
+            .flexcontent figure {
+                flex: 0 0 30vw;
+            }
+
+            .flexcontent ul {
+                flex: 1;
+                min-width: 40vw;
+            }
+
+            /* Footer */
+            .footer {
+                background: var(--footer-bg);
+                color: white;
+                height: 6vh;
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                padding: 0 3vw;
+                box-shadow: 0 -4px 20px rgba(79, 70, 229, 0.2);
+                position: relative;
+            }
+
+            .footer .contact {
+                font-size: 1.3vmax;
+                font-weight: 500;
+            }
+
+            .footer .navigation {
+                display: flex;
+                align-items: center;
+                gap: 2vw;
+                font-size: 1.4vmax;
+                font-weight: 600;
+            }
+
+            .footer .navigation a {
+                color: white;
+                text-decoration: none;
+                font-size: 2vmax;
+                transition: all 0.3s ease;
+                padding: 0.5vh 1vw;
+                border-radius: 0.5vmax;
+            }
+
+            .footer .navigation a:hover {
+                background: rgba(255, 255, 255, 0.2);
+                transform: scale(1.1);
+            }
+
+            .footer .navigation .prev::before {
+                content: "◀ ";
+            }
+
+            .footer .navigation .next::after {
+                content: " ▶";
+            }
+
+            /* First slide special styling */
+            #slide1 .content {
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                align-items: center;
+                text-align: center;
+            }
+
+            #slide1 h1 {
+                font-size: 4vmax;
+                background: var(--header-bg);
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                background-clip: text;
+                margin-bottom: 2vh;
+            }
+
+            #slide1 h2 {
+                font-size: 2.5vmax;
+                color: var(--accent-tertiary);
+                margin-bottom: 3vh;
+            }
+
+            #slide1 p {
+                font-size: 1.5vmax;
+                line-height: 2;
+                max-width: 60vw;
+            }
+
+            #slide1 b {
+                color: var(--accent-primary);
+                font-weight: 700;
+            }
+
+            #slide1 img {
+                margin-top: 2vh;
+                border-radius: 1vmax;
+            }
+
+            /* Portrait image styling */
+            .content img[src*="portrait"] {
+                border-radius: 50%;
+                border: 4px solid var(--accent-primary);
+                box-shadow: 0 8px 24px rgba(79, 70, 229, 0.3);
+            }
+
+            /* Highlight syntax */
+            .highlight {
+                background: #1e293b;
+                padding: 0.2em 0.4em;
+                border-radius: 0.3em;
+            }
+
+            .highlight .k {
+                color: #06b6d4;
+                font-weight: bold;
+            }
+
+            .highlight .s1,
+            .highlight .s2 {
+                color: #10b981;
+            }
+
+            .highlight .nn,
+            .highlight .nb {
+                color: #8b5cf6;
+            }
+
+            .highlight .mi,
+            .highlight .mf {
+                color: #f59e0b;
+            }
+
+            /* Animations */
+            @keyframes float {
+
+                0%,
+                100% {
+                    transform: translateY(0) rotate(0deg);
+                }
+
+                50% {
+                    transform: translateY(-20px) rotate(5deg);
+                }
+            }
+
+            @keyframes fadeIn {
+                from {
+                    opacity: 0;
+                    transform: translateY(20px);
+                }
+
+                to {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            }
+
+            .slide {
+                animation: fadeIn 0.5s ease-out;
+            }
+
+            /* Responsive */
+            @media (max-width: 768px) {
+                .header h1 {
+                    font-size: 4vmax;
+                }
+
+                .content {
+                    font-size: 2vmax;
+                    padding: 2vh 3vw;
+                }
+
+                .content h1 {
+                    font-size: 4vmax;
+                }
+
+                .topicheading {
+                    width: 90%;
+                    font-size: 3vmax !important;
+                }
+
+                .topicsubheading {
+                    width: 80%;
+                    font-size: 2.5vmax !important;
+                }
+
+                .flexcontent {
+                    flex-direction: column;
+                }
+
+                .flexcontent figure,
+                .flexcontent ul {
+                    flex: 1 1 100%;
+                    width: 100%;
+                }
+
+                .footer .contact {
+                    font-size: 2vmax;
+                }
+
+                .footer .navigation {
+                    font-size: 2.5vmax;
+                }
+            }
+
+            @media print {
+                .slide {
+                    page-break-after: always;
+                }
+            }
+        </style>
+    </head>
+
+    <body>
+        <section class="slide" id="slide1">
+            <div class="header">
+            </div>
+            <div class="content">
+                <h2 style="font-size:2.5vw">Données ouvertes liées (Linked Open Data)</h2>
+                <h2 style="font-size:1.5vw">PSM</h2>
+                <p><b>John Samuel</b></br>
+                    CPE Lyon<br /><br />
+                    <b>Année</b>: 2025-2026<br />
+                    <b>Courriel</b>: john.samuel@cpe.fr</br>
+                    </br>
+                    <a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/"><img
+                            alt="Creative Commons License" style="border-width:0"
+                            src="../../../../../en/teaching/courses/2017/C/88x31.png" /></a>
+                </p>
+            </div>
+            <div class="footer">
+                <div class="contact">Approfondissement Python - Traitement de données | John Samuel</div>
+                <div class="navigation">1
+
+                    <a class="next" href="#slide2"></a>
+                </div>
+            </div>
+        </section>
+        <section class="slide" id="slide2">
+            <div class="header">
+                <h1>Wikidata</h1>
+            </div>
+            <div class="content">
+                <h1 class="topicsubheading">Linked Open Data</h1>
+                <div>
+                    <p>Le Linked Open Data (LOD) est une approche visant à connecter des ensembles de données
+                        hétérogènes
+                        de manière ouverte, interopérable et interconnectée. Cette approche facilite la découverte, le
+                        partage et la
+                        réutilisation de l’information à l’échelle du Web.</p>
+                    <h4>Principes Clés</h4>
+                    <ul>
+                        <li><b>Identifiants Uniques (URIs) :</b> Chaque ressource est identifiée de manière unique grâce
+                            à une URI
+                            permettant de la référencer sur le Web.</li>
+                        <li><b>Modèle RDF (Resource Description Framework) :</b> Les données sont structurées sous forme
+                            de triplets
+                            (sujet–prédicat–objet) pour représenter les relations entre entités.</li>
+                        <li><b>Protocole SPARQL :</b> Un langage de requête standardisé permettant d’interroger et de
+                            combiner des
+                            ensembles de données RDF provenant de différentes sources.</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer">
+                <div class="contact">Approfondissement Python - Traitement de données | John Samuel</div>
+                <div class="navigation">2
+                    <a class="prev" href="#slide1"></a>
+                    <a class="next" href="#slide3"></a>
+                </div>
+            </div>
+        </section>
+
+        <section class="slide" id="slide3">
+            <div class="header">
+                <h1>Wikidata</h1>
+            </div>
+            <div class="content">
+                <h1 class="topicsubheading">Linked Open Data</h1>
+                <div>
+                    <h4>Objectifs</h4>
+                    <ul>
+                        <li><b>Interconnexion des Données :</b> Faciliter la liaison entre différentes sources de
+                            données pour créer
+                            une vision globale et cohérente des informations disponibles.</li>
+                        <li><b>Accessibilité et Ouverture :</b> Promouvoir la diffusion publique des données sous
+                            licences ouvertes,
+                            favorisant la transparence et la réutilisation libre.</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer">
+                <div class="contact">Approfondissement Python - Traitement de données | John Samuel</div>
+                <div class="navigation">3
+                    <a class="prev" href="#slide2"></a>
+                    <a class="next" href="#slide4"></a>
+                </div>
+            </div>
+        </section>
+
+        <section class="slide" id="slide4">
+            <div class="header">
+                <h1>Wikidata</h1>
+            </div>
+            <div class="content">
+                <h1 class="topicsubheading">Linked Open Data</h1>
+                <figure class="flexcontent">
+                    <img src="../../2021/DataMining/Lod-datasets_2009-07-14.svg" height="350vh" width="400vw"
+                        alt="Carte du Linked Open Data en 2009, illustrant les ensembles de données interconnectées." />
+                    <img src="../../../../../fr/enseignement/cours/2017/BigData/images/LOD_Cloud_2014.svg.png"
+                        height="350vh" width="400vw"
+                        alt="Carte du Linked Open Data en 2014, montrant l'expansion du réseau de données ouvertes liées." />
+                </figure>
+                <ol style="font-size:2vh">
+                    <li><a href="https://commons.wikimedia.org/wiki/File:Lod-datasets_2009-07-14.svg">LOD datasets 2009
+                            (Wikimedia Commons)</a></li>
+                    <li><a href="https://commons.wikimedia.org/wiki/File:Lod-datasets_2010-09-22_colored.png">LOD
+                            datasets 2010 (Wikimedia Commons)</a></li>
+                </ol>
+            </div>
+            <div class="footer">
+                <div class="contact">Approfondissement Python - Traitement de données | John Samuel</div>
+                <div class="navigation">4
+                    <a class="prev" href="#slide3"></a>
+                    <a class="next" href="#slide5"></a>
+                </div>
+            </div>
+        </section>
+
+        <section class="slide" id="slide5">
+            <div class="header">
+                <h1>Wikidata</h1>
+            </div>
+            <div class="content">
+                <h3 class="topicsubheading">Wikidata</h3>
+                <p>Wikidata, lancé en 2012, est un projet collaboratif de la Wikimedia Foundation visant à créer une
+                    base de
+                    connaissances libre, liée et multilingue. Il sert de source centrale de données pour Wikipédia et
+                    d’autres projets
+                    Wikimédia.</p>
+                <ul>
+                    <li><b>Libre et Ouverte :</b> Les données sont accessibles sous licence libre pour encourager leur
+                        réutilisation.</li>
+                    <li><b>Liée et Structurée :</b> Les informations suivent le modèle RDF et sont interconnectées via
+                        des identifiants uniques.</li>
+                    <li><b>Collaborative :</b> Des contributeurs du monde entier ajoutent, vérifient et enrichissent les
+                        données.</li>
+                    <li><b>Multilingue :</b> Wikidata prend en charge des centaines de langues, facilitant l’accès
+                        global à la connaissance.</li>
+                </ul>
+                <div class="flexcontent">
+                    <figure>
+                        <img src="../../../../../en/slides/2017/Akademy/html/800px-Wikidata-logo-en.svg.png"
+                            height="120px" alt="Logo officiel du projet Wikidata." />
+                    </figure>
+                </div>
+            </div>
+            <div class="footer">
+                <div class="contact">Approfondissement Python - Traitement de données | John Samuel</div>
+                <div class="navigation">5
+                    <a class="prev" href="#slide4"></a>
+                    <a class="next" href="#slide6"></a>
+                </div>
+            </div>
+        </section>
+
+        <section class="slide" id="slide6">
+            <div class="header">
+                <h1>Wikidata</h1>
+            </div>
+            <div class="content">
+                <h3 class="topicsubheading">Wikidata</h3>
+                <p><b>Évolution des sites Wikipédia :</b> passage de plusieurs Wikipédias multilingues séparées à une
+                    base de connaissances centralisée (Wikidata) permettant une cohérence et une mise à jour unifiée des
+                    données entre langues.</p>
+                <div class="flexcontent">
+                    <figure>
+                        <img src="../../../../../en/slides/2017/Akademy/html/800px-Wikidata-logo-en.svg.png"
+                            height="220px"
+                            alt="Logo Wikidata symbolisant la centralisation multilingue des connaissances." />
+                    </figure>
+                </div>
+            </div>
+            <div class="footer">
+                <div class="contact">Approfondissement Python - Traitement de données | John Samuel</div>
+                <div class="navigation">6
+                    <a class="prev" href="#slide5"></a>
+                    <a class="next" href="#slide7"></a>
+                </div>
+            </div>
+        </section>
+
+        <section class="slide" id="slide7">
+            <div class="header">
+                <h1>Wikidata</h1>
+            </div>
+            <div class="content">
+                <h1 class="topicsubheading">Wikipédia : Articles multilingues</h1>
+                <p>L’Infobox est une composante essentielle des articles Wikipédia. Elle résume, sous une forme
+                    structurée,
+                    les informations principales sur un sujet donné.</p>
+                <ul>
+                    <li><b>Contenu de l’Infobox :</b>
+                        <ul>
+                            <li><b>Informations essentielles :</b> Données clés comme la date de naissance, la
+                                localisation ou les
+                                caractéristiques principales.</li>
+                            <li><b>Liens pertinents :</b> Souvent connectée à des entités Wikidata pour garantir la
+                                cohérence et la mise à jour.</li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+            <div class="footer">
+                <div class="contact">Approfondissement Python - Traitement de données | John Samuel</div>
+                <div class="navigation">7
+                    <a class="prev" href="#slide6"></a>
+                    <a class="next" href="#slide8"></a>
+                </div>
+            </div>
+        </section>
+
+        <section class="slide" id="slide8">
+            <div class="header">
+                <h1>Wikidata</h1>
+            </div>
+            <div class="content">
+                <h1 class="topicsubheading">Wikipédia : Articles multilingues</h1>
+                <ul>
+                    <li><b>Objectifs de l’Infobox :</b>
+                        <ul>
+                            <li><b>Accessibilité rapide :</b> Permet une consultation immédiate des faits essentiels.
+                            </li>
+                            <li><b>Uniformité :</b> Garantit une présentation cohérente des informations à travers les
+                                articles.</li>
+                        </ul>
+                    </li>
+                    <li><b>Évolution dynamique :</b>
+                        <ul>
+                            <li><b>Mise à jour collaborative :</b> Les Infoboxes peuvent être modifiées collectivement
+                                par la communauté.</li>
+                            <li><b>Liens dynamiques avec Wikidata :</b> Les données peuvent être synchronisées
+                                automatiquement depuis Wikidata pour maintenir leur exactitude.</li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+            <div class="footer">
+                <div class="contact">Approfondissement Python - Traitement de données | John Samuel</div>
+                <div class="navigation">8
+                    <a class="prev" href="#slide7"></a>
+                    <a class="next" href="#slide9"></a>
+                </div>
+            </div>
+        </section>
+
+        <section class="slide" id="slide9">
+            <div class="header">
+                <h1>Wikidata</h1>
+            </div>
+            <div class="content">
+                <h1 class="topicsubheading">Wikipédia : Articles multilingues</h1>
+                <h4>Problèmes potentiels</h4>
+                <figure class="fullwidth">
+                    <img src="../../../../../en/slides/2018/CLEF/WikipediaComparisonInfobox.png" height="300vh"
+                        alt="Comparaison d’Infoboxes entre différentes versions linguistiques de Wikipédia." />
+                    <figcaption>Différences entre les Infoboxes selon les versions linguistiques.</figcaption>
+                </figure>
+            </div>
+            <div class="footer">
+                <div class="contact">Approfondissement Python - Traitement de données | John Samuel</div>
+                <div class="navigation">9
+                    <a class="prev" href="#slide8"></a>
+                    <a class="next" href="#slide10"></a>
+                </div>
+            </div>
+        </section>
+
+        <section class="slide" id="slide10">
+            <div class="header">
+                <h1>Wikidata</h1>
+            </div>
+            <div class="content">
+                <h1 class="topicsubheading">Wikipédia : Articles multilingues</h1>
+                <h4>Problèmes potentiels</h4>
+                <ul>
+                    <li>Répétitions possibles entre les détails de l’Infobox et le texte principal de l’article.</li>
+                    <li>Maintenance complexe des Infoboxes à travers les différentes Wikipédias linguistiques.</li>
+                    <li>Difficulté de mise à jour centralisée et cohérente sans source unique de vérité.</li>
+                </ul>
+                <figure>
+                    <img src="../../../../../en/slides/2018/CLEF/WikipediaComparisonInfobox.png" height="100vh"
+                        alt="Exemple d’Infoboxes divergentes entre versions linguistiques de Wikipédia." />
+                    <figcaption>Wikipédia : Articles multilingues</figcaption>
+                </figure>
+            </div>
+            <div class="footer">
+                <div class="contact">Approfondissement Python - Traitement de données | John Samuel</div>
+                <div class="navigation">10
+                    <a class="prev" href="#slide9"></a>
+                    <a class="next" href="#slide11"></a>
+                </div>
+            </div>
+        </section>
+
+        <section class="slide" id="slide11">
+            <div class="header">
+                <h1>Wikidata</h1>
+            </div>
+            <div class="content">
+                <h1 class="topicsubheading">Élément de Wikidata : libellés, descriptions et alias</h1>
+                <p>Chaque élément de Wikidata comprend un <b>libellé</b> (nom principal), une <b>description</b> (brève
+                    explication)
+                    et des <b>alias</b> (variantes ou synonymes). Ces champs facilitent la recherche et la compréhension
+                    des entités
+                    dans plusieurs langues.</p>
+                <figure class="fullwidth">
+                    <img src="../../../../../en/slides/2019/Catai/WikidataProperties.png" height="300px" width="650px"
+                        alt="Capture d’écran montrant les libellés, descriptions et alias pour l’élément Wikidata 'Bogotá' (Q2841)." />
+                    <figcaption>Exemple : Bogotá (Q2841)</figcaption>
+                </figure>
+            </div>
+            <div class="footer">
+                <div class="contact">Approfondissement Python - Traitement de données | John Samuel</div>
+                <div class="navigation">11
+                    <a class="prev" href="#slide10"></a>
+                    <a class="next" href="#slide12"></a>
+                </div>
+            </div>
+        </section>
+
+        <section class="slide" id="slide12">
+            <div class="header">
+                <h1>Wikidata</h1>
+            </div>
+            <div class="content">
+                <h1 class="topicsubheading">Élément (item) de Wikidata : Étiquettes et propriétés</h1>
+                <p>Les <b>propriétés</b> décrivent les caractéristiques, relations ou attributs d’un élément (par ex.
+                    date de
+                    naissance, lieu, profession). Elles permettent une représentation structurée et interconnectée de la
+                    connaissance.</p>
+                <figure class="fullwidth">
+                    <img src="../../../../../en/slides/2018/CLEF/Screenshot_2018-09-09WikidataAvignon.png" width="600px"
+                        height="300px"
+                        alt="Page Wikidata montrant les propriétés liées à la ville d’Avignon (Q6397)." />
+                    <figcaption>Exemple : Avignon (Q6397)</figcaption>
+                </figure>
+            </div>
+            <div class="footer">
+                <div class="contact">Approfondissement Python - Traitement de données | John Samuel</div>
+                <div class="navigation">12
+                    <a class="prev" href="#slide11"></a>
+                    <a class="next" href="#slide13"></a>
+                </div>
+            </div>
+        </section>
+        <section class="slide" id="slide13">
+            <div class="header">
+                <h1>Wikidata</h1>
+            </div>
+            <div class="content">
+                <h2 class="topicsubheading">Propriétés de Wikidata</h2>
+                <div>
+                    <figure class="fullwidth">
+                        <img src="../../../../../en/slides/2018/CLEF/WikidataProperties.png" width="600" height="400"
+                            alt="Visualisation des propriétés de Wikidata">
+                        <figcaption>Propriétés de Wikidata</figcaption>
+                    </figure>
+                </div>
+            </div>
+            <div class="footer">
+                <div class="contact">Approfondissement Python - Traitement de données | John Samuel</div>
+                <div class="navigation">13
+                    <a class="prev" href="#slide12"></a>
+                    <a class="next" href="#slide14"></a>
+                </div>
+            </div>
+        </section>
+        <section class="slide" id="slide14">
+            <div class="header">
+                <h1>Wikidata</h1>
+            </div>
+            <div class="content">
+                <h2 class="topicsubheading">Propriétés: Étiquettes et descriptions</h2>
+                <div>
+                    <figure class="fullwidth">
+                        <img src="../../../../../en/slides/2018/CLEF/WikidataPropertiesLabelDesc.png" height="400"
+                            alt="Exemple de propriété Wikidata avec étiquette et description">
+                        <figcaption>Exemple: pays (P17)</figcaption>
+                    </figure>
+                </div>
+            </div>
+            <div class="footer">
+                <div class="contact">Approfondissement Python - Traitement de données | John Samuel</div>
+                <div class="navigation">14
+                    <a class="prev" href="#slide13"></a>
+                    <a class="next" href="#slide15"></a>
+                </div>
+            </div>
+        </section>
+        <section class="slide" id="slide15">
+            <div class="header">
+                <h1>Wikidata</h1>
+            </div>
+            <div class="content">
+                <h3 class="topicsubheading">Propriétés</h3>
+                <div style="text-align:center">
+                    <figure class="fullwidth">
+                        <img src="../../../../../en/slides/2019/WikidataCon/Screenshot_2019-10-24 instance of-English.png"
+                            width="600" height="400" alt="Exemple de la propriété P31 en anglais sur Wikidata">
+                        <figcaption>Étiquettes, descriptions et alias de Property:P31 en anglais</figcaption>
+                    </figure>
+                </div>
+            </div>
+            <div class="footer">
+                <div class="contact">Approfondissement Python - Traitement de données | John Samuel</div>
+                <div class="navigation">15
+                    <a class="prev" href="#slide14"></a>
+                    <a class="next" href="#slide16"></a>
+                </div>
+            </div>
+        </section>
+        <section class="slide" id="slide16">
+            <div class="header">
+                <h1>Wikidata</h1>
+            </div>
+            <div class="content">
+                <h1 class="topicsubheading">Propriétés de l'Infobox de Wikipedia</h1>
+                <div>
+                    <figure class="fullwidth">
+                        <img src="../../../../../en/slides/2019/Catai/InfoboxProperties.png" height="400" width="650"
+                            alt="Propriétés existantes de l’infoboîte Wikipédia pour une ville colombienne">
+                        <figcaption>Propriétés existantes de l'Infobox de Wikipedia en anglais pour une ville
+                            colombienne
+                        </figcaption>
+                    </figure>
+                </div>
+            </div>
+            <div class="footer">
+                <div class="contact">Approfondissement Python - Traitement de données | John Samuel</div>
+                <div class="navigation">16
+                    <a class="prev" href="#slide15"></a>
+                    <a class="next" href="#slide17"></a>
+                </div>
+            </div>
+        </section>
+        <section class="slide" id="slide17">
+            <div class="header">
+                <h1>Wikidata</h1>
+            </div>
+            <div class="content">
+                <h1 class="topicsubheading">Identifiant, étiquettes, descriptions et alias</h1>
+                <div>
+                    <figure class="fullwidth">
+                        <img src="../../../../../en/slides/2019/Catai/WikidataProperties.png" height="400" width="650"
+                            alt="Traductions Wikidata pour Bogotá">
+                        <figcaption>Traductions actuelles: Bogotá (Q2841)</figcaption>
+                    </figure>
+                </div>
+            </div>
+            <div class="footer">
+                <div class="contact">Approfondissement Python - Traitement de données | John Samuel</div>
+                <div class="navigation">17
+                    <a class="prev" href="#slide16"></a>
+                    <a class="next" href="#slide18"></a>
+                </div>
+            </div>
+        </section>
+        <section class="slide" id="slide18">
+            <div class="header">
+                <h1>Wikidata</h1>
+            </div>
+            <div class="content">
+                <h1 class="topicsubheading">Wikidata: Informations, propriétés, qualifications et références</h1>
+                <ul>
+                    <li><b>Informations de Base :</b>
+                        <ul>
+                            <li><b>Élément :</b> Représente une entité dans Wikidata (personne, lieu, concept, etc.).
+                            </li>
+                            <li><b>Identificateur Unique (QID) :</b> Chaque élément est associé à un identifiant unique.
+                            </li>
+                        </ul>
+                    </li>
+                    <li><b>Propriétés:</b>
+                        <ul>
+                            <li><b>Définition :</b> Caractéristiques ou relations spécifiques à un élément.</li>
+                            <li><b>Exemples :</b> Date de naissance, population, genre, etc.</li>
+                            <li><b>Structuration des Données :</b> Organisent les informations de manière catégorique.
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+            <div class="footer">
+                <div class="contact">Approfondissement Python - Traitement de données | John Samuel</div>
+                <div class="navigation">18
+                    <a class="prev" href="#slide17"></a>
+                    <a class="next" href="#slide19"></a>
+                </div>
+            </div>
+        </section>
+        <section class="slide" id="slide19">
+            <div class="header">
+                <h1>Wikidata</h1>
+            </div>
+            <div class="content">
+                <h1 class="topicsubheading">Wikidata: Informations, propriétés, qualifications et références</h1>
+                <ul>
+                    <li><b>Qualificatons :</b>
+                        <ul>
+                            <li><b>Précision :</b> Ajoutent des détails supplémentaires aux déclarations.</li>
+                            <li><b>Exemples :</b> Période pour une position occupée, lieu pour un événement, etc.</li>
+                            <li><b>Affinement des Données :</b> Améliorent la précision des informations.</li>
+                        </ul>
+                    </li>
+                    <li><b>Références:</b>
+                        <ul>
+                            <li><b>Source d'Information :</b> Indiquent la provenance des données.</li>
+                            <li><b>Citations et Liens :</b> Incluent des références pour la vérification et la
+                                transparence.
+                            </li>
+                            <li><b>Fondement de la Fidélité :</b> Renforcent la crédibilité des informations.</li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+            <div class="footer">
+                <div class="contact">Approfondissement Python - Traitement de données | John Samuel</div>
+                <div class="navigation">19
+                    <a class="prev" href="#slide18"></a>
+                    <a class="next" href="#slide20"></a>
+                </div>
+            </div>
+        </section>
+        <section class="slide" id="slide20">
+            <div class="header">
+                <h1>Wikidata</h1>
+            </div>
+            <div class="content">
+                <h1 class="topicsubheading">Wikidata: Informations, propriétés, qualifications et références</h1>
+                <div>
+                    <figure class="fullwidth">
+                        <img src="../../../../../en/slides/2019/Catai/WikidataStatements.png" height="400" width="650"
+                            alt="Déclarations Wikidata pour Bogotá">
+                        <figcaption>Informations actuelles: Bogotá (Q2841)</figcaption>
+                    </figure>
+                </div>
+            </div>
+            <div class="footer">
+                <div class="contact">Approfondissement Python - Traitement de données | John Samuel</div>
+                <div class="navigation">20
+                    <a class="prev" href="#slide19"></a>
+                    <a class="next" href="#slide21"></a>
+                </div>
+            </div>
+        </section>
+        <section class="slide" id="slide21">
+            <div class="header">
+                <h1>Wikidata</h1>
+            </div>
+            <div class="content">
+                <h1 class="topicsubheading">Wikidata: External identifiers</h1>
+                <div>
+                    <figure class="fullwidth">
+                        <img src="../../../../../en/slides/2019/Catai/WikidataExternalIDs.png" height="400" width="650"
+                            alt="Identifiants externes de l’élément Bogotá sur Wikidata">
+                        <figcaption>Identifiants externes actuels: Bogotá (Q2841)</figcaption>
+                    </figure>
+                </div>
+            </div>
+            <div class="footer">
+                <div class="contact">Approfondissement Python - Traitement de données | John Samuel</div>
+                <div class="navigation">21
+                    <a class="prev" href="#slide20"></a>
+                    <a class="next" href="#slide22"></a>
+                </div>
+            </div>
+        </section>
+        <section class="slide" id="slide22">
+            <div class="header">
+                <h1>Wikidata</h1>
+            </div>
+            <div class="content">
+                <h1 class="topicsubheading">Requêtes SPARQL</h1>
+                <figure class="fullwidth">
+                    <img src="../../../../../en/teaching/courses/2017/DataMining/images/wikidataquery.png" height="300"
+                        width="750" alt="Interface web de Wikidata Query Service">
+                    <figcaption>Interface web</figcaption>
+                </figure>
+            </div>
+            <div class="footer">
+                <div class="contact">Approfondissement Python - Traitement de données | John Samuel</div>
+                <div class="navigation">22
+                    <a class="prev" href="#slide21"></a>
+                    <a class="next" href="#slide23"></a>
+                </div>
+            </div>
+        </section>
+        <section class="slide" id="slide23">
+            <div class="header">
+                <h1>4. Wikidata</h1>
+            </div>
+            <div class="content">
+                <h1 class="topicsubheading">Requêtes SPARQL</h1>
+                <h4>Les identifiants des grandes villes.</h4>
+                <p class="codeexample">
+                <div class="highlight">
+                    <pre><span></span><span class="k">SELECT</span> <span class="nv">?grandeville</span> <span class="k">WHERE</span> <span class="p">{</span>
+  <span class="nv">?grandeville</span> <span class="nn">wdt</span><span class="p">:</span><span class="nt">P31</span> <span class="nn">wd</span><span class="p">:</span><span class="nt">Q1549591</span><span class="p">.</span>
+<span class="p">}</span>
+</pre>
+                </div>
+                </p>
+                <p class="codeexample">
+                <div class="highlight">
+                    <pre><span></span><span class="k">SELECT</span> <span class="nv">?grandeville</span> <span class="k">WHERE</span> <span class="p">{</span>
+  <span class="nv">?grandeville</span> <span class="nn">wdt</span><span class="p">:</span><span class="nt">P31</span> <span class="nn">wd</span><span class="p">:</span><span class="nt">Q1549591</span><span class="p">.</span>
+<span class="p">}</span>
+<span class="k">LIMIT</span> <span class="mi">100</span>
+</pre>
+                </div>
+                </p>
+            </div>
+            <div class="footer">
+                <div class="contact">Approfondissement Python - Traitement de données | John Samuel</div>
+                <div class="navigation">23
+                    <a class="prev" href="#slide22"></a>
+                    <a class="next" href="#slide24"></a>
+                </div>
+            </div>
+        </section>
+        <section class="slide" id="slide24">
+            <div class="header">
+                <h1>4. Wikidata</h1>
+            </div>
+            <div class="content">
+                <h1 class="topicsubheading">Requêtes SPARQL</h1>
+                <h4>Les noms des grandes villes.</h4>
+                <p class="codeexample">
+                <div class="highlight">
+                    <pre><span></span><span class="k">SELECT</span> <span class="nv">?grandeville</span> <span class="nv">?grandevilleLabel</span> <span class="k">WHERE</span> <span class="p">{</span>
+  <span class="nv">?grandeville</span> <span class="nn">wdt</span><span class="p">:</span><span class="nt">P31</span> <span class="nn">wd</span><span class="p">:</span><span class="nt">Q1549591</span><span class="p">.</span>
+  <span class="k">SERVICE</span> <span class="nn">wikibase</span><span class="p">:</span><span class="nt">label</span> <span class="p">{</span>
+  <span class="nn">bd</span><span class="p">:</span><span class="nt">serviceParam</span> <span class="nn">wikibase</span><span class="p">:</span><span class="nt">language</span> <span class="s">&quot;[AUTO_LANGUAGE],en&quot;</span><span class="p">.</span> <span class="p">}</span>
+<span class="p">}</span>
+<span class="k">LIMIT</span> <span class="mi">100</span>
+</pre>
+                </div>
+                </p>
+            </div>
+            <div class="footer">
+                <div class="contact">Approfondissement Python - Traitement de données | John Samuel</div>
+                <div class="navigation">24
+                    <a class="prev" href="#slide23"></a>
+                    <a class="next" href="#slide25"></a>
+                </div>
+            </div>
+        </section>
+        <section class="slide" id="slide25">
+            <div class="header">
+                <h1>4. Wikidata</h1>
+            </div>
+            <div class="content">
+                <h1 class="topicsubheading">Requêtes SPARQL</h1>
+                <h4>Les noms des grandes villes dans différentes langues.</h4>
+                <p class="codeexample">
+                <div class="highlight">
+                    <pre><span></span><span class="k">SELECT</span> <span class="nv">?grandeville</span> <span class="nv">?grandevilleLabel</span> <span class="k">WHERE</span> <span class="p">{</span>
+  <span class="nv">?grandeville</span> <span class="nn">wdt</span><span class="p">:</span><span class="nt">P31</span> <span class="nn">wd</span><span class="p">:</span><span class="nt">Q1549591</span><span class="p">.</span>
+  <span class="nv">?grandeville</span> <span class="nn">rdfs</span><span class="p">:</span><span class="nt">label</span> <span class="nv">?grandevilleLabel</span><span class="p">.</span>
+<span class="p">}</span>
+<span class="k">LIMIT</span> <span class="mi">100</span>
+</pre>
+                </div>
+                </p>
+            </div>
+            <div class="footer">
+                <div class="contact">Approfondissement Python - Traitement de données | John Samuel</div>
+                <div class="navigation">25
+                    <a class="prev" href="#slide24"></a>
+                    <a class="next" href="#slide26"></a>
+                </div>
+            </div>
+        </section>
+        <section class="slide" id="slide26">
+            <div class="header">
+                <h1>4. Wikidata</h1>
+            </div>
+            <div class="content">
+                <h1 class="topicsubheading">Requêtes SPARQL</h1>
+                <h4>Les noms français des grandes villes.</h4>
+                <p class="codeexample">
+                <div class="highlight">
+                    <pre><span></span><span class="k">SELECT</span> <span class="nv">?grandeville</span> <span class="nv">?grandevilleLabel</span> <span class="k">WHERE</span> <span class="p">{</span>
+  <span class="nv">?grandeville</span> <span class="nn">wdt</span><span class="p">:</span><span class="nt">P31</span> <span class="nn">wd</span><span class="p">:</span><span class="nt">Q1549591</span><span class="p">;</span>
+    <span class="nn">rdfs</span><span class="p">:</span><span class="nt">label</span> <span class="nv">?grandevilleLabel</span><span class="p">.</span>
+  <span class="k">FILTER</span><span class="p">(</span><span class="nf">lang</span><span class="p">(</span><span class="nv">?grandevilleLabel</span><span class="p">)</span> <span class="o">=</span> <span class="s">&quot;fr&quot;</span><span class="p">)</span>
+<span class="p">}</span>
+<span class="k">LIMIT</span> <span class="mi">100</span>
+</pre>
+                </div>
+                </p>
+                <p><b>Rémarque</b>: Le sujet n'est pas répété sur la deuxième ligne grâce au point-virgule.</p>
+            </div>
+            <div class="footer">
+                <div class="contact">Approfondissement Python - Traitement de données | John Samuel</div>
+                <div class="navigation">26
+                    <a class="prev" href="#slide25"></a>
+                    <a class="next" href="#slide27"></a>
+                </div>
+            </div>
+        </section>
+        <section class="slide" id="slide27">
+            <div class="header">
+                <h1>4. Wikidata</h1>
+            </div>
+            <div class="content">
+                <h1 class="topicsubheading">Requêtes SPARQL</h1>
+                <h4>Les noms des grandes villes de France.</h4>
+                <p class="codeexample">
+                <div class="highlight">
+                    <pre><span></span><span class="k">SELECT</span> <span class="nv">?grandeville</span> <span class="nv">?grandevilleLabel</span> <span class="k">WHERE</span> <span class="p">{</span>
+  <span class="nv">?grandeville</span> <span class="nn">wdt</span><span class="p">:</span><span class="nt">P31</span> <span class="nn">wd</span><span class="p">:</span><span class="nt">Q1549591</span><span class="p">;</span>
+    <span class="nn">wdt</span><span class="p">:</span><span class="nt">P17</span> <span class="nn">wd</span><span class="p">:</span><span class="nt">Q142</span><span class="p">;</span>
+    <span class="nn">rdfs</span><span class="p">:</span><span class="nt">label</span> <span class="nv">?grandevilleLabel</span><span class="p">.</span>
+  <span class="k">FILTER</span><span class="p">(</span><span class="nf">lang</span><span class="p">(</span><span class="nv">?grandevilleLabel</span><span class="p">)</span> <span class="o">=</span> <span class="s">&quot;fr&quot;</span><span class="p">)</span>
+<span class="p">}</span>
+<span class="k">LIMIT</span> <span class="mi">100</span>
+</pre>
+                </div>
+
+                </p>
+            </div>
+            <div class="footer">
+                <div class="contact">Approfondissement Python - Traitement de données | John Samuel</div>
+                <div class="navigation">27
+                    <a class="prev" href="#slide26"></a>
+                    <a class="next" href="#slide28"></a>
+                </div>
+            </div>
+        </section>
+        <section class="slide" id="slide28">
+            <div class="header">
+                <h1>4. Wikidata</h1>
+            </div>
+            <div class="content">
+                <h1 class="topicsubheading">Requêtes SPARQL</h1>
+                <h4>Les noms et images des grandes villes de France.</h4>
+                <p class="codeexample">
+                <div class="highlight">
+                    <pre><span></span><span class="k">SELECT</span> <span class="nv">?grandeville</span> <span class="nv">?grandevilleLabel</span> <span class="nv">?image</span> <span class="p">{</span>
+  <span class="nv">?grandeville</span> <span class="nn">wdt</span><span class="p">:</span><span class="nt">P31</span> <span class="nn">wd</span><span class="p">:</span><span class="nt">Q1549591</span><span class="p">;</span>
+               <span class="nn">wdt</span><span class="p">:</span><span class="nt">P17</span> <span class="nn">wd</span><span class="p">:</span><span class="nt">Q142</span><span class="p">;</span>
+               <span class="nn">wdt</span><span class="p">:</span><span class="nt">P18</span> <span class="nv">?image</span><span class="p">;</span>
+               <span class="nn">rdfs</span><span class="p">:</span><span class="nt">label</span> <span class="nv">?grandevilleLabel</span><span class="p">.</span>
+  <span class="k">FILTER</span><span class="p">(</span><span class="nf">lang</span><span class="p">(</span><span class="nv">?grandevilleLabel</span><span class="p">)</span> <span class="o">=</span> <span class="s">&quot;fr&quot;</span><span class="p">)</span>
+<span class="p">}</span>
+</pre>
+                </div>
+                </p>
+            </div>
+            <div class="footer">
+                <div class="contact">Approfondissement Python - Traitement de données | John Samuel</div>
+                <div class="navigation">28
+                    <a class="prev" href="#slide27"></a>
+                    <a class="next" href="#slide29"></a>
+                </div>
+            </div>
+        </section>
+        <section class="slide" id="slide29">
+            <div class="header">
+                <h1>4. Wikidata</h1>
+            </div>
+            <div class="content">
+                <h1 class="topicsubheading">Requêtes SPARQL</h1>
+                <h4>Les noms et images des grandes villes.</h4>
+                <p class="codeexample">
+                <div class="highlight">
+                    <pre><span></span><span class="k">SELECT</span> <span class="k">DISTINCT</span> <span class="nv">?grandeville</span> <span class="nv">?grandevilleLabel</span> <span class="nv">?pays</span> <span class="nv">?paysLabel</span> <span class="nv">?image</span> <span class="p">{</span>
+  <span class="nv">?grandeville</span> <span class="nn">wdt</span><span class="p">:</span><span class="nt">P31</span> <span class="nn">wd</span><span class="p">:</span><span class="nt">Q1549591</span><span class="p">;</span>
+               <span class="nn">wdt</span><span class="p">:</span><span class="nt">P17</span> <span class="nv">?pays</span><span class="p">;</span>
+               <span class="nn">wdt</span><span class="p">:</span><span class="nt">P18</span> <span class="nv">?image</span><span class="p">.</span>
+ <span class="k">SERVICE</span> <span class="nn">wikibase</span><span class="p">:</span><span class="nt">label</span> <span class="p">{</span> <span class="nn">bd</span><span class="p">:</span><span class="nt">serviceParam</span> <span class="nn">wikibase</span><span class="p">:</span><span class="nt">language</span> <span class="s">&quot;fr&quot;</span><span class="p">.</span> <span class="p">}</span>
+<span class="p">}</span>
+<span class="k">LIMIT</span> <span class="mi">100</span>
+</pre>
+                </div>
+                </p>
+            </div>
+            <div class="footer">
+                <div class="contact">Approfondissement Python - Traitement de données | John Samuel</div>
+                <div class="navigation">29
+                    <a class="prev" href="#slide28"></a>
+                    <a class="next" href="#slide30"></a>
+                </div>
+            </div>
+        </section>
+        <section class="slide" id="slide30">
+            <div class="header">
+                <h1>4. Wikidata</h1>
+            </div>
+            <div class="content">
+                <h1 class="topicsubheading">Requêtes SPARQL</h1>
+                <h4>Les noms de 100 langages de programmation.</h4>
+                <p class="codeexample">
+                <div class="highlight">
+                    <pre><span></span><span class="k">SELECT</span> <span class="nv">?languageLabel</span> <span class="p">(</span><span class="nf">YEAR</span><span class="p">(</span><span class="nv">?inception</span><span class="p">)</span> <span class="k">AS</span> <span class="nv">?year</span><span class="p">)</span> <span class="k">WHERE</span> <span class="p">{</span>
+  <span class="nv">?language</span> <span class="nn">wdt</span><span class="p">:</span><span class="nt">P31</span> <span class="nn">wd</span><span class="p">:</span><span class="nt">Q9143</span><span class="p">;</span>
+    <span class="nn">wdt</span><span class="p">:</span><span class="nt">P571</span> <span class="nv">?inception</span><span class="p">;</span>
+    <span class="nn">rdfs</span><span class="p">:</span><span class="nt">label</span> <span class="nv">?languageLabel</span><span class="p">.</span>
+  <span class="k">FILTER</span><span class="p">((</span><span class="nf">LANG</span><span class="p">(</span><span class="nv">?languageLabel</span><span class="p">))</span> <span class="o">=</span> <span class="s">&quot;en&quot;</span><span class="p">)</span>
+<span class="p">}</span>
+<span class="k">ORDER BY</span> <span class="p">(</span><span class="nv">?year</span><span class="p">)</span>
+<span class="k">LIMIT</span> <span class="mi">100</span>
+</pre>
+                </div>
+                </p>
+            </div>
+            <div class="footer">
+                <div class="contact">Approfondissement Python - Traitement de données | John Samuel</div>
+                <div class="navigation">30
+                    <a class="prev" href="#slide29"></a>
+                    <a class="next" href="#slide31"></a>
+                </div>
+            </div>
+        </section>
+        <section class="slide" id="slide31">
+            <div class="header">
+                <h1>4. Wikidata</h1>
+            </div>
+            <div class="content">
+                <h1 class="topicsubheading">Requêtes SPARQL</h1>
+                <h4>Les noms de 100 langages de programmation et leurs paradigmes.</h4>
+                <p class="codeexample">
+                <div class="highlight">
+                    <pre><span></span><span class="k">SELECT</span> <span class="nv">?languageLabel</span> <span class="nv">?paradigmLabel</span> <span class="p">(</span><span class="nf">YEAR</span><span class="p">(</span><span class="nv">?inception</span><span class="p">)</span> <span class="k">AS</span> <span class="nv">?year</span><span class="p">)</span> <span class="k">WHERE</span> <span class="p">{</span>
+  <span class="nv">?language</span> <span class="nn">wdt</span><span class="p">:</span><span class="nt">P31</span> <span class="nn">wd</span><span class="p">:</span><span class="nt">Q9143</span><span class="p">;</span>
+    <span class="nn">wdt</span><span class="p">:</span><span class="nt">P571</span> <span class="nv">?inception</span><span class="p">;</span>
+    <span class="nn">wdt</span><span class="p">:</span><span class="nt">P3966</span> <span class="nv">?paradigm</span><span class="p">;</span>
+    <span class="nn">rdfs</span><span class="p">:</span><span class="nt">label</span> <span class="nv">?languageLabel</span><span class="p">.</span>
+  <span class="nv">?paradigm</span> <span class="nn">rdfs</span><span class="p">:</span><span class="nt">label</span> <span class="nv">?paradigmLabel</span><span class="p">.</span>
+  <span class="k">FILTER</span><span class="p">(((</span><span class="nf">LANG</span><span class="p">(</span><span class="nv">?languageLabel</span><span class="p">))</span> <span class="o">=</span> <span class="s">&quot;en&quot;</span><span class="p">)</span> <span class="o">&amp;&amp;</span> <span class="p">((</span><span class="nf">LANG</span><span class="p">(</span><span class="nv">?paradigmLabel</span><span class="p">))</span> <span class="o">=</span> <span class="s">&quot;en&quot;</span><span class="p">))</span>
+<span class="p">}</span>
+<span class="k">ORDER BY</span> <span class="p">(</span><span class="nv">?year</span><span class="p">)</span> <span class="p">(</span><span class="nv">?paradigmLabel</span><span class="p">)</span>
+<span class="k">LIMIT</span> <span class="mi">100</span>
+</pre>
+                </div>
+
+                </p>
+            </div>
+            <div class="footer">
+                <div class="contact">Approfondissement Python - Traitement de données | John Samuel</div>
+                <div class="navigation">31
+                    <a class="prev" href="#slide30"></a>
+                    <a class="next" href="#slide32"></a>
+                </div>
+            </div>
+        </section>
+        <section class="slide" id="slide32">
+            <div class="header">
+                <h1>4. Wikidata</h1>
+            </div>
+            <div class="content">
+                <h1 class="topicsubheading">Requêtes SPARQL</h1>
+                <h4>Les informations disponibles sur la population des différents pays à différentes périodes.</h4>
+                <p class="codeexample">
+                <div class="highlight">
+                    <pre><span></span><span class="k">SELECT</span> <span class="k">DISTINCT</span> <span class="nv">?countryLabel</span> <span class="p">(</span><span class="nf">YEAR</span><span class="p">(</span><span class="nv">?date</span><span class="p">)</span> <span class="k">AS</span> <span class="nv">?year</span><span class="p">)</span> <span class="nv">?population</span> <span class="k">WHERE</span> <span class="p">{</span>
+  <span class="nv">?country</span> <span class="nn">wdt</span><span class="p">:</span><span class="nt">P31</span> <span class="nn">wd</span><span class="p">:</span><span class="nt">Q6256</span><span class="p">;</span>
+    <span class="nn">p</span><span class="p">:</span><span class="nt">P1082</span> <span class="nv">?populationStatement</span><span class="p">;</span>
+    <span class="nn">rdfs</span><span class="p">:</span><span class="nt">label</span> <span class="nv">?countryLabel</span><span class="p">.</span>
+  <span class="nv">?populationStatement</span> <span class="nn">ps</span><span class="p">:</span><span class="nt">P1082</span> <span class="nv">?population</span><span class="p">;</span>
+    <span class="nn">pq</span><span class="p">:</span><span class="nt">P585</span> <span class="nv">?date</span><span class="p">.</span>
+  <span class="k">FILTER</span><span class="p">((</span><span class="nf">LANG</span><span class="p">(</span><span class="nv">?countryLabel</span><span class="p">))</span> <span class="o">=</span> <span class="s">&quot;en&quot;</span><span class="p">)</span>
+<span class="p">}</span>
+<span class="k">ORDER BY</span> <span class="p">(</span><span class="nv">?countryLabel</span><span class="p">)</span> <span class="p">(</span><span class="nv">?year</span><span class="p">)</span>
+<span class="k">LIMIT</span> <span class="mi">1000</span>
+</pre>
+                </div>
+                </p>
+            </div>
+            <div class="footer">
+                <div class="contact">Approfondissement Python - Traitement de données | John Samuel</div>
+                <div class="navigation">32
+                    <a class="prev" href="#slide31"></a>
+                    <a class="next" href="#slide33"></a>
+                </div>
+            </div>
+        </section>
+        <section class="slide" id="slide33">
+            <div class="header">
+                <h1>Références</h1>
+            </div>
+            <div class="content">
+                <h1>Ressources en ligne</h1>
+                <ul>
+                    <li><a href="https://www.w3.org/RDF/">Resource Description Framework (RDF)</a>
+                        <i>https://www.w3.org/RDF/</i>
+                    </li>
+                    <li><a href="https://en.wikipedia.org/wiki/Resource_Description_Framework">Resource Description
+                            Framework</a> <i>https://en.wikipedia.org/wiki/Resource_Description_Framework</i></li>
+                </ul>
+            </div>
+            <div class="footer">
+                <div class="contact">Approfondissement Python - Traitement de données | John Samuel</div>
+                <div class="navigation">33
+                    <a class="prev" href="#slide32"></a>
+                    <a class="next" href="#slide34"></a>
+                </div>
+            </div>
+        </section>
+        <section class="slide" id="slide34">
+            <div class="header">
+                <h1>Références</h1>
+            </div>
+            <div class="content">
+                <h1>Couleurs</h1>
+                <ul>
+                    <li><a href="https://material.io/color/">Color Tool - Material Design</a></li>
+                </ul>
+                <h1>Images</h1>
+                <ul>
+                    <li><a href="https://commons.wikimedia.org/">Wikimedia Commons</a></li>
+                </ul>
+            </div>
+            <div class="footer">
+                <div class="contact">Approfondissement Python - Traitement de données | John Samuel</div>
+                <div class="navigation">34
+                    <a class="prev" href="#slide33"></a>
+                </div>
+            </div>
+        </section>
+
+
+        <script>
+            function changeCurrentURLSlideNumber(isIncrement) {
+                url = window.location.href;
+                position = url.indexOf("#slide");
+                if (position != -1) { // Not on the first page
+                    slideIdString = url.substr(position + 6);
+                    if (!Number.isNaN(slideIdString)) {
+                        slideId = parseInt(slideIdString);
+                        if (isIncrement) {
+                            if (slideId < 34) {
+                                slideId = slideId + 1;
+                            }
+                        } else {
+                            if (slideId > 1) {
+                                slideId = slideId - 1;
+                            }
+                        }
+                        /* regexp */
+                        url = url.replace(/#slide\d+/g, "#slide" + slideId);
+                        window.location.href = url;
+                    }
+                } else {
+                    window.location.href = url + "#slide2";
+                }
+            }
+            document.onkeydown = function (event) {
+
+                event.preventDefault();
+                /* This will ensure the default behavior of
+                                                                page scroll behaviour (up, down, right, left)*/
+
+                event = event || window.event;
+                /*Codes de la touche sur le clavier: 37, 38, 39, 40*/
+                if (event.keyCode == '37') {
+                    // left
+                    changeCurrentURLSlideNumber(false);
+                } else if (event.keyCode == '38') {
+                    // up
+                    changeCurrentURLSlideNumber(false);
+                } else if (event.keyCode == '39') {
+                    // right
+                    changeCurrentURLSlideNumber(true);
+                } else if (event.keyCode == '40') {
+                    // down
+                    changeCurrentURLSlideNumber(true);
+                }
+            }
+            document.body.onmouseup = function (event) {
+                event = event || window.event;
+                event.preventDefault();
+                changeCurrentURLSlideNumber(true);
+            }
+        </script>
+    </body>
+
+</html>

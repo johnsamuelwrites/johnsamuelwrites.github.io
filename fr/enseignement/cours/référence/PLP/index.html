@@ -1,0 +1,830 @@
+<!DOCTYPE html>
+<html lang="en">
+
+    <head>
+        <meta charset="utf-8" />
+        <meta http-equiv="Content-Language" content="en" />
+        <link rel="shortcut icon" href="../../../../../images/logo/favicon.png" />
+        <title>Principes de langages de programmation (2025-2026): John Samuel</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <style>
+            * {
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
+            }
+
+            :root {
+                --bg-primary: #f7f9fb;
+                --bg-secondary: #ffffff;
+                --accent-code: #1B80CF;
+                --accent-syntax: #0a5a8a;
+                --accent-light: #4a9fd6;
+                --accent-compile: #00acc1;
+                --text-primary: #1a2332;
+                --text-secondary: #4a5568;
+                --shadow-code: rgba(27, 128, 207, 0.15);
+                --shadow-syntax: rgba(10, 90, 138, 0.2);
+            }
+
+            body {
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+                background: linear-gradient(135deg, var(--bg-primary) 0%, #e8f2f7 100%);
+                color: var(--text-primary);
+                line-height: 1.7;
+                min-height: 100vh;
+            }
+
+            /* Navigation */
+            nav {
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                background: rgba(255, 255, 255, 0.94);
+                -webkit-backdrop-filter: blur(12px);
+                backdrop-filter: blur(12px);
+                padding: 1rem 2rem;
+                box-shadow: 0 2px 20px var(--shadow-code);
+                z-index: 1000;
+                border-bottom: 1px solid rgba(27, 128, 207, 0.1);
+            }
+
+            .nav-content {
+                max-width: 1400px;
+                margin: 0 auto;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                flex-wrap: wrap;
+                gap: 1rem;
+            }
+
+            .nav-title {
+                font-size: 1.1rem;
+                font-weight: 600;
+                color: var(--accent-code);
+                text-decoration: none;
+                letter-spacing: -0.01em;
+            }
+
+            .nav-links {
+                display: flex;
+                gap: 2rem;
+                list-style: none;
+            }
+
+            .nav-links a {
+                color: var(--text-secondary);
+                text-decoration: none;
+                font-size: 0.95rem;
+                font-weight: 500;
+                transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+                padding: 0.4rem 0.8rem;
+                border-radius: 6px;
+                position: relative;
+                z-index: 1;
+            }
+
+            .nav-links a:hover {
+                color: var(--accent-code);
+                background: rgba(27, 128, 207, 0.08);
+            }
+
+            /* Hero Section */
+            .hero {
+                max-width: 1400px;
+                margin: 0 auto;
+                padding: 140px 2rem 80px;
+                display: grid;
+                grid-template-columns: 1fr 400px;
+                gap: 4rem;
+                align-items: center;
+            }
+
+            .hero-content h1 {
+                font-size: 4.5rem;
+                font-weight: 800;
+                color: var(--text-primary);
+                line-height: 1.1;
+                letter-spacing: -0.03em;
+                margin-bottom: 1.5rem;
+                background: linear-gradient(135deg, var(--accent-syntax) 0%, var(--accent-code) 100%);
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                background-clip: text;
+            }
+
+            .hero-content .subtitle {
+                font-size: 1.5rem;
+                color: var(--text-secondary);
+                margin-bottom: 1rem;
+                font-weight: 500;
+            }
+
+            .hero-content .year {
+                font-size: 1.2rem;
+                color: var(--accent-code);
+                font-weight: 600;
+                margin-bottom: 2rem;
+            }
+
+            .hero-description {
+                font-size: 1.15rem;
+                color: var(--text-secondary);
+                line-height: 1.8;
+                padding: 2rem;
+                background: rgba(255, 255, 255, 0.8);
+                border-radius: 16px;
+                border: 1px solid rgba(27, 128, 207, 0.12);
+                box-shadow: 0 4px 20px var(--shadow-code);
+            }
+
+            /* Code Visualization SVG */
+            .hero-visual {
+                position: relative;
+            }
+
+            .code-visual-svg {
+                width: 100%;
+                height: auto;
+                filter: drop-shadow(0 10px 30px var(--shadow-code));
+            }
+
+            /* Content Container */
+            .content-wrapper {
+                max-width: 1400px;
+                margin: 0 auto;
+                padding: 4rem 2rem;
+            }
+
+            /* Section Styling */
+            .section {
+                margin-bottom: 5rem;
+            }
+
+            .section-header {
+                display: flex;
+                align-items: center;
+                gap: 1rem;
+                margin-bottom: 3rem;
+            }
+
+            .section-icon {
+                width: 50px;
+                height: 50px;
+                background: linear-gradient(135deg, var(--accent-code), var(--accent-compile));
+                border-radius: 12px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                animation: iconPulse 3s ease-in-out infinite;
+            }
+
+            @keyframes iconPulse {
+
+                0%,
+                100% {
+                    transform: scale(1);
+                    box-shadow: 0 4px 15px var(--shadow-code);
+                }
+
+                50% {
+                    transform: scale(1.08);
+                    box-shadow: 0 6px 25px var(--shadow-syntax);
+                }
+            }
+
+            .section h2 {
+                font-size: 2.5rem;
+                font-weight: 700;
+                color: var(--text-primary);
+                letter-spacing: -0.02em;
+            }
+
+            /* Bento Grid Layout */
+            .bento-grid {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+                gap: 2rem;
+                margin-bottom: 2rem;
+            }
+
+            .bento-grid.featured {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .card {
+                background: var(--bg-secondary);
+                border-radius: 20px;
+                padding: 2.5rem;
+                border: 2px solid rgba(27, 128, 207, 0.1);
+                transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+                position: relative;
+                overflow: hidden;
+            }
+
+            .card::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background:
+                    linear-gradient(135deg, rgba(27, 128, 207, 0.03) 0%, transparent 50%),
+                    radial-gradient(circle at 80% 20%, rgba(0, 172, 193, 0.04) 0%, transparent 50%);
+                opacity: 0;
+                transition: opacity 0.4s ease;
+                pointer-events: none;
+                z-index: 0;
+            }
+
+            .card:hover::before {
+                opacity: 1;
+            }
+
+            .card:hover {
+                transform: translateY(-12px) scale(1.02);
+                border-color: var(--accent-code);
+                box-shadow:
+                    0 20px 40px var(--shadow-code),
+                    0 10px 20px var(--shadow-syntax);
+            }
+
+            .card.featured {
+                grid-column: span 1;
+            }
+
+            .card.span-2 {
+                grid-column: span 2;
+                background: linear-gradient(135deg, rgba(27, 128, 207, 0.05) 0%, rgba(255, 255, 255, 0.9) 100%);
+            }
+
+            .card-icon {
+                width: 92px;
+                height: 92px;
+                background: linear-gradient(135deg, var(--accent-light), var(--accent-code));
+                border-radius: 50% 45% 50% 45%;
+                margin-bottom: 1.5rem;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                animation: morphCode 6s ease-in-out infinite;
+                transition: all 0.4s ease;
+                position: relative;
+                z-index: 1;
+            }
+
+            .card:hover .card-icon {
+                transform: scale(1.15) rotate(8deg);
+                border-radius: 45% 50% 45% 50%;
+            }
+
+            @keyframes morphCode {
+
+                0%,
+                100% {
+                    border-radius: 50% 45% 50% 45%;
+                }
+
+                25% {
+                    border-radius: 45% 50% 45% 50%;
+                }
+
+                50% {
+                    border-radius: 50% 50% 45% 55%;
+                }
+
+                75% {
+                    border-radius: 55% 45% 50% 50%;
+                }
+            }
+
+            .card-badge {
+                display: inline-block;
+                padding: 0.4rem 1rem;
+                background: rgba(27, 128, 207, 0.12);
+                color: var(--accent-syntax);
+                border-radius: 20px;
+                font-size: 0.85rem;
+                font-weight: 600;
+                margin-bottom: 1rem;
+                letter-spacing: 0.02em;
+                position: relative;
+                z-index: 1;
+            }
+
+            .card h3 {
+                font-size: 1.6rem;
+                font-weight: 700;
+                color: var(--text-primary);
+                margin-bottom: 0.8rem;
+                letter-spacing: -0.01em;
+                position: relative;
+                z-index: 1;
+            }
+
+            .card p {
+                font-size: 1.05rem;
+                color: var(--text-secondary);
+                line-height: 1.7;
+                margin-bottom: 1.5rem;
+                position: relative;
+                z-index: 1;
+            }
+
+            .card a {
+                color: var(--accent-code);
+                text-decoration: none;
+                font-weight: 600;
+                display: inline-flex;
+                align-items: center;
+                gap: 0.5rem;
+                transition: all 0.3s ease;
+                position: relative;
+                z-index: 1;
+            }
+
+            .card a:hover {
+                color: var(--accent-syntax);
+                gap: 0.8rem;
+            }
+
+            .card a::after {
+                content: '→';
+                font-size: 1.2rem;
+                transition: transform 0.3s ease;
+            }
+
+            .card a:hover::after {
+                transform: translateX(4px);
+            }
+
+            /* GitHub Link Special Styling */
+            .github-card {
+                background: linear-gradient(135deg, #f6f8fa 0%, #ffffff 100%);
+                border: 2px solid rgba(27, 128, 207, 0.15);
+            }
+
+            /* Footer */
+            footer {
+                background: rgba(255, 255, 255, 0.8);
+                -webkit-backdrop-filter: blur(12px);
+                backdrop-filter: blur(12px);
+                padding: 3rem 2rem;
+                margin-top: 6rem;
+                border-top: 2px solid rgba(27, 128, 207, 0.1);
+            }
+
+            .footer-content {
+                max-width: 1400px;
+                margin: 0 auto;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                flex-wrap: wrap;
+                gap: 2rem;
+            }
+
+            .footer-links {
+                display: flex;
+                gap: 2rem;
+            }
+
+            .footer-links a {
+                color: var(--text-secondary);
+                text-decoration: none;
+                font-weight: 500;
+                transition: all 0.3s ease;
+                padding: 0.5rem 1rem;
+                border-radius: 8px;
+                position: relative;
+                z-index: 1;
+            }
+
+            .footer-links a:hover {
+                color: var(--accent-code);
+                background: rgba(27, 128, 207, 0.08);
+            }
+
+            .copyright {
+                color: var(--text-secondary);
+                font-size: 0.95rem;
+            }
+
+            /* Responsive Design */
+            @media (max-width: 1200px) {
+                .hero {
+                    grid-template-columns: 1fr;
+                    gap: 3rem;
+                }
+
+                .hero-visual {
+                    max-width: 400px;
+                    margin: 0 auto;
+                }
+
+                .bento-grid.featured {
+                    grid-template-columns: 1fr;
+                }
+
+                .card.span-2 {
+                    grid-column: span 1;
+                }
+            }
+
+            @media (max-width: 768px) {
+                .hero-content h1 {
+                    font-size: 2.75rem;
+                }
+
+                .hero-content .subtitle {
+                    font-size: 1.2rem;
+                }
+
+                .section h2 {
+                    font-size: 1.8rem;
+                }
+
+                .bento-grid,
+                .bento-grid.featured {
+                    grid-template-columns: 1fr;
+                }
+
+                .card.span-2 {
+                    grid-column: span 1;
+                }
+
+                .nav-content {
+                    flex-direction: column;
+                    align-items: flex-start;
+                }
+
+                .nav-links {
+                    flex-wrap: wrap;
+                    gap: 1rem;
+                }
+
+                .footer-content {
+                    flex-direction: column;
+                    text-align: center;
+                }
+            }
+        </style>
+    </head>
+
+    <body>
+        <!-- Navigation -->
+        <nav>
+            <div class="nav-content">
+                <div><a href="../../../../apropos.html" class="nav-title">John Samuel</a></div>
+                <ul class="nav-links">
+                    <li><a href="../../../../index.html">Accueil</a></li>
+                    <li><a href="../../../index.html">Enseignement</a></li>
+                    <li><a href="../../../../apropos.html">À propos</a></li>
+                </ul>
+            </div>
+        </nav>
+
+        <!-- Hero Section -->
+        <section class="hero">
+            <div class="hero-content">
+                <h1>Principes de langages de programmation</h1>
+                <p class="subtitle">CPE Lyon</p>
+                <p class="year">Année universitaire 2025-2026</p>
+                <div class="hero-description">
+                    Concepts fondamentaux des langages de programmation : types, opérateurs, structures de
+                    contrôle, gestion de la mémoire et le processus de compilation du code source aux programmes
+                    exécutables.
+                </div>
+            </div>
+            <div class="hero-visual">
+                <svg class="code-visual-svg" viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg">
+                    <!-- Background Code Pattern -->
+                    <defs>
+                        <pattern id="codeGrid" width="50" height="50" patternUnits="userSpaceOnUse">
+                            <text x="5" y="15" fill="rgba(27, 128, 207, 0.06)" font-family="monospace" font-size="10">{
+                                }</text>
+                            <text x="25" y="35" fill="rgba(27, 128, 207, 0.06)" font-family="monospace" font-size="10">(
+                                )</text>
+                        </pattern>
+
+                        <linearGradient id="codeGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" style="stop-color:#1B80CF;stop-opacity:1" />
+                            <stop offset="100%" style="stop-color:#0a5a8a;stop-opacity:1" />
+                        </linearGradient>
+
+                        <linearGradient id="compileGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                            <stop offset="0%" style="stop-color:#00acc1;stop-opacity:0.8" />
+                            <stop offset="100%" style="stop-color:#1B80CF;stop-opacity:0.8" />
+                        </linearGradient>
+
+                        <!-- Cursor Blink -->
+                        <rect id="cursor" x="0" y="0" width="3" height="20" fill="#00acc1">
+                            <animate attributeName="opacity" values="1;0;1" dur="1.5s" repeatCount="indefinite" />
+                        </rect>
+                    </defs>
+
+                    <rect width="400" height="400" fill="url(#codeGrid)" />
+
+                    <!-- Code Editor Window -->
+                    <g id="editorWindow">
+                        <!-- Window Frame -->
+                        <rect x="50" y="60" width="300" height="280" rx="12" fill="white" opacity="0.95"
+                            stroke="url(#codeGradient)" stroke-width="2" />
+
+                        <!-- Title Bar -->
+                        <rect x="50" y="60" width="300" height="35" rx="12" fill="url(#codeGradient)" />
+                        <circle cx="70" cy="77.5" r="5" fill="rgba(255, 255, 255, 0.8)" />
+                        <circle cx="85" cy="77.5" r="5" fill="rgba(255, 255, 255, 0.8)" />
+                        <circle cx="100" cy="77.5" r="5" fill="rgba(255, 255, 255, 0.8)" />
+
+                        <text x="200" y="82" fill="white" font-size="11" text-anchor="middle" font-weight="600"
+                            font-family="monospace">main.c</text>
+                    </g>
+
+                    <!-- Code Lines -->
+                    <g id="codeLines" font-family="monospace" font-size="11">
+                        <!-- Line numbers -->
+                        <text x="65" y="120" fill="rgba(27, 128, 207, 0.4)" font-size="9">1</text>
+                        <text x="65" y="140" fill="rgba(27, 128, 207, 0.4)" font-size="9">2</text>
+                        <text x="65" y="160" fill="rgba(27, 128, 207, 0.4)" font-size="9">3</text>
+                        <text x="65" y="180" fill="rgba(27, 128, 207, 0.4)" font-size="9">4</text>
+                        <text x="65" y="200" fill="rgba(27, 128, 207, 0.4)" font-size="9">5</text>
+                        <text x="65" y="220" fill="rgba(27, 128, 207, 0.4)" font-size="9">6</text>
+                        <text x="65" y="240" fill="rgba(27, 128, 207, 0.4)" font-size="9">7</text>
+                        <text x="65" y="260" fill="rgba(27, 128, 207, 0.4)" font-size="9">8</text>
+                        <text x="65" y="280" fill="rgba(27, 128, 207, 0.4)" font-size="9">9</text>
+
+                        <!-- Code content with syntax highlighting -->
+                        <text x="85" y="120" fill="#0a5a8a" font-weight="600">#include</text>
+                        <text x="140" y="120" fill="#666">&lt;stdio.h&gt;</text>
+
+                        <text x="85" y="160" fill="#0a5a8a" font-weight="600">int</text>
+                        <text x="115" y="160" fill="#1B80CF">main</text>
+                        <text x="145" y="160" fill="#666">() {</text>
+
+                        <text x="105" y="200" fill="#0a5a8a" font-weight="600">int</text>
+                        <text x="135" y="200" fill="#1B80CF">x</text>
+                        <text x="145" y="200" fill="#666">= 42;</text>
+
+                        <text x="105" y="220" fill="#0a5a8a" font-weight="600">return</text>
+                        <text x="155" y="220" fill="#00acc1">0</text>
+                        <text x="165" y="220" fill="#666">;</text>
+
+                        <text x="85" y="240" fill="#666">}</text>
+
+                        <!-- Animated cursor -->
+                        <use href="#cursor" x="170" y="220" />
+                    </g>
+
+                    <!-- Compilation Arrow -->
+                    <g id="compileArrow">
+                        <path d="M 200 350 L 200 380" stroke="url(#compileGradient)" stroke-width="3" fill="none"
+                            marker-end="url(#arrowhead)">
+                            <animate attributeName="stroke-dasharray" values="0,30;30,0;0,30" dur="3s"
+                                repeatCount="indefinite" />
+                        </path>
+                        <defs>
+                            <marker id="arrowhead" markerWidth="10" markerHeight="10" refX="5" refY="5" orient="auto">
+                                <polygon points="0,2 5,5 0,8" fill="#00acc1" />
+                            </marker>
+                        </defs>
+
+                        <text x="220" y="368" fill="#1B80CF" font-size="10" font-weight="600">
+                            COMPILER
+                            <animate attributeName="opacity" values="0.6;1;0.6" dur="2s" repeatCount="indefinite" />
+                        </text>
+                    </g>
+
+                    <!-- Binary Output Representation -->
+                    <g id="binaryOutput">
+                        <rect x="120" y="390" width="160" height="8" rx="4" fill="url(#codeGradient)" opacity="0.7">
+                            <animate attributeName="width" values="0;160;160" dur="4s" repeatCount="indefinite" />
+                        </rect>
+                        <rect x="130" y="390" width="140" height="8" rx="3" fill="#00acc1" opacity="0.4">
+                            <animate attributeName="width" values="0;140;140" dur="4s" begin="0.2s"
+                                repeatCount="indefinite" />
+                        </rect>
+                    </g>
+
+                    <!-- Floating Code Symbols -->
+                    <g id="floatingSymbols" opacity="0.3">
+                        <text x="30" y="150" fill="#1B80CF" font-family="monospace" font-size="18" font-weight="bold">
+                            {
+                            <animateTransform attributeName="transform" type="translate" values="0,0; -5,20; 0,0"
+                                dur="6s" repeatCount="indefinite" />
+                            <animate attributeName="opacity" values="0.3;0.6;0.3" dur="6s" repeatCount="indefinite" />
+                        </text>
+
+                        <text x="360" y="200" fill="#0a5a8a" font-family="monospace" font-size="18" font-weight="bold">
+                            }
+                            <animateTransform attributeName="transform" type="translate" values="0,0; 5,-20; 0,0"
+                                dur="7s" repeatCount="indefinite" />
+                            <animate attributeName="opacity" values="0.3;0.6;0.3" dur="7s" repeatCount="indefinite" />
+                        </text>
+
+                        <text x="25" y="300" fill="#00acc1" font-family="monospace" font-size="16" font-weight="bold">
+                            *
+                            <animateTransform attributeName="transform" type="translate" values="0,0; 10,-15; 0,0"
+                                dur="8s" repeatCount="indefinite" />
+                            <animate attributeName="opacity" values="0.3;0.6;0.3" dur="8s" repeatCount="indefinite" />
+                        </text>
+
+                        <text x="365" y="120" fill="#4a9fd6" font-family="monospace" font-size="16" font-weight="bold">
+                            &amp;
+                            <animateTransform attributeName="transform" type="translate" values="0,0; -10,15; 0,0"
+                                dur="7.5s" repeatCount="indefinite" />
+                            <animate attributeName="opacity" values="0.3;0.6;0.3" dur="7.5s" repeatCount="indefinite" />
+                        </text>
+                    </g>
+
+                    <!-- Data Type Icons -->
+                    <g id="typeIndicators">
+                        <circle cx="380" cy="280" r="8" fill="#1B80CF" opacity="0.6">
+                            <animate attributeName="r" values="8;11;8" dur="3s" repeatCount="indefinite" />
+                        </circle>
+                        <text x="378" y="283" fill="white" font-size="8" font-weight="700">i</text>
+
+                        <circle cx="20" cy="220" r="8" fill="#00acc1" opacity="0.6">
+                            <animate attributeName="r" values="8;11;8" dur="3.5s" repeatCount="indefinite" />
+                        </circle>
+                        <text x="17" y="223" fill="white" font-size="8" font-weight="700">f</text>
+                    </g>
+                </svg>
+            </div>
+        </section>
+
+        <!-- Content -->
+        <div class="content-wrapper">
+            <!-- Overview Section -->
+            <section class="section">
+                <div class="section-header">
+                    <div class="section-icon">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                            <polyline points="14 2 14 8 20 8" />
+                            <line x1="16" y1="13" x2="8" y2="13" />
+                            <line x1="16" y1="17" x2="8" y2="17" />
+                            <polyline points="10 9 9 9 8 9" />
+                        </svg>
+                    </div>
+                    <h2>Aperçu du cours</h2>
+                </div>
+                <div class="bento-grid">
+                    <div class="card span-2">
+                        <div class="card-badge">Programme</div>
+                        <div class="card-icon">
+                            <svg width="42" height="42" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
+                                <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" />
+                                <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" />
+                            </svg>
+                        </div>
+                        <h3>Contenu et structure du cours</h3>
+                        <p>Programme complet détaillant tous les sujets abordés dans ce cours.</p>
+                        <a href="plan.html">Voir le plan du cours</a>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Classes Section -->
+            <section class="section">
+                <div class="section-header">
+                    <div class="section-icon">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
+                            <polyline points="16 18 22 12 16 6" />
+                            <polyline points="8 6 2 12 8 18" />
+                        </svg>
+                    </div>
+                    <h2>Cours</h2>
+                </div>
+                <div class="bento-grid featured">
+                    <div class="card">
+                        <div class="card-badge">Introduction</div>
+                        <div class="card-icon">
+                            <svg width="42" height="42" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
+                                <circle cx="12" cy="12" r="10" />
+                                <line x1="12" y1="8" x2="12" y2="16" />
+                                <line x1="8" y1="12" x2="16" y2="12" />
+                            </svg>
+                        </div>
+                        <h3>Introduction</h3>
+                        <p>Aperçu des objectifs d'apprentissage, critères d'évaluation et planning détaillé des cours
+                            magistraux et séances pratiques tout au long de l'année universitaire.</p>
+                        <a href="introduction.html">Voir le cours</a>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-badge">Concepts fondamentaux</div>
+                        <div class="card-icon">
+                            <svg width="42" height="42" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
+                                <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
+                                <line x1="9" y1="9" x2="15" y2="9" />
+                                <line x1="9" y1="15" x2="15" y2="15" />
+                            </svg>
+                        </div>
+                        <h3>Types, opérateurs et contrôle</h3>
+                        <p>Paradigmes de programmation, types de données, systèmes de types, opérateurs, expressions et
+                            structures de contrôle incluant les conditionnelles et les boucles.</p>
+                        <a href="cours1.html">Voir le cours</a>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-badge">Mémoire et structure</div>
+                        <div class="card-icon">
+                            <svg width="42" height="42" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
+                                <path
+                                    d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" />
+                                <polyline points="3.27 6.96 12 12.01 20.73 6.96" />
+                                <line x1="12" y1="22.08" x2="12" y2="12" />
+                            </svg>
+                        </div>
+                        <h3>Pointeurs, structures et fonctions</h3>
+                        <p>Gestion de la mémoire à travers les pointeurs, organisation des données avec les structures
+                            et implémentation de code modulaire utilisant les fonctions.</p>
+                        <a href="cours2.html">Voir le cours</a>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-badge">Avancé</div>
+                        <div class="card-icon">
+                            <svg width="42" height="42" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
+                                <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />
+                            </svg>
+                        </div>
+                        <h3>Chaîne de compilation</h3>
+                        <p>Compréhension de la chaîne de compilation du code source à l'exécutable : prétraitement,
+                            compilation, assemblage et édition de liens.</p>
+                        <a href="cours3.html">Voir le cours</a>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-badge">Programmation fonctionnelle</div>
+                        <div class="card-icon">
+                            <svg width="42" height="42" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
+                                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+                                <line x1="9" y1="10" x2="15" y2="10" />
+                            </svg>
+                        </div>
+                        <h3>Expressions lambda</h3>
+                        <p>Introduction aux concepts de programmation fonctionnelle et aux expressions lambda.</p>
+                        <a href="cours4.html">Voir le cours</a>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Practical Sessions Section -->
+            <section class="section">
+                <div class="section-header">
+                    <div class="section-icon">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
+                            <rect x="2" y="3" width="20" height="14" rx="2" ry="2" />
+                            <line x1="8" y1="21" x2="16" y2="21" />
+                            <line x1="12" y1="17" x2="12" y2="21" />
+                        </svg>
+                    </div>
+                    <h2>Travaux pratiques et projet</h2>
+                </div>
+                <div class="bento-grid">
+                    <div class="card github-card span-2">
+                        <div class="card-badge">Dépôt GitHub</div>
+                        <div class="card-icon">
+                            <svg width="42" height="42" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
+                                <path
+                                    d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22" />
+                            </svg>
+                        </div>
+                        <h3>Dépôt PLP</h3>
+                        <p>Exercices pratiques complets, devoirs de programmation et projet semestriel.
+                            Comprend le code de départ, des instructions détaillées en français et des exemples
+                            couvrant tous les sujets du cours, de la syntaxe de base aux processus de compilation.</p>
+                        <a href="https://github.com/johnsamuelwrites/PLP" target="_blank" rel="noopener">Accéder sur
+                            GitHub</a>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <!-- Footer -->
+        <footer>
+            <div class="footer-content">
+                <div class="copyright">
+                    <p>© 2025 John Samuel</p>
+                    <p style="margin-top: 0.5rem;">
+                        <a href="http://creativecommons.org/licenses/by-sa/4.0/" target="_blank" rel="noopener"
+                            style="color: var(--accent-code); text-decoration: none;">
+                            Creative Commons BY-SA 4.0
+                        </a>
+                    </p>
+                </div>
+                <div class="footer-links">
+                    <a href="../../../../index.html">Accueil</a>
+                    <a href="../../../index.html">Enseignement</a>
+                    <a href="../../../../apropos.html">À propos</a>
+                </div>
+            </div>
+        </footer>
+    </body>
+
+</html>

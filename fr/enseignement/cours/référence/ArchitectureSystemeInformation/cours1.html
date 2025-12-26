@@ -1,0 +1,2279 @@
+<html>
+<head>
+<meta charset="utf-8"/>
+<title>Architecture of Information Systems: Search Engine (2019-2020): John Samuel</title>
+<style type="text/css">
+    body {
+      height: 100%;
+      width: 100%;
+      background-color: white;
+      margin: 0;
+      overflow: hidden;
+      font-family: Arial;
+    }
+    .slide {
+      height: 100%;
+      width: 100%;
+    }
+    .content {
+      height: 79%;
+      width: 95vw;
+      display: flex;
+      flex-direction: column;
+      color: #000000;
+      text-align: left;
+      padding-left: 1.5vmax;
+      padding-top: 1.5vmax;
+      overflow-x: auto;
+      font-size: 3vmin;
+      flex-wrap: wrap;
+    }
+    .content h1, h2, h3, h4 {
+      color: #1B80CF;
+    }
+    .content .topichighlight {
+      background-color: #78002E;
+      color: #FFFFFF;
+    }
+    .content .topicheading{
+      background-color: #1B80CF;
+      color: #FFFFFF;
+      vertical-align:middle;
+      border-radius:0 2vmax 2vmax 0%;
+      height:4vmax;
+      line-height:4vmax;
+      padding-left:1vmax;
+      margin:0.1vmax;
+      width:50%;
+      margin-bottom:1vmax;
+    }
+    .content .flexcontent{
+      height: 79%;
+      width:auto;
+      display: flex;
+      overflow-y: auto;
+      font-size: 3vmin;
+      flex-wrap: wrap;
+    }
+    .content .gridcontent{
+      display:grid;
+      grid-template-columns: auto auto auto auto;
+      grid-column-gap:0px;
+      grid-row-gap:0px;
+      grid-gap:0px;
+    }
+    .content .topicsubheading{
+      background-color: #1B80CF;
+      color: #FFFFFF;
+      vertical-align:middle;
+      border-radius:0 1.5vmax 1.5vmax 0%;
+      height:3vmax;
+      margin:0.1vmax;
+      font-size:90%;
+      line-height:3vmax;
+      padding-left:1vmax;
+      width:40%;
+      margin-bottom:1vmax;
+    }
+    .content table {
+      color: #000000;
+      font-size: 100%;
+      width: 100%;
+    }
+    .content a:link,
+    .content a:visited{
+      color: #1B80CF;
+      text-decoration:none;
+    }
+    .content th {
+      color: #FFFFFF;
+      background-color: #1B80CF;
+      border-radius:2vmax 2vmax 2vmax 2vmax;
+      font-size: 120%;
+      padding: 15px;
+    }
+    .content figure {
+      max-width:90%;
+      max-height:90%;
+    }
+    .content .fullwidth img {
+      max-width:90%;
+      max-height:90%;
+    }
+    .content figure img{
+      max-width:50vw;
+      max-height:50vw;
+      vertical-align:center;
+      display:block;
+      margin-left:auto;
+      margin-right:auto;
+    }
+    .content figure figcaption {
+      max-width:90%;
+      max-height:90%;
+      margin:0.1vmax;
+      font-size:90%;
+      text-align:center;
+      padding:0.5vmax;
+      background-color: #E1F5FE;
+      border-radius:2vmax 2vmax 2vmax 2vmax;
+    }
+    .content td {
+      color: #000000;
+      width: 8%;
+      padding-left: 3vmax;
+      padding-top: 1vmax;
+      padding-bottom: 1vmax;
+      background-color: #E1F5FE;
+      border-radius:2vmax 2vmax 2vmax 2vmax;
+    }
+    .content li {
+      line-height: 4vh;
+    }
+    .header {
+      color: #ffffff;
+      background-color: #00549d;
+      height: 5vmax;
+    }
+    .header h1 {
+      text-align: center;
+      vertical-align: middle;
+      font-size: 3vmax;
+      line-height: 4vmax;
+      margin: 0;
+    }
+    .footer {
+      height: 3vmax;
+      line-height: 3vmax;
+      vertical-align: middle;
+      color: #ffffff;
+      background-color: #00549d;
+      margin: 0;
+      padding: .3vmax;
+      overflow: hidden;
+    }
+    .footer .contact {
+      float: left;
+      color: #ffffff;
+      text-align: left;
+      font-size: 3.2vmin;
+    }
+    .footer .navigation {
+      float: right;
+      text-align: right;
+      width: 8vw;
+      font-size: 3vmin;
+    }
+    .footer .navigation .next,.prev {
+      font-size: 3vmin;
+      color: #ffffff;
+      text-decoration: none;
+    }
+    .footer .navigation .next::after {
+      content: "| >";
+    }
+    .footer .navigation .prev::after {
+      content: "< ";
+    }
+    @media (max-width: 640px), screen and (orientation: portrait) {
+       body {
+         max-width:100%;
+         max-height:100%;
+       }
+       .slide {
+          height: 100%;
+          width: 100%;
+       }
+       .content {
+          width: 100%;
+          height:92%;
+          display: flex;
+          flex-direction: row;
+          text-align: left;
+          padding: 1vw;
+          line-height: 3.8vmax;
+          font-size: 1.8vmax;
+          flex-wrap: wrap;
+       }
+       .content .topicheading{
+         width:90%;
+       }
+       .content h1, h2, h3, h4 {
+          width:100%;
+       }
+       .content figure img{
+          max-width:80vmin;
+          max-height:50vmin;
+       }
+       .content figure figcaption {
+           max-width:90%;
+           max-height:90%;
+       }
+    }
+
+    @media print {
+      body {
+        max-width:100%;
+        max-height:100%;
+      }
+      .content {
+        height: 76%;
+        width: 90vw;
+        display: flex;
+        flex-direction: column;
+        color: #000000;
+        text-align: left;
+        padding: 5vw;
+        font-size: 3vmin;
+        flex-wrap: wrap;
+      }
+      .content figure img{
+        max-width:80%;
+        max-height:80%;
+      }
+      .content figcaption {
+        max-width:80%;
+        max-height:80%;
+      }
+    }
+
+    </style>
+</head>
+<body>
+	<section class="slide" id="slide1">
+		<div class="header">
+		</div>
+		<div class="content">
+			<h1 style="font-size:3.5vmin">Architecture of Information Systems</br>
+			<span style="line-height:3.5vmax;font-size:3.0vmin">
+                           Search Engine<span></h1>
+                        <p><b>John Samuel</b></br>
+                          CPE Lyon<br/><br/>
+                        <b>Year</b>: 2018-2019<br/>
+                        <b>Email</b>: john(dot)samuel(at)cpe(dot)fr</br></br>
+                        <a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/"><img alt="Creative Commons License" style="border-width:0" src="../../../../../en/teaching/courses/2017/C/88x31.png" /></a></p>
+                <figure>
+                   <img src="../../../../../en/teaching/courses/2017/ArchitectureInformationSystems/images/searchonebox.svg" height="350vh" />
+                </figure>
+		</div>
+		<div class="footer">
+			<div class="contact">Architecture of Information Systems | John Samuel</div>
+			<div class="navigation">1
+				<a class="next" href="#slide2"></a>
+			</div>
+		</div>
+	</section>
+	<section class="slide" id="slide2">
+		<div class="header">
+			<h1>Architecture of Information Systems</h1>
+		</div>
+		<div class="content">
+			<h1>Outline: Search engine</h1>
+			<ol>
+				<li>Frontend development</li>
+				<li>Backend development</li>
+				<li>Application programming interface</li>
+				<li>Towards Federated Search Engines</li>
+			</ol>
+		</div>
+		<div class="footer">
+			<div class="contact">Architecture of Information Systems | John Samuel</div>
+			<div class="navigation">2
+				<a class="prev" href="#slide1"></a>
+                                <a class="next" href="#slide3"></a>
+			</div>
+		</div>
+	</section>
+	<section class="slide" id="slide3">
+		<div class="header">
+			<h1>1. Frontend development: Search Engine</h1>
+		</div>
+		<div class="content">
+	         <h1 class="topicheading">Target devices</h1>
+                 <figure>
+                   <img src="../../../../../en/teaching/courses/2017/ArchitectureInformationSystems/images/searchonebox.svg" height="400vh" />
+                 </figure>
+
+		</div>
+		<div class="footer">
+			<div class="contact">Architecture of Information Systems | John Samuel</div>
+			<div class="navigation">3
+				<a class="prev" href="#slide2"></a>
+                                <a class="next" href="#slide4"></a>
+			</div>
+		</div>
+	</section>
+	<section class="slide" id="slide4">
+		<div class="header">
+			<h1>1. Frontend development: Search Engine</h1>
+		</div>
+		<div class="content">
+	          <h1 class="topicsubheading">Desktop PC</h1>
+		  <div class="gridcontent">
+                   <figure>
+                     <img src="../../2018/ArchitectureSystemeInformation/images/Screenshot_2018-10-24 DuckDuckGo — Privacy, simplified .png" height="300vh" />
+                     <figcaption>DuckDuckGo</figcaption>
+                   </figure>
+		  </div>
+		</div>
+		<div class="footer">
+			<div class="contact">Architecture of Information Systems | John Samuel</div>
+			<div class="navigation">4
+				<a class="prev" href="#slide3"></a>
+                                <a class="next" href="#slide5"></a>
+			</div>
+		</div>
+	</section>
+	<section class="slide" id="slide5">
+		<div class="header">
+			<h1>1. Frontend development: Search Engine</h1>
+		</div>
+		<div class="content">
+	          <h1 class="topicsubheading">Desktop PC</h1>
+		  <div class="gridcontent">
+                   <figure>
+                     <img src="../../2018/ArchitectureSystemeInformation/images/Screenshot_2018-10-25 Search - Qwant.png" height="300vh" />
+                     <figcaption>Qwant</figcaption>
+                   </figure>
+		  </div>
+		</div>
+		<div class="footer">
+			<div class="contact">Architecture of Information Systems | John Samuel</div>
+			<div class="navigation">5
+				<a class="prev" href="#slide4"></a>
+                                <a class="next" href="#slide6"></a>
+			</div>
+		</div>
+	</section>
+	<section class="slide" id="slide6">
+		<div class="header">
+			<h1>1. Frontend development: Search Engine</h1>
+		</div>
+		<div class="content">
+	          <h1 class="topicsubheading">Desktop PC</h1>
+		  <div class="gridcontent">
+                   <figure>
+                     <img src="../../2018/ArchitectureSystemeInformation/images/Screenshot_2018-10-24 Wikipedia, the free encyclopedia.png" height="100vh" />
+                     <figcaption>Wikipedia</figcaption>
+                   </figure>
+                  </div>
+		</div>
+		<div class="footer">
+			<div class="contact">Architecture of Information Systems | John Samuel</div>
+			<div class="navigation">6
+				<a class="prev" href="#slide5"></a>
+                                <a class="next" href="#slide7"></a>
+			</div>
+		</div>
+	</section>
+	<section class="slide" id="slide7">
+		<div class="header">
+			<h1>1. Frontend development: Search Engine</h1>
+		</div>
+		<div class="content">
+	          <h1 class="topicsubheading">Mobile phones</h1>
+		  <div class="gridcontent">
+                   <figure>
+                     <img src="Screen Shot 2019-10-01 at 20.17.00.png" height="300vh" />
+                     <figcaption>DuckDuckGo</figcaption>
+                   </figure>
+                  </div>
+		</div>
+		<div class="footer">
+			<div class="contact">Architecture of Information Systems | John Samuel</div>
+			<div class="navigation">7
+				<a class="prev" href="#slide6"></a>
+                                <a class="next" href="#slide8"></a>
+			</div>
+		</div>
+	</section>
+	<section class="slide" id="slide8">
+		<div class="header">
+			<h1>1. Frontend development: Search Engine</h1>
+		</div>
+		<div class="content">
+	          <h1 class="topicsubheading">Mobile phones</h1>
+		  <div class="gridcontent">
+                   <figure>
+                     <img src="Screen Shot 2019-10-01 at 20.20.50.png" height="300vh" />
+                     <figcaption>Google</figcaption>
+                   </figure>
+                  </div>
+		</div>
+		<div class="footer">
+			<div class="contact">Architecture of Information Systems | John Samuel</div>
+			<div class="navigation">8
+				<a class="prev" href="#slide7"></a>
+                                <a class="next" href="#slide9"></a>
+			</div>
+		</div>
+	</section>
+	<section class="slide" id="slide9">
+		<div class="header">
+			<h1>1. Frontend development: Search Engine</h1>
+		</div>
+		<div class="content">
+	          <h1 class="topicsubheading">Mobile phones</h1>
+		  <div class="gridcontent">
+                   <figure>
+                     <img src="Screen Shot 2019-10-01 at 20.21.43.png" height="300vh" />
+                     <figcaption>Wikipedia</figcaption>
+                   </figure>
+                  </div>
+		</div>
+		<div class="footer">
+			<div class="contact">Architecture of Information Systems | John Samuel</div>
+			<div class="navigation">9
+				<a class="prev" href="#slide8"></a>
+                                <a class="next" href="#slide10"></a>
+			</div>
+		</div>
+	</section>
+	<section class="slide" id="slide10">
+		<div class="header">
+			<h1>1. Frontend development: Search Engine</h1>
+		</div>
+		<div class="content">
+	          <h1 class="topicsubheading">Mobile phones</h1>
+		  <div class="gridcontent">
+                   <figure>
+                     <img src="Screen Shot 2019-10-01 at 20.22.39.png" height="300vh" />
+                     <figcaption>Wikipedia</figcaption>
+                   </figure>
+                  </div>
+		</div>
+		<div class="footer">
+			<div class="contact">Architecture of Information Systems | John Samuel</div>
+			<div class="navigation">10
+				<a class="prev" href="#slide9"></a>
+                                <a class="next" href="#slide11"></a>
+			</div>
+		</div>
+	</section>
+	<section class="slide" id="slide11">
+		<div class="header">
+			<h1>1. Frontend development: Features</h1>
+		</div>
+		<div class="content">
+	          <h3 class="topicsubheading">Autocompletion</h3>
+                  <div class="flexcontent">
+                   <figure>
+                   <img src="../../2018/ArchitectureSystemeInformation/images/Screenshot_2018-11-21-Wikipedia Autocomplete.png" height="250vh" />
+                   <figcaption>Wikipedia Autocomplete(November 2018)</figcaption>
+                </figure>
+                 </div>
+		</div>
+		<div class="footer">
+			<div class="contact">Architecture of Information Systems | John Samuel</div>
+			<div class="navigation">11
+				<a class="prev" href="#slide10"></a>
+                                <a class="next" href="#slide12"></a>
+			</div>
+		</div>
+	</section>
+	<section class="slide" id="slide12">
+		<div class="header">
+			<h1>1. Frontend development: Features</h1>
+		</div>
+		<div class="content">
+	        <h3 class="topicsubheading">Autocorrection</h3>
+                <div class="flexcontent">
+                   <figure>
+                   <img src="../../2018/ArchitectureSystemeInformation/images/Screenshot_2018-10-25 Search - QwantAutocorrect.png" height="350vh" />
+                   <figcaption>Softwre (November 2018 Qwant Autocorrect)</figcaption>
+                </figure>
+                 </div>
+		</div>
+		<div class="footer">
+			<div class="contact">Architecture of Information Systems | John Samuel</div>
+			<div class="navigation">12
+				<a class="prev" href="#slide11"></a>
+                                <a class="next" href="#slide13"></a>
+			</div>
+		</div>
+	</section>
+	<section class="slide" id="slide13">
+		<div class="header">
+			<h1>1. Frontend development: Features</h1>
+		</div>
+		<div class="content">
+	        <h3 class="topicsubheading">Autocorrection</h3>
+                <div class="flexcontent">
+                   <figure>
+                   <img src="../../2018/ArchitectureSystemeInformation/images/Screenshot_2018-10-25 Search - DuckDuckgoAutocorrect.png" height="300vh" />
+                   <figcaption>Softwre (November 2018 DuckDuckGo)</figcaption>
+                </figure>
+                 </div>
+		</div>
+		<div class="footer">
+			<div class="contact">Architecture of Information Systems | John Samuel</div>
+			<div class="navigation">13
+				<a class="prev" href="#slide12"></a>
+                                <a class="next" href="#slide14"></a>
+			</div>
+		</div>
+	</section>
+	<section class="slide" id="slide14">
+		<div class="header">
+			<h1>1. Frontend development: Search Engine</h1>
+		</div>
+		<div class="content">
+	          <h3 class="topicsubheading">Advanced Search</h3>
+                  <div class="flexcontent">
+                   <figure>
+                   <img src="../../../../../en/teaching/courses/2017/ArchitectureInformationSystems/images/filters.svg" height="400vh" />
+                  </figure>
+                 </div>
+		</div>
+		<div class="footer">
+			<div class="contact">Architecture of Information Systems | John Samuel</div>
+			<div class="navigation">14
+				<a class="prev" href="#slide13"></a>
+                                <a class="next" href="#slide15"></a>
+			</div>
+		</div>
+	</section>
+	<section class="slide" id="slide15">
+		<div class="header">
+			<h1>1. Frontend development: Search Engine Filters</h1>
+		</div>
+		<div class="content">
+	          <h3 class="topicsubheading">Advanced Search: Filters</h3>
+                   <div class="flexcontent">
+                   <figure>
+                     <img src="../../2018/ArchitectureSystemeInformation/images/Screenshot_2018-10-24 DuckDuckGo at DuckDuckGo.png" height="150vh" />
+                     <figcaption>More options (filters)</figcaption>
+                   </figure>
+                 </div>
+		</div>
+		<div class="footer">
+			<div class="contact">Architecture of Information Systems | John Samuel</div>
+			<div class="navigation">15
+				<a class="prev" href="#slide14"></a>
+                                <a class="next" href="#slide16"></a>
+			</div>
+		</div>
+	</section>
+	<section class="slide" id="slide16">
+		<div class="header">
+			<h1>1. Frontend development: Search Engine Filters</h1>
+		</div>
+		<div class="content">
+	          <h3 class="topicsubheading">Advanced Search: Filters</h3>
+                   <div class="flexcontent">
+                   <figure>
+                     <img src="../../2018/ArchitectureSystemeInformation/images/Screenshot_2018-10-24 Search - Wikipedia.png" height="250vh" />
+                     <figcaption>More options (filters)</figcaption>
+                   </figure>
+                 </div>
+		</div>
+		<div class="footer">
+			<div class="contact">Architecture of Information Systems | John Samuel</div>
+			<div class="navigation">16
+				<a class="prev" href="#slide15"></a>
+                                <a class="next" href="#slide17"></a>
+			</div>
+		</div>
+	</section>
+	<section class="slide" id="slide17">
+		<div class="header">
+			<h1>1. Frontend development: Search Engine Filters</h1>
+		</div>
+		<div class="content">
+	          <h3 class="topicsubheading">Advanced Search: Filters</h3>
+                   <div class="flexcontent">
+                   <figure>
+                     <img src="../../2018/ArchitectureSystemeInformation/images/Screenshot_2018-10-25 Search - QwantAdvanced.png" height="400vh" />
+                     <figcaption>More options (filters)</figcaption>
+                   </figure>
+                 </div>
+		</div>
+		<div class="footer">
+			<div class="contact">Architecture of Information Systems | John Samuel</div>
+			<div class="navigation">17
+				<a class="prev" href="#slide16"></a>
+                                <a class="next" href="#slide18"></a>
+			</div>
+		</div>
+	</section>
+	<section class="slide" id="slide18">
+		<div class="header">
+			<h1>1. Frontend Development: Target Audience</h1>
+		</div>
+		<div class="content">
+	          <h3 class="topicsubheading">Users of search interfaces</h3>
+                <div class="flexcontent">
+                   <figure>
+                   <img src="../../../../../en/teaching/courses/2017/ArchitectureInformationSystems/images/group-2517459_640.png" height="400vh" />
+                </figure>
+                 </div>
+                        <ul>
+                         <li>Regular users</li>
+                         <li>Domain Experts</li>
+                        </ul>
+		</div>
+		<div class="footer">
+			<div class="contact">Architecture of Information Systems | John Samuel</div>
+			<div class="navigation">18
+				<a class="prev" href="#slide17"></a>
+                                <a class="next" href="#slide19"></a>
+			</div>
+		</div>
+	</section>
+	<section class="slide" id="slide19">
+		<div class="header">
+			<h1>1. Frontend Development: Target Audience</h1>
+		</div>
+		<div class="content">
+	          <h3 class="topicsubheading">Users of search interfaces</h3>
+                <div class="flexcontent">
+                   <figure>
+                   <img src="../../../../../en/teaching/courses/2017/ArchitectureInformationSystems/images/group-2517459_640.png" height="400vh" />
+                </figure>
+                 </div>
+                        <ul>
+                         <li>Power users (Superusers)</li>
+                        </ul>
+		</div>
+		<div class="footer">
+			<div class="contact">Architecture of Information Systems | John Samuel</div>
+			<div class="navigation">19
+				<a class="prev" href="#slide18"></a>
+                                <a class="next" href="#slide20"></a>
+			</div>
+		</div>
+	</section>
+	<section class="slide" id="slide20">
+		<div class="header">
+			<h1>1. Frontend development: Results</h1>
+		</div>
+		<div class="content">
+	          <h3 class="topicsubheading">Search Results</h3>
+                <div class="flexcontent">
+                   <figure>
+                   <img src="../../2018/ArchitectureSystemeInformation/images/Screenshot_2018-10-25 Search - QwantSearchSnippets.png" height="250vh" /></br></br>
+                   <figcaption>Leonardo da Vinci (November 2018 Qwant results)</figcaption>
+                </figure>
+                 </div>
+		</div>
+		<div class="footer">
+			<div class="contact">Architecture of Information Systems | John Samuel</div>
+			<div class="navigation">20
+				<a class="prev" href="#slide19"></a>
+                                <a class="next" href="#slide21"></a>
+			</div>
+		</div>
+	</section>
+	<section class="slide" id="slide21">
+		<div class="header">
+			<h1>1. Frontend development: Results</h1>
+		</div>
+		<div class="content">
+	          <h3 class="topicsubheading">Search Results</h3>
+                <div class="flexcontent">
+                   <figure>
+                   <img src="../../../../../en/teaching/courses/2017/ArchitectureInformationSystems/images/responselinks.png" height="100vh" /></br></br>
+                   <figcaption>Leonardo da Vinci (October 2017 Google results)</figcaption>
+                </figure>
+                 </div>
+		</div>
+		<div class="footer">
+			<div class="contact">Architecture of Information Systems | John Samuel</div>
+			<div class="navigation">21
+				<a class="prev" href="#slide20"></a>
+                                <a class="next" href="#slide22"></a>
+			</div>
+		</div>
+	</section>
+	<section class="slide" id="slide22">
+		<div class="header">
+			<h1>1. Frontend development: Results</h1>
+		</div>
+		<div class="content">
+	          <h3 class="topicsubheading">Search Results</h3>
+                <div class="flexcontent">
+                   <figure>
+                   <img src="../../../../../en/teaching/courses/2017/ArchitectureInformationSystems/images/structuredresponse.png" height="350vh" />
+                   <figcaption>Leonardo da Vinci (October 2017 Google results)</figcaption>
+                </figure>
+                 </div>
+		</div>
+		<div class="footer">
+			<div class="contact">Architecture of Information Systems | John Samuel</div>
+			<div class="navigation">22
+				<a class="prev" href="#slide21"></a>
+                                <a class="next" href="#slide23"></a>
+			</div>
+		</div>
+	</section>
+	<section class="slide" id="slide23">
+		<div class="header">
+			<h1>1. Frontend development: Results</h1>
+		</div>
+		<div class="content">
+	          <h3 class="topicsubheading">Search Results: Timeline</h3>
+                <div class="flexcontent">
+                   <figure>
+                   <img src="../../../../../en/teaching/courses/2017/ArchitectureInformationSystems/images/histropediaartists.png" height="300vh"/>
+                   <figcaption>Artists on Histropedia</figcaption>
+                </figure>
+                 </div>
+		</div>
+		<div class="footer">
+			<div class="contact">Architecture of Information Systems | John Samuel</div>
+			<div class="navigation">23
+				<a class="prev" href="#slide22"></a>
+                                <a class="next" href="#slide24"></a>
+			</div>
+		</div>
+	</section>
+	<section class="slide" id="slide24">
+		<div class="header">
+			<h1>1. Frontend development: Results</h1>
+		</div>
+		<div class="content">
+	          <h3 class="topicsubheading">Search Results: Map</h3>
+                <div class="flexcontent">
+                   <figure>
+                   <img src="../../../../../en/teaching/courses/2017/ArchitectureInformationSystems/images/archaeologicalsiteslocation.png" height="400vh"/>
+                   <figcaption>Location of Archaelogical sites (Wikidata)</figcaption>
+                </figure>
+                 </div>
+		</div>
+		<div class="footer">
+			<div class="contact">Architecture of Information Systems | John Samuel</div>
+			<div class="navigation">24
+				<a class="prev" href="#slide23"></a>
+                                <a class="next" href="#slide25"></a>
+			</div>
+		</div>
+	</section>
+	<section class="slide" id="slide25">
+		<div class="header">
+			<h1>1. Frontend development: Results</h1>
+		</div>
+		<div class="content">
+	          <h3 class="topicsubheading">Search Results: Map</h3>
+                <h3>Need for Geographical Coordiantes</h3>
+<div class=" highlight hl-ipython3"><pre>
+SELECT ?item ?location
+WHERE {
+  ?item wdt:P1435 wd:Q9259;
+        wdt:P625 ?location
+}
+</pre></div>
+
+                <div class="flexcontent">
+                   <figure>
+                   <img src="../../../../../en/teaching/courses/2017/ArchitectureInformationSystems/images/archaeologicalsiteslocation.png" height="200vh"/>
+                   <figcaption>Location of Archaelogical sites (Wikidata)</figcaption>
+                </figure>
+                 </div>
+		</div>
+		<div class="footer">
+			<div class="contact">Architecture of Information Systems | John Samuel</div>
+			<div class="navigation">25
+				<a class="prev" href="#slide24"></a>
+                                <a class="next" href="#slide26"></a>
+			</div>
+		</div>
+	</section>
+	<section class="slide" id="slide26">
+		<div class="header">
+			<h1>1. Frontend development: Results</h1>
+		</div>
+		<div class="content">
+                <h3 class="topicheading">Search paradigms [1]</h3>
+                <ul>
+                 <li>Keyword search</li>
+                 <li>Concept search</li>
+                 <li>Search by example</li>
+                 <li>Exploratory search (unsure about goals and how to find them)</li>
+                 <li>Question-answering systems</li>
+                 <li>Computational knowledge Engine</li>
+                 <li>Semantic web search</li>
+                </ul>
+		</div>
+		<div class="footer">
+			<div class="contact">Architecture of Information Systems | John Samuel</div>
+			<div class="navigation">26
+				<a class="prev" href="#slide25"></a>
+                                <a class="next" href="#slide27"></a>
+			</div>
+		</div>
+	</section>
+	<section class="slide" id="slide27">
+		<div class="header">
+			<h1>1. Frontend development: Results</h1>
+		</div>
+		<div class="content">
+                <h3 class="topicheading">Computational knowledge engine</h3>
+                <div class="flexcontent">
+                   <figure>
+                     <img src="Screenshot_2019-10-02 Wolfram Alpha Computational Intelligence.png" height="350vh" /></br></br>
+                   <figcaption>Wolfram Alpha</figcaption>
+                </figure>
+		</div>
+		</div>
+		<div class="footer">
+			<div class="contact">Architecture of Information Systems | John Samuel</div>
+			<div class="navigation">27
+				<a class="prev" href="#slide26"></a>
+                                <a class="next" href="#slide28"></a>
+			</div>
+		</div>
+	</section>
+	<section class="slide" id="slide28">
+		<div class="header">
+			<h1>1. Frontend development: Results</h1>
+		</div>
+		<div class="content">
+                <h3 class="topicsubheading">Search user interfaces</h3>
+                <ul>
+                 <li>Textual Search</li>
+                 <li>Voice search</li>
+                 <li>Search by image and video [3]</li>
+                 <li>Natural language queries</li>
+                </ul>
+		</div>
+		<div class="footer">
+			<div class="contact">Architecture of Information Systems | John Samuel</div>
+			<div class="navigation">28
+				<a class="prev" href="#slide27"></a>
+                                <a class="next" href="#slide29"></a>
+			</div>
+		</div>
+	</section>
+	<section class="slide" id="slide29">
+		<div class="header">
+			<h1>1. Frontend development: Results</h1>
+		</div>
+		<div class="content">
+                <h3 class="topicsubheading">Search Results</h3>
+                <ul>
+                 <li>Links</li>
+                 <li>Snippets</li>
+                 <li>Structured response</li>
+                 <li>Natural language response</li>
+                </ul>
+                <div class="flexcontent">
+                   <figure>
+                   <img src="../../../../../en/teaching/courses/2017/ArchitectureInformationSystems/images/responselinks.png" height="100vh" /></br></br>
+                   <img src="../../../../../en/teaching/courses/2017/ArchitectureInformationSystems/images/structuredresponse.png" height="250vh" />
+                   <figcaption>Leonardo da Vinci (October 2017 Google results)</figcaption>
+                </figure>
+                 </div>
+		</div>
+		<div class="footer">
+			<div class="contact">Architecture of Information Systems | John Samuel</div>
+			<div class="navigation">29
+				<a class="prev" href="#slide28"></a>
+                                <a class="next" href="#slide30"></a>
+			</div>
+		</div>
+	</section>
+	<section class="slide" id="slide30">
+		<div class="header">
+			<h1>1. Front-end development</h1>
+		</div>
+		<div class="content">
+                        <h3 class="topicsubheading">Search interface</h3>
+                        <ul>
+                         <li>One-box search</li>
+                         <li>Advanced search (filters)</li>
+                        </ul>
+                        <h3>Personalized user experience</h3>
+		</div>
+		<div class="footer">
+			<div class="contact">Architecture of Information Systems | John Samuel</div>
+			<div class="navigation">30
+				<a class="prev" href="#slide29"></a>
+                                <a class="next" href="#slide31"></a>
+			</div>
+		</div>
+	</section>
+	<section class="slide" id="slide31">
+		<div class="header">
+			<h1>1. Frontend development: Advanced search (filters)</h1>
+		</div>
+		<div class="content">
+                <h3 class="topicsubheading">Filter search results (Multiple boxes)</h3>
+                <div class="flexcontent">
+                   <figure>
+                   <img src="../../../../../en/teaching/courses/2017/ArchitectureInformationSystems/images/filters.svg" height="300vh" />
+                </figure>
+                 </div>
+		</div>
+		<div class="footer">
+			<div class="contact">Architecture of Information Systems | John Samuel</div>
+			<div class="navigation">31
+				<a class="prev" href="#slide30"></a>
+                                <a class="next" href="#slide32"></a>
+			</div>
+		</div>
+	</section>
+	<section class="slide" id="slide32">
+		<div class="header">
+			<h1>1. Frontend development: Advanced search (filters)</h1>
+		</div>
+		<div class="content">
+                   <h3 class="topicsubheading">Filter search results (Multiple boxes)</h3>
+                   <div class="flexcontent">
+                   <figure>
+                     <img src="../../2018/ArchitectureSystemeInformation/images/Screenshot_2018-10-25 Search - Wikipedia.png" height="400vh" />
+                   </figure>
+                 </div>
+		</div>
+		<div class="footer">
+			<div class="contact">Architecture of Information Systems | John Samuel</div>
+			<div class="navigation">32
+				<a class="prev" href="#slide31"></a>
+                                <a class="next" href="#slide33"></a>
+			</div>
+		</div>
+	</section>
+	<section class="slide" id="slide33">
+		<div class="header">
+			<h1>1. Frontend development: Advanced search (filters)</h1>
+		</div>
+		<div class="content">
+                   <h3 class="topicsubheading">Filter search results (Multiple boxes)</h3>
+                   <div class="flexcontent">
+                   <figure>
+                     <img src="../../2018/ArchitectureSystemeInformation/images/Screenshot_2018-10-25 Search - Wikidata.png" height="400vh" />
+                   </figure>
+                 </div>
+		</div>
+		<div class="footer">
+			<div class="contact">Architecture of Information Systems | John Samuel</div>
+			<div class="navigation">33
+				<a class="prev" href="#slide32"></a>
+                                <a class="next" href="#slide34"></a>
+			</div>
+		</div>
+	</section>
+	<section class="slide" id="slide34">
+		<div class="header">
+			<h1>1. Frontend development: Advanced search (filters)</h1>
+		</div>
+		<div class="content">
+                <h3 class="topicsubheading">Filter search results (Multiple boxes)</h3>
+			<h3>Why filters?</h3>
+                <ul>
+                 <li>Reduce information overload</li>
+                 <li>Precise queries</li>
+                 <li>Interactive search</li>
+                </ul>
+		</div>
+		<div class="footer">
+			<div class="contact">Architecture of Information Systems | John Samuel</div>
+			<div class="navigation">34
+				<a class="prev" href="#slide33"></a>
+                                <a class="next" href="#slide35"></a>
+			</div>
+		</div>
+	</section>
+	<section class="slide" id="slide35">
+		<div class="header">
+			<h1>1. Frontend development: Advanced Search in one-box</h1>
+		</div>
+		<div class="content">
+                <h3 class="topicsubheading">Power users</h3>
+  	        <h3>Operators</h3>
+                <ul>
+                 <li>AND</li>
+                 <li>OR</li>
+                 <li>NOT</li>
+                </ul>
+		</div>
+		<div class="footer">
+			<div class="contact">Architecture of Information Systems | John Samuel</div>
+			<div class="navigation">35
+				<a class="prev" href="#slide34"></a>
+                                <a class="next" href="#slide36"></a>
+			</div>
+		</div>
+	</section>
+	<section class="slide" id="slide36">
+		<div class="header">
+			<h1>1. Frontend development: Advanced Search in one-box</h1>
+		</div>
+		<div class="content">
+                <h3 class="topicsubheading">Power users: Mnemonics </h3>
+                <div class="flexcontent">
+                   <figure>
+                   <img src="../../../../../en/teaching/courses/2017/ArchitectureInformationSystems/images/duckduckgobangs.png" height="300vh"/>
+                   <figcaption>Bangs (DuckDuckGo)</figcaption>
+                </figure>
+                 </div>
+		</div>
+		<div class="footer">
+			<div class="contact">Architecture of Information Systems | John Samuel</div>
+			<div class="navigation">36
+				<a class="prev" href="#slide35"></a>
+                                <a class="next" href="#slide37"></a>
+			</div>
+		</div>
+	</section>
+	<section class="slide" id="slide37">
+		<div class="header">
+			<h1>1. Frontend development: Personalized user experience</h1>
+		</div>
+		<div class="content">
+	        <h3  class="topicsubheading">Context: Time and location (Internationalization)</h3>
+                <div class="flexcontent">
+                   <figure>
+                   <img src="../../../../../en/teaching/courses/2017/ArchitectureInformationSystems/images/weather.png" height="200vh"/>
+                   <figcaption>Weather (weather.com)</figcaption>
+                </figure>
+                 </div>
+		</div>
+		<div class="footer">
+			<div class="contact">Architecture of Information Systems | John Samuel</div>
+			<div class="navigation">37
+				<a class="prev" href="#slide36"></a>
+                                <a class="next" href="#slide38"></a>
+			</div>
+		</div>
+	</section>
+	<section class="slide" id="slide38">
+		<div class="header">
+			<h1>1. Frontend development: Personalized user experience</h1>
+		</div>
+		<div class="content">
+		<h3 class="topicsubheading">Past user search queries</h3>
+                <div class="flexcontent">
+                   <figure>
+                   <img src="../../../../../en/teaching/courses/2017/ArchitectureInformationSystems/images/Privacy_written_in_tiles.jpg" height="300vh"/>
+                   <figcaption>User privacy</figcaption>
+                </figure>
+                 </div>
+		</div>
+		<div class="footer">
+			<div class="contact">Architecture of Information Systems | John Samuel</div>
+			<div class="navigation">38
+				<a class="prev" href="#slide37"></a>
+                                <a class="next" href="#slide39"></a>
+			</div>
+		</div>
+	</section>
+	<section class="slide" id="slide39">
+		<div class="header">
+			<h1>2. Backend development</h1>
+		</div>
+		<div class="content">
+                    <ol>
+                       <li>Data collection</li>
+                       <li>Data storage</li>
+                       <li>Configuration</li>
+                       <li>Logging</li>
+                       <li>Dashboard</li>
+                       <li>Security</li>
+                    </ol>
+		</div>
+		<div class="footer">
+			<div class="contact">Architecture of Information Systems | John Samuel</div>
+			<div class="navigation">39
+				<a class="prev" href="#slide38"></a>
+                                <a class="next" href="#slide40"></a>
+			</div>
+		</div>
+	</section>
+	<section class="slide" id="slide40">
+		<div class="header">
+			<h1>2.1 Backend development: Data collection</h1>
+		</div>
+		<div class="content">
+		    <h3>Data ownership</h3>
+                    <ul>
+                       <li>Internal data (e.g., official website, internal wikis, databases etc.)</li>
+                       <li>External data (e.g., other websites, wikis, open data)</li>
+                    </ul>
+		    <h3>Data model (Data and Schema)</h3>
+                    <ul>
+                       <li>Unstructured data (e.g., documents, texts, web pages etc.)</li>
+                       <li>Semi-structured data (e.g., JSON/XML files etc.)</li>
+                       <li>Structured data (e.g., relational databases, linked data)</li>
+                    </ul>
+		</div>
+		<div class="footer">
+			<div class="contact">Architecture of Information Systems | John Samuel</div>
+			<div class="navigation">40
+				<a class="prev" href="#slide39"></a>
+                                <a class="next" href="#slide41"></a>
+			</div>
+		</div>
+	</section>
+	<section class="slide" id="slide41">
+		<div class="header">
+			<h1>2.1 Backend development: Data collection</h1>
+		</div>
+		<div class="content">
+		    <h3>Data sources</h3>
+                    <ul>
+                       <li>Web pages</li>
+                       <li>Documents, texts</li>
+                       <li>Sensors</li>
+                       <li>Databases</li>
+                       <li>...</li>
+                    </ul>
+		</div>
+		<div class="footer">
+			<div class="contact">Architecture of Information Systems | John Samuel</div>
+			<div class="navigation">41
+				<a class="prev" href="#slide40"></a>
+                                <a class="next" href="#slide42"></a>
+			</div>
+		</div>
+	</section>
+	<section class="slide" id="slide42">
+		<div class="header">
+			<h1>2.1 Backend development: Data collection</h1>
+		</div>
+		<div class="content">
+		    <h3>Data acquisition</h3>
+                    <ul>
+                       <li>Data dumps</li>
+                       <li>Crawlers</li>
+                       <li>Web scraping</li>
+                       <li>Application Programming Interface (API)</li>
+                    </ul>
+		</div>
+		<div class="footer">
+			<div class="contact">Architecture of Information Systems | John Samuel</div>
+			<div class="navigation">42
+				<a class="prev" href="#slide41"></a>
+                                <a class="next" href="#slide43"></a>
+			</div>
+		</div>
+	</section>
+	<section class="slide" id="slide43">
+		<div class="header">
+			<h1>2.1 Backend development: Data collection</h1>
+		</div>
+		<div class="content">
+                        <div class="flexcontent">
+                   <figure>
+                           <img src="../../2017/BigData/images/WebCrawlerArchitecture.svg.png" height="350vh"/>
+                        </figure>
+                 </div>
+		</div>
+		<div class="footer">
+			<div class="contact">Architecture of Information Systems | John Samuel</div>
+			<div class="navigation">43
+				<a class="prev" href="#slide42"></a>
+                                <a class="next" href="#slide44"></a>
+			</div>
+		</div>
+	</section>
+	<section class="slide" id="slide44">
+		<div class="header">
+			<h1>2.1 Backend development: Data collection</h1>
+		</div>
+		<div class="content">
+                        <div class="flexcontent">
+                   <figure>
+                           <img src="../../2017/BigData/images/Apisssss.gif" height="350vh"/>
+                        <figcaption>API</figcaption>
+                        </figure>
+                 </div>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">import</span> <span class="nn">requests</span>
+<span class="n">url</span> <span class="o">=</span> <span class="s2">&quot;https://api.github.com/&quot;</span>
+
+<span class="n">response</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">json</span><span class="p">())</span>
+</pre></div>
+
+		</div>
+		<div class="footer">
+			<div class="contact">Architecture of Information Systems | John Samuel</div>
+			<div class="navigation">44
+				<a class="prev" href="#slide43"></a>
+                                <a class="next" href="#slide45"></a>
+			</div>
+		</div>
+	</section>
+	<section class="slide" id="slide45">
+		<div class="header">
+			<h1>2.1 Backend development: Data collection</h1>
+		</div>
+		<div class="content">
+                        <div class="flexcontent">
+                   <figure>
+                           <img src="../../2017/BigData/images/Open_Definition_logo.png" height="50vh"/>
+                           <img src="../../../../../en/slides/2017/Akademy/html/800px-Wikidata-logo-en.svg.png" height="100vh"/>
+                        <figcaption>Open Data</figcaption>
+                        </figure>
+                 </div>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">from</span> <span class="nn">SPARQLWrapper</span> <span class="k">import</span> <span class="n">SPARQLWrapper</span><span class="p">,</span> <span class="n">JSON</span>
+
+<span class="n">sparql</span> <span class="o">=</span> <span class="n">SPARQLWrapper</span><span class="p">(</span><span class="s2">&quot;http://query.wikidata.org/sparql&quot;</span><span class="p">)</span>
+<span class="n">sparql</span><span class="o">.</span><span class="n">setQuery</span><span class="p">(</span><span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">SELECT ?item WHERE {</span>
+<span class="s2">  ?item wdt:P31 wd:Q9143;</span>
+<span class="s2">}</span>
+<span class="s2">LIMIT 10</span>
+<span class="s2">&quot;&quot;&quot;</span><span class="p">)</span>
+<span class="n">sparql</span><span class="o">.</span><span class="n">setReturnFormat</span><span class="p">(</span><span class="n">JSON</span><span class="p">)</span>
+<span class="n">results</span> <span class="o">=</span> <span class="n">sparql</span><span class="o">.</span><span class="n">query</span><span class="p">()</span><span class="o">.</span><span class="n">convert</span><span class="p">()</span>
+
+<span class="k">for</span> <span class="n">result</span> <span class="ow">in</span> <span class="n">results</span><span class="p">[</span><span class="s2">&quot;results&quot;</span><span class="p">][</span><span class="s2">&quot;bindings&quot;</span><span class="p">]:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
+</pre></div>
+		</div>
+		<div class="footer">
+			<div class="contact">Architecture of Information Systems | John Samuel</div>
+			<div class="navigation">45
+				<a class="prev" href="#slide44"></a>
+                                <a class="next" href="#slide46"></a>
+			</div>
+		</div>
+	</section>
+	<section class="slide" id="slide46">
+		<div class="header">
+			<h1>2.1 Backend development: Data collection</h1>
+		</div>
+		<div class="content">
+                        <div class="flexcontent">
+                   <figure>
+                           <img src="../../2017/BigData/images/LOD_Cloud_2014.svg.png" height="350vh"/>
+                        <figcaption>Linked Open data cloud</figcaption>
+                        </figure>
+                 </div>
+		</div>
+		<div class="footer">
+			<div class="contact">Architecture of Information Systems | John Samuel</div>
+			<div class="navigation">46
+				<a class="prev" href="#slide45"></a>
+                                <a class="next" href="#slide47"></a>
+			</div>
+		</div>
+	</section>
+	<section class="slide" id="slide47">
+		<div class="header">
+			<h1>2.1 Backend development: Data collection</h1>
+		</div>
+		<div class="content">
+                        <div class="flexcontent">
+                   <figure>
+                           <img src="../../2017/BigData/images/Internet_Archive_logo_and_wordmark.svg.png" height="200vh"/>
+                           <img src="../../../../../en/slides/2018/CLEF/Screenshot_2018-09-09 Revision history of country (P17) - Wikidata.png" height="200vh"/>
+			   <figcaption>Archived and Historical Data</figcaption>
+                        </figure>
+                 </div>
+		</div>
+		<div class="footer">
+			<div class="contact">Architecture of Information Systems | John Samuel</div>
+			<div class="navigation">47
+				<a class="prev" href="#slide46"></a>
+                                <a class="next" href="#slide48"></a>
+			</div>
+		</div>
+	</section>
+	<section class="slide" id="slide48">
+		<div class="header">
+			<h1>2.1 Backend development: Data collection</h1>
+		</div>
+		<div class="content">
+		    <h3>Data cleaning and transformation</h3>
+                    <ul>
+                       <li>Accuracy (e.g., verification with external sources)</li>
+                       <li>Validity (e.g., detect constraint violations)</li>
+                       <li>Uniformity (e.g., units)</li>
+                    </ul>
+		</div>
+		<div class="footer">
+			<div class="contact">Architecture of Information Systems | John Samuel</div>
+			<div class="navigation">48
+				<a class="prev" href="#slide47"></a>
+                                <a class="next" href="#slide49"></a>
+			</div>
+		</div>
+	</section>
+	<section class="slide" id="slide49">
+		<div class="header">
+			<h1>2.2 Backend development: Data storage</h1>
+		</div>
+		<div class="content">
+                    <ul>
+                       <li>Model</li>
+                       <li>Indexation</li>
+                       <li>Query optimization</li>
+                       <li>Caching</li>
+                       <li>Replication</li>
+                       <li>Backup</li>
+                    </ul>
+		</div>
+		<div class="footer">
+			<div class="contact">Architecture of Information Systems | John Samuel</div>
+			<div class="navigation">49
+				<a class="prev" href="#slide48"></a>
+                                <a class="next" href="#slide50"></a>
+			</div>
+		</div>
+	</section>
+	<section class="slide" id="slide50">
+		<div class="header">
+			<h1>2.2. Backend development: Data Model</h1>
+		</div>
+		</div>
+		<div class="content">
+                    <ul>
+                       <li>Database schema</li>
+                       <li>Schema-less</li>
+                    </ul>
+		</div>
+		<div class="footer">
+			<div class="contact">Architecture of Information Systems | John Samuel</div>
+			<div class="navigation">50
+				<a class="prev" href="#slide49"></a>
+                                <a class="next" href="#slide51"></a>
+			</div>
+		</div>
+	</section>
+	<section class="slide" id="slide51">
+		<div class="header">
+			<h1>2.2 Backend development: Data storage</h1>
+		</div>
+		<div class="content">
+                    <ul>
+                       <li>Relational Databases</li>
+                       <li>Object-oriented Databases</li>
+                       <li>NoSQL databases (e.g., graph databases)</li>
+                       <li>NewSQL databases (SQL + ACID guarantees)</li>
+                    </ul>
+		</div>
+		<div class="footer">
+			<div class="contact">Architecture of Information Systems | John Samuel</div>
+			<div class="navigation">51
+				<a class="prev" href="#slide50"></a>
+                                <a class="next" href="#slide52"></a>
+			</div>
+		</div>
+	</section>
+	<section class="slide" id="slide52">
+		<div class="header">
+			<h1>2.2. Document indices and Query Optimization</h1>
+		</div>
+		<div class="content">
+	            <h3>Document indices</h3>
+                    <ul>
+                       <li>Forward index</li>
+                       <li>Inverted index</li>
+                    </ul>
+	            <h3>Database Indexation</h3>
+	            <h3>Query Optimization</h3>
+                    <ul>
+                       <li>Join ordering</li>
+                       <li>Cost estimation</li>
+                    </ul>
+		</div>
+		<div class="footer">
+			<div class="contact">Architecture of Information Systems | John Samuel</div>
+			<div class="navigation">52
+				<a class="prev" href="#slide51"></a>
+                                <a class="next" href="#slide53"></a>
+			</div>
+		</div>
+	</section>
+	<section class="slide" id="slide53">
+		<div class="header">
+			<h1>2.2. Backend development: Caching</h1>
+		</div>
+		<div class="content">
+                    <ul>
+                       <li>Frequently asked questions and cached responses</li>
+                    </ul>
+		</div>
+		<div class="footer">
+			<div class="contact">Architecture of Information Systems | John Samuel</div>
+			<div class="navigation">53
+				<a class="prev" href="#slide52"></a>
+                                <a class="next" href="#slide54"></a>
+			</div>
+		</div>
+	</section>
+	<section class="slide" id="slide54">
+		<div class="header">
+			<h1>2.2. Backend development: Replication and Backup</h1>
+		</div>
+		<div class="content">
+                <div class="flexcontent">
+                   <figure>
+                   <img src="../../../../../en/teaching/courses/2017/ArchitectureInformationSystems/images/replications.png" height="300vh"/>
+                   <figcaption>Replication(Master-slave)</figcaption>
+                </figure>
+                 </div>
+		</div>
+		<div class="footer">
+			<div class="contact">Architecture of Information Systems | John Samuel</div>
+			<div class="navigation">54
+				<a class="prev" href="#slide53"></a>
+                                <a class="next" href="#slide55"></a>
+			</div>
+		</div>
+	</section>
+	<section class="slide" id="slide55">
+		<div class="header">
+			<h1>2.3. Resource management and configuration</h1>
+		</div>
+		<div class="content">
+                <div class="flexcontent">
+                   <figure>
+                   <img src="../../../../../en/teaching/courses/2017/ArchitectureInformationSystems/images/availability.png" height="400vh"/>
+                   <figcaption>Availability (Wikipedia)</figcaption>
+                </figure>
+                 </div>
+		</div>
+		<div class="footer">
+			<div class="contact">Architecture of Information Systems | John Samuel</div>
+			<div class="navigation">55
+				<a class="prev" href="#slide54"></a>
+                                <a class="next" href="#slide56"></a>
+			</div>
+		</div>
+	</section>
+	<section class="slide" id="slide56">
+		<div class="header">
+			<h1>2.3. Resource management and configuration</h1>
+		</div>
+		<div class="content">
+                  <ul>
+                    <li>Machines (servers, disks etc.)</li>
+                    <li>Software packages and dependencies</li>
+                    <li>Energy consumption</li>
+                  </ul>
+		</div>
+		<div class="footer">
+			<div class="contact">Architecture of Information Systems | John Samuel</div>
+			<div class="navigation">56
+				<a class="prev" href="#slide55"></a>
+                                <a class="next" href="#slide57"></a>
+			</div>
+		</div>
+	</section>
+	<section class="slide" id="slide57">
+		<div class="header">
+			<h1>2.3. Deployment</h1>
+		</div>
+		<div class="content">
+                  <ul>
+                    <li>Development setup</li>
+                    <li>Pre-production setup</li>
+                    <li>Production setup</li>
+                  </ul>
+		</div>
+		<div class="footer">
+			<div class="contact">Architecture of Information Systems | John Samuel</div>
+			<div class="navigation">57
+				<a class="prev" href="#slide56"></a>
+                                <a class="next" href="#slide58"></a>
+			</div>
+		</div>
+	</section>
+        <section class="slide" id="slide58">
+		<div class="header">
+			<h1>2.3. Packaging</h1>
+		</div>
+		<div class="content">
+                  <h3></h3>
+                  <ul>
+                    <li>Virtual machines</li>
+                    <li>Containers (e.g., Linux containers, Docker)</li>
+                  </ul>
+		</div>
+		<div class="footer">
+			<div class="contact">Architecture of Information Systems | John Samuel</div>
+			<div class="navigation">58
+				<a class="prev" href="#slide57"></a>
+                                <a class="next" href="#slide59"></a>
+			</div>
+		</div>
+	</section>
+	<section class="slide" id="slide59">
+		<div class="header">
+			<h1>2.3. Load balancing</h1>
+		</div>
+		<div class="content">
+                  <ul>
+                    <li>Server-side</li>
+                    <li>Client-side</li>
+                  </ul>
+		</div>
+		<div class="footer">
+			<div class="contact">Architecture of Information Systems | John Samuel</div>
+			<div class="navigation">59
+				<a class="prev" href="#slide58"></a>
+                                <a class="next" href="#slide60"></a>
+			</div>
+		</div>
+	</section>
+	<section class="slide" id="slide60">
+		<div class="header">
+			<h1>2.3. Selective Testing</h1>
+		</div>
+		<div class="content">
+                  <h3>A/B Testing</h3>
+		</div>
+		<div class="footer">
+			<div class="contact">Architecture of Information Systems | John Samuel</div>
+			<div class="navigation">60
+				<a class="prev" href="#slide59"></a>
+                                <a class="next" href="#slide61"></a>
+			</div>
+		</div>
+	</section>
+	<section class="slide" id="slide61">
+		<div class="header">
+			<h1>2.4. Backend development: Logging</h1>
+		</div>
+		<div class="content">
+                <ul>
+                   <li>Access logs</li>
+                   <li>Error logs</li>
+                   <li>Event logs</li>
+                   <li>Transaction logs</li>
+                </ul>
+		</div>
+		<div class="footer">
+			<div class="contact">Architecture of Information Systems | John Samuel</div>
+			<div class="navigation">61
+				<a class="prev" href="#slide60"></a>
+                                <a class="next" href="#slide62"></a>
+			</div>
+		</div>
+	</section>
+	<section class="slide" id="slide62">
+		<div class="header">
+			<h1>2.4. Logging</h1>
+		</div>
+		<div class="content">
+                <h3>Why logs?</h3>
+                <ul>
+                   <li>Debugging</li>
+                   <li>Security (e.g., detect intrusion)</li>
+                   <li>Database rollbacks</li>
+                   <li>Audit</li>
+                   <li>Analysis (e.g., detecting patterns, resource planning)</li>
+                </ul>
+                <code>
+                </code>
+		</div>
+		<div class="footer">
+			<div class="contact">Architecture of Information Systems | John Samuel</div>
+			<div class="navigation">62
+				<a class="prev" href="#slide61"></a>
+                                <a class="next" href="#slide63"></a>
+			</div>
+		</div>
+	</section>
+	<section class="slide" id="slide63">
+		<div class="header">
+			<h1>2.4. Logging</h1>
+		</div>
+		<div class="content">
+                <ul>
+                  <li>IP address</li>
+                  <li>User</li>
+                  <li>Resource ID</li>
+                  <li>...</li>
+                </ul>
+		</div>
+		<div class="footer">
+			<div class="contact">Architecture of Information Systems | John Samuel</div>
+			<div class="navigation">63
+				<a class="prev" href="#slide62"></a>
+                                <a class="next" href="#slide64"></a>
+			</div>
+		</div>
+	</section>
+	<section class="slide" id="slide64">
+		<div class="header">
+			<h1>2.5. Backend development: Dashboard</h1>
+		</div>
+		<div class="content">
+                  <div class="flexcontent">
+                   <figure>
+                   <img src="../../../../../en/teaching/courses/2017/ArchitectureInformationSystems/images/performancemetrics.png" height="400vh"/>
+                   <figcaption>Wikimedia (Grafana: 5<sup>th</sup> October 2017)</figcaption>
+                  </figure>
+                 </div>
+		</div>
+		<div class="footer">
+			<div class="contact">Architecture of Information Systems | John Samuel</div>
+			<div class="navigation">64
+				<a class="prev" href="#slide63"></a>
+                                <a class="next" href="#slide65"></a>
+			</div>
+		</div>
+	</section>
+	<section class="slide" id="slide65">
+		<div class="header">
+			<h1>2.5. Backend development: Dashboard</h1>
+		</div>
+		<div class="content">
+                  <div class="flexcontent">
+                   <figure>
+                   <img src="../../../../../en/teaching/courses/2017/ArchitectureInformationSystems/images/wikiavailability.png" height="400vh"/>
+                   <figcaption>Wikimedia (Availability: 5<sup>th</sup> October 2017)</figcaption>
+                  </figure>
+                 </div>
+		</div>
+		<div class="footer">
+			<div class="contact">Architecture of Information Systems | John Samuel</div>
+			<div class="navigation">65
+				<a class="prev" href="#slide64"></a>
+                                <a class="next" href="#slide66"></a>
+			</div>
+		</div>
+	</section>
+	<section class="slide" id="slide66">
+		<div class="header">
+			<h1>2.5. Backend development: Dashboard</h1>
+		</div>
+		<div class="content">
+                  <ul>
+                    <li>Performance Metrics (active users, queries served etc.)</li>
+                    <li>Real-time metrics (e.g., downtime, latency, throughput)</li>
+                  </ul>
+		</div>
+		<div class="footer">
+			<div class="contact">Architecture of Information Systems | John Samuel</div>
+			<div class="navigation">66
+				<a class="prev" href="#slide65"></a>
+                                <a class="next" href="#slide67"></a>
+			</div>
+		</div>
+	</section>
+	<section class="slide" id="slide67">
+		<div class="header">
+			<h1>2.5. Backend development: Dashboard</h1>
+		</div>
+		<div class="content">
+                  <ul>
+                    <li>Email Alerts</li>
+                    <li>Visual indicators</li>
+                  </ul>
+		</div>
+		<div class="footer">
+			<div class="contact">Architecture of Information Systems | John Samuel</div>
+			<div class="navigation">67
+				<a class="prev" href="#slide66"></a>
+                                <a class="next" href="#slide68"></a>
+			</div>
+		</div>
+	</section>
+	<section class="slide" id="slide68">
+		<div class="header">
+			<h1>2.6. Backend development: Security</h1>
+		</div>
+		<div class="content">
+                  <ul>
+                    <li>Data protection</li>
+                    <li>Logged-in users or public access</li>
+                    <li>Third party access</li>
+                  </ul>
+                  <div class="flexcontent">
+                   <figure>
+                   <img src="../../../../../en/teaching/courses/2017/ArchitectureInformationSystems/images/login.png" height="350vh"/>
+                   <figcaption>Login (Wikipedia)</figcaption>
+                  </figure>
+                 </div>
+		</div>
+		<div class="footer">
+			<div class="contact">Architecture of Information Systems | John Samuel</div>
+			<div class="navigation">68
+				<a class="prev" href="#slide67"></a>
+                                <a class="next" href="#slide69"></a>
+			</div>
+		</div>
+	</section>
+	<section class="slide" id="slide69">
+		<div class="header">
+			<h1>2.6. Backend development: Security</h1>
+		</div>
+		<div class="content">
+                  <ul>
+                    <li>Authentication</li>
+                    <li>Authorization to third party access</li>
+                  </ul>
+                  <div class="flexcontent">
+                   <figure>
+                   <img src="../../../../../en/teaching/courses/2017/ArchitectureInformationSystems/images/OpenID_logo_2.svg" height="150vh"/>
+                   <figcaption>OpenID</figcaption>
+                  </figure>
+                 </div>
+                  <div class="flexcontent">
+                   <figure>
+                   <img src="../../../../../en/teaching/courses/2017/ArchitectureInformationSystems/images/mozillapersona.png" height="350vh"/>
+                   <figcaption>Mozilla Persona (2011-2016)</figcaption>
+                  </figure>
+                 </div>
+		</div>
+		<div class="footer">
+			<div class="contact">Architecture of Information Systems | John Samuel</div>
+			<div class="navigation">69
+				<a class="prev" href="#slide68"></a>
+                                <a class="next" href="#slide70"></a>
+			</div>
+		</div>
+	</section>
+	<section class="slide" id="slide70">
+		<div class="header">
+			<h1>2.6. Detecting security vulnerabilities</h1>
+		</div>
+		<div class="content">
+                  <ul>
+                    <li>Intrusion</li>
+                    <li>SQL code injection</li>
+                    <li>Cross-site scripting</li>
+                    <li>Denial of service</li>
+                  </ul>
+		</div>
+		<div class="footer">
+			<div class="contact">Architecture of Information Systems | John Samuel</div>
+			<div class="navigation">70
+				<a class="prev" href="#slide69"></a>
+                                <a class="next" href="#slide71"></a>
+			</div>
+		</div>
+	</section>
+	<section class="slide" id="slide71">
+		<div class="header">
+			<h1>3. Application programming interface</h1>
+		</div>
+		<div class="content">
+                   <ul>
+                     <li>Service-oriented (SOAP)</li>
+                     <li>Resource-oriented (REST) </li>
+                   </ul>
+		</div>
+		<div class="footer">
+			<div class="contact">Architecture of Information Systems | John Samuel</div>
+			<div class="navigation">71
+				<a class="prev" href="#slide70"></a>
+                                <a class="next" href="#slide72"></a>
+			</div>
+		</div>
+	</section>
+	<section class="slide" id="slide72">
+		<div class="header">
+			<h1>3. API: Data formats</h1>
+		</div>
+		<div class="content">
+                   <ul>
+                     <li>XML</li>
+                     <li>JSON</li>
+                     <li>HTML?</li>
+                   </ul>
+		</div>
+		<div class="footer">
+			<div class="contact">Architecture of Information Systems | John Samuel</div>
+			<div class="navigation">72
+				<a class="prev" href="#slide71"></a>
+                                <a class="next" href="#slide73"></a>
+			</div>
+		</div>
+	</section>
+	<section class="slide" id="slide73">
+		<div class="header">
+			<h1>3. API: (CRUDL) Operations</h1>
+		</div>
+		<div class="content">
+                   <ul>
+                     <li>Create</li>
+                     <li>Read</li>
+                     <li>Update</li>
+                     <li>Delete</li>
+                     <li>List</li>
+                   </ul>
+		</div>
+		<div class="footer">
+			<div class="contact">Architecture of Information Systems | John Samuel</div>
+			<div class="navigation">73
+				<a class="prev" href="#slide72"></a>
+                                <a class="next" href="#slide74"></a>
+			</div>
+		</div>
+	</section>
+	<section class="slide" id="slide74">
+		<div class="header">
+			<h1>3. API: Examples</h1>
+		</div>
+		<div class="content">
+                   <div class="flexcontent">
+                   <figure>
+                    <img src="../../2018/ArchitectureSystemeInformation/images/Screenshot_2018-10-25 https api github com.png" height="400px">
+                   </figure>
+                 </div>
+		</div>
+		<div class="footer">
+			<div class="contact">Architecture of Information Systems | John Samuel</div>
+			<div class="navigation">74
+				<a class="prev" href="#slide73"></a>
+                                <a class="next" href="#slide75"></a>
+			</div>
+		</div>
+	</section>
+	<section class="slide" id="slide75">
+		<div class="header">
+			<h1>3. API: Examples</h1>
+		</div>
+		<div class="content">
+                   <div class="flexcontent">
+                   <figure>
+                    <img src="../../2018/ArchitectureSystemeInformation/images/Screenshot_2018-10-25 https api github com-searchrepository.png" height="200px">
+                    <figcaption>GitHub API: Repository Search</figcaption>
+                   </figure>
+                 </div>
+		</div>
+		<div class="footer">
+			<div class="contact">Architecture of Information Systems | John Samuel</div>
+			<div class="navigation">75
+				<a class="prev" href="#slide74"></a>
+                                <a class="next" href="#slide76"></a>
+			</div>
+		</div>
+	</section>
+	<section class="slide" id="slide76">
+		<div class="header">
+			<h1>3. API: Examples</h1>
+		</div>
+		<div class="content">
+                   <div class="flexcontent">
+                   <figure>
+                    <img src="../../2018/ArchitectureSystemeInformation/images/Screenshot_2018-10-25 GitHub API v3.png" height="300px">
+                    <figcaption>GitHub API: Pagination</figcaption>
+                   </figure>
+                 </div>
+		</div>
+		<div class="footer">
+			<div class="contact">Architecture of Information Systems | John Samuel</div>
+			<div class="navigation">76
+				<a class="prev" href="#slide75"></a>
+                                <a class="next" href="#slide77"></a>
+			</div>
+		</div>
+	</section>
+	<section class="slide" id="slide77">
+		<div class="header">
+			<h1>3. API: Examples</h1>
+		</div>
+		<div class="content">
+                   <div class="flexcontent">
+                   <figure>
+                    <img src="../../2018/ArchitectureSystemeInformation/images/Screenshot_2018-10-25 https api github com-git.png" height="300px">
+                   </figure>
+                 </div>
+		</div>
+		<div class="footer">
+			<div class="contact">Architecture of Information Systems | John Samuel</div>
+			<div class="navigation">77
+				<a class="prev" href="#slide76"></a>
+                                <a class="next" href="#slide78"></a>
+			</div>
+		</div>
+	</section>
+	<section class="slide" id="slide78">
+		<div class="header">
+			<h1>3. API: Data dumps</h1>
+		</div>
+		<div class="content">
+                   <ul>
+                     <li>Complete data dumps</li>
+                     <li>Selective data dumps</li>
+                   </ul>
+		</div>
+		<div class="footer">
+			<div class="contact">Architecture of Information Systems | John Samuel</div>
+			<div class="navigation">78
+				<a class="prev" href="#slide77"></a>
+                                <a class="next" href="#slide79"></a>
+			</div>
+		</div>
+	</section>
+	<section class="slide" id="slide79">
+		<div class="header">
+			<h1>3. Application programming interface</h1>
+		</div>
+		<div class="content">
+                   <ul>
+                     <li>HTTP</li>
+                     <li>Software development kits (SDKs)</li>
+                   </ul>
+		</div>
+		<div class="footer">
+			<div class="contact">Architecture of Information Systems | John Samuel</div>
+			<div class="navigation">79
+				<a class="prev" href="#slide78"></a>
+                                <a class="next" href="#slide80"></a>
+			</div>
+		</div>
+	</section>
+	<section class="slide" id="slide80">
+		<div class="header">
+			<h1>3. Interface definition</h1>
+		</div>
+		<div class="content">
+                   <ul>
+                     <li>Human-readable documentation</li>
+                     <li>Machine-readable documentation (WSDL, WADL etc.)</li>
+                     <li>Human and machine-readable documentation (microformats, semantic web languages)</li>
+                   </ul>
+		</div>
+		<div class="footer">
+			<div class="contact">Architecture of Information Systems | John Samuel</div>
+			<div class="navigation">80
+				<a class="prev" href="#slide79"></a>
+                                <a class="next" href="#slide81"></a>
+			</div>
+		</div>
+	</section>
+	<section class="slide" id="slide81">
+		<div class="header">
+			<h1>3. Human readable Documentation</h1>
+		</div>
+		<div class="content">
+                   <ol>
+                    <li>Read documentation</li>
+                    <li>Develop application to integrate</li>
+                    <li>Add business logic, if any</li>
+                   </ol>
+		</div>
+		<div class="footer">
+			<div class="contact">Architecture of Information Systems | John Samuel</div>
+			<div class="navigation">81
+				<a class="prev" href="#slide80"></a>
+                                <a class="next" href="#slide82"></a>
+			</div>
+		</div>
+	</section>
+	<section class="slide" id="slide82">
+		<div class="header">
+			<h1>3. Machine-readable Documentation</h1>
+		</div>
+		<div class="content">
+                   <ol>
+                    <li>Fully autonomous solution to integrate</li>
+                    <li>Add business logic, if any</li>
+                   </ol>
+		</div>
+		<div class="footer">
+			<div class="contact">Architecture of Information Systems | John Samuel</div>
+			<div class="navigation">82
+				<a class="prev" href="#slide81"></a>
+                                <a class="next" href="#slide83"></a>
+			</div>
+		</div>
+	</section>
+	<section class="slide" id="slide83">
+		<div class="header">
+			<h1>3. Quality of service</h1>
+		</div>
+		<div class="content">
+                <h3>Resource usage limits</h3>
+                <ul>
+                  <li>Limits on API call count (per user, IP)</li>
+                  <li>Limits on data transfer</li>
+                  <li>Temporary blocks</li>
+                </ul>
+		</div>
+		<div class="footer">
+			<div class="contact">Architecture of Information Systems | John Samuel</div>
+			<div class="navigation">83
+				<a class="prev" href="#slide82"></a>
+                                <a class="next" href="#slide84"></a>
+			</div>
+		</div>
+	</section>
+	<section class="slide" id="slide84">
+		<div class="header">
+			<h1>3. Quality of service</h1>
+		</div>
+		<div class="content">
+                <ul>
+                  <li>Analysis on frequently made API calls</li>
+                  <li>Resource planning and allocation</li>
+                </ul>
+		</div>
+		<div class="footer">
+			<div class="contact">Architecture of Information Systems | John Samuel</div>
+			<div class="navigation">84
+				<a class="prev" href="#slide83"></a>
+                                <a class="next" href="#slide85"></a>
+			</div>
+		</div>
+	</section>
+	<section class="slide" id="slide85">
+		<div class="header">
+			<h1>3. Security</h1>
+		</div>
+		<div class="content">
+                <ul>
+                  <li>No password</li>
+                  <li>Basic authentication (e.g., username, password)</li>
+                  <li>(Open) authentication protocols (e.g., OAuth)</li>
+                </ul>
+                  <div class="flexcontent">
+                   <figure>
+                   <img src="../../../../../en/teaching/courses/2017/ArchitectureInformationSystems/images/598px-Oauth_logo.svg" height="350vh"/>
+                   <figcaption>OAuth</figcaption>
+                  </figure>
+                 </div>
+		</div>
+		<div class="footer">
+			<div class="contact">Architecture of Information Systems | John Samuel</div>
+			<div class="navigation">85
+				<a class="prev" href="#slide84"></a>
+                                <a class="next" href="#slide86"></a>
+			</div>
+		</div>
+	</section>
+	<section class="slide" id="slide86">
+		<div class="header">
+			<h1>4. Towards Federated Search</h1>
+		</div>
+		<div class="content">
+                <h3 class="topicsubheading">Federated Search</h3>
+                <ul>
+                  <li>No centralized strore for all data</li>
+                  <li>Multiple (autonomous) search engines respond to search queries</li>
+                  <li>Every search engine has its own crawling, indexing and </li>
+                  <li>Centralized approach for broadcasting queries</li>
+                  <li>Centralized approach for processing responses by the search engines</li>
+                </ul>
+		</div>
+		<div class="footer">
+			<div class="contact">Architecture of Information Systems | John Samuel</div>
+			<div class="navigation">86
+				<a class="prev" href="#slide85"></a>
+                                <a class="next" href="#slide87"></a>
+			</div>
+		</div>
+	</section>
+	<section class="slide" id="slide87">
+		<div class="header">
+			<h1>Project: Federated Search</h1>
+		</div>
+		<div class="content">
+                 <h3 class="topicsubheading">Virtual Library</h3>
+                  <div class="flexcontent">
+                   <figure>
+                   <img src="../../../../../en/teaching/courses/2017/ArchitectureInformationSystems/images/800px-SteacieLibrary.jpg" height="400vh"/>
+                   <figcaption>Virtual Library</figcaption>
+                  </figure>
+                 </div>
+		</div>
+		<div class="footer">
+			<div class="contact">Architecture of Information Systems | John Samuel</div>
+			<div class="navigation">87
+				<a class="prev" href="#slide86"></a>
+                                <a class="next" href="#slide88"></a>
+			</div>
+		</div>
+	</section>
+	<section class="slide" id="slide88">
+		<div class="header">
+			<h1>Project: Federated Search</h1>
+		</div>
+		<div class="content">
+                <h3 class="topicsubheading">Virtual Library: 4 search engines</h3>
+                <ul>
+                  <li>Textual data stores (book contents)</li>
+                  <li>Book reviews and ratings</li>
+                  <li>Book images (e.g., cover pictures, author photographs)</li>
+                  <li>Metadata related to books (e.g., authors, price)</li>
+                </ul>
+		</div>
+		<div class="footer">
+			<div class="contact">Architecture of Information Systems | John Samuel</div>
+			<div class="navigation">88
+				<a class="prev" href="#slide87"></a>
+                                <a class="next" href="#slide89"></a>
+			</div>
+		</div>
+	</section>
+	<section class="slide" id="slide89">
+		<div class="header">
+			<h1>Project: Federated Search</h1>
+		</div>
+		<div class="content">
+                 <h3 class="topicsubheading">Task 1: identify your target audience</h3>
+                 <div class="flexcontent">
+                   <figure>
+                   <img src="../../../../../en/teaching/courses/2017/ArchitectureInformationSystems/images/group-2517459_640.png" height="400vh" />
+                   <figcaption>Target audience</figcaption>
+                  </figure>
+                 </div>
+		</div>
+		<div class="footer">
+			<div class="contact">Architecture of Information Systems | John Samuel</div>
+			<div class="navigation">89
+				<a class="prev" href="#slide88"></a>
+                                <a class="next" href="#slide90"></a>
+			</div>
+		</div>
+	</section>
+	<section class="slide" id="slide90">
+		<div class="header">
+			<h1>Project: Federated Search</h1>
+		</div>
+		<div class="content">
+                 <h3 class="topicsubheading">Task 2: Build your search interface</h3>
+                 <div class="flexcontent">
+                   <img src="../../../../../en/teaching/courses/2017/ArchitectureInformationSystems/images/searchonebox.svg" height="400vh" />
+                   <img src="../../../../../en/teaching/courses/2017/ArchitectureInformationSystems/images/filters.svg" height="400vh" />
+                 </div>
+		</div>
+		<div class="footer">
+			<div class="contact">Architecture of Information Systems | John Samuel</div>
+			<div class="navigation">90
+				<a class="prev" href="#slide89"></a>
+                                <a class="next" href="#slide91"></a>
+			</div>
+		</div>
+	</section>
+	<section class="slide" id="slide91">
+		<div class="header">
+			<h1>Project: Federated Search</h1>
+		</div>
+		<div class="content">
+                 <h3 class="topicsubheading">Task 3: Build your results interface</h3>
+                 <div class="flexcontent">
+                   <img src="interface-results.svg" height="400vh" />
+                 </div>
+		</div>
+		<div class="footer">
+			<div class="contact">Architecture of Information Systems | John Samuel</div>
+			<div class="navigation">91
+				<a class="prev" href="#slide90"></a>
+                                <a class="next" href="#slide92"></a>
+			</div>
+		</div>
+	</section>
+	<section class="slide" id="slide92">
+		<div class="header">
+			<h1>Project: Federated Search</h1>
+		</div>
+		<div class="content">
+                 <h3 class="topicsubheading">Task 4: Infrastructure using message queue</h3>
+                 <div class="flexcontent">
+                   <img src="infrastructure.svg" height="400vh" />
+                 </div>
+		</div>
+		<div class="footer">
+			<div class="contact">Architecture of Information Systems | John Samuel</div>
+			<div class="navigation">92
+				<a class="prev" href="#slide91"></a>
+                                <a class="next" href="#slide93"></a>
+			</div>
+		</div>
+	</section>
+	<section class="slide" id="slide93">
+		<div class="header">
+			<h1>References</h1>
+		</div>
+		<div class="content">
+			<h1>References</h1>
+			<ol>
+   		 	  <li>Rahman, Mahmudur. “Search Engines Going beyond Keyword Search: A Survey.” International Journal of Computer Applications, vol. 75, no. 17, Aug. 2013, pp. 1–8. DOI.org (Crossref)</li>
+   		 	  <li>Marchionini, Gary. “Exploratory Search: From Finding to Understanding.” Communications of the ACM, vol. 49, no. 4, Apr. 2006, p. 41. </li>
+                          <li>Flickner, M., et al. “Query by Image and Video Content: The QBIC System.” Computer, vol. 28, no. 9, Sept. 1995, pp. 23–32. </li>
+			</ol>
+		</div>
+		<div class="footer">
+			<div class="contact">Architecture of Information Systems | John Samuel</div>
+			<div class="navigation">93
+				<a class="prev" href="#slide92"></a>
+                                <a class="next" href="#slide94"></a>
+			</div>
+		</div>
+	</section>
+
+	<section class="slide" id="slide94">
+		<div class="header">
+			<h1>References</h1>
+		</div>
+		<div class="content">
+			<h1>References</h1>
+			<ul>
+				<li><a href="https://en.wikipedia.org/wiki/Information_system">https://en.wikipedia.org/wiki/Information_system</a>
+				<li><a href="https://en.wikipedia.org/wiki/Federated_search">https://en.wikipedia.org/wiki/Federated_search</a>
+				<li><a href="https://en.wikipedia.org/wiki/Search_engine_(computing)">https://en.wikipedia.org/wiki/Search_engine_(computing)</a>
+				<li><a href="https://query.wikidata.org/">https://query.wikidata.org/</a>
+				<li><a href="https://weather.com/">https://weather.com/</a>
+				<li><a href="https://duckduckgo.com/bang">https://duckduckgo.com/bang</a>
+				<li><a href="http://commoncrawl.org/">http://commoncrawl.org/</a>
+				<li><a href="https://en.wikipedia.org/wiki/High_availability">https://en.wikipedia.org/wiki/High_availability</a>
+				<li><a href="https://grafana.wikimedia.org">https://grafana.wikimedia.org</a>
+				<li><a href="https://status.wikimedia.org">https://status.wikimedia.org</a>
+				<li><a href="http://highscalability.com/">http://highscalability.com/</a>
+			</ul>
+			<h1>Image credits</h1>
+			<ul>
+				<li><a href="https://commons.wikimedia.org/wiki/Main_Page">Wikimedia Commons</a></li>
+				<li><a href="http://histropedia.com/timeline/5bnj79bjyr/Artists">http://histropedia.com/timeline/5bnj79bjyr/Artists</a></li>
+				<li><a href="https://pixabay.com/">https://pixabay.com/</a></li>
+			</ul>
+		</div>
+		<div class="footer">
+			<div class="contact">Architecture of Information Systems | John Samuel</div>
+			<div class="navigation">94
+				<a class="prev" href="#slide93"></a>
+                                <a class="next" href="#slide95"></a>
+			</div>
+		</div>
+	</section>
+
+	<script>
+		function changeCurrentURLSlideNumber(isIncrement) {
+			url = window.location.href;
+			position = url.indexOf("#slide");
+			if (position != -1) { // Not on the first page
+				slideIdString = url.substr(position + 6);
+				if (!Number.isNaN(slideIdString)) {
+					slideId = parseInt(slideIdString);
+					if (isIncrement) {
+                                               if (slideId  < 94) {
+						slideId = slideId + 1;
+                                               }
+					} else {
+						if (slideId > 1) {
+							slideId = slideId - 1;
+						}
+					}
+					url = url.replace(/#slide\d+/g, "#slide" + slideId);
+					window.location.href = url;
+				}
+			} else {
+				window.location.href = url + "#slide2";
+			}
+		}
+		document.onkeydown = function(event) {
+
+			event.preventDefault(); /* This will ensure the default behavior of
+													        page scroll behaviour (up, down, right, left)*/
+
+			event = event || window.event;
+			if (event.keyCode == '37') {
+				// left
+				changeCurrentURLSlideNumber(false);
+			} else if (event.keyCode == '38') {
+				// up
+				changeCurrentURLSlideNumber(false);
+			} else if (event.keyCode == '39') {
+				// right
+				changeCurrentURLSlideNumber(true);
+			} else if (event.keyCode == '40') {
+				// down
+				changeCurrentURLSlideNumber(true);
+			}
+		}
+		document.body.onmouseup = function(event) {
+			event = event || window.event;
+			event.preventDefault();
+			changeCurrentURLSlideNumber(true);
+		}
+	</script>
+</body>
+</html>
