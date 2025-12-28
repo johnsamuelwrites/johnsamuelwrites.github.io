@@ -1,422 +1,857 @@
 <!DOCTYPE html>
-
 <html lang="en">
 
-<head>
+  <head>
     <meta charset="utf-8" />
     <meta content="en" http-equiv="Content-Language" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link href="../../images/logo/favicon.png" rel="shortcut icon" />
-    <title>Photographie: Villes: John Samuel</title>
-    <style type="text/css">
-        body {
-            background-color: #C7ECE7;
+    <title>Photographie : Villes : John Samuel</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: 'Arial', 'Helvetica', sans-serif;
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        color: #2c3e50;
+        overflow-x: hidden;
+        position: relative;
+      }
+
+      /* Subtle animated grid background */
+      body::before {
+        content: '';
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-image:
+          linear-gradient(90deg, rgba(100, 100, 100, 0.02) 1px, transparent 1px),
+          linear-gradient(0deg, rgba(100, 100, 100, 0.02) 1px, transparent 1px);
+        background-size: 60px 60px;
+        animation: gridMove 40s linear infinite;
+        pointer-events: none;
+        z-index: 0;
+      }
+
+      @keyframes gridMove {
+        0% {
+          transform: translate(0, 0);
         }
 
-        #sidebar {
-            position: fixed;
-            background-color: #005b4f;
-            top: 0;
-            left: 0;
-            bottom: 0;
-            width: 30vw;
+        100% {
+          transform: translate(60px, 60px);
+        }
+      }
+
+      .content-wrapper {
+        position: relative;
+        z-index: 1;
+      }
+
+      /* Header with Navigation and Branding */
+      header {
+        background: rgba(255, 255, 255, 0.98);
+        -webkit-backdrop-filter: blur(20px);
+        backdrop-filter: blur(20px);
+        border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+        padding: 1.5rem 2rem;
+        position: sticky;
+        top: 0;
+        z-index: 100;
+        box-shadow: 0 2px 20px rgba(0, 0, 0, 0.03);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+      }
+
+      .site-branding {
+        flex: 1;
+        min-width: 200px;
+      }
+
+      .site-title a {
+        text-decoration: none;
+        font-size: 2rem;
+        font-weight: 900;
+        color: #2c3e50;
+        letter-spacing: 3px;
+        text-transform: uppercase;
+        transition: all 0.3s ease;
+        position: relative;
+      }
+
+      .site-title a::after {
+        content: '';
+        position: absolute;
+        bottom: -5px;
+        left: 0;
+        width: 0;
+        height: 2px;
+        background: #3498db;
+        transition: width 0.3s ease;
+      }
+
+      .site-title a:hover::after {
+        width: 100%;
+      }
+
+      .site-title a:hover {
+        color: #3498db;
+      }
+
+      .site-tagline {
+        font-size: 0.85rem;
+        color: #95a5a6;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+        margin-top: 0.3rem;
+      }
+
+      /* Navigation Menu */
+      #menu {
+        flex: 1;
+        display: flex;
+        justify-content: flex-end;
+      }
+
+      #menu ul {
+        list-style: none;
+        display: flex;
+        flex-wrap: wrap;
+        margin: 0;
+        padding: 0;
+        justify-content: flex-end;
+      }
+
+      #menu li {
+        margin: 0 1rem;
+        font-size: 1rem;
+        line-height: 2.5rem;
+        position: relative;
+      }
+
+      #menu li::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 0;
+        height: 2px;
+        background: #3498db;
+        transition: width 0.4s ease;
+      }
+
+      #menu li:hover::after {
+        width: 100%;
+      }
+
+      #menu a {
+        text-decoration: none;
+        color: #2c3e50;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+      }
+
+      #menu li:hover a {
+        color: #3498db;
+      }
+
+      /* Hero Section */
+      .hero-section {
+        text-align: center;
+        padding: 5rem 2rem 4rem;
+        position: relative;
+        overflow: hidden;
+        background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(249, 249, 249, 0.9) 100%);
+      }
+
+      .hero-title {
+        font-size: 4.5rem;
+        font-weight: 900;
+        color: #2c3e50;
+        margin-bottom: 1rem;
+        text-transform: uppercase;
+        letter-spacing: 12px;
+        position: relative;
+      }
+
+      .hero-title::after {
+        content: '';
+        position: absolute;
+        bottom: -15px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 100px;
+        height: 3px;
+        background: #3498db;
+      }
+
+      .hero-subtitle {
+        font-size: 1.3rem;
+        color: #7f8c8d;
+        letter-spacing: 4px;
+        text-transform: uppercase;
+        font-weight: 400;
+        margin-top: 2rem;
+      }
+
+      /* SVG Skyline - minimal and clean */
+      .skyline-svg {
+        width: 100%;
+        height: 120px;
+        margin-top: 3rem;
+        opacity: 0.4;
+      }
+
+      /* City Gallery - Masonry Grid Layout */
+      .city-gallery {
+        max-width: 1600px;
+        margin: 3rem auto;
+        padding: 0 2rem 4rem;
+      }
+
+      .gallery-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+        gap: 3rem;
+        margin-top: 2rem;
+      }
+
+      /* City Card with proper z-index */
+      .city-card {
+        position: relative;
+        overflow: hidden;
+        cursor: pointer;
+        height: 500px;
+        transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        isolation: isolate;
+        z-index: 1;
+      }
+
+      .city-card:hover {
+        transform: translateY(-20px);
+        z-index: 10;
+      }
+
+      /* Clean white border with subtle shadow */
+      .card-container {
+        position: absolute;
+        inset: 0;
+        background: #ffffff;
+        border-radius: 12px;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
+        transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        overflow: hidden;
+      }
+
+      .city-card:hover .card-container {
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+      }
+
+      /* Subtle accent line on top */
+      .accent-line {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: linear-gradient(90deg, #3498db, #2ecc71);
+        z-index: 3;
+        transform: scaleX(0);
+        transform-origin: left;
+        transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+      }
+
+      .city-card:hover .accent-line {
+        transform: scaleX(1);
+      }
+
+      /* Image Container - Clean, no heavy overlay */
+      .city-image-wrapper {
+        position: absolute;
+        inset: 0;
+        overflow: hidden;
+        border-radius: 12px;
+      }
+
+      /* Very light vignette only */
+      .city-image-wrapper::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: radial-gradient(circle at center,
+            transparent 30%,
+            rgba(0, 0, 0, 0.05) 100%);
+        z-index: 1;
+        pointer-events: none;
+        opacity: 0.6;
+        transition: opacity 0.4s ease;
+      }
+
+      .city-card:hover .city-image-wrapper::before {
+        opacity: 0.2;
+      }
+
+      .city-image {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+        filter: saturate(1.1) contrast(1.05);
+      }
+
+      .city-card:hover .city-image {
+        transform: scale(1.08);
+        filter: saturate(1.2) contrast(1.08);
+      }
+
+      /* City Info Overlay - Fixed z-index */
+      .city-info {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        padding: 2.5rem;
+        z-index: 5;
+        background: linear-gradient(to top,
+            rgba(255, 255, 255, 0.98) 0%,
+            rgba(255, 255, 255, 0.85) 60%,
+            transparent 100%);
+        -webkit-backdrop-filter: blur(12px);
+        backdrop-filter: blur(12px);
+        border-radius: 0 0 12px 12px;
+        transform: translateY(calc(100% - 100px));
+        transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+      }
+
+      .city-card:hover .city-info {
+        transform: translateY(0);
+      }
+
+      .city-name {
+        font-size: 2.2rem;
+        font-weight: 900;
+        color: #2c3e50;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+        margin: 0 0 0.3rem 0;
+        transition: all 0.3s ease;
+      }
+
+      .city-card:hover .city-name {
+        color: #3498db;
+      }
+
+      .city-country {
+        font-size: 0.9rem;
+        color: #95a5a6;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+        margin-bottom: 1rem;
+        font-weight: 600;
+      }
+
+      .city-description {
+        color: #7f8c8d;
+        font-size: 0.95rem;
+        line-height: 1.7;
+        font-weight: 400;
+        opacity: 0;
+        transform: translateY(10px);
+        transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1) 0.1s;
+      }
+
+      .city-card:hover .city-description {
+        opacity: 1;
+        transform: translateY(0);
+      }
+
+      /* Minimal corner indicator */
+      .corner-indicator {
+        position: absolute;
+        top: 1.5rem;
+        right: 1.5rem;
+        width: 40px;
+        height: 40px;
+        border-top: 2px solid rgba(52, 152, 219, 0.3);
+        border-right: 2px solid rgba(52, 152, 219, 0.3);
+        z-index: 4;
+        transition: all 0.4s ease;
+        border-radius: 0 8px 0 0;
+      }
+
+      .city-card:hover .corner-indicator {
+        width: 50px;
+        height: 50px;
+        border-color: rgba(52, 152, 219, 0.8);
+      }
+
+      /* Footer with Language Selector */
+      footer {
+        background: rgba(255, 255, 255, 0.98);
+        -webkit-backdrop-filter: blur(20px);
+        backdrop-filter: blur(20px);
+        border-top: 1px solid rgba(0, 0, 0, 0.05);
+        padding: 3rem 2rem;
+        margin-top: 4rem;
+        text-align: center;
+      }
+
+      .footer-content {
+        max-width: 1200px;
+        margin: 0 auto;
+      }
+
+      .footer-title {
+        font-size: 1.2rem;
+        color: #2c3e50;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+        margin-bottom: 1.5rem;
+        font-weight: 700;
+      }
+
+      #langlist {
+        display: inline-flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        background: rgba(248, 249, 250, 0.9);
+        border-radius: 50px;
+        padding: 0.5rem;
+        border: 1px solid rgba(0, 0, 0, 0.08);
+        -webkit-backdrop-filter: blur(10px);
+        backdrop-filter: blur(10px);
+        margin-bottom: 2rem;
+      }
+
+      #langlist li {
+        display: inline-block;
+        list-style: none;
+        margin: 0.3rem;
+        padding: 0.7rem 1.3rem;
+        border-radius: 30px;
+        transition: all 0.3s ease;
+      }
+
+      #langlist a {
+        text-decoration: none;
+        color: #7f8c8d;
+        font-size: 0.95rem;
+        transition: all 0.3s ease;
+        font-weight: 600;
+      }
+
+      #langlist .highlight {
+        background: #3498db;
+      }
+
+      #langlist .highlight a {
+        color: #ffffff;
+        font-weight: bold;
+      }
+
+      #langlist li:not(.highlight):hover {
+        background: rgba(52, 152, 219, 0.1);
+      }
+
+      #langlist li:not(.highlight):hover a {
+        color: #3498db;
+      }
+
+      .footer-credits {
+        color: #95a5a6;
+        font-size: 0.9rem;
+        letter-spacing: 1px;
+        margin-top: 2rem;
+        font-weight: 400;
+      }
+
+      .footer-credits strong {
+        color: #2c3e50;
+        font-weight: 900;
+      }
+
+      /* Responsive Design */
+      @media screen and (max-width: 968px) {
+        header {
+          flex-direction: column;
+          text-align: center;
+          padding: 1.5rem 1rem;
         }
 
-        #sidebar .title {
-            position: relative;
-            top: 2vh;
-            text-align: center;
-            line-height: 7vh;
-            font-size: 1.6vmax;
-            font-family: 'Arial';
-            margin-top: 10vh;
+        .site-branding {
+          margin-bottom: 1rem;
         }
 
-        #sidebar .title a:link,
-        #sidebar .title a:visited {
-            text-decoration: none;
-            color: #FFFFFF;
+        #menu {
+          justify-content: center;
         }
 
-        .subtitle {
-            position: relative;
-            text-align: center;
-            line-height: 1.3vmax;
-            font-family: 'Arial';
-            font-size: 1.5vmax;
-            color: #FFFFFF;
+        #menu ul {
+          justify-content: center;
         }
 
-        .subtitle a:link,
-        .subtitle a:visited {
-            color: #FFFFFF;
-            text-decoration: none;
+        .gallery-grid {
+          grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+          gap: 2.5rem;
         }
 
-        .licence {
-            position: fixed;
-            text-align: right;
-            bottom: 0;
-            right: 0;
+        .hero-title {
+          font-size: 3rem;
+          letter-spacing: 6px;
         }
 
-        .home {
-            position: fixed;
-            text-align: left;
-            font-family: 'Arial';
-            color: #D3D3D3;
-            z-index: 100;
-            width: 100%;
-            background-color: #C7ECE7;
-            top: 0px;
-            padding-bottom: 15px;
+        .hero-subtitle {
+          font-size: 1rem;
+          letter-spacing: 3px;
         }
 
-        .home a:link,
-        .home a:visited {
-            text-decoration: none;
-            color: #D3D3D3;
+        .city-card {
+          height: 450px;
         }
 
-        .home ul {
-            margin: 0;
-            padding: 0;
-            text-align: left;
-            list-style: none;
+        .city-name {
+          font-size: 2rem;
+        }
+      }
+
+      @media screen and (max-width: 600px) {
+        .site-title a {
+          font-size: 1.5rem;
         }
 
-        .home li {
-            position: relative;
-            float: left;
-            padding-top: 15px;
-            margin-right: 1em;
-            font-family: 'Arial';
+        .site-tagline {
+          font-size: 0.75rem;
         }
 
-        .home li:hover a:link,
-        .home li:hover a:visited {
-            text-decoration: none;
-            padding: 15px;
-            color: #FFFFFF;
-            background-color: #005b4f;
+        #menu li {
+          margin: 0 0.5rem;
+          font-size: 0.85rem;
         }
 
-        .home ul ul {
-            display: none;
-            position: absolute;
-            padding: 5px;
+        .hero-title {
+          font-size: 2rem;
+          letter-spacing: 4px;
         }
 
-        .home ul ul li {
-            float: none;
-            padding-left: 0px;
-            padding-top: 15px;
-            padding-bottom: 15px;
-            width: 150px;
+        .hero-subtitle {
+          font-size: 0.85rem;
+          letter-spacing: 2px;
         }
 
-        .home li:hover ul {
-            display: block;
+        .gallery-grid {
+          grid-template-columns: 1fr;
+          gap: 2rem;
         }
 
-        .content li a {
-            text-decoration: none;
+        .city-card {
+          height: 400px;
         }
 
-        .content h2,
-        h3 {
-            color: #005b4f;
+        .city-name {
+          font-size: 1.8rem;
         }
 
-        .home a:link,
-        .home a:visited {
-            text-decoration: none;
-            color: #005b4f;
+        .city-info {
+          padding: 2rem;
+          transform: translateY(calc(100% - 90px));
         }
-
-        .content a:link,
-        .content a:visited {
-            color: #005b4f;
-        }
-
-        .content .links {
-            line-height: 1.8em;
-            font-size: 1.3em;
-            margin-top: 5vh;
-            padding-top: 10vh;
-            font-family: "Arial";
-        }
-
-        .links ul {
-            display: flex;
-            flex-direction: row;
-            flex-wrap: wrap;
-            justify-content: center;
-            align-items: center;
-            text-align: center;
-            padding-left: 0px;
-            max-width: 120rem;
-            list-style-type: none;
-        }
-
-        .links li {
-            height: 17rem;
-            width: 20rem;
-            border-radius: 20px;
-            margin-bottom: 0px;
-            background-color: #91D1C9;
-            margin: 1px;
-        }
-
-        .links li a {
-            color: #17172f;
-            text-decoration: none;
-        }
-
-        .links li:hover {
-            z-index: 10;
-            transform: scale(1.2);
-            background-color: rgba(200, 200, 200, 0.1);
-            transition: all 0.5s ease-in-out;
-        }
-
-        .page {
-            width: 65vw;
-            height: 100%;
-            margin-left: 30vw;
-            overflow: hidden;
-            padding: 0 1em;
-            font-family: 'Arial';
-        }
-
-        .page img {
-            max-width: 100%;
-            max-height: 100%;
-        }
-
-        @media (max-width: 640px),
-        screen and (orientation: portrait) {
-            body {
-                max-width: 100%;
-                max-height: 100%;
-            }
-
-            #sidebar {
-                position: fixed;
-                z-index: 10;
-                background-color: #005b4f;
-                top: 0;
-                left: 0;
-                bottom: 78vh;
-                width: 100vw;
-            }
-
-            #sidebar .title {
-                text-align: center;
-                position: fixed;
-                margin-top: 6vh;
-                left: 0px;
-                right: 0px;
-                line-height: 2vmax;
-                font-size: 2vmax;
-                font-family: 'Arial';
-            }
-
-            #sidebar .subtitle {
-                text-align: center;
-                top: 5vh;
-                left: 0px;
-                right: 0px;
-                position: fixed;
-                margin-top: 10vh;
-                font-size: 1.4vmax;
-            }
-
-            #sidebar .title a:link,
-            #sidebar .title a:visited {
-                text-align: center;
-                color: #FFFFFF;
-            }
-
-            #sidebar .subtitle a:link,
-            #sidebar .subtitle a:visited {
-                text-align: center;
-                color: #FFFFFF;
-            }
-
-            .home {
-                position: fixed;
-                z-index: 100;
-                width: 100%;
-                background-color: #005b4f;
-                font-size: 1.5vmax;
-            }
-
-            .home a:link,
-            .home a:visited {
-                text-decoration: none;
-                color: #FFFFFF;
-            }
-
-            .content {
-                font-family: 'Arial';
-                margin-top: 15vh;
-            }
-
-            .page {
-                top: 40vh;
-                width: 95%;
-                margin-left: 0vw;
-                padding-left: 0vw;
-            }
-
-            .page img {
-                max-width: 100%;
-                max-height: 100%;
-                border: 0;
-            }
-        }
-
-
-        #langsection {
-            padding-top: 10vh;
-        }
-
-        #langlist {
-            padding-left: 0;
-            border-radius: 1.2em;
-            background-color: #005b4f;
-            display: inline-block;
-        }
-
-        #langlist li {
-            list-style: none;
-            display: inline-block;
-            padding: 0.5em;
-            margin-left: 0.3em;
-            margin-right: 0.3em;
-            font-family: 'Arial';
-        }
-
-        #langlist a {
-            text-decoration: none;
-            color: #FFFFFF;
-        }
-
-        #langlist .highlight {
-            border-radius: 1em;
-            padding-top: 0.3em;
-            padding-bottom: 0.3em;
-            background-color: #ebfbee;
-        }
-
-        #langlist .highlight a {
-            color: #17172f;
-        }
+      }
     </style>
-</head>
+  </head>
 
-<body vocab="http://schema.org/">
-    <div id="sidebar">
-        <img alt="Path" src="../../images/writings/path.svg"
-            style="max-width:100%;max-height:50%;opacity:0.9;filter:alpha(opacity=70);" />
-        <div class="title">
-            <h1><a href="./villes.html">Villes</a></h1>
+  <body vocab="http://schema.org/">
+    <div class="content-wrapper">
+      <!-- Header with Branding and Navigation -->
+      <header>
+        <div class="site-branding">
+          <h1 class="site-title"><a href="../index.html">John Samuel</a></h1>
+          <p class="site-tagline">Photographie et voyage</p>
         </div>
-        <div class="subtitle">
-            <h3><a href="../apropos.html">John Samuel</a></h3>
+        <nav id="menu">
+          <ul typeof="BreadcrumbList">
+            <li property="itemListElement" typeof="ListItem">
+              <a href="../index.html" property="item" typeof="WebPage">
+                <span property="name">Accueil</span>
+              </a>
+            </li>
+            <li property="itemListElement" typeof="ListItem">
+              <a href="./index.html" property="item" typeof="WebPage">
+                <span property="name">Voyages</span>
+              </a>
+            </li>
+          </ul>
+        </nav>
+      </header>
+
+      <!-- Hero Section -->
+      <section class="hero-section">
+        <h2 class="hero-title">Villes</h2>
+        <p class="hero-subtitle">Paysages Urbains à travers le Monde</p>
+
+        <!-- Minimal SVG Skyline -->
+        <svg class="skyline-svg" viewBox="0 0 1200 120" xmlns="http://www.w3.org/2000/svg">
+          <rect x="50" y="50" width="60" height="70" fill="#3498db" opacity="0.5" />
+          <rect x="120" y="30" width="70" height="90" fill="#2ecc71" opacity="0.5" />
+          <rect x="200" y="60" width="50" height="60" fill="#3498db" opacity="0.5" />
+          <rect x="260" y="40" width="65" height="80" fill="#2ecc71" opacity="0.5" />
+          <rect x="335" y="25" width="75" height="95" fill="#3498db" opacity="0.5" />
+          <rect x="420" y="55" width="55" height="65" fill="#2ecc71" opacity="0.5" />
+          <rect x="485" y="35" width="70" height="85" fill="#3498db" opacity="0.5" />
+          <rect x="565" y="45" width="60" height="75" fill="#2ecc71" opacity="0.5" />
+          <rect x="635" y="30" width="65" height="90" fill="#3498db" opacity="0.5" />
+          <rect x="710" y="50" width="70" height="70" fill="#2ecc71" opacity="0.5" />
+          <rect x="790" y="40" width="60" height="80" fill="#3498db" opacity="0.5" />
+          <rect x="860" y="35" width="75" height="85" fill="#2ecc71" opacity="0.5" />
+          <rect x="945" y="55" width="55" height="65" fill="#3498db" opacity="0.5" />
+          <rect x="1010" y="30" width="70" height="90" fill="#2ecc71" opacity="0.5" />
+          <rect x="1090" y="45" width="60" height="75" fill="#3498db" opacity="0.5" />
+        </svg>
+      </section>
+
+      <!-- City Gallery with Grid Layout -->
+      <section class="city-gallery">
+        <div class="gallery-grid">
+
+          <!-- Amsterdam Card -->
+          <article class="city-card">
+            <div class="card-container">
+              <div class="accent-line"></div>
+              <div class="corner-indicator"></div>
+              <div class="city-image-wrapper">
+                <img class="city-image"
+                  src="https://upload.wikimedia.org/wikipedia/commons/thumb/d/df/Street_light%2C_Amsterdam.jpg/1024px-Street_light%2C_Amsterdam.jpg"
+                  alt="Amsterdam canals" />
+              </div>
+              <div class="city-info">
+                <h3 class="city-name">Amsterdam</h3>
+                <p class="city-country">Pays-Bas</p>
+                <p class="city-description">
+                  A city of bridges and bicycles, where historic canals reflect the golden age of Dutch culture.
+                </p>
+              </div>
+            </div>
+          </article>
+
+          <!-- Berlin Card -->
+          <article class="city-card">
+            <div class="card-container">
+              <div class="accent-line"></div>
+              <div class="corner-indicator"></div>
+              <div class="city-image-wrapper">
+                <img class="city-image"
+                  src="https://upload.wikimedia.org/wikipedia/commons/thumb/9/90/Mitte_-_Berlin_Cathedral_-_20170803181059.jpg/1024px-Mitte_-_Berlin_Cathedral_-_20170803181059.jpg"
+                  alt="Berlin cathedral" />
+              </div>
+              <div class="city-info">
+                <h3 class="city-name">Berlin</h3>
+                <p class="city-country">Allemagne</p>
+                <p class="city-description">
+                  A city reborn from history, where creativity and culture pulse through every street and wall.
+                </p>
+              </div>
+            </div>
+          </article>
+
+          <!-- Brussels Card -->
+          <article class="city-card">
+            <div class="card-container">
+              <div class="accent-line"></div>
+              <div class="corner-indicator"></div>
+              <div class="city-image-wrapper">
+                <img class="city-image"
+                  src="https://upload.wikimedia.org/wikipedia/commons/thumb/a/ab/Doors%2C_Basilica_of_the_Sacred_Heart%2C_Brussels_02.jpg/1024px-Doors%2C_Basilica_of_the_Sacred_Heart%2C_Brussels_02.jpg"
+                  alt="Brussels architecture" />
+              </div>
+              <div class="city-info">
+                <h3 class="city-name">Brussels</h3>
+                <p class="city-country">Belgique</p>
+                <p class="city-description">
+                  The heart of Europe, where Art Nouveau façades and medieval squares create architectural harmony.
+                </p>
+              </div>
+            </div>
+          </article>
+
+          <!-- Copenhagen Card -->
+          <article class="city-card">
+            <div class="card-container">
+              <div class="accent-line"></div>
+              <div class="corner-indicator"></div>
+              <div class="city-image-wrapper">
+                <img class="city-image"
+                  src="https://upload.wikimedia.org/wikipedia/commons/thumb/a/aa/Church_of_Holmen%2C_Copenhagen.jpg/1024px-Church_of_Holmen%2C_Copenhagen.jpg"
+                  alt="Brussels architecture" />
+              </div>
+              <div class="city-info">
+                <h3 class="city-name">Copenhague</h3>
+                <p class="city-country">Danemark</p>
+                <p class="city-description">
+                  A blend of historic charm and modern design, where colorful harborfronts meet sleek Scandinavian
+                  architecture.
+                </p>
+              </div>
+            </div>
+          </article>
+
+          <!-- Helsinki Card -->
+          <article class="city-card">
+            <div class="card-container">
+              <div class="accent-line"></div>
+              <div class="corner-indicator"></div>
+              <div class="city-image-wrapper">
+                <img class="city-image"
+                  src="https://upload.wikimedia.org/wikipedia/commons/thumb/7/71/Uspenski_Cathedral_In_Helsinki.jpg/1024px-Uspenski_Cathedral_In_Helsinki.jpg"
+                  alt="Brussels architecture" />
+              </div>
+              <div class="city-info">
+                <h3 class="city-name">Helsinki</h3>
+                <p class="city-country">Finlande</p>
+                <p class="city-description">
+                  A coastal gem where neoclassical architecture meets modern minimalism amidst serene Baltic landscapes.
+                </p>
+              </div>
+            </div>
+          </article>
+
+          <!-- Lyon Card -->
+          <article class="city-card">
+            <div class="card-container">
+              <div class="accent-line"></div>
+              <div class="corner-indicator"></div>
+              <div class="city-image-wrapper">
+                <img class="city-image"
+                  src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/5b/Golden_hour%2C_Lyon_08.jpg/1024px-Golden_hour%2C_Lyon_08.jpg"
+                  alt="Lyon at golden hour" />
+              </div>
+              <div class="city-info">
+                <h3 class="city-name">Lyon</h3>
+                <p class="city-country">France</p>
+                <p class="city-description">
+                  France's gastronomic capital, where Roman history meets Renaissance elegance at the confluence of
+                  rivers.
+                </p>
+              </div>
+            </div>
+          </article>
+          <!-- Rotterdam Card -->
+          <article class="city-card">
+            <div class="card-container">
+              <div class="accent-line"></div>
+              <div class="corner-indicator"></div>
+              <div class="city-image-wrapper">
+                <img class="city-image"
+                  src="https://upload.wikimedia.org/wikipedia/commons/thumb/1/1c/Skyline%2C_Rotterdam.jpg/2560px-Skyline%2C_Rotterdam.jpg"
+                  alt="Rotterdam skyline" />
+              </div>
+              <div class="city-info">
+                <h3 class="city-name">Rotterdam</h3>
+                <p class="city-country">Pays-Bas</p>
+                <p class="city-description">
+                  A bold architectural playground where innovative design reshapes the urban landscape.
+                </p>
+              </div>
+            </div>
+          </article>
+
+          <!-- Stockholm Card -->
+          <article class="city-card">
+            <div class="card-container">
+              <div class="accent-line"></div>
+              <div class="corner-indicator"></div>
+              <div class="city-image-wrapper">
+                <img class="city-image"
+                  src="https://upload.wikimedia.org/wikipedia/commons/thumb/6/68/Street_light%2C_Stockholm.jpg/2560px-Street_light%2C_Stockholm.jpg"
+                  alt="Stockholm cityscape" />
+              </div>
+              <div class="city-info">
+                <h3 class="city-name">Stockholm</h3>
+                <p class="city-country">Suède</p>
+                <p class="city-description">
+                  The Venice of the North, where Scandinavian design meets medieval architecture across 14 islands.
+                </p>
+              </div>
+            </div>
+          </article>
+
+          <!-- Tallinn Card -->
+          <article class="city-card">
+            <div class="card-container">
+              <div class="accent-line"></div>
+              <div class="corner-indicator"></div>
+              <div class="city-image-wrapper">
+                <img class="city-image"
+                  src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/c7/Pink_building_In_Tallinn.jpg/1024px-Pink_building_In_Tallinn.jpg"
+                  alt="Tallinn cityscape" />
+              </div>
+              <div class="city-info">
+                <h3 class="city-name">Tallinn</h3>
+                <p class="city-country">Estonie</p>
+                <p class="city-description">
+                  A medieval gem on the Baltic Sea, where cobblestone streets wind through a fairy-tale old town.
+                </p>
+              </div>
+            </div>
+          </article>
         </div>
-    </div>
-    <div class="licence">
-        <a href="http://creativecommons.org/licenses/by-sa/4.0/" rel="license"><img alt="Creative Commons License"
-                src="./../../images/license.png" style="border-width:0" /></a>
-    </div>
-    <div class="page">
-        <div class="home">
-            <ul typeof="BreadcrumbList">
-                <li property="itemListElement" typeof="ListItem">
-                    <a href="../index.html" property="item" typeof="WebPage">
-                        <span property="name">Accueil</span>
-                    </a>
-                </li>
-                <li property="itemListElement" typeof="ListItem">
-                    <a href="../recherche/recherche.html" property="item" typeof="WebPage">
-                        <span property="name">Recherche</span>
-                    </a>
-                </li>
-                <li property="itemListElement" typeof="ListItem">
-                    <a href="../enseignement/index.html" property="item" typeof="WebPage">
-                        <span property="name">Enseignement</span>
-                    </a>
-                </li>
-                <li property="itemListElement" typeof="ListItem">
-                    <a href="../ecrits/index.html" property="item" typeof="WebPage">
-                        <span property="name">Écrits</span>
-                    </a>
-                </li>
-                <li property="itemListElement" typeof="ListItem">
-                    <a href="../linguistique/index.html" property="item" typeof="WebPage">
-                        <span property="name">Linguistique</span>
-                    </a>
-                </li>
-                <li property="itemListElement" typeof="ListItem">
-                    <a href="../voyages/index.html" property="item" typeof="WebPage">
-                        <span property="name">Voyages</span>
-                    </a>
-                </li>
+      </section>
+
+      <!-- Footer with Language Selector -->
+      <footer>
+        <div class="footer-content">
+          <h3 class="footer-title">Select Language</h3>
+          <section id="langsection">
+            <ul id="langlist">
+              <li class="highlight" id="enpage" rel="hasPart" resource="#enpage">
+                <span lang="en">
+                  <a class="langlink" href="../../en/photography/cities.html" property="url" typeof="WebPage">
+                    <span property="inLanguage">English</span>
+                  </a>
+                </span>
+              </li>
+              <li id="frpage" rel="hasPart" resource="#frpage">
+                <span lang="fr">
+                  <a class="langlink" href="../../fr/voyages/villes.html" property="url" typeof="WebPage">
+                    <span property="inLanguage">Français</span>
+                  </a>
+                </span>
+              </li>
+              <li id="mlpage" rel="hasPart" resource="#mlpage">
+                <span lang="ml">
+                  <a class="langlink" href="../../ml/യാത്രകൾ/നഗരങ്ങൾ.html" property="url" typeof="WebPage">
+                    <span property="inLanguage">മലയാളം</span>
+                  </a>
+                </span>
+              </li>
+              <li id="papage" rel="hasPart" resource="#papage">
+                <span lang="pa">
+                  <a class="langlink" href="../../pa/ਯਾਤਰਾ/ਸ਼ਹਿਰ.html" property="url" typeof="WebPage">
+                    <span property="inLanguage">ਪੰਜਾਬੀ</span>
+                  </a>
+                </span>
+              </li>
+              <li id="hipage" rel="hasPart" resource="#hipage">
+                <span lang="hi">
+                  <a class="langlink" href="../../hi/यात्रा/नगर.html" property="url" typeof="WebPage">
+                    <span property="inLanguage">हिन्दी</span>
+                  </a>
+                </span>
+              </li>
             </ul>
+          </section>
+          <p class="footer-credits">© 2025 <strong>John Samuel</strong> - Photographie et voyage</p>
         </div>
-        <div class="content">
-            <section id="langsection">
-                <ul id="langlist">
-                    <li id="enpage" rel="hasPart" resource="#enpage">
-                        <span lang="en"><a class="langlink" href="../../en/photography/cities.html" property="url"
-                                typeof="WebPage"><span property="inLanguage">English</span></a>
-                        </span>
-                    </li>
-                    <li class="highlight" id="frpage" rel="hasPart" resource="#frpage">
-                        <span lang="fr"><a class="langlink" href="../../fr/voyages/villes.html" property="url"
-                                typeof="WebPage"><span property="inLanguage">Français</span></a>
-                        </span>
-                    </li>
-                    <li id="mlpage" rel="hasPart" resource="#mlpage">
-                        <span lang="ml"><a class="langlink" href="../../ml/യാത്രകൾ/നഗരങ്ങൾ.html" property="url"
-                                typeof="WebPage"><span property="inLanguage">മലയാളം</span></a>
-                        </span>
-                    </li>
-                    <li id="papage" rel="hasPart" resource="#papage">
-                        <span lang="pa"><a class="langlink" href="../../pa/ਯਾਤਰਾ/ਸ਼ਹਿਰ.html" property="url"
-                                typeof="WebPage"><span property="inLanguage">ਪੰਜਾਬੀ</span></a>
-                        </span>
-                    </li>
-                    <li id="hipage" rel="hasPart" resource="#hipage">
-                        <span lang="hi"><a class="langlink" href="../../hi/यात्रा/नगर.html" property="url"
-                                typeof="WebPage"><span property="inLanguage">हिन्दी</span></a>
-                        </span>
-                    </li>
-                </ul>
-            </section>
-            <section class="links">
-                <h2>Villes</h2>
-                <h3>Suède</h3>
-                <ul>
-                    <li>
-                        <a href="../voyages/villes.html"><img
-                                src="https://upload.wikimedia.org/wikipedia/commons/thumb/6/68/Street_light%2C_Stockholm.jpg/320px-Street_light%2C_Stockholm.jpg" />Stockholm</a>
-                    </li>
-                </ul>
-            </section>
-            <section class="links">
-                <h3>Pays-Bas</h3>
-                <ul>
-                    <li>
-                        <a href="../voyages/villes.html"><img
-                                src="https://upload.wikimedia.org/wikipedia/commons/thumb/1/1c/Skyline%2C_Rotterdam.jpg/320px-Skyline%2C_Rotterdam.jpg" />Rotterdam</a>
-                    </li>
-                </ul>
-            </section>
-        </div>
-        <br />
+      </footer>
     </div>
-</body>
+  </body>
 
 </html>
