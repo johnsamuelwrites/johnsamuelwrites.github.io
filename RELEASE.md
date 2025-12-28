@@ -1,3 +1,30 @@
+# v1.2
+===============================================================================
+
+### Added
+- New academic year (2025–2026) content and archives
+- New and expanded articles on AI, education, ethics, multimodal models, labor markets, and culture
+- New courses and teaching materials (Advanced Python, AI & DL, data processing)
+- Extensive additions to Project 3D (low-poly models, environments, simple assets)
+- New visualizations (Perceptron, MLP, ML-related)
+- Large expansion of travel and thematic photography galleries
+- New talks, conference papers, interviews, and community contributions
+
+### Changed
+- Major expansions and refinements of existing articles, notes, and essays
+- Reorganized site structure, articles, and navigation
+- Improved CSS, layout, typography, and responsiveness across all sections
+- Updated main pages, project pages, and teaching references
+
+### Fixed
+- Corrected links, filenames, URLs, tags, titles, and HTML markup
+- Reduced duplication and cleaned up repetitive or unused content
+- Fixed favicon, metadata, and viewport issues
+
+### Removed
+- Obsolete templates, WIP files, and unused assets
+
+
 # v1.1
 ===============================================================================
 
