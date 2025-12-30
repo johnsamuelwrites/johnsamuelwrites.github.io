@@ -1,0 +1,884 @@
+<!DOCTYPE html>
+<html lang="en">
+
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta http-equiv="Content-Language" content="en" />
+        <link rel="shortcut icon" href="../../../images/logo/favicon.png" />
+        <title>Nature - Projet 3D : John Samuel</title>
+
+        <!-- Load model-viewer for 3D previews -->
+        <script type="module" src="https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js"></script>
+        <script nomodule src="https://unpkg.com/@google/model-viewer/dist/model-viewer-legacy.js"></script>
+
+        <style type="text/css">
+            * {
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
+            }
+
+            :root {
+                /* Nature Theme Color Palette */
+                --bg-dark: #0a0e27;
+                --bg-darker: #060913;
+                --surface-dark: #141829;
+                --surface-elevated: #1a1f3a;
+                --text-primary: #e2e8f0;
+                --text-secondary: #94a3b8;
+
+                /* Nature-inspired colors */
+                --nature-green: #10b981;
+                --nature-emerald: #059669;
+                --nature-lime: #84cc16;
+                --nature-sky: #0ea5e9;
+                --nature-amber: #f59e0b;
+                --nature-brown: #92400e;
+                --glow-green: rgba(16, 185, 129, 0.5);
+                --glow-emerald: rgba(5, 150, 105, 0.5);
+                --glow-sky: rgba(14, 165, 233, 0.5);
+                --gradient-nature: linear-gradient(135deg, var(--nature-lime) 0%, var(--nature-green) 50%, var(--nature-emerald) 100%);
+
+                /* Design Tokens */
+                --space-xs: 0.25rem;
+                --space-sm: 0.5rem;
+                --space-md: 1rem;
+                --space-lg: 1.5rem;
+                --space-xl: 2rem;
+                --space-2xl: 3rem;
+                --space-3xl: 4rem;
+                --space-4xl: 6rem;
+
+                --radius-sm: 4px;
+                --radius-md: 8px;
+                --radius-lg: 12px;
+                --radius-xl: 16px;
+                --radius-2xl: 24px;
+
+                --text-base: clamp(1rem, 0.95rem + 0.25vw, 1.125rem);
+                --text-lg: clamp(1.125rem, 1.05rem + 0.35vw, 1.25rem);
+                --text-xl: clamp(1.25rem, 1.15rem + 0.5vw, 1.5rem);
+                --text-2xl: clamp(1.5rem, 1.3rem + 1vw, 2rem);
+                --text-3xl: clamp(2rem, 1.6rem + 2vw, 2.5rem);
+                --text-4xl: clamp(2.5rem, 2rem + 2.5vw, 3.5rem);
+            }
+
+            body {
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+                background: radial-gradient(ellipse at top, var(--bg-dark) 0%, var(--bg-darker) 100%);
+                background-attachment: fixed;
+                color: var(--text-primary);
+                line-height: 1.6;
+                overflow-x: hidden;
+                position: relative;
+            }
+
+            /* Animated background pattern - organic shapes */
+            body::before {
+                content: '';
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background-image:
+                    radial-gradient(circle at 20% 30%, var(--glow-green) 0%, transparent 50%),
+                    radial-gradient(circle at 80% 70%, var(--glow-emerald) 0%, transparent 50%),
+                    radial-gradient(circle at 50% 90%, var(--glow-sky) 0%, transparent 50%);
+                pointer-events: none;
+                z-index: 0;
+                animation: organicPulse 12s ease-in-out infinite;
+            }
+
+            @keyframes organicPulse {
+
+                0%,
+                100% {
+                    opacity: 0.25;
+                    transform: scale(1) rotate(0deg);
+                }
+
+                50% {
+                    opacity: 0.45;
+                    transform: scale(1.1) rotate(5deg);
+                }
+            }
+
+            /* Organic pattern overlay */
+            body::after {
+                content: '';
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background:
+                    radial-gradient(circle at 20% 50%, rgba(16, 185, 129, 0.03) 0%, transparent 50%),
+                    radial-gradient(circle at 80% 50%, rgba(5, 150, 105, 0.03) 0%, transparent 50%);
+                pointer-events: none;
+                z-index: 0;
+            }
+
+            /* Organic grid pattern */
+            .grid-pattern {
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background-image:
+                    linear-gradient(rgba(16, 185, 129, 0.06) 1px, transparent 1px),
+                    linear-gradient(90deg, rgba(16, 185, 129, 0.06) 1px, transparent 1px);
+                background-size: 70px 70px;
+                pointer-events: none;
+                z-index: 0;
+                opacity: 0.3;
+            }
+
+            /* Fixed Navigation */
+            .navigation {
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                background: rgba(20, 24, 41, 0.7);
+                -webkit-backdrop-filter: blur(20px) saturate(180%);
+                backdrop-filter: blur(20px) saturate(180%);
+                padding: 1.2rem 2rem;
+                z-index: 1000;
+                border-bottom: 1px solid rgba(16, 185, 129, 0.2);
+                box-shadow: 0 4px 24px rgba(0, 0, 0, 0.5), 0 0 40px rgba(16, 185, 129, 0.1);
+            }
+
+            .nav-content {
+                max-width: 1400px;
+                margin: 0 auto;
+                display: flex;
+                align-items: center;
+                gap: 2rem;
+            }
+
+            .nav-name {
+                font-size: 1.1rem;
+                font-weight: 700;
+                color: var(--nature-green);
+                text-decoration: none;
+                transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+                position: relative;
+                text-shadow: 0 0 20px var(--glow-green);
+            }
+
+            .nav-name::after {
+                content: '';
+                position: absolute;
+                bottom: -2px;
+                left: 0;
+                width: 0;
+                height: 2px;
+                background: var(--gradient-nature);
+                transition: width 0.3s ease;
+                box-shadow: 0 0 10px var(--glow-green);
+            }
+
+            .nav-name:hover {
+                color: var(--nature-lime);
+                text-shadow: 0 0 30px var(--glow-green);
+                transform: translateY(-1px);
+            }
+
+            .nav-name:hover::after {
+                width: 100%;
+            }
+
+            .breadcrumb {
+                display: flex;
+                gap: 0.5rem;
+                list-style: none;
+                font-size: 0.95rem;
+                flex-wrap: wrap;
+            }
+
+            .breadcrumb li {
+                display: flex;
+                align-items: center;
+                gap: 0.5rem;
+            }
+
+            .breadcrumb li:not(:last-child)::after {
+                content: '→';
+                color: var(--nature-green);
+                opacity: 0.5;
+            }
+
+            .breadcrumb a {
+                color: var(--text-secondary);
+                text-decoration: none;
+                transition: all 0.3s ease;
+                padding: 0.3rem 0.8rem;
+                border-radius: var(--radius-md);
+            }
+
+            .breadcrumb a:hover {
+                background: rgba(16, 185, 129, 0.1);
+                color: var(--nature-green);
+                text-shadow: 0 0 10px var(--glow-green);
+            }
+
+            .breadcrumb span {
+                color: var(--text-primary);
+                opacity: 0.7;
+                padding: 0.3rem 0.8rem;
+            }
+
+            /* Hero Section */
+            .hero {
+                margin-top: 6rem;
+                padding: 3rem 2rem 5rem;
+                text-align: center;
+                max-width: 1400px;
+                margin-left: auto;
+                margin-right: auto;
+                position: relative;
+                z-index: 1;
+            }
+
+            .hero-title {
+                font-size: var(--text-4xl);
+                font-weight: 800;
+                letter-spacing: -0.03em;
+                margin-bottom: 1.5rem;
+                background: var(--gradient-nature);
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                background-clip: text;
+                animation: titleShimmer 8s ease-in-out infinite;
+                background-size: 200% 200%;
+                filter: drop-shadow(0 0 40px var(--glow-green));
+            }
+
+            @keyframes titleShimmer {
+
+                0%,
+                100% {
+                    background-position: 0% 50%;
+                }
+
+                50% {
+                    background-position: 100% 50%;
+                }
+            }
+
+            .hero-subtitle {
+                font-size: var(--text-xl);
+                color: var(--text-secondary);
+                margin-bottom: 2.5rem;
+                font-weight: 500;
+            }
+
+            /* Hero SVG - Organic Nature Forms */
+            .hero-svg {
+                width: 100%;
+                max-width: 600px;
+                height: 300px;
+                margin: 0 auto 2.5rem;
+                filter: drop-shadow(0 0 30px var(--glow-green));
+            }
+
+            .hero-description {
+                max-width: 800px;
+                margin: 0 auto;
+                font-size: var(--text-lg);
+                line-height: 1.8;
+                color: var(--text-secondary);
+                background: rgba(20, 24, 41, 0.6);
+                -webkit-backdrop-filter: blur(20px);
+                backdrop-filter: blur(20px);
+                padding: 2rem;
+                border-radius: var(--radius-2xl);
+                box-shadow:
+                    0 10px 40px rgba(0, 0, 0, 0.5),
+                    0 0 40px var(--glow-green),
+                    inset 0 0 0 1px rgba(16, 185, 129, 0.2);
+                border: 1px solid rgba(16, 185, 129, 0.2);
+            }
+
+            /* Section Styling */
+            .content-section {
+                max-width: 1400px;
+                margin: 0 auto;
+                padding: var(--space-3xl) var(--space-xl);
+                position: relative;
+                z-index: 1;
+            }
+
+            /* 3D Models Grid */
+            .models-grid {
+                display: grid;
+                grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+                gap: var(--space-2xl);
+                margin-bottom: var(--space-3xl);
+            }
+
+            .model-card {
+                background: rgba(20, 24, 41, 0.6);
+                -webkit-backdrop-filter: blur(20px);
+                backdrop-filter: blur(20px);
+                border-radius: var(--radius-2xl);
+                overflow: hidden;
+                box-shadow:
+                    0 20px 60px rgba(0, 0, 0, 0.6),
+                    0 0 40px var(--glow-green),
+                    inset 0 0 0 1px rgba(16, 185, 129, 0.3);
+                border: 1px solid rgba(16, 185, 129, 0.2);
+                transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+                position: relative;
+            }
+
+            .model-card::before {
+                content: '';
+                position: absolute;
+                inset: -2px;
+                background: var(--gradient-nature);
+                border-radius: var(--radius-2xl);
+                z-index: -1;
+                opacity: 0;
+                transition: opacity 0.4s ease;
+                filter: blur(10px);
+            }
+
+            .model-card:hover {
+                transform: translateY(-12px);
+                box-shadow:
+                    0 30px 80px rgba(0, 0, 0, 0.8),
+                    0 0 60px var(--glow-emerald);
+            }
+
+            .model-card:hover::before {
+                opacity: 0.8;
+            }
+
+            .model-preview {
+                width: 100%;
+                height: 350px;
+                background: linear-gradient(135deg, rgba(16, 185, 129, 0.05), rgba(132, 204, 22, 0.05));
+                position: relative;
+            }
+
+            .model-preview model-viewer {
+                width: 100%;
+                height: 100%;
+                --progress-bar-color: var(--nature-green);
+            }
+
+            .model-info {
+                padding: var(--space-xl);
+                position: relative;
+            }
+
+            .model-name {
+                font-size: var(--text-2xl);
+                font-weight: 700;
+                color: var(--nature-green);
+                margin-bottom: var(--space-sm);
+                text-shadow: 0 0 20px var(--glow-green);
+            }
+
+            .model-description {
+                font-size: var(--text-base);
+                color: var(--text-secondary);
+                margin-bottom: var(--space-lg);
+                line-height: 1.6;
+            }
+
+            .model-link {
+                display: inline-flex;
+                align-items: center;
+                gap: var(--space-sm);
+                color: var(--nature-green);
+                text-decoration: none;
+                font-size: var(--text-base);
+                font-weight: 600;
+                padding: var(--space-md) var(--space-xl);
+                background: rgba(16, 185, 129, 0.1);
+                border-radius: var(--radius-lg);
+                border: 1px solid rgba(16, 185, 129, 0.3);
+                transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+                position: relative;
+                overflow: hidden;
+            }
+
+            .model-link::after {
+                content: '→';
+                margin-left: 0.5rem;
+                transition: transform 0.3s ease;
+            }
+
+            .model-link::before {
+                content: '';
+                position: absolute;
+                inset: 0;
+                background: var(--gradient-nature);
+                opacity: 0;
+                transition: opacity 0.3s ease;
+            }
+
+            .model-link:hover {
+                color: white;
+                border-color: transparent;
+                box-shadow: 0 0 30px var(--glow-green);
+                text-shadow: 0 0 10px white;
+            }
+
+            .model-link:hover::before {
+                opacity: 1;
+            }
+
+            .model-link:hover::after {
+                transform: translateX(4px);
+            }
+
+            .model-link span {
+                position: relative;
+                z-index: 1;
+            }
+
+            /* Back Link */
+            .back-link {
+                display: inline-flex;
+                align-items: center;
+                gap: 0.5rem;
+                color: var(--nature-emerald);
+                text-decoration: none;
+                font-size: var(--text-lg);
+                font-weight: 600;
+                padding: var(--space-md) var(--space-xl);
+                background: rgba(5, 150, 105, 0.1);
+                border-radius: var(--radius-lg);
+                border: 1px solid rgba(5, 150, 105, 0.3);
+                transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+                margin-bottom: var(--space-2xl);
+            }
+
+            .back-link::before {
+                content: '←';
+            }
+
+            .back-link:hover {
+                background: rgba(5, 150, 105, 0.2);
+                transform: translateX(-4px);
+                box-shadow: 0 0 20px rgba(5, 150, 105, 0.3);
+            }
+
+            /* Footer Styling */
+            .footer {
+                position: relative;
+                z-index: 1;
+                margin-top: var(--space-4xl);
+                padding: var(--space-2xl) var(--space-xl);
+                background: rgba(20, 24, 41, 0.6);
+                -webkit-backdrop-filter: blur(20px) saturate(180%);
+                backdrop-filter: blur(20px) saturate(180%);
+                border-top: 1px solid rgba(16, 185, 129, 0.2);
+                box-shadow: 0 -4px 24px rgba(0, 0, 0, 0.5), 0 0 40px rgba(16, 185, 129, 0.05);
+            }
+
+            .footer::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                height: 1px;
+                background: var(--gradient-nature);
+                opacity: 0.6;
+                animation: footerBorderPulse 3s ease-in-out infinite;
+            }
+
+            @keyframes footerBorderPulse {
+
+                0%,
+                100% {
+                    opacity: 0.4;
+                }
+
+                50% {
+                    opacity: 0.8;
+                }
+            }
+
+            .footer-content {
+                max-width: 1400px;
+                margin: 0 auto;
+                text-align: center;
+            }
+
+            .copyright {
+                font-size: var(--text-base);
+                color: var(--text-secondary);
+                font-weight: 400;
+                letter-spacing: 0.01em;
+            }
+
+            .copyright a {
+                color: var(--nature-green);
+                text-decoration: none;
+                transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+                padding: 0.2rem 0.5rem;
+                border-radius: var(--radius-sm);
+                position: relative;
+            }
+
+            .copyright a::before {
+                content: '';
+                position: absolute;
+                inset: 0;
+                background: rgba(16, 185, 129, 0.1);
+                border-radius: var(--radius-sm);
+                opacity: 0;
+                transition: opacity 0.3s ease;
+            }
+
+            .copyright a:hover {
+                color: var(--nature-lime);
+                text-shadow: 0 0 15px var(--glow-green);
+            }
+
+            .copyright a:hover::before {
+                opacity: 1;
+            }
+
+            /* Responsive Design */
+            @media (max-width: 768px) {
+                .nav-content {
+                    flex-direction: column;
+                    gap: var(--space-md);
+                    align-items: flex-start;
+                }
+
+                .breadcrumb {
+                    flex-wrap: wrap;
+                }
+
+                .hero {
+                    padding: var(--space-3xl) var(--space-md) var(--space-4xl);
+                }
+
+                .hero-svg {
+                    height: 200px;
+                }
+
+                .hero-description {
+                    padding: var(--space-lg);
+                }
+
+                .content-section {
+                    padding: var(--space-3xl) var(--space-md);
+                }
+
+                .models-grid {
+                    grid-template-columns: 1fr;
+                    gap: var(--space-lg);
+                }
+
+                .footer {
+                    padding: var(--space-xl) var(--space-md);
+                }
+
+                .copyright {
+                    font-size: 0.9rem;
+                }
+            }
+
+            @media (max-width: 480px) {
+                .navigation {
+                    padding: var(--space-md);
+                }
+
+                .hero {
+                    padding: var(--space-2xl) var(--space-md) var(--space-3xl);
+                }
+
+                .model-preview {
+                    height: 250px;
+                }
+            }
+
+            /* Accessibility: Reduced motion */
+            @media (prefers-reduced-motion: reduce) {
+
+                *,
+                *::before,
+                *::after {
+                    animation-duration: 0.01ms !important;
+                    animation-iteration-count: 1 !important;
+                    transition-duration: 0.01ms !important;
+                }
+            }
+
+            /* Focus styles for accessibility */
+            a:focus,
+            a:focus-visible {
+                outline: 3px solid var(--nature-green);
+                outline-offset: 2px;
+                border-radius: var(--radius-sm);
+            }
+        </style>
+    </head>
+
+    <body vocab="http://schema.org/">
+        <!-- Decorative grid pattern -->
+        <div class="grid-pattern"></div>
+
+        <!-- Fixed Navigation -->
+        <nav class="navigation">
+            <div class="nav-content">
+                <a href="../../apropos.html" class="nav-name">John Samuel</a>
+                <ul class="breadcrumb" typeof="BreadcrumbList">
+                    <li property="itemListElement" typeof="ListItem">
+                        <a property="item" typeof="WebPage" href="../../index.html">
+                            <span property="name">Accueil</span>
+                        </a>
+                    </li>
+                    <li property="itemListElement" typeof="ListItem">
+                        <a property="item" typeof="WebPage" href="../../recherche/recherche.html">
+                            <span property="name">Recherche</span>
+                        </a>
+                    </li>
+                    <li property="itemListElement" typeof="ListItem">
+                        <a property="item" typeof="WebPage" href="../3D.html">
+                            <span property="name">Projet 3D</span>
+                        </a>
+                    </li>
+                    <li property="itemListElement" typeof="ListItem">
+                        <span property="name">Nature</span>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+
+        <!-- Hero Section -->
+        <section class="hero">
+            <h1 class="hero-title">Nature</h1>
+            <p class="hero-subtitle">Formes organiques et structures naturelles</p>
+
+            <!-- SVG - Organic Nature Composition -->
+            <svg class="hero-svg" viewbox="0 0 600 300" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                    <lineargradient id="natureGrad1" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" style="stop-color:#10b981;stop-opacity:0.8" />
+                        <stop offset="100%" style="stop-color:#84cc16;stop-opacity:0.8" />
+                    </lineargradient>
+                    <lineargradient id="natureGrad2" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" style="stop-color:#059669;stop-opacity:0.8" />
+                        <stop offset="100%" style="stop-color:#0ea5e9;stop-opacity:0.8" />
+                    </lineargradient>
+                    <lineargradient id="trunkGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" style="stop-color:#92400e;stop-opacity:0.9" />
+                        <stop offset="100%" style="stop-color:#78350f;stop-opacity:0.9" />
+                    </lineargradient>
+                    <filter id="natureGlow">
+                        <fegaussianblur stddeviation="3" result="coloredBlur" />
+                        <femerge>
+                            <femergenode in="coloredBlur" />
+                            <femergenode in="SourceGraphic" />
+                        </femerge>
+                    </filter>
+                </defs>
+
+                <!-- Background organic shapes -->
+                <ellipse cx="300" cy="150" rx="140" ry="100" fill="rgba(16, 185, 129, 0.05)" />
+                <ellipse cx="300" cy="150" rx="100" ry="70" fill="rgba(132, 204, 22, 0.05)" />
+
+                <!-- Tree on the left -->
+                <g transform="translate(120, 150)" filter="url(#natureGlow)">
+                    <!-- Trunk -->
+                    <rect x="-8" y="30" width="16" height="80" fill="url(#trunkGrad)" rx="3" />
+
+                    <!-- Foliage - stylized triangular tree -->
+                    <polygon points="-40,30 0,-50 40,30" fill="url(#natureGrad1)" opacity="0.8">
+                        <animatetransform attributename="transform" type="scale" values="1 1; 1.05 1.05; 1 1" dur="4s"
+                            repeatcount="indefinite" />
+                    </polygon>
+                    <polygon points="-35,10 0,-40 35,10" fill="url(#natureGrad1)" opacity="0.9">
+                        <animatetransform attributename="transform" type="scale" values="1 1; 1.03 1.03; 1 1" dur="4.5s"
+                            repeatcount="indefinite" />
+                    </polygon>
+                    <polygon points="-25,-5 0,-30 25,-5" fill="#84cc16" opacity="0.95">
+                        <animatetransform attributename="transform" type="scale" values="1 1; 1.08 1.08; 1 1" dur="5s"
+                            repeatcount="indefinite" />
+                    </polygon>
+                </g>
+
+                <!-- Sand dunes in center -->
+                <g transform="translate(300, 150)" opacity="0.7" filter="url(#natureGlow)">
+                    <!-- Dune waves -->
+                    <path d="M -80,80 Q -60,50 -30,60 T 20,65 T 80,80" fill="url(#natureGrad2)" opacity="0.6" />
+                    <path d="M -70,70 Q -40,40 -10,50 T 30,55 T 70,70" fill="url(#natureGrad2)" opacity="0.7" />
+                    <path d="M -60,60 Q -30,30 0,40 T 40,45 T 60,60" fill="#0ea5e9" opacity="0.8">
+                        <animate attributename="d" values="M -60,60 Q -30,30 0,40 T 40,45 T 60,60;
+                                    M -60,60 Q -30,35 0,38 T 40,48 T 60,60;
+                                    M -60,60 Q -30,30 0,40 T 40,45 T 60,60" dur="6s" repeatcount="indefinite" />
+                    </path>
+                </g>
+
+                <!-- Egg on the right -->
+                <g transform="translate(480, 150)" filter="url(#natureGlow)">
+                    <ellipse cx="0" cy="0" rx="35" ry="45" fill="url(#natureGrad1)" opacity="0.7">
+                        <animate attributename="ry" values="45;47;45" dur="3s" repeatcount="indefinite" />
+                        <animate attributename="opacity" values="0.6;0.8;0.6" dur="3s" repeatcount="indefinite" />
+                    </ellipse>
+                    <!-- Highlight on egg -->
+                    <ellipse cx="-8" cy="-15" rx="12" ry="18" fill="rgba(255, 255, 255, 0.3)">
+                        <animate attributename="opacity" values="0.2;0.4;0.2" dur="3s" repeatcount="indefinite" />
+                    </ellipse>
+                </g>
+
+                <!-- Floating leaves/particles -->
+                <g opacity="0.5">
+                    <ellipse cx="180" cy="80" rx="8" ry="4" fill="#84cc16" transform="rotate(30 180 80)">
+                        <animatetransform attributename="transform" type="rotate"
+                            values="30 180 80; 50 180 80; 30 180 80" dur="4s" repeatcount="indefinite" />
+                        <animate attributename="cy" values="80;70;80" dur="4s" repeatcount="indefinite" />
+                    </ellipse>
+                    <ellipse cx="420" cy="100" rx="7" ry="3" fill="#10b981" transform="rotate(-20 420 100)">
+                        <animatetransform attributename="transform" type="rotate"
+                            values="-20 420 100; -40 420 100; -20 420 100" dur="5s" repeatcount="indefinite" />
+                        <animate attributename="cy" values="100;90;100" dur="5s" repeatcount="indefinite" />
+                    </ellipse>
+                    <ellipse cx="250" cy="240" rx="6" ry="3" fill="#059669" transform="rotate(15 250 240)">
+                        <animatetransform attributename="transform" type="rotate"
+                            values="15 250 240; 35 250 240; 15 250 240" dur="4.5s" repeatcount="indefinite" />
+                        <animate attributename="cy" values="240;235;240" dur="4.5s" repeatcount="indefinite" />
+                    </ellipse>
+                </g>
+            </svg>
+
+            <div class="hero-description">
+                Nature's forms demonstrate the elegance of organic geometry—from the fractal branching of trees to the
+                smooth curves of sand dunes shaped by wind, and the perfect ovoid of an egg. These models capture the
+                essence of natural structures, where growth patterns, environmental forces, and biological imperatives
+                create shapes that balance efficiency, beauty, and structural integrity. Each form tells a story of
+                adaptation and evolution in three-dimensional space.
+            </div>
+        </section>
+
+        <!-- Models Section -->
+        <section class="content-section">
+            <a href="../3D.html" class="back-link">Retour au Projet 3D</a>
+
+            <div class="models-grid">
+                <!-- Low Poly Tree -->
+                <article class="model-card">
+                    <div class="model-preview">
+                        <model-viewer src="../../../../models/low-poly-tree.glb" alt="Arbre low-poly 3D"
+                            auto-rotate="None" min-camera-orbit="auto auto 200%" max-camera-orbit="auto auto 500%"
+                            field-of-view="45deg" disable-zoom="None" interaction-prompt="none">
+                        </model-viewer>
+                    </div>
+                    <div class="model-info">
+                        <h3 class="model-name">Arbre low-poly</h3>
+                        <p class="model-description">
+                            Stylized low-polygon natural form composed of simple geometric volumes, illustrating
+                            abstraction, structure, and visual economy in representing organic growth.
+                        </p>
+                        <a href="arbre-low-poly.html" class="model-link">
+                            <span>Explorer le modèle</span>
+                        </a>
+                    </div>
+                </article>
+
+                <!-- Sand Dunes -->
+                <article class="model-card">
+                    <div class="model-preview">
+                        <model-viewer src="../../../../models/nature/sanddunes.glb" alt="Dunes de sable 3D"
+                            auto-rotate="None" min-camera-orbit="auto auto 200%" max-camera-orbit="auto auto 500%"
+                            field-of-view="45deg" disable-zoom="None" interaction-prompt="none">
+                        </model-viewer>
+                    </div>
+                    <div class="model-info">
+                        <h3 class="model-name">Dunes de sable</h3>
+                        <p class="model-description">
+                            Organic landscape forms shaped by wind and time, demonstrating natural curved surfaces,
+                            wave-like patterns, and the sculptural power of environmental forces.
+                        </p>
+                        <a href="nature/dunessable.html" class="model-link">
+                            <span>Explorer le modèle</span>
+                        </a>
+                    </div>
+                </article>
+
+                <!-- Egg -->
+                <article class="model-card">
+                    <div class="model-preview">
+                        <model-viewer src="../../../../models/nature/egg.glb" alt="Œuf 3D" auto-rotate="None"
+                            min-camera-orbit="auto auto 200%" max-camera-orbit="auto auto 500%" field-of-view="45deg"
+                            disable-zoom="None" interaction-prompt="none">
+                        </model-viewer>
+                    </div>
+                    <div class="model-info">
+                        <h3 class="model-name">Œuf</h3>
+                        <p class="model-description">
+                            Organic ovoid form representing life and natural symmetry, showcasing the mathematical
+                            perfection found in nature's solution for structural strength and minimal surface area.
+                        </p>
+                        <a href="nature/œuf.html" class="model-link">
+                            <span>Explorer le modèle</span>
+                        </a>
+                    </div>
+                </article>
+
+                <!-- Cloud -->
+                <article class="model-card">
+                    <div class="model-preview">
+                        <model-viewer src="../../../../models/nature/cloud.glb" alt="Nuage 3D" auto-rotate="None"
+                            min-camera-orbit="auto auto 200%" max-camera-orbit="auto auto 500%" field-of-view="45deg"
+                            disable-zoom="None" interaction-prompt="none">
+                        </model-viewer>
+                    </div>
+                    <div class="model-info">
+                        <h3 class="model-name">Nuage</h3>
+                        <p class="model-description">
+                            Irregular, volumetric form defined by fluid dynamics and phase transitions, illustrating
+                            emergent structure.
+                        </p>
+                        <a href="nature/nuage.html" class="model-link">
+                            <span>Explorer le modèle</span>
+                        </a>
+                    </div>
+                </article>
+
+                <!-- Mountains -->
+                <article class="model-card">
+                    <div class="model-preview">
+                        <model-viewer src="../../../../models/nature/mountains.glb" alt="Montagnes 3D"
+                            auto-rotate="None" min-camera-orbit="auto auto 200%" max-camera-orbit="auto auto 500%"
+                            field-of-view="45deg" disable-zoom="None" interaction-prompt="none">
+                        </model-viewer>
+                    </div>
+                    <div class="model-info">
+                        <h3 class="model-name">Montagnes</h3>
+                        <p class="model-description">
+                            Large-scale landforms shaped by tectonic forces, erosion, and uplift, characterized by
+                            irregular geometry and long-term geological processes.
+                        </p>
+                        <a href="nature/montagnes.html" class="model-link">
+                            <span>Explorer le modèle</span>
+                        </a>
+                    </div>
+                </article>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <div class="footer-content">
+                <p class="copyright">
+                    © 2025 <a href="../../ecrits/Iohannes.html">Iohannes</a> - <a href="../../apropos.html">John
+                        Samuel</a> | Creative Commons License
+                </p>
+            </div>
+        </footer>
+    </body>
+
+</html>
