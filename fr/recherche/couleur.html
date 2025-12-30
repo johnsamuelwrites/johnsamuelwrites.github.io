@@ -1,0 +1,1132 @@
+<!DOCTYPE html>
+<html lang="en">
+
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Projet Couleur : Exploration chromatique - John Samuel</title>
+        <link rel="shortcut icon" href="../../images/logo/favicon.png" />
+        <style>
+            * {
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
+            }
+
+            :root {
+                --cream: #FFF9F0;
+                --indigo: #2D3561;
+                --coral: #FF6B6B;
+                --cyan: #4ECDC4;
+                --amber: #FFE66D;
+                --light-indigo: #4A5284;
+                --pale-coral: #FFE5E5;
+                --pale-cyan: #E0F7F5;
+                --pale-amber: #FFF9E0;
+            }
+
+            body {
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+                background: var(--cream);
+                color: var(--indigo);
+                line-height: 1.6;
+                overflow-x: hidden;
+            }
+
+            /* Background Pattern */
+            body::before {
+                content: '';
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background-image:
+                    repeating-linear-gradient(0deg, transparent, transparent 50px, rgba(45, 53, 97, 0.02) 50px, rgba(45, 53, 97, 0.02) 51px),
+                    repeating-linear-gradient(90deg, transparent, transparent 50px, rgba(45, 53, 97, 0.02) 50px, rgba(45, 53, 97, 0.02) 51px);
+                pointer-events: none;
+                z-index: 1;
+            }
+
+            /* Navigation */
+            nav {
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                background: rgba(255, 249, 240, 0.95);
+                -webkit-backdrop-filter: blur(10px);
+                backdrop-filter: blur(10px);
+                z-index: 1000;
+                border-bottom: 2px solid rgba(45, 53, 97, 0.1);
+                box-shadow: 0 4px 20px rgba(45, 53, 97, 0.08);
+            }
+
+            nav ul {
+                list-style: none;
+                display: flex;
+                padding: 1rem 2rem;
+                align-items: center;
+                flex-wrap: wrap;
+            }
+
+            nav li {
+                margin-right: 2rem;
+            }
+
+            nav a {
+                text-decoration: none;
+                color: var(--indigo);
+                font-weight: 500;
+                font-size: 0.95rem;
+                position: relative;
+                transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            }
+
+            nav a::after {
+                content: '';
+                position: absolute;
+                bottom: -4px;
+                left: 0;
+                width: 0;
+                height: 3px;
+                background: linear-gradient(90deg, var(--coral), var(--cyan), var(--amber));
+                transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            }
+
+            nav a:hover {
+                color: var(--coral);
+            }
+
+            nav a:hover::after {
+                width: 100%;
+            }
+
+            /* Hero Section */
+            .hero {
+                position: relative;
+                padding: 140px 2rem 80px;
+                text-align: center;
+                z-index: 2;
+                background: linear-gradient(135deg, var(--pale-cyan) 0%, var(--cream) 50%, var(--pale-amber) 100%);
+            }
+
+            .hero h1 {
+                font-size: 4.5rem;
+                font-weight: 800;
+                letter-spacing: -0.03em;
+                margin-bottom: 1.5rem;
+                background: linear-gradient(135deg, var(--indigo), var(--coral), var(--cyan));
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                background-clip: text;
+                animation: shimmer 3s ease-in-out infinite;
+            }
+
+            @keyframes shimmer {
+
+                0%,
+                100% {
+                    filter: hue-rotate(0deg) brightness(1);
+                }
+
+                50% {
+                    filter: hue-rotate(15deg) brightness(1.1);
+                }
+            }
+
+            .hero h2 {
+                font-size: 1.8rem;
+                font-weight: 500;
+                color: var(--sketch-blue);
+                margin-bottom: 1rem;
+                font-style: italic;
+            }
+
+            .hero .author {
+                font-size: 1.3rem;
+                color: var(--memory-purple);
+                font-weight: 600;
+                margin-bottom: 2rem;
+            }
+
+            .hero-svg-container {
+                display: flex;
+                justify-content: center;
+                margin: 3rem auto;
+                max-width: 500px;
+            }
+
+            /* Animated Prism SVG */
+            .prism-container {
+                width: 100%;
+                max-width: 400px;
+                height: 350px;
+            }
+
+            /* Content Container */
+            .container {
+                max-width: 1400px;
+                margin: 0 auto;
+                padding: 3rem 2rem;
+                position: relative;
+                z-index: 2;
+            }
+
+            /* Intro Section */
+            .intro-section {
+                background: white;
+                border-radius: 24px;
+                padding: 3rem;
+                margin-bottom: 4rem;
+                box-shadow: 0 4px 30px rgba(0, 0, 0, 0.08);
+                border: 2px solid var(--gallery-gray);
+                position: relative;
+                overflow: hidden;
+            }
+
+            .intro-section::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 6px;
+                background: linear-gradient(90deg, var(--coral), var(--cyan), var(--amber));
+            }
+
+            .intro-section h3 {
+                font-size: 2rem;
+                color: var(--indigo);
+                margin-bottom: 1.5rem;
+                font-weight: 700;
+            }
+
+            .intro-section h4 {
+                font-size: 1.4rem;
+                color: var(--charcoal);
+                margin: 2rem 0 1rem;
+                font-weight: 600;
+                display: flex;
+                align-items: center;
+                gap: 0.5rem;
+            }
+
+            .intro-section h4::before {
+                content: '◆';
+                color: var(--coral);
+                font-size: 0.8em;
+            }
+
+            .intro-section ul {
+                list-style: none;
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+                gap: 1rem;
+                margin-top: 1rem;
+            }
+
+            .intro-section li a {
+                display: block;
+                padding: 1rem 1.5rem;
+                background: var(--cream);
+                border-radius: 12px;
+                text-decoration: none;
+                color: var(--indigo);
+                font-weight: 500;
+                transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+                border: 2px solid transparent;
+            }
+
+            .intro-section li a:hover {
+                background: white;
+                border-color: var(--coral);
+                transform: translateX(5px);
+                box-shadow: 0 4px 12px rgba(255, 107, 107, 0.15);
+            }
+
+            /* Section Headers */
+            .section {
+                margin-bottom: 4rem;
+            }
+
+            .section-header {
+                display: flex;
+                align-items: center;
+                margin-bottom: 2.5rem;
+                gap: 1.5rem;
+            }
+
+            .section-icon {
+                width: 60px;
+                height: 60px;
+                border-radius: 16px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 2rem;
+                animation: float 4s ease-in-out infinite;
+            }
+
+            @keyframes float {
+
+                0%,
+                100% {
+                    transform: translateY(0px);
+                }
+
+                50% {
+                    transform: translateY(-10px);
+                }
+            }
+
+            .nature-icon {
+                background: linear-gradient(135deg, #A8E6CF, #56C596);
+            }
+
+            .harvest-icon {
+                background: linear-gradient(135deg, #FFD93D, #FF8C42);
+            }
+
+            .artifacts-icon {
+                background: linear-gradient(135deg, #6C5CE7, #A29BFE);
+            }
+
+            .tools-icon {
+                background: linear-gradient(135deg, #FD79A8, #FDCB6E);
+            }
+
+            .infrastructure-icon {
+                background: linear-gradient(135deg, #74B9FF, #0984E3);
+            }
+
+            .comfort-icon {
+                background: linear-gradient(135deg, #FF7675, #FD79A8);
+            }
+
+            .whimsy-icon {
+                background: linear-gradient(135deg, var(--cyan), var(--amber));
+            }
+
+            .section-title {
+                font-size: 2.5rem;
+                font-weight: 700;
+                color: var(--indigo);
+                letter-spacing: -0.02em;
+            }
+
+            .section-number {
+                font-size: 1rem;
+                color: var(--light-indigo);
+                font-weight: 500;
+                opacity: 0.7;
+            }
+
+            /* Grid Layout */
+            .grid {
+                display: grid;
+                grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+                gap: 2rem;
+                margin-bottom: 3rem;
+            }
+
+            /* Card Styles */
+            .card {
+                background: white;
+                border-radius: 20px;
+                padding: 1.5rem;
+                border: 2px solid rgba(45, 53, 97, 0.08);
+                transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+                position: relative;
+                overflow: hidden;
+                text-decoration: none;
+                display: flex;
+                flex-direction: column;
+                cursor: pointer;
+            }
+
+            .card::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background: linear-gradient(135deg, var(--pale-coral), var(--pale-cyan));
+                opacity: 0;
+                transition: opacity 0.4s ease;
+                z-index: 0;
+            }
+
+            .card:hover::before {
+                opacity: 1;
+            }
+
+            .card:hover {
+                transform: translateY(-12px) scale(1.02);
+                box-shadow:
+                    0 20px 40px rgba(255, 107, 107, 0.15),
+                    0 10px 20px rgba(78, 205, 196, 0.1);
+                border-color: var(--coral);
+            }
+
+            .card-content {
+                position: relative;
+                z-index: 1;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                flex: 1;
+            }
+
+            .card-drawing {
+                width: 100%;
+                height: 200px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                margin-bottom: 1rem;
+                background: linear-gradient(135deg, rgba(224, 247, 245, 0.3), rgba(255, 249, 224, 0.3));
+                border-radius: 12px;
+                padding: 1rem;
+                transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            }
+
+            .card-drawing img {
+                max-width: 100%;
+                max-height: 100%;
+                object-fit: contain;
+                transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            }
+
+            .card:hover .card-drawing {
+                background: linear-gradient(135deg, rgba(224, 247, 245, 0.5), rgba(255, 249, 224, 0.5));
+            }
+
+            .card:hover .card-drawing img {
+                transform: scale(1.1);
+            }
+
+            .card-icon {
+                width: 40px;
+                height: 40px;
+                background: linear-gradient(135deg, var(--pale-cyan), var(--pale-amber));
+                border-radius: 50%;
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 1.3rem;
+                transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+                animation: morph 6s ease-in-out infinite;
+                flex-shrink: 0;
+            }
+
+            @keyframes morph {
+
+                0%,
+                100% {
+                    border-radius: 50% 40% 45% 55%;
+                }
+
+                25% {
+                    border-radius: 45% 55% 50% 40%;
+                }
+
+                50% {
+                    border-radius: 40% 50% 55% 45%;
+                }
+
+                75% {
+                    border-radius: 55% 45% 40% 50%;
+                }
+            }
+
+            .card:hover .card-icon {
+                transform: scale(1.15) rotate(8deg);
+                box-shadow: 0 10px 30px rgba(78, 205, 196, 0.3);
+            }
+
+            .card-title {
+                font-size: 1.5rem;
+                font-weight: 700;
+                color: var(--indigo);
+                text-align: center;
+                letter-spacing: -0.01em;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                gap: 0.5rem;
+            }
+
+            /* Featured Cards */
+            .card.featured {
+                grid-column: span 2;
+                grid-row: span 2;
+            }
+
+            .card.featured .card-drawing {
+                height: 300px;
+            }
+
+            .card.featured .card-icon {
+                width: 50px;
+                height: 50px;
+                font-size: 1.8rem;
+            }
+
+            .card.featured .card-title {
+                font-size: 2rem;
+            }
+
+            .featured-badge {
+                position: absolute;
+                top: 1rem;
+                right: 1rem;
+                background: linear-gradient(135deg, var(--coral), var(--amber));
+                color: white;
+                padding: 0.4rem 1rem;
+                border-radius: 20px;
+                font-size: 0.75rem;
+                font-weight: 600;
+                z-index: 2;
+                letter-spacing: 0.5px;
+                text-transform: uppercase;
+            }
+
+            /* See More Cards */
+            .see-more-card {
+                background: linear-gradient(135deg, var(--cyan), var(--amber));
+                border: none;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                min-height: 300px;
+            }
+
+            .see-more-card::before {
+                display: none;
+            }
+
+            .see-more-card .card-content {
+                color: white;
+            }
+
+            .see-more-card .card-title {
+                color: white;
+                font-size: 1.8rem;
+            }
+
+            .see-more-card:hover {
+                transform: translateY(-12px) scale(1.05);
+                box-shadow: 0 20px 40px rgba(78, 205, 196, 0.3);
+            }
+
+            .see-more-card:hover .card-title {
+                transform: scale(1.1);
+            }
+
+            /* Conclusion Section */
+            .conclusion {
+                text-align: center;
+                margin-top: 4rem;
+                padding: 3rem;
+                background: white;
+                border-radius: 24px;
+                box-shadow: 0 4px 30px rgba(0, 0, 0, 0.08);
+                border: 2px solid rgba(45, 53, 97, 0.08);
+            }
+
+            .conclusion a {
+                display: inline-block;
+                padding: 1.2rem 3rem;
+                background: linear-gradient(135deg, var(--coral), var(--amber));
+                color: white;
+                text-decoration: none;
+                border-radius: 50px;
+                font-weight: 600;
+                font-size: 1.2rem;
+                transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+                box-shadow: 0 4px 20px rgba(255, 107, 107, 0.3);
+            }
+
+            .conclusion a:hover {
+                transform: translateY(-3px);
+                box-shadow: 0 8px 30px rgba(255, 107, 107, 0.4);
+            }
+
+            /* Responsive */
+            @media (max-width: 768px) {
+                .hero h1 {
+                    font-size: 2.5rem;
+                }
+
+                .hero h2 {
+                    font-size: 1.3rem;
+                }
+
+                .section-title {
+                    font-size: 1.8rem;
+                }
+
+                .grid {
+                    grid-template-columns: 1fr;
+                    gap: 1.5rem;
+                }
+
+                .card.featured {
+                    grid-column: span 1;
+                    grid-row: span 1;
+                }
+
+                nav ul {
+                    padding: 1rem;
+                }
+
+                nav li {
+                    margin-right: 1rem;
+                }
+
+                .container {
+                    padding: 2rem 1rem;
+                }
+
+                .intro-section {
+                    padding: 2rem;
+                }
+
+                .intro-section ul {
+                    grid-template-columns: 1fr;
+                }
+            }
+
+            @media (max-width: 480px) {
+                .hero {
+                    padding: 120px 1rem 60px;
+                }
+
+                .section-header {
+                    flex-direction: column;
+                    text-align: center;
+                }
+            }
+        </style>
+    </head>
+
+    <body vocab="http://schema.org/">
+        <!-- Navigation -->
+        <nav>
+            <ul typeof="BreadcrumbList">
+                <li property="itemListElement" typeof="ListItem"> <a property="item" typeof="WebPage"
+                        href="../apropos.html">
+                        <span property="name">John Samuel</span>
+                    </a></li>
+                <li property="itemListElement" typeof="ListItem">
+                    <a property="item" typeof="WebPage" href="../index.html">
+                        <span property="name">Accueil</span>
+                    </a>
+                </li>
+                <li property="itemListElement" typeof="ListItem">
+                    <a property="item" typeof="WebPage" href="../recherche/recherche.html">
+                        <span property="name">Recherche</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+
+        <!-- Hero Section -->
+        <div class="hero">
+            <h1>Projet Couleur</h1>
+            <h2>Exploration chromatique</h2>
+            <p class="author">John Samuel</p>
+
+            <div class="hero-svg-container">
+                <svg class="prism-container" viewbox="0 0 400 350" xmlns="http://www.w3.org/2000/svg">
+                    <!-- Prism -->
+                    <defs>
+                        <lineargradient id="prismGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" style="stop-color:#E0F7F5;stop-opacity:0.8" />
+                            <stop offset="100%" style="stop-color:#4ECDC4;stop-opacity:0.6" />
+                        </lineargradient>
+                        <filter id="glow">
+                            <fegaussianblur stddeviation="4" result="coloredBlur" />
+                            <femerge>
+                                <femergenode in="coloredBlur" />
+                                <femergenode in="SourceGraphic" />
+                            </femerge>
+                        </filter>
+                    </defs>
+
+                    <!-- Light Beams -->
+                    <line x1="40" y1="175" x2="140" y2="175" stroke="#FF6B6B" stroke-width="3" opacity="0.7">
+                        <animate attributename="opacity" values="0.7;1;0.7" dur="2s" repeatcount="indefinite" />
+                    </line>
+                    <line x1="40" y1="175" x2="130" y2="140" stroke="#FFE66D" stroke-width="3" opacity="0.7">
+                        <animate attributename="opacity" values="0.7;1;0.7" dur="2.5s" repeatcount="indefinite" />
+                    </line>
+                    <line x1="40" y1="175" x2="130" y2="210" stroke="#4ECDC4" stroke-width="3" opacity="0.7">
+                        <animate attributename="opacity" values="0.7;1;0.7" dur="3s" repeatcount="indefinite" />
+                    </line>
+
+                    <!-- Prism Shape -->
+                    <polygon points="140,140 230,175 140,210" fill="url(#prismGrad)" stroke="#2D3561" stroke-width="2"
+                        filter="url(#glow)">
+                        <animatetransform attributename="transform" type="rotate" from="0 185 175" to="360 185 175"
+                            dur="20s" repeatcount="indefinite" />
+                    </polygon>
+
+                    <!-- Spectrum Rays -->
+                    <line x1="230" y1="175" x2="350" y2="120" stroke="#FF6B6B" stroke-width="4" opacity="0.8">
+                        <animate attributename="opacity" values="0.5;0.9;0.5" dur="3s" repeatcount="indefinite" />
+                    </line>
+                    <line x1="230" y1="175" x2="360" y2="145" stroke="#FF8C42" stroke-width="4" opacity="0.8">
+                        <animate attributename="opacity" values="0.5;0.9;0.5" dur="3.2s" repeatcount="indefinite" />
+                    </line>
+                    <line x1="230" y1="175" x2="370" y2="175" stroke="#FFE66D" stroke-width="4" opacity="0.8">
+                        <animate attributename="opacity" values="0.5;0.9;0.5" dur="3.4s" repeatcount="indefinite" />
+                    </line>
+                    <line x1="230" y1="175" x2="360" y2="205" stroke="#A8E6CF" stroke-width="4" opacity="0.8">
+                        <animate attributename="opacity" values="0.5;0.9;0.5" dur="3.6s" repeatcount="indefinite" />
+                    </line>
+                    <line x1="230" y1="175" x2="350" y2="230" stroke="#4ECDC4" stroke-width="4" opacity="0.8">
+                        <animate attributename="opacity" values="0.5;0.9;0.5" dur="3.8s" repeatcount="indefinite" />
+                    </line>
+                    <line x1="230" y1="175" x2="340" y2="255" stroke="#6C5CE7" stroke-width="4" opacity="0.8">
+                        <animate attributename="opacity" values="0.5;0.9;0.5" dur="4s" repeatcount="indefinite" />
+                    </line>
+
+                    <!-- Floating Particles -->
+                    <circle cx="100" cy="100" r="3" fill="#FF6B6B" opacity="0.6">
+                        <animate attributename="cy" values="100;80;100" dur="4s" repeatcount="indefinite" />
+                        <animate attributename="opacity" values="0.3;0.8;0.3" dur="4s" repeatcount="indefinite" />
+                    </circle>
+                    <circle cx="300" cy="280" r="4" fill="#4ECDC4" opacity="0.6">
+                        <animate attributename="cy" values="280;260;280" dur="5s" repeatcount="indefinite" />
+                        <animate attributename="opacity" values="0.3;0.8;0.3" dur="5s" repeatcount="indefinite" />
+                    </circle>
+                    <circle cx="320" cy="100" r="3" fill="#FFE66D" opacity="0.6">
+                        <animate attributename="cy" values="100;120;100" dur="4.5s" repeatcount="indefinite" />
+                        <animate attributename="opacity" values="0.3;0.8;0.3" dur="4.5s" repeatcount="indefinite" />
+                    </circle>
+                </svg>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <main>
+            <div class="container">
+                <!-- Background Section -->
+                <section class="intro-section">
+                    <h3>Un voyage à travers l’expression chromatique</h3>
+                    <h4>Contexte</h4>
+                    <ul>
+                        <li><a href="couleur/introduction.html">Introduction</a></li>
+                        <li><a href="couleur/dédicace.html">Dédicace</a></li>
+                        <li><a href="couleur/motivation.html">Motivation</a></li>
+                        <li><a href="couleur/logiciel.html">Outils logiciels</a></li>
+                        <li><a href="couleur/remerciements.html">Remerciements</a></li>
+                        <li><a href="couleur/références.html">Références</a></li>
+                    </ul>
+                </section>
+
+                <!-- Nature's Palette -->
+                <section class="section">
+                    <div class="section-header">
+                        <div class="section-icon nature-icon">🌿</div>
+                        <div>
+                            <h2 class="section-title">Palette de la nature</h2>
+                            <p class="section-number">Formes organiques et éléments vivants</p>
+                        </div>
+                    </div>
+                    <div class="grid">
+                        <a href="couleur/coucher de soleil.html" class="card featured">
+                            <span class="featured-badge">À la une</span>
+                            <div class="card-content">
+                                <div class="card-drawing">
+                                    <img src="../../images/color/sunset.svg" alt="Coucher de soleil">
+                                </div>
+                                <h3 class="card-title">
+                                    <div class="card-icon">🌅</div>
+                                    Coucher de soleil
+                                </h3>
+                            </div>
+                        </a>
+                        <a href="couleur/arbre.html" class="card">
+                            <div class="card-content">
+                                <div class="card-drawing">
+                                    <img src="../../images/color/tree-with-leaves.svg" alt="Arbre">
+                                </div>
+                                <h3 class="card-title">
+                                    <div class="card-icon">🌳</div>
+                                    Arbre
+                                </h3>
+                            </div>
+                        </a>
+                        <a href="couleur/pin.html" class="card">
+                            <div class="card-content">
+                                <div class="card-drawing">
+                                    <img src="../../images/color/pine-tree-curved-cutout.svg" alt="Pin">
+                                </div>
+                                <h3 class="card-title">
+                                    <div class="card-icon">🌲</div>
+                                    Pin
+                                </h3>
+                            </div>
+                        </a>
+                        <a href="couleur/bourgeon.html" class="card">
+                            <div class="card-content">
+                                <div class="card-drawing">
+                                    <img src="../../images/color/flower-bud.svg" alt="Bourgeon de fleur">
+                                </div>
+                                <h3 class="card-title">
+                                    <div class="card-icon">🌸</div>
+                                    Bourgeon de fleur
+                                </h3>
+                            </div>
+                        </a>
+                        <a href="./couleur/nature.html" class="card see-more-card">
+                            <div class="card-content">
+                                <h3 class="card-title">Voir plus →</h3>
+                            </div>
+                        </a>
+                    </div>
+                </section>
+
+                <!-- Harvest & Growth -->
+                <section class="section">
+                    <div class="section-header">
+                        <div class="section-icon harvest-icon">🍎</div>
+                        <div>
+                            <h2 class="section-title">Récolte et croissance</h2>
+                            <p class="section-number">Fruits et légumes</p>
+                        </div>
+                    </div>
+                    <div class="grid">
+                        <a href="couleur/aubergine.html" class="card">
+                            <div class="card-content">
+                                <div class="card-drawing">
+                                    <img src="../../images/color/brinjal.svg" alt="Aubergine">
+                                </div>
+                                <h3 class="card-title">
+                                    <div class="card-icon">🍆</div>
+                                    Aubergine
+                                </h3>
+                            </div>
+                        </a>
+                        <a href="couleur/pomme.html" class="card">
+                            <div class="card-content">
+                                <div class="card-drawing">
+                                    <img src="../../images/color/apple-ellipse-tilted-union.svg" alt="Pomme">
+                                </div>
+                                <h3 class="card-title">
+                                    <div class="card-icon">🍎</div>
+                                    Pomme
+                                </h3>
+                            </div>
+                        </a>
+                        <a href="couleur/mangue.html" class="card">
+                            <div class="card-content">
+                                <div class="card-drawing">
+                                    <img src="../../images/color/mango.svg" alt="Mangue">
+                                </div>
+                                <h3 class="card-title">
+                                    <div class="card-icon">🥭</div>
+                                    Mangue
+                                </h3>
+                            </div>
+                        </a>
+                        <a href="./couleur/récolte-croissance.html" class="card see-more-card">
+                            <div class="card-content">
+                                <h3 class="card-title">Voir plus →</h3>
+                            </div>
+                        </a>
+                    </div>
+                </section>
+
+                <!-- Human Artifacts -->
+                <section class="section">
+                    <div class="section-header">
+                        <div class="section-icon artifacts-icon">🏺</div>
+                        <div>
+                            <h2 class="section-title">Artefacts humains</h2>
+                            <p class="section-number">Meubles et objets</p>
+                        </div>
+                    </div>
+                    <div class="grid">
+                        <a href="couleur/artefacts/boule de cristal.html" class="card featured">
+                            <span class="featured-badge">À la une</span>
+                            <div class="card-content">
+                                <div class="card-drawing">
+                                    <img src="../../images/color/artifacts/crystal-ball.svg" alt="Boule de cristal">
+                                </div>
+                                <h3 class="card-title">
+                                    <div class="card-icon">🔮</div>
+                                    Boule de cristal
+                                </h3>
+                            </div>
+                        </a>
+                        <a href="couleur/chaise.html" class="card">
+                            <div class="card-content">
+                                <div class="card-drawing">
+                                    <img src="../../images/color/chair.svg" alt="Chaise">
+                                </div>
+                                <h3 class="card-title">
+                                    <div class="card-icon">🪑</div>
+                                    Chaise
+                                </h3>
+                            </div>
+                        </a>
+                        <a href="couleur/table.html" class="card">
+                            <div class="card-content">
+                                <div class="card-drawing">
+                                    <img src="../../images/color/table.svg" alt="Table">
+                                </div>
+                                <h3 class="card-title">
+                                    <div class="card-icon">🪑</div>
+                                    Table
+                                </h3>
+                            </div>
+                        </a>
+                        <a href="couleur/banc.html" class="card">
+                            <div class="card-content">
+                                <div class="card-drawing">
+                                    <img src="../../images/color/bench.svg" alt="Banc">
+                                </div>
+                                <h3 class="card-title">
+                                    <div class="card-icon">🪑</div>
+                                    Banc
+                                </h3>
+                            </div>
+                        </a>
+                        <a href="./couleur/artefacts.html" class="card see-more-card">
+                            <div class="card-content">
+                                <h3 class="card-title">Voir plus →</h3>
+                            </div>
+                        </a>
+                    </div>
+                </section>
+
+                <!-- Tools & Technology -->
+                <section class="section">
+                    <div class="section-header">
+                        <div class="section-icon tools-icon">🔧</div>
+                        <div>
+                            <h2 class="section-title">Outils et technologie</h2>
+                            <p class="section-number">Instruments et appareils</p>
+                        </div>
+                    </div>
+                    <div class="grid">
+                        <a href="couleur/crayon.html" class="card">
+                            <div class="card-content">
+                                <div class="card-drawing">
+                                    <img src="../../images/color/pencil-perspective-slanting.svg" alt="Crayon">
+                                </div>
+                                <h3 class="card-title">
+                                    <div class="card-icon">✏️</div>
+                                    Crayon
+                                </h3>
+                            </div>
+                        </a>
+                        <a href="couleur/baguette.html" class="card">
+                            <div class="card-content">
+                                <div class="card-drawing">
+                                    <img src="../../images/color/wand.svg" alt="Baguette">
+                                </div>
+                                <h3 class="card-title">
+                                    <div class="card-icon">🪄</div>
+                                    Baguette
+                                </h3>
+                            </div>
+                        </a>
+                        <a href="couleur/canne-de-marche.html" class="card">
+                            <div class="card-content">
+                                <div class="card-drawing">
+                                    <img src="../../images/color/walking-stick-sideview.svg" alt="Canne de marche">
+                                </div>
+                                <h3 class="card-title">
+                                    <div class="card-icon">🦯</div>
+                                    Canne de marche
+                                </h3>
+                            </div>
+                        </a>
+                        <a href="./couleur/outils.html" class="card see-more-card">
+                            <div class="card-content">
+                                <h3 class="card-title">Voir plus →</h3>
+                            </div>
+                        </a>
+                    </div>
+                </section>
+
+                <!-- Infrastructure -->
+                <section class="section">
+                    <div class="section-header">
+                        <div class="section-icon infrastructure-icon">🏗️</div>
+                        <div>
+                            <h2 class="section-title">Infrastructure</h2>
+                            <p class="section-number">Voies et structures</p>
+                        </div>
+                    </div>
+                    <div class="grid">
+                        <a href="couleur/route.html" class="card">
+                            <div class="card-content">
+                                <div class="card-drawing">
+                                    <img src="../../images/color/road-horizon.svg" alt="Route">
+                                </div>
+                                <h3 class="card-title">
+                                    <div class="card-icon">🛣️</div>
+                                    Route
+                                </h3>
+                            </div>
+                        </a>
+                        <a href="couleur/promenade en bois.html" class="card">
+                            <div class="card-content">
+                                <div class="card-drawing">
+                                    <img src="../../images/color/boardwalk-wide.svg" alt="Promenade en bois">
+                                </div>
+                                <h3 class="card-title">
+                                    <div class="card-icon">🚶</div>
+                                    Promenade en bois
+                                </h3>
+                            </div>
+                        </a>
+                        <a href="couleur/passage-piéton.html" class="card">
+                            <div class="card-content">
+                                <div class="card-drawing">
+                                    <img src="../../images/color/zebra-crossing.svg" alt="Passage piéton">
+                                </div>
+                                <h3 class="card-title">
+                                    <div class="card-icon">🚸</div>
+                                    Passage piéton
+                                </h3>
+                            </div>
+                        </a>
+                        <a href="./couleur/infrastructure.html" class="card see-more-card">
+                            <div class="card-content">
+                                <h3 class="card-title">Voir plus →</h3>
+                            </div>
+                        </a>
+                    </div>
+                </section>
+
+                <!-- Home & Comfort -->
+                <section class="section">
+                    <div class="section-header">
+                        <div class="section-icon comfort-icon">🏡</div>
+                        <div>
+                            <h2 class="section-title">Maison et confort</h2>
+                            <p class="section-number">Éléments domestiques</p>
+                        </div>
+                    </div>
+                    <div class="grid">
+                        <a href="couleur/bougie.html" class="card">
+                            <div class="card-content">
+                                <div class="card-drawing">
+                                    <img src="../../images/color/burning-candle.svg" alt="Bougie">
+                                </div>
+                                <h3 class="card-title">
+                                    <div class="card-icon">🕯️</div>
+                                    Bougie
+                                </h3>
+                            </div>
+                        </a>
+                        <a href="couleur/rRéfrigérateur.html" class="card">
+                            <div class="card-content">
+                                <div class="card-drawing">
+                                    <img src="../../images/color/refrigerator.svg" alt="Réfrigérateur">
+                                </div>
+                                <h3 class="card-title">
+                                    <div class="card-icon">❄️</div>
+                                    Réfrigérateur
+                                </h3>
+                            </div>
+                        </a>
+                        <a href="couleur/machine-à-laver.html" class="card">
+                            <div class="card-content">
+                                <div class="card-drawing">
+                                    <img src="../../images/color/washing-machine.svg" alt="Machine à laver">
+                                </div>
+                                <h3 class="card-title">
+                                    <div class="card-icon">🧺</div>
+                                    Machine à laver
+                                </h3>
+                            </div>
+                        </a>
+                        <a href="./couleur/maison-confort.html" class="card see-more-card">
+                            <div class="card-content">
+                                <h3 class="card-title">Voir plus →</h3>
+                            </div>
+                        </a>
+                    </div>
+                </section>
+
+                <!-- Whimsy & Wonder -->
+                <section class="section">
+                    <div class="section-header">
+                        <div class="section-icon whimsy-icon">✨</div>
+                        <div>
+                            <h2 class="section-title">Fantaisie et émerveillement</h2>
+                            <p class="section-number">Ludique et imaginatif</p>
+                        </div>
+                    </div>
+                    <div class="grid">
+                        <a href="couleur/roue chromatique.html" class="card featured">
+                            <span class="featured-badge">À la une</span>
+                            <div class="card-content">
+                                <div class="card-drawing">
+                                    <img src="../../images/color/color-wheel-colored.svg" alt="Roue chromatique">
+                                </div>
+                                <h3 class="card-title">
+                                    <div class="card-icon">🎨</div>
+                                    Roue chromatique
+                                </h3>
+                            </div>
+                        </a>
+                        <a href="couleur/soleil.html" class="card">
+                            <div class="card-content">
+                                <div class="card-drawing">
+                                    <img src="../../images/color/sun.svg" alt="Soleil">
+                                </div>
+                                <h3 class="card-title">
+                                    <div class="card-icon">☀️</div>
+                                    Soleil
+                                </h3>
+                            </div>
+                        </a>
+                        <a href="couleur/toile d’araignée.html" class="card">
+                            <div class="card-content">
+                                <div class="card-drawing">
+                                    <img src="../../images/color/cobweb.svg" alt="Toile d’araignée">
+                                </div>
+                                <h3 class="card-title">
+                                    <div class="card-icon">🕸️</div>
+                                    Toile d’araignée
+                                </h3>
+                            </div>
+                        </a>
+                        <a href="couleur/anneau.html" class="card">
+                            <div class="card-content">
+                                <div class="card-drawing">
+                                    <img src="../../images/color/ring.svg" alt="Anneau">
+                                </div>
+                                <h3 class="card-title">
+                                    <div class="card-icon">💍</div>
+                                    Anneau
+                                </h3>
+                            </div>
+                        </a>
+                        <a href="./couleur/fantaisie-émerveillement.html" class="card see-more-card">
+                            <div class="card-content">
+                                <h3 class="card-title">Voir plus →</h3>
+                            </div>
+                        </a>
+                    </div>
+                </section>
+
+                <!-- Conclusion Section -->
+                <section class="conclusion">
+                    <a href="couleur/conclusion.html">Voir la conclusion</a>
+                </section>
+            </div>
+        </main>
+    </body>
+
+</html>

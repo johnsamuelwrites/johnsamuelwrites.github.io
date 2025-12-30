@@ -1,0 +1,785 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="Content-Language" content="en" />
+    <link rel="shortcut icon" href="../../../images/logo/favicon.png" />
+    <title>Projet Couleur : Outils logiciels - John Samuel</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      :root {
+        --cream: #FFF9F0;
+        --indigo: #2D3561;
+        --coral: #FF6B6B;
+        --cyan: #4ECDC4;
+        --amber: #FFE66D;
+        --light-indigo: #4A5284;
+        --pale-coral: #FFE5E5;
+        --pale-cyan: #E0F7F5;
+        --pale-amber: #FFF9E0;
+        --charcoal: #3A3A3A;
+      }
+
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+        background: var(--cream);
+        color: var(--indigo);
+        line-height: 1.8;
+        overflow-x: hidden;
+      }
+
+      /* Background Pattern */
+      body::before {
+        content: '';
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-image:
+          repeating-linear-gradient(0deg, transparent, transparent 50px, rgba(45, 53, 97, 0.02) 50px, rgba(45, 53, 97, 0.02) 51px),
+          repeating-linear-gradient(90deg, transparent, transparent 50px, rgba(45, 53, 97, 0.02) 50px, rgba(45, 53, 97, 0.02) 51px);
+        pointer-events: none;
+        z-index: 1;
+      }
+
+      /* Navigation */
+      nav {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        background: rgba(255, 249, 240, 0.95);
+        -webkit-backdrop-filter: blur(10px);
+        backdrop-filter: blur(10px);
+        z-index: 1000;
+        border-bottom: 2px solid rgba(45, 53, 97, 0.1);
+        box-shadow: 0 4px 20px rgba(45, 53, 97, 0.08);
+      }
+
+      nav ul {
+        list-style: none;
+        display: flex;
+        padding: 1rem 2rem;
+        align-items: center;
+        flex-wrap: wrap;
+      }
+
+      nav li {
+        margin-right: 2rem;
+      }
+
+      nav a {
+        text-decoration: none;
+        color: var(--indigo);
+        font-weight: 500;
+        font-size: 0.95rem;
+        position: relative;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      }
+
+      nav a::after {
+        content: '';
+        position: absolute;
+        bottom: -4px;
+        left: 0;
+        width: 0;
+        height: 3px;
+        background: linear-gradient(90deg, var(--coral), var(--cyan), var(--amber));
+        transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      }
+
+      nav a:hover {
+        color: var(--coral);
+      }
+
+      nav a:hover::after {
+        width: 100%;
+      }
+
+      /* Hero Section */
+      .hero {
+        position: relative;
+        padding: 140px 2rem 60px;
+        text-align: center;
+        z-index: 2;
+        background: linear-gradient(135deg, var(--pale-cyan) 0%, var(--cream) 50%, var(--pale-amber) 100%);
+      }
+
+      .hero h1 {
+        font-size: 3.5rem;
+        font-weight: 800;
+        letter-spacing: -0.03em;
+        margin-bottom: 1rem;
+        background: linear-gradient(135deg, var(--cyan), var(--indigo), var(--coral));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        animation: shimmer 3s ease-in-out infinite;
+      }
+
+      @keyframes shimmer {
+
+        0%,
+        100% {
+          filter: hue-rotate(0deg) brightness(1);
+        }
+
+        50% {
+          filter: hue-rotate(15deg) brightness(1.1);
+        }
+      }
+
+      .hero h2 {
+        font-size: 1.6rem;
+        font-weight: 500;
+        color: var(--light-indigo);
+        margin-bottom: 0.5rem;
+        font-style: italic;
+      }
+
+      .hero .author {
+        font-size: 1.2rem;
+        color: var(--charcoal);
+        font-weight: 600;
+        margin-top: 1rem;
+      }
+
+      /* Tool Icons */
+      .tool-icons {
+        display: flex;
+        justify-content: center;
+        gap: 2rem;
+        margin-top: 2rem;
+      }
+
+      .tool-icon {
+        font-size: 3rem;
+        animation: float 3s ease-in-out infinite;
+      }
+
+      .tool-icon:nth-child(2) {
+        animation-delay: 0.5s;
+      }
+
+      .tool-icon:nth-child(3) {
+        animation-delay: 1s;
+      }
+
+      @keyframes float {
+
+        0%,
+        100% {
+          transform: translateY(0px);
+        }
+
+        50% {
+          transform: translateY(-15px);
+        }
+      }
+
+      /* Content Container */
+      .container {
+        max-width: 1100px;
+        margin: 0 auto;
+        padding: 3rem 2rem;
+        position: relative;
+        z-index: 2;
+      }
+
+      /* Content Sections */
+      .content-section {
+        background: white;
+        border-radius: 24px;
+        padding: 3rem;
+        margin-bottom: 3rem;
+        box-shadow: 0 4px 30px rgba(0, 0, 0, 0.08);
+        border: 2px solid rgba(45, 53, 97, 0.08);
+        position: relative;
+        overflow: hidden;
+      }
+
+      .content-section::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 6px;
+        background: linear-gradient(90deg, var(--coral), var(--cyan), var(--amber));
+      }
+
+      .content-section h3 {
+        font-size: 2rem;
+        color: var(--indigo);
+        margin-bottom: 1.5rem;
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        gap: 0.8rem;
+      }
+
+      .content-section h3::before {
+        content: '◆';
+        color: var(--coral);
+        font-size: 0.8em;
+      }
+
+      .content-section h4 {
+        font-size: 1.5rem;
+        color: var(--light-indigo);
+        margin: 2rem 0 1rem;
+        font-weight: 600;
+      }
+
+      .content-section p {
+        font-size: 1.1rem;
+        line-height: 1.9;
+        margin-bottom: 1.5rem;
+        color: var(--charcoal);
+      }
+
+      .content-section a {
+        color: var(--coral);
+        text-decoration: none;
+        font-weight: 600;
+        position: relative;
+        transition: all 0.3s ease;
+      }
+
+      .content-section a::after {
+        content: '';
+        position: absolute;
+        bottom: -2px;
+        left: 0;
+        width: 0;
+        height: 2px;
+        background: var(--cyan);
+        transition: width 0.3s ease;
+      }
+
+      .content-section a:hover::after {
+        width: 100%;
+      }
+
+      .content-section strong {
+        color: var(--indigo);
+        font-weight: 700;
+      }
+
+      /* Tool Cards */
+      .tool-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 2rem;
+        margin: 2rem 0;
+      }
+
+      .tool-card {
+        background: linear-gradient(135deg, var(--pale-cyan), var(--pale-amber));
+        border-radius: 20px;
+        padding: 2rem;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        transition: all 0.3s ease;
+        border: 2px solid transparent;
+      }
+
+      .tool-card:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+        border-color: var(--coral);
+      }
+
+      .tool-card-header {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+      }
+
+      .tool-card-icon {
+        font-size: 2.5rem;
+      }
+
+      .tool-card h4 {
+        font-size: 1.8rem;
+        color: var(--indigo);
+        margin: 0;
+        font-weight: 700;
+      }
+
+      .tool-card p {
+        font-size: 1rem;
+        line-height: 1.7;
+        color: var(--charcoal);
+        margin-bottom: 1rem;
+      }
+
+      .tool-link {
+        display: inline-block;
+        padding: 0.8rem 1.5rem;
+        background: linear-gradient(135deg, var(--coral), var(--amber));
+        color: white;
+        text-decoration: none;
+        border-radius: 12px;
+        font-weight: 600;
+        font-size: 0.95rem;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 15px rgba(255, 107, 107, 0.3);
+      }
+
+      .tool-link:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(255, 107, 107, 0.4);
+      }
+
+      .tool-link::after {
+        display: none;
+      }
+
+      /* Feature Lists */
+      .feature-list {
+        background: white;
+        border-radius: 16px;
+        padding: 2rem;
+        margin: 2rem 0;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+      }
+
+      .feature-list h4 {
+        font-size: 1.4rem;
+        color: var(--indigo);
+        margin-bottom: 1rem;
+        font-weight: 700;
+      }
+
+      .feature-list ul {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+      }
+
+      .feature-list li {
+        padding: 0.8rem 0 0.8rem 2.5rem;
+        position: relative;
+        line-height: 1.7;
+        border-bottom: 1px solid var(--pale-cyan);
+      }
+
+      .feature-list li:last-child {
+        border-bottom: none;
+      }
+
+      .feature-list li::before {
+        content: '✓';
+        position: absolute;
+        left: 0;
+        color: var(--coral);
+        font-weight: bold;
+        font-size: 1.3rem;
+      }
+
+      .feature-list code {
+        background: var(--pale-amber);
+        padding: 0.2rem 0.6rem;
+        border-radius: 6px;
+        font-family: 'Monaco', 'Courier New', monospace;
+        font-size: 0.9em;
+        color: var(--indigo);
+        font-weight: 600;
+      }
+
+      /* Nested Lists */
+      .feature-list ul ul {
+        margin-top: 0.5rem;
+        margin-left: 1rem;
+      }
+
+      .feature-list ul ul li {
+        padding-left: 2rem;
+        border-bottom: none;
+        font-size: 0.95rem;
+      }
+
+      .feature-list ul ul li::before {
+        content: '▸';
+        font-size: 1rem;
+      }
+
+      /* Highlight Box */
+      .highlight-box {
+        background: linear-gradient(135deg, var(--pale-coral), var(--pale-cyan));
+        border-left: 5px solid var(--coral);
+        border-radius: 16px;
+        padding: 2rem;
+        margin: 2rem 0;
+        box-shadow: 0 4px 20px rgba(255, 107, 107, 0.15);
+      }
+
+      .highlight-box p {
+        font-size: 1.15rem;
+        line-height: 1.9;
+        color: var(--indigo);
+        font-weight: 500;
+        margin-bottom: 0;
+      }
+
+      /* References Section */
+      .references {
+        background: var(--pale-amber);
+        border-radius: 16px;
+        padding: 2rem;
+        margin: 2rem 0;
+      }
+
+      .references h4 {
+        font-size: 1.5rem;
+        color: var(--indigo);
+        margin-bottom: 1rem;
+        font-weight: 700;
+      }
+
+      .references ul {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+      }
+
+      .references li {
+        padding: 0.8rem 0;
+        line-height: 1.7;
+      }
+
+      .references li::before {
+        content: '🔗';
+        margin-right: 0.5rem;
+      }
+
+      /* Navigation Links */
+      .nav-links {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 3rem;
+        gap: 1rem;
+        flex-wrap: wrap;
+      }
+
+      .nav-link {
+        flex: 1;
+        min-width: 200px;
+        padding: 1.5rem 2rem;
+        background: linear-gradient(135deg, var(--coral), var(--amber));
+        color: white;
+        text-decoration: none;
+        border-radius: 16px;
+        font-weight: 600;
+        font-size: 1.1rem;
+        text-align: center;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        box-shadow: 0 4px 20px rgba(255, 107, 107, 0.3);
+      }
+
+      .nav-link:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 30px rgba(255, 107, 107, 0.4);
+      }
+
+      .nav-link::after {
+        display: none;
+      }
+
+      .nav-link.secondary {
+        background: linear-gradient(135deg, var(--cyan), var(--indigo));
+        box-shadow: 0 4px 20px rgba(78, 205, 196, 0.3);
+      }
+
+      .nav-link.secondary:hover {
+        box-shadow: 0 8px 30px rgba(78, 205, 196, 0.4);
+      }
+
+      /* Responsive */
+      @media (max-width: 768px) {
+        .hero h1 {
+          font-size: 2.5rem;
+        }
+
+        .hero h2 {
+          font-size: 1.3rem;
+        }
+
+        .content-section {
+          padding: 2rem;
+        }
+
+        .content-section h3 {
+          font-size: 1.6rem;
+        }
+
+        .content-section p {
+          font-size: 1rem;
+        }
+
+        .tool-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .tool-icons {
+          gap: 1rem;
+        }
+
+        .tool-icon {
+          font-size: 2rem;
+        }
+
+        nav ul {
+          padding: 1rem;
+        }
+
+        nav li {
+          margin-right: 1rem;
+        }
+
+        .container {
+          padding: 2rem 1rem;
+        }
+
+        .nav-links {
+          flex-direction: column;
+        }
+
+        .nav-link {
+          min-width: 100%;
+        }
+      }
+
+      @media (max-width: 480px) {
+        .hero {
+          padding: 120px 1rem 50px;
+        }
+
+        .hero h1 {
+          font-size: 2rem;
+        }
+      }
+    </style>
+  </head>
+
+  <body vocab="http://schema.org/">
+    <!-- Navigation -->
+    <nav>
+      <ul typeof="BreadcrumbList">
+        <li property="itemListElement" typeof="ListItem">
+          <a property="item" typeof="WebPage" href="../../apropos.html">
+            <span property="name">John Samuel</span>
+          </a>
+        </li>
+        <li property="itemListElement" typeof="ListItem">
+          <a property="item" typeof="WebPage" href="../../index.html">
+            <span property="name">Accueil</span>
+          </a>
+        </li>
+        <li property="itemListElement" typeof="ListItem">
+          <a property="item" typeof="WebPage" href="../recherche.html">
+            <span property="name">Recherche</span>
+          </a>
+        </li>
+        <li property="itemListElement" typeof="ListItem">
+          <a property="item" typeof="WebPage" href="../couleur.html">
+            <span property="name">Projet Couleur</span>
+          </a>
+        </li>
+      </ul>
+    </nav>
+
+    <!-- Hero Section -->
+    <div class="hero">
+      <h1>Outils logiciels</h1>
+      <h2>La palette numérique pour la création chromatique</h2>
+      <p class="author">John Samuel</p>
+
+      <div class="tool-icons">
+        <span class="tool-icon">🎨</span>
+        <span class="tool-icon">🖌️</span>
+        <span class="tool-icon">🎭</span>
+      </div>
+    </div>
+
+    <!-- Main Content -->
+    <main>
+      <div class="container">
+        <!-- Introduction Section -->
+        <section class="content-section">
+          <h3>Outils open source pour l'expression colorée</h3>
+          <p>
+            Le <a href="../couleur.html">Projet Couleur</a> est entièrement construit avec des <strong>logiciels open
+              source</strong>,
+            démontrant que l'art chromatique de qualité professionnelle peut être créé sans outils propriétaires.
+            L'écosystème logiciel principal combine la création graphique vectorielle avec des utilitaires d'analyse de
+            couleur pour
+            permettre une exploration systématique de la théorie et de l'application des couleurs.
+          </p>
+
+          <div class="highlight-box">
+            <p>
+              Mon engagement envers l'open source reflète la conviction que les outils créatifs devraient être
+              accessibles à tous,
+              quelles que soient les ressources économiques. Ces outils se sont avérés plus que capables de soutenir des
+              explorations chromatiques complexes et une vision artistique.
+            </p>
+          </div>
+        </section>
+
+        <!-- Primary Tools -->
+        <section class="content-section">
+          <h3>Outils logiciels principaux</h3>
+
+          <div class="tool-grid">
+            <div class="tool-card">
+              <div class="tool-card-header">
+                <span class="tool-card-icon">🎨</span>
+                <h4>Inkscape</h4>
+              </div>
+              <p>
+                La pierre angulaire du Projet Couleur, Inkscape est un éditeur graphique vectoriel professionnel qui
+                fournit des outils complets pour créer des œuvres colorées évolutives et de haute qualité. Ses
+                fonctionnalités étendues de gestion des couleurs le rendent idéal pour l'exploration chromatique.
+              </p>
+              <a href="https://www.inkscape.org" class="tool-link" target="_blank" rel="noopener">Visiter le site
+                officiel →</a>
+            </div>
+
+            <div class="tool-card">
+              <div class="tool-card-header">
+                <span class="tool-card-icon">🎨</span>
+                <h4>ColorZilla</h4>
+              </div>
+              <p>
+                Une extension de navigateur essentielle pour la découverte et l'analyse des couleurs. ColorZilla permet
+                l'extraction de valeurs de couleur de n'importe quelle page web ou image numérique, construisant une
+                bibliothèque
+                de palette personnelle à partir du monde visuel qui nous entoure.
+              </p>
+              <a href="http://www.colorzilla.com/" class="tool-link" target="_blank" rel="noopener">Visiter le site
+                officiel →</a>
+            </div>
+
+            <div class="tool-card">
+              <div class="tool-card-header">
+                <span class="tool-card-icon">🔲</span>
+                <h4>Blender</h4>
+              </div>
+              <p>
+                Utilisé occasionnellement pour comprendre les aspects tridimensionnels des objets—l'éclairage, les
+                ombres,
+                les propriétés des matériaux et la perspective. Ces connaissances 3D informent une application de
+                couleur 2D
+                plus sophistiquée dans Inkscape.
+              </p>
+              <a href="https://www.blender.org" class="tool-link" target="_blank" rel="noopener">Visiter le site
+                officiel →</a>
+            </div>
+          </div>
+        </section>
+
+        <!-- Inkscape Features -->
+        <section class="content-section">
+          <h3>Fonctionnalités essentielles d'Inkscape pour le travail de la couleur</h3>
+          <p>
+            Inkscape offre une suite complète d'outils de couleur qui permettent une expression chromatique nuancée.
+            Ces fonctionnalités forment la base technique de tous les dessins colorés de ce projet.
+          </p>
+
+          <div class="feature-list">
+            <h4>Outils colorimétriques de base</h4>
+            <ul>
+              <li>
+                <strong>Panneau de remplissage et de contour</strong> <code>Maj+Ctrl+F</code>
+                <ul>
+                  <li>Sélection précise des couleurs en utilisant les valeurs RVB, TSL, CMJN ou hexadécimales</li>
+                  <li>Création et manipulation de dégradés avec plusieurs points de contrôle de couleur</li>
+                  <li>Contrôle de l'opacité pour des effets chromatiques en couches</li>
+                  <li>Remplissages à motifs pour une complexité texturale</li>
+                </ul>
+              </li>
+              <li>
+                <strong>Remplir les zones délimitées</strong> <code>Maj+F7</code>
+                <ul>
+                  <li>Outil pot de peinture pour une application rapide de la couleur</li>
+                  <li>Ajustement du seuil pour un contrôle précis du remplissage</li>
+                  <li>Idéal pour colorier des dessins complexes au trait</li>
+                </ul>
+              </li>
+              <li>
+                <strong>Outil pipette à couleurs</strong> <code>D</code>
+                <ul>
+                  <li>Extraire les couleurs directement des œuvres existantes</li>
+                  <li>Échantillonner et réutiliser des combinaisons de couleurs réussies</li>
+                  <li>Construire des palettes cohérentes à travers plusieurs dessins</li>
+                </ul>
+              </li>
+            </ul>
+          </div>
+
+          <div class="feature-list">
+            <h4>Techniques chromatiques avancées</h4>
+            <ul>
+              <li>
+                <strong>Éditeur de dégradés</strong>
+                <ul>
+                  <li>Dégradés linéaires et radiaux pour des effets dimensionnels</li>
+                  <li>Multiples points de couleur pour des transitions complexes</li>
+                  <li>Maillage de dégradé pour un ombrage avancé (fonctionnalité expérimentale)</li>
+                </ul>
+              </li>
+              <li>
+                <strong>Filtres et effets</strong>
+                <ul>
+                  <li>Effets de flou pour des ombres douces et une profondeur atmosphérique</li>
+                  <li>Manipulation de matrice de couleur pour ajuster l'humeur</li>
+                  <li>Modes de fusion pour des interactions chromatiques en couches</li>
+                </ul>
+              </li>
+              <li>
+                <strong>Nuanciers et palettes</strong>
+                <ul>
+                  <li>Bibliothèques de palettes de couleurs intégrées</li>
+                  <li>Création de palettes personnalisées pour la cohérence du projet</li>
+                  <li>Import/export de palettes pour l'intégration au flux de travail</li>
+                </ul>
+              </li>
+            </ul>
+          </div>
+        </section>
+
+        <!-- References -->
+        <div class="references">
+          <h4>Références et ressources</h4>
+          <ul>
+            <li id="inkscape"><strong>Inkscape :</strong> <a href="https://inkscape.org" target="_blank"
+                rel="noopener">Site officiel</a> - Éditeur graphique vectoriel professionnel</li>
+            <li id="colorzilla"><strong>ColorZilla :</strong> <a href="http://www.colorzilla.com/" target="_blank"
+                rel="noopener">Site officiel</a> - Pipette à couleurs avancée et générateur de dégradés</li>
+            <li id="blender"><strong>Blender :</strong> <a href="https://www.blender.org" target="_blank"
+                rel="noopener">Site officiel</a> - Suite de création 3D pour la compréhension dimensionnelle</li>
+            <li><strong>Documentation Inkscape :</strong> <a href="https://inkscape.org/doc/" target="_blank"
+                rel="noopener">Tutoriels et guides</a></li>
+          </ul>
+        </div>
+
+        <!-- Navigation -->
+        <div class="nav-links">
+          <a href="./motivation.html" class="nav-link secondary">← Retour à la motivation</a>
+          <a href="./remerciements.html" class="nav-link">Suivant : Remerciements →</a>
+        </div>
+      </div>
+    </main>
+  </body>
+
+</html>
