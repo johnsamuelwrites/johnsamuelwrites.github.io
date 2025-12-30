@@ -1,0 +1,1237 @@
+<!DOCTYPE html>
+<html lang="en">
+
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta http-equiv="Content-Language" content="en" />
+        <link rel="shortcut icon" href="../../../images/logo/favicon.png" />
+        <title>Projet Dessin - Artefacts humains : John Samuel</title>
+        <style type="text/css">
+            * {
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
+            }
+
+            :root {
+                --canvas-cream: #FAF7F0;
+                --charcoal: #2C2C2C;
+                --sketch-blue: #4A90B8;
+                --watercolor-blue: #7FB3D5;
+                --artistic-orange: #E8A87C;
+                --soft-peach: #F5D5C0;
+                --gallery-gray: #E8E4DF;
+                --memory-purple: #9B8FB5;
+                --artifact-brown: #A67C52;
+            }
+
+            body {
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+                background: linear-gradient(135deg, var(--canvas-cream) 0%, #FEFCF8 100%);
+                color: var(--charcoal);
+                line-height: 1.7;
+                min-height: 100vh;
+            }
+
+            /* Navigation */
+            nav {
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                background: rgba(250, 247, 240, 0.95);
+                -webkit-backdrop-filter: blur(12px);
+                backdrop-filter: blur(12px);
+                border-bottom: 2px solid var(--gallery-gray);
+                padding: 1.2rem 2rem;
+                z-index: 1000;
+                box-shadow: 0 2px 20px rgba(74, 144, 184, 0.08);
+            }
+
+            nav ul {
+                list-style: none;
+                display: flex;
+                gap: 1.5rem;
+                align-items: center;
+                flex-wrap: wrap;
+            }
+
+            nav a {
+                text-decoration: none;
+                color: var(--charcoal);
+                font-weight: 500;
+                transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+                padding: 0.5rem 1rem;
+                border-radius: 8px;
+                position: relative;
+            }
+
+            nav a::after {
+                content: '';
+                position: absolute;
+                bottom: 0;
+                left: 50%;
+                width: 0;
+                height: 2px;
+                background: var(--sketch-blue);
+                transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+                transform: translateX(-50%);
+            }
+
+            nav a:hover {
+                color: var(--sketch-blue);
+                background: rgba(74, 144, 184, 0.08);
+            }
+
+            nav a:hover::after {
+                width: 80%;
+            }
+
+            /* Header Section */
+            .header-section {
+                margin-top: 5rem;
+                padding: 3rem 2rem;
+                text-align: center;
+                background: white;
+                border-bottom: 3px solid var(--gallery-gray);
+                position: relative;
+                overflow: hidden;
+            }
+
+            .header-section::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 6px;
+                background: linear-gradient(90deg, var(--artifact-brown), var(--artistic-orange), var(--sketch-blue));
+            }
+
+            .header-section h1 {
+                font-size: 3rem;
+                font-weight: 800;
+                color: var(--charcoal);
+                letter-spacing: -0.02em;
+                margin-bottom: 0.5rem;
+            }
+
+            .header-section h1::after {
+                content: '';
+                display: block;
+                width: 100px;
+                height: 3px;
+                background: linear-gradient(90deg, var(--artifact-brown), var(--artistic-orange));
+                margin: 1rem auto;
+                border-radius: 2px;
+            }
+
+            .header-section h3 {
+                font-size: 1.3rem;
+                font-weight: 500;
+                color: var(--artifact-brown);
+                font-style: italic;
+            }
+
+            /* Main Content */
+            main {
+                max-width: 1400px;
+                margin: 0 auto;
+                padding: 3rem 2rem 6rem;
+            }
+
+            /* Drawing Gallery Grid */
+            .drawing-gallery {
+                display: grid;
+                grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+                gap: 2rem;
+                list-style: none;
+            }
+
+            .drawing-card {
+                background: white;
+                border-radius: 20px;
+                overflow: hidden;
+                position: relative;
+                border: 2px solid var(--gallery-gray);
+                transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+                box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+            }
+
+            .drawing-card::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background: linear-gradient(135deg,
+                        rgba(166, 124, 82, 0.05) 0%,
+                        rgba(232, 168, 124, 0.05) 100%);
+                opacity: 0;
+                transition: opacity 0.4s ease;
+                pointer-events: none;
+            }
+
+            .drawing-card:hover {
+                transform: translateY(-12px) scale(1.02);
+                box-shadow: 0 20px 40px rgba(166, 124, 82, 0.2);
+                border-color: var(--artifact-brown);
+            }
+
+            .drawing-card:hover::before {
+                opacity: 1;
+            }
+
+            .drawing-card a {
+                text-decoration: none;
+                color: inherit;
+                display: block;
+            }
+
+            .drawing-image {
+                width: 100%;
+                height: 280px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                background: var(--canvas-cream);
+                padding: 2rem;
+                position: relative;
+                overflow: hidden;
+            }
+
+            .drawing-image::after {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background:
+                    repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(166, 124, 82, 0.03) 2px, rgba(166, 124, 82, 0.03) 4px),
+                    repeating-linear-gradient(90deg, transparent, transparent 2px, rgba(166, 124, 82, 0.03) 2px, rgba(166, 124, 82, 0.03) 4px);
+                opacity: 0;
+                transition: opacity 0.4s ease;
+                pointer-events: none;
+            }
+
+            .drawing-card:hover .drawing-image::after {
+                opacity: 1;
+            }
+
+            .drawing-image img {
+                max-width: 100%;
+                max-height: 100%;
+                object-fit: contain;
+                transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+                filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.1));
+            }
+
+            .drawing-card:hover .drawing-image img {
+                transform: scale(1.08) rotate(2deg);
+            }
+
+            .drawing-title {
+                padding: 1.5rem;
+                background: white;
+                font-size: 1.1rem;
+                font-weight: 600;
+                color: var(--charcoal);
+                text-align: center;
+                transition: all 0.3s ease;
+                line-height: 1.5;
+            }
+
+            .drawing-card:hover .drawing-title {
+                color: var(--artifact-brown);
+            }
+
+            /* Coming Soon Card */
+            .coming-soon-card {
+                background: linear-gradient(135deg, var(--canvas-cream) 0%, #F5EBE0 100%);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                min-height: 400px;
+                border: 2px dashed var(--artifact-brown);
+                opacity: 0.7;
+            }
+
+            .coming-soon-card .drawing-title {
+                background: transparent;
+                color: var(--charcoal);
+                font-size: 0.9rem;
+                font-style: italic;
+                padding: 2rem;
+                line-height: 1.8;
+            }
+
+            .coming-soon-card:hover {
+                transform: none;
+                opacity: 0.85;
+            }
+
+            /* Responsive Design */
+            @media (max-width: 768px) {
+                .header-section h1 {
+                    font-size: 2rem;
+                }
+
+                .header-section h3 {
+                    font-size: 1.1rem;
+                }
+
+                nav {
+                    padding: 1rem;
+                }
+
+                nav ul {
+                    gap: 0.8rem;
+                }
+
+                .drawing-gallery {
+                    grid-template-columns: 1fr;
+                    gap: 1.5rem;
+                }
+            }
+        </style>
+    </head>
+
+    <body vocab="http://schema.org/">
+        <nav>
+            <ul typeof="BreadcrumbList">
+                <li property="itemListElement" typeof="ListItem">
+                    <a property="item" typeof="WebPage" href="../../index.html">
+                        <span property="name">Accueil</span>
+                    </a>
+                </li>
+                <li property="itemListElement" typeof="ListItem">
+                    <a property="item" typeof="WebPage" href="../../recherche/recherche.html">
+                        <span property="name">Recherche</span>
+                    </a>
+                </li>
+                <li property="itemListElement" typeof="ListItem">
+                    <a property="item" typeof="WebPage" href="../../recherche/dessin.html">
+                        <span property="name">Projet Dessin</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+
+        <div class="header-section">
+            <h1>Artefacts humains</h1>
+            <h3>Objets de création et d'innovation humaines</h3>
+        </div>
+
+        <main>
+            <ul class="drawing-gallery">
+                <li class="drawing-card">
+                    <a href="../art/hutte.html">
+                        <div class="drawing-image">
+                            <img src="../../../images/art/hut-perspective.svg" alt="Hutte">
+                        </div>
+                        <div class="drawing-title">Hutte</div>
+                    </a>
+                </li>
+                <li class="drawing-card">
+                    <a href="../art/fenêtre.html">
+                        <div class="drawing-image">
+                            <img src="../../../images/art/window-half-open-inside.svg" alt="Fenêtre">
+                        </div>
+                        <div class="drawing-title">Fenêtre</div>
+                    </a>
+                </li>
+                <li class="drawing-card">
+                    <a href="../art/porte.html">
+                        <div class="drawing-image">
+                            <img src="../../../images/art/door-half-open-inside.svg" alt="Porte">
+                        </div>
+                        <div class="drawing-title">Porte</div>
+                    </a>
+                </li>
+                <li class="drawing-card">
+                    <a href="../art/pilier.html">
+                        <div class="drawing-image">
+                            <img src="../../../images/art/pillar.svg" alt="Pilier">
+                        </div>
+                        <div class="drawing-title">Pilier/colonne</div>
+                    </a>
+                </li>
+                <li class="drawing-card">
+                    <a href="../art/clôture.html">
+                        <div class="drawing-image">
+                            <img src="../../../images/art/fence.svg" alt="Clôture">
+                        </div>
+                        <div class="drawing-title">Clôture</div>
+                    </a>
+                </li>
+                <li class="drawing-card">
+                    <a href="../art/route.html">
+                        <div class="drawing-image">
+                            <img src="../../../images/art/road-horizon.svg" alt="Route">
+                        </div>
+                        <div class="drawing-title">Route</div>
+                    </a>
+                </li>
+                <li class="drawing-card">
+                    <a href="../art/étagère.html">
+                        <div class="drawing-image">
+                            <img src="../../../images/art/shelf.svg" alt="Étagère">
+                        </div>
+                        <div class="drawing-title">Étagère</div>
+                    </a>
+                </li>
+                <li class="drawing-card">
+                    <a href="../art/puits.html">
+                        <div class="drawing-image">
+                            <img src="../../../images/art/well.svg" alt="Puits">
+                        </div>
+                        <div class="drawing-title">Puits</div>
+                    </a>
+                </li>
+                <li class="drawing-card">
+                    <a href="../art/enveloppe.html">
+                        <div class="drawing-image">
+                            <img src="../../../images/art/envelope-open.svg" alt="Enveloppe">
+                        </div>
+                        <div class="drawing-title">Enveloppe</div>
+                    </a>
+                </li>
+                <li class="drawing-card">
+                    <a href="../art/cadeau.html">
+                        <div class="drawing-image">
+                            <img src="../../../images/art/gift.svg" alt="Cadeau">
+                        </div>
+                        <div class="drawing-title">Cadeau</div>
+                    </a>
+                </li>
+                <li class="drawing-card">
+                    <a href="../art/brique.html">
+                        <div class="drawing-image">
+                            <img src="../../../images/art/brick.svg" alt="Brique">
+                        </div>
+                        <div class="drawing-title">Brique</div>
+                    </a>
+                </li>
+                <li class="drawing-card">
+                    <a href="../art/mur-de-briques.html">
+                        <div class="drawing-image">
+                            <img src="../../../images/art/brick-wall.svg" alt="Mur de briques">
+                        </div>
+                        <div class="drawing-title">Mur de briques</div>
+                    </a>
+                </li>
+                <li class="drawing-card">
+                    <a href="../art/table.html">
+                        <div class="drawing-image">
+                            <img src="../../../images/art/table.svg" alt="Table">
+                        </div>
+                        <div class="drawing-title">Table</div>
+                    </a>
+                </li>
+                <li class="drawing-card">
+                    <a href="../art/télévision.html">
+                        <div class="drawing-image">
+                            <img src="../../../images/art/television.svg" alt="Télévision">
+                        </div>
+                        <div class="drawing-title">Télévision</div>
+                    </a>
+                </li>
+                <li class="drawing-card">
+                    <a href="../art/tableau-noir.html">
+                        <div class="drawing-image">
+                            <img src="../../../images/art/blackboard-with-placeholder.svg" alt="Tableau noir">
+                        </div>
+                        <div class="drawing-title">Tableau noir</div>
+                    </a>
+                </li>
+                <li class="drawing-card">
+                    <a href="../art/craie.html">
+                        <div class="drawing-image">
+                            <img src="../../../images/art/chalk.svg" alt="Craie">
+                        </div>
+                        <div class="drawing-title">Craie</div>
+                    </a>
+                </li>
+                <li class="drawing-card">
+                    <a href="../art/miroir.html">
+                        <div class="drawing-image">
+                            <img src="../../../images/art/mirror.svg" alt="Miroir">
+                        </div>
+                        <div class="drawing-title">Miroir</div>
+                    </a>
+                </li>
+                <li class="drawing-card">
+                    <a href="../art/escalier.html">
+                        <div class="drawing-image">
+                            <img src="../../../images/art/stairs.svg" alt="Escalier">
+                        </div>
+                        <div class="drawing-title">Escalier</div>
+                    </a>
+                </li>
+                <li class="drawing-card">
+                    <a href="../art/banc.html">
+                        <div class="drawing-image">
+                            <img src="../../../images/art/bench.svg" alt="Banc">
+                        </div>
+                        <div class="drawing-title">Banc</div>
+                    </a>
+                </li>
+                <li class="drawing-card">
+                    <a href="../art/photographie.html">
+                        <div class="drawing-image">
+                            <img src="../../../images/art/photograph-landscape.svg" alt="Photographie">
+                        </div>
+                        <div class="drawing-title">Photographie</div>
+                    </a>
+                </li>
+                <li class="drawing-card">
+                    <a href="../art/carton.html">
+                        <div class="drawing-image">
+                            <img src="../../../images/art/carton.svg" alt="Carton">
+                        </div>
+                        <div class="drawing-title">Carton</div>
+                    </a>
+                </li>
+                <li class="drawing-card">
+                    <a href="../art/lampe.html">
+                        <div class="drawing-image">
+                            <img src="../../../images/art/cube.svg" alt="Lampe">
+                        </div>
+                        <div class="drawing-title">Lampe</div>
+                    </a>
+                </li>
+                <li class="drawing-card">
+                    <a href="../art/livre.html">
+                        <div class="drawing-image">
+                            <img src="../../../images/art/lamp-adjusted-edge.svg" alt="Livre">
+                        </div>
+                        <div class="drawing-title">Livre</div>
+                    </a>
+                </li>
+                <li class="drawing-card">
+                    <a href="../art/parapluie.html">
+                        <div class="drawing-image">
+                            <img src="../../../images/art/umbrella-top-view.svg" alt="Parapluie">
+                        </div>
+                        <div class="drawing-title">Parapluie</div>
+                    </a>
+                </li>
+                <li class="drawing-card">
+                    <a href="../art/canne.html">
+                        <div class="drawing-image">
+                            <img src="../../../images/art/walking-stick-sideview.svg" alt="Canne">
+                        </div>
+                        <div class="drawing-title">Canne</div>
+                    </a>
+                </li>
+                <li class="drawing-card">
+                    <a href="../art/baguette.html">
+                        <div class="drawing-image">
+                            <img src="../../../images/art/wand.svg" alt="Baguette">
+                        </div>
+                        <div class="drawing-title">Baguette</div>
+                    </a>
+                </li>
+                <li class="drawing-card">
+                    <a href="../art/corde.html">
+                        <div class="drawing-image">
+                            <img src="../../../images/art/rope.svg" alt="Corde">
+                        </div>
+                        <div class="drawing-title">Corde</div>
+                    </a>
+                </li>
+                <li class="drawing-card">
+                    <a href="../art/ampoule.html">
+                        <div class="drawing-image">
+                            <img src="../../../images/art/bulb.svg" alt="Ampoule">
+                        </div>
+                        <div class="drawing-title">Ampoule</div>
+                    </a>
+                </li>
+                <li class="drawing-card">
+                    <a href="../art/ressort.html">
+                        <div class="drawing-image">
+                            <img src="../../../images/art/spring.svg" alt="Ressort">
+                        </div>
+                        <div class="drawing-title">Ressort</div>
+                    </a>
+                </li>
+                <li class="drawing-card">
+                    <a href="../art/crayon.html">
+                        <div class="drawing-image">
+                            <img src="../../../images/art/pencil-perspective-slanting.svg" alt="Crayon">
+                        </div>
+                        <div class="drawing-title">Crayon</div>
+                    </a>
+                </li>
+                <li class="drawing-card">
+                    <a href="../art/bougie.html">
+                        <div class="drawing-image">
+                            <img src="../../../images/art/burning-candle.svg" alt="Bougie">
+                        </div>
+                        <div class="drawing-title">Bougie</div>
+                    </a>
+                </li>
+                <li class="drawing-card">
+                    <a href="../art/lampe-de-poche.html">
+                        <div class="drawing-image">
+                            <img src="../../../images/art/flashlight-topview.svg" alt="Lampe de poche">
+                        </div>
+                        <div class="drawing-title">Lampe de poche</div>
+                    </a>
+                </li>
+                <li class="drawing-card">
+                    <a href="../art/torche.html">
+                        <div class="drawing-image">
+                            <img src="../../../images/art/torch.svg" alt="Torche">
+                        </div>
+                        <div class="drawing-title">Torche</div>
+                    </a>
+                </li>
+                <li class="drawing-card">
+                    <a href="../art/anneau.html">
+                        <div class="drawing-image">
+                            <img src="../../../images/art/ring.svg" alt="Anneau">
+                        </div>
+                        <div class="drawing-title">Anneau</div>
+                    </a>
+                </li>
+                <li class="drawing-card">
+                    <a href="../art/paille.html">
+                        <div class="drawing-image">
+                            <img src="../../../images/art/drinking-straw.svg" alt="Paille">
+                        </div>
+                        <div class="drawing-title">Paille</div>
+                    </a>
+                </li>
+                <li class="drawing-card">
+                    <a href="../art/verre.html">
+                        <div class="drawing-image">
+                            <img src="../../../images/art/glass-with-water.svg" alt="Verre">
+                        </div>
+                        <div class="drawing-title">Verre</div>
+                    </a>
+                </li>
+                <li class="drawing-card">
+                    <a href="../art/seau.html">
+                        <div class="drawing-image">
+                            <img src="../../../images/art/bucket-with-water.svg" alt="Seau">
+                        </div>
+                        <div class="drawing-title">Seau</div>
+                    </a>
+                </li>
+                <li class="drawing-card">
+                    <a href="../art/tube-à-essai.html">
+                        <div class="drawing-image">
+                            <img src="../../../images/art/test-tube.svg" alt="Tube à essai">
+                        </div>
+                        <div class="drawing-title">Tube à essai</div>
+                    </a>
+                </li>
+                <li class="drawing-card">
+                    <a href="../art/escalator.html">
+                        <div class="drawing-image">
+                            <img src="../../../images/art/escalator-sideview.svg" alt="Escalator">
+                        </div>
+                        <div class="drawing-title">Escalator</div>
+                    </a>
+                </li>
+                <li class="drawing-card">
+                    <a href="../art/horloge.html">
+                        <div class="drawing-image">
+                            <img src="../../../images/art/clock.svg" alt="Horloge">
+                        </div>
+                        <div class="drawing-title">Horloge</div>
+                    </a>
+                </li>
+                <li class="drawing-card">
+                    <a href="../art/montre-bracelet.html">
+                        <div class="drawing-image">
+                            <img src="../../../images/art/wrist-watch.svg" alt="Montre-bracelet">
+                        </div>
+                        <div class="drawing-title">Montre-bracelet</div>
+                    </a>
+                </li>
+                <li class="drawing-card">
+                    <a href="../art/réveil.html">
+                        <div class="drawing-image">
+                            <img src="../../../images/art/alarm-clock.svg" alt="Réveil">
+                        </div>
+                        <div class="drawing-title">Réveil</div>
+                    </a>
+                </li>
+                <li class="drawing-card">
+                    <a href="../art/horloge-à-pendule.html">
+                        <div class="drawing-image">
+                            <img src="../../../images/art/pendulum-clock.svg" alt="Horloge à pendule">
+                        </div>
+                        <div class="drawing-title">Horloge à pendule</div>
+                    </a>
+                </li>
+                <li class="drawing-card">
+                    <a href="../art/ardoise.html">
+                        <div class="drawing-image">
+                            <img src="../../../images/art/slate.svg" alt="Ardoise">
+                        </div>
+                        <div class="drawing-title">Ardoise (écriture)</div>
+                    </a>
+                </li>
+                <li class="drawing-card">
+                    <a href="../art/gomme.html">
+                        <div class="drawing-image">
+                            <img src="../../../images/art/eraser.svg" alt="Gomme">
+                        </div>
+                        <div class="drawing-title">Gomme</div>
+                    </a>
+                </li>
+                <li class="drawing-card">
+                    <a href="../art/tuyau.html">
+                        <div class="drawing-image">
+                            <img src="../../../images/art/pipe-slanting-view.svg" alt="Tuyau">
+                        </div>
+                        <div class="drawing-title">Tuyau</div>
+                    </a>
+                </li>
+                <li class="drawing-card">
+                    <a href="../art/tasse-soucoupe.html">
+                        <div class="drawing-image">
+                            <img src="../../../images/art/cup-saucer.svg" alt="Tasse et soucoupe">
+                        </div>
+                        <div class="drawing-title">Tasse et soucoupe</div>
+                    </a>
+                </li>
+                <li class="drawing-card">
+                    <a href="../art/globe.html">
+                        <div class="drawing-image">
+                            <img src="../../../images/art/globe.svg" alt="Globe">
+                        </div>
+                        <div class="drawing-title">Globe</div>
+                    </a>
+                </li>
+                <li class="drawing-card">
+                    <a href="../art/timbre-poste.html">
+                        <div class="drawing-image">
+                            <img src="../../../images/art/postage-stamp.svg" alt="Timbre-poste">
+                        </div>
+                        <div class="drawing-title">Timbre-poste</div>
+                    </a>
+                </li>
+                <li class="drawing-card">
+                    <a href="../art/spirale.html">
+                        <div class="drawing-image">
+                            <img src="../../../images/art/spiral-dense-outer.svg" alt="Spirale">
+                        </div>
+                        <div class="drawing-title">Spirale</div>
+                    </a>
+                </li>
+                <li class="drawing-card">
+                    <a href="../art/réfrigérateur.html">
+                        <div class="drawing-image">
+                            <img src="../../../images/art/refrigerator.svg" alt="Réfrigérateur">
+                        </div>
+                        <div class="drawing-title">Réfrigérateur</div>
+                    </a>
+                </li>
+                <li class="drawing-card">
+                    <a href="../art/machine-à-laver.html">
+                        <div class="drawing-image">
+                            <img src="../../../images/art/washing-machine.svg" alt="Machine à laver">
+                        </div>
+                        <div class="drawing-title">Machine à laver</div>
+                    </a>
+                </li>
+                <li class="drawing-card">
+                    <a href="../art/clavier.html">
+                        <div class="drawing-image">
+                            <img src="../../../images/art/keyboard-topview.svg" alt="Clavier musical">
+                        </div>
+                        <div class="drawing-title">Clavier musical</div>
+                    </a>
+                </li>
+                <li class="drawing-card">
+                    <a href="../art/assiette.html">
+                        <div class="drawing-image">
+                            <img src="../../../images/art/plate-sideview.svg" alt="Assiette">
+                        </div>
+                        <div class="drawing-title">Assiette</div>
+                    </a>
+                </li>
+                <li class="drawing-card">
+                    <a href="../art/ballon.html">
+                        <div class="drawing-image">
+                            <img src="../../../images/art/balloon-with-thread.svg" alt="Ballon">
+                        </div>
+                        <div class="drawing-title">Ballon</div>
+                    </a>
+                </li>
+                <li class="drawing-card">
+                    <a href="../art/cerf-volant.html">
+                        <div class="drawing-image">
+                            <img src="../../../images/art/kite-unequal.svg" alt="Cerf-volant">
+                        </div>
+                        <div class="drawing-title">Cerf-volant</div>
+                    </a>
+                </li>
+                <li class="drawing-card">
+                    <a href="../art/fontaine.html">
+                        <div class="drawing-image">
+                            <img src="../../../images/art/fountain-sideview-water.svg" alt="Fontaine">
+                        </div>
+                        <div class="drawing-title">Fontaine</div>
+                    </a>
+                </li>
+                <li class="drawing-card">
+                    <a href="../art/dé.html">
+                        <div class="drawing-image">
+                            <img src="../../../images/art/dice.svg" alt="Dé">
+                        </div>
+                        <div class="drawing-title">Dé</div>
+                    </a>
+                </li>
+                <li class="drawing-card">
+                    <a href="../art/armoire.html">
+                        <div class="drawing-image">
+                            <img src="../../../images/art/wardrobe.svg" alt="Armoire">
+                        </div>
+                        <div class="drawing-title">Armoire</div>
+                    </a>
+                </li>
+                <li class="drawing-card">
+                    <a href="../art/gâteau.html">
+                        <div class="drawing-image">
+                            <img src="../../../images/art/cake.svg" alt="Gâteau">
+                        </div>
+                        <div class="drawing-title">Gâteau</div>
+                    </a>
+                </li>
+                <li class="drawing-card">
+                    <a href="../art/aquarium.html">
+                        <div class="drawing-image">
+                            <img src="../../../images/art/aquarium-sphere.svg" alt="Aquarium">
+                        </div>
+                        <div class="drawing-title">Aquarium</div>
+                    </a>
+                </li>
+                <li class="drawing-card">
+                    <a href="../art/chaise.html">
+                        <div class="drawing-image">
+                            <img src="../../../images/art/chair.svg" alt="Chaise">
+                        </div>
+                        <div class="drawing-title">Chaise</div>
+                    </a>
+                </li>
+                <li class="drawing-card">
+                    <a href="../art/poubelle.html">
+                        <div class="drawing-image">
+                            <img src="../../../images/art/dustbin.svg" alt="Poubelle">
+                        </div>
+                        <div class="drawing-title">Poubelle</div>
+                    </a>
+                </li>
+                <li class="drawing-card">
+                    <a href="../art/tasse.html">
+                        <div class="drawing-image">
+                            <img src="../../../images/art/cup.svg" alt="Tasse">
+                        </div>
+                        <div class="drawing-title">Tasse</div>
+                    </a>
+                </li>
+                <li class="drawing-card">
+                    <a href="../art/disque-volant.html">
+                        <div class="drawing-image">
+                            <img src="../../../images/art/flyingdisc.svg" alt="Disque volant">
+                        </div>
+                        <div class="drawing-title">Disque volant</div>
+                    </a>
+                </li>
+                <li class="drawing-card">
+                    <a href="../art/échelle.html">
+                        <div class="drawing-image">
+                            <img src="../../../images/art/ladder-with-cylindrical-rungs.svg" alt="Échelle">
+                        </div>
+                        <div class="drawing-title">Échelle</div>
+                    </a>
+                </li>
+                <li class="drawing-card">
+                    <a href="../art/roue.html">
+                        <div class="drawing-image">
+                            <img src="../../../images/art/wheel.svg" alt="Roue">
+                        </div>
+                        <div class="drawing-title">Roue</div>
+                    </a>
+                </li>
+                <li class="drawing-card">
+                    <a href="../art/promenade-en-bois.html">
+                        <div class="drawing-image">
+                            <img src="../../../images/art/boardwalk-wide.svg" alt="Promenade en bois">
+                        </div>
+                        <div class="drawing-title">Promenade en bois</div>
+                    </a>
+                </li>
+                <li class="drawing-card">
+                    <a href="../art/voie-ferrée.html">
+                        <div class="drawing-image">
+                            <img src="../../../images/art/railtrack.svg" alt="Voie ferrée">
+                        </div>
+                        <div class="drawing-title">Voie ferrée</div>
+                    </a>
+                </li>
+                <li class="drawing-card">
+                    <a href="../art/vase.html">
+                        <div class="drawing-image">
+                            <img src="../../../images/art/vase.svg" alt="Vase">
+                        </div>
+                        <div class="drawing-title">Vase</div>
+                    </a>
+                </li>
+                <li class="drawing-card">
+                    <a href="../art/échiquier.html">
+                        <div class="drawing-image">
+                            <img src="../../../images/art/chessboard.svg" alt="Échiquier">
+                        </div>
+                        <div class="drawing-title">Échiquier</div>
+                    </a>
+                </li>
+                <li class="drawing-card">
+                    <a href="../art/podium.html">
+                        <div class="drawing-image">
+                            <img src="../../../images/art/podium-joined-boxes.svg" alt="Podium">
+                        </div>
+                        <div class="drawing-title">Podium</div>
+                    </a>
+                </li>
+                <li class="drawing-card">
+                    <a href="../art/cadre-photo.html">
+                        <div class="drawing-image">
+                            <img src="../../../images/art/picture-frame-landscape.svg" alt="Cadre photo">
+                        </div>
+                        <div class="drawing-title">Cadre photo</div>
+                    </a>
+                </li>
+                <li class="drawing-card">
+                    <a href="../art/peinture.html">
+                        <div class="drawing-image">
+                            <img src="../../../images/art/painting.svg" alt="Peinture">
+                        </div>
+                        <div class="drawing-title">Peinture sur mur</div>
+                    </a>
+                </li>
+                <li class="drawing-card">
+                    <a href="../art/ruelle.html">
+                        <div class="drawing-image">
+                            <img src="../../../images/art/alley.svg" alt="Ruelle">
+                        </div>
+                        <div class="drawing-title">Ruelle</div>
+                    </a>
+                </li>
+                <li class="drawing-card">
+                    <a href="../art/bol.html">
+                        <div class="drawing-image">
+                            <img src="../../../images/art/bowl.svg" alt="Bol">
+                        </div>
+                        <div class="drawing-title">Bol</div>
+                    </a>
+                </li>
+                <li class="drawing-card">
+                    <a href="../art/passage-piéton.html">
+                        <div class="drawing-image">
+                            <img src="../../../images/art/zebra-crossing.svg" alt="Passage piéton">
+                        </div>
+                        <div class="drawing-title">Passage piéton</div>
+                    </a>
+                </li>
+                <li class="drawing-card">
+                    <a href="../art/roue-chromatique.html">
+                        <div class="drawing-image">
+                            <img src="../../../images/art/color-wheel.svg" alt="Roue chromatique">
+                        </div>
+                        <div class="drawing-title">Roue chromatique</div>
+                    </a>
+                </li>
+                <li class="drawing-card">
+                    <a href="../art/boîte-de-conserve.html">
+                        <div class="drawing-image">
+                            <img src="../../../images/art/can.svg" alt="Boîte de conserve">
+                        </div>
+                        <div class="drawing-title">Boîte de conserve</div>
+                    </a>
+                </li>
+                <li class="drawing-card">
+                    <a href="../art/radio.html">
+                        <div class="drawing-image">
+                            <img src="../../../images/art/radio.svg" alt="Radio">
+                        </div>
+                        <div class="drawing-title">Radio</div>
+                    </a>
+                </li>
+                <li class="drawing-card">
+                    <a href="../art/bateau.html">
+                        <div class="drawing-image">
+                            <img src="../../../images/art/boat.svg" alt="Bateau">
+                        </div>
+                        <div class="drawing-title">Bateau</div>
+                    </a>
+                </li>
+                <li class="drawing-card">
+                    <a href="../art/artefacts/arc.html">
+                        <div class="drawing-image">
+                            <img src="../../../images/art/artifacts/arch.svg" alt="Arc">
+                        </div>
+                        <div class="drawing-title">Arc</div>
+                    </a>
+                </li>
+                <li class="drawing-card">
+                    <a href="../art/artefacts/fil.html">
+                        <div class="drawing-image">
+                            <img src="../../../images/art/artifacts/thread.svg" alt="Fil">
+                        </div>
+                        <div class="drawing-title">Fil</div>
+                    </a>
+                </li>
+                <li class="drawing-card">
+                    <a href="../art/artefacts/brosse.html">
+                        <div class="drawing-image">
+                            <img src="../../../images/art/artifacts/brush-basic.svg" alt="Brosse">
+                        </div>
+                        <div class="drawing-title">Brosse</div>
+                    </a>
+                </li>
+                <li class="drawing-card">
+                    <a href="../art/herbe.html">
+                        <div class="drawing-image">
+                            <img src="../../../images/art/grass.svg" alt="Herbe">
+                        </div>
+                        <div class="drawing-title">Herbe dans le jardin</div>
+                    </a>
+                </li>
+                <li class="drawing-card">
+                    <a href="../art/malle.html">
+                        <div class="drawing-image">
+                            <img src="../../../images/art/trunk.svg" alt="Malle">
+                        </div>
+                        <div class="drawing-title">Malle</div>
+                    </a>
+                </li>
+                <li class="drawing-card">
+                    <a href="../art/artefacts/scie-à-main.html">
+                        <div class="drawing-image">
+                            <img src="../../../images/art/handsaw.svg" alt="Scie à main">
+                        </div>
+                        <div class="drawing-title">Scie à main</div>
+                    </a>
+                </li>
+                <li class="drawing-card">
+                    <a href="../art/artefacts/skiboard.html">
+                        <div class="drawing-image">
+                            <img src="../../../images/art/artifacts/skiboard.svg" alt="Skiboard">
+                        </div>
+                        <div class="drawing-title">Skiboard</div>
+                    </a>
+                </li>
+                <li class="drawing-card">
+                    <a href="../art/artefacts/avant-poste.html">
+                        <div class="drawing-image">
+                            <img src="../../../images/art/artifacts/outpost.svg" alt="Avant-poste">
+                        </div>
+                        <div class="drawing-title">Avant-poste</div>
+                    </a>
+                </li>
+                <li class="drawing-card">
+                    <a href="../art/artefacts/fusée.html">
+                        <div class="drawing-image">
+                            <img src="../../../images/art/artifacts/rocket.svg" alt="Fusée">
+                        </div>
+                        <div class="drawing-title">Fusée</div>
+                    </a>
+                </li>
+                <li class="drawing-card">
+                    <a href="../art/artefacts/boule-de-cristal.html">
+                        <div class="drawing-image">
+                            <img src="../../../images/art/artifacts/crystal-ball.svg" alt="Boule de cristal">
+                        </div>
+                        <div class="drawing-title">Boule de cristal</div>
+                    </a>
+                </li>
+                <li class="drawing-card">
+                    <a href="../art/artefacts/chemise.html">
+                        <div class="drawing-image">
+                            <img src="../../../images/art/artifacts/shirt.svg" alt="Chemise">
+                        </div>
+                        <div class="drawing-title">Chemise</div>
+                    </a>
+                </li>
+                <li class="drawing-card">
+                    <a href="../art/artefacts/pantalon.html">
+                        <div class="drawing-image">
+                            <img src="../../../images/art/artifacts/trousers.svg" alt="Pantalon">
+                        </div>
+                        <div class="drawing-title">Pantalon</div>
+                    </a>
+                </li>
+                <li class="drawing-card">
+                    <a href="../art/artefacts/costume.html">
+                        <div class="drawing-image">
+                            <img src="../../../images/art/artifacts/suit.svg" alt="Costume">
+                        </div>
+                        <div class="drawing-title">Costume</div>
+                    </a>
+                </li>
+                <li class="drawing-card">
+                    <a href="../art/artefacts/arche.html">
+                        <div class="drawing-image">
+                            <img src="../../../images/art/artifacts/ark.svg" alt="Arche">
+                        </div>
+                        <div class="drawing-title">Arche</div>
+                    </a>
+                </li>
+                <li class="drawing-card">
+                    <a href="../art/artefacts/nœud.html">
+                        <div class="drawing-image">
+                            <img src="../../../images/art/artifacts/knot.svg" alt="Nœud">
+                        </div>
+                        <div class="drawing-title">Nœud</div>
+                    </a>
+                </li>
+                <li class="drawing-card">
+                    <a href="../art/artefacts/fantôme.html">
+                        <div class="drawing-image">
+                            <img src="../../../images/art/artifacts/ghost.svg" alt="Fantôme">
+                        </div>
+                        <div class="drawing-title">Fantôme</div>
+                    </a>
+                </li>
+                <li class="drawing-card coming-soon-card">
+                    <div class="drawing-title">
+                        <strong>Art & Outils d'écriture :</strong><br>
+                        Compas magnétique • Règle • Boîte de peinture • Crayon de couleur • Peintures • Collage • Stylo
+                        • Taille-crayon • Compas • Encrier • Parchemin • Cahier • Journaux • Magazines • Graphiques •
+                        Affiches • Journal intime • Toile • Chevalet
+                        <br><br>
+                        Bientôt disponible...
+                    </div>
+                </li>
+                <li class="drawing-card coming-soon-card">
+                    <div class="drawing-title">
+                        <strong>Maison & Jardin :</strong><br>
+                        Jardin • Plantes • Arrosoir • Tuyau d'arrosage • Couette • Drap de lit • Balai • Rideau • Pot de
+                        fleurs • Bouquet • Terrasse • Balcon • Cuisine • Cuisinière • Cheminée • Robinet • Salon • Salle
+                        à manger • Chambre • Cave • Igloo • Péniche • Lit • Oreiller • Maison • Toit • Plafond •
+                        Tondeuse à gazon • Bureau • Cour • Pièce • Ventilateur • Aérateur • Canapé • Pompe à main •
+                        Garage • Égout
+                        <br><br>
+                        Bientôt disponible...
+                    </div>
+                </li>
+                <li class="drawing-card coming-soon-card">
+                    <div class="drawing-title">
+                        <strong>Éducation & Loisirs :</strong><br>
+                        École • Salle de classe • Brosse à tableau • Cour de récréation • Balançoire à bascule • Manège
+                        • Foire • Scène • Théâtre • Parc • Parcs d'attractions • Grande roue • Toboggans aquatiques •
+                        Montagnes russes • Balançoires • Toboggans • Piscine • Bibliothèque
+                        <br><br>
+                        Bientôt disponible...
+                    </div>
+                </li>
+                <li class="drawing-card coming-soon-card">
+                    <div class="drawing-title">
+                        <strong>Cuisine & Repas :</strong><br>
+                        Ustensile • Couverts • Fourchette • Cuillère • Couteau • Ciseaux • Béchers • Entonnoirs •
+                        Bouchon • Agitateur • Diapason • Fer à repasser • Mixeur • Filet • Panier • Paquet • Sac •
+                        Théière • Gourde • Kit de pique-nique • Cruche • Pain • Cookies • Biscuits • Bonbons • Jus •
+                        Glace • Sandwich • Sel • Sucre • Pop-corn
+                        <br><br>
+                        Bientôt disponible...
+                    </div>
+                </li>
+                <li class="drawing-card coming-soon-card">
+                    <div class="drawing-title">
+                        <strong>Vêtements & Textiles :</strong><br>
+                        Laine • Aiguilles à tricoter • Cache-nez • Bobine • Cravate • Écharpe • T-shirt • Pantoufles •
+                        Chaussures • Casquette • Chapeau • Imperméable • Cintre
+                        <br><br>
+                        Bientôt disponible...
+                    </div>
+                </li>
+                <li class="drawing-card coming-soon-card">
+                    <div class="drawing-title">
+                        <strong>Sports & Jeux :</strong><br>
+                        Flèche • Arc • Nœud papillon • Ballon • Balle de tennis • Raquette de badminton • Ballon de
+                        football • Volant • Vélo • Patins • Basketball • Pièces d'échecs • Puzzle
+                        <br><br>
+                        Bientôt disponible...
+                    </div>
+                </li>
+                <li class="drawing-card coming-soon-card">
+                    <div class="drawing-title">
+                        <strong>Musique & Divertissement :</strong><br>
+                        Guitare • Trompette • Violon • Tambour • Flûte • Pupitre • Cassette vidéo • Cassette audio •
+                        Ordinateur portable • Casque audio • Haut-parleurs • Microphone
+                        <br><br>
+                        Bientôt disponible...
+                    </div>
+                </li>
+                <li class="drawing-card coming-soon-card">
+                    <div class="drawing-title">
+                        <strong>Instruments optiques :</strong><br>
+                        Télescope • Microscope • Jumelles • Kaléidoscope • Lunettes • Appareil photo
+                        <br><br>
+                        Bientôt disponible...
+                    </div>
+                </li>
+                <li class="drawing-card coming-soon-card">
+                    <div class="drawing-title">
+                        <strong>Infrastructure urbaine :</strong><br>
+                        Magasin • Centre commercial • Marché • Lampadaire • Lanterne • Lustre • Trottoir • Cloche • Cage
+                        • Tunnel • Fauteuil roulant • Fauteuil à bascule • Tabouret • Ancre • Panneau d'affichage •
+                        Téléphone • Cabine téléphonique • Lignes téléphoniques • Téléphone portable • Poulie • Feux de
+                        circulation • Poteaux électriques • Lignes électriques • Prise • Fil • Socket • Interrupteur •
+                        Rond-point • Carrefour • Ordinateur • Tente • Statue • Bois flotté • Jetée • Grue • Brise-lames
+                        • Portail • Sac • Boîte • Pavés • Chemin pavé • Boîte aux lettres • Boîte à lettres • Cadenas •
+                        Clé • Masque
+                        <br><br>
+                        Bientôt disponible...
+                    </div>
+                </li>
+                <li class="drawing-card coming-soon-card">
+                    <div class="drawing-title">
+                        <strong>Architecture & Structures :</strong><br>
+                        Cabane dans les arbres • Chariot • Palais • Fort • Château • Bâtiments • Village • Ville • Cité
+                        • Appartement • Balcon • Ruines • Escalier extérieur • Escalier intérieur • Escalier en
+                        colimaçon • Moulin à vent • Ascenseur • Tour • Passerelle • Voies ferrées • Quais • Phare •
+                        Drapeau (droit) • Drapeau (au vent) • Sapin de Noël • Étoile • Décoration • Crèche de Noël •
+                        Mangeoire
+                        <br><br>
+                        Bientôt disponible...
+                    </div>
+                </li>
+                <li class="drawing-card coming-soon-card">
+                    <div class="drawing-title">
+                        <strong>Transports :</strong><br>
+                        Train • Voitures • Bus • Fourgonnette • Camion • Moto • Arrêt de bus • Yacht • Bâtons de ski •
+                        Petites rivières et petits ponts • Directions (route) • Route sur falaise • Sentier • Routes
+                        sinueuses (collines, plaines) • Routes descendantes • Routes montantes • Tunnel • Tube •
+                        Chariots de légumes
+                        <br><br>
+                        Bientôt disponible...
+                    </div>
+                </li>
+                <li class="drawing-card coming-soon-card">
+                    <div class="drawing-title">
+                        <strong>Divers & Outils :</strong><br>
+                        Machines et outils • Fichiers et dossiers • Pneus • Brosse à dents • Dentifrice • Jouet •
+                        Voiture jouet • Ours en peluche • Train jouet • Toupie • Champs • Céréales • Tracteur •
+                        Épouvantail • Carte de vœux • Chaîne • Poteau • Bouteille • Peigne • Feuilles de papier •
+                        Montgolfières • Panier sur le dos • Bouquet de ballons • Ruban de cadeau • Calendrier • Valise •
+                        Mallette • Tapis • Lettres • Bulletin de vote
+                        <br><br>
+                        Bientôt disponible...
+                    </div>
+                </li>
+            </ul>
+        </main>
+    </body>
+
+</html>

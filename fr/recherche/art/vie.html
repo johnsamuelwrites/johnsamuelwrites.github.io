@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html lang="en">
+
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta http-equiv="Content-Language" content="en" />
+        <link rel="shortcut icon" href="../../../images/logo/favicon.png" />
+        <title>Projet Dessin - Vie : John Samuel</title>
+        <style type="text/css">
+            * {
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
+            }
+
+            :root {
+                --canvas-cream: #FAF7F0;
+                --charcoal: #2C2C2C;
+                --sketch-blue: #4A90B8;
+                --watercolor-blue: #7FB3D5;
+                --artistic-orange: #E8A87C;
+                --soft-peach: #F5D5C0;
+                --gallery-gray: #E8E4DF;
+                --memory-purple: #9B8FB5;
+                --life-green: #6B9E78;
+            }
+
+            body {
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+                background: linear-gradient(135deg, var(--canvas-cream) 0%, #FEFCF8 100%);
+                color: var(--charcoal);
+                line-height: 1.7;
+                min-height: 100vh;
+            }
+
+            /* Navigation */
+            nav {
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                background: rgba(250, 247, 240, 0.95);
+                -webkit-backdrop-filter: blur(12px);
+                backdrop-filter: blur(12px);
+                border-bottom: 2px solid var(--gallery-gray);
+                padding: 1.2rem 2rem;
+                z-index: 1000;
+                box-shadow: 0 2px 20px rgba(74, 144, 184, 0.08);
+            }
+
+            nav ul {
+                list-style: none;
+                display: flex;
+                gap: 1.5rem;
+                align-items: center;
+                flex-wrap: wrap;
+            }
+
+            nav a {
+                text-decoration: none;
+                color: var(--charcoal);
+                font-weight: 500;
+                transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+                padding: 0.5rem 1rem;
+                border-radius: 8px;
+                position: relative;
+            }
+
+            nav a::after {
+                content: '';
+                position: absolute;
+                bottom: 0;
+                left: 50%;
+                width: 0;
+                height: 2px;
+                background: var(--sketch-blue);
+                transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+                transform: translateX(-50%);
+            }
+
+            nav a:hover {
+                color: var(--sketch-blue);
+                background: rgba(74, 144, 184, 0.08);
+            }
+
+            nav a:hover::after {
+                width: 80%;
+            }
+
+            /* Header Section */
+            .header-section {
+                margin-top: 5rem;
+                padding: 3rem 2rem;
+                text-align: center;
+                background: white;
+                border-bottom: 3px solid var(--gallery-gray);
+                position: relative;
+                overflow: hidden;
+            }
+
+            .header-section::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 6px;
+                background: linear-gradient(90deg, var(--life-green), var(--sketch-blue), var(--artistic-orange));
+            }
+
+            .header-section h1 {
+                font-size: 3rem;
+                font-weight: 800;
+                color: var(--charcoal);
+                letter-spacing: -0.02em;
+                margin-bottom: 0.5rem;
+            }
+
+            .header-section h1::after {
+                content: '';
+                display: block;
+                width: 100px;
+                height: 3px;
+                background: linear-gradient(90deg, var(--life-green), var(--sketch-blue));
+                margin: 1rem auto;
+                border-radius: 2px;
+            }
+
+            .header-section h3 {
+                font-size: 1.3rem;
+                font-weight: 500;
+                color: var(--life-green);
+                font-style: italic;
+            }
+
+            /* Main Content */
+            main {
+                max-width: 1400px;
+                margin: 0 auto;
+                padding: 3rem 2rem 6rem;
+            }
+
+            /* Drawing Gallery Grid */
+            .drawing-gallery {
+                display: grid;
+                grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+                gap: 2rem;
+                list-style: none;
+            }
+
+            .drawing-card {
+                background: white;
+                border-radius: 20px;
+                overflow: hidden;
+                position: relative;
+                border: 2px solid var(--gallery-gray);
+                transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+                box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+            }
+
+            .drawing-card::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background: linear-gradient(135deg,
+                        rgba(107, 158, 120, 0.05) 0%,
+                        rgba(74, 144, 184, 0.05) 100%);
+                opacity: 0;
+                transition: opacity 0.4s ease;
+                pointer-events: none;
+            }
+
+            .drawing-card:hover {
+                transform: translateY(-12px) scale(1.02);
+                box-shadow: 0 20px 40px rgba(107, 158, 120, 0.2);
+                border-color: var(--life-green);
+            }
+
+            .drawing-card:hover::before {
+                opacity: 1;
+            }
+
+            .drawing-card a {
+                text-decoration: none;
+                color: inherit;
+                display: block;
+            }
+
+            .drawing-image {
+                width: 100%;
+                height: 280px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                background: var(--canvas-cream);
+                padding: 2rem;
+                position: relative;
+                overflow: hidden;
+            }
+
+            .drawing-image::after {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background:
+                    repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(107, 158, 120, 0.03) 2px, rgba(107, 158, 120, 0.03) 4px),
+                    repeating-linear-gradient(90deg, transparent, transparent 2px, rgba(107, 158, 120, 0.03) 2px, rgba(107, 158, 120, 0.03) 4px);
+                opacity: 0;
+                transition: opacity 0.4s ease;
+                pointer-events: none;
+            }
+
+            .drawing-card:hover .drawing-image::after {
+                opacity: 1;
+            }
+
+            .drawing-image img {
+                max-width: 100%;
+                max-height: 100%;
+                object-fit: contain;
+                transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+                filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.1));
+            }
+
+            .drawing-card:hover .drawing-image img {
+                transform: scale(1.08) rotate(2deg);
+            }
+
+            .drawing-title {
+                padding: 1.5rem;
+                background: white;
+                font-size: 1.1rem;
+                font-weight: 600;
+                color: var(--charcoal);
+                text-align: center;
+                transition: all 0.3s ease;
+                line-height: 1.5;
+            }
+
+            .drawing-card:hover .drawing-title {
+                color: var(--life-green);
+            }
+
+            /* Coming Soon Card */
+            .coming-soon-card {
+                background: linear-gradient(135deg, var(--canvas-cream) 0%, #E8F5E1 100%);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                min-height: 400px;
+                border: 2px dashed var(--life-green);
+                opacity: 0.7;
+            }
+
+            .coming-soon-card .drawing-title {
+                background: transparent;
+                color: var(--charcoal);
+                font-size: 0.95rem;
+                font-style: italic;
+                padding: 2rem;
+                line-height: 1.8;
+            }
+
+            .coming-soon-card:hover {
+                transform: none;
+                opacity: 0.85;
+            }
+
+            /* Responsive Design */
+            @media (max-width: 768px) {
+                .header-section h1 {
+                    font-size: 2rem;
+                }
+
+                .header-section h3 {
+                    font-size: 1.1rem;
+                }
+
+                nav {
+                    padding: 1rem;
+                }
+
+                nav ul {
+                    gap: 0.8rem;
+                }
+
+                .drawing-gallery {
+                    grid-template-columns: 1fr;
+                    gap: 1.5rem;
+                }
+            }
+        </style>
+    </head>
+
+    <body vocab="http://schema.org/">
+        <nav>
+            <ul typeof="BreadcrumbList">
+                <li property="itemListElement" typeof="ListItem">
+                    <a property="item" typeof="WebPage" href="../../index.html">
+                        <span property="name">Accueil</span>
+                    </a>
+                </li>
+                <li property="itemListElement" typeof="ListItem">
+                    <a property="item" typeof="WebPage" href="../../recherche/recherche.html">
+                        <span property="name">Recherche</span>
+                    </a>
+                </li>
+                <li property="itemListElement" typeof="ListItem">
+                    <a property="item" typeof="WebPage" href="../../recherche/dessin.html">
+                        <span property="name">Projet Dessin</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+
+        <div class="header-section">
+            <h1>Vie</h1>
+            <h3>Célébrer la diversité des formes de vie</h3>
+        </div>
+
+        <main>
+            <ul class="drawing-gallery">
+                <li class="drawing-card">
+                    <a href="../art/pomme.html">
+                        <div class="drawing-image">
+                            <img src="../../../images/art/apple-ellipse-tilted-union.svg" alt="Pomme">
+                        </div>
+                        <div class="drawing-title">Pomme</div>
+                    </a>
+                </li>
+                <li class="drawing-card">
+                    <a href="../art/mangue.html">
+                        <div class="drawing-image">
+                            <img src="../../../images/art/mango.svg" alt="Mangue">
+                        </div>
+                        <div class="drawing-title">Mangue</div>
+                    </a>
+                </li>
+                <li class="drawing-card">
+                    <a href="../art/raisin.html">
+                        <div class="drawing-image">
+                            <img src="../../../images/art/grape-circles-rearranged.svg" alt="Raisin">
+                        </div>
+                        <div class="drawing-title">Raisin</div>
+                    </a>
+                </li>
+                <li class="drawing-card">
+                    <a href="../art/fleur-avec-cercle.html">
+                        <div class="drawing-image">
+                            <img src="../../../images/art/flower-arc.svg" alt="Fleurs avec des cercles">
+                        </div>
+                        <div class="drawing-title">Fleurs avec des cercles</div>
+                    </a>
+                </li>
+                <li class="drawing-card">
+                    <a href="../art/bouton-de-fleur.html">
+                        <div class="drawing-image">
+                            <img src="../../../images/art/flower-bud.svg" alt="Bouton de fleur">
+                        </div>
+                        <div class="drawing-title">Bouton de fleur</div>
+                    </a>
+                </li>
+                <li class="drawing-card">
+                    <a href="../art/oignon.html">
+                        <div class="drawing-image">
+                            <img src="../../../images/art/onion.svg" alt="Oignon">
+                        </div>
+                        <div class="drawing-title">Oignon</div>
+                    </a>
+                </li>
+                <li class="drawing-card">
+                    <a href="../art/ail.html">
+                        <div class="drawing-image">
+                            <img src="../../../images/art/garlic.svg" alt="Ail">
+                        </div>
+                        <div class="drawing-title">Ail</div>
+                    </a>
+                </li>
+                <li class="drawing-card">
+                    <a href="../art/concombre.html">
+                        <div class="drawing-image">
+                            <img src="../../../images/art/cucumber.svg" alt="Concombre">
+                        </div>
+                        <div class="drawing-title">Concombre</div>
+                    </a>
+                </li>
+                <li class="drawing-card">
+                    <a href="../art/courgette.html">
+                        <div class="drawing-image">
+                            <img src="../../../images/art/zucchini.svg" alt="Courgette">
+                        </div>
+                        <div class="drawing-title">Courgette</div>
+                    </a>
+                </li>
+                <li class="drawing-card">
+                    <a href="../art/citrouille.html">
+                        <div class="drawing-image">
+                            <img src="../../../images/art/pumpkin-morelines.svg" alt="Citrouille">
+                        </div>
+                        <div class="drawing-title">Citrouille</div>
+                    </a>
+                </li>
+                <li class="drawing-card">
+                    <a href="../art/carotte.html">
+                        <div class="drawing-image">
+                            <img src="../../../images/art/carrot.svg" alt="Carotte">
+                        </div>
+                        <div class="drawing-title">Carotte</div>
+                    </a>
+                </li>
+                <li class="drawing-card">
+                    <a href="../art/aubergine.html">
+                        <div class="drawing-image">
+                            <img src="../../../images/art/brinjal.svg" alt="Aubergine">
+                        </div>
+                        <div class="drawing-title">Aubergine</div>
+                    </a>
+                </li>
+                <li class="drawing-card">
+                    <a href="../art/arbre.html">
+                        <div class="drawing-image">
+                            <img src="../../../images/art/tree-with-leaves.svg" alt="Arbre">
+                        </div>
+                        <div class="drawing-title">Arbre</div>
+                    </a>
+                </li>
+                <li class="drawing-card">
+                    <a href="../art/pin.html">
+                        <div class="drawing-image">
+                            <img src="../../../images/art/pine-tree-curved-cutout.svg" alt="Pin">
+                        </div>
+                        <div class="drawing-title">Pin</div>
+                    </a>
+                </li>
+                <li class="drawing-card">
+                    <a href="../art/bambou.html">
+                        <div class="drawing-image">
+                            <img src="../../../images/art/bamboo-sideview.svg" alt="Bambou">
+                        </div>
+                        <div class="drawing-title">Bambou</div>
+                    </a>
+                </li>
+                <li class="drawing-card">
+                    <a href="../art/feuille.html">
+                        <div class="drawing-image">
+                            <img src="../../../images/art/leaf.svg" alt="Feuille">
+                        </div>
+                        <div class="drawing-title">Feuille</div>
+                    </a>
+                </li>
+                <li class="drawing-card">
+                    <a href="../art/cocotier.html">
+                        <div class="drawing-image">
+                            <img src="../../../images/art/coconut-tree-composition.svg" alt="Cocotier">
+                        </div>
+                        <div class="drawing-title">Cocotier</div>
+                    </a>
+                </li>
+                <li class="drawing-card">
+                    <a href="../art/toile-d'araignée.html">
+                        <div class="drawing-image">
+                            <img src="../../../images/art/cobweb.svg" alt="Toile d'araignée">
+                        </div>
+                        <div class="drawing-title">Toile d'araignée</div>
+                    </a>
+                </li>
+                <li class="drawing-card">
+                    <a href="../art/œuf.html">
+                        <div class="drawing-image">
+                            <img src="../../../images/art/egg.svg" alt="Œuf">
+                        </div>
+                        <div class="drawing-title">Œuf</div>
+                    </a>
+                </li>
+                <li class="drawing-card">
+                    <a href="../art/poisson.html">
+                        <div class="drawing-image">
+                            <img src="../../../images/art/fish-with-tail.svg" alt="Poisson">
+                        </div>
+                        <div class="drawing-title">Poisson</div>
+                    </a>
+                </li>
+                <li class="drawing-card">
+                    <a href="../art/champignon.html">
+                        <div class="drawing-image">
+                            <img src="../../../images/art/mushroom-bottom-view.svg" alt="Champignon">
+                        </div>
+                        <div class="drawing-title">Champignon</div>
+                    </a>
+                </li>
+                <li class="drawing-card">
+                    <a href="../art/vie/plante.html">
+                        <div class="drawing-image">
+                            <img src="../../../images/art/life/plant-basic.svg" alt="Plante">
+                        </div>
+                        <div class="drawing-title">Plante</div>
+                    </a>
+                </li>
+                <li class="drawing-card">
+                    <a href="../art/vie/rat.html">
+                        <div class="drawing-image">
+                            <img src="../../../images/art/rat-shape.svg" alt="Rat">
+                        </div>
+                        <div class="drawing-title">Rat</div>
+                    </a>
+                </li>
+                <li class="drawing-card">
+                    <a href="../art/nature/tronc-d'arbre.html">
+                        <div class="drawing-image">
+                            <img src="../../../images/art/nature/tree-trunk.svg" alt="Tronc d'arbre">
+                        </div>
+                        <div class="drawing-title">Tronc d'arbre</div>
+                    </a>
+                </li>
+                <li class="drawing-card">
+                    <a href="../art/nature/épine.html">
+                        <div class="drawing-image">
+                            <img src="../../../images/art/nature/thorn.svg" alt="Épine">
+                        </div>
+                        <div class="drawing-title">Épine</div>
+                    </a>
+                </li>
+                <li class="drawing-card coming-soon-card">
+                    <div class="drawing-title">
+                        <strong>Flore :</strong> Végétation • Banane • Cactus • Pissenlit • Noix de coco • Racine
+                        aérienne • Vigne • Bosquet • Ombre d'arbre • Ananas • Orange • Fraise • Grenade • Vigne à
+                        raisins • Jacquier • Goyave • Poire • Pastèque • Melon • Fruits • Guirlande • Verger • Rose •
+                        Tournesol • Lys • Lotus • Jasmin • Hibiscus • Orchidée • Légumes • Poivre • Poivron • Tomate •
+                        Gingembre • Haricots • Radis • Pomme de terre • Épinards • Petits pois • Chou-fleur • Chou •
+                        Canne à sucre • Céréales • Riz • Blé • Maïs • Roseau
+                        <br><br>
+                        Bientôt disponible...
+                    </div>
+                </li>
+                <li class="drawing-card coming-soon-card">
+                    <div class="drawing-title">
+                        <strong>Faune :</strong> Éléphant • Chameau • Cheval • Âne • Chien • Loup • Chat • Rhinocéros •
+                        Lapin • Lion • Girafe • Tigre • Léopard • Hippopotame • Crocodile • Alligator • Caméléon • Singe
+                        • Zèbre • Dinosaure • Cerf • Souris • Dauphin • Baleine • Manchot • Renard • Ours • Écureuil •
+                        Grenouille • Chenille • Canard • Cygne • Poule • Coq • Paon • Moineau • Corbeau • Coucou •
+                        Autruche • Piquant • Plume • Ailes • Vache • Taureau • Chèvre • Mouton • Tortue • Escargot •
+                        Étoile de mer • Hippocampe • Sardine • Requin • Pieuvre • Cafard • Abeille • Rayon de miel •
+                        Goéland • Chouette • Chauve-souris • Pigeon • Colombe • Feuille d'olivier • Pic • Fourmi • Nid
+                        d'oiseau • Luciole • Coccinelle • Sauterelle • Grillons • Papillon • Libellule • Amibe •
+                        Paramécie • Araignée • Vers de terre • Oiseaux en vol • Nid • Perroquet
+                        <br><br>
+                        Bientôt disponible...
+                    </div>
+                </li>
+            </ul>
+        </main>
+    </body>
+
+</html>

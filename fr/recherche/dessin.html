@@ -1,0 +1,833 @@
+<!DOCTYPE html>
+<html lang="en">
+
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta http-equiv="Content-Language" content="en">
+        <link rel="shortcut icon" href="../../images/logo/favicon.png" />
+        <title>Project Drawing-A Retrospective: John Samuel</title>
+        <style>
+            * {
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
+            }
+
+            :root {
+                --canvas-cream: #FAF7F0;
+                --charcoal: #2C2C2C;
+                --sketch-blue: #4A90B8;
+                --watercolor-blue: #7FB3D5;
+                --artistic-orange: #E8A87C;
+                --soft-peach: #F5D5C0;
+                --gallery-gray: #E8E4DF;
+                --memory-purple: #9B8FB5;
+            }
+
+            body {
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+                background: linear-gradient(135deg, var(--canvas-cream) 0%, #FEFCF8 100%);
+                color: var(--charcoal);
+                line-height: 1.7;
+                min-height: 100vh;
+            }
+
+            /* Navigation */
+            nav {
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                background: rgba(250, 247, 240, 0.95);
+                -webkit-backdrop-filter: blur(12px);
+                backdrop-filter: blur(12px);
+                border-bottom: 2px solid var(--gallery-gray);
+                padding: 1.2rem 2rem;
+                z-index: 1000;
+                box-shadow: 0 2px 20px rgba(74, 144, 184, 0.08);
+            }
+
+            nav ul {
+                list-style: none;
+                display: flex;
+                gap: 1.5rem;
+                align-items: center;
+            }
+
+            nav li {
+                position: relative;
+            }
+
+            nav li:first-child {
+                font-weight: 700;
+                color: var(--sketch-blue);
+                font-size: 1.1rem;
+                letter-spacing: -0.01em;
+            }
+
+            nav a {
+                text-decoration: none;
+                color: var(--charcoal);
+                font-weight: 500;
+                transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+                padding: 0.5rem 1rem;
+                border-radius: 8px;
+                position: relative;
+            }
+
+            nav a::after {
+                content: '';
+                position: absolute;
+                bottom: 0;
+                left: 50%;
+                width: 0;
+                height: 2px;
+                background: var(--sketch-blue);
+                transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+                transform: translateX(-50%);
+            }
+
+            nav a:hover {
+                color: var(--sketch-blue);
+                background: rgba(74, 144, 184, 0.08);
+            }
+
+            nav a:hover::after {
+                width: 80%;
+            }
+
+            /* Hero Section */
+            .hero {
+                margin-top: 5rem;
+                padding: 4rem 2rem;
+                text-align: center;
+                position: relative;
+                overflow: hidden;
+            }
+
+            .hero::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                height: 300px;
+                background: radial-gradient(ellipse at top, rgba(127, 179, 213, 0.15), transparent);
+                pointer-events: none;
+            }
+
+            .hero h1 {
+                font-size: 4rem;
+                font-weight: 800;
+                color: var(--charcoal);
+                letter-spacing: -0.03em;
+                margin-bottom: 1rem;
+                position: relative;
+                z-index: 1;
+            }
+
+            .hero h1::after {
+                content: '';
+                display: block;
+                width: 120px;
+                height: 4px;
+                background: linear-gradient(90deg, var(--sketch-blue), var(--artistic-orange));
+                margin: 1.5rem auto;
+                border-radius: 2px;
+            }
+
+            .hero h2 {
+                font-size: 1.8rem;
+                font-weight: 500;
+                color: var(--sketch-blue);
+                margin-bottom: 1rem;
+                font-style: italic;
+            }
+
+            .hero .author {
+                font-size: 1.3rem;
+                color: var(--memory-purple);
+                font-weight: 600;
+                margin-bottom: 2rem;
+            }
+
+            .hero-svg {
+                max-width: 500px;
+                margin: 3rem auto;
+                filter: drop-shadow(0 10px 30px rgba(74, 144, 184, 0.15));
+            }
+
+            /* Main Content */
+            main {
+                max-width: 1400px;
+                margin: 0 auto;
+                padding: 3rem 2rem 6rem;
+            }
+
+            .intro-section {
+                background: white;
+                border-radius: 24px;
+                padding: 3rem;
+                margin-bottom: 4rem;
+                box-shadow: 0 4px 30px rgba(0, 0, 0, 0.08);
+                border: 2px solid var(--gallery-gray);
+                position: relative;
+                overflow: hidden;
+            }
+
+            .intro-section::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 6px;
+                background: linear-gradient(90deg, var(--sketch-blue), var(--artistic-orange), var(--memory-purple));
+            }
+
+            .intro-section h3 {
+                font-size: 2rem;
+                color: var(--sketch-blue);
+                margin-bottom: 1.5rem;
+                font-weight: 700;
+            }
+
+            .intro-section h4 {
+                font-size: 1.4rem;
+                color: var(--charcoal);
+                margin: 2rem 0 1rem;
+                font-weight: 600;
+                display: flex;
+                align-items: center;
+                gap: 0.5rem;
+            }
+
+            .intro-section h4::before {
+                content: '◆';
+                color: var(--artistic-orange);
+                font-size: 0.8em;
+            }
+
+            .intro-section ul {
+                list-style: none;
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+                gap: 1rem;
+                margin-top: 1rem;
+            }
+
+            .intro-section li a {
+                display: block;
+                padding: 1rem 1.5rem;
+                background: var(--canvas-cream);
+                border-radius: 12px;
+                text-decoration: none;
+                color: var(--charcoal);
+                font-weight: 500;
+                transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+                border: 2px solid transparent;
+            }
+
+            .intro-section li a:hover {
+                background: white;
+                border-color: var(--sketch-blue);
+                transform: translateX(5px);
+                box-shadow: 0 4px 12px rgba(74, 144, 184, 0.15);
+            }
+
+            /* Category Sections */
+            .category-section {
+                margin-bottom: 5rem;
+            }
+
+            .category-header {
+                text-align: center;
+                margin-bottom: 3rem;
+                position: relative;
+            }
+
+            .category-header h3 {
+                font-size: 2.5rem;
+                font-weight: 700;
+                color: var(--charcoal);
+                letter-spacing: -0.02em;
+                display: inline-block;
+                position: relative;
+                padding: 0 2rem;
+            }
+
+            .category-header h3::before,
+            .category-header h3::after {
+                content: '';
+                position: absolute;
+                top: 50%;
+                width: 60px;
+                height: 2px;
+                background: linear-gradient(90deg, transparent, var(--artistic-orange));
+            }
+
+            .category-header h3::before {
+                right: 100%;
+                transform: translateY(-50%);
+            }
+
+            .category-header h3::after {
+                left: 100%;
+                background: linear-gradient(90deg, var(--artistic-orange), transparent);
+                transform: translateY(-50%);
+            }
+
+            /* Drawing Gallery Grid */
+            .drawing-gallery {
+                display: grid;
+                grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+                gap: 2rem;
+                list-style: none;
+            }
+
+            .drawing-card {
+                background: white;
+                border-radius: 20px;
+                overflow: hidden;
+                position: relative;
+                border: 2px solid var(--gallery-gray);
+                transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+                box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+            }
+
+            .drawing-card::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background: linear-gradient(135deg,
+                        rgba(74, 144, 184, 0.05) 0%,
+                        rgba(232, 168, 124, 0.05) 100%);
+                opacity: 0;
+                transition: opacity 0.4s ease;
+                pointer-events: none;
+            }
+
+            .drawing-card:hover {
+                transform: translateY(-12px) scale(1.02);
+                box-shadow: 0 20px 40px rgba(74, 144, 184, 0.2);
+                border-color: var(--sketch-blue);
+            }
+
+            .drawing-card:hover::before {
+                opacity: 1;
+            }
+
+            .drawing-card a {
+                text-decoration: none;
+                color: inherit;
+                display: block;
+            }
+
+            .drawing-image {
+                width: 100%;
+                height: 280px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                background: var(--canvas-cream);
+                padding: 2rem;
+                position: relative;
+                overflow: hidden;
+            }
+
+            .drawing-image::after {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background:
+                    repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(74, 144, 184, 0.03) 2px, rgba(74, 144, 184, 0.03) 4px),
+                    repeating-linear-gradient(90deg, transparent, transparent 2px, rgba(74, 144, 184, 0.03) 2px, rgba(74, 144, 184, 0.03) 4px);
+                opacity: 0;
+                transition: opacity 0.4s ease;
+                pointer-events: none;
+            }
+
+            .drawing-card:hover .drawing-image::after {
+                opacity: 1;
+            }
+
+            .drawing-image img {
+                max-width: 100%;
+                max-height: 100%;
+                object-fit: contain;
+                transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+                filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.1));
+            }
+
+            .drawing-card:hover .drawing-image img {
+                transform: scale(1.08) rotate(2deg);
+            }
+
+            .drawing-title {
+                padding: 1.5rem;
+                background: white;
+                font-size: 1.2rem;
+                font-weight: 600;
+                color: var(--charcoal);
+                text-align: center;
+                transition: all 0.3s ease;
+            }
+
+            .drawing-card:hover .drawing-title {
+                color: var(--sketch-blue);
+            }
+
+            /* Special "See More" Card */
+            .see-more-card {
+                background: linear-gradient(135deg, var(--sketch-blue) 0%, var(--memory-purple) 100%);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                min-height: 400px;
+                border: none;
+            }
+
+            .see-more-card .drawing-title {
+                background: transparent;
+                color: white;
+                font-size: 1.5rem;
+                padding: 0;
+            }
+
+            .see-more-card:hover .drawing-title {
+                color: white;
+                transform: scale(1.1);
+            }
+
+            /* Conclusion */
+            .conclusion {
+                text-align: center;
+                margin-top: 4rem;
+                padding: 3rem;
+                background: white;
+                border-radius: 24px;
+                box-shadow: 0 4px 30px rgba(0, 0, 0, 0.08);
+                border: 2px solid var(--gallery-gray);
+            }
+
+            .conclusion a {
+                display: inline-block;
+                padding: 1.2rem 3rem;
+                background: linear-gradient(135deg, var(--sketch-blue), var(--memory-purple));
+                color: white;
+                text-decoration: none;
+                border-radius: 50px;
+                font-weight: 600;
+                font-size: 1.2rem;
+                transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+                box-shadow: 0 4px 20px rgba(74, 144, 184, 0.3);
+            }
+
+            .conclusion a:hover {
+                transform: translateY(-3px);
+                box-shadow: 0 8px 30px rgba(74, 144, 184, 0.4);
+            }
+
+            /* Responsive Design */
+            @media (max-width: 768px) {
+                .hero h1 {
+                    font-size: 2.5rem;
+                }
+
+                .hero h2 {
+                    font-size: 1.3rem;
+                }
+
+                nav {
+                    padding: 1rem;
+                }
+
+                nav ul {
+                    flex-wrap: wrap;
+                    gap: 0.8rem;
+                }
+
+                .category-header h3 {
+                    font-size: 1.8rem;
+                }
+
+                .category-header h3::before,
+                .category-header h3::after {
+                    width: 30px;
+                }
+
+                .drawing-gallery {
+                    grid-template-columns: 1fr;
+                    gap: 1.5rem;
+                }
+
+                .intro-section {
+                    padding: 2rem;
+                }
+
+                .intro-section ul {
+                    grid-template-columns: 1fr;
+                }
+            }
+
+            /* Animation keyframes */
+            @keyframes float {
+
+                0%,
+                100% {
+                    transform: translateY(0) rotate(0deg);
+                }
+
+                50% {
+                    transform: translateY(-15px) rotate(5deg);
+                }
+            }
+
+            @keyframes sway {
+
+                0%,
+                100% {
+                    transform: translateX(0) rotate(0deg);
+                }
+
+                50% {
+                    transform: translateX(10px) rotate(3deg);
+                }
+            }
+
+            @keyframes morph {
+
+                0%,
+                100% {
+                    border-radius: 60% 40% 50% 50%;
+                }
+
+                50% {
+                    border-radius: 40% 60% 40% 60%;
+                }
+            }
+
+            @keyframes sketch {
+
+                0%,
+                100% {
+                    stroke-dashoffset: 0;
+                }
+
+                50% {
+                    stroke-dashoffset: 100;
+                }
+            }
+        </style>
+    </head>
+
+    <body vocab="http://schema.org/">
+        <nav>
+            <ul typeof="BreadcrumbList">
+                <li property="itemListElement" typeof="ListItem">John Samuel</li>
+                <li property="itemListElement" typeof="ListItem">
+                    <a property="item" typeof="WebPage" href="../index.html">
+                        <span property="name">Accueil</span>
+                    </a>
+                </li>
+                <li property="itemListElement" typeof="ListItem">
+                    <a property="item" typeof="WebPage" href="../recherche/recherche.html">
+                        <span property="name">Recherche</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+
+        <div class="hero">
+            <h1>Projet Dessin</h1>
+            <h2>Redécouvrir les souvenirs de vie avec SVG et Inkscape</h2>
+            <p class="author">Une Rétrospective par John Samuel</p>
+
+            <svg class="hero-svg" viewbox="0 0 500 400" xmlns="http://www.w3.org/2000/svg">
+                <!-- Canvas background -->
+                <rect x="20" y="30" width="460" height="340" fill="#FAF7F0" stroke="#E8E4DF" stroke-width="3" rx="12" />
+
+                <!-- Sketched memory fragments -->
+                <g opacity="0.3">
+                    <circle cx="100" cy="100" r="25" fill="none" stroke="#4A90B8" stroke-width="2"
+                        stroke-dasharray="5,5">
+                        <animate attributename="r" values="25;28;25" dur="3s" repeatcount="indefinite" />
+                    </circle>
+                    <rect x="350" y="80" width="40" height="40" fill="none" stroke="#E8A87C" stroke-width="2"
+                        stroke-dasharray="5,5" transform="rotate(15 370 100)">
+                        <animatetransform attributename="transform" type="rotate"
+                            values="15 370 100;20 370 100;15 370 100" dur="4s" repeatcount="indefinite" />
+                    </rect>
+                    <polygon points="150,280 170,250 190,280" fill="none" stroke="#9B8FB5" stroke-width="2"
+                        stroke-dasharray="5,5">
+                        <animate attributename="opacity" values="0.3;0.6;0.3" dur="5s" repeatcount="indefinite" />
+                    </polygon>
+                </g>
+
+                <!-- Drawing pencil -->
+                <g style="animation: float 4s ease-in-out infinite;">
+                    <rect x="200" y="150" width="12" height="100" fill="#E8A87C" stroke="#2C2C2C" stroke-width="2"
+                        rx="2" />
+                    <polygon points="206,150 200,135 212,135" fill="#2C2C2C" />
+                    <rect x="200" y="220" width="12" height="30" fill="#F5D5C0" />
+                    <circle cx="206" cy="240" r="3" fill="#2C2C2C" />
+                </g>
+
+                <!-- Eraser -->
+                <g style="animation: sway 3.5s ease-in-out infinite;">
+                    <rect x="320" y="200" width="40" height="20" fill="#FFB6C6" stroke="#2C2C2C" stroke-width="2"
+                        rx="3" />
+                    <rect x="325" y="205" width="30" height="10" fill="#FFC9D9" opacity="0.6" />
+                </g>
+
+                <!-- Compass tool -->
+                <g style="animation: float 5s ease-in-out infinite;" transform="translate(0, -10)">
+                    <line x1="120" y1="220" x2="140" y2="260" stroke="#7FB3D5" stroke-width="3"
+                        stroke-linecap="round" />
+                    <line x1="120" y1="220" x2="100" y2="260" stroke="#7FB3D5" stroke-width="3"
+                        stroke-linecap="round" />
+                    <circle cx="120" cy="220" r="4" fill="#4A90B8" />
+                </g>
+
+                <!-- Ruler -->
+                <g opacity="0.8">
+                    <rect x="280" y="300" width="150" height="25" fill="#F5D5C0" stroke="#2C2C2C" stroke-width="2"
+                        rx="2" />
+                    <line x1="290" y1="300" x2="290" y2="315" stroke="#2C2C2C" stroke-width="1" />
+                    <line x1="310" y1="300" x2="310" y2="320" stroke="#2C2C2C" stroke-width="1" />
+                    <line x1="330" y1="300" x2="330" y2="315" stroke="#2C2C2C" stroke-width="1" />
+                    <line x1="350" y1="300" x2="350" y2="320" stroke="#2C2C2C" stroke-width="1" />
+                    <line x1="370" y1="300" x2="370" y2="315" stroke="#2C2C2C" stroke-width="1" />
+                    <line x1="390" y1="300" x2="390" y2="320" stroke="#2C2C2C" stroke-width="1" />
+                    <line x1="410" y1="300" x2="410" y2="315" stroke="#2C2C2C" stroke-width="1" />
+                </g>
+
+                <!-- Floating geometric shapes (memories) -->
+                <g opacity="0.5">
+                    <circle cx="400" cy="180" r="15" fill="#4A90B8" opacity="0.3">
+                        <animate attributename="cy" values="180;170;180" dur="3s" repeatcount="indefinite" />
+                    </circle>
+                    <rect x="70" y="300" width="20" height="20" fill="#E8A87C" opacity="0.3"
+                        transform="rotate(45 80 310)">
+                        <animatetransform attributename="transform" type="rotate" values="45 80 310;60 80 310;45 80 310"
+                            dur="4s" repeatcount="indefinite" />
+                    </rect>
+                    <polygon points="430,280 445,300 415,300" fill="#9B8FB5" opacity="0.3">
+                        <animate attributename="opacity" values="0.3;0.5;0.3" dur="4s" repeatcount="indefinite" />
+                    </polygon>
+                </g>
+
+                <!-- Sketched line -->
+                <path d="M 60 350 Q 150 340, 250 345 T 440 350" fill="none" stroke="#4A90B8" stroke-width="2"
+                    stroke-dasharray="5,3" opacity="0.4">
+                    <animate attributename="stroke-dashoffset" values="0;-50;0" dur="6s" repeatcount="indefinite" />
+                </path>
+            </svg>
+        </div>
+
+        <main>
+            <section class="intro-section">
+                <h3>Un voyage à travers la mémoire créative</h3>
+                <h4>Contexte</h4>
+                <ul>
+                    <li><a href="art/introduction.html">Introduction</a></li>
+                    <li><a href="art/dédicace.html">Dédicace</a></li>
+                    <li><a href="art/motivation.html">Motivation</a></li>
+                    <li><a href="art/logiciel.html">Outils logiciels</a></li>
+                    <li><a href="art/remerciements.html">Remerciements</a></li>
+                    <li><a href="art/références.html">Références</a></li>
+                </ul>
+            </section>
+
+            <section class="category-section">
+                <div class="category-header">
+                    <h3>Géométrie</h3>
+                </div>
+                <ul class="drawing-gallery">
+                    <li class="drawing-card">
+                        <a href="./art/formes-de-base.html">
+                            <div class="drawing-image">
+                                <img src="../../images/art/cube.svg" alt="Formes de base">
+                            </div>
+                            <div class="drawing-title">Triangle, Parallélogramme, Rectangle, Losange, Carrés, Cercle,
+                                Cubes, Parallélépipède, Cône</div>
+                        </a>
+                    </li>
+                    <li class="drawing-card">
+                        <a href="./art/polygone-régulier.html">
+                            <div class="drawing-image">
+                                <img src="../../images/art/hendecagon.svg" alt="Polygone régulier">
+                            </div>
+                            <div class="drawing-title">Polygone régulier</div>
+                        </a>
+                    </li>
+                    <li class="drawing-card">
+                        <a href="./art/polygone-étoilé.html">
+                            <div class="drawing-image">
+                                <img src="../../images/art/star-twelve-corners.svg" alt="Polygone étoilé">
+                            </div>
+                            <div class="drawing-title">Polygone étoilé</div>
+                        </a>
+                    </li>
+                    <li class="drawing-card see-more-card">
+                        <a href="./art/géométrie.html">
+                            <div class="drawing-title">Voir plus →</div>
+                        </a>
+                    </li>
+                </ul>
+            </section>
+
+            <section class="category-section">
+                <div class="category-header">
+                    <h3>Nature</h3>
+                </div>
+                <ul class="drawing-gallery">
+                    <li class="drawing-card">
+                        <a href="./art/soleil.html">
+                            <div class="drawing-image">
+                                <img src="../../images/art/sun-more-rays.svg" alt="Soleil">
+                            </div>
+                            <div class="drawing-title">Soleil</div>
+                        </a>
+                    </li>
+                    <li class="drawing-card">
+                        <a href="./art/nature/tempête.html">
+                            <div class="drawing-image">
+                                <img src="../../images/art/nature/storm.svg" alt="Tempête">
+                            </div>
+                            <div class="drawing-title">Tempête</div>
+                        </a>
+                    </li>
+                    <li class="drawing-card">
+                        <a href="./art/nature/drosera.html">
+                            <div class="drawing-image">
+                                <img src="../../images/art/nature/drosera.svg" alt="Drosera">
+                            </div>
+                            <div class="drawing-title">Drosera</div>
+                        </a>
+                    </li>
+                    <li class="drawing-card see-more-card">
+                        <a href="./art/nature.html">
+                            <div class="drawing-title">Voir plus →</div>
+                        </a>
+                    </li>
+                </ul>
+            </section>
+
+            <section class="category-section">
+                <div class="category-header">
+                    <h3>Vie</h3>
+                </div>
+                <ul class="drawing-gallery">
+                    <li class="drawing-card">
+                        <a href="./art/arbre.html">
+                            <div class="drawing-image">
+                                <img src="../../images/art/tree-with-leaves.svg" alt="Arbre">
+                            </div>
+                            <div class="drawing-title">Arbre</div>
+                        </a>
+                    </li>
+                    <li class="drawing-card">
+                        <a href="./art/champignon.html">
+                            <div class="drawing-image">
+                                <img src="../../images/art/mushroom-bottom-view.svg" alt="Champignon">
+                            </div>
+                            <div class="drawing-title">Champignon</div>
+                        </a>
+                    </li>
+                    <li class="drawing-card">
+                        <a href="./art/citrouille.html">
+                            <div class="drawing-image">
+                                <img src="../../images/art/pumpkin-morelines.svg" alt="Citrouille">
+                            </div>
+                            <div class="drawing-title">Citrouille</div>
+                        </a>
+                    </li>
+                    <li class="drawing-card see-more-card">
+                        <a href="./art/vie.html">
+                            <div class="drawing-title">Voir plus →</div>
+                        </a>
+                    </li>
+                </ul>
+            </section>
+
+            <section class="category-section">
+                <div class="category-header">
+                    <h3>Artefacts humains</h3>
+                </div>
+                <ul class="drawing-gallery">
+                    <li class="drawing-card">
+                        <a href="./art/bougie.html">
+                            <div class="drawing-image">
+                                <img src="../../images/art/burning-candle.svg" alt="Bougie">
+                            </div>
+                            <div class="drawing-title">Bougie</div>
+                        </a>
+                    </li>
+                    <li class="drawing-card">
+                        <a href="./art/réveil.html">
+                            <div class="drawing-image">
+                                <img src="../../images/art/alarm-clock.svg" alt="Réveil">
+                            </div>
+                            <div class="drawing-title">Réveil</div>
+                        </a>
+                    </li>
+                    <li class="drawing-card">
+                        <a href="./art/fontaine.html">
+                            <div class="drawing-image">
+                                <img src="../../images/art/fountain-sideview-water.svg" alt="Fontaine">
+                            </div>
+                            <div class="drawing-title">Fontaine</div>
+                        </a>
+                    </li>
+                    <li class="drawing-card see-more-card">
+                        <a href="./art/artefacts.html">
+                            <div class="drawing-title">Voir plus →</div>
+                        </a>
+                    </li>
+                </ul>
+            </section>
+
+            <section class="category-section">
+                <div class="category-header">
+                    <h3>Activités humaines</h3>
+                </div>
+                <ul class="drawing-gallery">
+                    <li class="drawing-card">
+                        <a href="./art/activité/jonglage.html">
+                            <div class="drawing-image">
+                                <img src="../../images/art/juggling.svg" alt="Jonglage">
+                            </div>
+                            <div class="drawing-title">Jonglage</div>
+                        </a>
+                    </li>
+                    <li class="drawing-card">
+                        <a href="./art/activité/pris-de-vertige.html">
+                            <div class="drawing-image">
+                                <img src="../../images/art/dizzy.svg" alt="Étourdi">
+                            </div>
+                            <div class="drawing-title">Étourdi</div>
+                        </a>
+                    </li>
+                    <li class="drawing-card see-more-card" style="grid-column: span 1;">
+                        <a href="./art/activités.html">
+                            <div class="drawing-title">Voir plus →</div>
+                        </a>
+                    </li>
+                </ul>
+            </section>
+
+            <section class="conclusion">
+                <a href="art/conclusion.html">Voir la conclusion</a>
+            </section>
+        </main>
+    </body>
+
+</html>
