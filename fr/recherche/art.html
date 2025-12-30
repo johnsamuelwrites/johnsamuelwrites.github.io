@@ -1,0 +1,589 @@
+<!DOCTYPE html>
+<html lang="en">
+
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta http-equiv="Content-Language" content="en" />
+        <link rel="shortcut icon" href="../../images/logo/favicon.png" />
+        <title>Art : John Samuel</title>
+        <style type="text/css">
+            * {
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
+            }
+
+            :root {
+                --canvas-white: #FDFBF7;
+                --ink-navy: #2C3E50;
+                --palette-purple: #9B59B6;
+                --sunset-coral: #E74C3C;
+                --sky-aqua: #3498DB;
+                --soft-lavender: #ECE3F0;
+                --card-shadow: rgba(155, 89, 182, 0.08);
+                --card-shadow-hover: rgba(155, 89, 182, 0.2);
+            }
+
+            body {
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+                background: linear-gradient(135deg, var(--canvas-white) 0%, #FFF5F8 100%);
+                color: var(--ink-navy);
+                line-height: 1.6;
+                overflow-x: hidden;
+            }
+
+            /* Fixed Navigation */
+            .navigation {
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                background: rgba(253, 251, 247, 0.85);
+                -webkit-backdrop-filter: blur(20px);
+                backdrop-filter: blur(20px);
+                padding: 1.2rem 2rem;
+                z-index: 1000;
+                border-bottom: 1px solid rgba(155, 89, 182, 0.1);
+            }
+
+            .nav-content {
+                max-width: 1400px;
+                margin: 0 auto;
+                display: flex;
+                align-items: center;
+                gap: 2rem;
+            }
+
+            .nav-name {
+                font-size: 1.1rem;
+                font-weight: 700;
+                color: var(--palette-purple);
+                text-decoration: none;
+                transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            }
+
+            .nav-name:hover {
+                color: var(--sunset-coral);
+                transform: translateY(-1px);
+            }
+
+            .breadcrumb {
+                display: flex;
+                gap: 0.5rem;
+                list-style: none;
+                font-size: 0.95rem;
+            }
+
+            .breadcrumb li {
+                display: flex;
+                align-items: center;
+                gap: 0.5rem;
+            }
+
+            .breadcrumb li:not(:last-child)::after {
+                content: '→';
+                color: var(--palette-purple);
+                opacity: 0.4;
+            }
+
+            .breadcrumb a {
+                color: var(--ink-navy);
+                text-decoration: none;
+                transition: all 0.3s ease;
+                padding: 0.3rem 0.8rem;
+                border-radius: 6px;
+            }
+
+            .breadcrumb a:hover {
+                background: var(--soft-lavender);
+                color: var(--palette-purple);
+            }
+
+            /* Hero Section */
+            .hero {
+                margin-top: 6rem;
+                padding: 4rem 2rem 6rem;
+                text-align: center;
+                max-width: 1400px;
+                margin-left: auto;
+                margin-right: auto;
+            }
+
+            .hero-title {
+                font-size: 5rem;
+                font-weight: 800;
+                color: var(--ink-navy);
+                letter-spacing: -0.03em;
+                margin-bottom: 2rem;
+                background: linear-gradient(135deg, var(--palette-purple) 0%, var(--sunset-coral) 100%);
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                background-clip: text;
+                animation: titlePulse 6s ease-in-out infinite;
+            }
+
+            @keyframes titlePulse {
+
+                0%,
+                100% {
+                    opacity: 1;
+                }
+
+                50% {
+                    opacity: 0.85;
+                }
+            }
+
+            .hero-subtitle {
+                font-size: 1.4rem;
+                color: var(--ink-navy);
+                opacity: 0.7;
+                margin-bottom: 3rem;
+                font-weight: 500;
+            }
+
+            /* SVG Illustration */
+            .hero-svg {
+                width: 400px;
+                height: 400px;
+                margin: 0 auto 3rem;
+            }
+
+            .hero-description {
+                max-width: 700px;
+                margin: 0 auto;
+                font-size: 1.15rem;
+                line-height: 1.8;
+                color: var(--ink-navy);
+                opacity: 0.8;
+                background: white;
+                padding: 2.5rem;
+                border-radius: 20px;
+                box-shadow: 0 10px 40px var(--card-shadow);
+            }
+
+            /* Section Styling */
+            .content-section {
+                max-width: 1400px;
+                margin: 0 auto;
+                padding: 4rem 2rem;
+            }
+
+            .section-title {
+                font-size: 2.5rem;
+                font-weight: 700;
+                color: var(--ink-navy);
+                margin-bottom: 3rem;
+                text-align: center;
+                position: relative;
+                display: inline-block;
+                left: 50%;
+                transform: translateX(-50%);
+            }
+
+            .section-title::after {
+                content: '';
+                position: absolute;
+                bottom: -10px;
+                left: 50%;
+                transform: translateX(-50%);
+                width: 80px;
+                height: 4px;
+                background: linear-gradient(90deg, var(--palette-purple), var(--sunset-coral));
+                border-radius: 2px;
+            }
+
+            /* Bento Grid for Projects */
+            .projects-grid {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+                gap: 2rem;
+                list-style: none;
+                padding: 0;
+            }
+
+            .project-card {
+                background: white;
+                border-radius: 24px;
+                overflow: hidden;
+                transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+                box-shadow: 0 4px 20px var(--card-shadow);
+                border: 2px solid transparent;
+                position: relative;
+            }
+
+            .project-card::before {
+                content: '';
+                position: absolute;
+                inset: 0;
+                background: linear-gradient(135deg,
+                        rgba(155, 89, 182, 0.05) 0%,
+                        rgba(231, 76, 60, 0.05) 100%);
+                opacity: 0;
+                transition: opacity 0.4s ease;
+            }
+
+            .project-card:hover {
+                transform: translateY(-12px) scale(1.02);
+                box-shadow: 0 20px 50px var(--card-shadow-hover);
+                border-color: var(--palette-purple);
+            }
+
+            .project-card:hover::before {
+                opacity: 1;
+            }
+
+            .project-card a {
+                text-decoration: none;
+                color: inherit;
+                display: flex;
+                flex-direction: column;
+                height: 100%;
+                padding: 2.5rem;
+            }
+
+            .project-icon {
+                width: 100px;
+                height: 100px;
+                margin: 0 auto 2rem;
+                background: linear-gradient(135deg, var(--soft-lavender), rgba(155, 89, 182, 0.1));
+                border-radius: 50% 40% 50% 40%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                transition: all 0.5s ease;
+                animation: morphIcon 6s ease-in-out infinite;
+            }
+
+            @keyframes morphIcon {
+
+                0%,
+                100% {
+                    border-radius: 50% 40% 50% 40%;
+                }
+
+                25% {
+                    border-radius: 40% 50% 40% 50%;
+                }
+
+                50% {
+                    border-radius: 50% 50% 40% 40%;
+                }
+
+                75% {
+                    border-radius: 40% 40% 50% 50%;
+                }
+            }
+
+            .project-card:hover .project-icon {
+                transform: scale(1.15) rotate(5deg);
+                background: linear-gradient(135deg, var(--palette-purple), var(--sunset-coral));
+            }
+
+            .project-icon img {
+                width: 70%;
+                height: 70%;
+                object-fit: contain;
+                filter: drop-shadow(0 2px 8px rgba(155, 89, 182, 0.3));
+            }
+
+            .project-title {
+                font-size: 1.6rem;
+                font-weight: 700;
+                color: var(--ink-navy);
+                margin-bottom: 1rem;
+                text-align: center;
+                letter-spacing: -0.01em;
+            }
+
+            .project-description {
+                font-size: 1.05rem;
+                line-height: 1.7;
+                color: var(--ink-navy);
+                opacity: 0.7;
+                text-align: center;
+            }
+
+            /* Footer */
+            .footer {
+                background: linear-gradient(135deg, var(--soft-lavender) 0%, rgba(155, 89, 182, 0.05) 100%);
+                padding: 3rem 2rem;
+                margin-top: 4rem;
+                text-align: center;
+            }
+
+            .footer-content {
+                max-width: 1400px;
+                margin: 0 auto;
+            }
+
+            .language-selector {
+                display: flex;
+                gap: 1rem;
+                justify-content: center;
+                margin-bottom: 1.5rem;
+            }
+
+            .language-selector a {
+                padding: 0.6rem 1.2rem;
+                background: white;
+                color: var(--ink-navy);
+                text-decoration: none;
+                border-radius: 8px;
+                font-size: 0.95rem;
+                transition: all 0.3s ease;
+                border: 2px solid transparent;
+            }
+
+            .language-selector a:hover {
+                background: var(--palette-purple);
+                color: white;
+                border-color: var(--palette-purple);
+                transform: translateY(-2px);
+            }
+
+            .copyright {
+                font-size: 0.9rem;
+                color: var(--ink-navy);
+                opacity: 0.6;
+            }
+
+            /* Responsive Design */
+            @media (max-width: 768px) {
+                .hero-title {
+                    font-size: 2.5rem;
+                }
+
+                .hero-svg {
+                    width: 280px;
+                    height: 280px;
+                }
+
+                .hero-description {
+                    font-size: 1rem;
+                    padding: 1.5rem;
+                }
+
+                .section-title {
+                    font-size: 1.8rem;
+                }
+
+                .projects-grid {
+                    grid-template-columns: 1fr;
+                    gap: 1.5rem;
+                }
+
+                .nav-content {
+                    flex-direction: column;
+                    gap: 1rem;
+                    align-items: flex-start;
+                }
+
+                .breadcrumb {
+                    flex-wrap: wrap;
+                }
+            }
+
+            @media (max-width: 480px) {
+                .navigation {
+                    padding: 1rem;
+                }
+
+                .hero {
+                    padding: 3rem 1rem 4rem;
+                }
+
+                .hero-title {
+                    font-size: 2rem;
+                }
+
+                .project-card a {
+                    padding: 1.5rem;
+                }
+            }
+        </style>
+    </head>
+
+    <body vocab="http://schema.org/">
+        <!-- Fixed Navigation -->
+        <nav class="navigation">
+            <div class="nav-content">
+                <a href="../apropos.html" class="nav-name">John Samuel</a>
+                <ul class="breadcrumb" typeof="BreadcrumbList">
+                    <li property="itemListElement" typeof="ListItem">
+                        <a property="item" typeof="WebPage" href="../index.html">
+                            <span property="name">Accueil</span>
+                        </a>
+                    </li>
+                    <li property="itemListElement" typeof="ListItem">
+                        <a property="item" typeof="WebPage" href="../recherche/recherche.html">
+                            <span property="name">Recherche</span>
+                        </a>
+                    </li>
+                    <li property="itemListElement" typeof="ListItem">
+                        <span property="name">Art</span>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+
+        <!-- Hero Section -->
+        <section class="hero">
+            <h1 class="hero-title">Art</h1>
+            <p class="hero-subtitle">Expression créative à travers les médias numériques</p>
+
+            <!-- Custom Animated SVG -->
+            <svg class="hero-svg" viewbox="0 0 400 400" xmlns="http://www.w3.org/2000/svg">
+                <!-- Background circles -->
+                <circle cx="200" cy="200" r="180" fill="rgba(155, 89, 182, 0.05)" />
+                <circle cx="200" cy="200" r="140" fill="rgba(231, 76, 60, 0.05)" />
+
+                <!-- Paint palette -->
+                <ellipse cx="200" cy="220" rx="120" ry="100" fill="#FFFFFF" stroke="var(--palette-purple)"
+                    stroke-width="3">
+                    <animate attributename="rx" values="120;125;120" dur="4s" repeatcount="indefinite" />
+                    <animate attributename="ry" values="100;105;100" dur="4s" repeatcount="indefinite" />
+                </ellipse>
+
+                <!-- Paint blobs on palette -->
+                <circle cx="160" cy="200" r="18" fill="var(--sunset-coral)">
+                    <animate attributename="r" values="18;20;18" dur="3s" repeatcount="indefinite" />
+                </circle>
+                <circle cx="210" cy="195" r="16" fill="var(--palette-purple)">
+                    <animate attributename="r" values="16;18;16" dur="3.5s" repeatcount="indefinite" />
+                </circle>
+                <circle cx="240" cy="210" r="15" fill="var(--sky-aqua)">
+                    <animate attributename="r" values="15;17;15" dur="4s" repeatcount="indefinite" />
+                </circle>
+                <circle cx="180" cy="240" r="14" fill="#F39C12">
+                    <animate attributename="r" values="14;16;14" dur="3.2s" repeatcount="indefinite" />
+                </circle>
+                <circle cx="220" cy="235" r="13" fill="#2ECC71">
+                    <animate attributename="r" values="13;15;13" dur="3.8s" repeatcount="indefinite" />
+                </circle>
+
+                <!-- Paintbrush -->
+                <g transform="translate(280, 120)">
+                    <animatetransform attributename="transform" type="rotate"
+                        values="280 120 -15; 280 120 5; 280 120 -15" dur="5s" repeatcount="indefinite" />
+
+                    <!-- Brush handle -->
+                    <rect x="-3" y="0" width="6" height="80" fill="var(--ink-navy)" rx="3" />
+
+                    <!-- Ferrule -->
+                    <rect x="-5" y="75" width="10" height="15" fill="#BDC3C7" />
+
+                    <!-- Bristles -->
+                    <path d="M -4,90 L -4,105 L 0,110 L 4,105 L 4,90 Z" fill="var(--palette-purple)">
+                        <animate attributename="d" values="M -4,90 L -4,105 L 0,110 L 4,105 L 4,90 Z;
+                                M -4,90 L -4,105 L 0,112 L 4,105 L 4,90 Z;
+                                M -4,90 L -4,105 L 0,110 L 4,105 L 4,90 Z" dur="2s" repeatcount="indefinite" />
+                    </path>
+                </g>
+
+                <!-- Floating paint droplets -->
+                <circle cx="120" cy="140" r="6" fill="var(--sunset-coral)" opacity="0.7">
+                    <animate attributename="cy" values="140;120;140" dur="4s" repeatcount="indefinite" />
+                    <animate attributename="opacity" values="0.7;0.3;0.7" dur="4s" repeatcount="indefinite" />
+                </circle>
+                <circle cx="280" cy="260" r="5" fill="var(--sky-aqua)" opacity="0.7">
+                    <animate attributename="cy" values="260;240;260" dur="5s" repeatcount="indefinite" />
+                    <animate attributename="opacity" values="0.7;0.3;0.7" dur="5s" repeatcount="indefinite" />
+                </circle>
+                <circle cx="150" cy="320" r="4" fill="var(--palette-purple)" opacity="0.7">
+                    <animate attributename="cy" values="320;300;320" dur="4.5s" repeatcount="indefinite" />
+                    <animate attributename="opacity" values="0.7;0.3;0.7" dur="4.5s" repeatcount="indefinite" />
+                </circle>
+
+                <!-- Creative sparkles -->
+                <g opacity="0.6">
+                    <path d="M 320 180 L 325 185 L 330 180 L 325 175 Z" fill="var(--sunset-coral)">
+                        <animate attributename="opacity" values="0.6;1;0.6" dur="2s" repeatcount="indefinite" />
+                        <animatetransform attributename="transform" type="rotate" values="0 325 180; 360 325 180"
+                            dur="6s" repeatcount="indefinite" />
+                    </path>
+                    <path d="M 80 240 L 84 244 L 88 240 L 84 236 Z" fill="var(--palette-purple)">
+                        <animate attributename="opacity" values="0.6;1;0.6" dur="2.5s" repeatcount="indefinite" />
+                        <animatetransform attributename="transform" type="rotate" values="0 84 240; 360 84 240" dur="7s"
+                            repeatcount="indefinite" />
+                    </path>
+                </g>
+            </svg>
+
+            <div class="hero-description">
+                Explorer l'intersection de la technologie et de la créativité à travers divers projets artistiques. Des
+                techniques de dessin traditionnelles à la théorie expérimentale des couleurs et aux visualisations 3D
+                immersives, chaque projet représente un voyage unique dans l'expression visuelle.
+            </div>
+        </section>
+        <!-- Projects Section -->
+        <section class="content-section">
+            <h2 class="section-title">Projets</h2>
+            <ul class="projects-grid">
+                <li class="project-card">
+                    <a href="dessin.html">
+                        <div class="project-icon">
+                            <img src="../../images/art/mushroom-bottom-view.svg" alt="Icône Projet Dessin" />
+                        </div>
+                        <h3 class="project-title">Projet Dessin</h3>
+                        <p class="project-description">
+                            Illustrations et croquis réalisés à la main explorant la forme, la composition et la
+                            narration visuelle à travers la ligne et la forme.
+                        </p>
+                    </a>
+                </li>
+                <li class="project-card">
+                    <a href="couleur.html">
+                        <div class="project-icon">
+                            <img src="../../images/color/dizzy.svg" alt="Icône Projet Couleur" />
+                        </div>
+                        <h3 class="project-title">Projet Couleur</h3>
+                        <p class="project-description">
+                            Expérimentations avec la théorie des couleurs, l'exploration de palettes et les relations
+                            chromatiques dans les compositions numériques.
+                        </p>
+                    </a>
+                </li>
+                <li class="project-card">
+                    <a href="3D.html">
+                        <div class="project-icon">
+                            <img src="../../images/color/washing-machine.svg" alt="Icône Projet 3D" />
+                        </div>
+                        <h3 class="project-title">Projet 3D</h3>
+                        <p class="project-description">
+                            Projets de modélisation et de visualisation tridimensionnelles repoussant les limites de la
+                            représentation spatiale.
+                        </p>
+                    </a>
+                </li>
+                <li class="project-card">
+                    <a href="../voyages/dessins.html">
+                        <div class="project-icon">
+                            <img src="../../images/color/sunset.svg" alt="Icône Projet Voyage" />
+                        </div>
+                        <h3 class="project-title">Projet Dessins inspirés par le voyage</h3>
+                        <p class="project-description">
+                            Une série de dessins inspirés par le voyage explorant les lieux, le mouvement et la
+                            perception spatiale à travers l'expression visuelle.
+                        </p>
+                    </a>
+                </li>
+            </ul>
+        </section>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <div class="footer-content">
+                <div class="language-selector">
+                    <a href="../../en/research/art.html">English</a>
+                    <a href="art.html">Français</a>
+                </div>
+                <p class="copyright">
+                    © 2025 <a href="../ecrits/Iohannes.html">Iohannes</a> - John Samuel | Creative Commons License
+                </p>
+            </div>
+        </footer>
+    </body>
+
+</html>
