@@ -77,10 +77,8 @@ SOURCE_DIR = "en/photography"  # or "en" for all
 
 ```
 ├── translate_manager.py        # Core translation engine
-├── translate_manager_v2.py     # Path mapping support
 ├── batch_translate.py          # Batch processing CLI
 ├── html_generator.py           # HTML file generation
-├── generate_overview_v2.py     # Dashboard generator
 ├── check_db.py                 # Database inspection tool
 │
 ├── translations.db             # SQLite database (auto-created)
