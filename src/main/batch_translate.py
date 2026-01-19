@@ -248,9 +248,9 @@ def generate_overview(manager=None):
     # Use the new mapping-based overview generator
     from generate_overview import generate_overview as gen_overview
 
-    output_path = REPO_ROOT / 'translation_overview.html'
+    output_path = REPO_ROOT / 'analysis/translation_overview.html'
     gen_overview(str(output_path))
-    print_info(f"Overview saved to: translation_overview.html")
+    print_info(f"Overview saved to: analysis/translation_overview.html")
 
 
 def show_statistics():

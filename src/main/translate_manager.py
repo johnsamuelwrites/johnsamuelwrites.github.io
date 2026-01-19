@@ -530,7 +530,7 @@ class TranslationManager:
             'missing_items': missing
         }
 
-    def generate_translation_overview(self, output_file: str = 'translation_overview.html'):
+    def generate_translation_overview(self, output_file: str = 'analysis/translation_overview.html'):
         """Generate HTML overview of all translations"""
         # Collect all files
         source_files = list(Path(self.source_lang).rglob('*.html'))
@@ -918,7 +918,7 @@ def main():
             print(f"Translations imported from: {args.csv}")
 
         elif args.command == 'overview':
-            output_html = args.output or 'translation_overview.html'
+            output_html = args.output or 'analysis/translation_overview.html'
             manager.generate_translation_overview(output_html)
             print(f"Translation overview generated: {output_html}")
 

@@ -61,7 +61,7 @@ LANGUAGE_NAMES = {
 }
 
 
-def generate_overview(output_file='translation_overview.html'):
+def generate_overview(output_file='analysis/translation_overview.html'):
     """Generate HTML overview showing only mapped files"""
 
     # Use absolute path for database

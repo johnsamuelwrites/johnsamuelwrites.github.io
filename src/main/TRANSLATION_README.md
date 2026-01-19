@@ -71,7 +71,7 @@ SOURCE_DIR = "en/photography"  # or "en" for all
 
 4. **Import**: System stores translations in SQLite database
 
-5. **Monitor Progress**: View `translation_overview.html` in browser
+5. **Monitor Progress**: View `analysis/translation_overview.html` in browser
 
 ## File Structure
 
@@ -83,7 +83,7 @@ SOURCE_DIR = "en/photography"  # or "en" for all
 │
 ├── translations.db             # SQLite database (auto-created)
 ├── path_mappings.csv           # Path translations (manual)
-├── translation_overview.html   # Progress dashboard (generated)
+├── analysis/translation_overview.html   # Progress dashboard (generated)
 │
 └── translations_pending/       # CSV files for translation
     ├── missing_*.csv           # Pending translations
