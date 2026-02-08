@@ -7,421 +7,1006 @@
         <title>Traitement de données massives (2025-2026): Introduction (Big Data): John Samuel</title>
         <link rel="shortcut icon" href="../../../../../images/logo/favicon.png" />
         <style type="text/css">
-            body {
-                height: 100%;
-                width: 100%;
-                background-color: white;
+            :root {
+                /* Light theme */
+                --bg-primary: #f8fafc;
+                --bg-secondary: #ffffff;
+                --bg-card: rgba(255, 255, 255, 0.8);
+                --text-primary: #0f172a;
+                --text-secondary: #475569;
+                --accent-primary: #6366f1;
+                --accent-secondary: #8b5cf6;
+                --accent-gradient: linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #a855f7 100%);
+                --accent-glow: rgba(99, 102, 241, 0.3);
+                --border-color: rgba(99, 102, 241, 0.2);
+                --header-bg: linear-gradient(135deg, #1e1b4b 0%, #312e81 50%, #4c1d95 100%);
+                --footer-bg: linear-gradient(90deg, #1e1b4b 0%, #312e81 100%);
+                --card-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+                --glass-bg: rgba(255, 255, 255, 0.7);
+                --glass-border: rgba(255, 255, 255, 0.3);
+                --code-bg: #1e293b;
+                --success: #10b981;
+                --warning: #f59e0b;
+                --danger: #ef4444;
+                --grid-line: rgba(99, 102, 241, 0.1);
+            }
+
+            [data-theme="dark"] {
+                --bg-primary: #0f0f1a;
+                --bg-secondary: #1a1a2e;
+                --bg-card: rgba(26, 26, 46, 0.9);
+                --text-primary: #f1f5f9;
+                --text-secondary: #94a3b8;
+                --accent-primary: #818cf8;
+                --accent-secondary: #a78bfa;
+                --accent-gradient: linear-gradient(135deg, #818cf8 0%, #a78bfa 50%, #c084fc 100%);
+                --accent-glow: rgba(129, 140, 248, 0.4);
+                --border-color: rgba(129, 140, 248, 0.3);
+                --header-bg: linear-gradient(135deg, #0f0f1a 0%, #1e1b4b 50%, #2e1065 100%);
+                --footer-bg: linear-gradient(90deg, #0f0f1a 0%, #1e1b4b 100%);
+                --card-shadow: 0 4px 30px rgba(129, 140, 248, 0.15);
+                --glass-bg: rgba(15, 15, 26, 0.8);
+                --glass-border: rgba(129, 140, 248, 0.2);
+                --code-bg: #0f172a;
+                --grid-line: rgba(129, 140, 248, 0.08);
+            }
+
+            * {
                 margin: 0;
+                padding: 0;
+                box-sizing: border-box;
+            }
+
+            body {
+                height: 100vh;
+                width: 100vw;
+                background: var(--bg-primary);
                 overflow: hidden;
-                font-family: Arial;
+                font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+                transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            }
+
+            /* Animated background grid */
+            body::before {
+                content: '';
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background-image:
+                    linear-gradient(var(--grid-line) 1px, transparent 1px),
+                    linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
+                background-size: 50px 50px;
+                pointer-events: none;
+                z-index: 0;
+            }
+
+            /* Floating orbs animation */
+            .orb {
+                position: fixed;
+                border-radius: 50%;
+                filter: blur(60px);
+                opacity: 0.5;
+                pointer-events: none;
+                z-index: 0;
+                animation: float 20s infinite ease-in-out;
+            }
+
+            .orb-1 {
+                width: 400px;
+                height: 400px;
+                background: var(--accent-primary);
+                top: -100px;
+                right: -100px;
+                animation-delay: 0s;
+            }
+
+            .orb-2 {
+                width: 300px;
+                height: 300px;
+                background: var(--accent-secondary);
+                bottom: -50px;
+                left: -50px;
+                animation-delay: -7s;
+            }
+
+            .orb-3 {
+                width: 200px;
+                height: 200px;
+                background: #a855f7;
+                top: 50%;
+                left: 50%;
+                animation-delay: -14s;
+            }
+
+            @keyframes float {
+
+                0%,
+                100% {
+                    transform: translate(0, 0) scale(1);
+                }
+
+                25% {
+                    transform: translate(30px, -30px) scale(1.1);
+                }
+
+                50% {
+                    transform: translate(-20px, 20px) scale(0.9);
+                }
+
+                75% {
+                    transform: translate(20px, 10px) scale(1.05);
+                }
             }
 
             .slide {
-                height: 100%;
-                width: 100%;
-            }
-
-            .content {
-                height: 79%;
-                width: 95vw;
+                height: 100vh;
+                width: 100vw;
                 display: flex;
-                line-height: 1.7em;
                 flex-direction: column;
-                align-items: flex-start;
-                margin: 0 auto;
-                color: #000000;
-                text-align: left;
-                padding-left: 1.5vmax;
-                padding-top: 1.5vmax;
-                overflow-x: auto;
-                font-size: 2.8vmin;
-                flex-wrap: wrap;
+                position: relative;
+                z-index: 1;
             }
 
-            .content h1,
-            h2,
-            h3,
-            h4 {
-                color: #1B80CF;
-            }
-
-            .content .topichighlight {
-                background-color: #78002E;
-                color: #FFFFFF;
-            }
-
-            .content .topicheading {
-                background-color: #1B80CF;
-                color: #FFFFFF;
-                vertical-align: middle;
-                border-radius: 0 2vmax 2vmax 0%;
-                height: 4vmax;
-                line-height: 4vmax;
-                padding-left: 1vmax;
-                margin: 0.1vmax;
-                width: 50%;
-                margin-bottom: 1vmax;
-            }
-
-            .content .flexcontent {
+            /* Theme Toggle */
+            .theme-toggle {
+                position: fixed;
+                top: 1.5vmax;
+                right: 1.5vmax;
+                z-index: 1000;
+                background: var(--glass-bg);
+                -webkit-backdrop-filter: blur(10px);
+                backdrop-filter: blur(10px);
+                border: 1px solid var(--glass-border);
+                border-radius: 50px;
+                padding: 8px;
+                cursor: pointer;
                 display: flex;
-                overflow-y: auto;
-                font-size: 2.8vmin;
-                flex-wrap: wrap;
+                align-items: center;
+                gap: 8px;
+                transition: all 0.3s ease;
+                box-shadow: var(--card-shadow);
             }
 
-            .content .gridcontent {
-                display: grid;
-                grid-template-columns: auto auto auto auto;
-                grid-column-gap: 0px;
-                grid-row-gap: 0px;
-                grid-gap: 0px;
+            .theme-toggle:hover {
+                transform: scale(1.05);
+                box-shadow: 0 0 20px var(--accent-glow);
             }
 
-            .content .topicsubheading {
-                background-color: #1B80CF;
-                color: #FFFFFF;
-                vertical-align: middle;
-                border-radius: 0 1.5vmax 1.5vmax 0%;
-                height: 3vmax;
-                margin: 0.1vmax;
-                font-size: 90%;
-                line-height: 3vmax;
-                padding-left: 1vmax;
-                width: 40%;
-                margin-bottom: 1vmax;
+            .theme-toggle svg {
+                width: 24px;
+                height: 24px;
+                fill: var(--text-primary);
+                transition: all 0.3s ease;
             }
 
-            .content table {
-                color: #000000;
-                font-size: 100%;
-                width: 100%;
-            }
-
-            .content a:link,
-            .content a:visited {
-                color: #1B80CF;
-                text-decoration: none;
-            }
-
-            .content th {
-                color: #FFFFFF;
-                background-color: #1B80CF;
-                border-radius: 2vmax 2vmax 2vmax 2vmax;
-                font-size: 120%;
-                padding: 15px;
-            }
-
-            .content figure {
-                max-width: 90%;
-                max-height: 90%;
-            }
-
-            .content .fullwidth img {
-                max-width: 90%;
-                max-height: 90%;
-            }
-
-            .content figure img {
-                max-width: 50vmin;
-                max-height: 50vmin;
+            .theme-toggle .sun {
                 display: block;
-                margin-left: auto;
-                margin-right: auto;
             }
 
-            .content figure figcaption {
-                max-width: 90%;
-                max-height: 90%;
-                margin: 0.1vmax;
-                font-size: 90%;
-                text-align: center;
-                padding: 0.5vmax;
-                background-color: #E1F5FE;
-                border-radius: 2vmax 2vmax 2vmax 2vmax;
+            .theme-toggle .moon {
+                display: none;
             }
 
-            .content td {
-                color: #000000;
-                width: 8%;
-                padding-left: 3vmax;
-                padding-top: 1vmax;
-                padding-bottom: 1vmax;
-                background-color: #E1F5FE;
-                border-radius: 2vmax 2vmax 2vmax 2vmax;
+            [data-theme="dark"] .theme-toggle .sun {
+                display: none;
             }
 
-            .content li {
-                line-height: 1.7em;
+            [data-theme="dark"] .theme-toggle .moon {
+                display: block;
             }
 
+            /* Header */
             .header {
-                color: #ffffff;
-                background-color: #00549d;
-                height: 5vmax;
-            }
-
-            .header h1 {
-                text-align: center;
-                vertical-align: middle;
-                font-size: 3vmax;
-                line-height: 4vmax;
-                margin: 0;
-            }
-
-            .footer {
-                height: 3vmax;
-                line-height: 3vmax;
-                vertical-align: middle;
-                color: #ffffff;
-                background-color: #00549d;
-                margin: 0;
-                padding: .3vmax;
+                background: var(--header-bg);
+                padding: 1.5vmax 2vmax;
+                position: relative;
                 overflow: hidden;
             }
 
-            .footer .contact {
-                float: left;
+            .header::after {
+                content: '';
+                position: absolute;
+                bottom: 0;
+                left: 0;
+                width: 100%;
+                height: 2px;
+                background: var(--accent-gradient);
+            }
+
+            .header h1 {
                 color: #ffffff;
+                font-size: clamp(1.5rem, 3.5vmax, 2.8rem);
+                font-weight: 600;
+                text-align: center;
+                letter-spacing: 0.5px;
+                text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+            }
+
+            /* Content */
+            .content {
+                flex: 1;
+                padding: 2.5vmax 4vmax;
+                overflow-y: auto;
+                display: flex;
+                flex-direction: column;
+                gap: 2.5vmax;
+                color: var(--text-primary);
+                font-size: clamp(1.1rem, 2.5vmax, 1.6rem);
+            }
+
+            .content h1 {
+                font-size: clamp(2rem, 4.5vmax, 3.5rem);
+                background: var(--accent-gradient);
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                background-clip: text;
+                font-weight: 700;
+            }
+
+            .content h2 {
+                font-size: clamp(1.4rem, 3vmax, 2.2rem);
+                color: var(--text-secondary);
+                font-weight: 400;
+            }
+
+            .content h3,
+            .content h4 {
+                color: var(--accent-primary);
+                font-weight: 600;
+                font-size: clamp(1.2rem, 2.5vmax, 1.8rem);
+            }
+
+            .title-main {
+                font-size: clamp(1.35rem, 5.5vw, 4.5rem);
+                line-height: 1.02;
+                letter-spacing: 0.3px;
+                white-space: nowrap;
+                max-width: 100%;
+                margin-bottom: 1vmax;
+            }
+
+            /* Cards */
+            .card {
+                background: var(--glass-bg);
+                -webkit-backdrop-filter: blur(10px);
+                backdrop-filter: blur(10px);
+                border: 1px solid var(--glass-border);
+                border-radius: 16px;
+                padding: 2vmax 2.5vmax;
+                box-shadow: var(--card-shadow);
+                transition: all 0.3s ease;
+            }
+
+            .card:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 8px 30px var(--accent-glow);
+                border-color: var(--accent-primary);
+            }
+
+            /* Flex layouts */
+            .flex-row {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 2vmax;
+                align-items: stretch;
+            }
+
+            .flex-center {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                flex-direction: column;
+                text-align: center;
+            }
+
+            /* Topic heading */
+            .topic-heading {
+                display: inline-flex;
+                align-items: center;
+                gap: 1vmax;
+                background: var(--accent-gradient);
+                color: white;
+                padding: 1vmax 2.5vmax;
+                border-radius: 50px;
+                font-size: clamp(1.2rem, 2.8vmax, 1.8rem);
+                font-weight: 600;
+                box-shadow: 0 4px 15px var(--accent-glow);
+            }
+
+            .topic-heading svg {
+                width: 1.5em;
+                height: 1.5em;
+                fill: currentColor;
+            }
+
+            /* Icon boxes */
+            .icon-box {
+                display: flex;
+                align-items: center;
+                gap: 1.5vmax;
+                padding: 1.2vmax;
+                font-size: clamp(1.1rem, 2.3vmax, 1.5rem);
+            }
+
+            .icon-circle {
+                width: 4vmax;
+                height: 4vmax;
+                min-width: 50px;
+                min-height: 50px;
+                border-radius: 50%;
+                background: var(--accent-gradient);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                box-shadow: 0 4px 15px var(--accent-glow);
+            }
+
+            .icon-circle svg {
+                width: 60%;
+                height: 60%;
+                fill: white;
+            }
+
+            /* Stats grid */
+            .stats-grid {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+                gap: 2vmax;
+            }
+
+            .stat-card {
+                background: var(--glass-bg);
+                -webkit-backdrop-filter: blur(10px);
+                backdrop-filter: blur(10px);
+                border: 1px solid var(--glass-border);
+                border-radius: 16px;
+                padding: 2vmax;
+                text-align: center;
+                transition: all 0.3s ease;
+            }
+
+            .stat-card:hover {
+                transform: scale(1.05);
+                box-shadow: 0 0 30px var(--accent-glow);
+            }
+
+            .stat-number {
+                font-size: clamp(2.5rem, 5vmax, 4rem);
+                font-weight: 700;
+                background: var(--accent-gradient);
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                background-clip: text;
+            }
+
+            .stat-label {
+                color: var(--text-secondary);
+                font-size: clamp(1rem, 2vmax, 1.4rem);
+                margin-top: 0.5vmax;
+            }
+
+            /* Lists */
+            .content ul {
+                list-style: none;
+                padding: 0;
+            }
+
+            .content li {
+                position: relative;
+                padding-left: 2em;
+                margin-bottom: 0.8em;
+                line-height: 1.7;
+                color: var(--text-primary);
+                font-size: clamp(1.1rem, 2.5vmax, 1.6rem);
+            }
+
+            .content li::before {
+                content: '';
+                position: absolute;
+                left: 0;
+                top: 0.55em;
+                width: 12px;
+                height: 12px;
+                background: var(--accent-gradient);
+                border-radius: 50%;
+                box-shadow: 0 0 10px var(--accent-glow);
+            }
+
+            /* Tables */
+            .modern-table {
+                width: 100%;
+                border-collapse: separate;
+                border-spacing: 0 8px;
+            }
+
+            .modern-table th {
+                background: var(--accent-gradient);
+                color: white;
+                padding: 0.5vmax 2vmax;
+                font-weight: 600;
                 text-align: left;
-                font-size: 3.2vmin;
+                font-size: clamp(1.1rem, 2.2vmax, 1.5rem);
+            }
+
+            .modern-table th:first-child {
+                border-radius: 12px 0 0 12px;
+            }
+
+            .modern-table th:last-child {
+                border-radius: 0 12px 12px 0;
+            }
+
+            .modern-table td {
+                background: var(--glass-bg);
+                padding: 0.5vmax 2vmax;
+                border-top: 1px solid var(--border-color);
+                border-bottom: 1px solid var(--border-color);
+                transition: all 0.3s ease;
+                font-size: clamp(1rem, 2vmax, 1.4rem);
+            }
+
+            .modern-table tr:hover td {
+                background: var(--bg-card);
+                box-shadow: 0 0 20px var(--accent-glow);
+            }
+
+            .modern-table td:first-child {
+                border-left: 1px solid var(--border-color);
+                border-radius: 12px 0 0 12px;
+            }
+
+            .modern-table td:last-child {
+                border-right: 1px solid var(--border-color);
+                border-radius: 0 12px 12px 0;
+            }
+
+            /* Code blocks */
+            .code-block {
+                background: var(--code-bg);
+                border-radius: 12px;
+                padding: 1.5vmax;
+                overflow-x: auto;
+                border: 1px solid var(--border-color);
+            }
+
+            .code-block pre {
+                margin: 0;
+                color: #e2e8f0;
+                font-family: 'Cascadia Code', 'Fira Code', monospace;
+                font-size: clamp(1rem, 2vmax, 1.4rem);
+                line-height: 1.7;
+            }
+
+            .code-block .cmd {
+                color: #10b981;
+            }
+
+            .code-block .path {
+                color: #818cf8;
+            }
+
+            /* Figures */
+            .content figure {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                gap: 1vmax;
+            }
+
+            .content figure img {
+                max-width: 100%;
+                max-height: 40vh;
+                border-radius: 12px;
+                box-shadow: var(--card-shadow);
+                transition: all 0.3s ease;
+            }
+
+            .content figure img:hover {
+                transform: scale(1.02);
+                box-shadow: 0 0 30px var(--accent-glow);
+            }
+
+            .content figcaption {
+                color: var(--text-secondary);
+                font-size: clamp(1rem, 2vmax, 1.3rem);
+                text-align: center;
+                padding: 0.8vmax 1.5vmax;
+                background: var(--glass-bg);
+                border-radius: 8px;
+            }
+
+            /* Links */
+            .content a {
+                color: var(--accent-primary);
+                text-decoration: none;
+                border-bottom: 1px dashed var(--accent-primary);
+                transition: all 0.3s ease;
+            }
+
+            .content a:hover {
+                color: var(--accent-secondary);
+                border-bottom-style: solid;
+            }
+
+            /* Badges */
+            .badge {
+                display: inline-flex;
+                align-items: center;
+                gap: 0.5em;
+                padding: 0.4em 1em;
+                border-radius: 50px;
+                font-size: clamp(0.95rem, 1.8vmax, 1.2rem);
+                font-weight: 500;
+            }
+
+            .badge-success {
+                background: rgba(16, 185, 129, 0.15);
+                color: var(--success);
+                border: 1px solid rgba(16, 185, 129, 0.3);
+            }
+
+            .badge-warning {
+                background: rgba(245, 158, 11, 0.15);
+                color: var(--warning);
+                border: 1px solid rgba(245, 158, 11, 0.3);
+            }
+
+            .badge-danger {
+                background: rgba(239, 68, 68, 0.15);
+                color: var(--danger);
+                border: 1px solid rgba(239, 68, 68, 0.3);
+            }
+
+            /* Checklist */
+            .checklist {
+                display: flex;
+                flex-direction: column;
+                gap: 0.1vmax;
+            }
+
+            .check-item {
+                display: flex;
+                align-items: flex-start;
+                gap: 0.8vmax;
+                padding: 0.5vmax 1.5vmax;
+                background: var(--glass-bg);
+                border-radius: 12px;
+                border: 1px solid var(--glass-border);
+                transition: all 0.3s ease;
+                font-size: clamp(1rem, 2.2vmax, 1.5rem);
+            }
+
+            .check-item:hover {
+                border-color: var(--accent-primary);
+            }
+
+            .check-icon {
+                width: 1.8em;
+                height: 1.8em;
+                flex-shrink: 0;
+            }
+
+            .check-icon.success {
+                fill: var(--success);
+            }
+
+            .check-icon.danger {
+                fill: var(--danger);
+            }
+
+            /* Profile card */
+            .profile-card {
+                display: flex;
+                gap: 2vmax;
+                align-items: center;
+                flex-wrap: wrap;
+            }
+
+            .profile-img {
+                width: clamp(120px, 20vmax, 200px);
+                height: clamp(120px, 20vmax, 200px);
+                border-radius: 50%;
+                object-fit: cover;
+                border: 4px solid transparent;
+                background: var(--accent-gradient) border-box;
+                box-shadow: 0 0 30px var(--accent-glow);
+            }
+
+            .profile-info {
+                flex: 1;
+                min-width: 250px;
+            }
+
+            /* Difficulty stars */
+            .difficulty {
+                display: flex;
+                gap: 0.3em;
+            }
+
+            .difficulty .star {
+                color: var(--warning);
+                font-size: 1.5em;
+            }
+
+            .difficulty .star.empty {
+                opacity: 0.3;
+            }
+
+            /* Footer */
+            .footer {
+                background: var(--footer-bg);
+                padding: 1vmax 2vmax;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                position: relative;
+            }
+
+            .footer::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 2px;
+                background: var(--accent-gradient);
+            }
+
+            .footer .contact {
+                color: rgba(255, 255, 255, 0.8);
+                font-size: clamp(1rem, 2vmax, 1.3rem);
             }
 
             .footer .navigation {
-                float: right;
-                text-align: right;
-                width: 8vw;
-                font-size: 3vmin;
+                display: flex;
+                align-items: center;
+                gap: 1vmax;
             }
 
-            .footer .navigation .next,
-            .prev {
-                font-size: 3vmin;
-                color: #ffffff;
+            .footer .page-number {
+                color: white;
+                font-weight: 600;
+                font-size: clamp(1.1rem, 2vmax, 1.4rem);
+                background: rgba(255, 255, 255, 0.1);
+                padding: 0.4em 1em;
+                border-radius: 20px;
+            }
+
+            .nav-btn {
+                width: 2.5vmax;
+                height: 2.5vmax;
+                min-width: 32px;
+                min-height: 32px;
+                border-radius: 50%;
+                background: rgba(255, 255, 255, 0.1);
+                border: 1px solid rgba(255, 255, 255, 0.2);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                color: white;
                 text-decoration: none;
+                transition: all 0.3s ease;
             }
 
-            .footer .navigation .next::after {
-                content: "| >";
+            .nav-btn:hover {
+                background: rgba(255, 255, 255, 0.2);
+                transform: scale(1.1);
             }
 
-            .footer .navigation .prev::after {
-                content: "< ";
+            .nav-btn svg {
+                width: 50%;
+                height: 50%;
+                fill: currentColor;
             }
 
-            /* Using same Jupyter CSS
-     */
-
-            .highlight {
-                background: #f8f8f8;
+            /* Progress bar */
+            .progress-container {
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 3px;
+                background: rgba(255, 255, 255, 0.1);
             }
 
-            .highlight .c {
-                color: #408080;
-                font-style: italic
+            .progress-bar {
+                height: 100%;
+                background: var(--accent-gradient);
+                transition: width 0.3s ease;
             }
 
-            /* Comment */
-
-            .highlight .err {
-                border: 1px solid #FF0000
-            }
-
-            /* Error */
-
-            .highlight .k {
-                color: #008000;
-                font-weight: bold
-            }
-
-            /* Keyword */
-
-            .highlight .o {
-                color: #666666
-            }
-
-            /* Operator */
-
-            .highlight .ch {
-                color: #408080;
-                font-style: italic
-            }
-
-            /* Comment.Hashbang */
-
-            .highlight .c1 {
-                color: #408080;
-                font-style: italic
-            }
-
-            /* Comment.Single */
-
-            .highlight .cs {
-                color: #408080;
-                font-style: italic
-            }
-
-            /* Comment.Special */
-
-            .highlight .cm {
-                color: #408080;
-                font-style: italic
-            }
-
-            /* Comment.Multiline */
-
-            .highlight .nn {
-                color: #0000FF;
-                font-weight: bold
-            }
-
-            /* Name.Namespace */
-
-            .highlight .k {
-                color: #008000;
-                font-weight: bold
-            }
-
-            /* Keyword */
-
-            .highlight .s2 {
-                color: #BA2121
-            }
-
-            /* Literal.String.Double */
-
-            .highlight .s1 {
-                color: #BA2121
-            }
-
-            /* Literal.String.Single */
-
-            .highlight .kn {
-                color: #008000;
-                font-weight: bold
-            }
-
-            /* Keyword.Namespace */
-
-            .highlight .nb {
-                color: #008000
-            }
-
-            /* Name.Builtin */
-
-            .highlight .mb {
-                color: #666666
-            }
-
-            /* Literal.Number.Bin */
-
-            .highlight .mf {
-                color: #666666
-            }
-
-            /* Literal.Number.Float */
-
-            .highlight .mh {
-                color: #666666
-            }
-
-            /* Literal.Number.Hex */
-
-            .highlight .mi {
-                color: #666666
-            }
-
-            /* Literal.Number.Integer */
-
-            .highlight .mo {
-                color: #666666
-            }
-
-            /* Literal.Number.Oct */
-
-            @media (max-width: 640px),
-            screen and (orientation: portrait) {
-                body {
-                    max-width: 100%;
-                    max-height: 100%;
+            /* Animations */
+            @keyframes fadeInUp {
+                from {
+                    opacity: 0;
+                    transform: translateY(20px);
                 }
 
-                .slide {
-                    height: 100%;
-                    width: 100%;
+                to {
+                    opacity: 1;
+                    transform: translateY(0);
                 }
+            }
 
+            .animate-in {
+                animation: fadeInUp 0.6s ease forwards;
+            }
+
+            .delay-1 {
+                animation-delay: 0.1s;
+            }
+
+            .delay-2 {
+                animation-delay: 0.2s;
+            }
+
+            .delay-3 {
+                animation-delay: 0.3s;
+            }
+
+            .delay-4 {
+                animation-delay: 0.4s;
+            }
+
+            /* Tech icons row */
+            .tech-icons {
+                display: flex;
+                gap: 2vmax;
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+
+            .tech-icon {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                gap: 0.5vmax;
+                padding: 1vmax;
+                background: var(--glass-bg);
+                border-radius: 12px;
+                border: 1px solid var(--glass-border);
+                min-width: 80px;
+                transition: all 0.3s ease;
+            }
+
+            .tech-icon:hover {
+                transform: translateY(-5px);
+                box-shadow: 0 10px 30px var(--accent-glow);
+            }
+
+            .tech-icon img {
+                width: 50px;
+                height: 50px;
+                object-fit: contain;
+            }
+
+            .tech-icon span {
+                font-size: 0.85rem;
+                color: var(--text-secondary);
+            }
+
+            /* Timeline */
+            .timeline {
+                display: flex;
+                flex-direction: column;
+                gap: 0;
+                position: relative;
+                padding-left: 2vmax;
+            }
+
+            .timeline::before {
+                content: '';
+                position: absolute;
+                left: 0;
+                top: 0;
+                bottom: 0;
+                width: 3px;
+                background: var(--accent-gradient);
+                border-radius: 3px;
+            }
+
+            .timeline-item {
+                position: relative;
+                padding: 1vmax 0 1vmax 2vmax;
+            }
+
+            .timeline-item::before {
+                content: '';
+                position: absolute;
+                left: -0.6vmax;
+                top: 1.5vmax;
+                width: 1.2vmax;
+                height: 1.2vmax;
+                min-width: 12px;
+                min-height: 12px;
+                background: var(--accent-gradient);
+                border-radius: 50%;
+                box-shadow: 0 0 15px var(--accent-glow);
+            }
+
+            .compact-timeline .content {
+                padding: 1.2vmax 2.5vmax;
+            }
+
+            .compact-timeline .timeline-item {
+                padding: 0.4vmax 0 0.4vmax 1.4vmax;
+            }
+
+            .compact-timeline .card {
+                padding: 0.7vmax 1.2vmax;
+            }
+
+            .compact-timeline .timeline::before {
+                width: 2px;
+            }
+
+            .compact-timeline .timeline {
+                font-size: clamp(0.95rem, 1.8vmax, 1.25rem);
+            }
+
+            .compact-content .content {
+                padding: 1.6vmax 2.5vmax;
+            }
+
+            .compact-content .content ul {
+                margin-top: 0.4vmax;
+            }
+
+            .compact-content .content li {
+                margin-bottom: 0.5em;
+                line-height: 1.5;
+            }
+
+            /* Mobile responsive */
+            @media (max-width: 768px) {
                 .content {
-                    width: 100%;
-                    height: 92%;
-                    display: flex;
-                    flex-direction: row;
-                    text-align: left;
-                    padding: 1vw;
-                    line-height: 3.8vmax;
-                    font-size: 1.8vmax;
-                    flex-wrap: wrap;
+                    padding: 1.5vmax 2vmax;
                 }
 
-                .content .topicheading {
-                    width: 90%;
+                .profile-card {
+                    flex-direction: column;
+                    text-align: center;
                 }
 
-                .content h1,
-                h2,
-                h3,
-                h4 {
-                    width: 100%;
+                .flex-row {
+                    flex-direction: column;
                 }
 
-                .content figure img {
-                    max-width: 80vmin;
-                    max-height: 50vmin;
-                }
-
-                .content figure figcaption {
-                    max-width: 90%;
-                    max-height: 90%;
+                .stats-grid {
+                    grid-template-columns: repeat(2, 1fr);
                 }
             }
 
             @media print {
-                body {
-                    max-width: 100%;
-                    max-height: 100%;
+
+                body::before,
+                .orb,
+                .theme-toggle {
+                    display: none;
                 }
 
-                .content {
-                    font-size: 2.8vmin;
+                .slide {
+                    page-break-after: always;
                 }
+            }
 
-                .content .flexcontent {
-                    font-size: 2.5vmin;
-                }
+            /* Highlight classes for code */
+            .highlight {
+                background: var(--code-bg);
+                border-radius: 8px;
+                padding: 1vmax;
+            }
+
+            .highlight .c,
+            .highlight .ch,
+            .highlight .c1,
+            .highlight .cs,
+            .highlight .cm {
+                color: #6b7280;
+                font-style: italic;
+            }
+
+            .highlight .k,
+            .highlight .kn {
+                color: #c084fc;
+                font-weight: bold;
+            }
+
+            .highlight .o {
+                color: #94a3b8;
+            }
+
+            .highlight .nn,
+            .highlight .nb {
+                color: #60a5fa;
+            }
+
+            .highlight .s2,
+            .highlight .s1 {
+                color: #34d399;
+            }
+
+            .highlight .mf,
+            .highlight .mi,
+            .highlight .mh,
+            .highlight .mo,
+            .highlight .mb {
+                color: #fbbf24;
             }
         </style>
     </head>
 
     <body>
+        <!-- Animated background orbs -->
+        <div class="orb orb-1"></div>
+        <div class="orb orb-2"></div>
+        <div class="orb orb-3"></div>
+
+        <!-- Theme Toggle Button -->
+        <button class="theme-toggle" onclick="toggleTheme()" aria-label="Toggle theme">
+            <svg class="sun" viewBox="0 0 24 24">
+                <path
+                    d="M12 7c-2.76 0-5 2.24-5 5s2.24 5 5 5 5-2.24 5-5-2.24-5-5-5zM2 13h2c.55 0 1-.45 1-1s-.45-1-1-1H2c-.55 0-1 .45-1 1s.45 1 1 1zm18 0h2c.55 0 1-.45 1-1s-.45-1-1-1h-2c-.55 0-1 .45-1 1s.45 1 1 1zM11 2v2c0 .55.45 1 1 1s1-.45 1-1V2c0-.55-.45-1-1-1s-1 .45-1 1zm0 18v2c0 .55.45 1 1 1s1-.45 1-1v-2c0-.55-.45-1-1-1s-1 .45-1 1zM5.99 4.58c-.39-.39-1.03-.39-1.41 0-.39.39-.39 1.03 0 1.41l1.06 1.06c.39.39 1.03.39 1.41 0s.39-1.03 0-1.41L5.99 4.58zm12.37 12.37c-.39-.39-1.03-.39-1.41 0-.39.39-.39 1.03 0 1.41l1.06 1.06c.39.39 1.03.39 1.41 0 .39-.39.39-1.03 0-1.41l-1.06-1.06zm1.06-10.96c.39-.39.39-1.03 0-1.41-.39-.39-1.03-.39-1.41 0l-1.06 1.06c-.39.39-.39 1.03 0 1.41s1.03.39 1.41 0l1.06-1.06zM7.05 18.36c.39-.39.39-1.03 0-1.41-.39-.39-1.03-.39-1.41 0l-1.06 1.06c-.39.39-.39 1.03 0 1.41s1.03.39 1.41 0l1.06-1.06z" />
+            </svg>
+            <svg class="moon" viewBox="0 0 24 24">
+                <path
+                    d="M12 3c-4.97 0-9 4.03-9 9s4.03 9 9 9 9-4.03 9-9c0-.46-.04-.92-.1-1.36-.98 1.37-2.58 2.26-4.4 2.26-2.98 0-5.4-2.42-5.4-5.4 0-1.81.89-3.42 2.26-4.4-.44-.06-.9-.1-1.36-.1z" />
+            </svg>
+        </button>
         <section class="slide" id="slide1">
             <div class="header">
             </div>
-            <div class="content">
-                <h1 style="font-size:3.5vw">Traitement de données massives</h1>
-                <p><b>John Samuel</b></br>
-                    CPE Lyon<br /><br />
-                    <b>Année</b>: 2025-2026<br />
-                    <b>Courriel</b>: john.samuel@cpe.fr</br>
-                    </br>
-                    <a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/"><img
-                            alt="Creative Commons License" style="border-width:0"
-                            src="../../../../../en/teaching/courses/2017/C/88x31.png" /></a>
-                </p>
+            <div class="content flex-center" style="justify-content: center; padding: 2vmax 3vmax; gap: 1.5vmax;">
+                <h1 class="animate-in title-main">
+                    Traitement de données massives
+                </h1>
+                <h2 class="animate-in delay-1"
+                    style="font-size: clamp(1.1rem, 2.6vmax, 1.8rem); margin-bottom: 0.8vmax;">
+                    Introduction</h2>
+                <h3 class="animate-in delay-2" style="font-size: clamp(1rem, 2.2vmax, 1.5rem); margin-bottom: 1.2vmax;">
+                    2025-2026</h3>
+
+                <div class="card animate-in delay-2" style="max-width: 520px; padding: 1.5vmax 2vmax;">
+                    <div class="icon-box">
+                        <div class="icon-circle">
+                            <svg viewBox="0 0 24 24">
+                                <path
+                                    d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
+                            </svg>
+                        </div>
+                        <div>
+                            <strong style="font-size: 1.2em;">John Samuel</strong><br>
+                            <span style="color: var(--text-secondary);">CPE Lyon</span>
+                        </div>
+                    </div>
+                    <div class="icon-box">
+                        <div class="icon-circle">
+                            <svg viewBox="0 0 24 24">
+                                <path
+                                    d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z" />
+                            </svg>
+                        </div>
+                        <span>john.samuel@cpe.fr</span>
+                    </div>
+                </div>
+
+                <a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/" class="animate-in delay-3"
+                    style="margin-top: 1vmax;">
+                    <img alt="Creative Commons License" style="border-width:0; opacity: 0.8;"
+                        src="../../../../../en/teaching/courses/2017/C/88x31.png" />
+                </a>
             </div>
             <div class="footer">
                 <div class="contact">Traitement de données massives | John Samuel</div>
-                <div class="navigation">1
-                    <a class="next" href="#slide2"></a>
+                <div class="navigation">
+                    <span class="page-number">1 / 49</span>
+                    <a class="nav-btn" href="#slide2">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z" />
+                        </svg>
+                    </a>
                 </div>
             </div>
         </section>
@@ -430,28 +1015,42 @@
                 <h1>John SAMUEL</h1>
             </div>
             <div class="content">
-                <div class="flexcontent">
-                    <figure style="width:30vw">
-                        <img src="../../../../../images/portrait.jpg" width="300vw" style="background:#ffffff" />
+                <div class="profile-card animate-in">
+                    <figure style="margin: 0;">
+                        <img src="../../../../../images/portrait.jpg" class="profile-img" alt="John Samuel" />
                     </figure>
-                    <ul style="width:40vw">
-                        <li> <b>Enseignant-Chercheur</b>, Conception Logicielle et Big Data, CPE Lyon, </li>
-                        <li> <b>Intérêts et thèmes de recherche </b>: Représentation de connaissances, le web
-                            sémantique,
-                            les services web, l'intégration de données, l'entrepôt de données, les systèmes distribués,
-                            système d'information géographique</li>
-                        <li> <b>Cours </b>: Programmation en C, Algorithmes en C, Data Mining et Machine Learning,
-                            Intelligence Artificielle et Deep Learning, Systèmes d'exploitation et Programmation
-                            Concurrente, Langages Web</li>
-                        <li> <b>Thèse</b> : Intégration des données issues de services web</li>
-                    </ul>
+                    <div class="profile-info">
+                        <ul>
+                            <li> <b>Enseignant-Chercheur</b>, Conception Logicielle et Big Data, CPE Lyon</li>
+                            <li> <b>Intérêts et thèmes de recherche</b>: Représentation de connaissances, le web
+                                sémantique,
+                                les services web, l'intégration de données, l'entrepôt de données, les systèmes
+                                distribués,
+                                système d'information géographique</li>
+                            <li> <b>Cours</b>: Programmation en C, Algorithmes en C, Data Mining et Machine Learning,
+                                Intelligence Artificielle et Deep Learning, Systèmes d'exploitation et Programmation
+                                Concurrente, Langages Web</li>
+                            <li> <b>Thèse</b>: Intégration des données issues de services web</li>
+                            <li><b>HDR</b> : Des regards sémantiques pour des villes intelligentes, durables et
+                                inclusives</li>
+                        </ul>
+                    </div>
                 </div>
             </div>
             <div class="footer">
                 <div class="contact">Traitement de données massives | John Samuel</div>
-                <div class="navigation">2
-                    <a class="prev" href="#slide1"></a>
-                    <a class="next" href="#slide3"></a>
+                <div class="navigation">
+                    <a class="nav-btn" href="#slide1">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M15.41 16.59L10.83 12l4.58-4.59L14 6l-6 6 6 6 1.41-1.41z" />
+                        </svg>
+                    </a>
+                    <span class="page-number">2 / 49</span>
+                    <a class="nav-btn" href="#slide3">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z" />
+                        </svg>
+                    </a>
                 </div>
             </div>
         </section>
@@ -460,29 +1059,32 @@
                 <h1>Traitement de données massives</h1>
             </div>
             <div class="content">
-                <h1>Objectifs</h1>
-                <ol>
-                    <li>Explorer <b>l'évolution historique</b> du traitement de données massives (Big Data), ses
-                        origines et
-                        son impact sur la science.</li>
-                    <li>Maîtriser les techniques de <b>représentation, manipulation et prétraitement</b> des données
-                        pour en
-                        optimiser l'utilisation.</li>
-                    <li>Appliquer des méthodes avancées de <b>traitement des données</b> pour extraire des informations
-                        pertinentes et exploitables.</li>
-                    <li><b>Construire des modèles de traitement</b> par apprentissage machine afin d'analyser et de
-                        prédire
-                        des tendances à partir de données massives.</li>
-                    <li>Intégrer les <b>données ouvertes liées</b> dans vos analyses pour enrichir vos résultats.</li>
-                    <li>Se familiariser avec les outils essentiels tels que <b>Hadoop, Hive et Spark</b> pour mener des
-                        analyses approfondies sur de vastes ensembles de données.</li>
-                </ol>
+                <div class="card animate-in">
+                    <h3>Objectifs </h3>
+                    <ul>
+                        <li> Explorer <b>l'évolution historique</b> du traitement de données massives (Big Data).</li>
+                        <li> Maîtriser la <b>représentation, manipulation et prétraitement</b> des données.</li>
+                        <li> Appliquer des méthodes avancées de <b>traitement des données</b>.</li>
+                        <li> <b>Construire des modèles</b> par apprentissage machine pour analyser et prédire.</li>
+                        <li> Intégrer les <b>données ouvertes liées</b> pour enrichir les analyses.</li>
+                        <li> Se familiariser avec <b>Hadoop, Hive et Spark</b> pour l'analyse grande échelle.</li>
+                    </ul>
+                </div>
             </div>
             <div class="footer">
                 <div class="contact">Traitement de données massives | John Samuel</div>
-                <div class="navigation">3
-                    <a class="prev" href="#slide2"></a>
-                    <a class="next" href="#slide4"></a>
+                <div class="navigation">
+                    <a class="nav-btn" href="#slide2">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M15.41 16.59L10.83 12l4.58-4.59L14 6l-6 6 6 6 1.41-1.41z" />
+                        </svg>
+                    </a>
+                    <span class="page-number">3 / 49</span>
+                    <a class="nav-btn" href="#slide4">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z" />
+                        </svg>
+                    </a>
                 </div>
             </div>
         </section>
@@ -491,28 +1093,72 @@
                 <h1>Traitement de données massives</h1>
             </div>
             <div class="content">
-                <h1 class="topicheading">Environnement de programmation:</h1>
-                <ul>
-                    <li>Système d'exploitation: Linux</li>
-                    <ul>
-                        <li>Ubuntu</li>
-                        <li>Machine virtuelle (VirtualBox) + Ubuntu</li>
-                    </ul>
-                    </li>
-                    <li>Éditeur: Jupyter</li>
-                    <li>Logiciels:
-                        <ul>
-                            <li>Python: pandas, numpy, matplotlib, scikit-learn</li>
-                            <li>Hadoop, Hive, Spark, Docker/Kubernetes</li>
-                        </ul>
-                    </li>
-                </ul>
+                <div class="tech-icons animate-in">
+                    <div class="tech-icon">
+                        <div style="font-size: 2.5em;">🐧</div>
+                        <span>Linux/Ubuntu</span>
+                    </div>
+                    <div class="tech-icon">
+                        <img src="../../../../../en/teaching/courses/2018/DataMining/250px-Jupyter_logo.svg.png"
+                            alt="Jupyter" />
+                        <span>Jupyter</span>
+                    </div>
+                    <div class="tech-icon">
+                        <div style="font-size: 2.5em;">🐍</div>
+                        <span>Python</span>
+                    </div>
+                    <div class="tech-icon">
+                        <div style="font-size: 2.5em;">⚙️</div>
+                        <span>Big Data</span>
+                    </div>
+                </div>
+
+                <div class="card animate-in delay-1" style="margin-top: 2vmax;">
+                    <h4 style="margin-bottom: 1vmax;">Environnement de programmation</h4>
+                    <div class="flex-row">
+                        <div class="icon-box">
+                            <div class="icon-circle" style="background: linear-gradient(135deg, #10b981, #059669);">
+                                <svg viewBox="0 0 24 24">
+                                    <path
+                                        d="M20 18c1.1 0 1.99-.9 1.99-2L22 6c0-1.1-.9-2-2-2H4c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2H0v2h24v-2h-4zM4 6h16v10H4V6z" />
+                                </svg>
+                            </div>
+                            <span>Linux (Ubuntu) ou VM (VirtualBox + Ubuntu)</span>
+                        </div>
+                        <div class="icon-box">
+                            <div class="icon-circle" style="background: linear-gradient(135deg, #3b82f6, #1d4ed8);">
+                                <svg viewBox="0 0 24 24">
+                                    <path
+                                        d="M21 2H3c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h7v2H8v2h8v-2h-2v-2h7c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H3V4h18v12z" />
+                                </svg>
+                            </div>
+                            <span>Jupyter · pandas · numpy · matplotlib · scikit-learn</span>
+                        </div>
+                        <div class="icon-box">
+                            <div class="icon-circle" style="background: linear-gradient(135deg, #a855f7, #7c3aed);">
+                                <svg viewBox="0 0 24 24">
+                                    <path d="M4 6h16v2H4V6zm0 5h16v2H4v-2zm0 5h10v2H4v-2z" />
+                                </svg>
+                            </div>
+                            <span>Hadoop · Hive · Spark · Docker/Kubernetes</span>
+                        </div>
+                    </div>
+                </div>
             </div>
             <div class="footer">
                 <div class="contact">Traitement de données massives | John Samuel</div>
-                <div class="navigation">4
-                    <a class="prev" href="#slide3"></a>
-                    <a class="next" href="#slide5"></a>
+                <div class="navigation">
+                    <a class="nav-btn" href="#slide3">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M15.41 16.59L10.83 12l4.58-4.59L14 6l-6 6 6 6 1.41-1.41z" />
+                        </svg>
+                    </a>
+                    <span class="page-number">4 / 49</span>
+                    <a class="nav-btn" href="#slide5">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z" />
+                        </svg>
+                    </a>
                 </div>
             </div>
         </section>
@@ -523,24 +1169,67 @@
                 <h1>Traitement de données massives</h1>
             </div>
             <div class="content">
-                <h3 class="topicsubheading">Cours:</h3>
-                <ul>
-                    <li>Interactifs</li>
-                    <li>Devoir surveillé: 60%</li>
-                </ul>
-                <h3 class="topicsubheading">Travaux pratiques et projet</h3>
-                <ul>
-                    <li>Projet: 40%</li>
-                    <li>7 travaux pratiques et projet (parties 1 et 2)</li>
-                    <li>Programmation en binôme</li>
-                    <li>Soumission en ligne</li>
-                </ul>
+                <div class="tech-icons animate-in">
+                    <div class="tech-icon">
+                        <div style="font-size: 2.5em;">📘</div>
+                        <span>Cours interactifs</span>
+                    </div>
+                    <div class="tech-icon">
+                        <div style="font-size: 2.5em;">📝</div>
+                        <span>Devoir surveillé (60%)</span>
+                    </div>
+                    <div class="tech-icon">
+                        <div style="font-size: 2.5em;">🧪</div>
+                        <span>TP & Projet (40%)</span>
+                    </div>
+                    <div class="tech-icon">
+                        <div style="font-size: 2.5em;">🤝</div>
+                        <span>Travail en binôme</span>
+                    </div>
+                    <div class="tech-icon">
+                        <div style="font-size: 2.5em;">☁️</div>
+                        <span>Soumission en ligne</span>
+                    </div>
+                </div>
+
+                <div class="card animate-in delay-1" style="margin-top: 2vmax;">
+                    <h4 style="margin-bottom: 1vmax;">Organisation du cours</h4>
+                    <div class="flex-row">
+                        <div class="icon-box">
+                            <div class="icon-circle" style="background: linear-gradient(135deg, #10b981, #059669);">
+                                <svg viewBox="0 0 24 24">
+                                    <path
+                                        d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z" />
+                                </svg>
+                            </div>
+                            <span>Cours interactifs · 60%</span>
+                        </div>
+                        <div class="icon-box">
+                            <div class="icon-circle" style="background: linear-gradient(135deg, #3b82f6, #1d4ed8);">
+                                <svg viewBox="0 0 24 24">
+                                    <path
+                                        d="M9.4 16.6L4.8 12l4.6-4.6L8 6l-6 6 6 6 1.4-1.4zm5.2 0l4.6-4.6-4.6-4.6L16 6l6 6-6 6-1.4-1.4z" />
+                                </svg>
+                            </div>
+                            <span>TP & Projet · 7 TPs (parties 1 et 2) · 40%</span>
+                        </div>
+                    </div>
+                </div>
             </div>
             <div class="footer">
                 <div class="contact">Traitement de données massives | John Samuel</div>
-                <div class="navigation">5
-                    <a class="prev" href="#slide4"></a>
-                    <a class="next" href="#slide6"></a>
+                <div class="navigation">
+                    <a class="nav-btn" href="#slide4">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M15.41 16.59L10.83 12l4.58-4.59L14 6l-6 6 6 6 1.41-1.41z" />
+                        </svg>
+                    </a>
+                    <span class="page-number">5 / 49</span>
+                    <a class="nav-btn" href="#slide6">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z" />
+                        </svg>
+                    </a>
                 </div>
             </div>
         </section>
@@ -548,26 +1237,36 @@
             <div class="header">
                 <h1>Traitement de données massives</h1>
             </div>
-            </div>
             <div class="content">
-                <h3 class="topicsubheading">Devoir surveillé (DS): 60%</h3>
-                <ul>
-                    <li><b>Examen</b>: En-ligne sur E-campus</li>
-                    <li><b>Durée</b>: 2 heures</li>
-                    <li><b>Total</b>: 20 points</li>
-                    <li><b>Documents</b>: autorisés</li>
-                    <li><b>Types de documents autorisés</b>: tous les documents autorisés</li>
-                    <li><b>Calculatrices</b> : non autorisées</li>
-                    <li><b>Utilisation de l'internet</b> : non autorisée</li>
-                    <li><b>Dépôt supplémentaire</b> : disponible pour les fichiers personnels</li>
-                </ul>
-                <p>Vous recevrez un courrier détaillé avant l'examen</p>
+                <div class="card animate-in">
+                    <h3>Devoir surveillé (DS) </h3>
+                    <ul>
+                        <li><b>Examen</b>: En-ligne sur E-campus</li>
+                        <li><b>Durée</b>: 2 heures. <b>Total</b>: 20 points</li>
+                        <li><b>Documents</b>: autorisés ; <b>Types de documents autorisés</b>: tous les documents
+                            autorisés
+                        </li>
+                        <li><b>Calculatrices</b>: non autorisées</li>
+                        <li><b>Utilisation de l'internet</b>: non autorisée</li>
+                        <li><b>Dépôt supplémentaire</b>: disponible pour les fichiers personnels</li>
+                    </ul>
+                    <p style="margin-top: 1vmax;">Vous recevrez un courrier détaillé avant l'examen.</p>
+                </div>
             </div>
             <div class="footer">
                 <div class="contact">Traitement de données massives | John Samuel</div>
-                <div class="navigation">6
-                    <a class="prev" href="#slide5"></a>
-                    <a class="next" href="#slide7"></a>
+                <div class="navigation">
+                    <a class="nav-btn" href="#slide5">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M15.41 16.59L10.83 12l4.58-4.59L14 6l-6 6 6 6 1.41-1.41z" />
+                        </svg>
+                    </a>
+                    <span class="page-number">6 / 49</span>
+                    <a class="nav-btn" href="#slide7">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z" />
+                        </svg>
+                    </a>
                 </div>
             </div>
         </section>
@@ -591,107 +1290,271 @@
             </div>
             <div class="footer">
                 <div class="contact">Traitement de données massives | John Samuel</div>
-                <div class="navigation">7
-                    <a class="prev" href="#slide6"></a>
-                    <a class="next" href="#slide8"></a>
+                <div class="navigation">
+                    <a class="nav-btn" href="#slide6">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M15.41 16.59L10.83 12l4.58-4.59L14 6l-6 6 6 6 1.41-1.41z" />
+                        </svg>
+                    </a>
+                    <span class="page-number">7 / 49</span>
+                    <a class="nav-btn" href="#slide8">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z" />
+                        </svg>
+                    </a>
                 </div>
             </div>
         </section>
 
 
-        <section class="slide" id="slide8">
+        <section class="slide compact-timeline" id="slide8">
             <div class="header">
                 <h1>Traitement de données massives</h1>
             </div>
-            <div class="content">
-                <table>
-                    <tr>
-                        <th>Cours</th>
-                        <th>Dates</th>
-                    </tr>
-                    <tr>
-                        <td>Cours 1 (4h)</td>
-                        <td>3 février</td>
-                    </tr>
-                    <tr>
-                        <td>Cours 2 (4h)</td>
-                        <td>5 février</td>
-                    </tr>
-                    <tr>
-                        <td>Cours 3 (4h)</td>
-                        <td>19 février</td>
-                    </tr>
-                    <tr>
-                        <td>Cours 4 (4h)</td>
-                        <td>13 mars</td>
-                    </tr>
-                    <tr>
-                        <td>Cours 5 (4h)</td>
-                        <td>24 mars</td>
-                    </tr>
-                </table>
+            <div class="content flex-center" style="justify-content: center;">
+                <div class="flex-row" style="width: 100%; justify-content: center; gap: 1vmax;">
+                    <div style="width: 48%;">
+                        <div class="timeline animate-in" style="padding-left: 1.2vmax;">
+                            <div class="timeline-item">
+                                <div class="card">
+                                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                                        <div>
+                                            <strong style="font-size: 1.1em;">Cours 1</strong>
+                                            <span class="badge badge-success" style="margin-left: 0.5em;">2h</span>
+                                        </div>
+                                        <span style="color: var(--accent-primary); font-weight: 600;">9 février
+                                            (matin)</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="timeline-item">
+                                <div class="card">
+                                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                                        <div>
+                                            <strong style="font-size: 1.1em;">Cours 2</strong>
+                                            <span class="badge badge-success" style="margin-left: 0.5em;">2h</span>
+                                        </div>
+                                        <span style="color: var(--accent-primary); font-weight: 600;">9 février
+                                            (après-midi)</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="timeline-item">
+                                <div class="card">
+                                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                                        <div>
+                                            <strong style="font-size: 1.1em;">Cours 3</strong>
+                                            <span class="badge badge-success" style="margin-left: 0.5em;">2h</span>
+                                        </div>
+                                        <span style="color: var(--accent-primary); font-weight: 600;">10 février</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="timeline-item">
+                                <div class="card">
+                                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                                        <div>
+                                            <strong style="font-size: 1.1em;">Cours 4</strong>
+                                            <span class="badge badge-success" style="margin-left: 0.5em;">2h</span>
+                                        </div>
+                                        <span style="color: var(--accent-primary); font-weight: 600;">12 février</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="timeline-item">
+                                <div class="card">
+                                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                                        <div>
+                                            <strong style="font-size: 1.1em;">Cours 5</strong>
+                                            <span class="badge badge-success" style="margin-left: 0.5em;">2h</span>
+                                        </div>
+                                        <span style="color: var(--accent-primary); font-weight: 600;">12 mars</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div style="width: 48%;">
+                        <div class="timeline animate-in" style="padding-left: 1.2vmax;">
+                            <div class="timeline-item">
+                                <div class="card">
+                                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                                        <div>
+                                            <strong style="font-size: 1.1em;">Cours 6</strong>
+                                            <span class="badge badge-success" style="margin-left: 0.5em;">2h</span>
+                                        </div>
+                                        <span style="color: var(--accent-primary); font-weight: 600;">17 mars</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="timeline-item">
+                                <div class="card">
+                                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                                        <div>
+                                            <strong style="font-size: 1.1em;">Cours 7</strong>
+                                            <span class="badge badge-success" style="margin-left: 0.5em;">2h</span>
+                                        </div>
+                                        <span style="color: var(--accent-primary); font-weight: 600;">19 mars</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="timeline-item">
+                                <div class="card">
+                                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                                        <div>
+                                            <strong style="font-size: 1.1em;">Cours 8</strong>
+                                            <span class="badge badge-success" style="margin-left: 0.5em;">2h</span>
+                                        </div>
+                                        <span style="color: var(--accent-primary); font-weight: 600;">23 mars</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="timeline-item">
+                                <div class="card">
+                                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                                        <div>
+                                            <strong style="font-size: 1.1em;">Cours 9</strong>
+                                            <span class="badge badge-success" style="margin-left: 0.5em;">2h</span>
+                                        </div>
+                                        <span style="color: var(--accent-primary); font-weight: 600;">24 mars</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="timeline-item">
+                                <div class="card">
+                                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                                        <div>
+                                            <strong style="font-size: 1.1em;">Cours 10</strong>
+                                            <span class="badge badge-success" style="margin-left: 0.5em;">2h</span>
+                                        </div>
+                                        <span style="color: var(--accent-primary); font-weight: 600;">22 avril</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
             <div class="footer">
                 <div class="contact">Traitement de données massives | John Samuel</div>
-                <div class="navigation">8
-                    <a class="prev" href="#slide7"></a>
-                    <a class="next" href="#slide9"></a>
+                <div class="navigation">
+                    <a class="nav-btn" href="#slide7">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M15.41 16.59L10.83 12l4.58-4.59L14 6l-6 6 6 6 1.41-1.41z" />
+                        </svg>
+                    </a>
+                    <span class="page-number">8 / 49</span>
+                    <a class="nav-btn" href="#slide9">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z" />
+                        </svg>
+                    </a>
                 </div>
             </div>
         </section>
-        <section class="slide" id="slide9">
+        <section class="slide compact-timeline" id="slide9">
             <div class="header">
                 <h1>Traitement de données massives</h1>
             </div>
-            <div class="content">
-                <table>
-                    <tr>
-                        <th>Travaux pratiques</th>
-                        <th>Dates</th>
-                    </tr>
-                    <tr>
-                        <td>Séance 1 (TP 1)</td>
-                        <td>4 février</td>
-                    </tr>
-                    <tr>
-                        <td>Séance 2 (TP 2)</td>
-                        <td>6 mars</td>
-                    </tr>
-                    <tr>
-                        <td>Séance 3 (TP 3)</td>
-                        <td>20 mars</td>
-                    </tr>
-                    <tr>
-                        <td>Séance 4 (TP 4 et Projet partie 1)</td>
-                        <td>17 mars</td>
-                    </tr>
-                    <tr>
-                        <td>Séance 5 (Projet partie 1)</td>
-                        <td>27 mars</td>
-                    </tr>
-                    <tr>
-                        <td>Séance 6 (TP 5 et Projet partie 2)</td>
-                        <td>8 avril</td>
-                    </tr>
-                    <tr>
-                        <td>Séance 7 (TP 6 et Projet partie 2)</td>
-                        <td>15 avril</td>
-                    </tr>
-                    <tr>
-                        <td>Séance 8 (TP 7 et Projet partie 2)</td>
-                        <td>22 avril</td>
-                    </tr>
-                    <tr>
-                        <td>Séance 9 (Projet partie 2)</td>
-                        <td>6 mai</td>
-                    </tr>
-                </table>
+            <div class="content" style="padding: 1.8vmax 3vmax;">
+                <div class="flex-row" style="width: 100%; justify-content: center; gap: 0.8vmax;">
+                    <div style="width: 48%;">
+                        <div class="timeline animate-in" style="padding-left: 1.2vmax;">
+                            <div class="timeline-item">
+                                <div class="card">
+                                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                                        <strong>TP 1</strong>
+                                        <span style="color: var(--accent-primary);">9 février</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="timeline-item">
+                                <div class="card">
+                                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                                        <strong>TP 2</strong>
+                                        <span style="color: var(--accent-primary);">10 et 12 février</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="timeline-item">
+                                <div class="card">
+                                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                                        <strong>TP 3</strong>
+                                        <span style="color: var(--accent-primary);">24 février</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="timeline-item">
+                                <div class="card">
+                                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                                        <strong>TP 4 + Projet (partie 1)</strong>
+                                        <span style="color: var(--accent-primary);">26 février</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="timeline-item">
+                                <div class="card">
+                                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                                        <strong>Projet (partie 1)</strong>
+                                        <span style="color: var(--accent-primary);">12 et 17 mars</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div style="width: 48%;">
+                        <div class="timeline animate-in" style="padding-left: 1.2vmax;">
+                            <div class="timeline-item">
+                                <div class="card">
+                                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                                        <strong>TP 5 + Projet (partie 2)</strong>
+                                        <span style="color: var(--accent-primary);">19 et 23 mars</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="timeline-item">
+                                <div class="card">
+                                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                                        <strong>TP 6 + Projet (partie 2)</strong>
+                                        <span style="color: var(--accent-primary);">24 et 25 mars (matin)</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="timeline-item">
+                                <div class="card">
+                                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                                        <strong>TP 7 + Projet (partie 2)</strong>
+                                        <span style="color: var(--accent-primary);">25 mars (après-midi) et 22
+                                            avril</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="timeline-item">
+                                <div class="card">
+                                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                                        <strong>Projet (partie 2)</strong>
+                                        <span style="color: var(--accent-primary);">5 mai</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
             <div class="footer">
                 <div class="contact">Traitement de données massives | John Samuel</div>
-                <div class="navigation">9
-                    <a class="prev" href="#slide8"></a>
-                    <a class="next" href="#slide10"></a>
+                <div class="navigation">
+                    <a class="nav-btn" href="#slide8">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M15.41 16.59L10.83 12l4.58-4.59L14 6l-6 6 6 6 1.41-1.41z" />
+                        </svg>
+                    </a>
+                    <span class="page-number">9 / 49</span>
+                    <a class="nav-btn" href="#slide10">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z" />
+                        </svg>
+                    </a>
                 </div>
             </div>
         </section>
@@ -701,7 +1564,7 @@
                 <h1>Traitement de données massives</h1>
             </div>
             <div class="content">
-                <h1>Travaux pratiques</h1>
+                <h3>Travaux pratiques</h3>
                 <ul>
                     <li>Exploration approfondie de <b>Jupyter</b>, une plateforme interactive prisée pour l'analyse de
                         données.
@@ -715,17 +1578,26 @@
                         significatifs à partir de données volumineuses et hétérogènes.</li>
                 </ul>
                 <figure>
-                    <img width="100px"
+                    <img alt="Jupyter logo" width="100px"
                         src="../../../../../en/teaching/courses/2018/DataMining/250px-Jupyter_logo.svg.png" />
-                    <img width="100px"
+                    <img alt="Open Definition logo" width="100px"
                         src="../../../../../fr/enseignement/cours/2017/BigData/images/Open_Definition_logo.png" />
                 </figure>
             </div>
             <div class="footer">
                 <div class="contact">Traitement de données massives | John Samuel</div>
-                <div class="navigation">10
-                    <a class="prev" href="#slide9"></a>
-                    <a class="next" href="#slide11"></a>
+                <div class="navigation">
+                    <a class="nav-btn" href="#slide9">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M15.41 16.59L10.83 12l4.58-4.59L14 6l-6 6 6 6 1.41-1.41z" />
+                        </svg>
+                    </a>
+                    <span class="page-number">10 / 49</span>
+                    <a class="nav-btn" href="#slide11">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z" />
+                        </svg>
+                    </a>
                 </div>
             </div>
         </section>
@@ -734,22 +1606,22 @@
                 <h1>Traitement de données massives</h1>
             </div>
             <div class="content">
-                <h1>Soumission: Travaux pratiques et projet</h1>
-                <table>
+                <h3>Soumission: Travaux pratiques et projet</h3>
+                <table class="modern-table animate-in">
                     <tr>
                         <th>TP</th>
                         <th>Points</th>
                     </tr>
                     <tr>
                         <td>TP 1-7</td>
-                        <td>❌</td>
+                        <td><span class="badge badge-danger">Non noté</span></td>
                     </tr>
                     <tr>
-                        <td>Projet</td>
-                        <td>✅ (20 points)</td>
+                        <td><strong>Projet</strong></td>
+                        <td><span class="badge badge-success">20 points</span></td>
                     </tr>
                 </table>
-                <ul>
+                <ul class="animate-in delay-1">
                     <li>Les TP, notés de 1 à 7, ne sont pas soumis à évaluation. Cependant, la participation active et
                         l'assiduité sont fortement encouragées pour une meilleure compréhension des concepts enseignés.
                     </li>
@@ -759,9 +1631,18 @@
             </div>
             <div class="footer">
                 <div class="contact">Traitement de données massives | John Samuel</div>
-                <div class="navigation">11
-                    <a class="prev" href="#slide10"></a>
-                    <a class="next" href="#slide12"></a>
+                <div class="navigation">
+                    <a class="nav-btn" href="#slide10">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M15.41 16.59L10.83 12l4.58-4.59L14 6l-6 6 6 6 1.41-1.41z" />
+                        </svg>
+                    </a>
+                    <span class="page-number">11 / 49</span>
+                    <a class="nav-btn" href="#slide12">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z" />
+                        </svg>
+                    </a>
                 </div>
             </div>
         </section>
@@ -770,21 +1651,51 @@
                 <h1>Traitement de données massives</h1>
             </div>
             <div class="content">
-                <h1 class="topicheading">Travaux pratiques</h1>
-                <p>Chaque TP comporte plusieurs exercices. Chaque exercice est accompagné d'une indication de <b>niveau
-                        de
-                        difficulté</b> :</p>
-                <ul>
-                    <li><span style="color:red">&#9733;</span>: Facile</li>
-                    <li><span style="color:red">&#9733;&#9733;</span>: Difficulté moyenne</li>
-                    <li><span style="color:red">&#9733;&#9733;&#9733;</span>: Difficile</li>
-                </ul>
+                <h3 class="topicsubheading">Travaux pratiques</h3>
+                <p class="animate-in" style="margin-top: 1.5vmax;">Chaque TP comporte plusieurs exercices. Chaque
+                    exercice est accompagné d'une indication de <b>niveau de
+                        difficulté</b>:</p>
+                <div class="stats-grid animate-in delay-1" style="max-width: 700px; margin-top: 1.5vmax;">
+                    <div class="card" style="text-align: center; padding: 2vmax;">
+                        <div class="difficulty" style="justify-content: center; margin-bottom: 1vmax;">
+                            <span class="star">★</span>
+                            <span class="star empty">★</span>
+                            <span class="star empty">★</span>
+                        </div>
+                        <h4 style="color: var(--success);">Facile</h4>
+                    </div>
+                    <div class="card" style="text-align: center; padding: 2vmax;">
+                        <div class="difficulty" style="justify-content: center; margin-bottom: 1vmax;">
+                            <span class="star">★</span>
+                            <span class="star">★</span>
+                            <span class="star empty">★</span>
+                        </div>
+                        <h4 style="color: var(--warning);">Difficulté moyenne</h4>
+                    </div>
+                    <div class="card" style="text-align: center; padding: 2vmax;">
+                        <div class="difficulty" style="justify-content: center; margin-bottom: 1vmax;">
+                            <span class="star">★</span>
+                            <span class="star">★</span>
+                            <span class="star">★</span>
+                        </div>
+                        <h4 style="color: var(--danger);">Difficile</h4>
+                    </div>
+                </div>
             </div>
             <div class="footer">
                 <div class="contact">Traitement de données massives | John Samuel</div>
-                <div class="navigation">12
-                    <a class="prev" href="#slide11"></a>
-                    <a class="next" href="#slide13"></a>
+                <div class="navigation">
+                    <a class="nav-btn" href="#slide11">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M15.41 16.59L10.83 12l4.58-4.59L14 6l-6 6 6 6 1.41-1.41z" />
+                        </svg>
+                    </a>
+                    <span class="page-number">12 / 49</span>
+                    <a class="nav-btn" href="#slide13">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z" />
+                        </svg>
+                    </a>
                 </div>
             </div>
         </section>
@@ -793,29 +1704,67 @@
                 <h1>Traitement de données massives</h1>
             </div>
             <div class="content">
-                <h1 class="topicheading">Liste de contrôle</h1>
-                <p>Avant de soumettre votre travail pratique, veuillez vérifier que vous avez respecté la liste de
-                    contrôle
-                    suivante :</p>
-                <ul>
-                    <li>✅ Les noms complets (prénom et noms) de la binôme sont correctement inclus dans le fichier
-                        CONTRIBUTORS.md.</li>
-                    <li>✅ Le fichier README.md est rempli de manière exhaustive et conforme aux instructions fournies.
-                    </li>
-                    <li>✅ Vous avez respecté les noms de fichiers tels que spécifiés dans chaque exercice des travaux
-                        pratiques.</li>
-                    <li>✅ Votre code est accompagné de commentaires appropriés pour expliquer la logique et la
-                        fonctionnalité.</li>
-                    <li>✅ Votre code peut être exécuté sans générer d'erreurs, et dans la mesure du possible, sans
-                        générer
-                        d'avertissements.</li>
-                </ul>
+                <h3>Liste de contrôle</h3>
+                <p class="animate-in">Avant de soumettre votre travail pratique, veuillez vérifier que vous avez
+                    respecté
+                    la liste de contrôle suivante :</p>
+                <div class="checklist animate-in delay-1">
+                    <div class="check-item">
+                        <svg class="check-icon success" viewBox="0 0 24 24">
+                            <path
+                                d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" />
+                        </svg>
+                        <span>Les noms complets (prénom et noms) de la binôme sont correctement inclus dans le fichier
+                            CONTRIBUTORS.md.</span>
+                    </div>
+                    <div class="check-item">
+                        <svg class="check-icon success" viewBox="0 0 24 24">
+                            <path
+                                d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" />
+                        </svg>
+                        <span>Le fichier README.md est rempli de manière exhaustive et conforme aux instructions
+                            fournies.</span>
+                    </div>
+                    <div class="check-item">
+                        <svg class="check-icon success" viewBox="0 0 24 24">
+                            <path
+                                d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" />
+                        </svg>
+                        <span>Vous avez respecté les noms de fichiers tels que spécifiés dans chaque exercice des
+                            travaux pratiques.</span>
+                    </div>
+                    <div class="check-item">
+                        <svg class="check-icon success" viewBox="0 0 24 24">
+                            <path
+                                d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" />
+                        </svg>
+                        <span>Votre code est accompagné de commentaires appropriés pour expliquer la logique et la
+                            fonctionnalité.</span>
+                    </div>
+                    <div class="check-item">
+                        <svg class="check-icon success" viewBox="0 0 24 24">
+                            <path
+                                d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" />
+                        </svg>
+                        <span>Votre code peut être exécuté sans générer d'erreurs, et dans la mesure du possible, sans
+                            générer d'avertissements.</span>
+                    </div>
+                </div>
             </div>
             <div class="footer">
                 <div class="contact">Traitement de données massives | John Samuel</div>
-                <div class="navigation">13
-                    <a class="prev" href="#slide12"></a>
-                    <a class="next" href="#slide14"></a>
+                <div class="navigation">
+                    <a class="nav-btn" href="#slide12">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M15.41 16.59L10.83 12l4.58-4.59L14 6l-6 6 6 6 1.41-1.41z" />
+                        </svg>
+                    </a>
+                    <span class="page-number">13 / 49</span>
+                    <a class="nav-btn" href="#slide14">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z" />
+                        </svg>
+                    </a>
                 </div>
             </div>
         </section>
@@ -824,29 +1773,36 @@
                 <h1>Traitement de données massives</h1>
             </div>
             <div class="content">
-                <h1 class="topicsubheading">Modèle de code</h1>
-                <p>Vous pouvez consulter <a
-                        href="https://github.com/johnsamuelwrites/TDM">https://github.com/johnsamuelwrites/TDM</a> en
-                    ligne<br />ou le cloner sur votre machine à l'aide du terminal en utilisant les commandes suivantes.
-                </p>
-                <code>
-                	 <pre>
-                	  $ git clone https://github.com/johnsamuelwrites/TDM</br>
-                	  $ cd TDM ; ls
-                	 </pre>
-                	</code>
-                <p>Et pour les dernières modifications:</p>
-                <code>
-                	 <pre>
-                	  $ git pull</br>
-                	 </pre>
-                	</code>
+                <div class="card animate-in" style="max-width: 950px; margin: 0 auto;">
+                    <h4 style="margin-bottom: 1vmax;">
+                        <a href="https://github.com/johnsamuelwrites/TDM">github.com/johnsamuelwrites/TDM</a>
+                    </h4>
+
+                    <div class="code-block">
+                        <pre><span class="cmd">$</span> <span class="path">git clone</span> https://github.com/johnsamuelwrites/TDM
+<span class="cmd">$</span> <span class="path">cd</span> TDM && <span class="path">ls</span></pre>
+                    </div>
+
+                    <h4 style="margin: 1.5vmax 0 1vmax;">Pour les mises à jour:</h4>
+                    <div class="code-block">
+                        <pre><span class="cmd">$</span> <span class="path">git pull</span></pre>
+                    </div>
+                </div>
             </div>
             <div class="footer">
                 <div class="contact">Traitement de données massives | John Samuel</div>
-                <div class="navigation">14
-                    <a class="prev" href="#slide13"></a>
-                    <a class="next" href="#slide15"></a>
+                <div class="navigation">
+                    <a class="nav-btn" href="#slide13">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M15.41 16.59L10.83 12l4.58-4.59L14 6l-6 6 6 6 1.41-1.41z" />
+                        </svg>
+                    </a>
+                    <span class="page-number">14 / 49</span>
+                    <a class="nav-btn" href="#slide15">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z" />
+                        </svg>
+                    </a>
                 </div>
             </div>
         </section>
@@ -857,7 +1813,8 @@
             <div class="content">
                 <h4>Travaux pratiques: Notebooks Jupyter</h4>
                 <figure>
-                    <img src="../../../../../en/teaching/courses/2017/DataMining/images/jupyternotebook.png" />
+                    <img alt="Jupyternotebook"
+                        src="../../../../../en/teaching/courses/2017/DataMining/images/jupyternotebook.png" />
                 </figure>
                 <ul>
                     <li>Lorsque vous créez un nouveau notebook (onglet "New"), vous aurez la possibilité de choisir
@@ -868,9 +1825,18 @@
             </div>
             <div class="footer">
                 <div class="contact">Traitement de données massives | John Samuel</div>
-                <div class="navigation">15
-                    <a class="prev" href="#slide14"></a>
-                    <a class="next" href="#slide16"></a>
+                <div class="navigation">
+                    <a class="nav-btn" href="#slide14">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M15.41 16.59L10.83 12l4.58-4.59L14 6l-6 6 6 6 1.41-1.41z" />
+                        </svg>
+                    </a>
+                    <span class="page-number">15 / 49</span>
+                    <a class="nav-btn" href="#slide16">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z" />
+                        </svg>
+                    </a>
                 </div>
             </div>
         </section>
@@ -878,26 +1844,38 @@
             <div class="header">
                 <h1>Traitement de données massives: Notebooks Jupyter</h1>
             </div>
-            <div class="content">
-                <h4>Travaux pratiques: Notebooks Jupyter</h4>
-                <figure>
-                    <img src="../../../../../en/teaching/courses/2017/DataMining/images/jupyterprogram.png"
-                        width="950px" />
+            <div class="content flex-row">
+                <div style="width: 48%;">
+                    <h4>Travaux pratiques: Notebooks Jupyter</h4>
+                    <ul>
+                        <li><b>Découpage structuré</b> : Divisez le code en cellules, facilitant la compréhension, la
+                            modification, et le débogage par étapes.</li>
+                        <li><b>Interactivité</b> : Exécutez du code Python directement dans le notebook, permettant une
+                            exploration interactive des données.</li>
+                        <li><b>Avantages</b> - <b>Communication complète</b> : Combine explications, visualisations, et
+                            code dans un seul document, facilitant la compréhension et le partage avec d'autres.</li>
+                    </ul>
+                </div>
+                <figure style="width: 48%;">
+                    <img alt="Jupyterprogram"
+                        src="../../../../../en/teaching/courses/2017/DataMining/images/jupyterprogram.png"
+                        style="max-height: 48vh;" />
                 </figure>
-                <ul>
-                    <li><b>Découpage structuré</b> : Divisez le code en cellules, facilitant la compréhension, la
-                        modification, et le débogage par étapes.</li>
-                    <li><b>Interactivité</b> : Exécutez du code Python directement dans le notebook, permettant une
-                        exploration interactive des données.</li>
-                    <li><b>Avantages</b> - <b>Communication complète</b> : Combine explications, visualisations, et code
-                        dans un seul document, facilitant la compréhension et le partage avec d'autres.</li>
-                </ul>
             </div>
             <div class="footer">
                 <div class="contact">Traitement de données massives | John Samuel</div>
-                <div class="navigation">16
-                    <a class="prev" href="#slide15"></a>
-                    <a class="next" href="#slide17"></a>
+                <div class="navigation">
+                    <a class="nav-btn" href="#slide15">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M15.41 16.59L10.83 12l4.58-4.59L14 6l-6 6 6 6 1.41-1.41z" />
+                        </svg>
+                    </a>
+                    <span class="page-number">16 / 49</span>
+                    <a class="nav-btn" href="#slide17">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z" />
+                        </svg>
+                    </a>
                 </div>
             </div>
         </section>
@@ -908,7 +1886,8 @@
             <div class="content">
                 <h4>Travaux pratiques: notebook Jupyter</h4>
                 <figure>
-                    <img src="../../../../../en/teaching/courses/2017/DataMining/images/jupyterscikit.png" />
+                    <img alt="Jupyterscikit"
+                        src="../../../../../en/teaching/courses/2017/DataMining/images/jupyterscikit.png" />
                 </figure>
                 <ul>
                     <li>Explorer l'utilisation de la bibliothèque scikit-learn pour la mise en œuvre de tâches
@@ -917,9 +1896,18 @@
             </div>
             <div class="footer">
                 <div class="contact">Traitement de données massives | John Samuel</div>
-                <div class="navigation">17
-                    <a class="prev" href="#slide16"></a>
-                    <a class="next" href="#slide18"></a>
+                <div class="navigation">
+                    <a class="nav-btn" href="#slide16">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M15.41 16.59L10.83 12l4.58-4.59L14 6l-6 6 6 6 1.41-1.41z" />
+                        </svg>
+                    </a>
+                    <span class="page-number">17 / 49</span>
+                    <a class="nav-btn" href="#slide18">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z" />
+                        </svg>
+                    </a>
                 </div>
             </div>
         </section>
@@ -930,16 +1918,27 @@
             <div class="content">
                 <h4>Travaux pratiques: Visualisation et notebook Jupyter</h4>
                 <figure>
-                    <img src="../../../../../en/teaching/courses/2017/DataMining/images/histogramsubplots.png"
+                    <img alt="Histogramsubplots"
+                        src="../../../../../en/teaching/courses/2017/DataMining/images/histogramsubplots.png"
                         height="240px" />
-                    <img src="../../../../../en/teaching/courses/2017/DataMining/images/piechart.png" height="220px" />
+                    <img alt="Piechart" src="../../../../../en/teaching/courses/2017/DataMining/images/piechart.png"
+                        height="220px" />
                 </figure>
             </div>
             <div class="footer">
                 <div class="contact">Traitement de données massives | John Samuel</div>
-                <div class="navigation">18
-                    <a class="prev" href="#slide17"></a>
-                    <a class="next" href="#slide19"></a>
+                <div class="navigation">
+                    <a class="nav-btn" href="#slide17">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M15.41 16.59L10.83 12l4.58-4.59L14 6l-6 6 6 6 1.41-1.41z" />
+                        </svg>
+                    </a>
+                    <span class="page-number">18 / 49</span>
+                    <a class="nav-btn" href="#slide19">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z" />
+                        </svg>
+                    </a>
                 </div>
             </div>
         </section>
@@ -950,14 +1949,24 @@
             <div class="content">
                 <h4>Travaux pratiques: Visualisation et notebook Jupyter</h4>
                 <figure class="fullwidth">
-                    <img src="../../../../../en/teaching/courses/2017/DataMining/images/subplots.png" height="460px" />
+                    <img alt="Subplots" src="../../../../../en/teaching/courses/2017/DataMining/images/subplots.png"
+                        height="460px" />
                 </figure>
             </div>
             <div class="footer">
                 <div class="contact">Traitement de données massives | John Samuel</div>
-                <div class="navigation">19
-                    <a class="prev" href="#slide18"></a>
-                    <a class="next" href="#slide20"></a>
+                <div class="navigation">
+                    <a class="nav-btn" href="#slide18">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M15.41 16.59L10.83 12l4.58-4.59L14 6l-6 6 6 6 1.41-1.41z" />
+                        </svg>
+                    </a>
+                    <span class="page-number">19 / 49</span>
+                    <a class="nav-btn" href="#slide20">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z" />
+                        </svg>
+                    </a>
                 </div>
             </div>
         </section>
@@ -968,15 +1977,25 @@
             <div class="content">
                 <h4>Travaux pratiques: Wikidata (Open Data)</h4>
                 <figure class="fullwidth">
-                    <img src="../../../../../en/teaching/courses/2017/DataMining/images/wikidataquery.png"
-                        height="400px" width="750px" />
+                    <img alt="Wikidataquery"
+                        src="../../../../../en/teaching/courses/2017/DataMining/images/wikidataquery.png" height="400px"
+                        width="750px" />
                 </figure>
             </div>
             <div class="footer">
                 <div class="contact">Traitement de données massives | John Samuel</div>
-                <div class="navigation">20
-                    <a class="prev" href="#slide19"></a>
-                    <a class="next" href="#slide21"></a>
+                <div class="navigation">
+                    <a class="nav-btn" href="#slide19">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M15.41 16.59L10.83 12l4.58-4.59L14 6l-6 6 6 6 1.41-1.41z" />
+                        </svg>
+                    </a>
+                    <span class="page-number">20 / 49</span>
+                    <a class="nav-btn" href="#slide21">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z" />
+                        </svg>
+                    </a>
                 </div>
             </div>
         </section>
@@ -984,8 +2003,8 @@
             <div class="header">
                 <h1>Histoire scientifique</h1>
             </div>
-            <div class="content">
-                <div style="width:40%">
+            <div class="content flex-row">
+                <div style="width:48%">
                     <h3>Cadran solaire</h3>
                     <ul>
                         <li><b>Mesure du temps</b> : Utilisé pour indiquer l'heure en fonction de la position du soleil
@@ -997,17 +2016,27 @@
                         le
                         développement ultérieur des instruments astronomiques.</p>
                 </div>
-                <figure style="width:40%">
-                    <img src="../../../../../en/teaching/courses/2017/BigData/images/Ancient-egyptian-sundial.jpg"
+                <figure style="width:48%">
+                    <img alt="Ancient egyptian sundial"
+                        src="../../../../../en/teaching/courses/2017/BigData/images/Ancient-egyptian-sundial.jpg"
                         height="300vh" />
                     <figcaption>Ancien cadran solaire egyptien (1500 av. J.-C. )</figcaption>
                 </figure>
             </div>
             <div class="footer">
                 <div class="contact">Traitement de données massives | John Samuel</div>
-                <div class="navigation">21
-                    <a class="prev" href="#slide20"></a>
-                    <a class="next" href="#slide22"></a>
+                <div class="navigation">
+                    <a class="nav-btn" href="#slide20">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M15.41 16.59L10.83 12l4.58-4.59L14 6l-6 6 6 6 1.41-1.41z" />
+                        </svg>
+                    </a>
+                    <span class="page-number">21 / 49</span>
+                    <a class="nav-btn" href="#slide22">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z" />
+                        </svg>
+                    </a>
                 </div>
             </div>
         </section>
@@ -1015,25 +2044,38 @@
             <div class="header">
                 <h1>Histoire scientifique</h1>
             </div>
-            <div class="content">
+            <div class="content flex-row">
                 <h3>Système de numération</h3>
-                <figure>
-                    <img src="../../../../../en/teaching/courses/2017/BigData/images/512px-Numeral_Systems_of_the_World.svg"
-                        height="200vh" />
+                <figure style="width: 32%;">
+                    <img alt="Numeral Systems of the World"
+                        src="../../../../../en/teaching/courses/2017/BigData/images/512px-Numeral_Systems_of_the_World.svg"
+                        style="max-height: 28vh;" />
                 </figure>
-                <figure>
-                    <img src="../../2017/BigData/images/800px-Hauptbuch_Hochstetter_vor_1828.jpg" height="300vh" />
+                <figure style="width: 32%;">
+                    <img alt="Hauptbuch Hochstetter vor 1828"
+                        src="../../2017/BigData/images/800px-Hauptbuch_Hochstetter_vor_1828.jpg"
+                        style="max-height: 28vh;" />
                 </figure>
-                <figure>
-                    <img src="../../../../../en/teaching/courses/2017/BigData/images/252px-Papyrus_bill_of_sale_donkey.jpg"
-                        height="300vh" />
+                <figure style="width: 32%;">
+                    <img alt="Papyrus bill of sale donkey"
+                        src="../../../../../en/teaching/courses/2017/BigData/images/252px-Papyrus_bill_of_sale_donkey.jpg"
+                        style="max-height: 28vh;" />
                 </figure>
             </div>
             <div class="footer">
                 <div class="contact">Traitement de données massives | John Samuel</div>
-                <div class="navigation">22
-                    <a class="prev" href="#slide21"></a>
-                    <a class="next" href="#slide23"></a>
+                <div class="navigation">
+                    <a class="nav-btn" href="#slide21">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M15.41 16.59L10.83 12l4.58-4.59L14 6l-6 6 6 6 1.41-1.41z" />
+                        </svg>
+                    </a>
+                    <span class="page-number">22 / 49</span>
+                    <a class="nav-btn" href="#slide23">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z" />
+                        </svg>
+                    </a>
                 </div>
             </div>
         </section>
@@ -1056,9 +2098,18 @@
             </div>
             <div class="footer">
                 <div class="contact">Traitement de données massives | John Samuel</div>
-                <div class="navigation">23
-                    <a class="prev" href="#slide22"></a>
-                    <a class="next" href="#slide24"></a>
+                <div class="navigation">
+                    <a class="nav-btn" href="#slide22">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M15.41 16.59L10.83 12l4.58-4.59L14 6l-6 6 6 6 1.41-1.41z" />
+                        </svg>
+                    </a>
+                    <span class="page-number">23 / 49</span>
+                    <a class="nav-btn" href="#slide24">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z" />
+                        </svg>
+                    </a>
                 </div>
             </div>
         </section>
@@ -1085,9 +2136,18 @@
             </div>
             <div class="footer">
                 <div class="contact">Traitement de données massives | John Samuel</div>
-                <div class="navigation">24
-                    <a class="prev" href="#slide23"></a>
-                    <a class="next" href="#slide25"></a>
+                <div class="navigation">
+                    <a class="nav-btn" href="#slide23">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M15.41 16.59L10.83 12l4.58-4.59L14 6l-6 6 6 6 1.41-1.41z" />
+                        </svg>
+                    </a>
+                    <span class="page-number">24 / 49</span>
+                    <a class="nav-btn" href="#slide25">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z" />
+                        </svg>
+                    </a>
                 </div>
             </div>
         </section>
@@ -1095,22 +2155,32 @@
             <div class="header">
                 <h1>Histoire scientifique</h1>
             </div>
-            <div class="content">
-                <figure>
-                    <img src="../../2017/BigData/images/800px-Typewriter_-_Underwood_typewriter_-_Kroton_001.jpg"
-                        height="350vh" />
+            <div class="content flex-row">
+                <figure style="width: 48%;">
+                    <img alt="Typewriter Underwood typewriter Kroton 001"
+                        src="../../2017/BigData/images/800px-Typewriter_-_Underwood_typewriter_-_Kroton_001.jpg"
+                        style="max-height: 32vh;" />
                     <figcaption>Machine à écrire</figcaption>
                 </figure>
-                <figure>
-                    <img src="../../2017/BigData/images/800px-Type.jpg" height="350vh" />
+                <figure style="width: 48%;">
+                    <img alt="Type" src="../../2017/BigData/images/800px-Type.jpg" style="max-height: 32vh;" />
                     <figcaption>Machine à écrire électronique</figcaption>
                 </figure>
             </div>
             <div class="footer">
                 <div class="contact">Traitement de données massives | John Samuel</div>
-                <div class="navigation">25
-                    <a class="prev" href="#slide24"></a>
-                    <a class="next" href="#slide26"></a>
+                <div class="navigation">
+                    <a class="nav-btn" href="#slide24">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M15.41 16.59L10.83 12l4.58-4.59L14 6l-6 6 6 6 1.41-1.41z" />
+                        </svg>
+                    </a>
+                    <span class="page-number">25 / 49</span>
+                    <a class="nav-btn" href="#slide26">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z" />
+                        </svg>
+                    </a>
                 </div>
             </div>
         </section>
@@ -1118,7 +2188,7 @@
             <div class="header">
                 <h1>Histoire scientifique</h1>
             </div>
-            <div class="content">
+            <div class="content" style="padding: 2vmax 3vmax;">
                 <h4>Machine à Écrire</h4>
                 <ul>
                     <li><b>Invention :</b> Développement au 19e siècle pour la saisie et la documentation.</li>
@@ -1137,9 +2207,18 @@
             </div>
             <div class="footer">
                 <div class="contact">Traitement de données massives | John Samuel</div>
-                <div class="navigation">26
-                    <a class="prev" href="#slide25"></a>
-                    <a class="next" href="#slide27"></a>
+                <div class="navigation">
+                    <a class="nav-btn" href="#slide25">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M15.41 16.59L10.83 12l4.58-4.59L14 6l-6 6 6 6 1.41-1.41z" />
+                        </svg>
+                    </a>
+                    <span class="page-number">26 / 49</span>
+                    <a class="nav-btn" href="#slide27">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z" />
+                        </svg>
+                    </a>
                 </div>
             </div>
         </section>
@@ -1147,29 +2226,42 @@
             <div class="header">
                 <h1>Histoire scientifique</h1>
             </div>
-            <div class="content">
-                <figure>
-                    <img src="../../2017/BigData/images/800px-Arts_et_Metiers_Pascaline_dsc03869.jpg" height="350vh" />
+            <div class="content flex-row">
+                <figure style="width: 48%;">
+                    <img alt="Arts et Metiers Pascaline dsc03869"
+                        src="../../2017/BigData/images/800px-Arts_et_Metiers_Pascaline_dsc03869.jpg"
+                        style="max-height: 32vh;" />
                     <figcaption>Machine à calculer de Blaise Pascal à six chiffres</figcaption>
                 </figure>
-                <figure>
-                    <img src="../../2017/BigData/images/454px-Difference_engine_plate_1853.jpg" height="350vh" />
+                <figure style="width: 48%;">
+                    <img alt="Difference engine plate 1853"
+                        src="../../2017/BigData/images/454px-Difference_engine_plate_1853.jpg"
+                        style="max-height: 32vh;" />
                     <figcaption>Machine à différences de Charles Babbage</figcaption>
                 </figure>
             </div>
             <div class="footer">
                 <div class="contact">Traitement de données massives | John Samuel</div>
-                <div class="navigation">27
-                    <a class="prev" href="#slide26"></a>
-                    <a class="next" href="#slide28"></a>
+                <div class="navigation">
+                    <a class="nav-btn" href="#slide26">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M15.41 16.59L10.83 12l4.58-4.59L14 6l-6 6 6 6 1.41-1.41z" />
+                        </svg>
+                    </a>
+                    <span class="page-number">27 / 49</span>
+                    <a class="nav-btn" href="#slide28">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z" />
+                        </svg>
+                    </a>
                 </div>
             </div>
         </section>
-        <section class="slide" id="slide28">
+        <section class="slide compact-content" id="slide28">
             <div class="header">
                 <h1>Histoire scientifique</h1>
             </div>
-            <div class="content">
+            <div class="content" style="padding: 2vmax 3vmax;">
                 <h4>Machine à calculer de Blaise Pascal</h4>
                 <ul>
                     <li><b>Invention au 17e siècle :</b> Calculatrice mécanique à six chiffres.</li>
@@ -1195,9 +2287,18 @@
             </div>
             <div class="footer">
                 <div class="contact">Traitement de données massives | John Samuel</div>
-                <div class="navigation">28
-                    <a class="prev" href="#slide27"></a>
-                    <a class="next" href="#slide29"></a>
+                <div class="navigation">
+                    <a class="nav-btn" href="#slide27">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M15.41 16.59L10.83 12l4.58-4.59L14 6l-6 6 6 6 1.41-1.41z" />
+                        </svg>
+                    </a>
+                    <span class="page-number">28 / 49</span>
+                    <a class="nav-btn" href="#slide29">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z" />
+                        </svg>
+                    </a>
                 </div>
             </div>
         </section>
@@ -1205,29 +2306,39 @@
             <div class="header">
                 <h1>Histoire scientifique</h1>
             </div>
-            <div class="content">
-                <figure>
-                    <img src="../../2017/BigData/images/Eniac.jpg" height="350vh" />
+            <div class="content flex-row">
+                <figure style="width: 48%;">
+                    <img alt="Eniac" src="../../2017/BigData/images/Eniac.jpg" height="350vh" />
                     <figcaption>L'ENIAC (photo prise entre 1947 et 1955).</figcaption>
                 </figure>
-                <figure>
-                    <img src="../../2017/BigData/images/800px-IBM_PC_5150.jpg" height="350vh" />
+                <figure style="width: 48%;">
+                    <img alt="IBM PC 5150" src="../../2017/BigData/images/800px-IBM_PC_5150.jpg"
+                        style="max-height: 32vh;" />
                     <figcaption>IBM PC 5150 en 1983</figcaption>
                 </figure>
             </div>
             <div class="footer">
                 <div class="contact">Traitement de données massives | John Samuel</div>
-                <div class="navigation">29
-                    <a class="prev" href="#slide28"></a>
-                    <a class="next" href="#slide30"></a>
+                <div class="navigation">
+                    <a class="nav-btn" href="#slide28">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M15.41 16.59L10.83 12l4.58-4.59L14 6l-6 6 6 6 1.41-1.41z" />
+                        </svg>
+                    </a>
+                    <span class="page-number">29 / 49</span>
+                    <a class="nav-btn" href="#slide30">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z" />
+                        </svg>
+                    </a>
                 </div>
             </div>
         </section>
-        <section class="slide" id="slide30">
+        <section class="slide compact-content" id="slide30">
             <div class="header">
                 <h1>Histoire scientifique</h1>
             </div>
-            <div class="content">
+            <div class="content" style="padding: 2vmax 3vmax;">
                 <h4>L'ENIAC (1947-1955)</h4>
                 <ul>
                     <li><b>Pionnier de l'ère informatique :</b> Premier ordinateur électronique de grande échelle.</li>
@@ -1249,9 +2360,18 @@
             </div>
             <div class="footer">
                 <div class="contact">Traitement de données massives | John Samuel</div>
-                <div class="navigation">30
-                    <a class="prev" href="#slide29"></a>
-                    <a class="next" href="#slide31"></a>
+                <div class="navigation">
+                    <a class="nav-btn" href="#slide29">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M15.41 16.59L10.83 12l4.58-4.59L14 6l-6 6 6 6 1.41-1.41z" />
+                        </svg>
+                    </a>
+                    <span class="page-number">30 / 49</span>
+                    <a class="nav-btn" href="#slide31">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z" />
+                        </svg>
+                    </a>
                 </div>
             </div>
         </section>
@@ -1259,8 +2379,8 @@
             <div class="header">
                 <h1>Histoire scientifique</h1>
             </div>
-            <div class="content">
-                <div style="width:40%">
+            <div class="content flex-row">
+                <div style="width:48%">
                     <ul>
                         <li><b>Développement :</b> Introduction dans les années 1970.</li>
                         <li><b>Technologie d'Impact :</b> Utilisation de têtes d'impression à impact pour former des
@@ -1271,17 +2391,27 @@
                     <p><b>Sortie de données :</b> Facilitation de la <b>visualisation</b> des informations traitées.</p>
                     <p><b>Usage commercial :</b> Adoption répandue dans les environnements professionnels.</p>
                 </div>
-                <figure>
-                    <img src="../../2017/BigData/images/Ff30f-panasonic_kx_p_1150_dotmatrix_yazici.jpg"
-                        height="350vh" />
+                <figure style="width:48%">
+                    <img alt="Ff30f panasonic kx p 1150 dotmatrix yazici"
+                        src="../../2017/BigData/images/Ff30f-panasonic_kx_p_1150_dotmatrix_yazici.jpg"
+                        style="max-height: 32vh;" />
                     <figcaption>Imprimante matricielle (Panasonic)</figcaption>
                 </figure>
             </div>
             <div class="footer">
                 <div class="contact">Traitement de données massives | John Samuel</div>
-                <div class="navigation">31
-                    <a class="prev" href="#slide30"></a>
-                    <a class="next" href="#slide32"></a>
+                <div class="navigation">
+                    <a class="nav-btn" href="#slide30">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M15.41 16.59L10.83 12l4.58-4.59L14 6l-6 6 6 6 1.41-1.41z" />
+                        </svg>
+                    </a>
+                    <span class="page-number">31 / 49</span>
+                    <a class="nav-btn" href="#slide32">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z" />
+                        </svg>
+                    </a>
                 </div>
             </div>
         </section>
@@ -1289,29 +2419,40 @@
             <div class="header">
                 <h1>Histoire scientifique</h1>
             </div>
-            <div class="content">
-                <figure>
-                    <img src="../../2017/BigData/images/800px-Floppy_disk_2009_G1.jpg" height="350vh" />
+            <div class="content flex-row">
+                <figure style="width: 48%;">
+                    <img alt="Floppy disk 2009 G1" src="../../2017/BigData/images/800px-Floppy_disk_2009_G1.jpg"
+                        style="max-height: 32vh;" />
                     <figcaption>Disquettes 8 pouces, 5,25 pouces et 3,5 pouces</figcaption>
                 </figure>
-                <figure>
-                    <img src="../../2017/BigData/images/800px-Hard_disk_dismantled.jpg" height="350vh" />
+                <figure style="width: 48%;">
+                    <img alt="Hard disk dismantled" src="../../2017/BigData/images/800px-Hard_disk_dismantled.jpg"
+                        style="max-height: 32vh;" />
                     <figcaption>L’intérieur d’un disque dur</figcaption>
                 </figure>
             </div>
             <div class="footer">
                 <div class="contact">Traitement de données massives | John Samuel</div>
-                <div class="navigation">32
-                    <a class="prev" href="#slide31"></a>
-                    <a class="next" href="#slide33"></a>
+                <div class="navigation">
+                    <a class="nav-btn" href="#slide31">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M15.41 16.59L10.83 12l4.58-4.59L14 6l-6 6 6 6 1.41-1.41z" />
+                        </svg>
+                    </a>
+                    <span class="page-number">32 / 49</span>
+                    <a class="nav-btn" href="#slide33">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z" />
+                        </svg>
+                    </a>
                 </div>
             </div>
         </section>
-        <section class="slide" id="slide33">
+        <section class="slide compact-content" id="slide33">
             <div class="header">
                 <h1>Histoire scientifique</h1>
             </div>
-            <div class="content">
+            <div class="content" style="padding: 2vmax 3vmax;">
                 <h4>Disquettes (8 Pouces, 5,25 Pouces et 3,5 Pouces) </h4>
                 <ul>
                     <li><b>Développement :</b> Introduction des différentes tailles de disquettes dans les années 1970
@@ -1335,9 +2476,18 @@
             </div>
             <div class="footer">
                 <div class="contact">Traitement de données massives | John Samuel</div>
-                <div class="navigation">33
-                    <a class="prev" href="#slide32"></a>
-                    <a class="next" href="#slide34"></a>
+                <div class="navigation">
+                    <a class="nav-btn" href="#slide32">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M15.41 16.59L10.83 12l4.58-4.59L14 6l-6 6 6 6 1.41-1.41z" />
+                        </svg>
+                    </a>
+                    <span class="page-number">33 / 49</span>
+                    <a class="nav-btn" href="#slide34">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z" />
+                        </svg>
+                    </a>
                 </div>
             </div>
         </section>
@@ -1345,8 +2495,8 @@
             <div class="header">
                 <h1>Histoire scientifique</h1>
             </div>
-            <div class="content">
-                <div style="width:40%">
+            <div class="content flex-row">
+                <div style="width:48%">
                     <p><b>Serveurs</b> : Impact sur les méthodes de stockage de données et contribution à la gestion
                         centralisée des données.</p>
                     <ul>
@@ -1357,16 +2507,26 @@
                         <li><b>Connectivité réseau :</b> Intégration des serveurs dans des environnements réseau.</li>
                     </ul>
                 </div>
-                <figure>
-                    <img src="../../2017/BigData/images/770px-Floridaserversfront1.jpg" height="350vh" />
+                <figure style="width:48%">
+                    <img alt="Floridaserversfront1" src="../../2017/BigData/images/770px-Floridaserversfront1.jpg"
+                        style="max-height: 32vh;" />
                     <figcaption>Stockage: Serveurs</figcaption>
                 </figure>
             </div>
             <div class="footer">
                 <div class="contact">Traitement de données massives | John Samuel</div>
-                <div class="navigation">34
-                    <a class="prev" href="#slide33"></a>
-                    <a class="next" href="#slide35"></a>
+                <div class="navigation">
+                    <a class="nav-btn" href="#slide33">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M15.41 16.59L10.83 12l4.58-4.59L14 6l-6 6 6 6 1.41-1.41z" />
+                        </svg>
+                    </a>
+                    <span class="page-number">34 / 49</span>
+                    <a class="nav-btn" href="#slide35">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z" />
+                        </svg>
+                    </a>
                 </div>
             </div>
         </section>
@@ -1374,8 +2534,8 @@
             <div class="header">
                 <h1>Histoire scientifique</h1>
             </div>
-            <div class="content">
-                <div style="width:40%">
+            <div class="content flex-row">
+                <div style="width:48%">
                     <h4>Évolution des technologies serveur</h4>
                     <ul>
                         <li><b>Améliorations de la capacité :</b> Augmentation de la capacité de stockage des serveurs
@@ -1388,7 +2548,7 @@
                         <li><b>Stockage cloud :</b> Transition vers des solutions de stockage basées sur le cloud.</li>
                     </ul>
                 </div>
-                <div style="width:40%">
+                <div style="width:48%">
                     <h4>Impact</h4>
                     <ul>
                         <li><b>Centralisation et partage :</b> Facilitation de la centralisation et du partage des
@@ -1405,9 +2565,18 @@
             </div>
             <div class="footer">
                 <div class="contact">Traitement de données massives | John Samuel</div>
-                <div class="navigation">35
-                    <a class="prev" href="#slide34"></a>
-                    <a class="next" href="#slide36"></a>
+                <div class="navigation">
+                    <a class="nav-btn" href="#slide34">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M15.41 16.59L10.83 12l4.58-4.59L14 6l-6 6 6 6 1.41-1.41z" />
+                        </svg>
+                    </a>
+                    <span class="page-number">35 / 49</span>
+                    <a class="nav-btn" href="#slide36">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z" />
+                        </svg>
+                    </a>
                 </div>
             </div>
         </section>
@@ -1417,19 +2586,29 @@
             </div>
             <div class="content">
                 <figure>
-                    <img src="../../2017/BigData/images/Hilbert_InfoGrowth.png" height="350vh" />
+                    <img alt="Hilbert InfoGrowth" src="../../2017/BigData/images/Hilbert_InfoGrowth.png"
+                        height="350vh" />
                     <figcaption>Croissance de la capacité mondiale de stockage de données et informations</figcaption>
                 </figure>
             </div>
             <div class="footer">
                 <div class="contact">Traitement de données massives | John Samuel</div>
-                <div class="navigation">36
-                    <a class="prev" href="#slide35"></a>
-                    <a class="next" href="#slide37"></a>
+                <div class="navigation">
+                    <a class="nav-btn" href="#slide35">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M15.41 16.59L10.83 12l4.58-4.59L14 6l-6 6 6 6 1.41-1.41z" />
+                        </svg>
+                    </a>
+                    <span class="page-number">36 / 49</span>
+                    <a class="nav-btn" href="#slide37">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z" />
+                        </svg>
+                    </a>
                 </div>
             </div>
         </section>
-        <section class="slide" id="slide37">
+        <section class="slide compact-content" id="slide37">
             <div class="header">
                 <h1>Histoire scientifique</h1>
             </div>
@@ -1455,19 +2634,28 @@
             </div>
             <div class="footer">
                 <div class="contact">Traitement de données massives | John Samuel</div>
-                <div class="navigation">37
-                    <a class="prev" href="#slide36"></a>
-                    <a class="next" href="#slide38"></a>
+                <div class="navigation">
+                    <a class="nav-btn" href="#slide36">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M15.41 16.59L10.83 12l4.58-4.59L14 6l-6 6 6 6 1.41-1.41z" />
+                        </svg>
+                    </a>
+                    <span class="page-number">37 / 49</span>
+                    <a class="nav-btn" href="#slide38">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z" />
+                        </svg>
+                    </a>
                 </div>
             </div>
         </section>
-        <section class="slide" id="slide38">
+        <section class="slide compact-content" id="slide38">
             <div class="header">
                 <h1>Histoire scientifique</h1>
             </div>
-            <div class="content">
-                <h1>Systèmes</h1>
-                <div style="width:40%">
+            <div class="content flex-row">
+                <h3>Systèmes</h3>
+                <div style="width:48%">
                     <h4>Systèmes distribués (a,b)</h4>
                     <ul>
                         <li><b>Origines :</b> Développement des concepts de systèmes distribués dans les années 1960.
@@ -1478,8 +2666,9 @@
                             contemporains.</li>
                     </ul>
                 </div>
-                <figure>
-                    <img src="../../2021/BigData/Distributed-parallel.svg" height="350vh" />
+                <figure style="width:48%">
+                    <img alt="Distributed parallel" src="../../2021/BigData/Distributed-parallel.svg"
+                        style="max-height: 32vh;" />
                     <figcaption>Calcul distribué<br />
                         <span
                             style="font-size:10px">https://commons.wikimedia.org/wiki/File:Distributed-parallel.svg</span>
@@ -1488,19 +2677,28 @@
             </div>
             <div class="footer">
                 <div class="contact">Traitement de données massives | John Samuel</div>
-                <div class="navigation">38
-                    <a class="prev" href="#slide37"></a>
-                    <a class="next" href="#slide39"></a>
+                <div class="navigation">
+                    <a class="nav-btn" href="#slide37">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M15.41 16.59L10.83 12l4.58-4.59L14 6l-6 6 6 6 1.41-1.41z" />
+                        </svg>
+                    </a>
+                    <span class="page-number">38 / 49</span>
+                    <a class="nav-btn" href="#slide39">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z" />
+                        </svg>
+                    </a>
                 </div>
             </div>
         </section>
-        <section class="slide" id="slide39">
+        <section class="slide compact-content" id="slide39">
             <div class="header">
                 <h1>Histoire scientifique</h1>
             </div>
-            <div class="content">
-                <div style="width:40%">
-                    <h1>Systèmes</h1>
+            <div class="content flex-row">
+                <div style="width:48%">
+                    <h3>Systèmes</h3>
                     <h4>Systèmes parallèles (c)</h4>
                     <ul>
                         <li><b>Développement :</b> Émergence des systèmes parallèles pour exécuter des tâches
@@ -1511,8 +2709,9 @@
                             informatiques intensifs.
                     </ul>
                 </div>
-                <figure>
-                    <img src="../../2021/BigData/Distributed-parallel.svg" height="350vh" />
+                <figure style="width:48%">
+                    <img alt="Distributed parallel" src="../../2021/BigData/Distributed-parallel.svg"
+                        style="max-height: 32vh;" />
                     <figcaption>Calcul distribué<br />
                         <span
                             style="font-size:10px">https://commons.wikimedia.org/wiki/File:Distributed-parallel.svg</span>
@@ -1521,9 +2720,18 @@
             </div>
             <div class="footer">
                 <div class="contact">Traitement de données massives | John Samuel</div>
-                <div class="navigation">39
-                    <a class="prev" href="#slide38"></a>
-                    <a class="next" href="#slide40"></a>
+                <div class="navigation">
+                    <a class="nav-btn" href="#slide38">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M15.41 16.59L10.83 12l4.58-4.59L14 6l-6 6 6 6 1.41-1.41z" />
+                        </svg>
+                    </a>
+                    <span class="page-number">39 / 49</span>
+                    <a class="nav-btn" href="#slide40">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z" />
+                        </svg>
+                    </a>
                 </div>
             </div>
         </section>
@@ -1532,7 +2740,7 @@
                 <h1>Histoire scientifique</h1>
             </div>
             <div class="content">
-                <h1>Calcul distribué</h1>
+                <h3>Calcul distribué</h3>
                 <p>Les projets suivants ont utilisé la puissance de traitement des ordinateurs personnels pour
                     différents
                     objectifs</p>
@@ -1550,9 +2758,18 @@
             </div>
             <div class="footer">
                 <div class="contact">Traitement de données massives | John Samuel</div>
-                <div class="navigation">40
-                    <a class="prev" href="#slide39"></a>
-                    <a class="next" href="#slide41"></a>
+                <div class="navigation">
+                    <a class="nav-btn" href="#slide39">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M15.41 16.59L10.83 12l4.58-4.59L14 6l-6 6 6 6 1.41-1.41z" />
+                        </svg>
+                    </a>
+                    <span class="page-number">40 / 49</span>
+                    <a class="nav-btn" href="#slide41">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z" />
+                        </svg>
+                    </a>
                 </div>
             </div>
         </section>
@@ -1562,15 +2779,25 @@
             </div>
             <div class="content">
                 <figure class="fullwidth">
-                    <img src="../../2021/BigData/Screenshot_2020-11-12 Google Trends.png" />
+                    <img alt="Screenshot 2020 11 12 Google Trends"
+                        src="../../2021/BigData/Screenshot_2020-11-12 Google Trends.png" />
                     <figcaption>Tendances de recherche Google (novembre 2020): Big Data</figcaption>
                 </figure>
             </div>
             <div class="footer">
                 <div class="contact">Traitement de données massives | John Samuel</div>
-                <div class="navigation">41
-                    <a class="prev" href="#slide40"></a>
-                    <a class="next" href="#slide42"></a>
+                <div class="navigation">
+                    <a class="nav-btn" href="#slide40">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M15.41 16.59L10.83 12l4.58-4.59L14 6l-6 6 6 6 1.41-1.41z" />
+                        </svg>
+                    </a>
+                    <span class="page-number">41 / 49</span>
+                    <a class="nav-btn" href="#slide42">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z" />
+                        </svg>
+                    </a>
                 </div>
             </div>
         </section>
@@ -1580,16 +2807,26 @@
             </div>
             <div class="content">
                 <figure class="fullwidth">
-                    <img src="../../2021/BigData/Screenshot_2020-11-12 Google Trends-BigData-AI.png" />
+                    <img alt="Screenshot 2020 11 12 Google Trends BigData AI"
+                        src="../../2021/BigData/Screenshot_2020-11-12 Google Trends-BigData-AI.png" />
                     <figcaption>Tendances de recherche Google (novembre 2020): Big Data et Artificial Intelligence
                     </figcaption>
                 </figure>
             </div>
             <div class="footer">
                 <div class="contact">Traitement de données massives | John Samuel</div>
-                <div class="navigation">42
-                    <a class="prev" href="#slide41"></a>
-                    <a class="next" href="#slide43"></a>
+                <div class="navigation">
+                    <a class="nav-btn" href="#slide41">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M15.41 16.59L10.83 12l4.58-4.59L14 6l-6 6 6 6 1.41-1.41z" />
+                        </svg>
+                    </a>
+                    <span class="page-number">42 / 49</span>
+                    <a class="nav-btn" href="#slide43">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z" />
+                        </svg>
+                    </a>
                 </div>
             </div>
         </section>
@@ -1599,16 +2836,26 @@
             </div>
             <div class="content">
                 <figure class="fullwidth">
-                    <img src="../../2021/BigData/Screenshot_2020-11-12 Google Trends-BigData-AI-Blockchain.png" />
+                    <img alt="Screenshot 2020 11 12 Google Trends BigData AI Blockchain"
+                        src="../../2021/BigData/Screenshot_2020-11-12 Google Trends-BigData-AI-Blockchain.png" />
                     <figcaption>Tendances de recherche Google (novembre 2020): Big Data, Artificial Intelligence et
                         Blockchain</figcaption>
                 </figure>
             </div>
             <div class="footer">
                 <div class="contact">Traitement de données massives | John Samuel</div>
-                <div class="navigation">43
-                    <a class="prev" href="#slide42"></a>
-                    <a class="next" href="#slide44"></a>
+                <div class="navigation">
+                    <a class="nav-btn" href="#slide42">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M15.41 16.59L10.83 12l4.58-4.59L14 6l-6 6 6 6 1.41-1.41z" />
+                        </svg>
+                    </a>
+                    <span class="page-number">43 / 49</span>
+                    <a class="nav-btn" href="#slide44">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z" />
+                        </svg>
+                    </a>
                 </div>
             </div>
         </section>
@@ -1617,7 +2864,7 @@
                 <h1>Histoire scientifique</h1>
             </div>
             <div class="content">
-                <h1>Le populisme de la base de données [Driscoll 2012]</h1>
+                <h3>Le populisme de la base de données [Driscoll 2012]</h3>
                 <ul>
                     <li>La surveillance et le contrôle</li>
                     <li>La fonction sociale de la technologie des bases de données
@@ -1635,18 +2882,27 @@
             </div>
             <div class="footer">
                 <div class="contact">Traitement de données massives | John Samuel</div>
-                <div class="navigation">44
-                    <a class="prev" href="#slide43"></a>
-                    <a class="next" href="#slide45"></a>
+                <div class="navigation">
+                    <a class="nav-btn" href="#slide43">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M15.41 16.59L10.83 12l4.58-4.59L14 6l-6 6 6 6 1.41-1.41z" />
+                        </svg>
+                    </a>
+                    <span class="page-number">44 / 49</span>
+                    <a class="nav-btn" href="#slide45">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z" />
+                        </svg>
+                    </a>
                 </div>
             </div>
         </section>
-        <section class="slide" id="slide45">
+        <section class="slide compact-content" id="slide45">
             <div class="header">
                 <h1>Histoire scientifique</h1>
             </div>
             <div class="content">
-                <h1>Big Data: 3V [Chen 2012, Kwon 2014, Gandomi 2015]</h1>
+                <h3>Big Data: 3V [Chen 2012, Kwon 2014, Gandomi 2015]</h3>
                 <ul>
                     <li>Volume
                         <ul>
@@ -1669,18 +2925,27 @@
             </div>
             <div class="footer">
                 <div class="contact">Traitement de données massives | John Samuel</div>
-                <div class="navigation">45
-                    <a class="prev" href="#slide44"></a>
-                    <a class="next" href="#slide46"></a>
+                <div class="navigation">
+                    <a class="nav-btn" href="#slide44">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M15.41 16.59L10.83 12l4.58-4.59L14 6l-6 6 6 6 1.41-1.41z" />
+                        </svg>
+                    </a>
+                    <span class="page-number">45 / 49</span>
+                    <a class="nav-btn" href="#slide46">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z" />
+                        </svg>
+                    </a>
                 </div>
             </div>
         </section>
-        <section class="slide" id="slide46">
+        <section class="slide compact-content" id="slide46">
             <div class="header">
                 <h1>Histoire scientifique</h1>
             </div>
             <div class="content">
-                <h1>Big Data: 6V [Gandomi 2015]</h1>
+                <h3>Big Data: 6V [Gandomi 2015]</h3>
                 <ul>
                     <li>Volume</li>
                     <li>Variété</li>
@@ -1705,9 +2970,18 @@
             </div>
             <div class="footer">
                 <div class="contact">Traitement de données massives | John Samuel</div>
-                <div class="navigation">46
-                    <a class="prev" href="#slide45"></a>
-                    <a class="next" href="#slide47"></a>
+                <div class="navigation">
+                    <a class="nav-btn" href="#slide45">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M15.41 16.59L10.83 12l4.58-4.59L14 6l-6 6 6 6 1.41-1.41z" />
+                        </svg>
+                    </a>
+                    <span class="page-number">46 / 49</span>
+                    <a class="nav-btn" href="#slide47">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z" />
+                        </svg>
+                    </a>
                 </div>
             </div>
         </section>
@@ -1716,7 +2990,7 @@
                 <h1>Histoire scientifique</h1>
             </div>
             <div class="content">
-                <h1>Big Data [Kitchin 2016]</h1>
+                <h3>Big Data [Kitchin 2016]</h3>
                 <ul>
                     <li>Exhaustif
                         <ul>
@@ -1732,18 +3006,27 @@
             </div>
             <div class="footer">
                 <div class="contact">Traitement de données massives | John Samuel</div>
-                <div class="navigation">47
-                    <a class="prev" href="#slide46"></a>
-                    <a class="next" href="#slide48"></a>
+                <div class="navigation">
+                    <a class="nav-btn" href="#slide46">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M15.41 16.59L10.83 12l4.58-4.59L14 6l-6 6 6 6 1.41-1.41z" />
+                        </svg>
+                    </a>
+                    <span class="page-number">47 / 49</span>
+                    <a class="nav-btn" href="#slide48">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z" />
+                        </svg>
+                    </a>
                 </div>
             </div>
         </section>
-        <section class="slide" id="slide48">
+        <section class="slide compact-content" id="slide48">
             <div class="header">
                 <h1>Références</h1>
             </div>
             <div class="content">
-                <h1>Articles de recherche</h1>
+                <h3>Articles de recherche</h3>
                 <ul>
                     <li><b>[Chen 2014]</b> Chen, Min, et al. “Big Data: A Survey.” Mobile Networks and Applications,
                         vol.
@@ -1765,13 +3048,22 @@
             </div>
             <div class="footer">
                 <div class="contact">Traitement de données massives | John Samuel</div>
-                <div class="navigation">48
-                    <a class="prev" href="#slide47"></a>
-                    <a class="next" href="#slide49"></a>
+                <div class="navigation">
+                    <a class="nav-btn" href="#slide47">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M15.41 16.59L10.83 12l4.58-4.59L14 6l-6 6 6 6 1.41-1.41z" />
+                        </svg>
+                    </a>
+                    <span class="page-number">48 / 49</span>
+                    <a class="nav-btn" href="#slide49">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z" />
+                        </svg>
+                    </a>
                 </div>
             </div>
         </section>
-        <section class="slide" id="slide49">
+        <section class="slide compact-content" id="slide49">
             <div class="header">
                 <h1>Références</h1>
             </div>
@@ -1788,7 +3080,7 @@
                     </li>
                     <li><a href="https://fr.wikipedia.org/wiki/LHC@home">https://fr.wikipedia.org/wiki/LHC@home</a></li>
                 </ul>
-                <h1>Crédits d'images</h1>
+                <h3>Crédits d'images</h3>
                 <ul>
                     <li><a href="https://commons.wikimedia.org/wiki/Main_Page">Wikimedia Commons</a></li>
                     <li><a href="https://pixabay.com/">Pixabay</a></li>
@@ -1796,8 +3088,13 @@
             </div>
             <div class="footer">
                 <div class="contact">Traitement de données massives | John Samuel</div>
-                <div class="navigation">49
-                    <a class="prev" href="#slide48"></a>
+                <div class="navigation">
+                    <a class="nav-btn" href="#slide48">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M15.41 16.59L10.83 12l4.58-4.59L14 6l-6 6 6 6 1.41-1.41z" />
+                        </svg>
+                    </a>
+                    <span class="page-number">49 / 49</span>
                 </div>
             </div>
         </section>
@@ -1853,6 +3150,22 @@
                 event.preventDefault();
                 changeCurrentURLSlideNumber(true);
             }
+        </script>
+
+        <script>
+            function toggleTheme() {
+                const html = document.documentElement;
+                const currentTheme = html.getAttribute('data-theme');
+                const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+                html.setAttribute('data-theme', newTheme);
+                localStorage.setItem('theme', newTheme);
+            }
+
+            document.addEventListener('DOMContentLoaded', () => {
+                const savedTheme = localStorage.getItem('theme') ||
+                    (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+                document.documentElement.setAttribute('data-theme', savedTheme);
+            });
         </script>
     </body>
 
