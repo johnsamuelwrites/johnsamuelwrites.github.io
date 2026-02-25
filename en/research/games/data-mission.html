@@ -349,12 +349,24 @@
                                 </button>
                         </div>
                 </div>
-                <script id="config" type="application/json">
-   {"gameTitle":"Mission Pipeline","timeLimitSeconds":1500,"dataUnitsInitial":10,"selectionCountRequired":5,"maxProblemsPerPhase":6,"scoring":{"pipelineCorrectBonus":50,"pipelineWrongPenalty":-20,"firstClickCorrect":10,"wrongClickPenalty":-5,"secondClickCorrect":5,"laterCorrect":2,"phaseClearBonus":15,"winBonus":50},"phases":[{"id":"problem_definition","label":"Problem Definition","shortDescription":"Define objective","problemPool":[{"id":"pd1","title":"Scope drift","description":"Goal keeps changing.","options":["Freeze scope with KPI","Add more features","Ignore it"],"correctIndex":0},{"id":"pd2","title":"No KPI","description":"No success metric.","options":["Pick measurable KPI","Ship anyway","Wait forever"],"correctIndex":0}]},{"id":"data_collection","label":"Data Collection","shortDescription":"Gather data","problemPool":[{"id":"dc1","title":"Coverage gap","description":"Missing user segment.","options":["Collect targeted samples","Duplicate rows","Drop segment"],"correctIndex":0},{"id":"dc2","title":"Access denied","description":"Source permission issue.","options":["Request access","Bypass auth","Skip security"],"correctIndex":0}]},{"id":"data_cleaning","label":"Data Cleaning","shortDescription":"Fix quality","problemPool":[{"id":"cl1","title":"Missing values","description":"Null spike found.","options":["Use valid imputation","Fill all with zero","Ignore nulls"],"correctIndex":0},{"id":"cl2","title":"Duplicates","description":"Rows repeated.","options":["Deduplicate by key","Keep for size","Delete random rows"],"correctIndex":0}]},{"id":"feature_engineering","label":"Feature Engineering","shortDescription":"Create features","problemPool":[{"id":"fe1","title":"Leakage","description":"Feature reveals target.","options":["Remove leakage","Keep for accuracy","Hide issue"],"correctIndex":0},{"id":"fe2","title":"Scale mismatch","description":"Units conflict.","options":["Normalize consistently","Ignore scale","Convert random col"],"correctIndex":0}]},{"id":"model_training","label":"Model Training","shortDescription":"Train model","problemPool":[{"id":"mt1","title":"Overfitting","description":"Train high, val low.","options":["Regularize + CV","Train longer only","Increase complexity"],"correctIndex":0},{"id":"mt2","title":"Bad split","description":"Split not representative.","options":["Use stratified split","Reuse train as test","Shuffle labels"],"correctIndex":0}]},{"id":"evaluation","label":"Evaluation","shortDescription":"Evaluate performance","problemPool":[{"id":"ev1","title":"Wrong metric","description":"Imbalanced target.","options":["Use precision/recall/F1","Only accuracy","Ignore imbalance"],"correctIndex":0},{"id":"ev2","title":"No baseline","description":"No comparison point.","options":["Add simple baseline","Skip baseline","Claim success"],"correctIndex":0}]},{"id":"deployment","label":"Deployment","shortDescription":"Ship safely","problemPool":[{"id":"dp1","title":"Env drift","description":"Runtime differs.","options":["Pin dependencies","Deploy latest untested","Ignore mismatch"],"correctIndex":0},{"id":"dp2","title":"No rollback","description":"Release fallback missing.","options":["Create rollback plan","Ship with none","Wait and hope"],"correctIndex":0}]},{"id":"monitoring","label":"Monitoring","shortDescription":"Observe in production","problemPool":[{"id":"mn1","title":"Data drift","description":"Live data changed.","options":["Set drift alerts","Ignore changes","Delete logs"],"correctIndex":0},{"id":"mn2","title":"No feedback","description":"No error capture.","options":["Collect outcomes","Track CPU only","Collect nothing"],"correctIndex":0}]}],"correctPipeline":["problem_definition","data_collection","data_cleaning","model_training","evaluation"]}
-  </script>
                 <script>
-                        (() => {
-                                const c = JSON.parse(document.getElementById('config').textContent), by = Object.fromEntries(c.phases.map(p => [p.id, p])), $ = id => document.getElementById(id);
+                        (async () => {
+                                const $ = id => document.getElementById(id);
+                                let c;
+                                try {
+                                        const response = await fetch('./config.json', { cache: 'no-cache' });
+                                        if (!response.ok) throw new Error('HTTP ' + response.status);
+                                        c = await response.json();
+                                } catch (error) {
+                                        console.error('Mission config load failed:', error);
+                                        const err = $('bmsg') || $('pmsg');
+                                        if (err) {
+                                                err.textContent = 'Failed to load game configuration.';
+                                                err.className = 'status bad';
+                                        }
+                                        return;
+                                }
+                                const by = Object.fromEntries(c.phases.map(p => [p.id, p]));
                                 const E = {
                                         title: $('title'), timer: $('timer'), score: $('score'), cur: $('curLabel'), build: $('build'), play: $('play'), avail: $('avail'), sel: $('sel'), selN: $('selN'), bmsg: $('bmsg'), pmsg: $('pmsg'), focus: $('focus'), board: $('board'), d1: $('d1'), d2: $('d2'), summary: $('summary'), mbg: $('mbg'), mt: $('mt'), md: $('md'), mf: $('mf'), mfb: $('mfb')
                                 };
@@ -715,3 +727,4 @@
         </body>
 
 </html>
+
