@@ -1,0 +1,346 @@
+{
+  "gameTitle": "Mission Pipeline",
+  "timeLimitSeconds": 1500,
+  "dataUnitsInitial": 10,
+  "selectionCountRequired": 5,
+  "maxProblemsPerPhase": 6,
+  "scoring": {
+    "pipelineCorrectBonus": 50,
+    "pipelineWrongPenalty": -20,
+    "firstClickCorrect": 10,
+    "wrongClickPenalty": -5,
+    "secondClickCorrect": 5,
+    "laterCorrect": 2,
+    "phaseClearBonus": 15,
+    "winBonus": 50
+  },
+  "phases": [
+    {
+      "id": "data_acquisition",
+      "label": "Acquisition de données",
+      "shortDescription": "Collecte initiale des données (méthode 5W1H).",
+      "problemPool": [
+        {
+          "id": "acq_5w1h",
+          "title": "Contexte 5W1H incomplet",
+          "description": "La source est connue, mais Qui/Quand/Pourquoi ne sont pas documentés.",
+          "options": [
+            "Compléter la fiche source avec Qui, Quoi, Où, Quand, Pourquoi, Comment",
+            "Continuer la collecte sans métadonnées",
+            "Supprimer la source immédiatement"
+          ],
+          "correctIndex": 0
+        },
+        {
+          "id": "acq_multisource",
+          "title": "Sources hétérogènes",
+          "description": "Questionnaires, capteurs et réseaux sociaux arrivent à des rythmes différents.",
+          "options": [
+            "Définir un plan de collecte par source avec horodatage commun",
+            "Fusionner sans tenir compte du temps",
+            "Conserver uniquement une source"
+          ],
+          "correctIndex": 0
+        },
+        {
+          "id": "acq_missing_field",
+          "title": "Champs obligatoires manquants",
+          "description": "Des enregistrements arrivent sans identifiant de source.",
+          "options": [
+            "Valider les champs requis à l'entrée et rejeter les lignes invalides",
+            "Accepter toutes les lignes sans contrôle",
+            "Remplir les IDs manquants au hasard"
+          ],
+          "correctIndex": 0
+        }
+      ]
+    },
+    {
+      "id": "data_extraction",
+      "label": "Extraction de données",
+      "shortDescription": "Extraction via dumps, requêtes, flux et API.",
+      "problemPool": [
+        {
+          "id": "ext_dump",
+          "title": "Dump trop volumineux",
+          "description": "Le dump complet bloque le traitement et la mémoire.",
+          "options": [
+            "Passer à une extraction sélective et incrémentale",
+            "Toujours recharger le dump complet",
+            "Ignorer les limites de ressources"
+          ],
+          "correctIndex": 0
+        },
+        {
+          "id": "ext_query",
+          "title": "Filtre de requête incorrect",
+          "description": "Les paramètres SQL/SPARQL extraient des lignes hors périmètre.",
+          "options": [
+            "Corriger les critères de filtrage et tester sur échantillon",
+            "Retirer tous les filtres",
+            "Modifier les résultats manuellement"
+          ],
+          "correctIndex": 0
+        },
+        {
+          "id": "ext_api_wrapper",
+          "title": "Intégration API fragile",
+          "description": "L'API change de format, le wrapper interne casse.",
+          "options": [
+            "Versionner le wrapper et ajouter validation de réponse",
+            "Copier-coller les réponses sans parser",
+            "Désactiver les contrôles d'intégration"
+          ],
+          "correctIndex": 0
+        }
+      ]
+    },
+    {
+      "id": "data_cleaning",
+      "label": "Nettoyage de données",
+      "shortDescription": "Correction des erreurs syntaxiques, sémantiques et de couverture.",
+      "problemPool": [
+        {
+          "id": "cl_syntax",
+          "title": "Erreurs de syntaxe",
+          "description": "Certaines valeurs numeriques sont saisies en texte (ex: dix).",
+          "options": [
+            "Appliquer des règles de validation de type et corriger les entrées",
+            "Conserver les valeurs comme elles sont",
+            "Transformer toute la colonne en texte"
+          ],
+          "correctIndex": 0
+        },
+        {
+          "id": "cl_semantic",
+          "title": "Contradictions sémantiques",
+          "description": "Un produit est marqué \"en stock\" et \"rupture\" en même temps.",
+          "options": [
+            "Définir une règle d'intégrité et résoudre les contradictions",
+            "Garder les deux états",
+            "Supprimer aléatoirement un des champs"
+          ],
+          "correctIndex": 0
+        },
+        {
+          "id": "cl_coverage",
+          "title": "Erreurs de couverture",
+          "description": "Des valeurs et enregistrements sont manquants dans la base.",
+          "options": [
+            "Traiter valeurs manquantes et compléter avec des sources fiables",
+            "Ignorer les trous de données",
+            "Remplir toutes les valeurs par zéro"
+          ],
+          "correctIndex": 0
+        }
+      ]
+    },
+    {
+      "id": "data_transformation",
+      "label": "Transformation de données",
+      "shortDescription": "Mise en forme et harmonisation (XSD/JSON, XSLT, scripts).",
+      "problemPool": [
+        {
+          "id": "tr_schema",
+          "title": "Validation de schéma échouée",
+          "description": "Le JSON/XML ne respecte pas le schéma attendu.",
+          "options": [
+            "Valider avec schéma et corriger la structure avant chargement",
+            "Charger même si le schéma est invalide",
+            "Supprimer la validation de schéma"
+          ],
+          "correctIndex": 0
+        },
+        {
+          "id": "tr_units",
+          "title": "Unités irrégulières",
+          "description": "Les mêmes mesures sont en kg et en livres.",
+          "options": [
+            "Standardiser les unités avec une transformation documentée",
+            "Mélanger les unités dans une même colonne",
+            "Conserver uniquement les lignes en kg"
+          ],
+          "correctIndex": 0
+        },
+        {
+          "id": "tr_mapping",
+          "title": "Mapping de champs incomplet",
+          "description": "Plusieurs colonnes source ne sont pas mappées vers la cible.",
+          "options": [
+            "Finaliser la table de correspondance et tester bout en bout",
+            "Laisser les champs non mappés vides",
+            "Renommer les colonnes sans règle"
+          ],
+          "correctIndex": 0
+        }
+      ]
+    },
+    {
+      "id": "data_storage",
+      "label": "Stockage de données",
+      "shortDescription": "Choix de formats, modèles et propriétés de stockage.",
+      "problemPool": [
+        {
+          "id": "st_format",
+          "title": "Format de stockage inadapté",
+          "description": "Un flux semi-structuré est forcé dans un schéma tabulaire rigide.",
+          "options": [
+            "Choisir un format adapté (JSON/XML/CSV) selon la structure",
+            "Forcer toutes les données en CSV brut",
+            "Stocker les données sans structure"
+          ],
+          "correctIndex": 0
+        },
+        {
+          "id": "st_model",
+          "title": "Mauvais type de base",
+          "description": "Le modèle relationnel choisi ne répond pas au besoin document/graph.",
+          "options": [
+            "Aligner le type de base (SQL/NoSQL) avec les usages",
+            "Garder la base actuelle quoi qu'il arrive",
+            "Dupliquer les données dans tous les moteurs"
+          ],
+          "correctIndex": 0
+        },
+        {
+          "id": "st_consistency",
+          "title": "Conflit de cohérence",
+          "description": "Des transactions concurrentes produisent des états incohérents.",
+          "options": [
+            "Renforcer les garanties ACID sur les opérations critiques",
+            "Désactiver les contraintes de transaction",
+            "Relancer les écritures au hasard"
+          ],
+          "correctIndex": 0
+        }
+      ]
+    },
+    {
+      "id": "analysis_modeling",
+      "label": "Modélisation de l'analyse des données",
+      "shortDescription": "Conception des faits, dimensions et modèles analytiques.",
+      "problemPool": [
+        {
+          "id": "md_grain",
+          "title": "Grain de la table de faits flou",
+          "description": "Le niveau de détail des mesures n'est pas défini.",
+          "options": [
+            "Définir explicitement le grain avant chargement du modèle",
+            "Laisser chaque source décider du niveau de détail",
+            "Mélanger plusieurs grains dans la même table"
+          ],
+          "correctIndex": 0
+        },
+        {
+          "id": "md_dimension",
+          "title": "Dimensions incohérentes",
+          "description": "Les dimensions temps/produit/client n'utilisent pas des clés cohérentes.",
+          "options": [
+            "Normaliser les clés de dimensions et documenter les jointures",
+            "Joindre sur des libellés textuels uniquement",
+            "Supprimer les dimensions secondaires"
+          ],
+          "correctIndex": 0
+        },
+        {
+          "id": "md_snowflake",
+          "title": "Flocon trop complexe",
+          "description": "La normalisation réduit la redondance mais complexifie fortement les requêtes.",
+          "options": [
+            "Arbitrer entre étoile/flocon selon performance et maintenance",
+            "Normaliser toutes les tables sans compromis",
+            "Empiler des jointures sans revue"
+          ],
+          "correctIndex": 0
+        }
+      ]
+    },
+    {
+      "id": "data_analysis",
+      "label": "Analyses de données",
+      "shortDescription": "Filtrer, dériver, trier, détecter anomalies et corréler.",
+      "problemPool": [
+        {
+          "id": "an_filter",
+          "title": "Filtrage biaisé",
+          "description": "Le filtre actuel exclut involontairement une population importante.",
+          "options": [
+            "Revoir les critères de filtre et comparer avant/après",
+            "Conserver le filtre sans validation",
+            "Supprimer tous les filtres"
+          ],
+          "correctIndex": 0
+        },
+        {
+          "id": "an_outlier",
+          "title": "Anomalies non détectées",
+          "description": "Les valeurs aberrantes faussent les indicateurs dérivés.",
+          "options": [
+            "Identifier et traiter les anomalies avant interprétation",
+            "Calculer les métriques sans contrôle",
+            "Supprimer la moitié des valeurs extrêmes au hasard"
+          ],
+          "correctIndex": 0
+        },
+        {
+          "id": "an_correlation",
+          "title": "Corrélation mal interprétée",
+          "description": "Une corrélation est présentée comme une causalité.",
+          "options": [
+            "Présenter la corrélation avec contexte et limites",
+            "Conclure directement à la causalité",
+            "Ignorer toute relation entre variables"
+          ],
+          "correctIndex": 0
+        }
+      ]
+    },
+    {
+      "id": "data_visualization",
+      "label": "Visualisation de données",
+      "shortDescription": "Représentation claire: séries, distribution, corrélation, comparaison.",
+      "problemPool": [
+        {
+          "id": "vz_chart",
+          "title": "Type de graphique inadapté",
+          "description": "Un camembert est utilisé pour une série temporelle.",
+          "options": [
+            "Choisir le graphique selon l'objectif (ligne, histogramme, nuage, etc.)",
+            "Utiliser toujours le même type de graphique",
+            "Afficher uniquement un tableau brut"
+          ],
+          "correctIndex": 0
+        },
+        {
+          "id": "vz_scale",
+          "title": "Échelle trompeuse",
+          "description": "L'axe tronqué exagère des différences mineures.",
+          "options": [
+            "Utiliser une échelle lisible et justifier toute troncature",
+            "Tronquer les axes pour accentuer l'effet",
+            "Supprimer les axes"
+          ],
+          "correctIndex": 0
+        },
+        {
+          "id": "vz_visual_vars",
+          "title": "Mauvaises variables visuelles",
+          "description": "La couleur et la taille ne correspondent pas aux bonnes dimensions.",
+          "options": [
+            "Affecter position/taille/couleur selon le sens des variables",
+            "Choisir les couleurs aléatoirement",
+            "Encoder toutes les variables avec la même forme"
+          ],
+          "correctIndex": 0
+        }
+      ]
+    }
+  ],
+  "correctPipeline": [
+    "data_acquisition",
+    "data_extraction",
+    "data_cleaning",
+    "data_transformation",
+    "data_storage"
+  ]
+}

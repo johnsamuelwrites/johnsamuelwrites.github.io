@@ -16,80 +16,80 @@
   },
   "phases": [
     {
-      "id": "problem_definition",
-      "label": "Problem Definition",
-      "shortDescription": "Define goals, constraints, and success metrics.",
+      "id": "data_acquisition",
+      "label": "Data Acquisition",
+      "shortDescription": "Initial data collection (5W1H method).",
       "problemPool": [
         {
-          "id": "pd_scope",
-          "title": "Scope Drift",
-          "description": "The team is adding features outside the original objective.",
+          "id": "acq_5w1h",
+          "title": "Incomplete 5W1H context",
+          "description": "The source is known, but Who/When/Why are not documented.",
           "options": [
-            "Freeze scope and restate objective metrics",
-            "Add all requested features immediately",
-            "Ignore scope changes"
+            "Complete the source sheet with Who, What, Where, When, Why, How",
+            "Continue collection without metadata",
+            "Delete the source immediately"
           ],
           "correctIndex": 0
         },
         {
-          "id": "pd_metric",
-          "title": "Missing Success Metric",
-          "description": "No measurable KPI has been selected.",
+          "id": "acq_multisource",
+          "title": "Heterogeneous sources",
+          "description": "Surveys, sensors, and social networks arrive at different rhythms.",
           "options": [
-            "Pick one or two measurable KPIs",
-            "Proceed without metrics",
-            "Only rely on intuition"
+            "Define a source-by-source collection plan with a shared timestamp",
+            "Merge everything without considering time",
+            "Keep only one source"
           ],
           "correctIndex": 0
         },
         {
-          "id": "pd_stakeholder",
-          "title": "Stakeholder Misalignment",
-          "description": "Different stakeholders want contradictory outcomes.",
+          "id": "acq_missing_field",
+          "title": "Missing required fields",
+          "description": "Records arrive without a source identifier.",
           "options": [
-            "Run a requirements alignment meeting",
-            "Use whichever request came first",
-            "Delay all communication"
+            "Validate required fields at input and reject invalid rows",
+            "Accept all rows without checks",
+            "Fill missing IDs randomly"
           ],
           "correctIndex": 0
         }
       ]
     },
     {
-      "id": "data_collection",
-      "label": "Data Collection",
-      "shortDescription": "Gather data from reliable sources.",
+      "id": "data_extraction",
+      "label": "Data Extraction",
+      "shortDescription": "Extraction through dumps, queries, streams, and APIs.",
       "problemPool": [
         {
-          "id": "dc_coverage",
-          "title": "Coverage Gap",
-          "description": "Important user segments are missing in the dataset.",
+          "id": "ext_dump",
+          "title": "Oversized dump",
+          "description": "The full dump blocks processing and memory.",
           "options": [
-            "Collect targeted samples for missing segments",
-            "Duplicate existing rows",
-            "Drop the missing segments from scope"
+            "Switch to selective and incremental extraction",
+            "Always reload the full dump",
+            "Ignore resource limits"
           ],
           "correctIndex": 0
         },
         {
-          "id": "dc_permission",
-          "title": "Permission Error",
-          "description": "Access to one source is unauthorized.",
+          "id": "ext_query",
+          "title": "Incorrect query filter",
+          "description": "SQL/SPARQL parameters extract rows outside scope.",
           "options": [
-            "Obtain proper access approval",
-            "Bypass authentication",
-            "Scrape private data"
+            "Fix filtering criteria and test on a sample",
+            "Remove all filters",
+            "Manually edit the results"
           ],
           "correctIndex": 0
         },
         {
-          "id": "dc_schema",
-          "title": "Schema Mismatch",
-          "description": "Two sources use different field formats.",
+          "id": "ext_api_wrapper",
+          "title": "Fragile API integration",
+          "description": "The API format changes and the internal wrapper breaks.",
           "options": [
-            "Create a schema mapping before merge",
-            "Merge blindly",
-            "Delete one source"
+            "Version the wrapper and add response validation",
+            "Copy/paste responses without parsing",
+            "Disable integration checks"
           ],
           "correctIndex": 0
         }
@@ -98,238 +98,238 @@
     {
       "id": "data_cleaning",
       "label": "Data Cleaning",
-      "shortDescription": "Fix missing values and inconsistencies.",
+      "shortDescription": "Fix syntax, semantic, and coverage errors.",
       "problemPool": [
         {
-          "id": "cl_missing",
-          "title": "Missing Values Spike",
-          "description": "A key feature has many null entries.",
+          "id": "cl_syntax",
+          "title": "Syntax errors",
+          "description": "Some numeric values are entered as text (e.g., ten).",
           "options": [
-            "Apply a justified imputation strategy",
-            "Replace all nulls with zero always",
-            "Ignore nulls"
+            "Apply type validation rules and correct entries",
+            "Keep values as they are",
+            "Convert the whole column to text"
           ],
           "correctIndex": 0
         },
         {
-          "id": "cl_outlier",
-          "title": "Outlier Explosion",
-          "description": "Extreme values dominate model inputs.",
+          "id": "cl_semantic",
+          "title": "Semantic contradictions",
+          "description": "A product is marked both in stock and out of stock at the same time.",
           "options": [
-            "Investigate and cap or transform responsibly",
-            "Delete random rows",
-            "Keep all outliers without checks"
+            "Define an integrity rule and resolve contradictions",
+            "Keep both states",
+            "Randomly remove one field"
           ],
           "correctIndex": 0
         },
         {
-          "id": "cl_duplicate",
-          "title": "Duplicate Records",
-          "description": "Duplicate events inflate trends.",
+          "id": "cl_coverage",
+          "title": "Coverage errors",
+          "description": "Values and records are missing in the database.",
           "options": [
-            "Deduplicate using stable keys",
-            "Keep duplicates for bigger sample size",
-            "Drop half the table randomly"
+            "Handle missing values and complete with reliable sources",
+            "Ignore data gaps",
+            "Fill all missing values with zero"
           ],
           "correctIndex": 0
         }
       ]
     },
     {
-      "id": "feature_engineering",
-      "label": "Feature Engineering",
-      "shortDescription": "Transform raw fields into useful signals.",
+      "id": "data_transformation",
+      "label": "Data Transformation",
+      "shortDescription": "Formatting and harmonization (XSD/JSON, XSLT, scripts).",
       "problemPool": [
         {
-          "id": "fe_leakage",
-          "title": "Feature Leakage",
-          "description": "A feature indirectly reveals the target.",
+          "id": "tr_schema",
+          "title": "Schema validation failed",
+          "description": "JSON/XML does not comply with the expected schema.",
           "options": [
-            "Remove leaking features",
-            "Keep leakage for high accuracy",
-            "Hide the leakage in scaling"
+            "Validate against the schema and fix structure before loading",
+            "Load even if the schema is invalid",
+            "Remove schema validation"
           ],
           "correctIndex": 0
         },
         {
-          "id": "fe_scale",
-          "title": "Scale Inconsistency",
-          "description": "Features use incompatible units.",
+          "id": "tr_units",
+          "title": "Irregular units",
+          "description": "The same measure appears in kg and pounds.",
           "options": [
-            "Normalize or standardize consistently",
-            "Ignore scale differences",
-            "Convert only one random column"
+            "Standardize units with a documented transformation",
+            "Mix units in the same column",
+            "Keep only rows in kg"
           ],
           "correctIndex": 0
         },
         {
-          "id": "fe_sparse",
-          "title": "Sparse Explosion",
-          "description": "One-hot encoding creates too many sparse columns.",
+          "id": "tr_mapping",
+          "title": "Incomplete field mapping",
+          "description": "Several source columns are not mapped to target columns.",
           "options": [
-            "Group rare categories before encoding",
-            "Encode every unique value no matter what",
-            "Drop all categorical variables"
+            "Finalize the mapping table and test end-to-end",
+            "Leave unmapped fields empty",
+            "Rename columns without mapping rules"
           ],
           "correctIndex": 0
         }
       ]
     },
     {
-      "id": "model_training",
-      "label": "Model Training",
-      "shortDescription": "Train models with validated methods.",
+      "id": "data_storage",
+      "label": "Data Storage",
+      "shortDescription": "Choose formats, models, and storage properties.",
       "problemPool": [
         {
-          "id": "mt_overfit",
-          "title": "Overfitting Alert",
-          "description": "Training score is high, validation score drops.",
+          "id": "st_format",
+          "title": "Inadequate storage format",
+          "description": "A semi-structured stream is forced into a rigid tabular schema.",
           "options": [
-            "Use regularization and cross-validation",
-            "Train longer only",
-            "Increase model complexity immediately"
+            "Choose the right format (JSON/XML/CSV) based on structure",
+            "Force all data into raw CSV",
+            "Store data without structure"
           ],
           "correctIndex": 0
         },
         {
-          "id": "mt_split",
-          "title": "Bad Data Split",
-          "description": "Train and test sets are not representative.",
+          "id": "st_model",
+          "title": "Wrong database type",
+          "description": "The chosen relational model does not match document/graph needs.",
           "options": [
-            "Use stratified or time-aware split",
-            "Reuse training data as test data",
-            "Shuffle labels only"
+            "Align database type (SQL/NoSQL) with usage",
+            "Keep the current database no matter what",
+            "Duplicate data into every engine"
           ],
           "correctIndex": 0
         },
         {
-          "id": "mt_seed",
-          "title": "Unstable Runs",
-          "description": "Model metrics vary significantly per run.",
+          "id": "st_consistency",
+          "title": "Consistency conflict",
+          "description": "Concurrent transactions produce inconsistent states.",
           "options": [
-            "Fix random seeds and report variance",
-            "Report only best run",
-            "Ignore reproducibility"
+            "Strengthen ACID guarantees for critical operations",
+            "Disable transaction constraints",
+            "Retry writes randomly"
           ],
           "correctIndex": 0
         }
       ]
     },
     {
-      "id": "evaluation",
-      "label": "Evaluation",
-      "shortDescription": "Assess performance with proper metrics.",
+      "id": "analysis_modeling",
+      "label": "Analysis Modeling",
+      "shortDescription": "Design facts, dimensions, and analytical models.",
       "problemPool": [
         {
-          "id": "ev_metric",
-          "title": "Wrong Metric",
-          "description": "Accuracy is used for an imbalanced problem.",
+          "id": "md_grain",
+          "title": "Unclear fact table grain",
+          "description": "The detail level of measures is not defined.",
           "options": [
-            "Switch to precision/recall/F1 as needed",
-            "Keep only accuracy",
-            "Ignore class imbalance"
+            "Define the grain explicitly before model loading",
+            "Let each source decide the level of detail",
+            "Mix multiple grains in one table"
           ],
           "correctIndex": 0
         },
         {
-          "id": "ev_leak",
-          "title": "Evaluation Leakage",
-          "description": "Validation set influenced feature design.",
+          "id": "md_dimension",
+          "title": "Inconsistent dimensions",
+          "description": "Time/product/customer dimensions do not use consistent keys.",
           "options": [
-            "Rebuild with strict split discipline",
-            "Keep process unchanged",
-            "Merge train and validation"
+            "Normalize dimension keys and document joins",
+            "Join only on text labels",
+            "Remove secondary dimensions"
           ],
           "correctIndex": 0
         },
         {
-          "id": "ev_baseline",
-          "title": "No Baseline",
-          "description": "Model improvement cannot be quantified.",
+          "id": "md_snowflake",
+          "title": "Overly complex snowflake",
+          "description": "Normalization reduces redundancy but heavily complicates queries.",
           "options": [
-            "Compare against a simple baseline",
-            "Skip baseline comparisons",
-            "Claim success without evidence"
+            "Balance star vs snowflake based on performance and maintenance",
+            "Normalize all tables with no trade-off",
+            "Stack joins without review"
           ],
           "correctIndex": 0
         }
       ]
     },
     {
-      "id": "deployment",
-      "label": "Deployment",
-      "shortDescription": "Ship model safely into production.",
+      "id": "data_analysis",
+      "label": "Data Analysis",
+      "shortDescription": "Filter, derive, sort, detect anomalies, and correlate.",
       "problemPool": [
         {
-          "id": "dp_env",
-          "title": "Environment Drift",
-          "description": "Production package versions differ from training.",
+          "id": "an_filter",
+          "title": "Biased filtering",
+          "description": "The current filter unintentionally excludes a major population.",
           "options": [
-            "Pin dependencies and validate environment",
-            "Deploy with latest untested versions",
-            "Ignore runtime compatibility"
+            "Review filter criteria and compare before/after impact",
+            "Keep the filter without validation",
+            "Remove all filters"
           ],
           "correctIndex": 0
         },
         {
-          "id": "dp_latency",
-          "title": "Latency Spike",
-          "description": "Prediction endpoint breaches SLA.",
+          "id": "an_outlier",
+          "title": "Undetected anomalies",
+          "description": "Outliers distort derived indicators.",
           "options": [
-            "Profile and optimize inference path",
-            "Increase timeout indefinitely",
-            "Disable monitoring"
+            "Identify and handle anomalies before interpretation",
+            "Compute metrics with no controls",
+            "Delete half of extreme values randomly"
           ],
           "correctIndex": 0
         },
         {
-          "id": "dp_rollback",
-          "title": "No Rollback Plan",
-          "description": "Failed release cannot be reversed quickly.",
+          "id": "an_correlation",
+          "title": "Misinterpreted correlation",
+          "description": "A correlation is presented as causation.",
           "options": [
-            "Implement blue-green or canary rollback",
-            "Push directly without fallback",
-            "Wait and hope for recovery"
+            "Present correlation with context and limits",
+            "Conclude direct causality",
+            "Ignore all variable relationships"
           ],
           "correctIndex": 0
         }
       ]
     },
     {
-      "id": "monitoring",
-      "label": "Monitoring",
-      "shortDescription": "Track model quality and data drift.",
+      "id": "data_visualization",
+      "label": "Data Visualization",
+      "shortDescription": "Clear representation: series, distribution, correlation, comparison.",
       "problemPool": [
         {
-          "id": "mn_drift",
-          "title": "Data Drift",
-          "description": "Live feature distributions diverge from training.",
+          "id": "vz_chart",
+          "title": "Inappropriate chart type",
+          "description": "A pie chart is used for a time series.",
           "options": [
-            "Set drift alerts and retraining triggers",
-            "Ignore changing distributions",
-            "Delete historical logs"
+            "Choose chart type based on objective (line, histogram, scatter, etc.)",
+            "Always use the same chart type",
+            "Show only a raw table"
           ],
           "correctIndex": 0
         },
         {
-          "id": "mn_feedback",
-          "title": "Feedback Loop Missing",
-          "description": "No process exists for collecting model errors.",
+          "id": "vz_scale",
+          "title": "Misleading scale",
+          "description": "A truncated axis exaggerates minor differences.",
           "options": [
-            "Capture outcomes and error feedback",
-            "Collect no post-deployment labels",
-            "Only monitor CPU usage"
+            "Use a readable scale and justify any truncation",
+            "Truncate axes to amplify effects",
+            "Remove axes"
           ],
           "correctIndex": 0
         },
         {
-          "id": "mn_alert",
-          "title": "Alert Fatigue",
-          "description": "Too many noisy alerts are ignored.",
+          "id": "vz_visual_vars",
+          "title": "Poor visual variable mapping",
+          "description": "Color and size are not mapped to the right dimensions.",
           "options": [
-            "Tune alert thresholds and priorities",
-            "Turn off all alerts",
-            "Notify every second"
+            "Map position/size/color according to variable meaning",
+            "Choose colors randomly",
+            "Encode all variables with the same shape"
           ],
           "correctIndex": 0
         }
@@ -337,10 +337,10 @@
     }
   ],
   "correctPipeline": [
-    "problem_definition",
-    "data_collection",
+    "data_acquisition",
+    "data_extraction",
     "data_cleaning",
-    "model_training",
-    "evaluation"
+    "data_transformation",
+    "data_storage"
   ]
 }
