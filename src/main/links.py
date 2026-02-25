@@ -19,6 +19,7 @@ This script checks HTML files for broken links, distinguishing between:
 import argparse
 import logging
 import os
+import re
 import sys
 from pathlib import Path
 from typing import Dict, List, Set, Optional
@@ -86,6 +87,7 @@ class LinkChecker:
         check_favicon: bool = True,
         check_styles: bool = True,
         check_scripts: bool = True,
+        fix_favicon: bool = False,
         exclude_dirs: Optional[List[str]] = None,
     ):
         """
@@ -99,6 +101,7 @@ class LinkChecker:
             check_favicon: Whether to check favicon links
             check_styles: Whether to check stylesheet links
             check_scripts: Whether to check script links
+            fix_favicon: Whether to auto-insert missing favicon link
             exclude_dirs: List of directory names or paths to exclude from scanning
         """
         self.timeout = timeout
@@ -107,9 +110,29 @@ class LinkChecker:
         self.check_favicon = check_favicon
         self.check_styles = check_styles
         self.check_scripts = check_scripts
+        self.fix_favicon = fix_favicon
         self.exclude_dirs = set(exclude_dirs) if exclude_dirs else set()
         self.session = self._create_session(max_retries)
         self.checked_urls: Dict[str, int] = {}  # Cache for external URLs
+        self.fixed_favicon_files: Set[str] = set()
+        self.repo_root = Path(__file__).resolve().parents[2]
+        self.favicon_target = (
+            self.repo_root / "images" / "logo" / "favicon.png"
+        ).resolve()
+
+    def _expected_favicon_href(self, filepath: str) -> str:
+        """Compute expected relative favicon path for a given HTML file."""
+        source_dir = Path(filepath).parent.resolve()
+        rel_path = os.path.relpath(self.favicon_target, start=source_dir)
+        return rel_path.replace("\\", "/")
+
+    def _insert_favicon_link(self, html: str, href: str) -> str:
+        """Insert favicon link right after opening <head> tag."""
+        favicon_line = f'\n        <link rel="shortcut icon" href="{href}" />'
+        match = re.search(r"<head[^>]*>", html, flags=re.IGNORECASE)
+        if match:
+            return html[: match.end()] + favicon_line + html[match.end() :]
+        return html
 
     def _create_session(self, max_retries: int) -> requests.Session:
         """Create a requests session with retry strategy"""
@@ -326,13 +349,15 @@ class LinkChecker:
         """
         broken_links = []
 
+        read_encoding = "utf-8"
         try:
-            with open(filepath, "r", encoding="utf-8") as f:
+            with open(filepath, "r", encoding=read_encoding) as f:
                 content = f.read()
         except UnicodeDecodeError:
             # Try with latin-1 encoding as fallback
             try:
-                with open(filepath, "r", encoding="latin-1") as f:
+                read_encoding = "latin-1"
+                with open(filepath, "r", encoding=read_encoding) as f:
                     content = f.read()
             except Exception as e:
                 logger.error(f"Cannot read file {filepath}: {e}")
@@ -347,6 +372,58 @@ class LinkChecker:
         except Exception as e:
             logger.error(f"Cannot parse HTML in {filepath}: {e}")
             return broken_links
+
+        # Detect and optionally fix missing favicon link
+        if self.check_favicon:
+            favicon_links = []
+            for link_elem in soup.find_all("link"):
+                rel = link_elem.get("rel")
+                rel_str = " ".join(rel) if isinstance(rel, list) else (rel or "")
+                if "icon" in rel_str.lower():
+                    favicon_links.append(link_elem)
+
+            if not favicon_links:
+                expected_href = self._expected_favicon_href(filepath)
+                if self.fix_favicon:
+                    updated_content = self._insert_favicon_link(content, expected_href)
+                    if updated_content != content:
+                        try:
+                            with open(filepath, "w", encoding=read_encoding) as f:
+                                f.write(updated_content)
+                            self.fixed_favicon_files.add(filepath)
+                            content = updated_content
+                            soup = BeautifulSoup(content, "html.parser")
+                            logger.info(
+                                f"Fixed missing favicon in {filepath} -> {expected_href}"
+                            )
+                        except Exception as e:
+                            logger.error(f"Failed to write favicon fix in {filepath}: {e}")
+                            broken_links.append(
+                                BrokenLink(
+                                    filepath,
+                                    expected_href,
+                                    LinkType.FAVICON,
+                                    error="Favicon link missing (auto-fix failed)",
+                                )
+                            )
+                    else:
+                        broken_links.append(
+                            BrokenLink(
+                                filepath,
+                                expected_href,
+                                LinkType.FAVICON,
+                                error="Favicon link missing",
+                            )
+                        )
+                else:
+                    broken_links.append(
+                        BrokenLink(
+                            filepath,
+                            expected_href,
+                            LinkType.FAVICON,
+                            error="Favicon link missing",
+                        )
+                    )
 
         # Check regular anchor links
         links = soup.find_all("a", href=True)
@@ -538,6 +615,7 @@ class LinkChecker:
 
 def print_results(
     results: Dict[str, List[BrokenLink]],
+    fixed_favicon_files: Optional[Set[str]] = None,
     show_external: bool = True,
     show_internal: bool = True,
     show_favicon: bool = True,
@@ -557,6 +635,10 @@ def print_results(
     """
     if not results:
         print("\n✓ No broken links found!")
+        if fixed_favicon_files:
+            print(f"✓ Favicon fixes applied: {len(fixed_favicon_files)}")
+            for path in sorted(fixed_favicon_files):
+                print(f"  - {path}")
         return
 
     total_broken = sum(len(links) for links in results.values())
@@ -601,6 +683,12 @@ def print_results(
     print(f"  - Stylesheet: {stylesheet_count}")
     print(f"  - Script: {script_count}")
     print(f"{'='*70}\n")
+
+    if fixed_favicon_files:
+        print(f"Favicon fixes applied: {len(fixed_favicon_files)}")
+        for path in sorted(fixed_favicon_files):
+            print(f"  - {path}")
+        print()
 
     for filepath, broken_links in results.items():
         print(f"\n{'='*70}")
@@ -679,6 +767,12 @@ Examples:
     )
 
     parser.add_argument(
+        "--fix-favicon",
+        action="store_true",
+        help="Auto-fix missing favicon link using the correct relative path to images/logo/favicon.png",
+    )
+
+    parser.add_argument(
         "--no-styles", action="store_true", help="Skip checking stylesheet links"
     )
 
@@ -708,6 +802,8 @@ Examples:
     if not args.files:
         parser.print_usage()
         sys.exit(1)
+    if args.fix_favicon and args.no_favicon:
+        parser.error("--fix-favicon cannot be used with --no-favicon")
 
     # Set logging level
     if args.verbose:
@@ -722,6 +818,7 @@ Examples:
         check_favicon=not args.no_favicon,
         check_styles=not args.no_styles,
         check_scripts=not args.no_scripts,
+        fix_favicon=args.fix_favicon,
         exclude_dirs=args.exclude_dirs,
     )
 
@@ -731,6 +828,7 @@ Examples:
     # Print results
     print_results(
         results,
+        fixed_favicon_files=checker.fixed_favicon_files,
         show_external=not args.no_external,
         show_internal=not args.no_internal,
         show_favicon=not args.no_favicon,

@@ -1,10 +1,14 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
-<head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Mission Donnees</title>
-<style>
-:root{--bg:#f4f6fb;--p:#fff;--ink:#1f2937;--m:#6b7280;--a:#0f766e;--d:#b91c1c;--ok:#166534;--l:#dbe3ef}
+ <head>
+  <link href="../../../images/logo/favicon.png" rel="shortcut icon"/>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width,initial-scale=1" name="viewport"/>
+  <title>
+   Mission Donnees
+  </title>
+  <style>
+   :root{--bg:#f4f6fb;--p:#fff;--ink:#1f2937;--m:#6b7280;--a:#0f766e;--d:#b91c1c;--ok:#166534;--l:#dbe3ef}
 *{box-sizing:border-box}body{margin:0;font-family:Segoe UI,Tahoma,sans-serif;background:var(--bg);color:var(--ink)}
 .app{max-width:1100px;margin:0 auto;padding:14px}.panel{background:var(--p);border:1px solid var(--l);border-radius:10px;padding:12px;margin-bottom:10px}
 .top{display:grid;grid-template-columns:1fr auto auto auto auto;gap:10px;align-items:center}.btn{border:1px solid var(--l);border-radius:8px;padding:7px 11px;background:#fff;cursor:pointer}.btn:disabled{opacity:.5;cursor:not-allowed}.pri{background:var(--a);color:#fff;border-color:var(--a)}.danger{background:var(--d);color:#fff;border-color:var(--d)}
@@ -16,43 +20,299 @@
 .card{width:100%;border:1px solid #f0c7c7;border-radius:8px;padding:6px;text-align:left;background:#fff7f7;margin-bottom:6px;cursor:pointer}
 .modalbg{position:fixed;inset:0;background:rgba(15,23,42,.5);display:flex;align-items:center;justify-content:center;padding:10px}.modal{width:min(560px,100%);background:#fff;border:1px solid var(--l);border-radius:10px;padding:12px}.sum{border:1px solid var(--l);border-radius:8px;padding:10px;background:#f8fafc;margin-top:8px}
 @media(max-width:900px){.top{grid-template-columns:1fr 1fr}.grid2{grid-template-columns:1fr}.ctrl{grid-template-columns:1fr 1fr}.board{grid-template-columns:repeat(5,minmax(220px,1fr))}}
-</style>
-</head>
-<body><div class="app">
-<section class="panel top"><div id="title"><b>Mission Donnees</b></div><div>Minuteur : <b id="timer">25:00</b></div><div>Score : <b id="score">0</b></div><div>Phase courante : <b id="curLabel">N/A</b></div><button id="restart" class="btn danger" type="button">Recommencer</button></section>
-<section id="build" class="panel"><h2>Construire le pipeline</h2><p class="tiny">Selectionnez exactement 5 phases et ordonnez-les.</p><div class="grid2"><div><h3>Disponibles (8)</h3><div id="avail"></div></div><div><h3>Selection (<span id="selN">0</span>/5)</h3><div id="sel"></div><button id="validate" class="btn pri" type="button">Valider le pipeline</button><div id="bmsg" class="status"></div></div></div></section>
-<section id="play" class="panel hidden"><h2>Jouer</h2><div class="ctrl"><button id="roll" class="btn pri" type="button">Lancer les des</button><button id="move" class="btn" type="button">Deplacer les donnees</button><div>Deplacement : <b id="d1">-</b> | Problemees : <b id="d2">-</b></div><label class="tiny">Generer dans : <select id="focus"></select></label></div><div id="pmsg" class="status"></div><div id="board" class="board"></div><div id="summary" class="sum hidden"></div></section>
-</div>
-<div id="mbg" class="modalbg hidden" aria-hidden="true"><div class="modal"><h3 id="mt"></h3><p id="md"></p><form id="mf"></form><div id="mfb" class="status"></div><button id="msub" class="btn pri" type="button">Valider</button> <button id="mclose" class="btn" type="button">Fermer</button></div></div>
-<script type="application/json" id="config">{"gameTitle":"Mission Pipeline","timeLimitSeconds":1500,"dataUnitsInitial":10,"selectionCountRequired":5,"maxProblemesPerPhase":6,"scoring":{"pipelineCorrectBonus":50,"pipelineWrongPenalty":-20,"firstClickCorrect":10,"wrongClickPenalty":-5,"secondClickCorrect":5,"laterCorrect":2,"phaseClearBonus":15,"winBonus":50},"phases":[{"id":"problem_definition","label":"Probleme Definition","shortDescription":"Define objective","problemPool":[{"id":"pd1","title":"Scope drift","description":"Goal keeps changing.","options":["Freeze scope with KPI","Add more features","Ignore it"],"correctIndex":0},{"id":"pd2","title":"No KPI","description":"No success metric.","options":["Pick measurable KPI","Ship anyway","Wait forever"],"correctIndex":0}]},{"id":"data_collection","label":"Data Collection","shortDescription":"Gather data","problemPool":[{"id":"dc1","title":"Coverage gap","description":"Missing user segment.","options":["Collect targeted samples","Duplicate rows","Drop segment"],"correctIndex":0},{"id":"dc2","title":"Access denied","description":"Source permission issue.","options":["Request access","Bypass auth","Skip security"],"correctIndex":0}]},{"id":"data_cleaning","label":"Data Cleaning","shortDescription":"Fix quality","problemPool":[{"id":"cl1","title":"Missing values","description":"Null spike found.","options":["Use valid imputation","Fill all with zero","Ignore nulls"],"correctIndex":0},{"id":"cl2","title":"Duplicates","description":"Rows repeated.","options":["Deduplicate by key","Keep for size","Delete random rows"],"correctIndex":0}]},{"id":"feature_engineering","label":"Feature Engineering","shortDescription":"Create features","problemPool":[{"id":"fe1","title":"Leakage","description":"Feature reveals target.","options":["Remove leakage","Keep for accuracy","Hide issue"],"correctIndex":0},{"id":"fe2","title":"Scale mismatch","description":"Units conflict.","options":["Normalize consistently","Ignore scale","Convert random col"],"correctIndex":0}]},{"id":"model_training","label":"Model Training","shortDescription":"Train model","problemPool":[{"id":"mt1","title":"Overfitting","description":"Train high, val low.","options":["Regularize + CV","Train longer only","Increase complexity"],"correctIndex":0},{"id":"mt2","title":"Bad split","description":"Split not representative.","options":["Use stratified split","Reuse train as test","Shuffle labels"],"correctIndex":0}]},{"id":"evaluation","label":"Evaluation","shortDescription":"Evaluate performance","problemPool":[{"id":"ev1","title":"Wrong metric","description":"Imbalanced target.","options":["Use precision/recall/F1","Only accuracy","Ignore imbalance"],"correctIndex":0},{"id":"ev2","title":"No baseline","description":"No comparison point.","options":["Add simple baseline","Skip baseline","Claim success"],"correctIndex":0}]},{"id":"deployment","label":"Deployment","shortDescription":"Ship safely","problemPool":[{"id":"dp1","title":"Env drift","description":"Runtime differs.","options":["Pin dependencies","Deploy latest untested","Ignore mismatch"],"correctIndex":0},{"id":"dp2","title":"No rollback","description":"Release fallback missing.","options":["Create rollback plan","Ship with none","Wait and hope"],"correctIndex":0}]},{"id":"monitoring","label":"Monitoring","shortDescription":"Observe in production","problemPool":[{"id":"mn1","title":"Data drift","description":"Live data changed.","options":["Set drift alerts","Ignore changes","Delete logs"],"correctIndex":0},{"id":"mn2","title":"No feedback","description":"No error capture.","options":["Collect outcomes","Track CPU only","Collect nothing"],"correctIndex":0}]}],"correctPipeline":["problem_definition","data_collection","data_cleaning","model_training","evaluation"]}</script>
-<script>
-(()=>{
-const c=JSON.parse(document.getElementById('config').textContent),by=Object.fromEntries(c.phases.map(p=>[p.id,p])),$=id=>document.getElementById(id);
-const E={title:$('title'),timer:$('timer'),score:$('score'),cur:$('curLabel'),build:$('build'),play:$('play'),avail:$('avail'),sel:$('sel'),selN:$('selN'),bmsg:$('bmsg'),pmsg:$('pmsg'),focus:$('focus'),board:$('board'),d1:$('d1'),d2:$('d2'),summary:$('summary'),mbg:$('mbg'),mt:$('mt'),md:$('md'),mf:$('mf'),mfb:$('mfb')};
-let T=null,S;
-const r6=()=>Math.floor(Math.random()*6)+1,fmt=s=>String(Math.floor(s/60)).padStart(2,'0')+':'+String(s%60).padStart(2,'0');
-const eq=(a,b)=>a.length===b.length&&a.every((v,i)=>v===b[i]);
-const curIdx=()=>{if(!S.order.length)return null;for(let i=S.order.length-2;i>=0;i--)if(S.data[i]>0)return i;return null};
-const unres=id=>S.probs[id].length;
-const msg=(el,t,k='')=>{el.textContent=t;el.className='status'+(k?' '+k:'')};
-const pick=id=>{const pool=by[id].problemPool,u=S.used[id];let a=pool.filter(p=>!u.has(p.id));if(!a.length){u.clear();a=pool.slice()}const p=a[Math.floor(Math.random()*a.length)];u.add(p.id);return p};
-const bonus=i=>{if(i<0||i>=S.order.length)return;const id=S.order[i];if(S.clear[id])return;if(S.data[i]===0&&unres(id)===0){S.clear[id]=1;S.score+=c.scoring.phaseClearBonus;msg(E.pmsg,'Bonus de phase +'+c.scoring.phaseClearBonus,'good')}};
-const header=()=>{E.title.innerHTML='<b>'+c.gameTitle+'</b>';E.timer.textContent=fmt(S.time);E.score.textContent=S.score;const i=curIdx();E.cur.textContent=S.view!=='play'?'N/A':(i==null?by[S.order[S.order.length-1]].label:by[S.order[i]].label)};
-const openModal=(pid,uid)=>{const p=S.probs[pid].find(x=>x.uid===uid);if(!p)return;S.modal={pid,uid};E.mt.textContent=p.title;E.md.textContent=p.description;E.mf.innerHTML='';E.mfb.textContent='';p.options.forEach((o,i)=>{const l=document.createElement('label');l.style.display='block';l.style.marginBottom='6px';l.innerHTML='<input type="radio" name="a" value="'+i+'"> '+o;E.mf.appendChild(l)});E.mbg.classList.remove('hidden');E.mbg.setAttribute('aria-hidden','false')};
-const closeModal=()=>{S.modal=null;E.mbg.classList.add('hidden');E.mbg.setAttribute('aria-hidden','true')};
-const end=(win,reason)=>{S.over=1;S.win=win;S.reason=reason;clearInterval(T);T=null;if(win)S.score+=c.scoring.winBonus;render()};
-const winCheck=()=>{if(S.over||S.view!=='play')return;const last=S.order.length-1;if(S.data[last]===c.dataUnitsInitial&&S.order.every(id=>unres(id)===0))end(1,'Toutes les donnees ont atteint la phase finale et tous les problemes sont resolus.')};
-const reset=()=>{if(T)clearInterval(T);S={view:'build',score:0,time:c.timeLimitSeconds,sel:[],order:[],wrong:[],attempts:0,wrongClicks:0,data:[],probs:{},used:{},clear:{},focus:'',round:{rolled:0,p:null,q:null,from:null,cap:''},modal:null,over:0,win:0,reason:''};E.summary.classList.add('hidden');render()};
-const toPlay=()=>{S.order=S.sel.slice();S.data=new Array(S.order.length).fill(0);S.data[0]=c.dataUnitsInitial;S.order.forEach(id=>{S.probs[id]=[];S.used[id]=new Set();S.clear[id]=0});S.focus=S.order[curIdx()]||S.order[0];S.view='play';msg(E.pmsg,'Pipeline valide. Lancez les des pour commencer.','good');T=setInterval(()=>{if(S.over||S.view!=='play')return;S.time--;if(S.time<=0){S.time=0;end(0,"Temps ecoule")}header()},1000)};
-const validate=()=>{if(S.sel.length!==c.selectionCountRequired){msg(E.bmsg,'Selectionnez exactement '+c.selectionCountRequired+' phases d'abord.','bad');return}S.attempts++;S.wrong=[];if(eq(S.sel,c.correctPipeline)){S.score+=c.scoring.pipelineCorrectBonus;msg(E.bmsg,'Pipeline correct ! +'+c.scoring.pipelineCorrectBonus,'good');toPlay();render();return}S.score+=c.scoring.pipelineWrongPenalty;for(let i=0;i<c.selectionCountRequired;i++)if(S.sel[i]!==c.correctPipeline[i])S.wrong.push(i);msg(E.bmsg,'Ordre incorrect. '+c.scoring.pipelineWrongPenalty+' points.','bad');render()};
+  </style>
+ </head>
+ <body>
+  <div class="app">
+   <section class="panel top">
+    <div id="title">
+     <b>
+      Mission Donnees
+     </b>
+    </div>
+    <div>
+     Minuteur :
+     <b id="timer">
+      25:00
+     </b>
+    </div>
+    <div>
+     Score :
+     <b id="score">
+      0
+     </b>
+    </div>
+    <div>
+     Phase courante :
+     <b id="curLabel">
+      N/A
+     </b>
+    </div>
+    <button class="btn danger" id="restart" type="button">
+     Recommencer
+    </button>
+   </section>
+   <section class="panel" id="build">
+    <h2>
+     Construire le pipeline
+    </h2>
+    <p class="tiny">
+     Selectionnez exactement 5 phases et ordonnez-les.
+    </p>
+    <div class="grid2">
+     <div>
+      <h3>
+       Disponibles (8)
+      </h3>
+      <div id="avail">
+      </div>
+     </div>
+     <div>
+      <h3>
+       Selection (
+       <span id="selN">
+        0
+       </span>
+       /5)
+      </h3>
+      <div id="sel">
+      </div>
+      <button class="btn pri" id="validate" type="button">
+       Valider le pipeline
+      </button>
+      <div class="status" id="bmsg">
+      </div>
+     </div>
+    </div>
+   </section>
+   <section class="panel hidden" id="play">
+    <h2>
+     Jouer
+    </h2>
+    <div class="ctrl">
+     <button class="btn pri" id="roll" type="button">
+      Lancer les des
+     </button>
+     <button class="btn" id="move" type="button">
+      Deplacer les donnees
+     </button>
+     <div>
+      Deplacement :
+      <b id="d1">
+       -
+      </b>
+      | Problemees :
+      <b id="d2">
+       -
+      </b>
+     </div>
+     <label class="tiny">
+      Generer dans :
+      <select id="focus">
+      </select>
+     </label>
+    </div>
+    <div class="status" id="pmsg">
+    </div>
+    <div class="board" id="board">
+    </div>
+    <div class="sum hidden" id="summary">
+    </div>
+   </section>
+  </div>
+  <div aria-hidden="true" class="modalbg hidden" id="mbg">
+   <div class="modal">
+    <h3 id="mt">
+    </h3>
+    <p id="md">
+    </p>
+    <form id="mf">
+    </form>
+    <div class="status" id="mfb">
+    </div>
+    <button class="btn pri" id="msub" type="button">
+     Valider
+    </button>
+    <button class="btn" id="mclose" type="button">
+     Fermer
+    </button>
+   </div>
+  </div>
+  <script id="config" type="application/json">
+   {"gameTitle":"Mission Pipeline","timeLimitSeconds":1500,"dataUnitsInitial":10,"selectionCountRequired":5,"maxProblemesPerPhase":6,"scoring":{"pipelineCorrectBonus":50,"pipelineWrongPenalty":-20,"firstClickCorrect":10,"wrongClickPenalty":-5,"secondClickCorrect":5,"laterCorrect":2,"phaseClearBonus":15,"winBonus":50},"phases":[{"id":"problem_definition","label":"Probleme Definition","shortDescription":"Define objective","problemPool":[{"id":"pd1","title":"Scope drift","description":"Goal keeps changing.","options":["Freeze scope with KPI","Add more features","Ignore it"],"correctIndex":0},{"id":"pd2","title":"No KPI","description":"No success metric.","options":["Pick measurable KPI","Ship anyway","Wait forever"],"correctIndex":0}]},{"id":"data_collection","label":"Data Collection","shortDescription":"Gather data","problemPool":[{"id":"dc1","title":"Coverage gap","description":"Missing user segment.","options":["Collect targeted samples","Duplicate rows","Drop segment"],"correctIndex":0},{"id":"dc2","title":"Access denied","description":"Source permission issue.","options":["Request access","Bypass auth","Skip security"],"correctIndex":0}]},{"id":"data_cleaning","label":"Data Cleaning","shortDescription":"Fix quality","problemPool":[{"id":"cl1","title":"Missing values","description":"Null spike found.","options":["Use valid imputation","Fill all with zero","Ignore nulls"],"correctIndex":0},{"id":"cl2","title":"Duplicates","description":"Rows repeated.","options":["Deduplicate by key","Keep for size","Delete random rows"],"correctIndex":0}]},{"id":"feature_engineering","label":"Feature Engineering","shortDescription":"Create features","problemPool":[{"id":"fe1","title":"Leakage","description":"Feature reveals target.","options":["Remove leakage","Keep for accuracy","Hide issue"],"correctIndex":0},{"id":"fe2","title":"Scale mismatch","description":"Units conflict.","options":["Normalize consistently","Ignore scale","Convert random col"],"correctIndex":0}]},{"id":"model_training","label":"Model Training","shortDescription":"Train model","problemPool":[{"id":"mt1","title":"Overfitting","description":"Train high, val low.","options":["Regularize + CV","Train longer only","Increase complexity"],"correctIndex":0},{"id":"mt2","title":"Bad split","description":"Split not representative.","options":["Use stratified split","Reuse train as test","Shuffle labels"],"correctIndex":0}]},{"id":"evaluation","label":"Evaluation","shortDescription":"Evaluate performance","problemPool":[{"id":"ev1","title":"Wrong metric","description":"Imbalanced target.","options":["Use precision/recall/F1","Only accuracy","Ignore imbalance"],"correctIndex":0},{"id":"ev2","title":"No baseline","description":"No comparison point.","options":["Add simple baseline","Skip baseline","Claim success"],"correctIndex":0}]},{"id":"deployment","label":"Deployment","shortDescription":"Ship safely","problemPool":[{"id":"dp1","title":"Env drift","description":"Runtime differs.","options":["Pin dependencies","Deploy latest untested","Ignore mismatch"],"correctIndex":0},{"id":"dp2","title":"No rollback","description":"Release fallback missing.","options":["Create rollback plan","Ship with none","Wait and hope"],"correctIndex":0}]},{"id":"monitoring","label":"Monitoring","shortDescription":"Observe in production","problemPool":[{"id":"mn1","title":"Data drift","description":"Live data changed.","options":["Set drift alerts","Ignore changes","Delete logs"],"correctIndex":0},{"id":"mn2","title":"No feedback","description":"No error capture.","options":["Collect outcomes","Track CPU only","Collect nothing"],"correctIndex":0}]}],"correctPipeline":["problem_definition","data_collection","data_cleaning","model_training","evaluation"]}
+  </script>
+  <script>
+   (()=>{
+    const c=JSON.parse(document.getElementById('config').textContent),by=Object.fromEntries(c.phases.map(p=>[p.id,p])),$=id=>document.getElementById(id);
+    const E={
+        title:$('title'),timer:$('timer'),score:$('score'),cur:$('curLabel'),build:$('build'),play:$('play'),avail:$('avail'),sel:$('sel'),selN:$('selN'),bmsg:$('bmsg'),pmsg:$('pmsg'),focus:$('focus'),board:$('board'),d1:$('d1'),d2:$('d2'),summary:$('summary'),mbg:$('mbg'),mt:$('mt'),md:$('md'),mf:$('mf'),mfb:$('mfb')
+    };
+    let T=null,S;
+    const r6=()=>Math.floor(Math.random()*6)+1,fmt=s=>String(Math.floor(s/60)).padStart(2,'0')+':'+String(s%60).padStart(2,'0');
+    const eq=(a,b)=>a.length===b.length&&a.every((v,i)=>v===b[i]);
+    const curIdx=()=>{
+        if(!S.order.length)return null;
+        for(let i=S.order.length-2;
+        i>=0;
+        i--)if(S.data[i]>0)return i;
+        return null
+    };
+    const unres=id=>S.probs[id].length;
+    const msg=(el,t,k='')=>{
+        el.textContent=t;
+        el.className='status'+(k?' '+k:'')
+    };
+    const pick=id=>{
+        const pool=by[id].problemPool,u=S.used[id];
+        let a=pool.filter(p=>!u.has(p.id));
+        if(!a.length){
+            u.clear();
+            a=pool.slice()
+        }
+        const p=a[Math.floor(Math.random()*a.length)];
+        u.add(p.id);
+        return p
+    };
+    const bonus=i=>{
+        if(i<0||i>=S.order.length)return;
+        const id=S.order[i];
+        if(S.clear[id])return;
+        if(S.data[i]===0&&unres(id)===0){
+            S.clear[id]=1;
+            S.score+=c.scoring.phaseClearBonus;
+            msg(E.pmsg,'Bonus de phase +'+c.scoring.phaseClearBonus,'good')
+        }
+    };
+    const header=()=>{
+        E.title.innerHTML='<b>'+c.gameTitle+'</b>';
+        E.timer.textContent=fmt(S.time);
+        E.score.textContent=S.score;
+        const i=curIdx();
+        E.cur.textContent=S.view!=='play'?'N/A':(i==null?by[S.order[S.order.length-1]].label:by[S.order[i]].label)
+    };
+    const openModal=(pid,uid)=>{
+        const p=S.probs[pid].find(x=>x.uid===uid);
+        if(!p)return;
+        S.modal={
+            pid,uid
+        };
+        E.mt.textContent=p.title;
+        E.md.textContent=p.description;
+        E.mf.innerHTML='';
+        E.mfb.textContent='';
+        p.options.forEach((o,i)=>{
+            const l=document.createElement('label');
+            l.style.display='block';
+            l.style.marginBottom='6px';
+            l.innerHTML='<input type="radio" name="a" value="'+i+'"> '+o;
+            E.mf.appendChild(l)
+        });
+        E.mbg.classList.remove('hidden');
+        E.mbg.setAttribute('aria-hidden','false')
+    };
+    const closeModal=()=>{
+        S.modal=null;
+        E.mbg.classList.add('hidden');
+        E.mbg.setAttribute('aria-hidden','true')
+    };
+    const end=(win,reason)=>{
+        S.over=1;
+        S.win=win;
+        S.reason=reason;
+        clearInterval(T);
+        T=null;
+        if(win)S.score+=c.scoring.winBonus;
+        render()
+    };
+    const winCheck=()=>{
+        if(S.over||S.view!=='play')return;
+        const last=S.order.length-1;
+        if(S.data[last]===c.dataUnitsInitial&&S.order.every(id=>unres(id)===0))end(1,'Toutes les donnees ont atteint la phase finale et tous les problemes sont resolus.')
+    };
+    const reset=()=>{
+        if(T)clearInterval(T);
+        S={
+            view:'build',score:0,time:c.timeLimitSeconds,sel:[],order:[],wrong:[],attempts:0,wrongClicks:0,data:[],probs:{
+            },used:{
+            },clear:{
+            },focus:'',round:{
+                rolled:0,p:null,q:null,from:null,cap:''
+            },modal:null,over:0,win:0,reason:''
+        };
+        E.summary.classList.add('hidden');
+        render()
+    };
+    const toPlay=()=>{
+        S.order=S.sel.slice();
+        S.data=new Array(S.order.length).fill(0);
+        S.data[0]=c.dataUnitsInitial;
+        S.order.forEach(id=>{
+            S.probs[id]=[];
+            S.used[id]=new Set();
+            S.clear[id]=0
+        });
+        S.focus=S.order[curIdx()]||S.order[0];
+        S.view='play';
+        msg(E.pmsg,'Pipeline valide. Lancez les des pour commencer.','good');
+        T=setInterval(()=>{
+            if(S.over||S.view!=='play')return;
+            S.time--;
+            if(S.time<=0){
+                S.time=0;
+                end(0,"Temps ecoule")
+            }
+            header()
+        },1000)
+    };
+    const validate=()=>{
+        if(S.sel.length!==c.selectionCountRequired){
+            msg(E.bmsg,'Selectionnez exactement '+c.selectionCountRequired+' phases d'abord.','bad');return}S.attempts++;S.wrong=[];if(eq(S.sel,c.correctPipeline)){S.score+=c.scoring.pipelineCorrectBonus;msg(E.bmsg,'Pipeline correct ! +'+c.scoring.pipelineCorrectBonus,'good');toPlay();render();return}S.score+=c.scoring.pipelineWrongPenalty;for(let i=0;i<c.selectionCountRequired;i++)if(S.sel[i]!==c.correctPipeline[i])S.wrong.push(i);msg(E.bmsg,'Ordre incorrect. '+c.scoring.pipelineWrongPenalty+' points.','bad');render()};
 const gen=(id,n)=>{const arr=S.probs[id],slots=Math.max(0,c.maxProblemesPerPhase-arr.length),k=Math.min(n,slots);for(let i=0;i<k;i++){const p=pick(id);arr.push({uid:p.id+'_'+Date.now()+'_'+i+'_'+Math.floor(Math.random()*99999),title:p.title,description:p.description,options:p.options.slice(),correctIndex:p.correctIndex,attempts:0})}S.round.cap=k<n?'Cap reached':''};
 const roll=()=>{if(S.over||S.view!=='play')return;if(S.round.rolled){msg(E.pmsg,'Deplacez les donnees avant de relancer.','bad');return}const i=curIdx();if(i==null){winCheck();msg(E.pmsg,'Aucune donnee a deplacer.');return}const p=r6(),q=r6(),tid=S.focus||S.order[i],si=Math.max(0,S.order.indexOf(tid)),sid=S.order[si];S.round={rolled:1,p,q,from:i,cap:''};gen(sid,q);msg(E.pmsg,'Resultat de deplacement '+p+' et problemes '+q+(S.round.cap?' - '+S.round.cap:''),S.round.cap?'bad':'');render()};
-const move=()=>{if(S.over||S.view!=='play')return;if(!S.round.rolled){msg(E.pmsg,'Lancez les des d'abord.','bad');return}const i=S.round.from;if(i==null||i>=S.order.length-1){S.round.rolled=0;winCheck();render();return}const id=S.order[i];if(unres(id)>0){msg(E.pmsg,'Deplacement bloque : resolvez tous les problemes dans '+by[id].label+'.','bad');render();return}const m=Math.min(S.round.p,S.data[i]);if(m<=0){S.round.rolled=0;msg(E.pmsg,'Aucune donnee a deplacer.');render();return}S.data[i]-=m;S.data[i+1]+=m;bonus(i);S.round.rolled=0;S.focus=S.order[curIdx()]||S.order[S.order.length-1];msg(E.pmsg,'Deplacement de '+m+' unite(s) de donnees.','good');winCheck();render()};
-const submit=()=>{if(!S.modal)return;const sel=E.mf.querySelector('input[name="a"]:checked');if(!sel){E.mfb.textContent='Selectionnez une option d'abord.';return}const a=Number(sel.value),{pid,uid}=S.modal,arr=S.probs[pid],i=arr.findIndex(x=>x.uid===uid);if(i<0){closeModal();render();return}const p=arr[i];p.attempts++;if(a===p.correctIndex){let g=c.scoring.laterCorrect;if(p.attempts===1)g=c.scoring.firstClickCorrect;else if(p.attempts===2)g=c.scoring.secondClickCorrect;S.score+=g;arr.splice(i,1);closeModal();msg(E.pmsg,'Probleme resolved in '+by[pid].label+'.','good');bonus(S.order.indexOf(pid));winCheck();render();return}S.score+=c.scoring.wrongClickPenalty;S.wrongClicks++;E.mfb.textContent='Incorrect. '+c.scoring.wrongClickPenalty+' points. Reessayez.';header()};
+const move=()=>{if(S.over||S.view!=='play')return;if(!S.round.rolled){msg(E.pmsg,'Lancez les des d'abord.','bad');
+            return
+        }
+        const i=S.round.from;
+        if(i==null||i>=S.order.length-1){
+            S.round.rolled=0;
+            winCheck();
+            render();
+            return
+        }
+        const id=S.order[i];
+        if(unres(id)>0){
+            msg(E.pmsg,'Deplacement bloque : resolvez tous les problemes dans '+by[id].label+'.','bad');
+            render();
+            return
+        }
+        const m=Math.min(S.round.p,S.data[i]);
+        if(m<=0){
+            S.round.rolled=0;
+            msg(E.pmsg,'Aucune donnee a deplacer.');
+            render();
+            return
+        }
+        S.data[i]-=m;
+        S.data[i+1]+=m;
+        bonus(i);
+        S.round.rolled=0;
+        S.focus=S.order[curIdx()]||S.order[S.order.length-1];
+        msg(E.pmsg,'Deplacement de '+m+' unite(s) de donnees.','good');
+        winCheck();
+        render()
+    };
+    const submit=()=>{
+        if(!S.modal)return;
+        const sel=E.mf.querySelector('input[name="a"]:checked');
+        if(!sel){
+            E.mfb.textContent='Selectionnez une option d'abord.';return}const a=Number(sel.value),{pid,uid}=S.modal,arr=S.probs[pid],i=arr.findIndex(x=>x.uid===uid);if(i<0){closeModal();render();return}const p=arr[i];p.attempts++;if(a===p.correctIndex){let g=c.scoring.laterCorrect;if(p.attempts===1)g=c.scoring.firstClickCorrect;else if(p.attempts===2)g=c.scoring.secondClickCorrect;S.score+=g;arr.splice(i,1);closeModal();msg(E.pmsg,'Probleme resolved in '+by[pid].label+'.','good');bonus(S.order.indexOf(pid));winCheck();render();return}S.score+=c.scoring.wrongClickPenalty;S.wrongClicks++;E.mfb.textContent='Incorrect. '+c.scoring.wrongClickPenalty+' points. Reessayez.';header()};
 const renderBuild=()=>{E.build.classList.toggle('hidden',S.view!=='build');if(S.view!=='build')return;E.selN.textContent=S.sel.length;E.avail.innerHTML='';c.phases.forEach(p=>{const d=document.createElement('div');d.className='item';const off=S.sel.includes(p.id)||S.sel.length>=c.selectionCountRequired;d.innerHTML='<b>'+p.label+'</b><div class="tiny">'+p.shortDescription+'</div>';const b=document.createElement('button');b.className='btn';b.type='button';b.textContent='Ajouter';b.disabled=off;b.onclick=()=>{if(!off){S.sel.push(p.id);S.wrong=[];renderBuild()}};d.appendChild(document.createElement('br'));d.appendChild(b);E.avail.appendChild(d)});E.sel.innerHTML='';S.sel.forEach((id,i)=>{const r=document.createElement('div');r.className='sel'+(S.wrong.includes(i)?' wrong':'');r.innerHTML='<b>'+(i+1)+'.</b><div><b>'+by[id].label+'</b><div class="tiny">'+by[id].shortDescription+'</div></div>';const a=document.createElement('div');['Monter','Descendre','Retirer'].forEach(t=>{const b=document.createElement('button');b.className='btn';b.type='button';b.textContent=t;b.disabled=(t==='Monter'&&i===0)||(t==='Descendre'&&i===S.sel.length-1);b.onclick=()=>{if(t==='Monter')[S.sel[i-1],S.sel[i]]=[S.sel[i],S.sel[i-1]];if(t==='Descendre')[S.sel[i+1],S.sel[i]]=[S.sel[i],S.sel[i+1]];if(t==='Retirer')S.sel.splice(i,1);S.wrong=[];renderBuild()};a.appendChild(b)});r.appendChild(a);E.sel.appendChild(r)})};
 const renderPlay=()=>{E.play.classList.toggle('hidden',S.view!=='play');if(S.view!=='play')return;E.d1.textContent=S.round.p??'-';E.d2.textContent=S.round.q??'-';E.focus.innerHTML='';S.order.forEach(id=>{const o=document.createElement('option');o.value=id;o.textContent=by[id].label;o.selected=id===S.focus;E.focus.appendChild(o)});const ci=curIdx(),blocked=ci!=null&&unres(S.order[ci])>0;$('roll').disabled=S.over||S.round.rolled;$('move').disabled=S.over||!S.round.rolled||blocked;E.board.innerHTML='';S.order.forEach((id,i)=>{const d=S.data[i]||0,p=S.probs[id];const col=document.createElement('div');col.className='col'+(i===ci?' cur':'');col.innerHTML='<b>'+(i+1)+'. '+by[id].label+'</b><div class="tiny">Donnees : <b>'+d+'</b></div><div class="chips">'+new Array(d).fill('<span class="chip"></span>').join('')+'</div><div class="tiny">Problemees : <b>'+p.length+'</b></div>';const w=document.createElement('div');p.forEach(x=>{const b=document.createElement('button');b.type='button';b.className='card';b.textContent=x.title;b.onclick=()=>openModal(id,x.uid);w.appendChild(b)});col.appendChild(w);E.board.appendChild(col)});if(S.over){const used=c.timeLimitSeconds-S.time;E.summary.classList.remove('hidden');E.summary.innerHTML='<h3>'+(S.win?'Mission accomplie':"Temps ecoule")+'</h3><p>'+S.reason+'</p><p><b>Score total :</b> '+S.score+'</p><p><b>Temps utilise :</b> '+fmt(used)+'</p><p><b>Mauvais clics :</b> '+S.wrongClicks+'</p><p><b>Tentatives du pipeline :</b> '+S.attempts+'</p>'}else{E.summary.classList.add('hidden');E.summary.innerHTML=''}};
 const render=()=>{header();renderBuild();renderPlay()};
 $('validate').onclick=validate;$('roll').onclick=roll;$('move').onclick=move;$('restart').onclick=reset;E.focus.onchange=e=>S.focus=e.target.value;$('msub').onclick=submit;$('mclose').onclick=closeModal;E.mbg.onclick=e=>{if(e.target===E.mbg)closeModal()};
 reset();
 })();
-</script></body></html>
+  </script>
+ </body>
+</html>
+
