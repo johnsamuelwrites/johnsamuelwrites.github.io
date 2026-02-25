@@ -506,14 +506,14 @@
 
                         <section class="panel" id="build">
                                 <h2>Build Pipeline</h2>
-                                <p class="tiny">Select exactly 5 phases and order them.</p>
+                                <p class="tiny">Select phases in increasing numeric order. You may skip phases.</p>
                                 <div class="grid2">
                                         <div>
-                                                <h3>Available (8)</h3>
+                                                <h3>Available Phases</h3>
                                                 <div id="avail"></div>
                                         </div>
                                         <div>
-                                                <h3>Selected (<span id="selN">0</span>/5)</h3>
+                                                <h3>Selected (<span id="selN">0</span>)</h3>
                                                 <div id="sel"></div>
                                                 <button class="btn pri" id="validate" type="button">
                                                         Validate Pipeline
@@ -596,6 +596,9 @@
                                         return;
                                 }
                                 const by = Object.fromEntries(c.phases.map(p => [p.id, p]));
+                                const phaseIdx = Object.fromEntries(c.phases.map((p, i) => [p.id, i + 1]));
+                                const minSel = c.minSelectionCount ?? 2;
+                                const maxSel = Math.min(c.maxSelectionCount ?? c.phases.length, c.phases.length);
                                 const E = {
                                         title: $('title'), timer: $('timer'), score: $('score'), cur: $('curLabel'), build: $('build'), play: $('play'), avail: $('avail'), sel: $('sel'), selN: $('selN'), bmsg: $('bmsg'), pmsg: $('pmsg'), focus: $('focus'), board: $('board'), d1: $('d1'), d2: $('d2'), summary: $('summary'), mbg: $('mbg'), mt: $('mt'), md: $('md'), mf: $('mf'), mfb: $('mfb')
                                 };
@@ -717,24 +720,29 @@
                                         }, 1000)
                                 };
                                 const validate = () => {
-                                        if (S.sel.length !== c.selectionCountRequired) {
-                                                msg(E.bmsg, 'Select exactly ' + c.selectionCountRequired + ' phases first.', 'bad');
+                                        if (S.sel.length < minSel) {
+                                                msg(E.bmsg, 'Select at least ' + minSel + ' phases first.', 'bad');
                                                 return
                                         }
                                         S.attempts++;
                                         S.wrong = [];
-                                        if (eq(S.sel, c.correctPipeline)) {
-                                                S.score += c.scoring.pipelineCorrectBonus;
-                                                msg(E.bmsg, 'Correct pipeline! +' + c.scoring.pipelineCorrectBonus, 'good');
-                                                toPlay();
+                                        let badAt = -1;
+                                        for (let i = 1; i < S.sel.length; i++) {
+                                                if (phaseIdx[S.sel[i]] <= phaseIdx[S.sel[i - 1]]) {
+                                                        badAt = i;
+                                                        break;
+                                                }
+                                        }
+                                        if (badAt !== -1) {
+                                                S.score += c.scoring.pipelineWrongPenalty;
+                                                S.wrong.push(badAt - 1, badAt);
+                                                msg(E.bmsg, 'Order must be strictly increasing. ' + c.scoring.pipelineWrongPenalty + ' points.', 'bad');
                                                 render();
                                                 return
                                         }
-                                        S.score += c.scoring.pipelineWrongPenalty;
-                                        for (let i = 0;
-                                                i < c.selectionCountRequired;
-                                                i++) if (S.sel[i] !== c.correctPipeline[i]) S.wrong.push(i);
-                                        msg(E.bmsg, 'Incorrect order. ' + c.scoring.pipelineWrongPenalty + ' points.', 'bad');
+                                        S.score += c.scoring.pipelineCorrectBonus;
+                                        msg(E.bmsg, 'Valid pipeline! +' + c.scoring.pipelineCorrectBonus, 'good');
+                                        toPlay();
                                         render()
                                 };
                                 const gen = (id, n) => {
@@ -848,7 +856,7 @@
                                         c.phases.forEach(p => {
                                                 const d = document.createElement('div');
                                                 d.className = 'item';
-                                                const off = S.sel.includes(p.id) || S.sel.length >= c.selectionCountRequired;
+                                                const off = S.sel.includes(p.id) || S.sel.length >= maxSel;
                                                 d.innerHTML = '<b>' + p.label + '</b><div class="tiny">' + p.shortDescription + '</div>';
                                                 const b = document.createElement('button');
                                                 b.className = 'btn';

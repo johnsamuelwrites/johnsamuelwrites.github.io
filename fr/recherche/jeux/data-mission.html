@@ -506,10 +506,10 @@
 
                         <section class="panel" id="build">
                                 <h2>Construire le pipeline</h2>
-                                <p class="tiny">Sélectionnez exactement 5 phases et ordonnez-les.</p>
+                                <p class="tiny">Selectionnez les phases dans un ordre numerique croissant. Vous pouvez en ignorer.</p>
                                 <div class="grid2">
                                         <div>
-                                                <h3>Disponibles (8)</h3>
+                                                <h3>Phases disponibles</h3>
                                                 <div id="avail"></div>
                                         </div>
                                         <div>
@@ -595,6 +595,9 @@
                                         return;
                                 }
                                 const by = Object.fromEntries(c.phases.map(p => [p.id, p]));
+                                const phaseIdx = Object.fromEntries(c.phases.map((p, i) => [p.id, i + 1]));
+                                const minSel = c.minSelectionCount ?? 2;
+                                const maxSel = Math.min(c.maxSelectionCount ?? c.phases.length, c.phases.length);
                                 const E = {
                                         title: $('title'), timer: $('timer'), score: $('score'), cur: $('curLabel'), build: $('build'), play: $('play'), avail: $('avail'), sel: $('sel'), selN: $('selN'), bmsg: $('bmsg'), pmsg: $('pmsg'), focus: $('focus'), board: $('board'), d1: $('d1'), d2: $('d2'), summary: $('summary'), mbg: $('mbg'), mt: $('mt'), md: $('md'), mf: $('mf'), mfb: $('mfb')
                                 };
@@ -712,22 +715,29 @@
                                         }, 1000)
                                 };
                                 const validate = () => {
-                                        if (S.sel.length !== c.selectionCountRequired) {
-                                                msg(E.bmsg, 'Sélectionnez exactement ' + c.selectionCountRequired + ' phases d\'abord.', 'bad');
+                                        if (S.sel.length < minSel) {
+                                                msg(E.bmsg, 'Selectionnez au moins ' + minSel + ' phases.', 'bad');
                                                 return
                                         }
                                         S.attempts++;
                                         S.wrong = [];
-                                        if (eq(S.sel, c.correctPipeline)) {
-                                                S.score += c.scoring.pipelineCorrectBonus;
-                                                msg(E.bmsg, 'Pipeline correct ! +' + c.scoring.pipelineCorrectBonus, 'good');
-                                                toPlay();
+                                        let badAt = -1;
+                                        for (let i = 1; i < S.sel.length; i++) {
+                                                if (phaseIdx[S.sel[i]] <= phaseIdx[S.sel[i - 1]]) {
+                                                        badAt = i;
+                                                        break;
+                                                }
+                                        }
+                                        if (badAt !== -1) {
+                                                S.score += c.scoring.pipelineWrongPenalty;
+                                                S.wrong.push(badAt - 1, badAt);
+                                                msg(E.bmsg, 'L ordre doit etre strictement croissant. ' + c.scoring.pipelineWrongPenalty + ' points.', 'bad');
                                                 render();
                                                 return
                                         }
-                                        S.score += c.scoring.pipelineWrongPenalty;
-                                        for (let i = 0; i < c.selectionCountRequired; i++) if (S.sel[i] !== c.correctPipeline[i]) S.wrong.push(i);
-                                        msg(E.bmsg, 'Ordre incorrect. ' + c.scoring.pipelineWrongPenalty + ' points.', 'bad');
+                                        S.score += c.scoring.pipelineCorrectBonus;
+                                        msg(E.bmsg, 'Pipeline valide ! +' + c.scoring.pipelineCorrectBonus, 'good');
+                                        toPlay();
                                         render()
                                 };
                                 const gen = (id, n) => {
@@ -836,7 +846,7 @@
                                         c.phases.forEach(p => {
                                                 const d = document.createElement('div');
                                                 d.className = 'item';
-                                                const off = S.sel.includes(p.id) || S.sel.length >= c.selectionCountRequired;
+                                                const off = S.sel.includes(p.id) || S.sel.length >= maxSel;
                                                 d.innerHTML = '<b>' + p.label + '</b><div class="tiny">' + p.shortDescription + '</div>';
                                                 const b = document.createElement('button');
                                                 b.className = 'btn';
