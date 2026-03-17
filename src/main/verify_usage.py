@@ -4,11 +4,13 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 #
 
-import os
 import argparse
+import sys
 from pathlib import Path
 from html.parser import HTMLParser
 from typing import Dict, Set, List, Iterable
+
+from links import collect_html_files
 
 
 class LinkExtractor(HTMLParser):
@@ -24,66 +26,6 @@ class LinkExtractor(HTMLParser):
         for name, value in attrs:
             if name.lower() == "href" and value is not None:
                 self.links.append(value)
-
-
-def find_html_files(
-    root: Path,
-    exclude_dirs: Iterable[str] = (),
-    exclude_files: Iterable[str] = (),
-) -> List[Path]:
-    """
-    Recursively find all .html files under root.
-
-    exclude_dirs: directory names or root-relative paths to skip.
-    exclude_files: filenames or root-relative paths of files to skip.
-    """
-    # Normalize excludes for dirs
-    exclude_dir_names = set()
-    exclude_dir_relpaths = set()
-    for item in exclude_dirs:
-        p = Path(item)
-        if p.is_absolute():
-            exclude_dir_names.add(p.name)
-        else:
-            exclude_dir_names.add(p.name)
-            exclude_dir_relpaths.add(str(p))
-
-    # Normalize excludes for files
-    exclude_file_names = set()
-    exclude_file_relpaths = set()
-    for item in exclude_files:
-        p = Path(item)
-        if p.is_absolute():
-            exclude_file_names.add(p.name)
-        else:
-            exclude_file_names.add(p.name)
-            exclude_file_relpaths.add(str(p))
-
-    html_files: List[Path] = []
-
-    for dirpath, dirnames, filenames in os.walk(root, topdown=True):
-        current = Path(dirpath)
-
-        # Prune subdirectories to exclude [web:41][web:51]
-        pruned = []
-        for d in dirnames:
-            rel = (current / d).relative_to(root)
-            if d in exclude_dir_names or str(rel) in exclude_dir_relpaths:
-                pruned.append(d)
-        dirnames[:] = [d for d in dirnames if d not in pruned]
-
-        # Collect HTML files, filtering out excluded files
-        for fname in filenames:
-            if not fname.lower().endswith(".html"):
-                continue
-            full = current / fname
-            rel = full.relative_to(root)
-            if fname in exclude_file_names or str(rel) in exclude_file_relpaths:
-                continue
-            html_files.append(full)
-
-    return html_files
-
 
 def build_link_graph(html_files: List[Path]) -> Dict[Path, Set[Path]]:
     """
@@ -168,17 +110,29 @@ def check_html_backlinks(
     root_folder: str,
     exclude_dirs: Iterable[str] = (),
     exclude_files: Iterable[str] = (),
-):
+) -> int:
     root = Path(root_folder).resolve()
     if not root.is_dir():
         raise ValueError(f"{root_folder!r} is not a directory")
 
-    html_files = find_html_files(
-        root, exclude_dirs=exclude_dirs, exclude_files=exclude_files
-    )
+    html_files = [
+        Path(path)
+        for path in collect_html_files(
+            [str(root)], recursive=True, exclude_dirs=exclude_dirs
+        )
+    ]
+    if exclude_files:
+        excluded_file_paths = {str((root / path).resolve()) for path in exclude_files}
+        excluded_names = {Path(path).name for path in exclude_files}
+        html_files = [
+            path
+            for path in html_files
+            if str(path.resolve()) not in excluded_file_paths
+            and path.name not in excluded_names
+        ]
     if not html_files:
         print("No HTML files found.")
-        return
+        return 0
 
     graph = build_link_graph(html_files)
     backlinks = build_backlinks(graph)
@@ -196,6 +150,7 @@ def check_html_backlinks(
 
     report_file = write_link_report(root, backlinks)
     print(f"Full link report written to: {report_file}")
+    return 1 if unreferenced else 0
 
 
 def parse_args() -> argparse.Namespace:
@@ -228,8 +183,10 @@ def parse_args() -> argparse.Namespace:
 
 if __name__ == "__main__":
     args = parse_args()
-    check_html_backlinks(
-        args.root,
-        exclude_dirs=args.exclude_dirs,
-        exclude_files=args.exclude_files,
+    sys.exit(
+        check_html_backlinks(
+            args.root,
+            exclude_dirs=args.exclude_dirs,
+            exclude_files=args.exclude_files,
+        )
     )

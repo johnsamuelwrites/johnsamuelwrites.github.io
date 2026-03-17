@@ -21,9 +21,10 @@ import logging
 import os
 import re
 import sys
+from dataclasses import dataclass
 from pathlib import Path
-from typing import Dict, List, Set, Optional
-from urllib.parse import urlparse, urljoin
+from typing import Dict, Iterable, List, Optional, Set
+from urllib.parse import urlparse
 
 import requests
 from bs4 import BeautifulSoup
@@ -33,6 +34,17 @@ from requests.packages.urllib3.util.retry import Retry
 # Configure logging
 logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
 logger = logging.getLogger(__name__)
+HTML_EXTENSIONS = {".html", ".htm", ".xhtml"}
+
+
+def safe_print(message: str = "") -> None:
+    """Print text without failing on terminals that lack Unicode support."""
+    encoding = getattr(sys.stdout, "encoding", None) or "utf-8"
+    try:
+        print(message)
+    except UnicodeEncodeError:
+        sys.stdout.buffer.write(message.encode(encoding, errors="backslashreplace"))
+        sys.stdout.buffer.write(b"\n")
 
 
 class LinkType:
@@ -49,22 +61,14 @@ class LinkType:
     OTHER = "other"
 
 
+@dataclass
 class BrokenLink:
     """Represents a broken link with metadata"""
-
-    def __init__(
-        self,
-        source_file: str,
-        url: str,
-        link_type: str,
-        status_code: int = None,
-        error: str = None,
-    ):
-        self.source_file = source_file
-        self.url = url
-        self.link_type = link_type
-        self.status_code = status_code
-        self.error = error
+    source_file: str
+    url: str
+    link_type: str
+    status_code: Optional[int] = None
+    error: Optional[str] = None
 
     def __str__(self):
         if self.status_code:
@@ -73,6 +77,87 @@ class BrokenLink:
             return f"[{self.link_type.upper()}] ERROR: {self.url} - {self.error}"
         else:
             return f"[{self.link_type.upper()}] NOT FOUND: {self.url}"
+
+
+def is_excluded_path(path: Path, exclude_dirs: Optional[Iterable[str]] = None) -> bool:
+    """
+    Check if a path should be excluded based on directory names or paths.
+
+    The exclusion list may contain simple directory names such as `.git` or
+    root-relative / absolute paths.
+    """
+    if not exclude_dirs:
+        return False
+
+    resolved_path = path.resolve()
+    path_parts = resolved_path.parts
+    for exclude_dir in exclude_dirs:
+        exclude_path = Path(exclude_dir)
+        if exclude_dir in path_parts:
+            return True
+
+        try:
+            resolved_path.relative_to(exclude_path.resolve())
+            return True
+        except (OSError, ValueError):
+            continue
+
+    return False
+
+
+def collect_html_files(
+    filepaths: List[str], recursive: bool = False, exclude_dirs: Optional[Iterable[str]] = None
+) -> List[str]:
+    """Collect HTML files from file and directory inputs."""
+    html_files: List[str] = []
+
+    for filepath in filepaths:
+        path = Path(filepath)
+        if not path.exists():
+            logger.error(f"Path not found: {filepath}")
+            continue
+
+        resolved_path = path.resolve()
+        if path.is_file():
+            if is_excluded_path(resolved_path, exclude_dirs):
+                logger.info(f"Skipping excluded file: {filepath}")
+                continue
+            if resolved_path.suffix.lower() in HTML_EXTENSIONS:
+                html_files.append(str(resolved_path))
+            continue
+
+        if path.is_dir():
+            html_files.extend(
+                scan_html_directory(
+                    str(resolved_path), recursive=recursive, exclude_dirs=exclude_dirs
+                )
+            )
+            continue
+
+        logger.error(f"Invalid path: {filepath}")
+
+    return sorted(set(html_files))
+
+
+def scan_html_directory(
+    directory: str, recursive: bool, exclude_dirs: Optional[Iterable[str]] = None
+) -> List[str]:
+    """Scan a directory for HTML files."""
+    dir_path = Path(directory)
+    iterator = dir_path.rglob("*") if recursive else dir_path.glob("*")
+    html_files = []
+
+    for file_path in iterator:
+        if not file_path.is_file():
+            continue
+        if file_path.suffix.lower() not in HTML_EXTENSIONS:
+            continue
+        if is_excluded_path(file_path.resolve(), exclude_dirs):
+            logger.debug(f"Skipping excluded file: {file_path}")
+            continue
+        html_files.append(str(file_path.resolve()))
+
+    return sorted(html_files)
 
 
 class LinkChecker:
@@ -155,40 +240,6 @@ class LinkChecker:
         )
 
         return session
-
-    def _is_excluded(self, path: Path) -> bool:
-        """
-        Check if a path should be excluded based on exclude_dirs
-
-        Args:
-            path: Path object to check
-
-        Returns:
-            True if path should be excluded, False otherwise
-        """
-        if not self.exclude_dirs:
-            return False
-
-        # Check each part of the path
-        path_parts = path.parts
-        for exclude_dir in self.exclude_dirs:
-            exclude_path = Path(exclude_dir)
-            exclude_parts = exclude_path.parts
-
-            # Check if any part of the path matches the exclusion
-            # Support both exact directory name match and full path match
-            if exclude_dir in path_parts:
-                return True
-
-            # Check if the path starts with the excluded path
-            try:
-                path.relative_to(exclude_path)
-                return True
-            except ValueError:
-                # Not relative to this excluded path
-                pass
-
-        return False
 
     def classify_link(
         self, href: str, element_type: str = "a", rel: Optional[str] = None
@@ -543,26 +594,9 @@ class LinkChecker:
             Dictionary mapping filepaths to lists of broken links
         """
         results = {}
-        html_files = []
-
-        # Collect all HTML files
-        for filepath in filepaths:
-            if not os.path.exists(filepath):
-                logger.error(f"Path not found: {filepath}")
-                continue
-
-            if os.path.isfile(filepath):
-                # Single file - check if it should be excluded
-                file_path = Path(filepath).resolve()
-                if self._is_excluded(file_path):
-                    logger.info(f"Skipping excluded file: {filepath}")
-                    continue
-                html_files.append(filepath)
-            elif os.path.isdir(filepath):
-                # Directory - scan for HTML files
-                html_files.extend(self._scan_directory(filepath, recursive))
-            else:
-                logger.error(f"Invalid path: {filepath}")
+        html_files = collect_html_files(
+            filepaths, recursive=recursive, exclude_dirs=self.exclude_dirs
+        )
 
         # Check each HTML file
         for filepath in html_files:
@@ -571,46 +605,7 @@ class LinkChecker:
 
             if broken_links:
                 results[filepath] = broken_links
-
         return results
-
-    def _scan_directory(self, directory: str, recursive: bool) -> List[str]:
-        """
-        Scan a directory for HTML files
-
-        Args:
-            directory: Directory path to scan
-            recursive: Whether to scan recursively
-
-        Returns:
-            List of HTML file paths
-        """
-        html_files = []
-        dir_path = Path(directory)
-
-        # HTML file extensions to look for
-        html_extensions = {".html", ".htm", ".xhtml"}
-
-        if recursive:
-            # Recursive scan
-            for file_path in dir_path.rglob("*"):
-                if file_path.is_file() and file_path.suffix.lower() in html_extensions:
-                    # Check if this file should be excluded
-                    if self._is_excluded(file_path):
-                        logger.debug(f"Skipping excluded file: {file_path}")
-                        continue
-                    html_files.append(str(file_path))
-        else:
-            # Non-recursive scan (only immediate directory)
-            for file_path in dir_path.glob("*"):
-                if file_path.is_file() and file_path.suffix.lower() in html_extensions:
-                    # Check if this file should be excluded
-                    if self._is_excluded(file_path):
-                        logger.debug(f"Skipping excluded file: {file_path}")
-                        continue
-                    html_files.append(str(file_path))
-
-        return sorted(html_files)
 
 
 def print_results(
@@ -633,6 +628,13 @@ def print_results(
         show_styles: Whether to show broken stylesheet links
         show_scripts: Whether to show broken script links
     """
+    if not results:
+        safe_print("\nOK: No broken links found!")
+        if fixed_favicon_files:
+            safe_print(f"Favicon fixes applied: {len(fixed_favicon_files)}")
+            for path in sorted(fixed_favicon_files):
+                safe_print(f"  - {path}")
+        return
     if not results:
         print("\n✓ No broken links found!")
         if fixed_favicon_files:
@@ -673,27 +675,27 @@ def print_results(
         if link.link_type == LinkType.SCRIPT
     )
 
-    print(f"\n{'='*70}")
-    print(f"BROKEN LINKS SUMMARY")
-    print(f"{'='*70}")
-    print(f"Total broken links: {total_broken}")
-    print(f"  - External: {external_count}")
-    print(f"  - Internal: {internal_count}")
-    print(f"  - Favicon: {favicon_count}")
-    print(f"  - Stylesheet: {stylesheet_count}")
-    print(f"  - Script: {script_count}")
-    print(f"{'='*70}\n")
+    safe_print(f"\n{'='*70}")
+    safe_print("BROKEN LINKS SUMMARY")
+    safe_print(f"{'='*70}")
+    safe_print(f"Total broken links: {total_broken}")
+    safe_print(f"  - External: {external_count}")
+    safe_print(f"  - Internal: {internal_count}")
+    safe_print(f"  - Favicon: {favicon_count}")
+    safe_print(f"  - Stylesheet: {stylesheet_count}")
+    safe_print(f"  - Script: {script_count}")
+    safe_print(f"{'='*70}\n")
 
     if fixed_favicon_files:
-        print(f"Favicon fixes applied: {len(fixed_favicon_files)}")
+        safe_print(f"Favicon fixes applied: {len(fixed_favicon_files)}")
         for path in sorted(fixed_favicon_files):
-            print(f"  - {path}")
-        print()
+            safe_print(f"  - {path}")
+        safe_print()
 
     for filepath, broken_links in results.items():
-        print(f"\n{'='*70}")
-        print(f"FILE: {filepath}")
-        print(f"{'='*70}")
+        safe_print(f"\n{'='*70}")
+        safe_print(f"FILE: {filepath}")
+        safe_print(f"{'='*70}")
 
         for link in broken_links:
             show_link = False
@@ -709,7 +711,7 @@ def print_results(
                 show_link = True
 
             if show_link:
-                print(f"  {link}")
+                safe_print(f"  {link}")
 
 
 def main():
