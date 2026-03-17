@@ -10,9 +10,17 @@ import os
 import subprocess
 import sys
 from pathlib import Path
-from typing import List
+from typing import Iterable, List
 
 from links import LinkChecker, print_results
+
+IGNORED_DIRS = ("templates", "analysis")
+
+
+def is_ignored_html_file(path: Path, ignored_dirs: Iterable[str] = IGNORED_DIRS) -> bool:
+    """Return True when the changed file is under an ignored directory."""
+    ignored = set(ignored_dirs)
+    return any(part in ignored for part in path.parts)
 
 
 def resolve_changed_html_files(diff_range: str) -> List[str]:
@@ -51,7 +59,7 @@ def resolve_changed_html_files(diff_range: str) -> List[str]:
         if not line.strip():
             continue
         candidate = (repo_root / line.strip()).resolve()
-        if candidate.is_file():
+        if candidate.is_file() and not is_ignored_html_file(candidate.relative_to(repo_root)):
             html_files.append(str(candidate))
     return sorted(set(html_files))
 
