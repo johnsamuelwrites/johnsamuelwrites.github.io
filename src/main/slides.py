@@ -6,14 +6,12 @@
 # Numbering the slides
 
 import argparse
-from shutil import copy
-from os import remove
 import re
+
+from file_rewrite import rewrite_text_file
 
 
 def enumerate_slides(filename):
-    outputfile = open("/tmp/temp.html", "w")
-
     count = 1
 
     # Setting up regular expressions
@@ -21,7 +19,9 @@ def enumerate_slides(filename):
     regex2 = re.compile(r'<div class="navigation">[0-9]*', re.IGNORECASE)
     regex3 = re.compile(r'<a class="prev" href="#slide[0-9]*">', re.IGNORECASE)
     regex4 = re.compile(r'<a class="next" href="#slide[0-9]*">', re.IGNORECASE)
-    with open(filename, "r") as inputfile:
+    updated_lines = []
+
+    with open(filename, "r", encoding="utf-8") as inputfile:
         for line in inputfile:
             # stripping the new line character (to later add it)
             line = line.rstrip()
@@ -59,23 +59,26 @@ def enumerate_slides(filename):
                 if '<a class="next" href="#slide' in line:
                     count = count + 1
 
-            outputfile.write(line + "\n")
-    outputfile.close()
-    inputfile.close()
+            updated_lines.append(line)
 
-    # Replacing the old file
-    remove(filename)
-    copy("/tmp/temp.html", filename)
-    remove("/tmp/temp.html")
+    rewrite_text_file(filename, lambda _content: "\n".join(updated_lines) + "\n")
 
 
 def modify_files(files):
     for filename in files:
         enumerate_slides(filename)
 
+def parse_args(argv=None):
+    parser = argparse.ArgumentParser(description="Numbering the slides")
+    parser.add_argument("files", metavar="F", type=str, nargs="+", help="HTML file")
+    return parser.parse_args(argv)
 
-parser = argparse.ArgumentParser(description="Numbering the slides")
-parser.add_argument("files", metavar="F", type=str, nargs="+", help="HTML file")
 
-args = parser.parse_args()
-modify_files(args.files)
+def main(argv=None):
+    args = parse_args(argv)
+    modify_files(args.files)
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

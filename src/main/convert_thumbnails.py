@@ -10,7 +10,7 @@ Script to convert Wikimedia Commons thumbnail URLs to 1024x768 versions
 """
 
 import re
-import sys
+from argparse import ArgumentParser
 
 
 def convert_wikimedia_url(url):
@@ -86,23 +86,26 @@ def process_html_file(input_file, output_file):
         return False
 
 
-def main():
-    if len(sys.argv) < 2:
-        print(
-            "Usage: python convert_thumbnails.py <input_html_file> [output_html_file]"
-        )
-        print("\nExample:")
-        print("  python convert_thumbnails.py pride-vibrant.html pride-1024.html")
-        print(
-            "\nIf output file is not specified, it will use input_file with '-1024' suffix"
-        )
-        sys.exit(1)
+def parse_args(argv=None):
+    parser = ArgumentParser(
+        description="Convert Wikimedia Commons thumbnail URLs to 1024px variants."
+    )
+    parser.add_argument("input_file", help="Input HTML file")
+    parser.add_argument(
+        "output_file",
+        nargs="?",
+        help="Optional output HTML file. Defaults to '<input>-1024.html'.",
+    )
+    return parser.parse_args(argv)
 
-    input_file = sys.argv[1]
+
+def main(argv=None):
+    args = parse_args(argv)
+    input_file = args.input_file
 
     # Determine output file
-    if len(sys.argv) >= 3:
-        output_file = sys.argv[2]
+    if args.output_file:
+        output_file = args.output_file
     else:
         # Auto-generate output filename
         if input_file.endswith(".html"):
@@ -111,8 +114,8 @@ def main():
             output_file = input_file + "-1024"
 
     success = process_html_file(input_file, output_file)
-    sys.exit(0 if success else 1)
+    return 0 if success else 1
 
 
 if __name__ == "__main__":
-    main()
+    raise SystemExit(main())

@@ -13,78 +13,35 @@ of the CSS file
 """
 
 import argparse
-from shutil import copy
-from os import remove
 import re
+
+from file_rewrite import rewrite_text_file
 
 
 def modify_content(filename):
-    outputfile = open("/tmp/temp.html", "w")
-
     # Setting up regular expression for template
     pattern = r'(<div class="title">(\n|.)*?</div>(\n|.)*?<div class="subtitle">(\n|.)*?</div>)'
-
-    content = ""
     template = r'<div id="sidebar">\n      \1\n      </div>'
-    with open(filename, "r") as inputfile:
-        content = inputfile.read()
-    content = re.sub(pattern, template, content)
-    outputfile.write(content)
-
-    outputfile.close()
-    inputfile.close()
-
-    # Replacing the old file
-    remove(filename)
-    copy("/tmp/temp.html", filename)
-    remove("/tmp/temp.html")
+    rewrite_text_file(filename, lambda content: re.sub(pattern, template, content))
 
 
 def remove_content(filename, patterns):
-    outputfile = open("/tmp/temp.html", "w")
+    def transform(content):
+        for pattern in patterns:
+            content = re.sub(pattern, "", content)
+        return content
 
-    content = ""
-    template = ""
-    with open(filename, "r") as inputfile:
-        content = inputfile.read()
-    for pattern in patterns:
-        content = re.sub(pattern, template, content)
-
-    outputfile.write(content)
-
-    outputfile.close()
-    inputfile.close()
-
-    # Replacing the old file
-    remove(filename)
-    copy("/tmp/temp.html", filename)
-    remove("/tmp/temp.html")
+    rewrite_text_file(filename, transform)
 
 
 def add_content(filename, templatefilepath):
-    outputfile = open("/tmp/temp.html", "w")
-
     # Setting up regular expression for template
     pattern = r'<div class="home">(\n|.)*?</div>'
 
-    content = ""
-    template = ""
-    with open(filename, "r") as inputfile:
-        content = inputfile.read()
-    with open(templatefilepath, "r") as templatefile:
+    with open(templatefilepath, "r", encoding="utf-8") as templatefile:
         template = templatefile.read()
-    template = '<div class="home">\n' + template + "\n      </div>"
-    content = re.sub(pattern, template, content)
-    outputfile.write(content)
-
-    templatefile.close()
-    outputfile.close()
-    inputfile.close()
-
-    # Replacing the old file
-    remove(filename)
-    copy("/tmp/temp.html", filename)
-    remove("/tmp/temp.html")
+    replacement = '<div class="home">\n' + template + "\n      </div>"
+    rewrite_text_file(filename, lambda content: re.sub(pattern, replacement, content))
 
 
 def modify_files(files):
@@ -101,14 +58,22 @@ def modify_files(files):
         remove_content(filename, patterns)
         modify_content(filename)
 
+def parse_args(argv=None):
+    parser = argparse.ArgumentParser(description="change section of HTML file")
+    parser.add_argument(
+        "files", metavar="F", type=str, nargs="+", help="HTML header file"
+    )
+    return parser.parse_args(argv)
 
-parser = argparse.ArgumentParser(description="change section of HTML file")
-parser.add_argument("files", metavar="F", type=str, nargs="+", help="HTML header file")
 
-args = parser.parse_args()
+def main(argv=None):
+    args = parse_args(argv)
+    if len(args.files) < 2:
+        print("Usage: template.py <html-file> [<html-file> ...] <template-file>")
+        return 1
+    modify_files(args.files)
+    return 0
 
-# template file and HTML file
-if len(args.files) < 2:
-    parser.print_usage()
-    exit(1)
-modify_files(args.files)
+
+if __name__ == "__main__":
+    raise SystemExit(main())

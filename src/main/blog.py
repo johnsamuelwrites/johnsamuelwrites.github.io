@@ -497,11 +497,12 @@ class BlogGenerator:
         fg.rss_file("rss.xml", pretty=True)
 
 
-def main():
+def main(argv=None):
     """Main entry point."""
-    if len(sys.argv) > 1:
+    argv = list(sys.argv[1:] if argv is None else argv)
+    if argv:
         print("This program takes no input")
-        sys.exit(1)
+        return 1
 
     # Get articles dataframe
     df = WebsiteAnalysis.get_articles_list_dataframe()
@@ -516,4 +517,4 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    raise SystemExit(main())

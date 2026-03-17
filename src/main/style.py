@@ -12,35 +12,20 @@ of the CSS file
 """
 
 import argparse
-from shutil import copy
-from os import remove
 import re
+
+from file_rewrite import rewrite_text_file
 
 
 def change_style(filename, stylefilepath):
-    outputfile = open("/tmp/temp.html", "w")
-
     # Setting up regular expression for style
     pattern = r"<style.*>(\n|.)*style>"
 
-    content = ""
-    style = ""
-    with open(filename, "r") as inputfile:
-        content = inputfile.read()
-    with open(stylefilepath, "r") as stylefile:
+    with open(stylefilepath, "r", encoding="utf-8") as stylefile:
         style = stylefile.read()
-    style = '<style type="text/css">\n' + style + "\n    </style>"
-    content = re.sub(pattern, style, content)
-    outputfile.write(content)
 
-    stylefile.close()
-    outputfile.close()
-    inputfile.close()
-
-    # Replacing the old file
-    remove(filename)
-    copy("/tmp/temp.html", filename)
-    remove("/tmp/temp.html")
+    replacement = '<style type="text/css">\n' + style + "\n    </style>"
+    rewrite_text_file(filename, lambda content: re.sub(pattern, replacement, content))
 
 
 def modify_files(files):
@@ -50,16 +35,22 @@ def modify_files(files):
         print(filename, stylefile)
         change_style(filename, stylefile)
 
+def parse_args(argv=None):
+    parser = argparse.ArgumentParser(description="change style of HTML file")
+    parser.add_argument(
+        "files", metavar="F", type=str, nargs="+", help="HTML CSS style files"
+    )
+    return parser.parse_args(argv)
 
-parser = argparse.ArgumentParser(description="change style of HTML file")
-parser.add_argument(
-    "files", metavar="F", type=str, nargs="+", help="HTML CSS style filse"
-)
 
-args = parser.parse_args()
+def main(argv=None):
+    args = parse_args(argv)
+    if len(args.files) < 2:
+        print("Usage: style.py <html-file> [<html-file> ...] <css-file>")
+        return 1
+    modify_files(args.files)
+    return 0
 
-# style file and HTML file
-if len(args.files) < 2:
-    parser.print_usage()
-    exit(1)
-modify_files(args.files)
+
+if __name__ == "__main__":
+    raise SystemExit(main())
