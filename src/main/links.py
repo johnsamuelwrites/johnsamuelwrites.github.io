@@ -17,6 +17,7 @@ This script checks HTML files for broken links, distinguishing between:
 """
 
 import argparse
+import json
 import logging
 import os
 import re
@@ -77,6 +78,16 @@ class BrokenLink:
             return f"[{self.link_type.upper()}] ERROR: {self.url} - {self.error}"
         else:
             return f"[{self.link_type.upper()}] NOT FOUND: {self.url}"
+
+    def to_dict(self) -> dict:
+        """Return a machine-readable representation of the broken link."""
+        return {
+            "source_file": self.source_file,
+            "url": self.url,
+            "link_type": self.link_type,
+            "status_code": self.status_code,
+            "error": self.error,
+        }
 
 
 def is_excluded_path(path: Path, exclude_dirs: Optional[Iterable[str]] = None) -> bool:
@@ -714,6 +725,26 @@ def print_results(
                 safe_print(f"  {link}")
 
 
+def write_json_report(
+    results: Dict[str, List[BrokenLink]],
+    report_path: str | Path,
+    fixed_favicon_files: Optional[Set[str]] = None,
+) -> None:
+    """Write broken-link results to a JSON report."""
+    payload = {
+        "summary": {
+            "total_files_with_issues": len(results),
+            "total_broken_links": sum(len(links) for links in results.values()),
+            "fixed_favicon_files": sorted(fixed_favicon_files or []),
+        },
+        "files": {
+            filepath: [link.to_dict() for link in broken_links]
+            for filepath, broken_links in sorted(results.items())
+        },
+    }
+    Path(report_path).write_text(json.dumps(payload, indent=2), encoding="utf-8")
+
+
 def main():
     """Main entry point"""
     parser = argparse.ArgumentParser(
@@ -797,6 +828,10 @@ Examples:
     )
 
     parser.add_argument("--verbose", action="store_true", help="Enable verbose output")
+    parser.add_argument(
+        "--json-report",
+        help="Write a machine-readable JSON report to the given path.",
+    )
 
     args = parser.parse_args()
 
@@ -837,6 +872,12 @@ Examples:
         show_styles=not args.no_styles,
         show_scripts=not args.no_scripts,
     )
+    if args.json_report:
+        write_json_report(
+            results,
+            args.json_report,
+            fixed_favicon_files=checker.fixed_favicon_files,
+        )
 
     # Exit with error code if broken links found
     if results:

@@ -1,65 +1,44 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Multi-Language Search Index Generator
-Generates search indexes for all language directories (en, fr, ml, pa, hi)
+Multi-language search index generator for the static website.
 """
 
-import os
-import sys
+from __future__ import annotations
+
+import argparse
 import json
 import re
-from pathlib import Path
+import sys
 from html.parser import HTMLParser
+from pathlib import Path
+
+from config import CATEGORY_MAP, SUPPORTED_LANGUAGES
+from manifest import BuildManifest
+from paths import language_root, repo_root, search_index_path
 
 # Set UTF-8 encoding for output (fixes Windows console issues)
-if sys.platform == 'win32':
+if sys.platform == "win32":
     import codecs
-    sys.stdout = codecs.getwriter('utf-8')(sys.stdout.buffer, errors='replace')
-    sys.stderr = codecs.getwriter('utf-8')(sys.stderr.buffer, errors='replace')
 
-# Configuration
-SCRIPT_DIR = Path(__file__).parent if '__file__' in globals() else Path.cwd()
-SCRIPT_DIR = Path.cwd()
+    sys.stdout = codecs.getwriter("utf-8")(sys.stdout.buffer, errors="replace")
+    sys.stderr = codecs.getwriter("utf-8")(sys.stderr.buffer, errors="replace")
 
-# Language directories to process
-LANGUAGES = {
-    'en': 'English',
-    'fr': 'Français',
-    'ml': 'മലയാളം',
-    'pa': 'ਪੰਜਾਬੀ',
-    'hi': 'हिन्दी',
-}
 
-# Categories based on directory structure
-CATEGORY_MAP = {
-    'research': 'research',
-    'teaching': 'teaching',
-    'writings': 'writings',
-    'linguistics': 'linguistics',
-    'photography': 'photography',
-    'travel': 'travel',
-    'blog': 'blog',
-    'projects': 'projects',
-    'programming': 'programming',
-}
-
-# Files/directories to exclude
-# Note: These patterns match against the relative path from BASE_DIR
 EXCLUDE_PATTERNS = [
-    r'node_modules',        # node_modules directory
-    r'search-index\.json$', # search index file
-    r'search\.html$',       # search page itself
+    r"node_modules",
+    r"search-index\.json$",
+    r"search\.html$",
 ]
 
 
 class HTMLTextExtractor(HTMLParser):
-    """Extract text content from HTML"""
+    """Extract text content from HTML."""
 
     def __init__(self):
         super().__init__()
-        self.text = []
-        self.skip_tags = {'script', 'style', 'nav', 'footer'}
+        self.text: list[str] = []
+        self.skip_tags = {"script", "style", "nav", "footer"}
         self.current_tag = None
 
     def handle_starttag(self, tag, attrs):
@@ -73,179 +52,155 @@ class HTMLTextExtractor(HTMLParser):
             self.text.append(data)
 
     def get_text(self):
-        return ' '.join(self.text)
+        return " ".join(self.text)
 
 
-def get_all_html_files(directory):
-    """Get all HTML files recursively"""
-    html_files = []
-
-    # Use Path.rglob to find all HTML files
-    all_files = list(directory.rglob('*.html'))
-
-    for file_path in all_files:
-        # Check against relative path from base directory
+def get_all_html_files(directory: Path) -> list[Path]:
+    """Get all HTML files recursively."""
+    html_files: list[Path] = []
+    for file_path in directory.rglob("*.html"):
         relative_path = str(file_path.relative_to(directory))
-
-        # Check if file should be excluded
         excluded = any(re.search(pattern, relative_path) for pattern in EXCLUDE_PATTERNS)
         if not excluded:
             html_files.append(file_path)
-
     return html_files
 
 
-def get_category(file_path, base_dir):
-    """Determine category from file path"""
+def get_category(file_path: Path, base_dir: Path) -> str:
+    """Determine category from file path."""
     relative_path = file_path.relative_to(base_dir)
     parts = relative_path.parts
 
     for key, value in CATEGORY_MAP.items():
         if parts[0] == key or key in str(relative_path):
             return value
+    return "general"
 
-    return 'general'
 
-
-def extract_title(html, file_path):
-    """Extract title from HTML"""
-    # Try <title> tag
-    title_match = re.search(r'<title[^>]*>(.*?)</title>', html, re.IGNORECASE | re.DOTALL)
+def extract_title(html: str, file_path: Path) -> str:
+    """Extract title from HTML."""
+    title_match = re.search(r"<title[^>]*>(.*?)</title>", html, re.IGNORECASE | re.DOTALL)
     if title_match:
         title = title_match.group(1).strip()
         if title:
-            return re.sub(r'<[^>]+>', '', title)  # Remove any HTML tags
+            return re.sub(r"<[^>]+>", "", title)
 
-    # Try <h1> tag
-    h1_match = re.search(r'<h1[^>]*>(.*?)</h1>', html, re.IGNORECASE | re.DOTALL)
+    h1_match = re.search(r"<h1[^>]*>(.*?)</h1>", html, re.IGNORECASE | re.DOTALL)
     if h1_match:
-        h1 = h1_match.group(1).strip()
-        if h1:
-            return re.sub(r'<[^>]+>', '', h1)
+        heading = h1_match.group(1).strip()
+        if heading:
+            return re.sub(r"<[^>]+>", "", heading)
 
-    # Fallback to filename
-    return file_path.stem.replace('-', ' ').title()
+    return file_path.stem.replace("-", " ").title()
 
 
-def extract_description(html):
-    """Extract meta description or first paragraph"""
-    # Try meta description
-    desc_match = re.search(r'<meta\s+name=["\']description["\']\s+content=["\']([^"\']+)["\']', html, re.IGNORECASE)
-    if desc_match:
-        return desc_match.group(1).strip()
+def extract_description(html: str) -> str:
+    """Extract meta description or first paragraph."""
+    description_match = re.search(
+        r"<meta\s+name=[\"']description[\"']\s+content=[\"']([^\"']+)[\"']",
+        html,
+        re.IGNORECASE,
+    )
+    if description_match:
+        return description_match.group(1).strip()
 
-    # Try first paragraph
-    p_match = re.search(r'<p[^>]*>(.*?)</p>', html, re.IGNORECASE | re.DOTALL)
-    if p_match:
-        text = re.sub(r'<[^>]+>', '', p_match.group(1))
+    paragraph_match = re.search(r"<p[^>]*>(.*?)</p>", html, re.IGNORECASE | re.DOTALL)
+    if paragraph_match:
+        text = re.sub(r"<[^>]+>", "", paragraph_match.group(1))
         return text.strip()[:200]
+    return ""
 
-    return ''
 
-
-def extract_content(html):
-    """Extract text content from HTML"""
+def extract_content(html: str) -> str:
+    """Extract text content from HTML."""
     try:
         parser = HTMLTextExtractor()
         parser.feed(html)
-        text = parser.get_text()
-
-        # Clean up whitespace
-        text = re.sub(r'\s+', ' ', text).strip()
-
-        return text
-    except Exception as e:
-        print(f"Error extracting content: {e}")
-        return ''
+        return re.sub(r"\s+", " ", parser.get_text()).strip()
+    except Exception as error:
+        print(f"Error extracting content: {error}")
+        return ""
 
 
-def process_file(file_path, base_dir):
-    """Process a single HTML file"""
+def process_file(file_path: Path, base_dir: Path) -> dict | None:
+    """Process a single HTML file."""
     try:
-        with open(file_path, 'r', encoding='utf-8') as f:
-            html = f.read()
-
+        html = file_path.read_text(encoding="utf-8")
         relative_path = file_path.relative_to(base_dir)
-        url = './' + str(relative_path).replace('\\', '/')
-
-        title = extract_title(html, file_path)
-        content = extract_content(html)
-        description = extract_description(html)
-        category = get_category(file_path, base_dir)
-
         return {
-            'url': url,
-            'title': title,
-            'description': description,
-            'content': content[:1000],  # Limit content length
-            'category': category,
-            'path': str(relative_path),
+            "url": "./" + str(relative_path).replace("\\", "/"),
+            "title": extract_title(html, file_path),
+            "description": extract_description(html),
+            "content": extract_content(html)[:1000],
+            "category": get_category(file_path, base_dir),
+            "path": str(relative_path),
         }
-    except Exception as e:
-        print(f"Error processing {file_path}: {e}")
+    except Exception as error:
+        print(f"Error processing {file_path}: {error}")
         return None
 
 
-def build_search_index_for_language(lang_code, lang_name):
-    """Build search index for a specific language"""
-    base_dir = SCRIPT_DIR / lang_code
-    output_file = base_dir / 'search-index.json'
+def build_search_index_for_language(lang_code: str, lang_name: str, force: bool = False):
+    """Build a search index for a specific language."""
+    base_dir = language_root(lang_code)
+    output_file = search_index_path(lang_code)
+    html_files = get_all_html_files(base_dir) if base_dir.exists() and base_dir.is_dir() else []
+    manifest = BuildManifest()
+    sources = [Path(__file__), *html_files]
 
-    print(f"\n{'='*60}")
+    print(f"\n{'=' * 60}")
     print(f"Building search index for {lang_name} ({lang_code})")
-    print(f"{'='*60}")
+    print(f"{'=' * 60}")
     print(f"Base directory: {base_dir}")
 
-    # Check if directory exists
     if not base_dir.exists():
         print(f"[WARNING] Directory {base_dir} does not exist. Skipping.")
         return None
-
     if not base_dir.is_dir():
         print(f"[WARNING] {base_dir} is not a directory. Skipping.")
         return None
 
-    # Get all HTML files
-    html_files = get_all_html_files(base_dir)
     print(f"Found {len(html_files)} HTML files")
-
-    if len(html_files) == 0:
-        print(f"[WARNING] No HTML files found. Skipping.")
+    if not html_files:
+        print("[WARNING] No HTML files found. Skipping.")
         return None
 
-    # Process each file
+    if not force and manifest.is_current(f"search-index:{lang_code}", sources, [output_file]):
+        print(f"[SKIP] Search index is up to date: {output_file}")
+        file_size = output_file.stat().st_size
+        return {
+            "lang_code": lang_code,
+            "lang_name": lang_name,
+            "total_files": len(html_files),
+            "processed": len(html_files),
+            "output_file": str(output_file),
+            "file_size": file_size,
+            "categories": {},
+        }
+
     index = []
     processed = 0
-
-    for i, file_path in enumerate(html_files):
+    for index_position, file_path in enumerate(html_files, start=1):
         entry = process_file(file_path, base_dir)
         if entry:
             index.append(entry)
             processed += 1
-
-        # Progress indicator
-        if (i + 1) % 50 == 0:
-            print(f"Processed {i + 1}/{len(html_files)} files...")
+        if index_position % 50 == 0:
+            print(f"Processed {index_position}/{len(html_files)} files...")
 
     print(f"Successfully processed {processed} files")
-
-    # Write index to file
-    with open(output_file, 'w', encoding='utf-8') as f:
-        json.dump(index, f, indent=2, ensure_ascii=False)
-
+    output_file.write_text(json.dumps(index, indent=2, ensure_ascii=False), encoding="utf-8")
     print(f"[OK] Search index written to: {output_file}")
 
-    # Print statistics
-    categories = {}
+    categories: dict[str, int] = {}
     for item in index:
-        category = item['category']
+        category = item["category"]
         categories[category] = categories.get(category, 0) + 1
 
     print("\nCategory breakdown:")
-    for category, count in sorted(categories.items(), key=lambda x: x[1], reverse=True):
+    for category, count in sorted(categories.items(), key=lambda item: item[1], reverse=True):
         print(f"  {category}: {count}")
 
-    # Get file size
     file_size = output_file.stat().st_size
     if file_size < 1024:
         size_str = f"{file_size} B"
@@ -255,44 +210,73 @@ def build_search_index_for_language(lang_code, lang_name):
         size_str = f"{file_size / (1024 * 1024):.1f} MB"
 
     print(f"\nIndex file size: {size_str}")
-
+    manifest.update(f"search-index:{lang_code}", sources, [output_file])
     return {
-        'lang_code': lang_code,
-        'lang_name': lang_name,
-        'total_files': len(html_files),
-        'processed': processed,
-        'output_file': str(output_file),
-        'file_size': file_size,
-        'categories': categories,
+        "lang_code": lang_code,
+        "lang_name": lang_name,
+        "total_files": len(html_files),
+        "processed": processed,
+        "output_file": str(output_file),
+        "file_size": file_size,
+        "categories": categories,
     }
 
 
-def main():
-    """Main function to build search indexes for all languages"""
-    print("="*60)
+def parse_args(argv=None):
+    """Parse CLI arguments."""
+    parser = argparse.ArgumentParser(
+        description="Build search indexes for one or more supported languages."
+    )
+    parser.add_argument(
+        "languages",
+        nargs="*",
+        help="Optional language codes to build. Defaults to all supported languages.",
+    )
+    parser.add_argument(
+        "--force",
+        action="store_true",
+        help="Regenerate outputs even when the build manifest says they are current.",
+    )
+    return parser.parse_args(argv)
+
+
+def main(argv=None):
+    """Main function to build search indexes for all languages."""
+    args = parse_args(argv)
+    requested_languages = args.languages or list(SUPPORTED_LANGUAGES.keys())
+    invalid_languages = [
+        language for language in requested_languages if language not in SUPPORTED_LANGUAGES
+    ]
+    if invalid_languages:
+        print(f"Unknown language code(s): {', '.join(invalid_languages)}")
+        return 1
+
+    print("=" * 60)
     print("Multi-Language Search Index Generator")
-    print("="*60)
-    print(f"Working directory: {SCRIPT_DIR}")
-    print(f"Languages to process: {', '.join(LANGUAGES.keys())}")
+    print("=" * 60)
+    print(f"Repository root: {repo_root()}")
+    print(f"Languages to process: {', '.join(requested_languages)}")
 
     results = {}
-
-    for lang_code, lang_name in LANGUAGES.items():
-        result = build_search_index_for_language(lang_code, lang_name)
+    for lang_code in requested_languages:
+        result = build_search_index_for_language(
+            lang_code,
+            SUPPORTED_LANGUAGES[lang_code],
+            force=args.force,
+        )
         if result:
             results[lang_code] = result
 
-    # Print summary
-    print("\n" + "="*60)
+    print("\n" + "=" * 60)
     print("SUMMARY")
-    print("="*60)
+    print("=" * 60)
 
     if not results:
         print("No search indexes were generated.")
-        return
+        return 0
 
-    total_files = sum(r['processed'] for r in results.values())
-    total_size = sum(r['file_size'] for r in results.values())
+    total_files = sum(result["processed"] for result in results.values())
+    total_size = sum(result["file_size"] for result in results.values())
 
     print(f"\n[SUCCESS] Generated {len(results)} search index(es)")
     print(f"Total pages indexed: {total_files}")
@@ -307,10 +291,11 @@ def main():
     for lang_code, result in results.items():
         print(f"  - {result['lang_name']} ({lang_code}): {result['processed']} pages")
 
-    print("\n" + "="*60)
+    print("\n" + "=" * 60)
     print("All done!")
-    print("="*60)
+    print("=" * 60)
+    return 0
 
 
-if __name__ == '__main__':
-    main()
+if __name__ == "__main__":
+    raise SystemExit(main())

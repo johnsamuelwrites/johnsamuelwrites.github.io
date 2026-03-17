@@ -5,11 +5,13 @@
 #
 
 import argparse
+import json
 import sys
 from pathlib import Path
 from html.parser import HTMLParser
 from typing import Dict, Set, List, Iterable
 
+from config import EXCLUDED_DIRECTORIES
 from links import collect_html_files
 
 
@@ -106,10 +108,37 @@ def write_link_report(
     return report_path
 
 
+def write_json_report(
+    root: Path,
+    backlinks: Dict[Path, Set[Path]],
+    report_path: Path | None = None,
+) -> Path:
+    if report_path is None:
+        report_path = root / "html_link_report.json"
+
+    payload = {
+        "root": str(root),
+        "pages": [
+            {
+                "path": str(target.relative_to(root)),
+                "linked_from": [
+                    str(source.relative_to(root))
+                    for source in sorted(backlinks[target], key=lambda p: str(p.relative_to(root)))
+                ],
+            }
+            for target in sorted(backlinks.keys(), key=lambda p: str(p.relative_to(root)))
+        ],
+    }
+    report_path.write_text(json.dumps(payload, indent=2), encoding="utf-8")
+    return report_path
+
+
 def check_html_backlinks(
     root_folder: str,
     exclude_dirs: Iterable[str] = (),
     exclude_files: Iterable[str] = (),
+    json_report: bool = False,
+    json_report_path: str | None = None,
 ) -> int:
     root = Path(root_folder).resolve()
     if not root.is_dir():
@@ -150,6 +179,13 @@ def check_html_backlinks(
 
     report_file = write_link_report(root, backlinks)
     print(f"Full link report written to: {report_file}")
+    if json_report:
+        json_report_file = write_json_report(
+            root,
+            backlinks,
+            Path(json_report_path) if json_report_path else None,
+        )
+        print(f"JSON link report written to: {json_report_file}")
     return 1 if unreferenced else 0
 
 
@@ -169,7 +205,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--exclude-dirs",
         nargs="*",
-        default=[],
+        default=list(EXCLUDED_DIRECTORIES),
         help="Subdirectories (names or root-relative paths) to exclude.",
     )
     parser.add_argument(
@@ -177,6 +213,15 @@ def parse_args() -> argparse.Namespace:
         nargs="*",
         default=[],
         help="HTML files (names or root-relative paths) to exclude.",
+    )
+    parser.add_argument(
+        "--json-report",
+        action="store_true",
+        help="Also write a machine-readable JSON report.",
+    )
+    parser.add_argument(
+        "--json-report-path",
+        help="Optional explicit path for the JSON report.",
     )
     return parser.parse_args()
 
@@ -188,5 +233,7 @@ if __name__ == "__main__":
             args.root,
             exclude_dirs=args.exclude_dirs,
             exclude_files=args.exclude_files,
+            json_report=args.json_report,
+            json_report_path=args.json_report_path,
         )
     )

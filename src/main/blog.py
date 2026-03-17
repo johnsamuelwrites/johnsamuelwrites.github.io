@@ -8,6 +8,7 @@
 # Generate an upto date list of articles in reverse chronological order
 #!/usr/bin/env python3
 
+import argparse
 import sys
 from typing import Dict, List, Set, Tuple
 from dataclasses import dataclass
@@ -20,7 +21,11 @@ from feedgen.feed import FeedGenerator
 from pytz import timezone
 
 from analyse import HTMLTextAnalysis, WebsiteAnalysis
+from config import SITE_AUTHOR, SITE_URL
 from git import get_first_latest_modification
+from manifest import BuildManifest
+from paths import REPO_ROOT
+from site_text import strip_author_from_title
 
 
 @dataclass
@@ -66,6 +71,7 @@ class BlogGenerator:
     @staticmethod
     def clean_title(title: str) -> str:
         """Remove author name variations from title."""
+        return strip_author_from_title(title)
         replacements = [
             ": John Samuel",
             ": ജോൺ ശമൂവേൽ",
@@ -463,12 +469,12 @@ class BlogGenerator:
 
         articleset: Set[str] = set()
         fg = FeedGenerator()
-        fg.id("https://johnsamuel.info")
-        fg.title("John Samuel")
-        fg.description("Personal Blog of John Samuel")
-        fg.author({"name": "John Samuel"})
+        fg.id(SITE_URL)
+        fg.title(SITE_AUTHOR)
+        fg.description(f"Personal Blog of {SITE_AUTHOR}")
+        fg.author({"name": SITE_AUTHOR})
         fg.language("en")
-        fg.link(href="https://johnsamuel.info")
+        fg.link(href=SITE_URL)
 
         for _, row in df.iterrows():
             if row["filepath"] in articleset:
@@ -479,7 +485,7 @@ class BlogGenerator:
                 metadata = BlogGenerator.extract_article_metadata(row["filepath"])
 
                 fe = fg.add_entry(order="append")
-                fe.id(f"https://johnsamuel.info/{row['filepath']}")
+                fe.id(f"{SITE_URL}/{row['filepath']}")
                 fe.title(metadata.title)
                 fe.pubDate(
                     datetime.fromtimestamp(
@@ -487,7 +493,7 @@ class BlogGenerator:
                     )
                 )
                 fe.description(metadata.title)
-                fe.link(href=f"https://johnsamuel.info/{row['filepath']}")
+                fe.link(href=f"{SITE_URL}/{row['filepath']}")
             except Exception as e:
                 print(f"Error adding to feed {row['filepath']}: {e}")
                 continue
@@ -499,21 +505,43 @@ class BlogGenerator:
 
 def main(argv=None):
     """Main entry point."""
-    argv = list(sys.argv[1:] if argv is None else argv)
-    if argv:
-        print("This program takes no input")
-        return 1
+    parser = argparse.ArgumentParser(
+        description="Generate blog pages and feeds."
+    )
+    parser.add_argument(
+        "--force",
+        action="store_true",
+        help="Regenerate outputs even when the build manifest says they are current.",
+    )
+    args = parser.parse_args(sys.argv[1:] if argv is None else argv)
 
-    # Get articles dataframe
     df = WebsiteAnalysis.get_articles_list_dataframe()
+    article_sources = [REPO_ROOT / str(filepath) for filepath in df["filepath"].tolist()]
+    template_sources = list((REPO_ROOT / "templates").glob("blog.html"))
+    template_sources.extend((REPO_ROOT / "templates" / "blog").glob("*.html"))
+    manifest = BuildManifest()
+    output_paths = [
+        REPO_ROOT / "blog" / "index.html",
+        REPO_ROOT / "atom.xml",
+        REPO_ROOT / "rss.xml",
+        REPO_ROOT / "en" / "blog.html",
+        REPO_ROOT / "fr" / "blog.html",
+        REPO_ROOT / "ml" / "à´¬àµà´²àµ‹à´—àµ.html",
+        REPO_ROOT / "pa" / "à¨¬à¨²à¨¾à¨—.html",
+        REPO_ROOT / "hi" / "à¤¬à¥à¤²à¥‰à¤—.html",
+    ]
+    sources = [Path(__file__), *template_sources, *article_sources]
 
-    # Generate complete article list with year organization
+    if not args.force and manifest.is_current("blog", sources, output_paths):
+        print("[SKIP] Blog outputs are up to date.")
+        return 0
+
     BlogGenerator.generate_complete_list(df)
-
-    # Generate feeds (latest N articles)
     BlogGenerator.generate_feed(df, feed_count=20)
+    manifest.update("blog", sources, output_paths)
 
     print("✓ Blog generation complete!")
+    return 0
 
 
 if __name__ == "__main__":

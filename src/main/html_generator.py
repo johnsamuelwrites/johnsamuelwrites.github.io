@@ -9,20 +9,25 @@ import re
 from pathlib import Path
 from html.parser import HTMLParser
 from typing import Dict, List, Optional
+from manifest import BuildManifest
+from paths import REPO_ROOT
 from translate_manager import TranslationDatabase
+from translation_rules import (
+    NO_TRANSLATE_CLASS,
+    SKIP_TRANSLATION_TAGS,
+    TRANSLATABLE_ATTRIBUTES,
+    TRANSLATABLE_META_NAMES,
+)
 
 
 class HTMLTranslator(HTMLParser):
     """Translate HTML content using the translation database"""
 
     # Tags that should not be translated
-    SKIP_TAGS = {'script', 'style', 'code', 'pre'}
+    SKIP_TAGS = SKIP_TRANSLATION_TAGS
 
     # Attributes to translate
-    TRANSLATABLE_ATTRS = {
-        'title', 'alt', 'placeholder', 'aria-label',
-        'aria-description', 'content'
-    }
+    TRANSLATABLE_ATTRS = TRANSLATABLE_ATTRIBUTES
 
     def __init__(self, db: TranslationDatabase, source_lang: str, target_lang: str):
         super().__init__()
@@ -42,7 +47,7 @@ class HTMLTranslator(HTMLParser):
 
         # Check for no-translate class
         for attr, value in attrs:
-            if attr == 'class' and value and 'no-translate' in value.split():
+            if attr == 'class' and value and NO_TRANSLATE_CLASS in value.split():
                 self.skip_content = True
 
         # Translate attributes and build tag
@@ -54,7 +59,7 @@ class HTMLTranslator(HTMLParser):
                 # Special handling for meta content
                 if tag == 'meta' and attr == 'content':
                     meta_name = dict(attrs).get('name', '')
-                    if meta_name in ['description', 'keywords']:
+                    if meta_name in TRANSLATABLE_META_NAMES:
                         translation = self.db.get_translation(
                             self.source_lang, self.target_lang,
                             value.strip(), context
@@ -266,12 +271,53 @@ class HTMLGenerator:
 
     def __init__(self, source_lang: str = 'en', db_path: str = 'translations.db'):
         self.source_lang = source_lang
-        self.db = TranslationDatabase(db_path)
+        self.db_path = str((REPO_ROOT / db_path).resolve()) if not Path(db_path).is_absolute() else db_path
+        self.db = TranslationDatabase(self.db_path)
+        self.manifest = BuildManifest()
+
+    def _resolve_output_path(
+        self,
+        source_file: str,
+        target_lang: str,
+        output_file: str | None = None,
+        require_mapping: bool = True,
+    ) -> str:
+        """Resolve the output file path for a translated HTML file."""
+        if output_file is not None:
+            return output_file
+
+        source_path = str(Path(source_file)).replace('\\', '/')
+        target_path = self.db.get_path_mapping(
+            self.source_lang, target_lang, source_path
+        )
+
+        if not target_path:
+            source_dir = str(Path(source_file).parent).replace('\\', '/')
+            source_filename = Path(source_file).name
+            target_dir = self.db.get_path_mapping(
+                self.source_lang, target_lang, source_dir
+            )
+            if target_dir:
+                target_path = str(Path(target_dir) / source_filename).replace('\\', '/')
+
+        if not target_path and require_mapping:
+            raise ValueError(
+                f"No path mapping found for {source_path} -> {target_lang}. "
+                f"Add mapping to path_mappings.csv and run 'import-paths'."
+            )
+
+        if not target_path:
+            parts = list(Path(source_file).parts)
+            if parts and parts[0] == self.source_lang:
+                parts[0] = target_lang
+            target_path = str(Path(*parts)).replace('\\', '/')
+
+        return target_path
 
     def translate_file(self, source_file: str, target_lang: str,
                       output_file: str = None, rewrite_links: bool = True,
                       require_mapping: bool = True, dry_run: bool = False,
-                      confirm: bool = True) -> str:
+                      confirm: bool = True, force: bool = False) -> str:
         """
         Translate an HTML file
 
@@ -290,6 +336,30 @@ class HTMLGenerator:
         Raises:
             ValueError: If require_mapping=True and no mapping exists
         """
+        resolved_output_file = self._resolve_output_path(
+            source_file,
+            target_lang,
+            output_file=output_file,
+            require_mapping=require_mapping,
+        )
+        manifest_key = f"html-generator:{target_lang}:{resolved_output_file.replace(chr(92), '/')}"
+        manifest_sources = [Path(__file__), Path(self.db_path), Path(source_file)]
+        manifest_extra = (
+            f"rewrite_links={rewrite_links}|require_mapping={require_mapping}"
+        )
+        if (
+            not dry_run
+            and not force
+            and self.manifest.is_current(
+                manifest_key,
+                manifest_sources,
+                [resolved_output_file],
+                extra=manifest_extra,
+            )
+        ):
+            print(f"[SKIP] Up to date: {resolved_output_file}")
+            return resolved_output_file
+
         # Read source file
         with open(source_file, 'r', encoding='utf-8') as f:
             source_html = f.read()
@@ -304,42 +374,7 @@ class HTMLGenerator:
             link_rewriter = LinkRewriter(self.db, self.source_lang, target_lang)
             translated_html = link_rewriter.rewrite_links(translated_html, source_file)
 
-        # Determine output file path
-        if output_file is None:
-            # Normalize source path
-            source_path = str(Path(source_file)).replace('\\', '/')
-
-            # Try exact file mapping first
-            target_path = self.db.get_path_mapping(
-                self.source_lang, target_lang, source_path
-            )
-
-            if not target_path:
-                # Try directory mapping + filename
-                source_dir = str(Path(source_file).parent).replace('\\', '/')
-                source_filename = Path(source_file).name
-
-                target_dir = self.db.get_path_mapping(
-                    self.source_lang, target_lang, source_dir
-                )
-
-                if target_dir:
-                    target_path = str(Path(target_dir) / source_filename).replace('\\', '/')
-
-            if not target_path and require_mapping:
-                raise ValueError(
-                    f"No path mapping found for {source_path} -> {target_lang}. "
-                    f"Add mapping to path_mappings.csv and run 'import-paths'."
-                )
-
-            if not target_path:
-                # Fallback: auto-generate (only if require_mapping=False)
-                parts = list(Path(source_file).parts)
-                if parts[0] == self.source_lang:
-                    parts[0] = target_lang
-                target_path = str(Path(*parts)).replace('\\', '/')
-
-            output_file = target_path
+        output_file = resolved_output_file
 
         # Check if file exists and handle confirmation
         file_exists = Path(output_file).exists()
@@ -372,6 +407,12 @@ class HTMLGenerator:
         # Write translated file
         with open(output_file, 'w', encoding='utf-8') as f:
             f.write(translated_html)
+        self.manifest.update(
+            manifest_key,
+            manifest_sources,
+            [output_file],
+            extra=manifest_extra,
+        )
 
         return output_file
 
@@ -380,7 +421,8 @@ class HTMLGenerator:
                           rewrite_links: bool = True,
                           skip_unmapped: bool = True,
                           dry_run: bool = False,
-                          confirm: bool = True) -> List[str]:
+                          confirm: bool = True,
+                          force: bool = False) -> List[str]:
         """
         Translate all HTML files in a directory
 
@@ -412,7 +454,8 @@ class HTMLGenerator:
                         rewrite_links=rewrite_links,
                         require_mapping=skip_unmapped,
                         dry_run=dry_run,
-                        confirm=current_confirm
+                        confirm=current_confirm,
+                        force=force,
                     )
 
                     if output_file:
@@ -482,6 +525,8 @@ def main():
 
     parser.add_argument('--no-confirm', action='store_true',
                        help='Do not ask for confirmation before overwriting files')
+    parser.add_argument('--force', action='store_true',
+                       help='Regenerate outputs even when the build manifest says they are current')
 
     args = parser.parse_args()
 
@@ -499,7 +544,8 @@ def main():
                 args.output,
                 rewrite_links=not args.no_rewrite_links,
                 dry_run=args.dry_run,
-                confirm=not args.no_confirm
+                confirm=not args.no_confirm,
+                force=args.force,
             )
 
             if output_file and not args.dry_run:
@@ -519,7 +565,8 @@ def main():
                 args.pattern,
                 rewrite_links=not args.no_rewrite_links,
                 dry_run=args.dry_run,
-                confirm=not args.no_confirm
+                confirm=not args.no_confirm,
+                force=args.force,
             )
 
             if args.dry_run:

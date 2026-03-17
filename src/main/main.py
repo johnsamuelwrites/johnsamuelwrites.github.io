@@ -15,6 +15,7 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Iterable
 
+from config import EXCLUDED_DIRECTORIES
 
 @dataclass(frozen=True)
 class CommandSpec:
@@ -29,12 +30,14 @@ class CommandSpec:
 COMMANDS: tuple[CommandSpec, ...] = (
     CommandSpec("batch-translate", "batch_translate.py", "Manage translation workflows.", ("batch_translate",)),
     CommandSpec("blog", "blog.py", "Generate the blog index and feeds."),
+    CommandSpec("build", "", "Run the default static-site build workflow."),
     CommandSpec(
         "build-all-search-indexes",
         "build-all-search-indexes.py",
         "Generate search indexes for all supported languages.",
         ("build_all_search_indexes",),
     ),
+    CommandSpec("check", "", "Run the default static-site validation workflow."),
     CommandSpec("check-db", "check_db.py", "Inspect translation path mappings.", ("check_db",)),
     CommandSpec("ci-internal-links", "ci_internal_links.py", "Run CI internal-link checks.", ("ci_internal_links",)),
     CommandSpec(
@@ -122,6 +125,80 @@ def run_script(script_name: str, argv: list[str]) -> int:
     return 0
 
 
+def run_workflow(script_runs: Iterable[tuple[str, list[str]]]) -> int:
+    """Run a sequence of script commands and stop on the first failure."""
+    for script_name, script_argv in script_runs:
+        exit_code = run_script(script_name, script_argv)
+        if exit_code != 0:
+            return exit_code
+    return 0
+
+
+def run_builtin_command(command_name: str, forwarded_args: list[str]) -> int | None:
+    """Handle built-in orchestration commands."""
+    if command_name == "check":
+        parser = argparse.ArgumentParser(
+            prog="python src/main/main.py check",
+            description="Run offline-first validation: internal links and backlink usage.",
+        )
+        parser.add_argument(
+            "--json-report-dir",
+            help="Optional directory where JSON reports should be written.",
+        )
+        parsed = parser.parse_args(forwarded_args)
+        exclude_args = [
+            argument
+            for exclude_dir in EXCLUDED_DIRECTORIES
+            for argument in ("--exclude-dir", exclude_dir)
+        ]
+        links_args = ["--recursive", "--no-external", *exclude_args, "."]
+        verify_args = [".", "--exclude-dirs", *EXCLUDED_DIRECTORIES, "--json-report"]
+        if parsed.json_report_dir:
+            report_dir = Path(parsed.json_report_dir)
+            report_dir.mkdir(parents=True, exist_ok=True)
+            links_args.extend(["--json-report", str(report_dir / "links-report.json")])
+            verify_args.extend(
+                ["--json-report-path", str(report_dir / "verify-usage-report.json")]
+            )
+        return run_workflow(
+            (
+                ("links.py", links_args),
+                ("verify_usage.py", verify_args),
+            )
+        )
+    if command_name == "build":
+        parser = argparse.ArgumentParser(
+            prog="python src/main/main.py build",
+            description="Run the default static-site build: blog, search indexes, and overview.",
+        )
+        parser.add_argument(
+            "--force",
+            action="store_true",
+            help="Regenerate outputs even when individual generators are current.",
+        )
+        parser.add_argument(
+            "--languages",
+            nargs="*",
+            help="Optional subset of language codes for search index generation.",
+        )
+        parsed = parser.parse_args(forwarded_args)
+        blog_args = ["--force"] if parsed.force else []
+        search_args = []
+        overview_args = ["--force"] if parsed.force else []
+        if parsed.force:
+            search_args.append("--force")
+        if parsed.languages:
+            search_args.extend(parsed.languages)
+        return run_workflow(
+            (
+                ("blog.py", blog_args),
+                ("build-all-search-indexes.py", search_args),
+                ("generate_overview.py", overview_args),
+            )
+        )
+    return None
+
+
 def main(argv: list[str] | None = None) -> int:
     """Dispatch to a concrete tool in ``src/main``."""
     parser = build_parser()
@@ -138,6 +215,10 @@ def main(argv: list[str] | None = None) -> int:
     forwarded_args = list(args.command_args)
     if forwarded_args and forwarded_args[0] == "--":
         forwarded_args = forwarded_args[1:]
+
+    builtin_result = run_builtin_command(args.command, forwarded_args)
+    if builtin_result is not None:
+        return builtin_result
 
     return run_script(command.script, forwarded_args)
 

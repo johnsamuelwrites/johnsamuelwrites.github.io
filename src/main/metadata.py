@@ -5,20 +5,24 @@
 #
 # Add, update and extract metadata (RDFa, JSON-LD, microdata) of a web page
 
-import extruct
-import requests
-import pprint
-import argparse
-from w3lib.html import get_base_url
-from git import get_first_latest_modification
-from bs4 import BeautifulSoup
-import regex
-import json
-from datetime import datetime
-from shutil import copy
-from os import remove
+from __future__ import annotations
 
-jsonld_template = """
+import argparse
+import json
+import pprint
+from datetime import datetime
+from pathlib import Path
+from typing import Sequence
+
+import regex
+from bs4 import BeautifulSoup
+
+from config import SITE_AUTHOR, SITE_URL
+from file_rewrite import rewrite_text_file
+from paths import repo_url_for
+from site_text import strip_author_from_title
+
+JSONLD_TEMPLATE = """
 {
     "@context" : "http://schema.org",
     "@type" : "BlogPosting",
@@ -54,119 +58,152 @@ jsonld_template = """
 }
 """
 
-
-def replace_name(title):
-    title = title.replace("John Samuel", "")
-    title = title.replace("ജോൺ ശമൂവേൽ", "")
-    title = title.replace("ਜੌਨ ਸੈਮੂਅਲ", "")
-    title = title.replace("जॉन शमुऐल", "")
-    return title
+JSONLD_SCRIPT_PATTERN = r'<script type="application\/ld\+json">(\n|.)*script>'
 
 
-def get_article_content(link):
-    with open(link, "r") as f:
-        content = f.read()
-    f.close()
-    return content
+def replace_name(title: str) -> str:
+    """Remove author names from a title."""
+    return strip_author_from_title(title)
 
 
-def get_title(html_content):
+def get_article_content(link: str) -> str:
+    """Read an HTML file from disk."""
+    return Path(link).read_text(encoding="utf-8")
+
+
+def get_title(html_content: str) -> str:
+    """Extract the title text from an HTML document."""
     parsed_html = BeautifulSoup(html_content, features="html.parser")
     title = ""
-    for titletag in parsed_html.find_all("title"):
-        title = replace_name(titletag.text)
-        title = title.replace(":", "")
-        title = title.strip()
+    for title_tag in parsed_html.find_all("title"):
+        title = replace_name(title_tag.text)
     return title
 
 
-def get_title_from_link(link):
+def get_title_from_link(link: str) -> str:
+    """Extract the title from a file path."""
     content = get_article_content(link)
     return get_title(content)
 
 
-def add_update_metadata(links):
+def render_jsonld_script(payload: dict) -> str:
+    """Render JSON-LD as a script tag."""
+    return (
+        '<script type="application/ld+json">\n      '
+        + json.dumps(payload)
+        + "\n    </script>"
+    )
 
-    # Setting up regular expression for json-ld script
-    pattern = r'<script type="application\/ld\+json">(\n|.)*script>'
 
-    headpattern = r"<head.*>(\n|.)*<\/head>"
+def resolve_file_timestamps(link: str) -> tuple[float, float]:
+    """Resolve creation and modification timestamps, falling back to file metadata."""
+    try:
+        from git import get_first_latest_modification
 
+        return get_first_latest_modification(link)
+    except (ImportError, ModuleNotFoundError):
+        file_path = Path(link)
+        stat_result = file_path.stat()
+        created = getattr(stat_result, "st_ctime", stat_result.st_mtime)
+        return created, stat_result.st_mtime
+
+
+def update_metadata_content(content: str, link: str) -> str:
+    """Inject or replace JSON-LD metadata in an HTML document."""
+    jsonld = json.loads(JSONLD_TEMPLATE)
+    first, latest = resolve_file_timestamps(link)
+    title = get_title(content)
+
+    jsonld["dateCreated"] = str(datetime.fromtimestamp(first))
+    jsonld["datePublished"] = str(datetime.fromtimestamp(first))
+    jsonld["dateModified"] = str(datetime.fromtimestamp(latest))
+    jsonld["name"] = title
+    jsonld["description"] = f"Article by {SITE_AUTHOR}"
+    jsonld["url"] = f"{SITE_URL}/{repo_url_for(link)}"
+    jsonld["headline"] = title
+
+    script_jsonld = render_jsonld_script(jsonld)
+    if "application/ld+json" not in content:
+        return content.replace("</head>", script_jsonld + "\n  </head>")
+    return regex.sub(JSONLD_SCRIPT_PATTERN, script_jsonld, content)
+
+
+def add_update_metadata(links: Sequence[str]) -> None:
+    """Inject or update JSON-LD metadata for local HTML files."""
     for link in links:
-        # only with files
-        if not link.startswith("http"):
-            content = get_article_content(link)
-            jsonld = json.loads(jsonld_template)
-            # get creation, publication and modification date
-            first, latest = get_first_latest_modification(link)
-            jsonld["dateCreated"] = str(datetime.fromtimestamp(first))
-            jsonld["datePublished"] = str(datetime.fromtimestamp(first))
-            jsonld["dateModified"] = str(datetime.fromtimestamp(latest))
-
-            # get title
-            title = get_title(content)
-            jsonld["name"] = title
-            jsonld["description"] = "Article by John Samuel"
-            # Care must be taken to ensure the link exists
-            jsonld["url"] = "https://johnsamuel.info/" + link
-            jsonld["headline"] = title
-            scriptjsonld = (
-                '<script type="application/ld+json">\n      '
-                + json.dumps(jsonld)
-                + "\n    </script>"
-            )
-            if "application/ld+json" not in content:
-                content = content.replace("</head>", scriptjsonld + "\n  </head>")
-            else:
-                content = regex.sub(pattern, scriptjsonld, content)
-            outputfile = open("/tmp/temp.html", "w")
-
-            outputfile.write(content)
-
-            outputfile.close()
-
-            # Replacing the old file
-            remove(link)
-            copy("/tmp/temp.html", link)
-            remove("/tmp/temp.html")
+        if link.startswith("http"):
+            continue
+        rewrite_text_file(
+            link,
+            lambda original_content, current_link=link: update_metadata_content(
+                original_content, current_link
+            ),
+        )
 
 
-def extract_metadata(links):
+def extract_metadata(links: Sequence[str], allow_remote: bool = False) -> None:
+    """Extract metadata from local HTML files or, optionally, remote URLs."""
+    import extruct
+
     for link in links:
         print("=======" + link + "========")
-        pp = pprint.PrettyPrinter(indent=2)
-        data = None
+        pretty_printer = pprint.PrettyPrinter(indent=2)
         if link.startswith("http"):
-            r = requests.get(link)
-            base_url = get_base_url(r.text, r.url)
-            data = extruct.extract(r.text, base_url=base_url)
+            import requests
+            from w3lib.html import get_base_url
+
+            if not allow_remote:
+                raise ValueError(
+                    "Remote URL extraction is disabled by default. Use --allow-remote to enable it."
+                )
+            response = requests.get(link, timeout=10)
+            response.raise_for_status()
+            base_url = get_base_url(response.text, response.url)
+            data = extruct.extract(response.text, base_url=base_url)
         else:
-            with open(link, "r") as f:
-                data = extruct.extract(f.read())
-        pp.pprint(data)
+            data = extruct.extract(Path(link).read_text(encoding="utf-8"))
+        pretty_printer.pprint(data)
 
 
-if __name__ == "__main__":
+def build_parser() -> argparse.ArgumentParser:
+    """Build the CLI parser."""
     parser = argparse.ArgumentParser(
-        description="set or extract metadata form a URL or a file"
+        description="Set or extract metadata from a URL or an HTML file."
     )
     subparsers = parser.add_subparsers(help="sub-command help", dest="subparser_name")
 
-    # create the parser for the "extract" command
     parser_extract = subparsers.add_parser("extract", help="extract metadata")
     parser_extract.add_argument(
         "link", metavar="link", type=str, nargs="+", help="link or paths of html file"
     )
-    parser_extract.set_defaults(func=extract_metadata)
+    parser_extract.add_argument(
+        "--allow-remote",
+        action="store_true",
+        help="Allow metadata extraction from remote HTTP URLs.",
+    )
 
-    # create the parser for the "add" command
     parser_add = subparsers.add_parser("add", help="add metadata")
     parser_add.add_argument(
         "link", metavar="link", type=str, nargs="+", help="link or paths of html file"
     )
-    parser_add.set_defaults(func=add_update_metadata)
+    return parser
 
-    args = parser.parse_args()
-    # args.subparser_name contains the name of the subcommand
-    # since we have link as a parameter for both the command
-    args.func(args.link)
+
+def main(argv: Sequence[str] | None = None) -> int:
+    """CLI entry point."""
+    parser = build_parser()
+    args = parser.parse_args(argv)
+
+    if args.subparser_name == "extract":
+        extract_metadata(args.link, allow_remote=args.allow_remote)
+        return 0
+    if args.subparser_name == "add":
+        add_update_metadata(args.link)
+        return 0
+
+    parser.print_help()
+    return 1
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

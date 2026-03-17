@@ -14,19 +14,22 @@ from datetime import datetime
 from html.parser import HTMLParser
 from typing import Dict, List, Set, Tuple, Optional
 import re
+from translation_rules import (
+    NO_TRANSLATE_CLASS,
+    SKIP_TRANSLATION_TAGS,
+    TRANSLATABLE_ATTRIBUTES,
+    TRANSLATABLE_META_NAMES,
+)
 
 
 class HTMLTranslationExtractor(HTMLParser):
     """Extract translatable content from HTML files"""
 
     # Tags that should not be translated
-    SKIP_TAGS = {'script', 'style', 'code', 'pre'}
+    SKIP_TAGS = SKIP_TRANSLATION_TAGS
 
     # Attributes to translate
-    TRANSLATABLE_ATTRS = {
-        'title', 'alt', 'placeholder', 'aria-label',
-        'aria-description', 'content'
-    }
+    TRANSLATABLE_ATTRS = TRANSLATABLE_ATTRIBUTES
 
     def __init__(self):
         super().__init__()
@@ -46,7 +49,7 @@ class HTMLTranslationExtractor(HTMLParser):
         for attr, value in attrs:
             if attr == 'class' and value:
                 # Skip elements with specific classes (e.g., 'no-translate')
-                if 'no-translate' in value.split():
+                if NO_TRANSLATE_CLASS in value.split():
                     self.skip_content = True
                     return
 
@@ -57,7 +60,7 @@ class HTMLTranslationExtractor(HTMLParser):
                 if tag == 'meta' and attr == 'content':
                     # Check if this is a translatable meta tag
                     meta_name = dict(attrs).get('name', '')
-                    if meta_name in ['description', 'keywords']:
+                    if meta_name in TRANSLATABLE_META_NAMES:
                         self.translations.append({
                             'type': 'attr',
                             'tag': tag,

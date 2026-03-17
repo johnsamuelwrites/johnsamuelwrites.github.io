@@ -1,16 +1,16 @@
 #!/usr/bin/env python3
-"""
-Generate translation overview based on path mappings only
-"""
+"""Generate translation overview based on path mappings only."""
 
+import argparse
 from pathlib import Path
 from datetime import datetime
+from manifest import BuildManifest
+from paths import repo_root
 from translate_manager import TranslationManager
 from html.parser import HTMLParser
 
 
-# Get repository root (two levels up from this script)
-REPO_ROOT = Path(__file__).resolve().parent.parent.parent
+REPO_ROOT = repo_root()
 
 
 class TitleExtractor(HTMLParser):
@@ -61,11 +61,12 @@ LANGUAGE_NAMES = {
 }
 
 
-def generate_overview(output_file='analysis/translation_overview.html'):
+def generate_overview(output_file='analysis/translation_overview.html', force: bool = False):
     """Generate HTML overview showing only mapped files"""
-
-    # Use absolute path for database
+    output_path = REPO_ROOT / output_file
     db_path = REPO_ROOT / 'translations.db'
+    manifest = BuildManifest()
+
     manager = TranslationManager(db_path=str(db_path))
 
     try:
@@ -90,9 +91,14 @@ def generate_overview(output_file='analysis/translation_overview.html'):
                         all_mapped_files.add(str(rel_path).replace('\\', '/'))
 
         source_files = sorted(list(all_mapped_files))
+        sources = [Path(__file__), db_path, *[REPO_ROOT / source_file for source_file in source_files]]
 
         if not source_files:
             print("No mapped files found. Add mappings to path_mappings.csv and run import-paths.")
+            return
+
+        if not force and manifest.is_current("translation-overview", sources, [output_path]):
+            print(f"[SKIP] Translation overview is up to date: {output_path}")
             return
 
         # Extract titles for each file
@@ -173,10 +179,12 @@ def generate_overview(output_file='analysis/translation_overview.html'):
         html = _generate_overview_html(source_files, file_titles, stats_by_lang,
                                        target_paths_by_lang, manager.target_langs)
 
-        with open(output_file, 'w', encoding='utf-8') as f:
+        output_path.parent.mkdir(parents=True, exist_ok=True)
+        with open(output_path, 'w', encoding='utf-8') as f:
             f.write(html)
 
-        print(f"Overview generated: {output_file}")
+        manifest.update("translation-overview", sources, [output_path])
+        print(f"Overview generated: {output_path}")
         print(f"  Showing {len(source_files)} mapped files")
 
     finally:
@@ -571,5 +579,28 @@ def _generate_overview_html(source_files, file_titles, stats_by_lang,
     return html
 
 
+def parse_args(argv=None):
+    parser = argparse.ArgumentParser(
+        description="Generate the translation overview HTML report."
+    )
+    parser.add_argument(
+        "--output",
+        default="analysis/translation_overview.html",
+        help="Output path relative to the repository root.",
+    )
+    parser.add_argument(
+        "--force",
+        action="store_true",
+        help="Regenerate outputs even when the build manifest says they are current.",
+    )
+    return parser.parse_args(argv)
+
+
+def main(argv=None):
+    args = parse_args(argv)
+    generate_overview(output_file=args.output, force=args.force)
+    return 0
+
+
 if __name__ == '__main__':
-    generate_overview()
+    raise SystemExit(main())
