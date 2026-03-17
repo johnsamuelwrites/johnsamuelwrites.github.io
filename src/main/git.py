@@ -16,6 +16,11 @@ def get_first_latest_modification(filepath, main_directory="./"):
     repo = Repository(main_directory + ".git")
     latest = None
     first = None
+    from pathlib import Path
+    fp = Path(filepath)
+    if fp.is_absolute():
+        workdir = Path(repo.workdir).resolve()
+        filepath = str(fp.resolve().relative_to(workdir))
     blame = repo.blame(filepath, flags=GIT_BLAME_TRACK_COPIES_SAME_FILE)
     for b in blame:
         commit = repo.get(b.final_commit_id)
@@ -35,6 +40,11 @@ def get_modification_list(filepath, main_directory="./"):
     repo = Repository(main_directory + ".git")
     latest = None
     first = None
+    from pathlib import Path
+    fp = Path(filepath)
+    if fp.is_absolute():
+        workdir = Path(repo.workdir).resolve()
+        filepath = str(fp.resolve().relative_to(workdir))
     blame = repo.blame(filepath, flags=GIT_BLAME_TRACK_COPIES_SAME_FILE)
     modifications = list()
     for b in blame:
