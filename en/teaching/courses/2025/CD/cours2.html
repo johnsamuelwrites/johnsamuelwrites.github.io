@@ -1,0 +1,3028 @@
+<html>
+
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Data Mining and Machine Learning (2025-2026): Building processing models: John Samuel</title>
+        <link rel="shortcut icon" href="../../../../../images/logo/favicon.png" />
+        <style type="text/css">
+            /* ========================================
+           COASTAL DUAL THEME
+           Light + Dark palettes
+           Ocean Blue + Sea Green accents
+           ======================================== */
+
+            :root {
+                /* Light Theme - Coastal */
+                --bg-primary: #F4F8FB;
+                --bg-secondary: #D9E2EC;
+                --bg-tertiary: #FFFFFF;
+                --text-primary: #102A43;
+                --text-secondary: #334E68;
+                --text-muted: #627D98;
+                --accent-primary: #2C7DA0;
+                --accent-secondary: #1E6091;
+                --accent-tertiary: #52B788;
+                --accent-gradient: linear-gradient(135deg, #1E6091 0%, #2C7DA0 52%, #52B788 100%);
+                --header-bg: linear-gradient(135deg, #16425B 0%, #1E6091 58%, #2C7DA0 100%);
+                --footer-bg: linear-gradient(135deg, #16425B 0%, #1E6091 100%);
+                --card-bg: rgba(255, 255, 255, 0.85);
+                --card-border: rgba(44, 125, 160, 0.22);
+                --table-header-bg: linear-gradient(135deg, #1E6091, #2C7DA0);
+                --table-cell-bg: rgba(217, 226, 236, 0.62);
+                --code-bg: #EBF2F7;
+                --shadow-color: rgba(16, 42, 67, 0.1);
+                --glow-color: rgba(82, 183, 136, 0.22);
+                --highlight-color: #52B788;
+                --highlight-bg: #DFF3EA;
+                --figcaption-bg: rgba(244, 248, 251, 0.92);
+            }
+
+            [data-theme="dark"] {
+                /* Dark Theme - Deep Coastal */
+                --bg-primary: #0B1F33;
+                --bg-secondary: #102A43;
+                --bg-tertiary: #1A3D5A;
+                --text-primary: #E6F1F7;
+                --text-secondary: #C3D9E6;
+                --text-muted: #8FB3C7;
+                --accent-primary: #5DA9C9;
+                --accent-secondary: #2C7DA0;
+                --accent-tertiary: #52B788;
+                --accent-gradient: linear-gradient(135deg, #1E6091 0%, #2C7DA0 52%, #52B788 100%);
+                --header-bg: linear-gradient(135deg, #123A5A 0%, #1E6091 58%, #2C7DA0 100%);
+                --footer-bg: linear-gradient(135deg, #123A5A 0%, #1E6091 100%);
+                --card-bg: rgba(16, 42, 67, 0.82);
+                --card-border: rgba(93, 169, 201, 0.32);
+                --table-header-bg: linear-gradient(135deg, #1E6091, #2C7DA0);
+                --table-cell-bg: rgba(26, 61, 90, 0.72);
+                --code-bg: #102A43;
+                --shadow-color: rgba(0, 0, 0, 0.3);
+                --glow-color: rgba(82, 183, 136, 0.28);
+                --highlight-color: #52B788;
+                --highlight-bg: rgba(82, 183, 136, 0.18);
+                --figcaption-bg: rgba(16, 42, 67, 0.95);
+            }
+
+            /* Base Styles */
+            * {
+                box-sizing: border-box;
+            }
+
+            html {
+                height: 100%;
+                scroll-behavior: smooth;
+            }
+
+            body {
+                height: 100%;
+                width: 100%;
+                background: var(--bg-primary);
+                margin: 0;
+                overflow: hidden;
+                font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+                color: var(--text-primary);
+                transition: background-color 0.4s ease, color 0.4s ease;
+            }
+
+            /* Animated Background */
+            body::before {
+                content: '';
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background:
+                    radial-gradient(ellipse at 20% 20%, var(--glow-color) 0%, transparent 50%),
+                    radial-gradient(ellipse at 80% 80%, rgba(44, 125, 160, 0.14) 0%, transparent 50%),
+                    radial-gradient(ellipse at 50% 50%, rgba(82, 183, 136, 0.1) 0%, transparent 70%);
+                pointer-events: none;
+                z-index: -1;
+                animation: backgroundPulse 8s ease-in-out infinite;
+            }
+
+            @keyframes backgroundPulse {
+
+                0%,
+                100% {
+                    opacity: 0.6;
+                }
+
+                50% {
+                    opacity: 1;
+                }
+            }
+
+            /* Theme Toggle Button */
+            .theme-toggle {
+                position: fixed;
+                top: 1rem;
+                right: 1rem;
+                z-index: 1000;
+                background: var(--card-bg);
+                -webkit-backdrop-filter: blur(10px);
+                backdrop-filter: blur(10px);
+                border: 1px solid var(--card-border);
+                border-radius: 50%;
+                width: 48px;
+                height: 48px;
+                cursor: pointer;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                box-shadow: 0 4px 20px var(--shadow-color);
+                transition: all 0.3s ease;
+            }
+
+            .theme-toggle:hover {
+                transform: scale(1.1);
+                box-shadow: 0 6px 30px var(--glow-color);
+            }
+
+            .theme-toggle svg {
+                width: 24px;
+                height: 24px;
+                fill: var(--accent-primary);
+                transition: fill 0.3s ease;
+            }
+
+            .theme-toggle .sun-icon {
+                display: none;
+            }
+
+            .theme-toggle .moon-icon {
+                display: block;
+            }
+
+            [data-theme="dark"] .theme-toggle .sun-icon {
+                display: block;
+            }
+
+            [data-theme="dark"] .theme-toggle .moon-icon {
+                display: none;
+            }
+
+            /* Slide Styles */
+            .slide {
+                height: 100vh;
+                width: 100%;
+                display: flex;
+                flex-direction: column;
+                animation: fadeIn 0.5s ease-out;
+            }
+
+            @keyframes fadeIn {
+                from {
+                    opacity: 0;
+                    transform: translateY(10px);
+                }
+
+                to {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            }
+
+            /* Header Styles */
+            .header {
+                background: var(--header-bg);
+                height: 5.5vmax;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                position: relative;
+                overflow: hidden;
+                box-shadow: 0 4px 20px var(--shadow-color);
+            }
+
+            .header::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: -100%;
+                width: 200%;
+                height: 100%;
+                background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+                animation: headerShine 4s ease-in-out infinite;
+            }
+
+            @keyframes headerShine {
+                0% {
+                    transform: translateX(-50%);
+                }
+
+                100% {
+                    transform: translateX(50%);
+                }
+            }
+
+            .header h1 {
+                color: #ffffff;
+                text-align: center;
+                font-size: 3vmax;
+                line-height: 1.3;
+                margin: 0;
+                padding: 0 2rem;
+                text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+                font-weight: 600;
+                letter-spacing: 0.5px;
+                position: relative;
+                z-index: 1;
+            }
+
+            /* Content Styles */
+            .content {
+                height: calc(100vh - 5.5vmax - 3.2vmax - 0.6vmax);
+                width: 95vw;
+                max-width: 95vw;
+                display: flex;
+                line-height: 1.8em;
+                flex-direction: column;
+                align-items: flex-start;
+                margin: 0 auto;
+                color: var(--text-primary);
+                text-align: left;
+                padding: 1.5vmax;
+                overflow-x: auto;
+                overflow-y: auto;
+                font-size: 2.8vmin;
+                flex-wrap: wrap;
+                background: var(--card-bg);
+                -webkit-backdrop-filter: blur(10px);
+                backdrop-filter: blur(10px);
+            }
+
+            .content h1,
+            .content h2,
+            .content h3,
+            .content h4 {
+                color: var(--accent-primary);
+                font-weight: 600;
+                margin-top: 0.5em;
+                margin-bottom: 0.5em;
+                text-shadow: 0 1px 2px var(--shadow-color);
+            }
+
+            .content h1 {
+                font-size: 2.2em;
+                background: var(--accent-gradient);
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                background-clip: text;
+            }
+
+            .content h2 {
+                font-size: 1.6em;
+            }
+
+            .content h3 {
+                font-size: 1.3em;
+            }
+
+            .content h4 {
+                font-size: 1.1em;
+            }
+
+            .content p {
+                margin: 0.6em 0;
+                line-height: 1.9;
+                padding: 0.3em 0;
+            }
+
+            /* Bold/Strong terms - Key terminology highlighting */
+            .content b,
+            .content strong {
+                color: var(--accent-primary);
+                font-weight: 700;
+                background: linear-gradient(120deg, var(--table-cell-bg) 0%, var(--table-cell-bg) 100%);
+                background-size: 100% 0.3em;
+                background-repeat: no-repeat;
+                background-position: 0 88%;
+                padding: 0 0.2em;
+                border-radius: 0.2em;
+                transition: all 0.3s ease;
+            }
+
+            .content li>b:first-child,
+            .content li>strong:first-child {
+                display: inline-block;
+                background: var(--accent-gradient);
+                color: white;
+                padding: 0.1em 0.3em;
+                border-radius: 0.4em;
+                margin-right: 0.3em;
+                font-size: 0.85em;
+                box-shadow: 0 2px 6px var(--shadow-color);
+                text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+            }
+
+            /* Superscript styling for references */
+            .content sup {
+                color: var(--accent-tertiary);
+                font-weight: 600;
+            }
+
+            .content sup a {
+                color: var(--accent-tertiary);
+                font-weight: 600;
+            }
+
+            /* Divs with width styling (two-column layouts) */
+            .content>div[style*="width"] {
+                background: var(--card-bg);
+                border-radius: 1rem;
+                padding: 1rem;
+                margin: 0.5rem;
+                box-shadow: 0 2px 10px var(--shadow-color);
+                border: 1px solid var(--card-border);
+            }
+
+            /* Topic Headings */
+            .content .topichighlight {
+                background: linear-gradient(135deg, #1E6091, #52B788);
+                color: #FFFFFF;
+                padding: 0.5em 1em;
+                border-radius: 0.5em;
+                display: inline-block;
+                box-shadow: 0 2px 8px rgba(82, 183, 136, 0.35);
+            }
+
+            .content .topicheading {
+                background: var(--accent-gradient);
+                color: #FFFFFF;
+                vertical-align: middle;
+                border-radius: 0 2vmax 2vmax 0;
+                height: 4vmax;
+                line-height: 4vmax;
+                padding-left: 1.5vmax;
+                padding-right: 1vmax;
+                margin: 0.1vmax 0 1vmax 0;
+                width: 55%;
+                font-weight: 600;
+                box-shadow: 0 4px 15px var(--shadow-color);
+                position: relative;
+                overflow: hidden;
+            }
+
+            .content .topicheading::after {
+                content: '';
+                position: absolute;
+                top: 0;
+                right: 0;
+                width: 30%;
+                height: 100%;
+                background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2));
+            }
+
+            .content .topicsubheading {
+                background: var(--accent-gradient);
+                color: #FFFFFF;
+                vertical-align: middle;
+                border-radius: 0 1.5vmax 1.5vmax 0;
+                height: 3vmax;
+                margin: 0.1vmax 0 1vmax 0;
+                font-size: 95%;
+                line-height: 3vmax;
+                padding-left: 1.5vmax;
+                padding-right: 1vmax;
+                width: 85%;
+                font-weight: 600;
+                box-shadow: 0 3px 12px var(--shadow-color);
+            }
+
+            /* Flex and Grid Content */
+            .content .flexcontent {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+                gap: 0.9rem;
+                align-items: center;
+                justify-items: center;
+                width: 100%;
+                max-width: 100%;
+                margin: 0.4rem auto;
+                padding: 0.4rem;
+                font-size: 2.8vmin;
+            }
+
+            .content .gridcontent {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+                grid-gap: 1rem;
+            }
+
+            /* Lists - Enhanced Visual Styling */
+            .content ul,
+            .content ol {
+                padding-left: 0.5em;
+                margin: 0.8em 0;
+                list-style: none;
+            }
+
+            .content li {
+                line-height: 1.5em;
+                margin-bottom: 0.6em;
+                position: relative;
+                padding-left: 1.8em;
+                padding-right: 0.5em;
+                padding-top: 0.1em;
+                padding-bottom: 0.1em;
+                border-radius: 0.5em;
+                transition: all 0.3s ease;
+            }
+
+            /* Unordered list custom bullet */
+            .content ul>li::before {
+                content: '';
+                position: absolute;
+                left: 0.4em;
+                top: 0.85em;
+                width: 0.5em;
+                height: 0.5em;
+                background: var(--accent-gradient);
+                border-radius: 50%;
+                box-shadow: 0 0 6px var(--glow-color);
+            }
+
+            /* Ordered list custom numbers */
+            .content ol {
+                counter-reset: item;
+            }
+
+            .content ol>li {
+                counter-increment: item;
+            }
+
+            .content ol>li::before {
+                content: counter(item);
+                position: absolute;
+                left: 0.2em;
+                top: 0.3em;
+                width: 1.4em;
+                height: 1.4em;
+                background: var(--accent-gradient);
+                color: white;
+                border-radius: 50%;
+                font-size: 0.75em;
+                font-weight: 700;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                box-shadow: 0 2px 8px var(--shadow-color);
+            }
+
+            /* Nested lists */
+            .content ul ul,
+            .content ol ul,
+            .content ul ol,
+            .content ol ol {
+                margin: 0.4em 0 0.4em 0.5em;
+                padding-left: 0.3em;
+            }
+
+            .content ul ul>li::before,
+            .content ol ul>li::before {
+                width: 0.4em;
+                height: 0.4em;
+                background: var(--accent-secondary);
+                top: 0.9em;
+            }
+
+            .content ol ol>li::before,
+            .content ul ol>li::before {
+                width: 1.2em;
+                height: 1.2em;
+                font-size: 0.65em;
+                background: var(--accent-secondary);
+            }
+
+            /* List item hover effect */
+            .content li:hover {
+                background: var(--table-cell-bg);
+                border-radius: 0.5em;
+            }
+
+
+            .split-slide {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 1.2rem;
+                width: 100%;
+                height: 100%;
+                align-items: stretch;
+                overflow: hidden;
+            }
+
+            .split-text {
+                min-width: 0;
+                overflow-y: auto;
+                overflow-x: hidden;
+                padding-right: 0.8rem;
+                box-sizing: border-box;
+            }
+
+            .split-media {
+                min-width: 0;
+                overflow: hidden;
+                padding-left: 0.8rem;
+                box-sizing: border-box;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+
+            .split-media figure {
+                margin: 0;
+                width: 100%;
+                height: 100%;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+            }
+
+            .split-media figure img {
+                width: 100%;
+                max-width: 100%;
+                max-height: 78%;
+                object-fit: contain;
+            }
+
+            .split-media figure figcaption {
+                width: 96%;
+                margin-top: 0.6rem;
+                text-align: center;
+            }
+
+            /* Links */
+            .content a:link,
+            .content a:visited {
+                color: var(--accent-tertiary);
+                text-decoration: none;
+                border-bottom: 1px dashed var(--accent-tertiary);
+                transition: all 0.3s ease;
+            }
+
+            .content a:hover {
+                color: var(--accent-secondary);
+                border-bottom-style: solid;
+            }
+
+            /* Tables - Enhanced Visual Styling */
+            .content table {
+                color: var(--text-primary);
+                font-size: 100%;
+                width: 100%;
+                border-collapse: separate;
+                border-spacing: 0.4rem;
+                margin: 1em 0;
+                background: var(--card-bg);
+                border-radius: 1rem;
+                padding: 0.5rem;
+                box-shadow: 0 4px 20px var(--shadow-color);
+            }
+
+            .content th {
+                color: #FFFFFF;
+                background: var(--table-header-bg);
+                border-radius: 0.8rem;
+                font-size: 105%;
+                padding: 0.8em 1em;
+                font-weight: 600;
+                text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+                position: relative;
+                overflow: hidden;
+            }
+
+            .content th::after {
+                content: '';
+                position: absolute;
+                top: 0;
+                right: 0;
+                width: 30%;
+                height: 100%;
+                background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.15));
+                pointer-events: none;
+            }
+
+            .content td {
+                color: var(--text-primary);
+                padding: 0.7em 1em;
+                background: var(--table-cell-bg);
+                border-radius: 0.6rem;
+                -webkit-backdrop-filter: blur(5px);
+                backdrop-filter: blur(5px);
+                transition: all 0.3s ease;
+                border-left: 3px solid transparent;
+            }
+
+            .content tr:hover td {
+                background: var(--card-border);
+                border-left-color: var(--accent-primary);
+                transform: translateX(3px);
+            }
+
+            /* Figures and Images - Enhanced */
+            .content figure {
+                max-width: 90%;
+                max-height: 90%;
+                margin: 1em auto;
+                text-align: center;
+                padding: 0.8rem;
+                background: var(--card-bg);
+                border-radius: 1.2rem;
+                box-shadow: 0 4px 20px var(--shadow-color);
+                border: 1px solid var(--card-border);
+            }
+
+            .content .fullwidth img {
+                max-width: 90%;
+                max-height: 90%;
+            }
+
+            .content figure img {
+                max-width: 50vmin;
+                max-height: 50vmin;
+                display: block;
+                margin: 0 auto;
+                border-radius: 0.8rem;
+                box-shadow: 0 4px 15px var(--shadow-color);
+                transition: transform 0.3s ease, box-shadow 0.3s ease;
+            }
+
+            .content figure img:hover {
+                transform: scale(1.02);
+                box-shadow: 0 8px 25px var(--glow-color);
+            }
+
+            .content figure figcaption {
+                max-width: 95%;
+                margin: 0.8rem auto 0;
+                font-size: 90%;
+                text-align: center;
+                padding: 0.5rem 1rem;
+                background: var(--accent-gradient);
+                color: white;
+                border-radius: 2rem;
+                font-weight: 500;
+                font-style: normal;
+                box-shadow: 0 2px 10px var(--shadow-color);
+            }
+
+            /* Flexcontent images (multiple images) */
+            .content .flexcontent {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+                gap: 0.9rem;
+                align-items: center;
+                justify-items: center;
+                width: 100%;
+                max-width: 100%;
+                margin: 0.4rem auto;
+                padding: 0.4rem;
+                overflow: hidden;
+            }
+
+            .content .flexcontent img {
+                border-radius: 0.8rem;
+                box-shadow: 0 4px 15px var(--shadow-color);
+                transition: all 0.3s ease;
+                border: 2px solid var(--card-border);
+                width: clamp(220px, 36vmin, 420px);
+                max-width: 100%;
+                height: auto;
+                max-height: 36vmin;
+                object-fit: contain;
+            }
+
+            .content .flexcontent img:hover {
+                transform: scale(1.03) rotate(1deg);
+                box-shadow: 0 8px 25px var(--glow-color);
+                border-color: var(--accent-primary);
+            }
+
+            /* Code and Pre - Enhanced */
+            .content pre {
+                background: var(--code-bg);
+                border: 1px solid var(--card-border);
+                border-left: 4px solid var(--accent-primary);
+                border-radius: 0 0.8rem 0.8rem 0;
+                padding: 1.2rem 1.5rem;
+                overflow-x: auto;
+                font-family: 'Consolas', 'Monaco', 'Fira Code', monospace;
+                font-size: 85%;
+                line-height: 1.6;
+                box-shadow: 0 4px 15px var(--shadow-color);
+                position: relative;
+            }
+
+            .content pre::before {
+                content: 'CODE';
+                position: absolute;
+                top: 0;
+                right: 0;
+                background: var(--accent-gradient);
+                color: white;
+                font-size: 0.6em;
+                padding: 0.2em 0.8em;
+                border-radius: 0 0.8rem 0 0.5rem;
+                font-weight: 600;
+                letter-spacing: 0.5px;
+            }
+
+            .content code {
+                font-family: 'Consolas', 'Monaco', 'Fira Code', monospace;
+                background: var(--table-cell-bg);
+                padding: 0.15em 0.4em;
+                border-radius: 0.3em;
+                font-size: 90%;
+                color: var(--accent-primary);
+                border: 1px solid var(--card-border);
+            }
+
+            /* Inline code in pre should not have extra styling */
+            .content pre code {
+                background: transparent;
+                padding: 0;
+                border: none;
+                color: inherit;
+            }
+
+            /* Footer Styles */
+            .footer {
+                height: 3.2vmax;
+                line-height: 3.2vmax;
+                background: var(--footer-bg);
+                margin: 0;
+                padding: 0 1vmax;
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                box-shadow: 0 -4px 20px var(--shadow-color);
+            }
+
+            .footer .contact {
+                color: #ffffff;
+                text-align: left;
+                font-size: 2.8vmin;
+                font-weight: 500;
+                text-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+            }
+
+            .footer .navigation {
+                display: flex;
+                align-items: center;
+                gap: 0.5rem;
+                font-size: 2.8vmin;
+                color: #ffffff;
+                font-weight: 600;
+            }
+
+            .footer .navigation a {
+                color: #ffffff;
+                text-decoration: none;
+                padding: 0.3rem 0.6rem;
+                border-radius: 0.5rem;
+                transition: all 0.3s ease;
+                display: inline-flex;
+                align-items: center;
+            }
+
+            .footer .navigation a:hover {
+                background: rgba(255, 255, 255, 0.2);
+            }
+
+            .footer .navigation .next::after {
+                content: " >";
+                margin-left: 0.2rem;
+            }
+
+            .footer .navigation .prev::after {
+                content: "< ";
+                margin-right: 0.2rem;
+            }
+
+            /* Jupyter/Highlight Styles - Enhanced */
+            .highlight {
+                background: var(--code-bg);
+                border-radius: 0.8rem;
+                padding: 1rem;
+                border: 1px solid var(--card-border);
+                border-left: 4px solid var(--accent-tertiary);
+                box-shadow: 0 4px 15px var(--shadow-color);
+                position: relative;
+                margin: 0.5em 0;
+            }
+
+            .highlight::before {
+                content: 'PYTHON';
+                position: absolute;
+                top: 0;
+                right: 0;
+                background: linear-gradient(135deg, #1D4ED8, #3B82F6);
+                color: white;
+                font-size: 0.55em;
+                padding: 0.2em 0.8em;
+                border-radius: 0 0.8rem 0 0.5rem;
+                font-weight: 600;
+                letter-spacing: 0.5px;
+            }
+
+            .highlight pre {
+                margin: 0;
+                padding: 0;
+                background: transparent;
+                border: none;
+                box-shadow: none;
+            }
+
+            .highlight pre::before {
+                display: none;
+            }
+
+            .highlight .c {
+                color: #6b7280;
+                font-style: italic
+            }
+
+            .highlight .err {
+                border: 1px solid #ef4444;
+                border-radius: 2px;
+            }
+
+            .highlight .k {
+                color: var(--accent-primary);
+                font-weight: bold
+            }
+
+            .highlight .o {
+                color: var(--text-secondary)
+            }
+
+            .highlight .ch {
+                color: #6b7280;
+                font-style: italic
+            }
+
+            .highlight .c1 {
+                color: #6b7280;
+                font-style: italic
+            }
+
+            .highlight .cs {
+                color: #6b7280;
+                font-style: italic
+            }
+
+            .highlight .cm {
+                color: #6b7280;
+                font-style: italic
+            }
+
+            .highlight .nn {
+                color: var(--accent-tertiary);
+                font-weight: bold
+            }
+
+            .highlight .s2 {
+                color: var(--highlight-color)
+            }
+
+            .highlight .s1 {
+                color: var(--highlight-color)
+            }
+
+            .highlight .kn {
+                color: var(--accent-primary);
+                font-weight: bold
+            }
+
+            .highlight .nb {
+                color: var(--accent-secondary)
+            }
+
+            .highlight .n {
+                color: var(--text-primary)
+            }
+
+            .highlight .p {
+                color: var(--text-secondary)
+            }
+
+            .highlight .mb {
+                color: var(--highlight-color)
+            }
+
+            .highlight .mf {
+                color: var(--highlight-color)
+            }
+
+            .highlight .mh {
+                color: var(--highlight-color)
+            }
+
+            .highlight .mi {
+                color: var(--highlight-color)
+            }
+
+            .highlight .mo {
+                color: var(--highlight-color)
+            }
+
+            /* Title slide (slide 1) special styling */
+            #slide1 .content {
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                align-items: center;
+                text-align: center;
+            }
+
+            #slide1 .content h1 {
+                font-size: 3vw;
+                line-height: 1.2;
+                padding-bottom: 0.2em;
+                margin-bottom: 2rem;
+                animation: titleGlow 3s ease-in-out infinite alternate;
+            }
+
+            @keyframes titleGlow {
+                from {
+                    text-shadow: 0 0 20px var(--glow-color);
+                }
+
+                to {
+                    text-shadow: 0 0 40px var(--glow-color), 0 0 60px var(--accent-tertiary);
+                }
+            }
+
+            #slide1 .content p {
+                font-size: 1.2em;
+                max-width: 600px;
+                background: var(--card-bg);
+                padding: 1.5rem 2rem;
+                border-radius: 1rem;
+                box-shadow: 0 8px 30px var(--shadow-color);
+                border: 1px solid var(--card-border);
+            }
+
+            #slide1 .content img {
+                margin-top: 1rem;
+                border-radius: 0.5rem;
+                box-shadow: 0 4px 15px var(--shadow-color);
+            }
+
+            /* Responsive Styles */
+            @media (max-width: 640px),
+            screen and (orientation: portrait) {
+                body {
+                    max-width: 100%;
+                    max-height: 100%;
+                }
+
+                .slide {
+                    height: 100vh;
+                    width: 100%;
+                }
+
+                .content {
+                    height: calc(100vh - 5.5vmax - 3.2vmax - 0.6vmax);
+                    width: 100%;
+                    padding: 1vw;
+                    line-height: 3.5vmax;
+                    font-size: 1.8vmax;
+                }
+
+                .content .topicheading,
+                .content .topicsubheading {
+                    width: 95%;
+                }
+
+                .content h1,
+                .content h2,
+                .content h3,
+                .content h4 {
+                    width: 100%;
+                }
+
+                .content figure img {
+                    max-width: 80vmin;
+                    max-height: 50vmin;
+                }
+
+                .header h1 {
+                    font-size: 2.5vmax;
+                    padding: 0 1rem;
+                }
+
+                .theme-toggle {
+                    width: 40px;
+                    height: 40px;
+                    top: 0.5rem;
+                    right: 0.5rem;
+                }
+            }
+
+            @media print {
+                body {
+                    max-width: 100%;
+                    max-height: 100%;
+                }
+
+                body::before {
+                    display: none;
+                }
+
+                .theme-toggle {
+                    display: none;
+                }
+
+                .content {
+                    font-size: 2.8vmin;
+                }
+
+                .content .flexcontent {
+                    font-size: 2.5vmin;
+                }
+
+            }
+
+            /* Smooth scrollbar */
+            ::-webkit-scrollbar {
+                width: 8px;
+                height: 8px;
+            }
+
+            ::-webkit-scrollbar-track {
+                background: var(--bg-secondary);
+                border-radius: 4px;
+            }
+
+            ::-webkit-scrollbar-thumb {
+                background: var(--accent-primary);
+                border-radius: 4px;
+            }
+
+            ::-webkit-scrollbar-thumb:hover {
+                background: var(--accent-secondary);
+            }
+        </style>
+        <script src="../../../../../fr/enseignement/cours/2020/MachineLearning/tex-mml-chtml.js"
+            id="MathJax-script"></script>
+    </head>
+
+    <body>
+        <!-- Theme Toggle Button -->
+        <button class="theme-toggle" onclick="toggleTheme()" aria-label="Toggle theme">
+            <svg class="sun-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path
+                    d="M12 3V1m0 22v-2M4.22 4.22l1.42 1.42m12.72 12.72l1.42 1.42M1 12h2m18 0h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42M12 6a6 6 0 100 12 6 6 0 000-12z" />
+            </svg>
+            <svg class="moon-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z" />
+            </svg>
+        </button>
+        <section class="slide" id="slide1">
+            <div class="header">
+            </div>
+            <div class="content">
+                <h1 style="font-size:3.5vw">Data Mining and Machine Learning</h1>
+                <p><b>John Samuel</b></br>
+                    CPE Lyon<br /><br />
+                    <b>Year</b>: 2025-2026<br />
+                    <b>Email</b>: john.samuel@cpe.fr</br>
+                    </br>
+                    <a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/"><img
+                            alt="Creative Commons License" style="border-width:0"
+                            src="../../../../../en/teaching/courses/2017/C/88x31.png" /></a>
+                </p>
+            </div>
+            <div class="footer">
+                <div class="contact">Data Mining and Machine Learning | John Samuel</div>
+                <div class="navigation">1
+
+                    <a class="next" href="#slide2"></a>
+                </div>
+            </div>
+        </section>
+        <section class="slide" id="slide2">
+            <div class="header">
+                <h1>Data Mining</h1>
+            </div>
+            <div class="content">
+                <h3 class="topicsubheading">Objectives</h3>
+                <ol>
+                    <li>Machine Learning</li>
+                    <li>Deep Learning</li>
+                    <li>Reinforcement Learning</li>
+                    <li>Data licenses, ethics and privacy</li>
+                </ol>
+            </div>
+            <div class="footer">
+                <div class="contact">Data Mining and Machine Learning | John Samuel</div>
+                <div class="navigation">2
+                    <a class="prev" href="#slide1"></a>
+                    <a class="next" href="#slide3"></a>
+                </div>
+            </div>
+        </section>
+        <section class="slide" id="slide3">
+            <div class="header">
+                <h1>3.1. Machine Learning</h1>
+            </div>
+            <div class="content">
+                <h2 class="topicsubheading">Biological Neurons</h2>
+                <figure>
+                    <img src="../../2021/MachineLearning/Neuron3.png" alt="Neuron3" height="350px" />
+                    <figcaption>Biological neuron<sup>1</sup></figcaption>
+                </figure>
+                <ol style="font-size:2vh">
+                    <li>https://en.wikipedia.org/wiki/File:Neuron3.png</li>
+                </ol>
+            </div>
+            <div class="footer">
+                <div class="contact">Data Mining and Machine Learning | John Samuel</div>
+                <div class="navigation">3
+                    <a class="prev" href="#slide2"></a>
+                    <a class="next" href="#slide4"></a>
+                </div>
+            </div>
+        </section>
+        <section class="slide" id="slide4">
+            <div class="header">
+                <h1>3.1. Machine Learning</h1>
+            </div>
+            <div class="content">
+                <h3 class="topicsubheading">Introduction</h3>
+                <figure>
+                    <img src="../../../../../en/teaching/courses/2017/DataMining/images/Colored_neural_network.svg"
+                        alt="Colored neural network" />
+                    <figcaption>Artificial neural networks</figcaption>
+                </figure>
+            </div>
+            <div class="footer">
+                <div class="contact">Data Mining and Machine Learning | John Samuel</div>
+                <div class="navigation">4
+                    <a class="prev" href="#slide3"></a>
+                    <a class="next" href="#slide5"></a>
+                </div>
+            </div>
+        </section>
+        <section class="slide" id="slide5">
+            <div class="header">
+                <h1>3.1. Machine Learning</h1>
+            </div>
+            <div class="content">
+                <h2 class="topicsubheading">Neural Network</h2>
+                <p>Neural networks are commonly used in the field of machine learning, particularly in tasks such as
+                    classification, regression, image recognition, natural language processing, and many others. An
+                    artificial neural network is a collection of interconnected units called artificial neurons. These
+                    networks are inspired by the structure of the biological brain.</p>
+                <ul>
+                    <li><b>Connections</b>: Each connection between neurons, similar to synapses in the biological
+                        brain, can transmit a signal to other neurons.</li>
+                    <li><b>Signal transmission</b>: An artificial neuron receives a signal, processes it using a
+                        nonlinear function, and can then transmit a signal to neurons connected to it.</li>
+                    <li><b>Activation function</b>: The output of each neuron is computed by a nonlinear function
+                        applied to the weighted sum of its inputs. This activation function introduces nonlinearity into
+                        the network, allowing complex relationships to be modeled.</li>
+                </ul>
+            </div>
+            <div class="footer">
+                <div class="contact">Data Mining and Machine Learning | John Samuel</div>
+                <div class="navigation">5
+                    <a class="prev" href="#slide4"></a>
+                    <a class="next" href="#slide6"></a>
+                </div>
+            </div>
+        </section>
+        <section class="slide" id="slide6">
+            <div class="header">
+                <h1>3.1. Machine Learning</h1>
+            </div>
+            <div class="content">
+                <h2 class="topicsubheading">Neural Network</h2>
+                <ul>
+                    <li><b>Adjustable weights</b>: Neurons and connections generally have weights that are adjusted as
+                        learning progresses. These weights determine the relative importance of the different inputs for
+                        each neuron.</li>
+                    <li><b>Weight adjustment</b>: Weights can be adjusted to increase or decrease the strength of the
+                        signal at a connection, thus influencing the contribution of that connection to the network's
+                        computations.</li>
+                    <li><b>Threshold</b>: Neurons can have a threshold, such that a signal is only sent if the weighted
+                        sum of its inputs exceeds this threshold. This allows the network to modulate its sensitivity to
+                        inputs.</li>
+                </ul>
+            </div>
+            <div class="footer">
+                <div class="contact">Data Mining and Machine Learning | John Samuel</div>
+                <div class="navigation">6
+                    <a class="prev" href="#slide5"></a>
+                    <a class="next" href="#slide7"></a>
+                </div>
+            </div>
+        </section>
+        <section class="slide" id="slide7">
+            <div class="header">
+                <h1>3.1. Machine Learning</h1>
+            </div>
+            <div class="content">
+                <h2 class="topicsubheading">Layers</h2>
+                <p>Neurons are organized into layers. There are generally three types of layers in a neural network:</p>
+                <ul>
+                    <li><b>Input Layer</b>: This layer receives the initial signals or input data. Each neuron in this
+                        layer represents a feature or input variable.</li>
+                    <li><b>Hidden Layers</b>: These layers perform nonlinear transformations on the inputs. They are
+                        responsible for extracting and representing important features of the data. A neural network can
+                        have one or more hidden layers.</li>
+                    <li><b>Output Layer</b>: This layer generates the network's output. The number of neurons in this
+                        layer depends on the nature of the task; for example, binary classification would have one
+                        output neuron, while multi-class classification would have several.</li>
+                </ul>
+            </div>
+            <div class="footer">
+                <div class="contact">Data Mining and Machine Learning | John Samuel</div>
+                <div class="navigation">7
+                    <a class="prev" href="#slide6"></a>
+                    <a class="next" href="#slide8"></a>
+                </div>
+            </div>
+        </section>
+        <section class="slide" id="slide8">
+            <div class="header">
+                <h1>3.1. Machine Learning</h1>
+            </div>
+            <div class="content">
+                <h2 class="topicsubheading">Layers</h2>
+                <ul>
+                    <li><b>Transformations</b>: Each layer, including the input layer, performs transformations on the
+                        signals it receives. These transformations are determined by the weights of the connections
+                        between neurons.</li>
+                    <li><b>Signal propagation</b>: Signals pass from the first layer (input) to the last layer (output)
+                        through the weighted connections between neurons. This process is often called forward
+                        propagation. During training, backpropagation is used to adjust the weights in order to minimize
+                        the prediction error.</li>
+                    <li><b>Architecture</b>: The way layers are organized and connected in the network constitutes its
+                        architecture. Neural networks can have diverse architectures, including deep networks (with many
+                        hidden layers) or simpler architectures.</li>
+                </ul>
+            </div>
+            <div class="footer">
+                <div class="contact">Data Mining and Machine Learning | John Samuel</div>
+                <div class="navigation">8
+                    <a class="prev" href="#slide7"></a>
+                    <a class="next" href="#slide9"></a>
+                </div>
+            </div>
+        </section>
+        <section class="slide" id="slide9">
+            <div class="header">
+                <h1>3.1. Machine Learning</h1>
+            </div>
+            <div class="content">
+                <h2 class="topicsubheading">Training</h2>
+                <p>The overall goal of training is to adjust the weights of the network so that it can generalize to new
+                    data, producing accurate results for examples it has not seen during training.</p>
+                <ul>
+                    <li><b>Training data</b>: Neural networks learn from examples. Each example consists of an "input"
+                        (the features) and a known "output" (the label or expected output).</li>
+                    <li><b>Error computation</b>: When the network produces an output for a given input, the error is
+                        computed by comparing this output to the target output (the known result). There are different
+                        error measures, but the mean squared error (MSE) is commonly used.</li>
+                </ul>
+            </div>
+            <div class="footer">
+                <div class="contact">Data Mining and Machine Learning | John Samuel</div>
+                <div class="navigation">9
+                    <a class="prev" href="#slide8"></a>
+                    <a class="next" href="#slide10"></a>
+                </div>
+            </div>
+        </section>
+        <section class="slide" id="slide10">
+            <div class="header">
+                <h1>3.1. Machine Learning</h1>
+            </div>
+            <div class="content">
+                <h2 class="topicsubheading">Training</h2>
+                <ul>
+                    <li><b>Backpropagation</b>: The network adjusts its weights using backpropagation. This technique
+                        minimizes the error by modifying the weights from the output layer back to the input layer. The
+                        chain rule of differential calculus is applied to propagate the error through the network.</li>
+                    <li><b>Gradient descent</b>: The learning rule often used to adjust the weights is gradient descent.
+                        It uses the gradient of the error with respect to the weights to update the weights in the
+                        direction that minimizes the error.</li>
+                    <li><b>Iterations</b>: The process of adjusting weights based on the error is repeated for many
+                        examples in the training dataset. Each iteration is called an "epoch." Several epochs may be
+                        needed for the network to converge to a state where the error is sufficiently low.</li>
+                    <li><b>Optimization</b>: Different optimization techniques can be used to improve network
+                        convergence, such as adaptive learning rate adjustment.</li>
+                </ul>
+            </div>
+            <div class="footer">
+                <div class="contact">Data Mining and Machine Learning | John Samuel</div>
+                <div class="navigation">10
+                    <a class="prev" href="#slide9"></a>
+                    <a class="next" href="#slide11"></a>
+                </div>
+            </div>
+        </section>
+        <section class="slide" id="slide11">
+            <div class="header">
+                <h1>3.1. Machine Learning</h1>
+            </div>
+            <div class="content">
+                <h2 class="topicsubheading">Components of Artificial Neural Networks</h2>
+                <ul>
+                    <li><b>Neurons</b>: Artificial neurons are the basic units of a neural network. Each neuron receives
+                        input signals, performs a computation on these signals using an activation function, and
+                        produces an output. Neurons are organized into layers: the input layer, hidden layers, and the
+                        output layer.</li>
+                    <li><b>Connections and Weights</b>: The connections between neurons are represented by weights. Each
+                        connection has an associated weight that determines the relative importance of that connection
+                        in the computation of the output neuron. During training, these weights are adjusted to minimize
+                        the network's prediction error.</li>
+                    <li><b>Propagation Function (Forward Propagation)</b>: The propagation function, also called forward
+                        propagation, describes the process by which signals propagate through the network from the input
+                        layer to the output layer. Each neuron performs a transformation on the signals it receives, and
+                        these modified signals are transmitted to the neurons of the next layer.</li>
+                </ul>
+            </div>
+            <div class="footer">
+                <div class="contact">Data Mining and Machine Learning | John Samuel</div>
+                <div class="navigation">11
+                    <a class="prev" href="#slide10"></a>
+                    <a class="next" href="#slide12"></a>
+                </div>
+            </div>
+        </section>
+        <section class="slide" id="slide12">
+            <div class="header">
+                <h1>3.1. Machine Learning</h1>
+            </div>
+            <div class="content">
+                <h2 class="topicsubheading">Components of Artificial Neural Networks</h2>
+                <h2 class="topicsubheading">Neurons</h2>
+                <p>Each artificial neuron has inputs, which can be the feature values of an external data sample, and
+                    produces a single output. This output can be sent to several other neurons, forming the
+                    interconnected structure of the neural network. The <b>activation function</b> plays a crucial role
+                    in computing the output of a neuron. The process involves the following steps:</p>
+                <ul>
+                    <li><b>Weighted sum</b>: To find the neuron's output, the weighted sum of all inputs is taken. Each
+                        input is multiplied by the weight corresponding to the connection.</li>
+                </ul>
+            </div>
+            <div class="footer">
+                <div class="contact">Data Mining and Machine Learning | John Samuel</div>
+                <div class="navigation">12
+                    <a class="prev" href="#slide11"></a>
+                    <a class="next" href="#slide13"></a>
+                </div>
+            </div>
+        </section>
+        <section class="slide" id="slide13">
+            <div class="header">
+                <h1>3.1. Machine Learning</h1>
+            </div>
+            <div class="content">
+                <h2 class="topicsubheading">Components of Artificial Neural Networks</h2>
+                <h2 class="topicsubheading">Neurons</h2>
+                <ul>
+                    <li><b>Adding a bias term</b>: A bias term is added to the weighted sum. The bias term is an
+                        additional parameter that allows the model to learn an offset or translation.</li>
+                    <li><b>Activation</b>: The weighted sum, sometimes called the activation, is then passed through an
+                        activation function. This function is generally nonlinear and introduces complexity into the
+                        model, allowing the network to capture nonlinear relationships in the data.</li>
+                </ul>
+            </div>
+            <div class="footer">
+                <div class="contact">Data Mining and Machine Learning | John Samuel</div>
+                <div class="navigation">13
+                    <a class="prev" href="#slide12"></a>
+                    <a class="next" href="#slide14"></a>
+                </div>
+            </div>
+        </section>
+        <section class="slide" id="slide14">
+            <div class="header">
+                <h1>3.1. Machine Learning</h1>
+            </div>
+            <div class="content">
+                <h2 class="topicsubheading">Components of Artificial Neural Networks</h2>
+                <p><b>Connections and weights</b>: The neural network is made up of connections, where each connection
+                    transmits the output of one neuron as input to another neuron. Each connection has a weight that
+                    represents its relative importance in signal transmission.</p>
+                <ul>
+                    <li>A given neuron can have <b>multiple input connections</b>, receiving signals from different
+                        neurons, and multiple output connections, transmitting signals to other neurons. The weights
+                        associated with these connections allow the network to modulate the influence of each neuron on
+                        the others, adjusting the strength and direction of signals transmitted through the network.
+                    </li>
+                    <li>This connection and weighting structure is fundamental to the operation of neural networks, as
+                        it allows the network to learn complex representations of data and to adjust its parameters
+                        during training to accomplish specific tasks.</li>
+                </ul>
+            </div>
+            <div class="footer">
+                <div class="contact">Data Mining and Machine Learning | John Samuel</div>
+                <div class="navigation">14
+                    <a class="prev" href="#slide13"></a>
+                    <a class="next" href="#slide15"></a>
+                </div>
+            </div>
+        </section>
+        <section class="slide" id="slide15">
+            <div class="header">
+                <h1>3.1. Machine Learning</h1>
+            </div>
+            <div class="content">
+                <h2 class="topicsubheading">Components of Artificial Neural Networks</h2>
+                <h2 class="topicsubheading">Propagation Function</h2>
+                <p><b>Computing the neuron input</b>: The propagation function computes the input of a neuron by taking
+                    the weighted sum of the outputs of its predecessors, where each output is multiplied by the weight
+                    of the corresponding connection. This can be represented mathematically as:</p>
+                <p>\[ \text{Neuron Input} = \sum_{i=1}^{n} (\text{Predecessor Output}_i \times \text{Weight}_i)
+                    \]
+                    where \(n\) is the number of input connections.</p>
+            </div>
+            <div class="footer">
+                <div class="contact">Data Mining and Machine Learning | John Samuel</div>
+                <div class="navigation">15
+                    <a class="prev" href="#slide14"></a>
+                    <a class="next" href="#slide16"></a>
+                </div>
+            </div>
+        </section>
+        <section class="slide" id="slide16">
+            <div class="header">
+                <h1>3.1. Machine Learning</h1>
+            </div>
+            <div class="content">
+                <h2 class="topicsubheading">Components of Artificial Neural Networks</h2>
+                <h2 class="topicsubheading">Propagation Function</h2>
+                <p><b>Adding a bias term</b>: A bias term can be added to the result of the propagation. The bias term
+                    is an additional parameter, often represented by \(b\) in equations, which allows the model to learn
+                    an offset or translation. This gives the final form of the neuron input:</p>
+
+                <p>\[ \text{Neuron Input} = \sum_{i=1}^{n} (\text{Predecessor Output}_i \times \text{Weight}_i)
+                    +
+                    \text{Bias} \]</p>
+
+            </div>
+            <div class="footer">
+                <div class="contact">Data Mining and Machine Learning | John Samuel</div>
+                <div class="navigation">16
+                    <a class="prev" href="#slide15"></a>
+                    <a class="next" href="#slide17"></a>
+                </div>
+            </div>
+        </section>
+        <section class="slide" id="slide17">
+            <div class="header">
+                <h1>3.1. Machine Learning</h1>
+            </div>
+            <div class="content">
+                <h2 class="topicsubheading">Components of Artificial Neural Networks</h2>
+                <h2 class="topicsubheading">Propagation Function</h2>
+                <p><b>Activation Function</b>: After computing the neuron's input, it is passed through an activation
+                    function. This function introduces nonlinearity into the model, allowing the neural network to
+                    capture complex relationships and learn nonlinear patterns. Some commonly used activation functions
+                    include:</p>
+                <ul>
+                    <li><b>Sigmoid</b>: \( \sigma(x) = \frac{1}{1 + e^{-x}} \)</li>
+                    <li><b>Hyperbolic tangent (tanh)</b>: \( \text{tanh}(x) = \frac{e^{x} - e^{-x}}{e^{x} + e^{-x}}
+                        \)
+                    </li>
+                    <li><b>ReLU (Rectified Linear Unit)</b>: \( \text{ReLU}(x) = \max(0, x) \)</li>
+                    <li><b>Softmax</b> (for the output layer in classification): \( \text{Softmax}(x)_i =
+                        \frac{e^{x_i}}{\sum_{j} e^{x_j}} \)</li>
+                </ul>
+            </div>
+            <div class="footer">
+                <div class="contact">Data Mining and Machine Learning | John Samuel</div>
+                <div class="navigation">17
+                    <a class="prev" href="#slide16"></a>
+                    <a class="next" href="#slide18"></a>
+                </div>
+            </div>
+        </section>
+        <section class="slide" id="slide18">
+            <div class="header">
+                <h1>3.1. Machine Learning</h1>
+            </div>
+            <div class="content">
+                <h3 class="topicsubheading">Perceptron</h3>
+                <p>The perceptron is a <b>supervised learning algorithm</b> used for <b>binary classification</b>. It is
+                    designed to solve problems where the objective is to determine whether a given input belongs to a
+                    particular class or not.</p>
+                <ul>
+                    <li>The perceptron was invented by <b>Frank Rosenblatt</b> in 1958. The idea was to create a simple
+                        model of an artificial neuron inspired by the functioning of biological neurons. Rosenblatt
+                        formulated a learning algorithm that allows the perceptron to adjust its weights based on
+                        classification errors, thus improving its performance over time.</li>
+                </ul>
+            </div>
+            <div class="footer">
+                <div class="contact">Data Mining and Machine Learning | John Samuel</div>
+                <div class="navigation">18
+                    <a class="prev" href="#slide17"></a>
+                    <a class="next" href="#slide19"></a>
+                </div>
+            </div>
+        </section>
+        <section class="slide" id="slide19">
+            <div class="header">
+                <h1>3.1. Machine Learning</h1>
+            </div>
+            <div class="content">
+                <h3 class="topicsubheading">Perceptron</h3>
+                <ul>
+                    <li><b>Operation</b>: The perceptron takes several weighted inputs and combines them into a sum.
+                        This sum is then passed through an activation function, typically a step function, which
+                        produces the binary output of the perceptron.</li>
+                    <li><b>Limitations</b>: The perceptron has limitations, notably its inability to solve nonlinear
+                        problems and to learn complex patterns. However, it laid the groundwork for the development of
+                        more advanced neural networks, particularly multilayer networks that can learn hierarchical
+                        representations.</li>
+                </ul>
+            </div>
+            <div class="footer">
+                <div class="contact">Data Mining and Machine Learning | John Samuel</div>
+                <div class="navigation">19
+                    <a class="prev" href="#slide18"></a>
+                    <a class="next" href="#slide20"></a>
+                </div>
+            </div>
+        </section>
+        <section class="slide" id="slide20">
+            <div class="header">
+                <h1>3.1. Machine Learning</h1>
+            </div>
+            <div class="content">
+                <h1 class="topicsubheading">Perceptron</h1>
+                <figure>
+                    <img src="../../2021/MachineLearning/Perceptron_example.svg" alt="Perceptron example"
+                        height="350px" />
+                    <figcaption>Perceptron updating its linear boundary as more training examples are added.<sup>1</sup>
+                    </figcaption>
+                </figure>
+                <ol style="font-size:2vh">
+                    <li>Source: https://en.wikipedia.org/wiki/File:Perceptron_example.svg</li>
+                </ol>
+            </div>
+            <div class="footer">
+                <div class="contact">Data Mining and Machine Learning | John Samuel</div>
+                <div class="navigation">20
+                    <a class="prev" href="#slide19"></a>
+                    <a class="next" href="#slide21"></a>
+                </div>
+            </div>
+        </section>
+        <section class="slide" id="slide21">
+            <div class="header">
+                <h1>3.1. Machine Learning</h1>
+            </div>
+            <div class="content">
+                <h1 class="topicsubheading">Perceptron</h1>
+                <figure>
+                    <img src="../../../../../en/teaching/courses/2017/DataMining/images/Perceptron.svg" alt="Perceptron"
+                        height="400px" />
+                    <figcaption>Perceptron</figcaption>
+                </figure>
+            </div>
+            <div class="footer">
+                <div class="contact">Data Mining and Machine Learning | John Samuel</div>
+                <div class="navigation">21
+                    <a class="prev" href="#slide20"></a>
+                    <a class="next" href="#slide22"></a>
+                </div>
+            </div>
+        </section>
+        <section class="slide" id="slide22">
+            <div class="header">
+                <h1>3.1. Machine Learning</h1>
+            </div>
+            <div class="content">
+                <h1 class="topicsubheading">Perceptron: Formal Definition</h1>
+                <ul>
+                    <li>Let \(y = f(z)\) be the output of the perceptron for an input vector <i>z</i></li>
+                    <li>Let \(N\) be the number of training examples</li>
+                    <li>Let <i><b>X</b></i> be the feature input space</li>
+                    <li>Let \({(x_{1}, d_{1}),...,(x_{N}, d_{N})}\) be the <i><b>N</b></i> training examples, where
+                        <ul>
+                            <li>\(x_i\) is the feature vector of the <i>i<sup>th</sup></i> training example.</li>
+                            <li>\(d_i\) is the desired output value</li>
+                            <li>\(x_{j,i}\) is the <i>i<sup>th</sup></i> feature of the <i>j<sup>th</sup></i> training
+                                example.</li>
+                            <li>\(x_{j,0} = 1\)</li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+            <div class="footer">
+                <div class="contact">Data Mining and Machine Learning | John Samuel</div>
+                <div class="navigation">22
+                    <a class="prev" href="#slide21"></a>
+                    <a class="next" href="#slide23"></a>
+                </div>
+            </div>
+        </section>
+        <section class="slide" id="slide23">
+            <div class="header">
+                <h1>3.1. Machine Learning</h1>
+            </div>
+            <div class="content">
+                <h3 class="topicsubheading">Perceptron: Formal Definition</h3>
+                <ul>
+                    <li>The weights are represented as follows:
+                        <ul>
+                            <li>\(w_i\) is the <i>i<sup>th</sup></i> value of the weight vector.</li>
+                            <li>\(w_i(t)\) is the <i>i<sup>th</sup></i> value of the weight vector at a given time t.
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+            <div class="footer">
+                <div class="contact">Data Mining and Machine Learning | John Samuel</div>
+                <div class="navigation">23
+                    <a class="prev" href="#slide22"></a>
+                    <a class="next" href="#slide24"></a>
+                </div>
+            </div>
+        </section>
+        <section class="slide" id="slide24">
+            <div class="header">
+                <h1>3.1. Machine Learning</h1>
+            </div>
+            <div class="content">
+                <h3 class="topicsubheading">Perceptron: Steps</h3>
+                <ol>
+                    <li>Initialize the weights and thresholds</li>
+                    <li>For each example, \((x_j, d_j)\) in the training set<i></i>
+                        <ul>
+                            <li>Compute the current output: \[y_j(t)= f[w(t).x_j]\] \[= f[w_0(t)x_{j,0} +
+                                w_1(t)x_{j,1} +
+                                w_2(t)x_{j,2} + \dotsb + w_n(t)x_{j,n}]\]</li>
+                            <li>Update the weight: \[w_i(t + 1) = w_i(t) + r. (d_j-y_j(t))x_{j,i}\]</li>
+                        </ul> \(r\) is the learning rate.
+                    </li>
+                </ol>
+            </div>
+            <div class="footer">
+                <div class="contact">Data Mining and Machine Learning | John Samuel</div>
+                <div class="navigation">24
+                    <a class="prev" href="#slide23"></a>
+                    <a class="next" href="#slide25"></a>
+                </div>
+            </div>
+        </section>
+        <section class="slide" id="slide25">
+            <div class="header">
+                <h1>3.1. Machine Learning</h1>
+            </div>
+            <div class="content">
+                <h3 class="topicsubheading">Perceptron: Steps</h3>
+                <ol start="3">
+                    <li>Repeat step 2 until the iteration error \[\frac{1}{s} (&#931; |d_j - y_j(t)|)\] is less than the
+                        user-specified threshold \(\gamma\), or a predetermined number of iterations have been
+                        performed, where \(s\) is again the size of the sample set.</li>
+                </ol>
+            </div>
+            <div class="footer">
+                <div class="contact">Data Mining and Machine Learning | John Samuel</div>
+                <div class="navigation">25
+                    <a class="prev" href="#slide24"></a>
+                    <a class="next" href="#slide26"></a>
+                </div>
+            </div>
+        </section>
+        <section class="slide" id="slide26">
+            <div class="header">
+                <h1>3.1. Machine Learning</h1>
+            </div>
+            <div class="content">
+                <h2 class="topicsubheading">Step Function</h2>
+                <p>The perceptron typically uses a simple activation function, and the step function is frequently
+                    chosen for this task.</p>
+                <h4>Definition</h4>
+                <p>The step function assigns an output of 1 if the weighted sum of the inputs exceeds a certain
+                    threshold, and 0 otherwise.</p>
+                <p>\( f(x) = \begin{cases} 1 & \text{if } x \geq \text{threshold} \\ 0 & \text{otherwise} \end{cases} \)
+                </p>
+            </div>
+            <div class="footer">
+                <div class="contact">Data Mining and Machine Learning | John Samuel</div>
+                <div class="navigation">26
+                    <a class="prev" href="#slide25"></a>
+                    <a class="next" href="#slide27"></a>
+                </div>
+            </div>
+        </section>
+        <section class="slide" id="slide27">
+            <div class="header">
+                <h1>3.1. Machine Learning</h1>
+            </div>
+            <div class="content">
+                <h2 class="topicsubheading">Activation function: Identity function</h2>
+                <h4>Equation</h4>
+                <p>\[f(x)=x\]</p>
+                <h4>Derivative</h4>
+                <p>\[f'(x)=1\]</p>
+                <h3></h3>
+                <figure>
+                    <img src="../../../../../en/teaching/courses/2019/MachineLearning/Activation_identity.svg"
+                        alt="Activation identity" height="380px" />
+                    <figcaption>Identity function</figcaption>
+                </figure>
+            </div>
+            <div class="footer">
+                <div class="contact">Data Mining and Machine Learning | John Samuel</div>
+                <div class="navigation">27
+                    <a class="prev" href="#slide26"></a>
+                    <a class="next" href="#slide28"></a>
+                </div>
+            </div>
+        </section>
+        <section class="slide" id="slide28">
+            <div class="header">
+                <h1>3.1. Machine Learning</h1>
+            </div>
+            <div class="content">
+                <h1 class="topicsubheading">Activation function: Binary step</h2>
+                    <h4>Equation</h4>
+                    <p>\[f(x) = \begin{cases} 0 & \text{for } x
+                        < 0\\ 1 & \text{for } x \ge 0 \end{cases} \]</p>
+                            <h4>Derivative</h4>
+                            <p>\[f'(x) = \begin{cases} 0 & \text{for } x \ne 0\\ ? & \text{for } x = 0\end{cases}\]</p>
+                            <figure>
+                                <img src="../../../../../en/teaching/courses/2019/MachineLearning/Activation_binary_step.svg"
+                                    alt="Activation binary step" height="380px" />
+                                <figcaption>Binary step</figcaption>
+                            </figure>
+            </div>
+            <div class="footer">
+                <div class="contact">Data Mining and Machine Learning | John Samuel</div>
+                <div class="navigation">28
+                    <a class="prev" href="#slide27"></a>
+                    <a class="next" href="#slide29"></a>
+                </div>
+            </div>
+        </section>
+        <section class="slide" id="slide29">
+            <div class="header">
+                <h1>3.1. Machine Learning</h1>
+            </div>
+            <div class="content">
+                <h2 class="topicsubheading">Activation function: Sigmoid function</h2>
+                <h4>Equation</h4>
+                <p>\[f(x)=\sigma(x)=\frac{1}{1+e^{-x}}\]</p>
+                <h4>Derivative</h4>
+                <p>\[f'(x)=f(x)(1-f(x))\]</p>
+                <figure>
+                    <img src="../../2021/MachineLearning/Logistic-curve.svg" alt="Logistic curve" height="380px" />
+                    <figcaption>The sigmoid function</figcaption>
+                </figure>
+            </div>
+            <div class="footer">
+                <div class="contact">Data Mining and Machine Learning | John Samuel</div>
+                <div class="navigation">29
+                    <a class="prev" href="#slide28"></a>
+                    <a class="next" href="#slide30"></a>
+                </div>
+            </div>
+        </section>
+        <section class="slide" id="slide30">
+            <div class="header">
+                <h1>3.1. Machine Learning</h1>
+            </div>
+            <div class="content">
+                <h2 class="topicsubheading">Activation function: TanH</h2>
+                <h4>Equation</h4>
+                <p>\[f(x)=\tanh(x)=\frac{(e^{x} - e^{-x})}{(e^{x} + e^{-x})}\]</p>
+                <h4>Derivative</h4>
+                <p>\[f'(x)=1-f(x)^2\]</p>
+                <figure>
+                    <img src="../../../../../en/teaching/courses/2019/MachineLearning/Activation_tanh.svg"
+                        alt="Activation tanh" height="380px" />
+                    <figcaption>TanH</figcaption>
+                </figure>
+            </div>
+            <div class="footer">
+                <div class="contact">Data Mining and Machine Learning | John Samuel</div>
+                <div class="navigation">30
+                    <a class="prev" href="#slide29"></a>
+                    <a class="next" href="#slide31"></a>
+                </div>
+            </div>
+        </section>
+        <section class="slide" id="slide31">
+            <div class="header">
+                <h1>3.1. Machine Learning</h1>
+            </div>
+            <div class="content">
+                <h2 class="topicsubheading">Activation function: Rectified linear unit: ReLU</h2>
+                <h4>Equation</h4>
+                <p>\[f(x) = \begin{cases} 0 & \text{for } x \le 0\\ x & \text{for } x > 0\end{cases} = \max\{0,x\}= x
+                    \textbf{1}_{x>0}\]</p>
+                <h4>Derivative</h4>
+                <p>\[f'(x) = \begin{cases} 0 & \text{for } x \le 0\\ 1 & \text{for } x > 0\end{cases}\]</p>
+                <figure>
+                    <img src="../../../../../en/teaching/courses/2019/MachineLearning/Activation_rectified_linear.svg"
+                        alt="Activation rectified linear" height="380px" />
+                    <figcaption>Rectified Linear Unit (ReLU)</figcaption>
+                </figure>
+            </div>
+            <div class="footer">
+                <div class="contact">Data Mining and Machine Learning | John Samuel</div>
+                <div class="navigation">31
+                    <a class="prev" href="#slide30"></a>
+                    <a class="next" href="#slide32"></a>
+                </div>
+            </div>
+        </section>
+        <section class="slide" id="slide32">
+            <div class="header">
+                <h1>3.1. Machine Learning</h1>
+            </div>
+            <div class="content">
+                <h2 class="topicsubheading">Activation function: Gaussian</h2>
+                <h4>Equation</h4>
+                <p>\[f(x)=e^{-x^2}\]</p>
+                <h4>Derivative</h4>
+                <p>\[f'(x)=-2xe^{-x^2}\]</p>
+                <figure>
+                    <img src="../../../../../en/teaching/courses/2019/MachineLearning/Activation_gaussian.svg"
+                        alt="Activation gaussian" height="380px" />
+                    <figcaption>Gaussian</figcaption>
+                </figure>
+            </div>
+            <div class="footer">
+                <div class="contact">Data Mining and Machine Learning | John Samuel</div>
+                <div class="navigation">32
+                    <a class="prev" href="#slide31"></a>
+                    <a class="next" href="#slide33"></a>
+                </div>
+            </div>
+        </section>
+        <section class="slide" id="slide33">
+            <div class="header">
+                <h1>3.1. Machine Learning</h1>
+            </div>
+            <div class="content">
+                <h2 class="topicsubheading">Multiclass perceptron</h2>
+                <ul>
+                    <li>The perceptron can be generalized to multiclass classification.</li>
+                    <li>A feature representation function \(f( x , y )\) maps each possible input/output pair to a
+                        finite-dimensional real-valued feature vector.</li>
+                    <li>The feature vector is multiplied by a weight vector \(w\), but the resulting score is now used
+                        to choose among many possible outcomes: \[\hat y =
+                        \operatorname{argmax}_y f(x,y) \cdot w.\]</li>
+                    <li>Re-learning is done by iterating over examples, predicting an outcome for each, leaving the
+                        weights unchanged when the predicted outcome matches the target, and modifying them when it does
+                        not. The update becomes: \[w_{t+1} = w_t + f(x, y) - f(x,\hat y)\].</li>
+
+                </ul>
+            </div>
+            <div class="footer">
+                <div class="contact">Data Mining and Machine Learning | John Samuel</div>
+                <div class="navigation">33
+                    <a class="prev" href="#slide32"></a>
+                    <a class="next" href="#slide34"></a>
+                </div>
+            </div>
+        </section>
+        <section class="slide" id="slide34">
+            <div class="header">
+                <h1>3.2. Deep Learning</h1>
+            </div>
+            <div class="content">
+                <p>A <b>deep neural network</b>, also known as a deeply hierarchical neural network or deep neural
+                    network (DNN), is a type of artificial neural network that includes multiple processing layers,
+                    generally more than two. These networks are called "deep" because of their stacked layer
+                    architecture, enabling the creation of complex hierarchical representations of data.</p>
+                <p><b>Layered architecture</b>: Deep neural networks are composed of multiple layers, generally divided
+                    into three main types:</p>
+                <ul>
+                    <li><b>Input Layer</b>: Receives the raw data or features as input.</li>
+                    <li><b>Hidden Layers</b>: Perform nonlinear transformations and learn hierarchical representations
+                        of the data.</li>
+                    <li><b>Output Layer</b>: Produces the network's output, adapted to the specific task
+                        (classification, regression, etc.).</li>
+                </ul>
+            </div>
+            <div class="footer">
+                <div class="contact">Data Mining and Machine Learning | John Samuel</div>
+                <div class="navigation">34
+                    <a class="prev" href="#slide33"></a>
+                    <a class="next" href="#slide35"></a>
+                </div>
+            </div>
+        </section>
+        <section class="slide" id="slide35">
+            <div class="header">
+                <h1>3.2. Deep Learning</h1>
+            </div>
+            <div class="content">
+                <ul>
+                    <li><b>Hierarchical Learning</b>: The hidden layers of a deep neural network learn increasingly
+                        abstract and complex features as depth increases. Each layer represents an abstraction of the
+                        features extracted by the previous layers.</li>
+                    <li><b>Activation Functions</b>: Nonlinear activation functions, such as ReLU (Rectified Linear
+                        Unit) or its variants, are commonly used in hidden layers to allow the network to learn
+                        nonlinear relationships.</li>
+                    <li><b>Deep Learning</b>: Deep learning involves the simultaneous adjustment of the weights of all
+                        layers in the network to minimize prediction error. This is typically achieved using
+                        backpropagation and gradient descent techniques.</li>
+                    <li><b>Applications</b>: Deep neural networks are used in a variety of tasks, including computer
+                        vision, speech recognition, natural language processing, machine translation, content
+                        recommendation, and many others. Their ability to learn complex representations has led to
+                        significant advances in many areas of artificial intelligence.</li>
+                </ul>
+                <p>Training deep neural networks may require large volumes of data and computing power.</p>
+            </div>
+            <div class="footer">
+                <div class="contact">Data Mining and Machine Learning | John Samuel</div>
+                <div class="navigation">35
+                    <a class="prev" href="#slide34"></a>
+                    <a class="next" href="#slide36"></a>
+                </div>
+            </div>
+        </section>
+        <section class="slide" id="slide36">
+            <div class="header">
+                <h1>3.2. Deep Learning</h1>
+            </div>
+            <div class="content">
+                <h3 class="topicsubheading">Deep Learning</h3>
+                <ul>
+                    <li>The term "deep" refers to a network that has a large number of layers, generally more than
+                        three.</li>
+                    <li>These networks are also called "deep neural networks" or "deep neuronal networks".</li>
+                    <li>Deep neural networks have been made popular by their ability to learn complex hierarchical
+                        representations.</li>
+                </ul>
+            </div>
+            <div class="footer">
+                <div class="contact">Data Mining and Machine Learning | John Samuel</div>
+                <div class="navigation">36
+                    <a class="prev" href="#slide35"></a>
+                    <a class="next" href="#slide37"></a>
+                </div>
+            </div>
+        </section>
+        <section class="slide" id="slide37">
+            <div class="header">
+                <h1>3.2. Deep Learning</h1>
+            </div>
+            <div class="content">
+                <h2 class="topicsubheading">Example: Tensorflow</h2>
+                <div class="highlight">
+                    <pre><span></span><span class="c1"># Import necessary TensorFlow libraries</span>
+<span class="kn">from</span> <span class="nn">tensorflow.keras.models</span> <span class="kn">import</span> <span class="n">Sequential</span>
+<span class="kn">from</span> <span class="nn">tensorflow.keras.layers</span> <span class="kn">import</span> <span class="n">Dense</span>
+<span class="kn">from</span> <span class="nn">tensorflow.keras.optimizers</span> <span class="kn">import</span> <span class="n">SGD</span>
+
+<span class="c1"># Step 1: Create a sequential model</span>
+<span class="n">model</span> <span class="o">=</span> <span class="n">Sequential</span><span class="p">()</span>
+
+<span class="c1"># Step 2: Add a dense layer with ReLU activation function</span>
+<span class="c1"># The layer has 4 neurons, a &#39;relu&#39; activation function, and takes an input of shape (3,)</span>
+<span class="n">model</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">Dense</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="n">activation</span><span class="o">=</span><span class="s1">&#39;relu&#39;</span><span class="p">,</span> <span class="n">input_shape</span><span class="o">=</span><span class="p">(</span><span class="mi">3</span><span class="p">,)))</span>
+</pre>
+                </div>
+            </div>
+            <div class="footer">
+                <div class="contact">Data Mining and Machine Learning | John Samuel</div>
+                <div class="navigation">37
+                    <a class="prev" href="#slide36"></a>
+                    <a class="next" href="#slide38"></a>
+                </div>
+            </div>
+        </section>
+        <section class="slide" id="slide38">
+            <div class="header">
+                <h1>3.2. Deep Learning</h1>
+            </div>
+            <div class="content">
+                <h2 class="topicsubheading">Example: Tensorflow</h2>
+                <div class="highlight">
+                    <pre><span class="c1"># Step 3: Add a dense output layer with softmax activation function</span>
+<span class="c1"># The layer has 2 neurons for a binary classification task, and softmax is used</span>
+<span class="c1"># to obtain probabilities</span>
+<span class="n">model</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">Dense</span><span class="p">(</span><span class="n">units</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">activation</span><span class="o">=</span><span class="s1">&#39;softmax&#39;</span><span class="p">))</span>
+
+<span class="c1"># Step 4: Compile the model</span>
+<span class="c1"># Using stochastic gradient descent (SGD) as optimizer with a learning rate of 0.01</span>
+<span class="c1"># The loss function is &#39;mean_squared_error&#39; for a regression problem</span>
+<span class="c1"># Model performance will be measured in terms of &#39;accuracy&#39;</span>
+<span class="n">sgd</span> <span class="o">=</span> <span class="n">SGD</span><span class="p">(</span><span class="n">lr</span><span class="o">=</span><span class="mf">0.01</span><span class="p">)</span>
+<span class="n">model</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="n">loss</span><span class="o">=</span><span class="s1">&#39;mean_squared_error&#39;</span><span class="p">,</span> <span class="n">optimizer</span><span class="o">=</span><span class="n">sgd</span><span class="p">,</span> <span class="n">metrics</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;accuracy&#39;</span><span class="p">])</span>
+</pre>
+                </div>
+            </div>
+            <div class="footer">
+                <div class="contact">Data Mining and Machine Learning | John Samuel</div>
+                <div class="navigation">38
+                    <a class="prev" href="#slide37"></a>
+                    <a class="next" href="#slide39"></a>
+                </div>
+            </div>
+        </section>
+        <section class="slide" id="slide39">
+            <div class="header">
+                <h1>3.2. Deep Learning</h1>
+            </div>
+            <div class="content">
+                <ul>
+                    <li><b>Step 1</b>: We create a sequential model, which is a linear stack of layers.</li>
+                    <li><b>Step 2</b>: We add a dense layer with 4 neurons using the ReLU activation function. The layer
+                        takes an input of shape (3,) — meaning each training example has three features.</li>
+                    <li><b>Step 3</b>: We add a dense output layer with 2 neurons using the softmax activation function.
+                        This is commonly used for binary classification tasks, providing probabilities for each class.
+                    </li>
+                    <li><b>Step 4</b>: We compile the model by specifying the optimizer (SGD with a learning rate of
+                        0.01), the loss function ('mean_squared_error' for a regression task), and the performance
+                        metrics ('accuracy' to measure model accuracy).</li>
+                </ul>
+            </div>
+            <div class="footer">
+                <div class="contact">Data Mining and Machine Learning | John Samuel</div>
+                <div class="navigation">39
+                    <a class="prev" href="#slide38"></a>
+                    <a class="next" href="#slide40"></a>
+                </div>
+            </div>
+        </section>
+        <section class="slide" id="slide40">
+            <div class="header">
+                <h1>3.2. Deep Learning</h1>
+            </div>
+            <div class="content">
+                <figure>
+                    <img src="../../2021/MachineLearning/Screenshot_2020-10-20 Tensorflow — Neural Network Playground.png"
+                        alt="Screenshot Tensorflow — Neural Network Playground" height="450px" />
+                    <figcaption>Source: https://playground.tensorflow.org/</figcaption>
+                </figure>
+            </div>
+            <div class="footer">
+                <div class="contact">Data Mining and Machine Learning | John Samuel</div>
+                <div class="navigation">40
+                    <a class="prev" href="#slide39"></a>
+                    <a class="next" href="#slide41"></a>
+                </div>
+            </div>
+        </section>
+        <section class="slide" id="slide41">
+            <div class="header">
+                <h1>3.2. Deep Learning</h1>
+            </div>
+            <div class="content">
+                <figure>
+                    <img src="../../2021/MachineLearning/Screenshot_2020-10-20 Tensorflow 2 — Neural Network Playground.png"
+                        alt="Screenshot Tensorflow 2 — Neural Network Playground" height="450px" />
+                    <figcaption>Source: https://playground.tensorflow.org/</figcaption>
+                </figure>
+            </div>
+            <div class="footer">
+                <div class="contact">Data Mining and Machine Learning | John Samuel</div>
+                <div class="navigation">41
+                    <a class="prev" href="#slide40"></a>
+                    <a class="next" href="#slide42"></a>
+                </div>
+            </div>
+        </section>
+        <section class="slide" id="slide42">
+            <div class="header">
+                <h1>3.2. Deep Learning</h1>
+            </div>
+            <div class="content">
+                <h2 class="topicsubheading">Components of Artificial Neural Networks</h2>
+                <h2 class="topicsubheading">Organization</h2>
+                <p>A deep neural network is a complex architecture where information flows from the input layer through
+                    the hidden layers to the output layer. Each connection between neurons is associated with a weight
+                    that is adjusted during the learning process to optimize the model's performance on the specific
+                    task. The use of multiple hidden layers allows the network to learn increasingly abstract and
+                    complex representations of the data.</p>
+                <ul>
+                    <li><b>Multi-layer organization</b>: A deep neural network is structured into multiple layers,
+                        typically comprising an input layer, several hidden layers, and an output layer. Each layer is
+                        made up of neurons, also called nodes or units.</li>
+                    <li><b>Connections between neurons</b>: Neurons in one layer are connected to neurons in the
+                        immediately preceding layer and the immediately following layer. Each connection is associated
+                        with a weight that is adjusted during training.</li>
+                </ul>
+            </div>
+            <div class="footer">
+                <div class="contact">Data Mining and Machine Learning | John Samuel</div>
+                <div class="navigation">42
+                    <a class="prev" href="#slide41"></a>
+                    <a class="next" href="#slide43"></a>
+                </div>
+            </div>
+        </section>
+        <section class="slide" id="slide43">
+            <div class="header">
+                <h1>3.2. Deep Learning</h1>
+            </div>
+            <div class="content">
+                <h2 class="topicsubheading">Components of Artificial Neural Networks</h2>
+                <h2 class="topicsubheading">Organization</h2>
+                <ul>
+                    <li><b>Input layer</b>: The input layer is the first layer of the network. It receives the external
+                        data, often represented by features from a dataset. Each neuron in the input layer corresponds
+                        to a specific feature.</li>
+                    <li><b>Output layer</b>: The output layer is the last layer of the network. It produces the final
+                        result of the model according to the specific task, such as image classification, value
+                        prediction, etc. The number of neurons in this layer depends on the type of problem (for
+                        example, one neuron per class in a classification task).</li>
+                    <li><b>Hidden layers</b>: Between the input layer and the output layer, there can be zero or more
+                        hidden layers. These layers are responsible for extracting complex features from the input data.
+                        Each neuron in a hidden layer combines information from neurons in the previous layer to learn
+                        hierarchical representations.</li>
+                </ul>
+            </div>
+            <div class="footer">
+                <div class="contact">Data Mining and Machine Learning | John Samuel</div>
+                <div class="navigation">43
+                    <a class="prev" href="#slide42"></a>
+                    <a class="next" href="#slide44"></a>
+                </div>
+            </div>
+        </section>
+        <section class="slide" id="slide44">
+            <div class="header">
+                <h1>3.2. Deep Learning</h1>
+            </div>
+            <div class="content">
+                <h2 class="topicsubheading">Components of Artificial Neural Networks</h2>
+                <h2 class="topicsubheading">Organization and Connectivity</h2>
+                <p><b>Fully connected connectivity</b>: In fully connected connectivity, each neuron in one layer is
+                    connected to every neuron in the next layer. This means that all information from the previous layer
+                    is transmitted to each neuron in the next layer. This is the most common configuration in fully
+                    connected layers, typically present in the parts of the network closest to the output.</p>
+            </div>
+            <div class="footer">
+                <div class="contact">Data Mining and Machine Learning | John Samuel</div>
+                <div class="navigation">44
+                    <a class="prev" href="#slide43"></a>
+                    <a class="next" href="#slide45"></a>
+                </div>
+            </div>
+        </section>
+        <section class="slide" id="slide45">
+            <div class="header">
+                <h1>3.2. Deep Learning</h1>
+            </div>
+            <div class="content">
+                <h3 class="topicsubheading">Convolutional Neural Networks</h3>
+                <div class="fullwidth">
+                    <figure>
+                        <img src="../../2021/MachineLearning/Deep_Learning.jpg" alt="Deep Learning" height="400px" />
+                        <figcaption>Source: https://en.wikipedia.org/wiki/File:Deep_Learning.jpg</figcaption>
+                    </figure>
+                </div>
+            </div>
+            <div class="footer">
+                <div class="contact">Data Mining and Machine Learning | John Samuel</div>
+                <div class="navigation">45
+                    <a class="prev" href="#slide44"></a>
+                    <a class="next" href="#slide46"></a>
+                </div>
+            </div>
+        </section>
+        <section class="slide" id="slide46">
+            <div class="header">
+                <h1>3.2. Deep Learning</h1>
+            </div>
+            <div class="content">
+                <h3 class="topicsubheading">Convolutional Neural Networks</h3>
+                <figure class="fullwidth">
+                    <img src="../../../../../en/teaching/courses/2017/DataMining/images/Typical_cnn.png"
+                        alt="Typical cnn" height="400vh" />
+                </figure>
+            </div>
+            <div class="footer">
+                <div class="contact">Data Mining and Machine Learning | John Samuel</div>
+                <div class="navigation">46
+                    <a class="prev" href="#slide45"></a>
+                    <a class="next" href="#slide47"></a>
+                </div>
+            </div>
+        </section>
+        <section class="slide" id="slide47">
+            <div class="header">
+                <h1>3.2. Deep Learning</h1>
+            </div>
+            <div class="content">
+                <h3 class="topicsubheading">Convolutional Neural Networks</h3>
+                <p>Convolutional neural networks (CNNs) are a class of neural network architectures designed primarily
+                    for image analysis. They have been particularly effective in tasks such as image classification,
+                    object detection, and image segmentation.</p>
+                <ul>
+                    <li><b>Image Analysis</b>: CNNs are specifically designed to work with grid-structured data, such as
+                        images. They are capable of capturing important spatial patterns and features in images.</li>
+                </ul>
+            </div>
+            <div class="footer">
+                <div class="contact">Data Mining and Machine Learning | John Samuel</div>
+                <div class="navigation">47
+                    <a class="prev" href="#slide46"></a>
+                    <a class="next" href="#slide48"></a>
+                </div>
+            </div>
+        </section>
+        <section class="slide" id="slide48">
+            <div class="header">
+                <h1>3.2. Deep Learning</h1>
+            </div>
+            <div class="content">
+                <h3 class="topicsubheading">Convolutional Neural Networks</h3>
+                <ul>
+                    <li><b>Uses convolution</b>: Convolution is a linear mathematical operation used to extract local
+                        features from an image. Convolution filters are applied to the image to detect patterns such as
+                        edges, textures, or shapes.</li>
+                    <li><b>Layered architecture</b>: CNNs generally follow a layered architecture. They have an input
+                        layer to receive the image, one or more hidden layers composed mainly of convolutional layers,
+                        and an output layer to produce the final results.</li>
+                </ul>
+            </div>
+            <div class="footer">
+                <div class="contact">Data Mining and Machine Learning | John Samuel</div>
+                <div class="navigation">48
+                    <a class="prev" href="#slide47"></a>
+                    <a class="next" href="#slide49"></a>
+                </div>
+            </div>
+        </section>
+        <section class="slide" id="slide49">
+            <div class="header">
+                <h1>3.2. Deep Learning</h1>
+            </div>
+            <div class="content">
+                <h3 class="topicsubheading">Convolutional Neural Networks</h3>
+                <ul>
+                    <li><b>Convolutional layers</b>: Convolutional layers are responsible for extracting features from
+                        the image. Each layer can have multiple convolution filters that learn to detect specific
+                        patterns. These layers are often followed by pooling layers to reduce the dimensionality of the
+                        representation while preserving important features.</li>
+                    <li><b>Applications</b>: CNNs are widely used in applications such as image classification (e.g.,
+                        recognizing animals in photos), object detection (locating and identifying specific objects),
+                        and image segmentation (dividing an image into semantically meaningful regions).</li>
+                </ul>
+            </div>
+            <div class="footer">
+                <div class="contact">Data Mining and Machine Learning | John Samuel</div>
+                <div class="navigation">49
+                    <a class="prev" href="#slide48"></a>
+                    <a class="next" href="#slide50"></a>
+                </div>
+            </div>
+        </section>
+        <section class="slide" id="slide50">
+            <div class="header">
+                <h1>3.2. Deep Learning</h1>
+            </div>
+            <div class="content">
+                <h3 class="topicsubheading">Convolutional Neural Networks: architecture</h3>
+                <ul>
+                    <li><b>Hierarchical data model</b>: Convolutional neural networks (CNNs) are designed to capture
+                        hierarchical features in data, particularly in the context of image analysis. This means they
+                        can learn simple patterns in the early layers, then combine these patterns to form more complex
+                        features in subsequent layers.</li>
+                    <li><b>CNN architecture</b>: A convolutional neural network is generally composed of an input layer,
+                        several hidden layers, and an output layer. The hidden layers consist mainly of convolutional
+                        layers, but can also include other types of layers such as pooling layers, fully connected
+                        layers, and normalization layers.</li>
+                </ul>
+                <figure>
+                    <img src="../../../../../en/teaching/courses/2017/DataMining/images/Typical_cnn.png"
+                        alt="Typical cnn" height="180px" />
+                </figure>
+            </div>
+            <div class="footer">
+                <div class="contact">Data Mining and Machine Learning | John Samuel</div>
+                <div class="navigation">50
+                    <a class="prev" href="#slide49"></a>
+                    <a class="next" href="#slide51"></a>
+                </div>
+            </div>
+        </section>
+        <section class="slide" id="slide51">
+            <div class="header">
+                <h1>3.2. Deep Learning</h1>
+            </div>
+            <div class="content">
+                <h3 class="topicsubheading">Convolutional Neural Networks: architecture</h3>
+                <ul>
+                    <li><b>Convolutional layers and activation function</b>: Convolutional layers apply filters to
+                        extract features from the image. The multiplication is performed by the convolution. The most
+                        commonly used activation function is ReLU (Rectified Linear Unit), which introduces nonlinearity
+                        into the model. This nonlinearity is important to allow the network to learn complex
+                        relationships in the data.</li>
+                    <li><b>Additional layers</b>: After the convolutional layers, one can have pooling layers to reduce
+                        dimensionality, fully connected layers to combine global features, and normalization layers to
+                        improve training stability.</li>
+                </ul>
+                <p>In summary, CNNs follow a hierarchical architecture, where convolutional layers learn local features,
+                    and these features are then combined in subsequent layers to form more complex representations. The
+                    nonlinearity introduced by the ReLU activation function is crucial to allow the model to learn
+                    nonlinear relationships in the data.</p>
+            </div>
+            <div class="footer">
+                <div class="contact">Data Mining and Machine Learning | John Samuel</div>
+                <div class="navigation">51
+                    <a class="prev" href="#slide50"></a>
+                    <a class="next" href="#slide52"></a>
+                </div>
+            </div>
+        </section>
+        <section class="slide" id="slide52">
+            <div class="header">
+                <h1>3.2. Deep Learning</h1>
+            </div>
+            <div class="content">
+                <h2 class="topicsubheading">Kernel (image processing)</h2>
+                <p>A kernel in the context of image processing, also called a filter or mask, is a small matrix that is
+                    applied to an image using a convolution operation. The purpose of applying these kernels is to
+                    perform various filtering operations on the image, such as edge detection, detail enhancement,
+                    highlighting certain features, etc.</p>
+                <ul>
+                    <li><b>Convolution in CNNs</b>: In CNNs, convolution is a key operation that consists of applying a
+                        set of filters (kernels) to an input image. Each filter is designed to extract specific features
+                        from the image, such as edges, textures, or other patterns.</li>
+                </ul>
+            </div>
+            <div class="footer">
+                <div class="contact">Data Mining and Machine Learning | John Samuel</div>
+                <div class="navigation">52
+                    <a class="prev" href="#slide51"></a>
+                    <a class="next" href="#slide53"></a>
+                </div>
+            </div>
+        </section>
+        <section class="slide" id="slide53">
+            <div class="header">
+                <h1>3.2. Deep Learning</h1>
+            </div>
+            <div class="content">
+                <h2 class="topicsubheading">Kernel (image processing)</h2>
+                <ul>
+                    <li><b>Kernel learning</b>: One of the important features of CNNs is the ability to learn filters
+                        (kernels) automatically during training. Instead of manually defining filters as in traditional
+                        image processing, CNNs adjust the filter weights during the learning phase based on the features
+                        that are important for the task to be accomplished.</li>
+                </ul>
+            </div>
+            <div class="footer">
+                <div class="contact">Data Mining and Machine Learning | John Samuel</div>
+                <div class="navigation">53
+                    <a class="prev" href="#slide52"></a>
+                    <a class="next" href="#slide54"></a>
+                </div>
+            </div>
+        </section>
+        <section class="slide" id="slide54">
+            <div class="header">
+                <h1>3.2. Deep Learning</h1>
+            </div>
+            <div class="content">
+                <h2 class="topicsubheading">Kernel (image processing)</h2>
+                <ul>
+                    <li><b>Role in the feature hierarchy</b>: The early layers of a CNN typically learn simple filters
+                        that detect edges or basic textures. As one progresses through the network's layers, the filters
+                        become more complex, capturing higher-level features, until the final output represents abstract
+                        features of the input image.</li>
+                    <li><b>Dimensionality reduction with pooling</b>: After convolution, CNNs often use pooling layers
+                        to reduce the dimension of the representation, while preserving the important features extracted
+                        by the filters. This saves computational resources while maintaining crucial information.</li>
+                </ul>
+            </div>
+            <div class="footer">
+                <div class="contact">Data Mining and Machine Learning | John Samuel</div>
+                <div class="navigation">54
+                    <a class="prev" href="#slide53"></a>
+                    <a class="next" href="#slide55"></a>
+                </div>
+            </div>
+        </section>
+        <section class="slide" id="slide55">
+            <div class="header">
+                <h1>3.3. Reinforcement Learning</h1>
+            </div>
+            <div class="content">
+                <h1 class="topicsubheading">Reinforcement Learning</h1>
+                <div class="flexcontent">
+                    <ul style="width:50%">
+                        <li>Reinforcement Learning (RL) is a branch of machine learning inspired by theories of animal
+                            psychology.</li>
+                        <li><b>Autonomous agent</b>: RL involves an autonomous agent interacting with an environment.
+                        </li>
+                        <li><b>Decision making</b>: The agent makes decisions based on its current state.</li>
+                        <li><b>Rewards and penalties</b>: The environment provides the agent with rewards, which can be
+                            positive or negative.</li>
+                        <li><b>Objective</b>: The objective is to maximize the sum of cumulative rewards over time.</li>
+                    </ul>
+                    <figure>
+                        <img src="../../../../../en/teaching/courses/2017/DataMining/images/Reinforcement_learning_diagram.svg"
+                            alt="Reinforcement learning diagram" height="300vh" />
+                    </figure>
+                </div>
+            </div>
+            <div class="footer">
+                <div class="contact">Data Mining and Machine Learning | John Samuel</div>
+                <div class="navigation">55
+                    <a class="prev" href="#slide54"></a>
+                    <a class="next" href="#slide56"></a>
+                </div>
+            </div>
+        </section>
+        <section class="slide" id="slide56">
+            <div class="header">
+                <h1>3.4. Licenses, Ethics and Privacy</h1>
+            </div>
+            <div class="content">
+                <h1 class="topicsubheading">Licenses, Ethics and Privacy</h1>
+                <ul>
+                    <li>Data usage rights</li>
+                    <li>Confidentiality and privacy</li>
+                    <li>Ethics</li>
+                </ul>
+                <figure class="gridcontent">
+                    <img src="../../../../../fr/enseignement/cours/2017/BigData/images/Open_Definition_logo.png"
+                        alt="Open Definition logo" height="100vh" />
+                    <img src="../../../../../en/teaching/courses/2017/ArchitectureInformationSystems/images/Privacy_written_in_tiles.jpg"
+                        alt="Privacy written in tiles" height="300vh" />
+                </figure>
+            </div>
+            <div class="footer">
+                <div class="contact">Data Mining and Machine Learning | John Samuel</div>
+                <div class="navigation">56
+                    <a class="prev" href="#slide55"></a>
+                    <a class="next" href="#slide57"></a>
+                </div>
+            </div>
+        </section>
+        <section class="slide" id="slide57">
+            <div class="header">
+                <h1>3.4. Licenses, Ethics and Privacy</h1>
+            </div>
+            <div class="content">
+                <div class="flexcontent">
+                    <figure class="fullwidth">
+                        <img src="../../../../../fr/enseignement/cours/2018/BigData/images/CC-BY-NC-ND.svg"
+                            alt="CC BY NC ND" height="100vh" />
+                        <img src="../../../../../fr/enseignement/cours/2018/BigData/images/CC-BY-NC-SA.svg"
+                            alt="CC BY NC SA" height="100vh" />
+                        <img src="../../../../../fr/enseignement/cours/2018/BigData/images/CC-BY-NC.svg" alt="CC BY NC"
+                            height="100vh" />
+                        <img src="../../../../../fr/enseignement/cours/2018/BigData/images/CC-BY-ND.svg" alt="CC BY ND"
+                            height="100vh" />
+                    </figure>
+                    <figure class="fullwidth">
+                        <img src="../../../../../fr/enseignement/cours/2018/BigData/images/CC-BY-SA.svg" alt="CC BY SA"
+                            height="100vh" />
+                        <img src="../../../../../fr/enseignement/cours/2018/BigData/images/CC-BY.svg" alt="CC BY"
+                            height="100vh" />
+                        <img src="../../../../../fr/enseignement/cours/2018/BigData/images/Cc-zero.svg" alt="Cc zero"
+                            height="100vh" />
+                        <img src="../../../../../fr/enseignement/cours/2018/BigData/images/Cc-public_domain_mark_white.svg"
+                            alt="Cc public domain mark white" height="100vh" />
+                        <figcaption>Examples: Creative Commons (CC)</figcaption>
+                    </figure>
+                </div>
+            </div>
+            <div class="footer">
+                <div class="contact">Data Mining and Machine Learning | John Samuel</div>
+                <div class="navigation">57
+                    <a class="prev" href="#slide56"></a>
+                    <a class="next" href="#slide58"></a>
+                </div>
+            </div>
+        </section>
+        <section class="slide" id="slide58">
+            <div class="header">
+                <h1>3.4. Licenses, Ethics and Privacy</h1>
+            </div>
+            <div class="content">
+                <figure>
+                    <img src="../../../../../fr/enseignement/cours/2018/BigData/images/Creative_commons_license_spectrum.svg"
+                        alt="Creative commons license spectrum" height="500vh" />
+                    <figcaption>Exemples: Creative Commons (CC)</figcaption>
+                </figure>
+            </div>
+            <div class="footer">
+                <div class="contact">Data Mining and Machine Learning | John Samuel</div>
+                <div class="navigation">58
+                    <a class="prev" href="#slide57"></a>
+                    <a class="next" href="#slide59"></a>
+                </div>
+            </div>
+        </section>
+        <section class="slide" id="slide59">
+            <div class="header">
+                <h1>3.4. Licenses, Ethics and Privacy</h1>
+            </div>
+            <div class="content">
+                <figure>
+
+                    <img src="../../2018/BigData/images/Wikimedia_logo_family_complete-2013.svg"
+                        alt="Wikimedia logo family complete 2013" height="400vh" />
+                    <figcaption>Open data</figcaption>
+                </figure>
+            </div>
+            <div class="footer">
+                <div class="contact">Data Mining and Machine Learning | John Samuel</div>
+                <div class="navigation">59
+                    <a class="prev" href="#slide58"></a>
+                    <a class="next" href="#slide60"></a>
+                </div>
+            </div>
+        </section>
+        <section class="slide" id="slide60">
+            <div class="header">
+                <h1>3.4. Licenses, Ethics and Privacy</h1>
+            </div>
+            <div class="content">
+                <figure>
+                    <img src="../../../../../fr/enseignement/cours/2017/BigData/images/LOD_Cloud_2014.svg.png"
+                        alt="LOD Cloud 2014.svg" height="400vh" />
+                    <figcaption>Linked Open Data (LOD)</figcaption>
+                </figure>
+            </div>
+            <div class="footer">
+                <div class="contact">Data Mining and Machine Learning | John Samuel</div>
+                <div class="navigation">60
+                    <a class="prev" href="#slide59"></a>
+                    <a class="next" href="#slide61"></a>
+                </div>
+            </div>
+        </section>
+        <section class="slide" id="slide61">
+            <div class="header">
+                <h1>3.4. Licenses, Ethics and Privacy</h1>
+            </div>
+            <div class="content">
+                <figure>
+                    <img src="../../../../../fr/enseignement/cours/2017/BigData/images/Internet_Archive_logo_and_wordmark.svg.png"
+                        alt="Internet Archive logo and wordmark.svg" height="400vh" />
+                    <figcaption>Archived data</figcaption>
+                </figure>
+            </div>
+            <div class="footer">
+                <div class="contact">Data Mining and Machine Learning | John Samuel</div>
+                <div class="navigation">61
+                    <a class="prev" href="#slide60"></a>
+                    <a class="next" href="#slide62"></a>
+                </div>
+            </div>
+        </section>
+        <section class="slide" id="slide62">
+            <div class="header">
+                <h1>References</h1>
+            </div>
+            <div class="content">
+                <h3 class="topicsubheading">Online Resources</h3>
+                <ul>
+                    <ul>
+                        <li><a href="https://en.wikipedia.org/wiki/Artificial_neural_network">Artificial Neural
+                                Network</a>
+                        </li>
+                        <li><a href="https://fr.wikipedia.org/wiki/Noyau_(traitement_d%27image)">Kernel (image
+                                processing)</a></li>
+                        <li><a href="https://fr.wikipedia.org/wiki/R%C3%A9seau_neuronal_convolutif">Convolutional
+                                neural network</a></li>
+                        <li><a href="https://en.wikipedia.org/wiki/Perceptron">Perceptron</a></li>
+                    </ul>
+            </div>
+            <div class="footer">
+                <div class="contact">Data Mining and Machine Learning | John Samuel</div>
+                <div class="navigation">62
+                    <a class="prev" href="#slide61"></a>
+                    <a class="next" href="#slide63"></a>
+                </div>
+            </div>
+        </section>
+        <section class="slide" id="slide63">
+            <div class="header">
+                <h1>3.2.1. Perceptron and MLP</h1>
+            </div>
+            <div class="content">
+                <ul>
+                    <li><b>Perceptron</b>: single-layer model computing a weighted sum of inputs followed by an
+                        activation function. The simplest building block of neural networks.</li>
+                    <li><b>Multi-Layer Perceptron (MLP)</b>: stack of fully-connected layers. Each neuron computes:
+                        output = activation(W·x + b), where W are weights and b is the bias.</li>
+                    <li><b>Common activation functions</b>: Sigmoid \(\sigma(x) = \frac{1}{1+e^{-x}}\), Tanh,
+                        \(\text{ReLU}(x) = \max(0, x)\), Leaky ReLU, GELU.</li>
+                    <li><b>Loss functions</b>: Cross-entropy (classification), Mean Squared Error (regression), Binary
+                        cross-entropy (binary classification).</li>
+                </ul>
+            </div>
+            <div class="footer">
+                <div class="contact">Data Mining and Machine Learning | John Samuel</div>
+                <div class="navigation">63
+                    <a class="prev" href="#slide62"></a>
+                    <a class="next" href="#slide64"></a>
+                </div>
+            </div>
+        </section>
+        <section class="slide" id="slide64">
+            <div class="header">
+                <h1>3.2.1. Optimization: SGD and Adam</h1>
+            </div>
+            <div class="content">
+                <ul>
+                    <li><b>Stochastic Gradient Descent (SGD)</b>: update weights using gradient of loss on a mini-batch.
+                        \(w \leftarrow w - \eta \cdot \nabla L(w)\)</li>
+                    <li><b>Momentum SGD</b>: accumulates velocity in gradient directions. \(v \leftarrow \beta v +
+                        \nabla L(w)\); \(w \leftarrow w - \eta \cdot v\)</li>
+                    <li><b>Adam optimizer</b>: adaptive learning rates per parameter. Combines first moment (mean) and
+                        second moment (variance) of gradients. Default hyperparameters: \(\beta_1=0.9\),
+                        \(\beta_2=0.999\), \(\varepsilon=10^{-8}\).</li>
+                    <li><b>Learning rate</b>: most critical hyperparameter. Too high → divergence; too low → slow
+                        convergence.</li>
+                    <li><b>Learning rate schedules</b>: step decay, cosine annealing, warm-up.</li>
+                </ul>
+            </div>
+            <div class="footer">
+                <div class="contact">Data Mining and Machine Learning | John Samuel</div>
+                <div class="navigation">64
+                    <a class="prev" href="#slide63"></a>
+                    <a class="next" href="#slide65"></a>
+                </div>
+            </div>
+        </section>
+        <section class="slide" id="slide65">
+            <div class="header">
+                <h1>3.2.1. Training Stability</h1>
+            </div>
+            <div class="content">
+                <ul>
+                    <li><b>Weight initialization</b>: Xavier/Glorot for sigmoid/tanh; He initialization for ReLU. Avoids
+                        vanishing/exploding gradients.</li>
+                    <li><b>Batch normalization</b>: normalizes layer inputs to zero mean and unit variance. Improves
+                        training speed and stability.</li>
+                    <li><b>Layer normalization</b>: normalizes across features (used in Transformers).</li>
+                    <li><b>Early stopping</b>: halt training when validation loss stops improving. Prevents overfitting.
+                    </li>
+                    <li><b>Dropout</b>: randomly zero a fraction p of neurons during training. Acts as regularization.
+                    </li>
+                    <li><b>Weight decay (L2 regularization)</b>: adds \(\lambda \cdot \|w\|^2\) penalty to the loss.
+                        Shrinks weights toward zero.</li>
+                </ul>
+            </div>
+            <div class="footer">
+                <div class="contact">Data Mining and Machine Learning | John Samuel</div>
+                <div class="navigation">65
+                    <a class="prev" href="#slide64"></a>
+                    <a class="next" href="#slide66"></a>
+                </div>
+            </div>
+        </section>
+        <section class="slide" id="slide66">
+            <div class="header">
+                <h1>3.2.1. Training Stability: Practical Checklist</h1>
+            </div>
+            <div class="content">
+                <ul>
+                    <li>Start with He initialization for ReLU networks</li>
+                    <li>Use Adam optimizer with default hyperparameters as a first attempt</li>
+                    <li>Add batch normalization after linear layers, before activation</li>
+                    <li>Monitor train and validation loss curves: if val loss diverges, apply dropout or weight decay
+                    </li>
+                    <li>Apply early stopping with a patience of 5–20 epochs</li>
+                    <li>Check gradient norms: if they explode, apply gradient clipping (max norm 1.0)</li>
+                    <li>For very deep networks, use residual connections (skip connections)</li>
+                </ul>
+            </div>
+            <div class="footer">
+                <div class="contact">Data Mining and Machine Learning | John Samuel</div>
+                <div class="navigation">66
+                    <a class="prev" href="#slide65"></a>
+                    <a class="next" href="#slide67"></a>
+                </div>
+            </div>
+        </section>
+        <section class="slide" id="slide67">
+            <div class="header">
+                <h1>3.2.2. Scientific Data Modalities (Asynchronous)</h1>
+            </div>
+            <div class="content">
+                <p>Scientific datasets come in fundamentally different structural forms. The choice of architecture
+                    depends on the data modality.</p>
+                <p>Three main modalities in scientific contexts:</p>
+                <ol>
+                    <li><b>Time series / signals</b>: measurements ordered in time or frequency (e.g., spectra,
+                        waveforms, sensor readings)</li>
+                    <li><b>Images and spatial detectors</b>: 2D or 3D grids (e.g., telescope images, microscopy,
+                        particle detector maps)</li>
+                    <li><b>Tabular data</b>: structured rows and features (e.g., catalog data, simulation parameters,
+                        measurement tables)</li>
+                </ol>
+                <p><em>Note: This section is designated as asynchronous reading material.</em></p>
+            </div>
+            <div class="footer">
+                <div class="contact">Data Mining and Machine Learning | John Samuel</div>
+                <div class="navigation">67
+                    <a class="prev" href="#slide66"></a>
+                    <a class="next" href="#slide68"></a>
+                </div>
+            </div>
+        </section>
+        <section class="slide" id="slide68">
+            <div class="header">
+                <h1>3.2.2. Time Series and Signals</h1>
+            </div>
+            <div class="content">
+                <ul>
+                    <li><b>Sliding window approach</b>: transform a 1D signal of length T into overlapping windows of
+                        size w → produces a 2D feature matrix of shape (N_windows, w).</li>
+                    <li><b>Feature extraction</b>: mean, variance, FFT coefficients, spectral entropy, zero-crossing
+                        rate.</li>
+                    <li><b>1D Convolutional Neural Network (1D-CNN)</b>: applies learned filters along the time axis.
+                        Efficient for local pattern detection in signals.</li>
+                    <li><b>Recurrent Neural Network (RNN) / LSTM</b>: processes sequences step-by-step, maintaining
+                        hidden state. Suitable for long-range temporal dependencies.</li>
+                    <li><b>Example use case</b>: classifying cosmic ray events from detector waveforms; detecting
+                        equipment faults from vibration signals.</li>
+                </ul>
+            </div>
+            <div class="footer">
+                <div class="contact">Data Mining and Machine Learning | John Samuel</div>
+                <div class="navigation">68
+                    <a class="prev" href="#slide67"></a>
+                    <a class="next" href="#slide69"></a>
+                </div>
+            </div>
+        </section>
+        <section class="slide" id="slide69">
+            <div class="header">
+                <h1>3.2.2. Images and Spatial Detectors</h1>
+            </div>
+            <div class="content">
+                <p><b>Convolutional Neural Network (CNN)</b>: processes 2D grids using learned convolution filters. Key
+                    operations:</p>
+                <ul>
+                    <li><b>Convolution</b>: local feature detection (edges, textures, shapes)</li>
+                    <li><b>Pooling</b>: spatial downsampling (max pool, average pool)</li>
+                    <li><b>Fully-connected layer</b>: global classification/regression</li>
+                </ul>
+                <ul>
+                    <li><b>Transfer learning</b>: pre-trained CNNs (ResNet, EfficientNet) can be fine-tuned on small
+                        scientific datasets.</li>
+                    <li><b>Example use case</b>: galaxy morphology classification from telescope images; particle track
+                        reconstruction from detector readouts.</li>
+                    <li>When the spatial structure matters, CNNs are preferred over MLPs.</li>
+                </ul>
+            </div>
+            <div class="footer">
+                <div class="contact">Data Mining and Machine Learning | John Samuel</div>
+                <div class="navigation">69
+                    <a class="prev" href="#slide68"></a>
+                    <a class="next" href="#slide70"></a>
+                </div>
+            </div>
+        </section>
+        <section class="slide" id="slide70">
+            <div class="header">
+                <h1>3.2.2. Tabular Data</h1>
+            </div>
+            <div class="content">
+                <ul>
+                    <li>Tabular data remains the most common format in scientific computing (simulations, catalogs,
+                        laboratory measurements).</li>
+                    <li>Classical ML (gradient boosting, random forests) often outperforms deep learning on tabular
+                        data, especially with &lt; 10,000 samples.</li>
+                    <li><b>When to use deep learning for tabular data</b>: very large datasets (&gt;100k rows), complex
+                        feature interactions that cannot be manually engineered, multi-task learning.</li>
+                    <li><b>Embedding layers for categorical features</b>: map discrete categories to continuous dense
+                        vectors.</li>
+                    <li><b>When NOT to use deep learning</b>: small datasets, need for interpretability, structured data
+                        with well-understood features.</li>
+                </ul>
+            </div>
+            <div class="footer">
+                <div class="contact">Data Mining and Machine Learning | John Samuel</div>
+                <div class="navigation">70
+                    <a class="prev" href="#slide69"></a>
+                    <a class="next" href="#slide71"></a>
+                </div>
+            </div>
+        </section>
+        <section class="slide" id="slide71">
+            <div class="header">
+                <h1>3.5. Probabilistic Outputs and Calibration</h1>
+            </div>
+            <div class="content">
+                <ul>
+                    <li><b>A well-calibrated model</b>: if it predicts 70% probability for an event, that event should
+                        occur approximately 70% of the time.</li>
+                    <li><b>Calibration check</b>: reliability diagram (calibration curve) — plot predicted probability
+                        vs. observed frequency. A perfectly calibrated model follows the diagonal.</li>
+                    <li><b>Common miscalibration</b>: modern neural networks are often overconfident (predicted
+                        probabilities too extreme).</li>
+                    <li><b>Temperature scaling</b>: divide logits by a scalar T &gt; 0 before softmax. T &gt; 1 softens
+                        predictions; T &lt; 1 sharpens them. T is tuned on a validation set.</li>
+                    <li><b>Expected Calibration Error (ECE)</b>: measures average gap between confidence and accuracy
+                        across bins.</li>
+                </ul>
+            </div>
+            <div class="footer">
+                <div class="contact">Data Mining and Machine Learning | John Samuel</div>
+                <div class="navigation">71
+                    <a class="prev" href="#slide70"></a>
+                    <a class="next" href="#slide72"></a>
+                </div>
+            </div>
+        </section>
+        <section class="slide" id="slide72">
+            <div class="header">
+                <h1>3.5. Uncertainty Estimation</h1>
+            </div>
+            <div class="content">
+                <p>Types of uncertainty:</p>
+                <ul>
+                    <li><b>Aleatoric uncertainty</b>: inherent randomness in the data (irreducible). Cannot be reduced
+                        with more data.</li>
+                    <li><b>Epistemic uncertainty</b>: model uncertainty due to limited training data (reducible with
+                        more data).</li>
+                </ul>
+                <ul>
+                    <li><b>Deep ensembles</b>: train N independent models with different initializations. Aggregate
+                        predictions by averaging. Ensemble variance measures uncertainty.</li>
+                    <li><b>Bootstrap</b>: resample training data N times, train N models. Confidence intervals from the
+                        distribution of predictions.</li>
+                    <li><b>Monte Carlo Dropout (MC Dropout)</b>: apply dropout at inference time with T forward passes.
+                        Mean = prediction; variance = uncertainty estimate. Low overhead, easily implemented.</li>
+                </ul>
+            </div>
+            <div class="footer">
+                <div class="contact">Data Mining and Machine Learning | John Samuel</div>
+                <div class="navigation">72
+                    <a class="prev" href="#slide71"></a>
+                    <a class="next" href="#slide73"></a>
+                </div>
+            </div>
+        </section>
+        <section class="slide" id="slide73">
+            <div class="header">
+                <h1>3.5. Robustness to Systematics and Distribution Shifts</h1>
+            </div>
+            <div class="content">
+                <p><b>Distribution shift</b>: training and test data come from different distributions. Common in
+                    physics experiments (simulation ≠ real data).</p>
+                <p>Types of shifts:</p>
+                <ul>
+                    <li><b>Covariate shift</b>: input distribution P(x) changes; P(y|x) stays the same.</li>
+                    <li><b>Label shift</b>: output distribution P(y) changes.</li>
+                    <li><b>Concept drift</b>: the relationship P(y|x) itself changes over time.</li>
+                </ul>
+                <p>Strategies:</p>
+                <ul>
+                    <li><b>Domain adaptation</b>: fine-tune on a small sample of target distribution.</li>
+                    <li><b>Simulation-to-real (sim-to-real)</b>: train on simulation, validate with real data. Apply
+                        domain randomization to bridge the gap.</li>
+                    <li><b>Adversarial training</b>: augment with perturbed samples to improve robustness.</li>
+                    <li><b>Stress tests / out-of-distribution (OOD) detection</b>: test model on deliberately shifted or
+                        corrupted inputs.</li>
+                </ul>
+            </div>
+            <div class="footer">
+                <div class="contact">Data Mining and Machine Learning | John Samuel</div>
+                <div class="navigation">73
+                    <a class="prev" href="#slide72"></a>
+                    <a class="next" href="#slide74"></a>
+                </div>
+            </div>
+        </section>
+        <section class="slide" id="slide74">
+            <div class="header">
+                <h1>3.5. Robustness: Practical Strategies</h1>
+            </div>
+            <div class="content">
+                <ul>
+                    <li><b>Before training</b>: check for systematic differences between train and test distributions
+                        (feature shift analysis, MMD test).</li>
+                    <li><b>During training</b>: use data augmentation to simulate plausible distribution variations;
+                        apply domain randomization; mix simulation and real data where available.</li>
+                    <li><b>After training</b>: run stress tests on corrupted or shifted inputs; monitor confidence
+                        scores — a drop in average confidence may signal distribution shift.</li>
+                    <li><b>OOD detection</b>: models trained with softmax often assign high confidence to OOD inputs.
+                        Use energy-based scores or Mahalanobis distance for OOD detection.</li>
+                    <li><b>In experimental physics/astronomy</b>: always validate on real data even when trained on
+                        Monte Carlo simulation; report calibration curves alongside accuracy.</li>
+                </ul>
+            </div>
+            <div class="footer">
+                <div class="contact">Data Mining and Machine Learning | John Samuel</div>
+                <div class="navigation">74
+                    <a class="prev" href="#slide73"></a>
+                    <a class="next" href="#slide75"></a>
+                </div>
+            </div>
+        </section>
+        <section class="slide" id="slide75">
+            <div class="header">
+                <h1>References</h1>
+            </div>
+            <div class="content">
+                <h3 class="topicsubheading">Colors</h3>
+                <ul>
+                    <li><a href="https://material.io/color/">Color Tool - Material Design</a></li>
+                </ul>
+                <h3 class="topicsubheading">Images</h3>
+                <ul>
+                    <li><a href="https://commons.wikimedia.org/">Wikimedia Commons</a></li>
+                </ul>
+            </div>
+            <div class="footer">
+                <div class="contact">Data Mining and Machine Learning | John Samuel</div>
+                <div class="navigation">75
+                    <a class="prev" href="#slide74"></a>
+                </div>
+            </div>
+        </section>
+
+        <script>
+            // Theme Toggle Functionality
+            function toggleTheme() {
+                const html = document.documentElement;
+                const currentTheme = html.getAttribute('data-theme');
+                const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+                html.setAttribute('data-theme', newTheme);
+                localStorage.setItem('theme', newTheme);
+            }
+
+            // Initialize theme from localStorage or system preference
+            (function initTheme() {
+                const savedTheme = localStorage.getItem('theme');
+                if (savedTheme) {
+                    document.documentElement.setAttribute('data-theme', savedTheme);
+                } else if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+                    document.documentElement.setAttribute('data-theme', 'dark');
+                }
+            })();
+
+            // Listen for system theme changes
+            window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
+                if (!localStorage.getItem('theme')) {
+                    document.documentElement.setAttribute('data-theme', e.matches ? 'dark' : 'light');
+                }
+            });
+
+            function changeCurrentURLSlideNumber(isIncrement) {
+                url = window.location.href;
+                position = url.indexOf("#slide");
+                if (position != -1) { // Not on the first page
+                    slideIdString = url.substr(position + 6);
+                    if (!Number.isNaN(slideIdString)) {
+                        slideId = parseInt(slideIdString);
+                        if (isIncrement) {
+                            if (slideId < 75) {
+                                slideId = slideId + 1;
+                            }
+                        } else {
+                            if (slideId > 1) {
+                                slideId = slideId - 1;
+                            }
+                        }
+                        /* regexp */
+                        url = url.replace(/#slide\d+/g, "#slide" + slideId);
+                        window.location.href = url;
+                    }
+                } else {
+                    window.location.href = url + "#slide2";
+                }
+            }
+            document.onkeydown = function (event) {
+
+                event.preventDefault();
+                /* This will ensure the default behavior of
+                                                                page scroll behaviour (up, down, right, left)*/
+
+                event = event || window.event;
+                /*Codes de la touche sur le clavier: 37, 38, 39, 40*/
+                if (event.keyCode == '37') {
+                    // left
+                    changeCurrentURLSlideNumber(false);
+                } else if (event.keyCode == '38') {
+                    // up
+                    changeCurrentURLSlideNumber(false);
+                } else if (event.keyCode == '39') {
+                    // right
+                    changeCurrentURLSlideNumber(true);
+                } else if (event.keyCode == '40') {
+                    // down
+                    changeCurrentURLSlideNumber(true);
+                }
+            }
+            document.body.onmouseup = function (event) {
+                event = event || window.event;
+                event.preventDefault();
+                changeCurrentURLSlideNumber(true);
+            }
+        </script>
+    </body>
+
+</html>
