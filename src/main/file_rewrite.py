@@ -8,6 +8,7 @@
 
 from __future__ import annotations
 
+import os
 from pathlib import Path
 from tempfile import NamedTemporaryFile
 from typing import Callable
@@ -15,7 +16,7 @@ from typing import Callable
 
 def rewrite_text_file(path: str | Path, transform: Callable[[str], str]) -> None:
     """Rewrite a text file using a temporary file in the same directory."""
-    file_path = Path(path)
+    file_path = Path(path).resolve()
     original_content = file_path.read_text(encoding="utf-8")
     updated_content = transform(original_content)
 
@@ -29,4 +30,9 @@ def rewrite_text_file(path: str | Path, transform: Callable[[str], str]) -> None
         temp_path = Path(temp_file.name)
         temp_file.write(updated_content)
 
-    temp_path.replace(file_path)
+    try:
+        temp_path.replace(file_path)
+    except PermissionError:
+        # Some Windows editors lock rename/replace operations even when direct writes still work.
+        file_path.write_text(updated_content, encoding="utf-8")
+        os.unlink(temp_path)
