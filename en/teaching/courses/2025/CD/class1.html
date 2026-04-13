@@ -2732,9 +2732,15 @@
             </div>
             <div class="content">
                 <h3 class="topicsubheading">Example: Why This Dataset Works</h3>
-                <p>The two groups are linearly separable, so a linear SVM can learn a separating hyperplane with a clear
-                    margin.</p>
-                <p>This is a good bridge to the scikit-learn implementation on the next slide.</p>
+                <ul>
+                    <li><b>Separable classes</b>: The points labeled <code>-1</code> and <code>+1</code> can be split by
+                        one
+                        straight line.</li>
+                    <li><b>Margin idea</b>: SVM does not choose any separating line; it chooses the one with the largest
+                        safety margin.</li>
+                    <li><b>Expected outcome</b>: The learned separator should lie between the two groups, with the closest
+                        points defining the margin.</li>
+                </ul>
             </div>
             <div class="footer">
                 <div class="contact">Data Science | John Samuel</div>
@@ -2748,7 +2754,8 @@
             </div>
             <div class="content" style="display:block; overflow-x:hidden;">
                 <h3 class="topicsubheading">Example: Training a Linear SVM with scikit-learn</h3>
-                <pre><code class="language-python"><span class="py-keyword">from</span> <span class="py-name">sklearn.svm</span> <span class="py-keyword">import</span> <span class="py-name">SVC</span>
+                <pre
+                    style="font-size:74%;"><code class="language-python"><span class="py-keyword">from</span> <span class="py-name">sklearn.svm</span> <span class="py-keyword">import</span> <span class="py-name">SVC</span>
 
 <span class="py-name">svm_df</span> <span class="py-operator">=</span> <span class="py-name">pd</span>.<span class="py-name">DataFrame</span>({
     <span class="py-string">"x1"</span>: [<span class="py-number">1</span>, <span class="py-number">2</span>, <span class="py-number">2</span>, <span class="py-number">3</span>, <span class="py-number">4</span>, <span class="py-number">5</span>, <span class="py-number">5</span>, <span class="py-number">6</span>],
@@ -2760,15 +2767,15 @@
 <span class="py-name">y</span> <span class="py-operator">=</span> <span class="py-name">svm_df</span>[<span class="py-string">"label"</span>]
 <span class="py-name">svm_model</span> <span class="py-operator">=</span> <span class="py-name">SVC</span>(<span class="py-name">kernel</span><span class="py-operator">=</span><span class="py-string">"linear"</span>, <span class="py-name">C</span><span class="py-operator">=</span><span class="py-number">1.0</span>).<span class="py-name">fit</span>(<span class="py-name">X</span>, <span class="py-name">y</span>)
 
-<span class="py-name">svm_df</span>[<span class="py-string">"predicted"</span>] <span class="py-operator">=</span> <span class="py-name">svm_model</span>.<span class="py-name">predict</span>(<span class="py-name">X</span>)
 <span class="py-name">w</span> <span class="py-operator">=</span> <span class="py-name">svm_model</span>.<span class="py-name">coef_</span>[<span class="py-number">0</span>]
-<span class="py-name">b</span> <span class="py-operator">=</span> <span class="py-operator">-</span><span class="py-name">svm_model</span>.<span class="py-name">intercept_</span>[<span class="py-number">0</span>]</code></pre>
-                <p>The model learns approximately <code>w = (0.5, -0.5)</code> and <code>b = -0.5</code>, so in the
-                    slide notation the hyperplane is
-                    <code>0.5 x1 - 0.5 x2 - (-0.5) = 0</code>, or equivalently <code>x2 = x1 + 1</code>.
-                </p>
-                <p>The support vectors are close to <code>(2, 5)</code> and <code>(4, 3)</code>, and all training
-                    points are correctly classified.</p>
+<span class="py-name">b</span> <span class="py-operator">=</span> <span class="py-operator">-</span><span class="py-name">svm_model</span>.<span class="py-name">intercept_</span>[<span class="py-number">0</span>]
+<span class="py-name">support</span> <span class="py-operator">=</span> <span class="py-name">svm_model</span>.<span class="py-name">support_vectors_</span></code></pre>
+                <ul style="font-size:92%;">
+                    <li><b>Interpretation</b>: Here the line is close to <code>x2 = x1 + 1</code>, with support vectors
+                        near
+                        <code>(2, 5)</code> and <code>(4, 3)</code>.
+                    </li>
+                </ul>
             </div>
             <div class="footer">
                 <div class="contact">Data Science | John Samuel</div>
@@ -2960,7 +2967,8 @@
             <div class="content">
                 <h3 class="topicsubheading">Example: Query Point</h3>
                 <p>We study a new customer with <code>(age=30, visits=6)</code> using <code>k = 3</code>.</p>
-                <p>The next slides show how the same neighbors support classification and regression.</p>
+                <p>The algorithm will compare this point with the stored customers and use the three closest
+                    neighbors to make a prediction.</p>
             </div>
             <div class="footer">
                 <div class="contact">Data Science | John Samuel</div>
@@ -3182,7 +3190,14 @@
                         an observation belongs to a given class using the probabilities of the features given each
                         class.</li>
                 </ul>
-
+                <p>\[
+                    P(C \mid x)=\frac{P(x \mid C)P(C)}{P(x)}
+                    \]
+                </p>
+                <p style="font-size:90%;"><code>P(C)</code> is the prior, <code>P(x | C)</code> the likelihood,
+                    and
+                    <code>P(C | x)</code> the posterior.
+                </p>
             </div>
             <div class="footer">
                 <div class="contact">Data Science | John Samuel</div>
@@ -3207,7 +3222,15 @@
                         it uses Bayes' theorem to compute the probability that it belongs to each class and
                         chooses the class with the highest probability.</li>
                 </ul>
-
+                <p style="font-size:90%;">Because the features are assumed independent once the class is known, the joint
+                    likelihood is replaced by a product of simpler one-feature likelihoods:</p>
+                <p>\[
+                    P(x_1,\dots,x_d \mid C)\approx \prod_{i=1}^{d} P(x_i \mid C)
+                    \]
+                </p>
+                <p style="font-size:90%;">So the prediction rule becomes
+                    \(\hat{C}=\arg\max_C P(C)\prod_i P(x_i \mid C)\).
+                </p>
             </div>
             <div class="footer">
                 <div class="contact">Data Science | John Samuel</div>
@@ -3457,8 +3480,10 @@
                         </tr>
                     </tbody>
                 </table>
-                <p>A decision tree can learn interpretable rules such as "if debt ratio is high, reject" and
-                    "if debt ratio is low and there are no late payments, approve".</p>
+                <p style="font-size:90%;">The tree tests candidate splits such as <code>debt_ratio &lt; 0.4</code> or
+                    <code>late_payments &lt; 2</code> and keeps the split that best separates <code>yes</code> from
+                    <code>no</code>.
+                </p>
             </div>
             <div class="footer">
                 <div class="contact">Data Science | John Samuel</div>
@@ -3474,7 +3499,8 @@
             </div>
             <div class="content" style="display:block; overflow-x:hidden;">
                 <h3 class="topicsubheading">Example: Fitting and Reading the Rules</h3>
-                <pre><code class="language-python"><span class="py-name">loan</span> <span class="py-operator">=</span> <span class="py-name">pd</span>.<span class="py-name">DataFrame</span>({
+                <pre
+                    style="font-size:76%;"><code class="language-python"><span class="py-name">loan</span> <span class="py-operator">=</span> <span class="py-name">pd</span>.<span class="py-name">DataFrame</span>({
     <span class="py-string">"income_k"</span>: [<span class="py-number">32</span>, <span class="py-number">58</span>, <span class="py-number">45</span>, <span class="py-number">28</span>, <span class="py-number">64</span>],
     <span class="py-string">"debt_ratio"</span>: [<span class="py-number">0.52</span>, <span class="py-number">0.18</span>, <span class="py-number">0.30</span>, <span class="py-number">0.61</span>, <span class="py-number">0.25</span>],
     <span class="py-string">"late_payments"</span>: [<span class="py-number">4</span>, <span class="py-number">0</span>, <span class="py-number">1</span>, <span class="py-number">3</span>, <span class="py-number">0</span>],
@@ -3482,7 +3508,12 @@
 })
 
 <span class="py-name">X</span> <span class="py-operator">=</span> <span class="py-name">loan</span>[[<span class="py-string">"income_k"</span>, <span class="py-string">"debt_ratio"</span>, <span class="py-string">"late_payments"</span>]]
-<span class="py-name">y</span> <span class="py-operator">=</span> <span class="py-name">loan</span>[<span class="py-string">"approved"</span>]</code></pre>
+<span class="py-name">y</span> <span class="py-operator">=</span> <span class="py-name">loan</span>[<span class="py-string">"approved"</span>]
+<span class="py-name">tree</span> <span class="py-operator">=</span> <span class="py-name">DecisionTreeClassifier</span>(<span class="py-name">criterion</span><span class="py-operator">=</span><span class="py-string">"gini"</span>, <span class="py-name">max_depth</span><span class="py-operator">=</span><span class="py-number">2</span>, <span class="py-name">random_state</span><span class="py-operator">=</span><span class="py-number">0</span>)
+<span class="py-name">tree</span>.<span class="py-name">fit</span>(<span class="py-name">X</span>, <span class="py-name">y</span>)</code></pre>
+                <p style="font-size:90%;">At each node, the classifier checks several thresholds and keeps the split
+                    with
+                    the largest impurity reduction.</p>
             </div>
             <div class="footer">
                 <div class="contact">Data Science | John Samuel</div>
@@ -3496,12 +3527,17 @@
             </div>
             <div class="content" style="display:block; overflow-x:hidden;">
                 <h3 class="topicsubheading">Example: Tree Output</h3>
-                <pre><code class="language-python"><span class="py-name">tree</span> <span class="py-operator">=</span> <span class="py-name">DecisionTreeClassifier</span>(<span class="py-name">max_depth</span><span class="py-operator">=</span><span class="py-number">2</span>, <span class="py-name">random_state</span><span class="py-operator">=</span><span class="py-number">0</span>)
-<span class="py-name">tree</span>.<span class="py-name">fit</span>(<span class="py-name">X</span>, <span class="py-name">y</span>)
+                <pre
+                    style="font-size:78%;"><code class="language-python"><span class="py-name">rules</span> <span class="py-operator">=</span> <span class="py-name">export_text</span>(<span class="py-name">tree</span>, <span class="py-name">feature_names</span><span class="py-operator">=</span><span class="py-name">list</span>(<span class="py-name">X</span>.<span class="py-name">columns</span>))
 
-<span class="py-name">rules</span> <span class="py-operator">=</span> <span class="py-name">export_text</span>(<span class="py-name">tree</span>, <span class="py-name">feature_names</span><span class="py-operator">=</span><span class="py-name">list</span>(<span class="py-name">X</span>.<span class="py-name">columns</span>))
-<span class="py-name">prediction</span> <span class="py-operator">=</span> <span class="py-name">tree</span>.<span class="py-name">predict</span>(<span class="py-name">pd</span>.<span class="py-name">DataFrame</span>({<span class="py-string">"income_k"</span>: [<span class="py-number">40</span>], <span class="py-string">"debt_ratio"</span>: [<span class="py-number">0.35</span>], <span class="py-string">"late_payments"</span>: [<span class="py-number">2</span>]}))</code></pre>
-                <p>The path is easy to justify because each branch is a human-readable condition.</p>
+<span class="py-comment"># possible simplified output</span>
+|--- <span class="py-name">debt_ratio</span> &lt;= <span class="py-number">0.41</span>
+|   |--- <span class="py-name">late_payments</span> &lt;= <span class="py-number">1.50</span>: <span class="py-name">yes</span>
+|   |--- <span class="py-name">late_payments</span> &gt; <span class="py-number">1.50</span>: <span class="py-name">no</span>
+|--- <span class="py-name">debt_ratio</span> &gt; <span class="py-number">0.41</span>: <span class="py-name">no</span></code></pre>
+                <p style="font-size:90%;">The root split is most informative; later splits refine only the remaining
+                    mixed
+                    groups.</p>
             </div>
             <div class="footer">
                 <div class="contact">Data Science | John Samuel</div>
@@ -3515,20 +3551,18 @@
             </div>
             <div class="content">
                 <ul>
-                    <li><b>Stopping criterion</b>: The algorithm stops when one of the following conditions is met:
-                        <ul>
-                            <li>All elements of a subgroup belong to the same class.</li>
-                            <li>All features have been used for splitting.</li>
-                            <li>A maximum tree depth is reached.</li>
-                            <li>A minimum number of samples in a node is reached.</li>
-                        </ul>
-                    </li>
-                    <li><b>Tree construction</b>: Once the splits are complete, a decision tree is built where each
-                        node represents a splitting feature and each leaf represents an output class.</li>
-                    <li><b>Classification</b>: When a new example is introduced, it is classified by traversing the
-                        decision tree based on its features until reaching a leaf, where it is assigned to a
-                        class.</li>
+                    <li><b>Build recursively</b>: Start at the root, choose the best split, then repeat on each child
+                        node.</li>
+                    <li><b>Stop growing</b>: Stop when a node is pure, too small, or the allowed depth is reached.</li>
+                    <li><b>Leaf meaning</b>: Each leaf stores the majority class of the training examples that reached
+                        it.</li>
+                    <li><b>Prediction</b>: A new sample follows the yes/no tests from root to leaf and inherits that
+                        leaf label.</li>
                 </ul>
+                <p style="font-size:88%;">Example of building: at the root, a split like <code>debt_ratio &le; 0.41</code>
+                    is useful because it puts <code>A2,A3,A5</code> on one side and all three are <code>yes</code>,
+                    while <code>A1,A4</code> go to the other side and both are <code>no</code>. The child nodes are then
+                    split again only if they still contain mixed labels.</p>
             </div>
             <div class="footer">
                 <div class="contact">Data Science | John Samuel</div>
@@ -3671,7 +3705,7 @@
                     </tbody>
                 </table>
                 <p>Each tree sees a slightly different bootstrap sample, so the final model relies on many weakly
-                    different decision rules instead of one fragile tree.</p>
+                    different decision rules instead of 1 fragile tree.</p>
             </div>
             <div class="footer">
                 <div class="contact">Data Science | John Samuel</div>
@@ -3696,6 +3730,8 @@
 
 <span class="py-name">X</span> <span class="py-operator">=</span> <span class="py-name">credit</span>[[<span class="py-string">"income_k"</span>, <span class="py-string">"balance_k"</span>, <span class="py-string">"missed_payments"</span>]]
 <span class="py-name">y</span> <span class="py-operator">=</span> <span class="py-name">credit</span>[<span class="py-string">"default"</span>]</code></pre>
+                <p style="font-size:90%;">This slide prepares the training data: <code>X</code> contains the input
+                    features, and <code>y</code> contains the label to predict, namely whether the customer defaults.</p>
             </div>
             <div class="footer">
                 <div class="contact">Data Science | John Samuel</div>
@@ -3713,6 +3749,8 @@
 <span class="py-name">forest</span>.<span class="py-name">fit</span>(<span class="py-name">X</span>, <span class="py-name">y</span>)
 
 <span class="py-name">importance</span> <span class="py-operator">=</span> <span class="py-name">pd</span>.<span class="py-name">Series</span>(<span class="py-name">forest</span>.<span class="py-name">feature_importances_</span>, <span class="py-name">index</span><span class="py-operator">=</span><span class="py-name">X</span>.<span class="py-name">columns</span>).<span class="py-name">sort_values</span>(<span class="py-name">ascending</span><span class="py-operator">=</span><span class="py-name">False</span>)</code></pre>
+                <p style="font-size:90%;">After fitting many trees, the forest estimates which features were most useful
+                    for separating <code>default=yes</code> from <code>default=no</code>.</p>
             </div>
             <div class="footer">
                 <div class="contact">Data Science | John Samuel</div>
@@ -3886,17 +3924,15 @@
                 <h1>4.1. Stochastic Gradient Descent</h1>
             </div>
             <div class="content">
-                <p>Stochastic Gradient Descent is an optimization technique used to minimize an objective function
-                    that can be expressed as a sum of differentiable functions.</p>
-                <ul>
-                    <li>It is a stochastic approximation of gradient descent optimization, where the gradient
-                        computation is performed randomly on a subset of the data at each iteration.</li>
-                    <li>This method is iterative, meaning it makes progressive updates to the model parameters to
-                        approach the minimum or maximum of the objective function.</li>
-                    <li>Stochastic Gradient Descent is particularly effective for handling large datasets, as it allows
-                        computing parameter updates incrementally, which reduces the computational load compared to
-                        classical gradient optimization.</li>
-                </ul>
+                <p>SGD is an iterative method that updates the model to reduce a loss function, often one example at a
+                    time.</p>
+                <p style="font-size:88%;">For regression, the objective is often the average loss over the dataset:
+                    \[
+                    J(w)=\frac{1}{n}\sum_{i=1}^{n} L(w;x_i,y_i)
+                    \]
+                </p>
+                <p style="font-size:88%;">\(J(w)\) is the total objective, and \(L(w;x_i,y_i)\) is the
+                    error on one training example.</p>
             </div>
             <div class="footer">
                 <div class="contact">Data Science | John Samuel</div>
@@ -3960,8 +3996,10 @@
                         </tr>
                     </tbody>
                 </table>
-                <p>We want to predict a continuous value, so this is a regression task. SGD is useful when the
-                    dataset is large and we update the coefficients incrementally.</p>
+                <p style="font-size:90%;">We model rent with a linear prediction such as
+                    \(\hat{y}=w_1x_1+w_2x_2+w_3x_3+b\), where the features are surface, distance, and rooms.</p>
+                <p style="font-size:90%;">A common loss for one apartment is the squared error
+                    \(L(w;x_i,y_i)=(\hat{y}_i-y_i)^2\), so large mistakes receive a larger penalty.</p>
             </div>
             <div class="footer">
                 <div class="contact">Data Science | John Samuel</div>
@@ -3977,7 +4015,8 @@
             </div>
             <div class="content" style="display:block; overflow-x:hidden;">
                 <h3 class="topicsubheading">Example: Scaling then Fitting SGDRegressor</h3>
-                <pre><code class="language-python"><span class="py-name">rent</span> <span class="py-operator">=</span> <span class="py-name">pd</span>.<span class="py-name">DataFrame</span>({
+                <pre
+                    style="font-size:76%;"><code class="language-python"><span class="py-name">rent</span> <span class="py-operator">=</span> <span class="py-name">pd</span>.<span class="py-name">DataFrame</span>({
     <span class="py-string">"surface_m2"</span>: [<span class="py-number">28</span>, <span class="py-number">35</span>, <span class="py-number">52</span>, <span class="py-number">65</span>, <span class="py-number">42</span>, <span class="py-number">58</span>, <span class="py-number">31</span>, <span class="py-number">47</span>],
     <span class="py-string">"distance_km"</span>: [<span class="py-number">7.5</span>, <span class="py-number">5.0</span>, <span class="py-number">3.0</span>, <span class="py-number">2.0</span>, <span class="py-number">6.5</span>, <span class="py-number">4.0</span>, <span class="py-number">8.0</span>, <span class="py-number">3.5</span>],
     <span class="py-string">"rooms"</span>: [<span class="py-number">1</span>, <span class="py-number">2</span>, <span class="py-number">2</span>, <span class="py-number">3</span>, <span class="py-number">2</span>, <span class="py-number">3</span>, <span class="py-number">1</span>, <span class="py-number">2</span>],
@@ -3988,6 +4027,11 @@
 <span class="py-name">y</span> <span class="py-operator">=</span> <span class="py-name">rent</span>[<span class="py-string">"rent_eur"</span>]
 <span class="py-name">scaler</span> <span class="py-operator">=</span> <span class="py-name">StandardScaler</span>()
 <span class="py-name">X_scaled</span> <span class="py-operator">=</span> <span class="py-name">scaler</span>.<span class="py-name">fit_transform</span>(<span class="py-name">X</span>)</code></pre>
+                <p style="font-size:90%;">Now SGD uses one training example at a time to reduce the loss:
+                    \(w \leftarrow w - \eta \nabla L(w;x_i,y_i)\).</p>
+                <p style="font-size:90%;">Here, \(\nabla L\) tells us which direction increases error, and
+                    \(\eta\) controls how large the correction step is. Scaling keeps one feature from
+                    dominating the update.</p>
             </div>
             <div class="footer">
                 <div class="contact">Data Science | John Samuel</div>
@@ -4001,10 +4045,17 @@
             </div>
             <div class="content" style="display:block; overflow-x:hidden;">
                 <h3 class="topicsubheading">Example: SGD Fit</h3>
-                <pre><code class="language-python"><span class="py-name">sgd</span> <span class="py-operator">=</span> <span class="py-name">SGDRegressor</span>(<span class="py-name">max_iter</span><span class="py-operator">=</span><span class="py-number">20000</span>, <span class="py-name">eta0</span><span class="py-operator">=</span><span class="py-number">0.01</span>, <span class="py-name">learning_rate</span><span class="py-operator">=</span><span class="py-string">"adaptive"</span>, <span class="py-name">random_state</span><span class="py-operator">=</span><span class="py-number">0</span>)
+                <pre
+                    style="font-size:82%;"><code class="language-python"><span class="py-name">sgd</span> <span class="py-operator">=</span> <span class="py-name">SGDRegressor</span>(<span class="py-name">max_iter</span><span class="py-operator">=</span><span class="py-number">20000</span>, <span class="py-name">eta0</span><span class="py-operator">=</span><span class="py-number">0.01</span>, <span class="py-name">learning_rate</span><span class="py-operator">=</span><span class="py-string">"adaptive"</span>, <span class="py-name">random_state</span><span class="py-operator">=</span><span class="py-number">0</span>)
 <span class="py-name">sgd</span>.<span class="py-name">fit</span>(<span class="py-name">X_scaled</span>, <span class="py-name">y</span>)</code></pre>
-                <p>Scaling matters because SGD updates the coefficients incrementally and reacts badly to very different
-                    feature magnitudes.</p>
+                <ul style="font-size:92%;">
+                    <li><b>One pass idea</b>: Read one apartment, compute its error, and slightly adjust the weights.
+                    </li>
+                    <li><b>Adaptive learning rate</b>: If progress slows, smaller updates reduce oscillation.</li>
+                    <li><b>Why SGD is useful</b>: It is fast on large datasets because it avoids solving the full
+                        problem
+                        at once.</li>
+                </ul>
             </div>
             <div class="footer">
                 <div class="contact">Data Science | John Samuel</div>
@@ -4093,14 +4144,19 @@
             <div class="content">
                 <h3 class="topicsubheading">Clustering Models</h3>
                 <ul>
-                    <li><b>Centroid models</b>: Groups are represented by a single mean vector (centroid).
+                    <li><b>Centroid models</b>: Groups are represented by a single mean vector (centroid), so each point
+                        joins the nearest center.
                         Example: K-Means, K-Median.</li>
                     <li><b>Connectivity models</b>: Clusters are determined by the proximity of connectivity between
-                        points.
+                        points, so nearby objects are merged step by step.
                         Example: Hierarchical Agglomerative.</li>
-                    <li><b>Distribution models</b>: Clusters are modeled using statistical distributions.
+                    <li><b>Distribution models</b>: Clusters are modeled using statistical distributions, so each
+                        cluster
+                        is viewed as coming from a probability law.
                         Example: Gaussian Mixtures.</li>
-                    <li><b>Density models</b>: Clusters are defined by connected dense regions in the data space.
+                    <li><b>Density models</b>: Clusters are defined by connected dense regions in the data space, so
+                        sparse
+                        regions naturally separate groups.
                         Example: DBSCAN, OPTICS.</li>
                 </ul>
             </div>
@@ -4116,13 +4172,25 @@
             <div class="header">
                 <h1>5. Clustering</h1>
             </div>
-            <div class="content">
-                <h3 class="topicsubheading">Clustering Models</h3>
-                <figure class="fullwidth">
-                    <img src="../../../../../en/teaching/courses/2017/DataMining/images/K_Means_Example_Step_4.svg.png"
-                        alt="K Means Example Step 4.svg" height="400px" width="400px" />
-                    <figcaption>k-means clustering (see section 3.3)</figcaption>
-                </figure>
+            <div class="content" style="display:flex; gap:1rem; align-items:center; overflow:hidden;">
+                <div style="flex:0 0 45%; text-align:center; min-width:0;">
+                    <h3 class="topicsubheading">K-Means Example</h3>
+                    <figure style="margin:0;">
+                        <img src="../../../../../en/teaching/courses/2017/DataMining/images/K_Means_Example_Step_4.svg.png"
+                            alt="K Means Example Step 4.svg" style="max-width:100%; height:250px; width:auto;" />
+                        <figcaption style="font-size:80%;">Points grouped around their nearest centroid.</figcaption>
+                    </figure>
+                </div>
+                <div style="flex:1; min-width:0;">
+                    <h3 class="topicsubheading">Brief Algorithm</h3>
+                    <ol style="font-size:86%; margin:0.2em 0;">
+                        <li><b>Choose k</b>: Decide how many clusters to build.</li>
+                        <li><b>Initialize</b>: Place k initial centroids.</li>
+                        <li><b>Assign</b>: Send each point to the nearest centroid.</li>
+                        <li><b>Update</b>: Replace each centroid by its cluster mean.</li>
+                        <li><b>Repeat</b>: Continue until assignments barely change.</li>
+                    </ol>
+                </div>
             </div>
             <div class="footer">
                 <div class="contact">Data Science | John Samuel</div>
@@ -4195,14 +4263,21 @@
                 <h1>5.1. Clustering Algorithms</h1>
             </div>
             <div class="content" style="display:block; overflow-x:hidden;">
-                <h3 class="topicsubheading">Example: K-Means and DBSCAN</h3>
-                <pre><code class="language-python"><span class="py-name">segments</span> <span class="py-operator">=</span> <span class="py-name">pd</span>.<span class="py-name">DataFrame</span>({
+                <h3 class="topicsubheading">Example: How K-Means Works</h3>
+                <pre
+                    style="font-size:74%;"><code class="language-python"><span class="py-name">segments</span> <span class="py-operator">=</span> <span class="py-name">pd</span>.<span class="py-name">DataFrame</span>({
     <span class="py-string">"annual_spend"</span>: [<span class="py-number">220</span>, <span class="py-number">260</span>, <span class="py-number">980</span>, <span class="py-number">1020</span>, <span class="py-number">540</span>, <span class="py-number">560</span>, <span class="py-number">2400</span>],
     <span class="py-string">"visits_per_month"</span>: [<span class="py-number">2</span>, <span class="py-number">3</span>, <span class="py-number">12</span>, <span class="py-number">11</span>, <span class="py-number">6</span>, <span class="py-number">7</span>, <span class="py-number">1</span>],
 }, <span class="py-name">index</span><span class="py-operator">=</span>[<span class="py-string">"C1"</span>, <span class="py-string">"C2"</span>, <span class="py-string">"C3"</span>, <span class="py-string">"C4"</span>, <span class="py-string">"C5"</span>, <span class="py-string">"C6"</span>, <span class="py-string">"C7"</span>])
 
 <span class="py-name">kmeans</span> <span class="py-operator">=</span> <span class="py-name">KMeans</span>(<span class="py-name">n_clusters</span><span class="py-operator">=</span><span class="py-number">3</span>, <span class="py-name">random_state</span><span class="py-operator">=</span><span class="py-number">0</span>, <span class="py-name">n_init</span><span class="py-operator">=</span><span class="py-number">10</span>)
 <span class="py-name">segments</span>[<span class="py-string">"kmeans_cluster"</span>] <span class="py-operator">=</span> <span class="py-name">kmeans</span>.<span class="py-name">fit_predict</span>(<span class="py-name">segments</span>)</code></pre>
+                <ul style="font-size:88%; margin-top:0.2em;">
+                    <li><b>Start with k</b>: Here we ask for <code>3</code> clusters before learning begins.</li>
+                    <li><b>Assignment step</b>: Each customer goes to the cluster with the nearest centroid.</li>
+                    <li><b>Update step</b>: Each centroid is replaced by the mean of its current members.</li>
+                    <li><b>Result here</b>: The data naturally suggest low-spend, medium-spend, and high-spend groups.</li>
+                </ul>
             </div>
             <div class="footer">
                 <div class="contact">Data Science | John Samuel</div>
@@ -4215,13 +4290,21 @@
                 <h1>5.1. Clustering Algorithms</h1>
             </div>
             <div class="content" style="display:block; overflow-x:hidden;">
-                <h3 class="topicsubheading">Example: DBSCAN and Silhouette</h3>
-                <pre><code class="language-python"><span class="py-name">dbscan</span> <span class="py-operator">=</span> <span class="py-name">DBSCAN</span>(<span class="py-name">eps</span><span class="py-operator">=</span><span class="py-number">180</span>, <span class="py-name">min_samples</span><span class="py-operator">=</span><span class="py-number">2</span>)
+                <h3 class="topicsubheading">Example: How DBSCAN Works</h3>
+                <pre
+                    style="font-size:80%;"><code class="language-python"><span class="py-name">dbscan</span> <span class="py-operator">=</span> <span class="py-name">DBSCAN</span>(<span class="py-name">eps</span><span class="py-operator">=</span><span class="py-number">180</span>, <span class="py-name">min_samples</span><span class="py-operator">=</span><span class="py-number">2</span>)
 <span class="py-name">segments</span>[<span class="py-string">"dbscan_cluster"</span>] <span class="py-operator">=</span> <span class="py-name">dbscan</span>.<span class="py-name">fit_predict</span>(<span class="py-name">segments</span>[[<span class="py-string">"annual_spend"</span>, <span class="py-string">"visits_per_month"</span>]])
 
 <span class="py-name">sil</span> <span class="py-operator">=</span> <span class="py-name">silhouette_score</span>(<span class="py-name">segments</span>[[<span class="py-string">"annual_spend"</span>, <span class="py-string">"visits_per_month"</span>]], <span class="py-name">segments</span>[<span class="py-string">"kmeans_cluster"</span>])</code></pre>
-                <p><code>C7</code> can be treated as noise by DBSCAN, which is exactly why this comparison is useful.
-                </p>
+                <ul style="font-size:88%; margin-top:0.2em;">
+                    <li><b>Density rule</b>: A point starts a cluster only if enough neighbors lie within
+                        <code>eps</code>.</li>
+                    <li><b>Cluster growth</b>: Neighboring dense points are linked together into one region.</li>
+                    <li><b>Noise handling</b>: Isolated points are not forced into a cluster and receive label
+                        <code>-1</code>.</li>
+                    <li><b>Result here</b>: <code>C7</code> is far from the dense customer groups, so DBSCAN can treat it
+                        as noise.</li>
+                </ul>
             </div>
             <div class="footer">
                 <div class="contact">Data Science | John Samuel</div>
@@ -4236,12 +4319,14 @@
             <div class="content">
                 <h3 class="topicsubheading">Example: Evaluating the Clusters</h3>
                 <ul>
-                    <li>The silhouette coefficient summarizes how well separated the K-means groups are; a larger
-                        value suggests better cohesion and separation.</li>
-                    <li>If <code>dbscan_cluster=-1</code> for <code>C7</code>, DBSCAN is telling us that this point
-                        looks more like an outlier than a stable cluster member.</li>
-                    <li>This comparison is useful in practice: K-means is simple and efficient, while DBSCAN is often
-                        better when anomalies or irregular cluster shapes matter.</li>
+                    <li><b>K-Means output</b>: Every point must belong to one cluster, even if a point is unusually far
+                        from the others.</li>
+                    <li><b>Silhouette score</b>: A larger value means points are closer to their own cluster than to
+                        neighboring clusters.</li>
+                    <li><b>DBSCAN output</b>: A label of <code>-1</code> means "noise" rather than "force into a
+                        cluster".</li>
+                    <li><b>Practical contrast</b>: Use K-Means for compact groups, and DBSCAN when outliers or irregular
+                        shapes matter.</li>
                 </ul>
             </div>
             <div class="footer">
@@ -4368,18 +4453,14 @@
                 <p>Anomaly detection algorithms identify rare observations that differ significantly from the
                     majority of the data.</p>
                 <ul>
-                    <li><b>One-Class SVM (OC-SVM)</b>: A kernel-based method that learns a decision boundary
-                        enclosing the majority of training data in a high-dimensional feature space.
-                        <ul>
-                            <li>Trained on normal (non-anomalous) data only.</li>
-                            <li>The parameter \(\nu \in (0,1]\) controls the fraction of training samples
-                                allowed to be outliers.</li>
-                            <li>At test time, points outside the learned boundary are classified as
-                                anomalies.</li>
-                            <li>Effective in high-dimensional spaces but sensitive to the choice of kernel
-                                and hyperparameters.</li>
-                        </ul>
-                    </li>
+                    <li><b>Isolation Forest idea</b>: Instead of modeling normality directly, it tries to isolate each
+                        point using many random splits.</li>
+                    <li><b>Why anomalies stand out</b>: Rare or extreme points are separated after only a few splits,
+                        while normal points need deeper paths.</li>
+                    <li><b>Anomaly score</b>: The average path length across many random trees is converted into a score;
+                        shorter paths mean more suspicious observations.</li>
+                    <li><b>Main advantage</b>: It works well without labeled anomalies and handles high-dimensional data
+                        efficiently.</li>
                 </ul>
             </div>
             <div class="footer">
@@ -4396,7 +4477,7 @@
             </div>
             <div class="content" style="display:block; overflow-x:hidden;">
                 <h3 class="topicsubheading">Example: Suspicious Transactions</h3>
-                <pre><code class="language-python"><span class="py-name">transactions</span> <span class="py-operator">=</span> <span class="py-name">pd</span>.<span class="py-name">DataFrame</span>({
+                <pre style="font-size:78%;"><code class="language-python"><span class="py-name">transactions</span> <span class="py-operator">=</span> <span class="py-name">pd</span>.<span class="py-name">DataFrame</span>({
     <span class="py-string">"amount_eur"</span>: [<span class="py-number">18</span>, <span class="py-number">22</span>, <span class="py-number">25</span>, <span class="py-number">31</span>, <span class="py-number">410</span>, <span class="py-number">27</span>, <span class="py-number">19</span>, <span class="py-number">520</span>],
     <span class="py-string">"login_gap_min"</span>: [<span class="py-number">120</span>, <span class="py-number">95</span>, <span class="py-number">80</span>, <span class="py-number">110</span>, <span class="py-number">2</span>, <span class="py-number">105</span>, <span class="py-number">130</span>, <span class="py-number">1</span>],
 }, <span class="py-name">index</span><span class="py-operator">=</span>[<span class="py-string">"T1"</span>, <span class="py-string">"T2"</span>, <span class="py-string">"T3"</span>, <span class="py-string">"T4"</span>, <span class="py-string">"T5"</span>, <span class="py-string">"T6"</span>, <span class="py-string">"T7"</span>, <span class="py-string">"T8"</span>])
@@ -4408,8 +4489,14 @@
 <span class="py-name">transactions</span>[<span class="py-string">"anomaly_score"</span>] <span class="py-operator">=</span> <span class="py-name">iso</span>.<span class="py-name">decision_function</span>(<span class="py-name">features</span>)
 <span class="py-name">transactions</span>.<span class="py-name">sort_values</span>(<span class="py-string">"anomaly_score"</span>)
 </code></pre>
-                <p>Very large amounts combined with an unusually short gap since the previous login can indicate
-                    unusual behaviour worth investigating.</p>
+                <ul style="font-size:90%;">
+                    <li><b>Features</b>: Each transaction is represented by amount and time since login.</li>
+                    <li><b>Model step</b>: <code>fit_predict</code> builds many random trees and labels likely anomalies as
+                        <code>-1</code>.</li>
+                    <li><b>Interpretation</b>: Large amount plus very short login gap makes <code>T5</code> and
+                        <code>T8</code> easier to isolate than typical transactions.</li>
+                    <li><b>Score meaning</b>: Lower scores indicate more suspicious behavior.</li>
+                </ul>
             </div>
             <div class="footer">
                 <div class="contact">Data Science | John Samuel</div>
@@ -4425,7 +4512,7 @@
             </div>
             <div class="content">
                 <h3 class="topicsubheading">Example: Reading the Output</h3>
-                <table style="font-size:80%;">
+                <table style="font-size:78%;">
                     <thead>
                         <tr>
                             <th>transaction</th>
@@ -4451,8 +4538,8 @@
                         </tr>
                     </tbody>
                 </table>
-                <p>Isolation Forest does not need labeled anomalies beforehand. It isolates unusual points quickly,
-                    then uses the resulting path lengths to decide which records deserve attention.</p>
+                <p style="font-size:90%;">Isolation Forest builds many random trees. Unusual points get isolated after
+                    only a few splits, so they have shorter average path lengths and lower scores.</p>
             </div>
             <div class="footer">
                 <div class="contact">Data Science | John Samuel</div>
@@ -4758,7 +4845,7 @@
             </div>
             <div class="content">
                 <h3 class="topicsubheading">Research Articles</h3>
-                <ol start="5">
+                <ol start="5" style="counter-reset: item 4;">
                     <li>An Analysis of Active Learning Strategies for Sequence Labeling Tasks, Settles, Burr, and Mark
                         Craven. Proceedings of the conference on empirical methods in natural language processing.
                         Association for Computational Linguistics, 2008.</li>
