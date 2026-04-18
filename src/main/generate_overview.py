@@ -8,6 +8,7 @@ from manifest import BuildManifest
 from paths import repo_root
 from translate_manager import TranslationManager
 from html.parser import HTMLParser
+from translation_config import DEFAULT_DB_PATH
 
 
 REPO_ROOT = repo_root()
@@ -61,13 +62,17 @@ LANGUAGE_NAMES = {
 }
 
 
-def generate_overview(output_file='analysis/translation_overview.html', force: bool = False):
+def generate_overview(
+    output_file='analysis/translation_overview.html',
+    force: bool = False,
+    db_path: str = DEFAULT_DB_PATH,
+):
     """Generate HTML overview showing only mapped files"""
     output_path = REPO_ROOT / output_file
-    db_path = REPO_ROOT / 'translations.db'
     manifest = BuildManifest()
 
-    manager = TranslationManager(db_path=str(db_path))
+    resolved_db_path = Path(db_path)
+    manager = TranslationManager(db_path=str(resolved_db_path))
 
     try:
         # Get all unique source files from mappings across all languages
@@ -91,7 +96,7 @@ def generate_overview(output_file='analysis/translation_overview.html', force: b
                         all_mapped_files.add(str(rel_path).replace('\\', '/'))
 
         source_files = sorted(list(all_mapped_files))
-        sources = [Path(__file__), db_path, *[REPO_ROOT / source_file for source_file in source_files]]
+        sources = [Path(__file__), resolved_db_path, *[REPO_ROOT / source_file for source_file in source_files]]
 
         if not source_files:
             print("No mapped files found. Add mappings to path_mappings.csv and run import-paths.")
@@ -593,12 +598,17 @@ def parse_args(argv=None):
         action="store_true",
         help="Regenerate outputs even when the build manifest says they are current.",
     )
+    parser.add_argument(
+        "--db-path",
+        default=DEFAULT_DB_PATH,
+        help="Translation database path.",
+    )
     return parser.parse_args(argv)
 
 
 def main(argv=None):
     args = parse_args(argv)
-    generate_overview(output_file=args.output, force=args.force)
+    generate_overview(output_file=args.output, force=args.force, db_path=args.db_path)
     return 0
 
 

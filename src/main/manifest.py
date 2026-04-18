@@ -15,8 +15,9 @@ from pathlib import Path
 from typing import Iterable
 
 from paths import REPO_ROOT
+from translation_config import DEFAULT_BUILD_MANIFEST_PATH
 
-DEFAULT_MANIFEST_PATH = REPO_ROOT / "analysis" / "build-manifest.json"
+DEFAULT_MANIFEST_PATH = Path(DEFAULT_BUILD_MANIFEST_PATH)
 
 
 def _as_path(path: str | Path) -> Path:
@@ -40,7 +41,12 @@ def fingerprint_paths(paths: Iterable[str | Path], extra: str = "") -> str:
     """Create a stable fingerprint for a set of source files."""
     digest = hashlib.sha256()
     for path in sorted({_as_path(path) for path in paths}, key=lambda item: str(item)):
-        digest.update(str(path.relative_to(REPO_ROOT)).encode("utf-8", errors="replace"))
+        try:
+            path_str = str(path.relative_to(REPO_ROOT))
+        except ValueError:
+            # Path is outside REPO_ROOT, use absolute path
+            path_str = str(path.resolve())
+        digest.update(path_str.encode("utf-8", errors="replace"))
         if path.exists() and path.is_file():
             digest.update(hash_file(path).encode("ascii"))
         else:

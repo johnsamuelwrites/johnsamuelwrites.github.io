@@ -20,6 +20,12 @@ from translation_rules import (
     TRANSLATABLE_ATTRIBUTES,
     TRANSLATABLE_META_NAMES,
 )
+from translation_config import DEFAULT_TARGET_LANGS
+
+
+def normalize_translation_text(text: str) -> str:
+    """Normalize whitespace for consistent translation lookup/storage."""
+    return ' '.join((text or '').strip().split())
 
 
 class HTMLTranslationExtractor(HTMLParser):
@@ -95,10 +101,13 @@ class HTMLTranslationExtractor(HTMLParser):
         # Get current context
         context = '/'.join(self.current_tag_stack) if self.current_tag_stack else 'text'
 
+        # Normalize whitespace: collapse internal whitespace to single spaces
+        normalized = normalize_translation_text(data)
+
         self.translations.append({
             'type': 'text',
             'tag': self.current_tag_stack[-1] if self.current_tag_stack else None,
-            'text': data.strip(),
+            'text': normalized,
             'context': context
         })
 
@@ -172,12 +181,14 @@ class TranslationDatabase:
     def add_translation(self, source_lang: str, target_lang: str,
                        source_text: str, target_text: str, context: str = None):
         """Add or update a translation"""
+        normalized_source = normalize_translation_text(source_text)
+        normalized_target = normalize_translation_text(target_text)
         cursor = self.conn.cursor()
         cursor.execute('''
             INSERT OR REPLACE INTO translations
             (source_lang, target_lang, source_text, target_text, context, updated_at)
             VALUES (?, ?, ?, ?, ?, ?)
-        ''', (source_lang, target_lang, source_text, target_text, context,
+        ''', (source_lang, target_lang, normalized_source, normalized_target, context,
               datetime.now()))
         self.conn.commit()
 
@@ -288,7 +299,7 @@ class TranslationManager:
                  target_langs: List[str] = None,
                  db_path: str = 'translations.db'):
         self.source_lang = source_lang
-        self.target_langs = target_langs or ['fr', 'de', 'pt', 'nl', 'es', 'it', 'ml', 'pa', 'hi']
+        self.target_langs = target_langs or DEFAULT_TARGET_LANGS
         self.db = TranslationDatabase(db_path)
         self.base_dir = Path('.')
 
@@ -389,10 +400,12 @@ class TranslationManager:
 
         for item in source_texts:
             text = item['text']
+            # Normalize whitespace for lookup consistency
+            normalized_text = normalize_translation_text(text)
             context = item.get('context')
 
             translation = self.db.get_translation(
-                self.source_lang, target_lang, text, context
+                self.source_lang, target_lang, normalized_text, context
             )
 
             if translation is None:
@@ -412,7 +425,7 @@ class TranslationManager:
                 writer.writerow([
                     self.source_lang,
                     target_lang,
-                    item['text'],
+                    normalize_translation_text(item['text']),
                     '',  # Empty for manual translation
                     item.get('context', ''),
                     item.get('type', 'text')
@@ -430,15 +443,90 @@ class TranslationManager:
                 writer.writerow([
                     self.source_lang,
                     target_lang,
-                    item['source_text'],
-                    item['target_text'],  # Already translated
+                    normalize_translation_text(item['source_text']),
+                    normalize_translation_text(item['target_text']),  # Already translated
                     item.get('context', ''),
                     item.get('type', 'text')
                 ])
 
+    def load_glossary(self, glossary_file: str) -> Dict[str, str]:
+        """Load a normalized source_text -> target_text glossary from JSON."""
+        glossary_path = Path(glossary_file)
+        if not glossary_path.exists():
+            return {}
+
+        with open(glossary_path, 'r', encoding='utf-8') as f:
+            raw_entries = json.load(f)
+
+        return {
+            normalize_translation_text(source): normalize_translation_text(target)
+            for source, target in raw_entries.items()
+            if normalize_translation_text(source) and normalize_translation_text(target)
+        }
+
+    def prefill_translations_in_csv(self, csv_file: str,
+                                   glossaries_by_lang: Dict[str, Dict[str, str]],
+                                   overwrite_existing: bool = False) -> Dict[str, int]:
+        """Prefill pending CSV translations from DB first, glossary second."""
+        with open(csv_file, 'r', encoding='utf-8-sig', newline='') as f:
+            rows = list(csv.DictReader(f))
+            fieldnames = rows[0].keys() if rows else []
+
+        stats = {
+            'rows': len(rows),
+            'updated': 0,
+            'from_db': 0,
+            'from_glossary': 0,
+            'remaining': 0,
+        }
+
+        for row in rows:
+            row['source_text'] = normalize_translation_text(row.get('source_text', ''))
+            row['dest_text'] = normalize_translation_text(row.get('dest_text', ''))
+
+            if row['dest_text'] and not overwrite_existing:
+                continue
+
+            target_lang = row.get('dest_language', '')
+            context = row.get('context')
+            source_text = row['source_text']
+
+            translated = self.db.get_translation(
+                row.get('source_language', self.source_lang),
+                target_lang,
+                source_text,
+                context
+            )
+            source_name = None
+
+            if translated:
+                source_name = 'from_db'
+            else:
+                glossary = glossaries_by_lang.get(target_lang, {})
+                translated = glossary.get(source_text)
+                if translated:
+                    source_name = 'from_glossary'
+
+            if translated:
+                translated = normalize_translation_text(translated)
+                if row['dest_text'] != translated:
+                    row['dest_text'] = translated
+                    stats['updated'] += 1
+                if source_name:
+                    stats[source_name] += 1
+            elif not row['dest_text']:
+                stats['remaining'] += 1
+
+        with open(csv_file, 'w', encoding='utf-8-sig', newline='') as f:
+            writer = csv.DictWriter(f, fieldnames=fieldnames)
+            writer.writeheader()
+            writer.writerows(rows)
+
+        return stats
+
     def import_translations_from_csv(self, csv_file: str):
         """Import completed translations from CSV"""
-        with open(csv_file, 'r', encoding='utf-8') as f:
+        with open(csv_file, 'r', encoding='utf-8-sig') as f:
             reader = csv.DictReader(f)
 
             for row in reader:
@@ -446,8 +534,8 @@ class TranslationManager:
                     self.db.add_translation(
                         row['source_language'],
                         row['dest_language'],
-                        row['source_text'],
-                        row['dest_text'],
+                        normalize_translation_text(row['source_text']),
+                        normalize_translation_text(row['dest_text']),
                         row.get('context')
                     )
 
@@ -476,7 +564,7 @@ class TranslationManager:
         return str(Path(*new_parts))
 
     def process_file(self, source_file: str, target_lang: str,
-                    check_existing: bool = True) -> Dict:
+                    check_existing: bool = True, force: bool = False) -> Dict:
         """
         Process a single file for translation
         Returns statistics about translation status
@@ -485,9 +573,10 @@ class TranslationManager:
             source_file: Source file path
             target_lang: Target language code
             check_existing: If True, check for existing translated file
+            force: If True, skip has_file_changed check and force extraction
         """
-        # Check if file has changed
-        if not self.has_file_changed(source_file):
+        # Check if file has changed (skip if force=True)
+        if not force and not self.has_file_changed(source_file):
             return {
                 'file': source_file,
                 'status': 'unchanged',
@@ -698,10 +787,14 @@ class TranslationManager:
             # Example mappings
             writer.writerow(['en', 'fr', 'en/travel', 'fr/voyages'])
             writer.writerow(['en', 'fr', 'en/photography', 'fr/photographie'])
+            writer.writerow(['en', 'es', 'en/travel', 'es/viajes'])
+            writer.writerow(['en', 'es', 'en/photography', 'es/fotografia'])
+            writer.writerow(['en', 'pt', 'en/travel', 'pt/viagens'])
+            writer.writerow(['en', 'pt', 'en/photography', 'pt/fotografia'])
 
     def import_path_mappings(self, csv_file: str):
         """Import path mappings from CSV"""
-        with open(csv_file, 'r', encoding='utf-8') as f:
+        with open(csv_file, 'r', encoding='utf-8-sig') as f:
             reader = csv.DictReader(f)
 
             for row in reader:
@@ -759,7 +852,7 @@ class TranslationManager:
 
         return sorted(list(files_to_process))
 
-    def extract_for_language(self, target_lang: str, output_dir: str = 'translations_pending') -> dict:
+    def extract_for_language(self, target_lang: str, output_dir: str = 'translations_pending', force: bool = False) -> dict:
         """
         Extract missing translations for a specific language
         Only processes files with path mappings
@@ -767,6 +860,7 @@ class TranslationManager:
         Args:
             target_lang: Target language code
             output_dir: Directory for output CSV files
+            force: Re-extract even if file was previously processed
 
         Returns:
             Dictionary with statistics
@@ -791,7 +885,7 @@ class TranslationManager:
                 print(f"Warning: Mapped file not found: {source_file}")
                 continue
 
-            result = self.process_file(source_file, target_lang, check_existing=True)
+            result = self.process_file(source_file, target_lang, check_existing=True, force=force)
 
             # Handle existing translated file
             if result['status'] == 'has_existing_translation':

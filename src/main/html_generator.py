@@ -18,6 +18,7 @@ from translation_rules import (
     TRANSLATABLE_ATTRIBUTES,
     TRANSLATABLE_META_NAMES,
 )
+from translation_config import DEFAULT_DB_PATH, DEFAULT_SOURCE_DIR
 
 
 class HTMLTranslator(HTMLParser):
@@ -121,10 +122,13 @@ class HTMLTranslator(HTMLParser):
         # Get current context
         context = '/'.join(self.current_tag_stack) if self.current_tag_stack else 'text'
 
+        # Normalize whitespace: strip and collapse internal whitespace to single spaces
+        normalized = ' '.join(data.strip().split())
+
         # Try to get translation
         translation = self.db.get_translation(
             self.source_lang, self.target_lang,
-            data.strip(), context
+            normalized, context
         )
 
         if translation:
@@ -508,11 +512,20 @@ def main():
     parser.add_argument('--source-dir',
                        help='Source directory (for translate-dir)')
 
-    parser.add_argument('--target-lang', required=True,
-                       help='Target language code')
+    parser.add_argument('--target-lang',
+                       help='Target language code (use --target-langs for multiple)')
+
+    parser.add_argument('--target-langs', nargs='+',
+                       help='One or more target language codes')
 
     parser.add_argument('--output',
                        help='Output file/directory (auto-generated if not specified)')
+
+    parser.add_argument('--db-path', default=DEFAULT_DB_PATH,
+                       help=f'Path to translations.db (default: {DEFAULT_DB_PATH})')
+
+    parser.add_argument('--source-lang', default='en',
+                       help='Source language code (default: en)')
 
     parser.add_argument('--no-rewrite-links', action='store_true',
                        help='Do not rewrite internal links')
@@ -530,7 +543,17 @@ def main():
 
     args = parser.parse_args()
 
-    generator = HTMLGenerator()
+    # Determine target languages (support both --target-lang and --target-langs)
+    target_langs = args.target_langs if args.target_langs else (
+        [args.target_lang] if args.target_lang else None
+    )
+
+    if not target_langs:
+        print("Error: --target-lang or --target-langs required")
+        return 1
+
+    # Create generator with specified db_path and source_lang
+    generator = HTMLGenerator(source_lang=args.source_lang, db_path=args.db_path)
 
     try:
         if args.command == 'translate-file':
@@ -538,18 +561,20 @@ def main():
                 print("Error: --source-file required for translate-file")
                 return 1
 
-            output_file = generator.translate_file(
-                args.source_file,
-                args.target_lang,
-                args.output,
-                rewrite_links=not args.no_rewrite_links,
-                dry_run=args.dry_run,
-                confirm=not args.no_confirm,
-                force=args.force,
-            )
+            # For single file, process each target language
+            for target_lang in target_langs:
+                output_file = generator.translate_file(
+                    args.source_file,
+                    target_lang,
+                    args.output,
+                    rewrite_links=not args.no_rewrite_links,
+                    dry_run=args.dry_run,
+                    confirm=not args.no_confirm,
+                    force=args.force,
+                )
 
-            if output_file and not args.dry_run:
-                print(f"Generated: {output_file}")
+                if output_file and not args.dry_run:
+                    print(f"Generated: {output_file}")
 
         elif args.command == 'translate-dir':
             if not args.source_dir:
@@ -559,20 +584,23 @@ def main():
             if args.dry_run:
                 print("[DRY-RUN MODE] Showing what would be generated:\n")
 
-            generated_files = generator.translate_directory(
-                args.source_dir,
-                args.target_lang,
-                args.pattern,
-                rewrite_links=not args.no_rewrite_links,
-                dry_run=args.dry_run,
-                confirm=not args.no_confirm,
-                force=args.force,
-            )
+            total_files = 0
+            for target_lang in target_langs:
+                generated_files = generator.translate_directory(
+                    args.source_dir,
+                    target_lang,
+                    args.pattern,
+                    rewrite_links=not args.no_rewrite_links,
+                    dry_run=args.dry_run,
+                    confirm=not args.no_confirm,
+                    force=args.force,
+                )
+                total_files += len(generated_files)
 
             if args.dry_run:
-                print(f"\n[DRY-RUN] Would generate {len(generated_files)} files")
+                print(f"\n[DRY-RUN] Would generate {total_files} files")
             else:
-                print(f"\nGenerated {len(generated_files)} files")
+                print(f"\nGenerated {total_files} files")
 
     finally:
         generator.close()

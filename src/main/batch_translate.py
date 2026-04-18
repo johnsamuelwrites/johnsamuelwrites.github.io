@@ -9,21 +9,24 @@ import sys
 import glob
 import shutil
 import argparse
+import csv
 from pathlib import Path
 from datetime import datetime
 from translate_manager import TranslationManager
-
 from html_generator import HTMLGenerator
-
-
-# Get repository root (two levels up from this script)
-REPO_ROOT = Path(__file__).resolve().parent.parent.parent
-
-# Configuration
-SOURCE_LANG = "en"
-TARGET_LANGS = ["fr", "de", "pt", "nl", "es", "it", "ml", "pa", "hi"]
-SOURCE_DIR = "en/photography"
-OUTPUT_DIR = "translations_pending"
+from translation_config import (
+    SOURCE_LANG,
+    DEFAULT_TARGET_LANGS,
+    DEFAULT_DB_PATH,
+    DEFAULT_PATH_MAPPINGS,
+    DEFAULT_OUTPUT_DIR,
+    DEFAULT_BACKUP_DIR,
+    DEFAULT_GLOSSARY_DIR,
+    DEFAULT_MANIFEST_DIR,
+    DEFAULT_SOURCE_DIR,
+)
+from translation_log import backup_database, TranslationLog
+from paths import REPO_ROOT
 
 
 class Colors:
@@ -65,22 +68,14 @@ def print_error(message):
     print(f"{Colors.RED}[ERROR]{Colors.NC} {message}")
 
 
-def extract_for_file(manager, file_path, lang):
-    """
-    Extract translations for a single file and language
-
-    Returns:
-        bool: True if there are missing translations, False otherwise
-    """
+def extract_for_file(manager, file_path, lang, output_dir, force=False):
+    """Extract translations for a single file and language"""
     basename = Path(file_path).stem
-    output_csv = Path(OUTPUT_DIR) / f"missing_{lang}_{basename}.csv"
+    output_csv = Path(output_dir) / f"missing_{lang}_{basename}.csv"
 
-    print_info(f"Extracting {basename} for {lang}...")
-
-    result = manager.process_file(str(file_path), lang)
+    result = manager.process_file(str(file_path), lang, force=force)
 
     if result['missing'] == 0:
-        print_info(f"  ✓ No missing translations for {lang}")
         return False
     else:
         manager.export_missing_to_csv(
@@ -92,47 +87,78 @@ def extract_for_file(manager, file_path, lang):
         return True
 
 
-def process_file(manager, file_path):
-    """
-    Process a single HTML file for all target languages
+def cmd_setup(args):
+    """Initial setup - create path mapping template"""
+    print_info("Setting up translation system...")
 
-    Returns:
-        bool: True if any language has missing translations
-    """
-    print_info(f"Processing: {file_path}")
+    path_mappings_file = Path(args.paths_file)
 
-    has_missing = False
+    if path_mappings_file.exists():
+        print_warning(f"{path_mappings_file} already exists")
+        return 0
 
-    for lang in TARGET_LANGS:
-        if extract_for_file(manager, file_path, lang):
-            has_missing = True
+    manager = TranslationManager(
+        source_lang=args.source_lang,
+        target_langs=args.target_langs,
+        db_path=args.db_path
+    )
 
-    if not has_missing:
-        print_info(f"✓ File fully translated: {file_path}")
+    try:
+        manager.create_path_mapping_template(str(path_mappings_file))
+        print_info(f"Created {path_mappings_file}")
+        print_info(f"Please edit {path_mappings_file} and run: python batch_translate.py import-paths")
+    finally:
+        manager.close()
 
-    print()  # Empty line for readability
-    return has_missing
+    return 0
 
 
-def extract_all(source_dir=SOURCE_DIR):
+def cmd_import_paths(args):
+    """Import path mappings from CSV"""
+    path_mappings_file = Path(args.paths_file)
+
+    if not path_mappings_file.exists():
+        print_error(f"{path_mappings_file} not found")
+        print_info(f"Run: python batch_translate.py setup")
+        return 1
+
+    manager = TranslationManager(
+        source_lang=args.source_lang,
+        target_langs=[],  # Not needed for import-paths, imports all mappings
+        db_path=args.db_path
+    )
+
+    try:
+        manager.import_path_mappings(str(path_mappings_file))
+        print_info("Path mappings imported")
+    finally:
+        manager.close()
+
+    return 0
+
+
+def cmd_extract(args):
     """Extract translations based on path mappings in DB"""
     print_info("Starting extraction based on path mappings")
-    print_info(f"Target languages: {', '.join(TARGET_LANGS)}")
+    print_info(f"Target languages: {', '.join(args.target_langs)}")
     print()
 
     # Create output directory
-    output_dir = REPO_ROOT / OUTPUT_DIR
+    output_dir = Path(args.output_dir)
     output_dir.mkdir(parents=True, exist_ok=True)
 
-    # Initialize manager V2 (mapping-based)
-    manager = TranslationManager(source_lang=SOURCE_LANG, target_langs=TARGET_LANGS, db_path=str(REPO_ROOT / "translations.db"))
+    manager = TranslationManager(
+        source_lang=args.source_lang,
+        target_langs=args.target_langs,
+        db_path=args.db_path
+    )
 
     try:
         total_missing = 0
 
-        for lang in TARGET_LANGS:
+        for lang in args.target_langs:
             print_info(f"Processing {lang}...")
-            stats = manager.extract_for_language(lang, str(output_dir))
+            stats = manager.extract_for_language(lang, str(output_dir), force=args.force)
 
             if stats['total_files'] == 0:
                 print_warning(f"  No path mappings for {lang}")
@@ -142,11 +168,10 @@ def extract_all(source_dir=SOURCE_DIR):
 
             print()
 
-        # Show statistics
-        show_statistics()
+        cmd_stats(args)
 
         if total_missing > 0:
-            print_info(f"Done! Edit CSV files in {OUTPUT_DIR} and run: python {sys.argv[0]} import")
+            print_info(f"Done! Edit CSV files in {args.output_dir} and run: python batch_translate.py import")
         else:
             print_info("All mapped files are fully translated!")
 
@@ -156,84 +181,93 @@ def extract_all(source_dir=SOURCE_DIR):
     return 0
 
 
-def extract_file(file_path):
+def cmd_extract_file(args):
     """Extract translations for a single file"""
-    # Check if file exists
-    full_path = REPO_ROOT / file_path
+    file_path = args.file
+    full_path = Path(file_path)
+
     if not full_path.is_file():
         print_error(f"File not found: {file_path}")
         return 1
 
-    # Create output directory
-    output_dir = REPO_ROOT / OUTPUT_DIR
+    output_dir = Path(args.output_dir)
     output_dir.mkdir(parents=True, exist_ok=True)
 
-    # Initialize manager
-    manager = TranslationManager(source_lang=SOURCE_LANG, target_langs=TARGET_LANGS, db_path=str(REPO_ROOT / "translations.db"))
+    manager = TranslationManager(
+        source_lang=args.source_lang,
+        target_langs=args.target_langs,
+        db_path=args.db_path
+    )
 
     try:
-        process_file(manager, file_path)
-        show_statistics()
+        print_info(f"Processing: {file_path}")
+        has_missing = False
+
+        for lang in args.target_langs:
+            if extract_for_file(manager, file_path, lang, output_dir, force=args.force):
+                has_missing = True
+
+        if not has_missing:
+            print_info(f"* File fully translated: {file_path}")
+
+        cmd_stats(args)
     finally:
         manager.close()
 
     return 0
 
 
-def import_translations():
+def cmd_import(args):
     """Import completed translations from CSV files"""
     print_info("Importing completed translations...")
 
-    # Initialize manager
-    manager = TranslationManager(source_lang=SOURCE_LANG, target_langs=TARGET_LANGS, db_path=str(REPO_ROOT / "translations.db"))
+    manager = TranslationManager(
+        source_lang=args.source_lang,
+        target_langs=args.target_langs,
+        db_path=args.db_path
+    )
 
     try:
-        # Find all CSV files in output directory
-        output_dir = REPO_ROOT / OUTPUT_DIR
+        output_dir = Path(args.output_dir)
         csv_files = list(output_dir.glob('*.csv'))
 
         if not csv_files:
-            print_warning(f"No CSV files found in {OUTPUT_DIR}")
+            print_warning(f"No CSV files found in {args.output_dir}")
             return 0
 
         imported = 0
         total = len(csv_files)
 
-        # Create completed directory
         completed_dir = output_dir / 'completed'
         completed_dir.mkdir(parents=True, exist_ok=True)
 
         for csv_file in csv_files:
-            # Check if CSV has translations
-            with open(csv_file, 'r', encoding='utf-8') as f:
-                lines = f.readlines()
+            with open(csv_file, 'r', encoding='utf-8-sig', newline='') as f:
+                rows = list(csv.DictReader(f))
 
-            # Check if any line has content in dest_text column (column 3)
-            has_translations = False
-            for line in lines[1:]:  # Skip header
-                if line.strip():
-                    parts = line.split(',')
-                    if len(parts) >= 4 and parts[3].strip():
-                        has_translations = True
-                        break
+            total_entries = len(rows)
+            translated_entries = sum(
+                1 for row in rows if row.get('dest_text', '').strip()
+            )
 
-            if has_translations:
-                print_info(f"Importing: {csv_file.name}")
+            is_complete = total_entries > 0 and translated_entries == total_entries
+
+            if is_complete:
+                print_info(f"Importing: {csv_file.name} ({translated_entries}/{total_entries} translations)")
                 manager.import_translations_from_csv(str(csv_file))
                 imported += 1
 
-                # Move to completed folder
                 shutil.move(str(csv_file), str(completed_dir / csv_file.name))
             else:
-                print_warning(f"Skipping (not completed): {csv_file.name}")
+                if total_entries == 0:
+                    print_warning(f"Skipping (empty): {csv_file.name}")
+                else:
+                    print_warning(f"Skipping (incomplete): {csv_file.name} ({translated_entries}/{total_entries} translations)")
 
         print_info(f"Imported {imported}/{total} CSV files")
 
-        # Generate overview
-        generate_overview(manager)
-
-        # Show statistics
-        show_statistics()
+        cmd_overview(args)
+        cmd_stats(args)
 
     finally:
         manager.close()
@@ -241,29 +275,86 @@ def import_translations():
     return 0
 
 
-def generate_overview(manager=None):
-    """Generate translation overview HTML (mapping-based)"""
+def cmd_prefill(args):
+    """Prefill pending translations from DB and glossary files."""
+    print_info("Prefilling pending translations...")
+
+    manager = TranslationManager(
+        source_lang=args.source_lang,
+        target_langs=args.target_langs,
+        db_path=args.db_path
+    )
+
+    try:
+        output_dir = Path(args.output_dir)
+        csv_files = list(output_dir.glob('*.csv'))
+
+        if not csv_files:
+            print_warning(f"No CSV files found in {args.output_dir}")
+            return 0
+
+        glossary_base = Path(args.glossary_dir)
+        glossaries = {}
+        for lang in args.target_langs:
+            glossary_file = glossary_base / f'translation_glossary_{lang}.json'
+            glossaries[lang] = manager.load_glossary(str(glossary_file))
+            if glossaries[lang]:
+                print_info(f"Loaded glossary for {lang}: {glossary_file.name} ({len(glossaries[lang])} entries)")
+            else:
+                print_warning(f"No glossary found for {lang}: {glossary_file.name}")
+
+        total_updated = 0
+        total_from_db = 0
+        total_from_glossary = 0
+        total_remaining = 0
+
+        for csv_file in csv_files:
+            stats = manager.prefill_translations_in_csv(
+                str(csv_file),
+                glossaries,
+                overwrite_existing=args.overwrite
+            )
+            total_updated += stats['updated']
+            total_from_db += stats['from_db']
+            total_from_glossary += stats['from_glossary']
+            total_remaining += stats['remaining']
+
+            print_info(
+                f"{csv_file.name}: updated={stats['updated']}, "
+                f"db={stats['from_db']}, glossary={stats['from_glossary']}, "
+                f"remaining={stats['remaining']}"
+            )
+
+        print_info(
+            f"Prefill complete: updated={total_updated}, "
+            f"db={total_from_db}, glossary={total_from_glossary}, remaining={total_remaining}"
+        )
+    finally:
+        manager.close()
+
+    return 0
+
+
+def cmd_overview(args):
+    """Generate translation overview HTML"""
     print_info("Generating translation overview...")
 
-    # Use the new mapping-based overview generator
     from generate_overview import generate_overview as gen_overview
 
-    output_path = REPO_ROOT / 'analysis/translation_overview.html'
+    output_path = Path('analysis/translation_overview.html')
     gen_overview(str(output_path))
-    print_info(f"Overview saved to: analysis/translation_overview.html")
+    print_info(f"Overview saved to: {output_path}")
 
 
-def show_statistics():
+def cmd_stats(args):
     """Show translation statistics"""
     print_info("Translation Statistics:")
 
-    # Count pending CSVs
-    pending_dir = REPO_ROOT / OUTPUT_DIR
-    pending_csvs = list(pending_dir.glob('*.csv'))
+    output_dir = Path(args.output_dir)
+    pending_csvs = list(output_dir.glob('*.csv'))
     pending = len(pending_csvs)
 
-    # Count completed CSVs
-    completed_dir = pending_dir / 'completed'
+    completed_dir = output_dir / 'completed'
     completed = 0
     if completed_dir.is_dir():
         completed_csvs = list(completed_dir.glob('*.csv'))
@@ -272,8 +363,7 @@ def show_statistics():
     print(f"  Pending translations: {pending} CSV files")
     print(f"  Completed imports: {completed} CSV files")
 
-    # Show database statistics if it exists
-    db_path = REPO_ROOT / 'translations.db'
+    db_path = Path(args.db_path)
     if db_path.is_file():
         import sqlite3
         conn = sqlite3.connect(str(db_path))
@@ -290,54 +380,95 @@ def show_statistics():
         conn.close()
 
 
-def setup():
-    """Initial setup - create path mapping template"""
-    print_info("Setting up translation system...")
-
-    path_mappings_file = REPO_ROOT / 'path_mappings.csv'
-
-    if path_mappings_file.exists():
-        print_warning("path_mappings.csv already exists")
-        return 0
-
-    manager = TranslationManager(source_lang=SOURCE_LANG, target_langs=TARGET_LANGS, db_path=str(REPO_ROOT / 'translations.db'))
+def cmd_completeness(args):
+    """Show translation completeness per file"""
+    manager = TranslationManager(
+        source_lang=args.source_lang,
+        db_path=args.db_path
+    )
 
     try:
-        manager.create_path_mapping_template(str(path_mappings_file))
-        print_info(f"Created {path_mappings_file}")
-        print_info(f"Please edit {path_mappings_file} and run: python {sys.argv[0]} import-paths")
+        for lang in args.target_langs:
+            print_info(f"Translation completeness for {lang}:")
+
+            files_to_process = manager.get_files_from_mappings(lang)
+
+            if not files_to_process:
+                print_warning(f"  No path mappings for {lang}")
+                continue
+
+            # Collect completeness data
+            completeness_data = []
+            for source_file in files_to_process:
+                if not Path(source_file).exists():
+                    continue
+
+                result = manager.process_file(source_file, lang, check_existing=False, force=True)
+                total = result.get('total', 0)
+                found = result.get('found', 0)
+
+                if total == 0:
+                    pct = 100
+                else:
+                    pct = (found / total) * 100
+
+                completeness_data.append({
+                    'file': Path(source_file).name,
+                    'path': source_file,
+                    'total': total,
+                    'found': found,
+                    'pct': pct,
+                })
+
+            # Sort by chosen field
+            if args.sort_by == 'percent':
+                completeness_data.sort(key=lambda x: (-x['pct'], x['file']))
+            elif args.sort_by == 'missing':
+                completeness_data.sort(key=lambda x: (x['total'] - x['found'], x['file']))
+            else:  # name
+                completeness_data.sort(key=lambda x: x['file'])
+
+            # Print results
+            fully_translated = 0
+            for item in completeness_data:
+                pct = item['pct']
+                found = item['found']
+                total = item['total']
+                file = item['file']
+
+                # Create progress bar
+                bar_len = 20
+                filled = int(bar_len * pct / 100)
+                bar = '#' * filled + '-' * (bar_len - filled)
+
+                if pct == 100:
+                    fully_translated += 1
+                    status = "*"
+                else:
+                    status = " "
+
+                print(f"  {status} [{bar}] {pct:5.1f}% {file:30s} ({found}/{total})")
+
+            # Summary
+            total_files = len(completeness_data)
+            print_info(f"  {fully_translated}/{total_files} files fully translated")
+
     finally:
         manager.close()
 
     return 0
 
 
-def import_paths():
-    """Import path mappings from CSV"""
-    path_mappings_file = REPO_ROOT / 'path_mappings.csv'
-
-    if not path_mappings_file.exists():
-        print_error(f"{path_mappings_file} not found")
-        print_info(f"Run: python {sys.argv[0]} setup")
-        return 1
-
-    manager = TranslationManager(source_lang=SOURCE_LANG, target_langs=TARGET_LANGS, db_path=str(REPO_ROOT / "translations.db"))
-
-    try:
-        manager.import_path_mappings(str(path_mappings_file))
-        print_info("Path mappings imported")
-    finally:
-        manager.close()
-
-    return 0
-
-
-def export_database():
+def cmd_export(args):
     """Export database to JSON"""
     timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
     output_file = f"translations_backup_{timestamp}.json"
 
-    manager = TranslationManager(source_lang=SOURCE_LANG, target_langs=TARGET_LANGS, db_path=str(REPO_ROOT / "translations.db"))
+    manager = TranslationManager(
+        source_lang=args.source_lang,
+        target_langs=args.target_langs,
+        db_path=args.db_path
+    )
 
     try:
         manager.db.export_to_json(output_file)
@@ -348,51 +479,35 @@ def export_database():
     return 0
 
 
-def generate_html_file(source_file, target_lang):
-    """Generate translated HTML file"""
-    if len(sys.argv) < 3:
-        print_error("Usage: python {} generate-file <source_file> <target_lang>".format(sys.argv[0]))
-        return 1
+def cmd_generate(args):
+    """Generate translated HTML files for specified languages"""
+    print_info(f"Generating HTML files for: {', '.join(args.target_langs)}")
 
-    if not Path(source_file).exists():
-        print_error(f"File not found: {source_file}")
-        return 1
+    manager = TranslationManager(
+        source_lang=args.source_lang,
+        db_path=args.db_path
+    )
 
-    print_info(f"Generating {target_lang} version of {source_file}...")
+    # Create backup before generation
+    Path(args.backup_dir).mkdir(parents=True, exist_ok=True)
+    backup_path, db_hash = backup_database(args.db_path, args.backup_dir, label="generate")
+    print_info(f"Created DB backup: {backup_path}")
 
-    generator = HTMLGenerator(source_lang=SOURCE_LANG)
-
-    try:
-        output_file = generator.translate_file(source_file, target_lang)
-        print_info(f"✓ Generated: {output_file}")
-    finally:
-        generator.close()
-
-    return 0
-
-
-def generate_html_all(target_lang=None):
-    """
-    Generate/regenerate HTML files based on mappings
-    - NEW files: only if explicit mapping exists
-    - EXISTING files: regenerate if translations updated (check file mtime)
-    """
-    langs_to_generate = [target_lang] if target_lang else TARGET_LANGS
-
-    manager = TranslationManager(source_lang=SOURCE_LANG, db_path=str(REPO_ROOT / "translations.db"))
+    # Initialize translation log
+    log = TranslationLog()
+    log.start_batch(args.db_path, args.source_lang, args.target_langs, args.source_dir)
 
     try:
-        for lang in langs_to_generate:
-            print_info(f"Generating HTML files for {lang}...")
+        for lang in args.target_langs:
+            print_info(f"Generating {lang}...")
 
-            # Get all files with mappings
             files_to_process = manager.get_files_from_mappings(lang)
 
             if not files_to_process:
                 print_warning(f"  No path mappings for {lang}")
                 continue
 
-            generator = HTMLGenerator(source_lang=SOURCE_LANG)
+            generator = HTMLGenerator(source_lang=args.source_lang, db_path=args.db_path)
             generated_count = 0
             skipped_count = 0
             regenerated_count = 0
@@ -404,19 +519,16 @@ def generate_html_all(target_lang=None):
                         continue
 
                     try:
-                        # Determine output file path
                         source_path_normalized = str(Path(source_file)).replace('\\', '/')
 
-                        # Try exact file mapping
                         target_path = manager.db.get_path_mapping(
-                            SOURCE_LANG, lang, source_path_normalized
+                            args.source_lang, lang, source_path_normalized
                         )
 
                         if not target_path:
-                            # Try directory mapping
                             source_dir = str(Path(source_file).parent).replace('\\', '/')
                             target_dir = manager.db.get_path_mapping(
-                                SOURCE_LANG, lang, source_dir
+                                args.source_lang, lang, source_dir
                             )
                             if target_dir:
                                 target_path = str(Path(target_dir) / Path(source_file).name).replace('\\', '/')
@@ -426,63 +538,93 @@ def generate_html_all(target_lang=None):
                             skipped_count += 1
                             continue
 
-                        # Check if output file exists
+                        # Check completeness if required
+                        if args.require_complete:
+                            result = manager.process_file(source_file, lang, check_existing=False, force=True)
+                            if result.get('missing', 0) > 0:
+                                print_warning(f"  Skipping (incomplete): {source_file} "
+                                            f"({result['found']}/{result['total']} translations)")
+                                skipped_count += 1
+                                continue
+
                         output_exists = Path(target_path).exists()
 
+                        generator.translate_file(
+                            source_file, lang,
+                            output_file=target_path,
+                            require_mapping=False,
+                            force=args.force,
+                            confirm=not args.force,
+                        )
+
                         if output_exists:
-                            # EXISTING file - check if source was modified after output
-                            source_mtime = Path(source_file).stat().st_mtime
-                            output_mtime = Path(target_path).stat().st_mtime
-
-                            if source_mtime <= output_mtime:
-                                # Source not modified, check if DB translations updated
-                                # For simplicity, always regenerate existing files
-                                # (proper implementation would track translation update times)
-                                pass
-
-                            # Regenerate existing file
-                            generator.translate_file(
-                                source_file, lang,
-                                output_file=target_path,
-                                require_mapping=False
-                            )
-                            print(f"  ↻ Regenerated: {target_path}")
+                            print(f"  [REGEN] {target_path}")
                             regenerated_count += 1
                         else:
-                            # NEW file - generate it
-                            generator.translate_file(
-                                source_file, lang,
-                                output_file=target_path,
-                                require_mapping=False
-                            )
-                            print(f"  ✓ Generated: {target_path}")
+                            print(f"  [OK] {target_path}")
                             generated_count += 1
 
+                        log.record_file(source_file, target_path, lang)
+
                     except Exception as e:
-                        print_error(f"  ✗ Failed: {source_file} - {str(e)}")
+                        print_error(f"  [FAIL] {source_file} - {str(e)}")
 
             finally:
                 generator.close()
 
             print_info(f"  {generated_count} new, {regenerated_count} regenerated, {skipped_count} skipped")
-            print()
 
     finally:
         manager.close()
 
+    # Finalize and write log
+    log.finish_batch(backup_path, db_hash)
+    Path(args.manifest_dir).mkdir(parents=True, exist_ok=True)
+    manifest_path = log.write(args.manifest_dir)
+    print_info(f"Translation manifest saved: {manifest_path}")
+
     return 0
 
 
-def clean_pending():
-    """Clean pending translations (use with caution!)"""
-    output_dir = REPO_ROOT / OUTPUT_DIR
+def cmd_generate_lang(args):
+    """Generate HTML files for a specific language"""
+    # Override target_langs with the single specified language
+    args.target_langs = [args.language]
+    return cmd_generate(args)
+
+
+def cmd_generate_file(args):
+    """Generate single translated HTML file"""
+    source_file = args.file
+    target_lang = args.language
+
+    if not Path(source_file).exists():
+        print_error(f"File not found: {source_file}")
+        return 1
+
+    print_info(f"Generating {target_lang} version of {source_file}...")
+
+    generator = HTMLGenerator(source_lang=args.source_lang, db_path=args.db_path)
+
+    try:
+        output_file = generator.translate_file(source_file, target_lang, force=args.force)
+        print_info(f"✓ Generated: {output_file}")
+    finally:
+        generator.close()
+
+    return 0
+
+
+def cmd_clean(args):
+    """Clean pending translations"""
+    output_dir = Path(args.output_dir)
     pending_csvs = list(output_dir.glob('*.csv'))
 
     if not pending_csvs:
         print_info("No pending CSV files to clean")
         return 0
 
-    print_warning(f"This will delete {len(pending_csvs)} pending CSV files in {OUTPUT_DIR}")
+    print_warning(f"This will delete {len(pending_csvs)} pending CSV files in {args.output_dir}")
     response = input("Are you sure? (yes/no): ")
 
     if response.lower() == 'yes':
@@ -495,134 +637,171 @@ def clean_pending():
     return 0
 
 
-def show_help():
-    """Show help message"""
-    help_text = f"""
-Batch Translation Helper Script
-
-Usage: python {sys.argv[0]} <command>
-
-Commands:
-  setup           - Initial setup (create path mapping template)
-  import-paths    - Import path mappings from path_mappings.csv
-  extract         - Extract missing translations from all files
-  extract-file    - Extract missing translations from a single file
-  import          - Import completed translations from CSV files
-  generate        - Generate translated HTML files (all languages)
-  generate-lang   - Generate HTML files for specific language
-  generate-file   - Generate single translated HTML file
-  overview        - Generate translation overview HTML
-  stats           - Show translation statistics
-  export          - Export database to JSON (backup)
-  clean           - Delete pending CSV files
-  help            - Show this help
-
-Workflow:
-  1. python {sys.argv[0]} setup              # Create path mapping template
-  2. Edit path_mappings.csv
-  3. python {sys.argv[0]} import-paths       # Import path mappings
-  4. python {sys.argv[0]} extract            # Extract missing translations
-  5. Edit CSV files in {OUTPUT_DIR}
-  6. python {sys.argv[0]} import             # Import completed translations
-  7. python {sys.argv[0]} generate           # Generate HTML files
-  8. python {sys.argv[0]} overview           # View progress
-
-Configuration:
-  Source directory: {SOURCE_DIR}
-  Target languages: {', '.join(TARGET_LANGS)}
-  Output directory: {OUTPUT_DIR}
-
-Examples:
-  # Process a single file
-  python {sys.argv[0]} extract-file en/photography/beaches.html
-
-  # Generate HTML for specific language
-  python {sys.argv[0]} generate-lang de
-
-  # Generate single file
-  python {sys.argv[0]} generate-file en/photography/beaches.html de
-
-  # Generate overview only
-  python {sys.argv[0]} overview
-
-  # Show statistics
-  python {sys.argv[0]} stats
-
-  # Backup database
-  python {sys.argv[0]} export
-"""
-    print(help_text)
-
-
 def main():
     """Main entry point"""
-    if len(sys.argv) < 2:
-        show_help()
+    # Change to repo root so all paths are relative to repository
+    os.chdir(REPO_ROOT)
+
+    parser = argparse.ArgumentParser(
+        description='Batch Translation Helper Script',
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        epilog="""
+Examples:
+  python batch_translate.py setup
+  python batch_translate.py import-paths
+  python batch_translate.py extract --source-dir en/travel --target-langs es pt
+  python batch_translate.py prefill --target-langs es
+  python batch_translate.py import
+  python batch_translate.py generate --source-dir en/travel --target-langs es pt
+  python batch_translate.py stats
+        """
+    )
+
+    # Global arguments
+    parser.add_argument('--db-path', default=DEFAULT_DB_PATH,
+                       help=f'Path to translations.db (default: {DEFAULT_DB_PATH})')
+    parser.add_argument('--source-lang', default=SOURCE_LANG,
+                       help=f'Source language code (default: {SOURCE_LANG})')
+    parser.add_argument('--output-dir', default=DEFAULT_OUTPUT_DIR,
+                       help=f'Output directory for CSVs (default: {DEFAULT_OUTPUT_DIR})')
+    parser.add_argument('--paths-file', default=DEFAULT_PATH_MAPPINGS,
+                       help=f'Path mappings CSV file (default: {DEFAULT_PATH_MAPPINGS})')
+    parser.add_argument('--backup-dir', default=DEFAULT_BACKUP_DIR,
+                       help=f'Database backups directory (default: {DEFAULT_BACKUP_DIR})')
+    parser.add_argument('--manifest-dir', default=DEFAULT_MANIFEST_DIR,
+                       help=f'Translation manifest directory (default: {DEFAULT_MANIFEST_DIR})')
+    parser.add_argument('--glossary-dir', default=DEFAULT_GLOSSARY_DIR,
+                       help=f'Glossary directory (default: {DEFAULT_GLOSSARY_DIR})')
+
+    subparsers = parser.add_subparsers(dest='command', help='Command to run')
+
+    # setup command
+    subparsers.add_parser('setup', help='Create path mapping template')
+
+    # import-paths command
+    subparsers.add_parser('import-paths', help='Import path mappings from CSV')
+
+    # extract command
+    extract_parser = subparsers.add_parser('extract', help='Extract missing translations')
+    extract_parser.add_argument('--source-dir', default=DEFAULT_SOURCE_DIR,
+                               help=f'Source directory (default: {DEFAULT_SOURCE_DIR})')
+    extract_parser.add_argument('--target-langs', nargs='+', default=DEFAULT_TARGET_LANGS,
+                               help=f'Target language codes (default: {DEFAULT_TARGET_LANGS})')
+    extract_parser.add_argument('--force', action='store_true',
+                               help='Re-extract even if files were previously processed')
+
+    # extract-file command
+    extract_file_parser = subparsers.add_parser('extract-file', help='Extract translations from single file')
+    extract_file_parser.add_argument('file', help='HTML file to extract from')
+    extract_file_parser.add_argument('--target-langs', nargs='+', default=DEFAULT_TARGET_LANGS,
+                                    help=f'Target language codes (default: {DEFAULT_TARGET_LANGS})')
+    extract_file_parser.add_argument('--force', action='store_true',
+                                    help='Re-extract even if file was previously processed')
+
+    # import command
+    import_parser = subparsers.add_parser('import', help='Import completed translations from CSVs')
+    import_parser.add_argument('--target-langs', nargs='+', default=DEFAULT_TARGET_LANGS,
+                              help=f'Target language codes (default: {DEFAULT_TARGET_LANGS})')
+
+    # prefill command
+    prefill_parser = subparsers.add_parser(
+        'prefill',
+        help='Prefill pending CSVs from translation DB and glossary files'
+    )
+    prefill_parser.add_argument('--target-langs', nargs='+', default=DEFAULT_TARGET_LANGS,
+                               help=f'Target language codes (default: {DEFAULT_TARGET_LANGS})')
+    prefill_parser.add_argument('--overwrite', action='store_true',
+                               help='Overwrite existing dest_text values if a DB/glossary match exists')
+
+    # overview command
+    subparsers.add_parser('overview', help='Generate translation overview HTML')
+
+    # stats command
+    subparsers.add_parser('stats', help='Show translation statistics')
+
+    # completeness command
+    completeness_parser = subparsers.add_parser('completeness', help='Show translation completeness per file')
+    completeness_parser.add_argument('--target-langs', nargs='+', default=DEFAULT_TARGET_LANGS,
+                                    help=f'Target language codes (default: {DEFAULT_TARGET_LANGS})')
+    completeness_parser.add_argument('--sort-by', choices=['percent', 'missing', 'name'],
+                                    default='percent',
+                                    help='Sort order (default: percent)')
+
+    # export command
+    subparsers.add_parser('export', help='Export database to JSON')
+
+    # generate command
+    generate_parser = subparsers.add_parser('generate', help='Generate translated HTML files')
+    generate_parser.add_argument('--source-dir', default=DEFAULT_SOURCE_DIR,
+                                help=f'Source directory (default: {DEFAULT_SOURCE_DIR})')
+    generate_parser.add_argument('--target-langs', nargs='+', default=DEFAULT_TARGET_LANGS,
+                                help=f'Target language codes (default: {DEFAULT_TARGET_LANGS})')
+    generate_parser.add_argument('--force', action='store_true',
+                                help='Regenerate even if up-to-date')
+    generate_parser.add_argument('--require-complete', action='store_true',
+                                help='Only generate files with 100%% translations in DB')
+
+    # generate-lang command
+    generate_lang_parser = subparsers.add_parser('generate-lang', help='Generate HTML for specific language')
+    generate_lang_parser.add_argument('language', help='Language code')
+    generate_lang_parser.add_argument('--source-dir', default=DEFAULT_SOURCE_DIR,
+                                      help=f'Source directory (default: {DEFAULT_SOURCE_DIR})')
+    generate_lang_parser.add_argument('--force', action='store_true',
+                                      help='Regenerate even if up-to-date')
+
+    # generate-file command
+    generate_file_parser = subparsers.add_parser('generate-file', help='Generate single HTML file')
+    generate_file_parser.add_argument('file', help='Source HTML file')
+    generate_file_parser.add_argument('language', help='Target language code')
+    generate_file_parser.add_argument('--force', action='store_true',
+                                      help='Regenerate even if up-to-date')
+
+    # clean command
+    subparsers.add_parser('clean', help='Delete pending CSV files')
+
+    args = parser.parse_args()
+
+    if not args.command:
+        parser.print_help()
         return 0
 
-    command = sys.argv[1]
-
     try:
-        if command == 'extract':
-            return extract_all()
-
-        elif command == 'extract-file':
-            if len(sys.argv) < 3:
-                print_error("Usage: python {} extract-file <file.html>".format(sys.argv[0]))
-                return 1
-            return extract_file(sys.argv[2])
-
-        elif command == 'import':
-            return import_translations()
-
-        elif command == 'overview':
-            generate_overview()
-            return 0
-
-        elif command == 'stats':
-            show_statistics()
-            return 0
-
-        elif command == 'setup':
-            return setup()
-
-        elif command == 'import-paths':
-            return import_paths()
-
-        elif command == 'export':
-            return export_database()
-
-        elif command == 'generate':
-            return generate_html_all()
-
-        elif command == 'generate-lang':
-            if len(sys.argv) < 3:
-                print_error("Usage: python {} generate-lang <language_code>".format(sys.argv[0]))
-                return 1
-            return generate_html_all(sys.argv[2])
-
-        elif command == 'generate-file':
-            if len(sys.argv) < 4:
-                print_error("Usage: python {} generate-file <source_file> <target_lang>".format(sys.argv[0]))
-                return 1
-            return generate_html_file(sys.argv[2], sys.argv[3])
-
-        elif command == 'clean':
-            return clean_pending()
-
-        elif command == 'help':
-            show_help()
-            return 0
-
+        if args.command == 'setup':
+            return cmd_setup(args)
+        elif args.command == 'import-paths':
+            return cmd_import_paths(args)
+        elif args.command == 'extract':
+            return cmd_extract(args)
+        elif args.command == 'extract-file':
+            return cmd_extract_file(args)
+        elif args.command == 'import':
+            return cmd_import(args)
+        elif args.command == 'prefill':
+            return cmd_prefill(args)
+        elif args.command == 'overview':
+            return cmd_overview(args)
+        elif args.command == 'stats':
+            return cmd_stats(args)
+        elif args.command == 'completeness':
+            return cmd_completeness(args)
+        elif args.command == 'export':
+            return cmd_export(args)
+        elif args.command == 'generate':
+            return cmd_generate(args)
+        elif args.command == 'generate-lang':
+            return cmd_generate_lang(args)
+        elif args.command == 'generate-file':
+            return cmd_generate_file(args)
+        elif args.command == 'clean':
+            return cmd_clean(args)
         else:
-            print_error(f"Unknown command: {command}")
-            show_help()
+            print_error(f"Unknown command: {args.command}")
+            parser.print_help()
             return 1
 
     except KeyboardInterrupt:
         print_error("\nOperation cancelled by user")
         return 130
-
     except Exception as e:
         print_error(f"An error occurred: {str(e)}")
         import traceback
