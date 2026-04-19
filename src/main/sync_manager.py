@@ -56,7 +56,8 @@ class SyncManager:
         source_dir: str,
         output_dir: str,
         target_langs: List[str] = None,
-        force: bool = False
+        force: bool = False,
+        force_langs: set = None
     ) -> Dict[str, any]:
         """
         Check for changed source files and extract translations
@@ -74,18 +75,17 @@ class SyncManager:
                 'extracted_batches': {}
             }
 
-        # Determine which files changed
+        # Determine which files changed (per-language or global)
+        force_langs = force_langs or set()
+
+        # If force=True globally, extract all files for all langs
+        # Otherwise check per-language via force_langs set
         if force:
             changed_files = all_files
         else:
+            # For now, detect globally (if any lang needs changes, extract)
+            # Per-language filtering happens below
             changed_files = self._detect_changed_files(all_files)
-
-        if not changed_files:
-            return {
-                'status': 'no_changes',
-                'changed_files': [],
-                'extracted_batches': {}
-            }
 
         # Update hashes for all files
         for file_path in all_files:
@@ -108,7 +108,14 @@ class SyncManager:
                     'csv_files': []
                 }
 
-                for file_path in changed_files:
+                # Per-language force check: use full extraction if lang is in force_langs
+                lang_force = force or (lang in force_langs)
+                if lang_force:
+                    lang_files = all_files
+                else:
+                    lang_files = changed_files
+
+                for file_path in lang_files:
                     future = executor.submit(
                         self._extract_and_prefill,
                         file_path,

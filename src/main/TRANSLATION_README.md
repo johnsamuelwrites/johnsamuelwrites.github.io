@@ -90,6 +90,7 @@ python batch_translate.py glossary-sync --target-langs es pt         # Export gl
 **Step-by-Step:**
 ```bash
 python batch_translate.py sync --source-dir en/travel --target-langs es pt    # Extract changed files
+python batch_translate.py sync --target-langs it --force-incomplete          # Force extraction for incomplete languages
 python batch_translate.py validate-csv                               # Pre-import validation
 python batch_translate.py import                                     # Import validated CSVs
 python batch_translate.py generate --target-langs es --require-complete       # Generate HTML
@@ -130,10 +131,20 @@ GLOSSARY_DIR = "../photography"
 
 Pipeline Options:
 ```bash
---target-langs es pt    # Languages to process
---auto-import           # Skip "Import now?" prompt, auto-import if valid
---skip-generation       # Stop after import, don't generate HTML
---force                 # Force re-extract all files (ignore change detection)
+--target-langs es pt         # Languages to process
+--auto-import                # Skip "Import now?" prompt, auto-import if valid
+--skip-generation            # Stop after import, don't generate HTML
+--force                      # Force re-extract all files (ignore change detection)
+```
+
+Sync Options:
+```bash
+--target-langs es pt         # Languages to process
+--source-dir PATH            # Source directory (default: en/photography)
+--workers N                  # Parallel workers (default: 4)
+--force                      # Force re-extract all files (ignore change detection)
+--force-incomplete           # Force extraction for incomplete languages (below coverage threshold)
+--coverage-threshold PCT     # Coverage %% below which --force-incomplete triggers (default: 80.0)
 ```
 
 ## Path Mappings (Required for Generation)
@@ -210,7 +221,14 @@ Output: Detailed pipeline report with all metrics
 
 1. **Extract Changed Files**:
    ```bash
+   # Normal sync: Extract only changed files (uses SHA256 change detection)
+   python batch_translate.py sync --source-dir en/travel --target-langs es pt
+   
+   # Force sync: Extract all files regardless of changes
    python batch_translate.py sync --source-dir en/travel --target-langs es pt --force
+   
+   # Force incomplete: Extract all files for languages below coverage threshold (useful for new languages)
+   python batch_translate.py sync --target-langs it --force-incomplete --coverage-threshold 80.0
    ```
    Output: CSVs in `translations_pending/`
 
@@ -510,7 +528,30 @@ Glossaries include context awareness via suggestion system.
 
 **Pipeline stops at import prompt**: Type "yes" to import, "no" to review CSVs first
 
+**"No changes detected" error on new language**: Use `--force-incomplete` flag
+```bash
+python batch_translate.py sync --target-langs it --force-incomplete
+# This forces extraction even when source files haven't changed
+# Useful for new languages with low coverage
+```
+
 ## Advanced Workflows
+
+**New language onboarding (incomplete translation coverage):**
+```bash
+# When adding a new language with low coverage, use --force-incomplete
+# Example: Italian language only has 32% coverage, normal sync would skip it
+python batch_translate.py sync --target-langs it --force-incomplete
+# Output:
+# [WARNING] [SYNC] it: coverage 32.0% < 80.0% => forcing extraction
+# [INFO] Changed files: 0
+# [INFO] Files extracted: 150
+# [INFO] Translations: 3520
+
+# You can customize the coverage threshold:
+python batch_translate.py sync --target-langs it --force-incomplete --coverage-threshold 95.0
+# Forces extraction if coverage is below 95%
+```
 
 **Skip import, review only:**
 ```bash
@@ -528,6 +569,19 @@ python batch_translate.py pipeline --auto-import
 ```bash
 python batch_translate.py pipeline --force
 # Extracts all files, even unchanged ones
+```
+
+**Mixed: Force incomplete + manual edits:**
+```bash
+# 1. Register manual edits done outside the pipeline
+python batch_translate.py register-manual-edit it/index.html --lang it
+
+# 2. Force extraction for remaining untranslated strings
+python batch_translate.py sync --target-langs it --force-incomplete --coverage-threshold 95.0
+
+# 3. Continue with normal pipeline workflow
+python batch_translate.py serve --port 8000  # Review in dashboard
+python batch_translate.py pipeline --target-langs it
 ```
 
 ## Performance Notes

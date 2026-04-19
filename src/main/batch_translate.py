@@ -689,11 +689,38 @@ def cmd_sync(args):
         print_info(f"Starting sync check (workers: {args.workers}, force: {args.force})")
         print_info(f"Source directory: {args.source_dir}")
 
+        # Compute per-language coverage if --force-incomplete is set
+        force_langs = set()
+        if getattr(args, 'force_incomplete', False):
+            threshold = getattr(args, 'coverage_threshold', 80.0)
+            from translate_manager import TranslationManager
+            from pathlib import Path
+
+            tm = TranslationManager(source_lang=args.source_lang,
+                                    target_langs=args.target_langs,
+                                    db_path=args.db_path)
+            source_files = [str(f) for f in Path(args.source_dir).rglob('*.html')]
+
+            for lang in args.target_langs:
+                total_all, found_all = 0, 0
+                for source_file in source_files:
+                    result_file = tm.process_file(source_file, lang, check_existing=False, force=True)
+                    total_all += result_file.get('total', 0)
+                    found_all += result_file.get('found', 0)
+
+                pct = (found_all / total_all * 100) if total_all > 0 else 0.0
+                if pct < threshold:
+                    print_warning(f"[SYNC] {lang}: coverage {pct:.1f}% < {threshold}% => forcing extraction")
+                    force_langs.add(lang)
+                else:
+                    print_info(f"[SYNC] {lang}: coverage {pct:.1f}% >= {threshold}% => hash-based sync")
+
         result = sync.check_and_extract(
             args.source_dir,
             args.output_dir,
             target_langs=args.target_langs,
-            force=args.force
+            force=args.force,
+            force_langs=force_langs
         )
 
         if result['status'] == 'no_files':
@@ -1014,6 +1041,10 @@ Examples:
                             help='Force extract all files, not just changed')
     sync_parser.add_argument('--workers', type=int, default=4,
                             help='Number of parallel workers (default: 4)')
+    sync_parser.add_argument('--force-incomplete', action='store_true',
+                            help='Force full extraction for languages below coverage threshold')
+    sync_parser.add_argument('--coverage-threshold', type=float, default=80.0,
+                            help='Coverage %% below which --force-incomplete triggers (default: 80.0)')
 
     # validate-csv command
     validate_csv_parser = subparsers.add_parser('validate-csv', help='Validate CSV files for QA issues')
