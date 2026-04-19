@@ -4,15 +4,27 @@ A Python-based system for managing multilingual HTML translations with explicit 
 
 ## Quick Start (Recommended)
 
-Run the complete workflow with one command:
+**Setup (one-time):**
+```bash
+# 1. Create path mappings (map source paths to target paths)
+# Edit: ../photography/path_mappings.csv
+# Example:
+#   source_lang,target_lang,source_path,target_path
+#   en,es,en/travel,es/viajes
+#   en,it,en/travel,it/viaggi
 
+# 2. Import path mappings into database (required before generating!)
+python batch_translate.py import-paths
+```
+
+**Recurring workflow:**
 ```bash
 # Start web dashboard in separate terminal
 python batch_translate.py serve --port 8000
 # Opens: http://localhost:8000
 
 # Run full pipeline (sync → validate → import → generate → validate → glossary)
-python batch_translate.py pipeline --target-langs es pt
+python batch_translate.py pipeline --target-langs es pt it
 # Answer prompts:
 # - Review CSVs in web dashboard (http://localhost:8000)
 # - Answer "Import now?" prompt when ready
@@ -25,7 +37,7 @@ For granular control:
 
 ```bash
 # 1. Extract changed files (parallel, with change detection)
-python batch_translate.py sync --source-dir en/travel --target-langs es pt
+python batch_translate.py sync --source-dir en/travel --target-langs es pt it
 
 # 2. Review & edit in web dashboard (no CSV tool needed)
 python batch_translate.py serve --port 8000
@@ -36,14 +48,14 @@ python batch_translate.py validate-csv
 # 4. Import validated translations
 python batch_translate.py import
 
-# 5. Generate translated files
-python batch_translate.py generate --source-dir en/travel --target-langs es pt --require-complete
+# 5. Generate translated files (requires path_mappings.csv imported via import-paths!)
+python batch_translate.py generate --target-langs es pt it --require-complete
 
 # 6. Validate generated HTML files
-python batch_translate.py validate-html --target-langs es pt
+python batch_translate.py validate-html --target-langs es pt it
 
 # 7. Export glossaries for next cycle
-python batch_translate.py glossary-sync --target-langs es pt
+python batch_translate.py glossary-sync --target-langs es pt it
 ```
 
 ## Core Features
@@ -122,6 +134,52 @@ Pipeline Options:
 --auto-import           # Skip "Import now?" prompt, auto-import if valid
 --skip-generation       # Stop after import, don't generate HTML
 --force                 # Force re-extract all files (ignore change detection)
+```
+
+## Path Mappings (Required for Generation)
+
+Path mappings define where generated translated files go. **Generation will not work without importing path mappings first.**
+
+### Setup Path Mappings
+
+1. **Create path_mappings.csv**:
+   ```
+   ../photography/path_mappings.csv
+   ```
+
+2. **Format** (CSV with headers):
+   ```csv
+   source_lang,target_lang,source_path,target_path
+   en,es,en/travel,es/viajes
+   en,es,en/travel/cities.html,es/viajes/ciudades.html
+   en,it,en/travel,it/viaggi
+   en,pt,en/photography,pt/fotografia
+   ```
+
+3. **Import into database** (must do this after editing):
+   ```bash
+   python batch_translate.py import-paths
+   ```
+
+**Important**: After editing `path_mappings.csv`, always run `import-paths` before generating. Without this, generation will fail with "No path mappings for {lang}".
+
+### Path Mapping Examples
+
+Directory-level (all files in directory):
+```csv
+en,es,en/travel,es/viajes
+```
+
+File-level (specific file):
+```csv
+en,es,en/travel/index.html,es/viajes/index.html
+```
+
+Multiple languages:
+```csv
+en,es,en/travel,es/viajes
+en,it,en/travel,it/viaggi
+en,pt,en/travel,pt/viagens
 ```
 
 ## Workflow (Pipeline)
