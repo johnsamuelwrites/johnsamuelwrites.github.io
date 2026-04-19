@@ -25,6 +25,9 @@ from translation_config import (
     DEFAULT_MANIFEST_DIR,
     DEFAULT_SOURCE_DIR,
 )
+
+# State database path
+DEFAULT_STATE_DB_PATH = "../photography/translations_state.db"
 from translation_log import backup_database, TranslationLog
 from paths import REPO_ROOT
 
@@ -637,6 +640,243 @@ def cmd_clean(args):
     return 0
 
 
+def cmd_status(args):
+    """Show translation workflow status"""
+    from state_manager import StateManager
+
+    state_mgr = StateManager(args.state_db_path)
+    summary = state_mgr.get_status_summary()
+    state_mgr.close()
+
+    print_info("Translation Workflow Status")
+    print("=" * 60)
+
+    # Batch status
+    print_info("Batches:")
+    for status_key in ['PENDING_EXTRACT', 'PENDING_REVIEW', 'REVIEW_APPROVED', 'IMPORTED', 'GENERATION_COMPLETE']:
+        count = summary.get(f"batches_{status_key}", 0)
+        print(f"  {status_key}: {count}")
+
+    # Generated files status
+    print_info("Generated Files (ES):")
+    pass_count = summary.get('generated_es_pass', 0)
+    fail_count = summary.get('generated_es_fail', 0)
+    print(f"  QA PASS: {pass_count}")
+    print(f"  QA FAIL: {fail_count}")
+
+    print_info("Generated Files (PT):")
+    pass_count = summary.get('generated_pt_pass', 0)
+    fail_count = summary.get('generated_pt_fail', 0)
+    print(f"  QA PASS: {pass_count}")
+    print(f"  QA FAIL: {fail_count}")
+
+    return 0
+
+
+def cmd_sync(args):
+    """Sync translations: extract changed files with parallel processing"""
+    from sync_manager import SyncManager
+
+    sync = SyncManager(
+        source_lang=args.source_lang,
+        target_langs=args.target_langs,
+        db_path=args.db_path,
+        state_db_path=args.state_db_path,
+        max_workers=args.workers
+    )
+
+    try:
+        print_info(f"Starting sync check (workers: {args.workers}, force: {args.force})")
+        print_info(f"Source directory: {args.source_dir}")
+
+        result = sync.check_and_extract(
+            args.source_dir,
+            args.output_dir,
+            target_langs=args.target_langs,
+            force=args.force
+        )
+
+        if result['status'] == 'no_files':
+            print_warning("No HTML files found in source directory")
+            return 0
+
+        if result['status'] == 'no_changes':
+            print_info("No changes detected in source files")
+            return 0
+
+        print_info(f"Changed files: {len(result['changed_files'])}")
+
+        for lang, batch_info in result['extracted_batches'].items():
+            if batch_info['files_extracted'] > 0:
+                print_info(f"{lang}:")
+                print(f"  Batch ID: {batch_info['batch_id']}")
+                print(f"  Files extracted: {batch_info['files_extracted']}")
+                print(f"  Translations: {batch_info['translations_count']}")
+                print(f"  CSVs created: {len(batch_info['csv_files'])}")
+
+        print_info("Sync complete. CSVs are ready for review in translations_pending/")
+
+    finally:
+        sync.close()
+
+    return 0
+
+
+def cmd_validate_csv(args):
+    """Validate CSV files for translation quality"""
+    from csv_validators import CSVValidator, format_validation_report, format_batch_report
+
+    output_dir = Path(args.output_dir)
+    csv_files = list(output_dir.glob('*.csv'))
+
+    if not csv_files:
+        print_warning("No CSV files found in translations_pending/")
+        return 0
+
+    print_info(f"Validating {len(csv_files)} CSV files...")
+
+    validator = CSVValidator()
+    result = validator.validate_multiple([str(f) for f in csv_files])
+
+    # Print detailed report
+    print(format_batch_report(result))
+
+    # Print failed CSVs detailed errors
+    if not result['all_valid']:
+        print_error("Failed CSVs details:")
+        for csv_path, validation in result['by_file'].items():
+            if not validation['valid']:
+                print(format_validation_report(validation, csv_path))
+
+    return 0 if result['all_valid'] else 1
+
+
+def cmd_validate_html(args):
+    """Validate generated HTML files for quality issues"""
+    from html_validators import HTMLValidator, format_html_batch_report, format_html_validation_report
+    from pathlib import Path
+
+    html_files = []
+    for lang in args.target_langs:
+        lang_dir = Path(lang) / "travel"  # Adjust if different
+        if lang_dir.exists():
+            html_files.extend([str(f) for f in lang_dir.rglob("*.html")])
+
+    if not html_files:
+        print_warning("No generated HTML files found")
+        return 0
+
+    print_info(f"Validating {len(html_files)} HTML files...")
+
+    validator = HTMLValidator()
+    result = validator.validate_multiple(html_files)
+
+    # Print report
+    print(format_html_batch_report(result))
+
+    # Print failed files details
+    if not result['all_valid']:
+        print_error("Failed files details:")
+        for html_path, validation in result['by_file'].items():
+            if not validation['valid']:
+                print(format_html_validation_report(validation, html_path))
+
+    return 0 if result['all_valid'] else 1
+
+
+def cmd_pipeline(args):
+    """Run complete translation pipeline"""
+    from pipeline_manager import PipelineManager, format_pipeline_report
+
+    pipeline = PipelineManager(
+        source_lang=args.source_lang,
+        target_langs=args.target_langs,
+        db_path=args.db_path,
+        state_db_path=args.state_db_path,
+        output_dir=args.output_dir,
+        glossary_dir=args.glossary_dir,
+        source_dir=args.source_dir
+    )
+
+    try:
+        print_info("Starting translation pipeline...")
+        print_info(f"Source dir: {args.source_dir}")
+        print_info(f"Target langs: {', '.join(args.target_langs)}")
+
+        report = pipeline.run_full_pipeline(
+            force=args.force,
+            auto_import=args.auto_import,
+            skip_generation=args.skip_generation
+        )
+
+        # Print formatted report
+        print(format_pipeline_report(report))
+
+        return 0 if report['summary'].get('status') == 'success' else 1
+
+    finally:
+        pipeline.close()
+
+
+def cmd_serve(args):
+    """Start web dashboard for CSV review"""
+    try:
+        from web_dashboard import TranslationDashboard
+    except ImportError:
+        print_error("Flask not installed. Install with: pip install flask")
+        return 1
+
+    dashboard = TranslationDashboard(
+        output_dir=args.output_dir,
+        state_db_path=args.state_db_path,
+        db_path=args.db_path,
+        glossary_dir=args.glossary_dir,
+        port=args.port
+    )
+
+    try:
+        dashboard.run(debug=args.debug)
+    except KeyboardInterrupt:
+        print_info("Dashboard stopped")
+    finally:
+        dashboard.close()
+
+    return 0
+
+
+def cmd_glossary_sync(args):
+    """Export glossaries from translation database"""
+    from glossary_manager import GlossaryManager, format_glossary_export_report
+
+    glossary_mgr = GlossaryManager(args.db_path, args.glossary_dir)
+
+    try:
+        print_info("Exporting glossaries...")
+
+        for lang in args.target_langs:
+            print_info(f"Exporting {lang}...")
+
+            entries = glossary_mgr.get_high_value_entries(
+                args.source_lang,
+                lang,
+                limit=200,
+                min_frequency=2
+            )
+
+            if entries:
+                glossary = {e['source_text']: e['target_text'] for e in entries}
+                filepath = glossary_mgr.save_glossary_json(args.source_lang, lang, glossary)
+                print_info(f"  Saved {len(glossary)} entries to {filepath}")
+                print(format_glossary_export_report(entries))
+            else:
+                print_warning(f"  No entries found for {lang}")
+
+    finally:
+        glossary_mgr.close()
+
+    return 0
+
+
 def main():
     """Main entry point"""
     # Change to repo root so all paths are relative to repository
@@ -672,6 +912,8 @@ Examples:
                        help=f'Translation manifest directory (default: {DEFAULT_MANIFEST_DIR})')
     parser.add_argument('--glossary-dir', default=DEFAULT_GLOSSARY_DIR,
                        help=f'Glossary directory (default: {DEFAULT_GLOSSARY_DIR})')
+    parser.add_argument('--state-db-path', default=DEFAULT_STATE_DB_PATH,
+                       help=f'Path to state database (default: {DEFAULT_STATE_DB_PATH})')
 
     subparsers = parser.add_subparsers(dest='command', help='Command to run')
 
@@ -759,6 +1001,55 @@ Examples:
     # clean command
     subparsers.add_parser('clean', help='Delete pending CSV files')
 
+    # status command
+    subparsers.add_parser('status', help='Show translation workflow status')
+
+    # sync command
+    sync_parser = subparsers.add_parser('sync', help='Sync: extract changed files with parallel processing')
+    sync_parser.add_argument('--source-dir', default=DEFAULT_SOURCE_DIR,
+                            help=f'Source directory (default: {DEFAULT_SOURCE_DIR})')
+    sync_parser.add_argument('--target-langs', nargs='+', default=DEFAULT_TARGET_LANGS,
+                            help=f'Target language codes (default: {DEFAULT_TARGET_LANGS})')
+    sync_parser.add_argument('--force', action='store_true',
+                            help='Force extract all files, not just changed')
+    sync_parser.add_argument('--workers', type=int, default=4,
+                            help='Number of parallel workers (default: 4)')
+
+    # validate-csv command
+    validate_csv_parser = subparsers.add_parser('validate-csv', help='Validate CSV files for QA issues')
+    validate_csv_parser.add_argument('--target-langs', nargs='+', default=DEFAULT_TARGET_LANGS,
+                                    help=f'Target language codes (default: {DEFAULT_TARGET_LANGS})')
+
+    # validate-html command
+    validate_html_parser = subparsers.add_parser('validate-html', help='Validate generated HTML files')
+    validate_html_parser.add_argument('--target-langs', nargs='+', default=DEFAULT_TARGET_LANGS,
+                                     help=f'Target language codes (default: {DEFAULT_TARGET_LANGS})')
+
+    # pipeline command
+    pipeline_parser = subparsers.add_parser('pipeline', help='Run complete translation pipeline')
+    pipeline_parser.add_argument('--source-dir', default=DEFAULT_SOURCE_DIR,
+                               help=f'Source directory (default: {DEFAULT_SOURCE_DIR})')
+    pipeline_parser.add_argument('--target-langs', nargs='+', default=DEFAULT_TARGET_LANGS,
+                                help=f'Target language codes (default: {DEFAULT_TARGET_LANGS})')
+    pipeline_parser.add_argument('--force', action='store_true',
+                               help='Force re-extract all files')
+    pipeline_parser.add_argument('--auto-import', action='store_true',
+                               help='Auto-import CSVs if validation passes')
+    pipeline_parser.add_argument('--skip-generation', action='store_true',
+                               help='Skip HTML generation step')
+
+    # serve command
+    serve_parser = subparsers.add_parser('serve', help='Start web dashboard for CSV review')
+    serve_parser.add_argument('--port', type=int, default=8000,
+                            help='Port to run dashboard on (default: 8000)')
+    serve_parser.add_argument('--debug', action='store_true',
+                            help='Run in debug mode')
+
+    # glossary-sync command
+    glossary_parser = subparsers.add_parser('glossary-sync', help='Export glossaries from database')
+    glossary_parser.add_argument('--target-langs', nargs='+', default=DEFAULT_TARGET_LANGS,
+                                help=f'Target language codes (default: {DEFAULT_TARGET_LANGS})')
+
     args = parser.parse_args()
 
     if not args.command:
@@ -794,6 +1085,20 @@ Examples:
             return cmd_generate_file(args)
         elif args.command == 'clean':
             return cmd_clean(args)
+        elif args.command == 'status':
+            return cmd_status(args)
+        elif args.command == 'sync':
+            return cmd_sync(args)
+        elif args.command == 'validate-csv':
+            return cmd_validate_csv(args)
+        elif args.command == 'validate-html':
+            return cmd_validate_html(args)
+        elif args.command == 'pipeline':
+            return cmd_pipeline(args)
+        elif args.command == 'serve':
+            return cmd_serve(args)
+        elif args.command == 'glossary-sync':
+            return cmd_glossary_sync(args)
         else:
             print_error(f"Unknown command: {args.command}")
             parser.print_help()
