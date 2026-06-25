@@ -6,14 +6,21 @@
 
 from bs4 import BeautifulSoup
 from nltk.tokenize import sent_tokenize, word_tokenize
-from gensim.models import Word2Vec
 from nltk.corpus import stopwords
 from nltk.util import ngrams
 from collections import Counter
 from git import get_first_latest_modification
 import os
+import subprocess
 from pathlib import Path
 import pandas
+
+from config import SUPPORTED_LANGUAGES as CONFIG_SUPPORTED_LANGUAGES
+
+try:
+    from gensim.models import Word2Vec
+except ImportError:
+    Word2Vec = None
 
 # Download the stopwords
 # import nltk
@@ -24,16 +31,10 @@ class WebsiteAnalysis:
     """Analyzes website content across multiple languages and directories."""
 
     # Supported languages for the website
-    SUPPORTED_LANGUAGES = ["en", "fr", "hi", "pa", "ml"]
+    SUPPORTED_LANGUAGES = list(CONFIG_SUPPORTED_LANGUAGES.keys())
 
     # Root directories for each language
-    LANGUAGE_ROOTS = {
-        "en": "en",
-        "fr": "fr",
-        "ml": "ml",
-        "hi": "hi",
-        "pa": "pa",
-    }
+    LANGUAGE_ROOTS = {language: language for language in SUPPORTED_LANGUAGES}
 
     # Files to exclude from analysis (relative paths from main_directory)
     EXCLUDE_FILES = {
@@ -119,6 +120,48 @@ class WebsiteAnalysis:
             print(f"Warning: Could not access directory {root_dir}: {e}")
 
     @staticmethod
+    def _get_git_time_bounds(main_directory=""):
+        """Return first/latest commit timestamps for tracked HTML files in one git pass."""
+        cwd = main_directory or "."
+        try:
+            result = subprocess.run(
+                [
+                    "git",
+                    "-C",
+                    cwd,
+                    "log",
+                    "--format=--%ct",
+                    "--name-only",
+                    "--",
+                    ":(glob)*.html",
+                    ":(glob)**/*.html",
+                ],
+                check=True,
+                capture_output=True,
+                text=True,
+            )
+        except (OSError, subprocess.CalledProcessError):
+            return {}
+
+        timestamps = {}
+        current_time = None
+        for line in result.stdout.splitlines():
+            if line.startswith("--"):
+                try:
+                    current_time = int(line[2:])
+                except ValueError:
+                    current_time = None
+                continue
+            if not line or current_time is None:
+                continue
+
+            filepath = line.replace(os.sep, "/")
+            first, latest = timestamps.get(filepath, (current_time, current_time))
+            timestamps[filepath] = (min(first, current_time), max(latest, current_time))
+
+        return timestamps
+
+    @staticmethod
     def get_articles_list_dataframe(main_directory=""):
         """
         Recursively scan all language directories for HTML articles.
@@ -130,6 +173,7 @@ class WebsiteAnalysis:
             pandas.DataFrame with columns: filepath, language, first, latest
         """
         article_metadata = []
+        git_time_bounds = WebsiteAnalysis._get_git_time_bounds(main_directory)
 
         # Ensure main_directory ends with separator if not empty
         if main_directory and not main_directory.endswith(os.sep):
@@ -159,10 +203,10 @@ class WebsiteAnalysis:
                         if "NOTE: Article in Progress" in content:
                             continue
 
-                    # Get Git modification dates
-                    first, latest = get_first_latest_modification(
-                        rel_filepath, main_directory
-                    )
+                    first, latest = git_time_bounds.get(rel_filepath, (None, None))
+                    if first is None or latest is None:
+                        stat = os.stat(abs_filepath)
+                        first = latest = int(stat.st_mtime)
 
                     article_metadata.append(
                         [

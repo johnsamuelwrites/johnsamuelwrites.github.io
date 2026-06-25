@@ -14,6 +14,9 @@ SITE_AUTHOR = "John Samuel"
 SUPPORTED_LANGUAGES: dict[str, str] = {
     "en": "English",
     "fr": "Francais",
+    "pt": "Portuguese",
+    "es": "Spanish",
+    "it": "Italian",
     "ml": "Malayalam",
     "pa": "Punjabi",
     "hi": "Hindi",

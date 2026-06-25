@@ -9,8 +9,9 @@
 #!/usr/bin/env python3
 
 import argparse
+import re
 import sys
-from typing import Dict, List, Set, Tuple
+from typing import Dict, List, Set
 from dataclasses import dataclass
 from datetime import datetime
 from pathlib import Path
@@ -20,8 +21,8 @@ import pandas as pd
 from feedgen.feed import FeedGenerator
 from pytz import timezone
 
-from analyse import HTMLTextAnalysis, WebsiteAnalysis
-from config import SITE_AUTHOR, SITE_URL
+from analyse import WebsiteAnalysis
+from config import SITE_AUTHOR, SITE_URL, SUPPORTED_LANGUAGES
 from git import get_first_latest_modification
 from manifest import BuildManifest
 from paths import REPO_ROOT
@@ -62,6 +63,76 @@ class ArticleMetadata:
 class BlogGenerator:
     """Enhanced blog generator with year-based organization."""
 
+    LANGUAGE_BLOG_CONFIGS = {
+        "en": {
+            "template": "templates/blog/en.html",
+            "output": "en/blog.html",
+            "placeholder": "EnglishArticleList",
+        },
+        "fr": {
+            "template": "templates/blog/fr.html",
+            "output": "fr/blog.html",
+            "placeholder": "FrenchArticleList",
+        },
+        "pt": {
+            "template": "templates/blog/en.html",
+            "output": "pt/blog.html",
+            "placeholder": "EnglishArticleList",
+            "replacements": {
+                '<html lang="en">': '<html lang="pt">',
+                'content="en"': 'content="pt"',
+                "<title>Blog: John Samuel</title>": "<title>Blogue: John Samuel</title>",
+                "John Samuel - Blog": "John Samuel - Blogue",
+                '<span property="name">Home</span>': '<span property="name">Início</span>',
+                "For the complete list of articles in all languages, please check this": "Para a lista completa de artigos em todos os idiomas, consulte este",
+                ">link</a>.</p>": ">link</a>.</p>",
+            },
+        },
+        "es": {
+            "template": "templates/blog/en.html",
+            "output": "es/blog.html",
+            "placeholder": "EnglishArticleList",
+            "replacements": {
+                '<html lang="en">': '<html lang="es">',
+                'content="en"': 'content="es"',
+                "<title>Blog: John Samuel</title>": "<title>Blog: John Samuel</title>",
+                "John Samuel - Blog": "John Samuel - Blog",
+                '<span property="name">Home</span>': '<span property="name">Inicio</span>',
+                "For the complete list of articles in all languages, please check this": "Para la lista completa de artículos en todos los idiomas, consulta este",
+                ">link</a>.</p>": ">enlace</a>.</p>",
+            },
+        },
+        "it": {
+            "template": "templates/blog/en.html",
+            "output": "it/blog.html",
+            "placeholder": "EnglishArticleList",
+            "replacements": {
+                '<html lang="en">': '<html lang="it">',
+                'content="en"': 'content="it"',
+                "<title>Blog: John Samuel</title>": "<title>Blog: John Samuel</title>",
+                "John Samuel - Blog": "John Samuel - Blog",
+                '<span property="name">Home</span>': '<span property="name">Home</span>',
+                "For the complete list of articles in all languages, please check this": "Per l'elenco completo degli articoli in tutte le lingue, consulta questo",
+                ">link</a>.</p>": ">link</a>.</p>",
+            },
+        },
+        "ml": {
+            "template": "templates/blog/ml.html",
+            "output": "ml/ബ്ലോഗ്.html",
+            "placeholder": "MalayalamArticleList",
+        },
+        "pa": {
+            "template": "templates/blog/pa.html",
+            "output": "pa/ਬਲਾਗ.html",
+            "placeholder": "PunjabiArticleList",
+        },
+        "hi": {
+            "template": "templates/blog/hi.html",
+            "output": "hi/ब्लॉग.html",
+            "placeholder": "HindiArticleList",
+        },
+    }
+
     # Words per minute reading speed
     READING_SPEED = 200
 
@@ -97,7 +168,11 @@ class BlogGenerator:
         ) < BlogGenerator.RECENT_UPDATE_THRESHOLD
 
     @staticmethod
-    def extract_article_metadata(filepath: str) -> ArticleMetadata:
+    def extract_article_metadata(
+        filepath: str,
+        creation_time: int | None = None,
+        modification_time: int | None = None,
+    ) -> ArticleMetadata:
         """Extract comprehensive metadata from an article."""
         with open(filepath, "r", encoding="utf-8") as f:
             content = f.read()
@@ -110,21 +185,17 @@ class BlogGenerator:
             )
 
             # Get timestamps
-            creation_time, modification_time = get_first_latest_modification(
-                filepath, ""
-            )
+            if creation_time is None or modification_time is None:
+                creation_time, modification_time = get_first_latest_modification(
+                    filepath, ""
+                )
 
             # Determine language from filepath
             language = filepath.split("/")[0] if "/" in filepath else "en"
 
             # Calculate word count
-            tokens = HTMLTextAnalysis.get_tokens(
-                filepath,
-                lowercase=True,
-                remove_punctuation=True,
-                remove_stopwords=False,
-            )
-            word_count = len(tokens)
+            body_text = parsed_html.body.get_text(" ") if parsed_html.body else parsed_html.get_text(" ")
+            word_count = len(re.findall(r"\w+", body_text, flags=re.UNICODE))
 
             # Calculate reading time
             reading_time = BlogGenerator.calculate_reading_time(word_count)
@@ -253,7 +324,11 @@ class BlogGenerator:
             articleset.add(row["filepath"])
 
             try:
-                metadata = BlogGenerator.extract_article_metadata(row["filepath"])
+                metadata = BlogGenerator.extract_article_metadata(
+                    row["filepath"],
+                    creation_time=int(row["first"]),
+                    modification_time=int(row["latest"]),
+                )
                 if metadata.language in articles_by_language:
                     articles_by_language[metadata.language].append(metadata)
             except Exception as e:
@@ -274,7 +349,7 @@ class BlogGenerator:
         # Generate content for each language
         language_content = {}
 
-        for lang_code in ["en", "fr", "ml", "pa", "hi"]:
+        for lang_code in SUPPORTED_LANGUAGES:
             if (
                 lang_code not in articles_by_language
                 or not articles_by_language[lang_code]
@@ -322,13 +397,18 @@ class BlogGenerator:
             content = f.read()
 
         # Replace each language placeholder individually
-        content = content.replace("EnglishArticleList", language_content.get("en", ""))
-        content = content.replace("FrenchArticleList", language_content.get("fr", ""))
-        content = content.replace(
-            "MalayalamArticleList", language_content.get("ml", "")
-        )
-        content = content.replace("PunjabiArticleList", language_content.get("pa", ""))
-        content = content.replace("HindiArticleList", language_content.get("hi", ""))
+        placeholders = {
+            "en": "EnglishArticleList",
+            "fr": "FrenchArticleList",
+            "pt": "PortugueseArticleList",
+            "es": "SpanishArticleList",
+            "it": "ItalianArticleList",
+            "ml": "MalayalamArticleList",
+            "pa": "PunjabiArticleList",
+            "hi": "HindiArticleList",
+        }
+        for lang_code, placeholder in placeholders.items():
+            content = content.replace(placeholder, language_content.get(lang_code, ""))
 
         # Write the output
         output_path = Path("blog/index.html")
@@ -408,15 +488,7 @@ class BlogGenerator:
         articles_by_language: Dict[str, List[ArticleMetadata]],
     ) -> None:
         """Generate language-specific blog pages."""
-        language_configs = {
-            "en": {"template": "templates/blog/en.html", "output": "en/blog.html"},
-            "fr": {"template": "templates/blog/fr.html", "output": "fr/blog.html"},
-            "ml": {"template": "templates/blog/ml.html", "output": "ml/ബ്ലോഗ്.html"},
-            "pa": {"template": "templates/blog/pa.html", "output": "pa/ਬਲਾਗ.html"},
-            "hi": {"template": "templates/blog/hi.html", "output": "hi/ब्लॉग.html"},
-        }
-
-        for lang_code, config in language_configs.items():
+        for lang_code, config in BlogGenerator.LANGUAGE_BLOG_CONFIGS.items():
             if lang_code not in articles_by_language:
                 continue
 
@@ -450,11 +522,9 @@ class BlogGenerator:
                 content = f.read()
 
             # Replace placeholder
-            content = content.replace("EnglishArticleList", year_sections)
-            content = content.replace("FrenchArticleList", year_sections)
-            content = content.replace("MalayalamArticleList", year_sections)
-            content = content.replace("PunjabiArticleList", year_sections)
-            content = content.replace("HindiArticleList", year_sections)
+            content = content.replace(config["placeholder"], year_sections)
+            for old, new in config.get("replacements", {}).items():
+                content = content.replace(old, new)
 
             # Write output
             output_path = Path(config["output"])
@@ -482,7 +552,11 @@ class BlogGenerator:
             articleset.add(row["filepath"])
 
             try:
-                metadata = BlogGenerator.extract_article_metadata(row["filepath"])
+                metadata = BlogGenerator.extract_article_metadata(
+                    row["filepath"],
+                    creation_time=int(row["first"]),
+                    modification_time=int(row["latest"]),
+                )
 
                 fe = fg.add_entry(order="append")
                 fe.id(f"{SITE_URL}/{row['filepath']}")
@@ -524,12 +598,11 @@ def main(argv=None):
         REPO_ROOT / "blog" / "index.html",
         REPO_ROOT / "atom.xml",
         REPO_ROOT / "rss.xml",
-        REPO_ROOT / "en" / "blog.html",
-        REPO_ROOT / "fr" / "blog.html",
-        REPO_ROOT / "ml" / "à´¬àµà´²àµ‹à´—àµ.html",
-        REPO_ROOT / "pa" / "à¨¬à¨²à¨¾à¨—.html",
-        REPO_ROOT / "hi" / "à¤¬à¥à¤²à¥‰à¤—.html",
     ]
+    output_paths.extend(
+        REPO_ROOT / config["output"]
+        for config in BlogGenerator.LANGUAGE_BLOG_CONFIGS.values()
+    )
     sources = [Path(__file__), *template_sources, *article_sources]
 
     if not args.force and manifest.is_current("blog", sources, output_paths):
@@ -538,7 +611,10 @@ def main(argv=None):
 
     BlogGenerator.generate_complete_list(df)
     BlogGenerator.generate_feed(df, feed_count=20)
-    manifest.update("blog", sources, output_paths)
+    try:
+        manifest.update("blog", sources, output_paths)
+    except OSError as e:
+        print(f"[WARN] Blog outputs generated, but build manifest was not updated: {e}")
 
     print("✓ Blog generation complete!")
     return 0
