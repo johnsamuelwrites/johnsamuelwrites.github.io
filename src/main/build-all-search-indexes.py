@@ -29,7 +29,35 @@ EXCLUDE_PATTERNS = [
     r"node_modules",
     r"search-index\.json$",
     r"search\.html$",
+    r"recherche\.html$",
 ]
+
+LOCALIZED_CATEGORY_MAP = {
+    "recherche": "research",
+    "enseignement": "teaching",
+    "ecrits": "writings",
+    "écrits": "writings",
+    "linguistique": "linguistics",
+    "photographie": "photography",
+    "voyages": "travel",
+    "pesquisa": "research",
+    "escritos": "writings",
+    "viagens": "travel",
+    "investigación": "research",
+    "viajes": "travel",
+    "ricerca": "research",
+    "scritti": "writings",
+    "viaggi": "travel",
+    "ഗവേഷണം": "research",
+    "രചനകൾ": "writings",
+    "യാത്രകൾ": "travel",
+    "ਖੋਜ": "research",
+    "ਲਿਖਤਾਂ": "writings",
+    "ਯਾਤਰਾ": "travel",
+    "अनुसंधान": "research",
+    "रचनायें": "writings",
+    "यात्रा": "travel",
+}
 
 
 class HTMLTextExtractor(HTMLParser):
@@ -70,6 +98,9 @@ def get_category(file_path: Path, base_dir: Path) -> str:
     """Determine category from file path."""
     relative_path = file_path.relative_to(base_dir)
     parts = relative_path.parts
+
+    if parts and parts[0] in LOCALIZED_CATEGORY_MAP:
+        return LOCALIZED_CATEGORY_MAP[parts[0]]
 
     for key, value in CATEGORY_MAP.items():
         if parts[0] == key or key in str(relative_path):
@@ -210,7 +241,10 @@ def build_search_index_for_language(lang_code: str, lang_name: str, force: bool 
         size_str = f"{file_size / (1024 * 1024):.1f} MB"
 
     print(f"\nIndex file size: {size_str}")
-    manifest.update(f"search-index:{lang_code}", sources, [output_file])
+    try:
+        manifest.update(f"search-index:{lang_code}", sources, [output_file])
+    except OSError as error:
+        print(f"[WARNING] Search index generated, but build manifest was not updated: {error}")
     return {
         "lang_code": lang_code,
         "lang_name": lang_name,
