@@ -12,15 +12,32 @@ import sys
 from pathlib import Path
 from typing import Iterable, List
 
-from links import LinkChecker, print_results
+from links import LinkChecker, collect_html_files, print_results
 
 IGNORED_DIRS = ("templates", "analysis")
+
+# Directories skipped during a full-site scan. In addition to the directories
+# ignored for changed-file checks, this excludes the tooling/source tree (which
+# holds intentionally broken link fixtures used by the unit tests) and common
+# vendored/VCS directories.
+FULL_SCAN_IGNORED_DIRS = IGNORED_DIRS + ("src", "node_modules", ".git", ".github")
 
 
 def is_ignored_html_file(path: Path, ignored_dirs: Iterable[str] = IGNORED_DIRS) -> bool:
     """Return True when the changed file is under an ignored directory."""
     ignored = set(ignored_dirs)
     return any(part in ignored for part in path.parts)
+
+
+def resolve_all_html_files() -> List[str]:
+    """Return every checkable HTML file in the repository (full-site scan)."""
+    repo_root = Path.cwd().resolve()
+    html_files = collect_html_files(
+        [str(repo_root)],
+        recursive=True,
+        exclude_dirs=FULL_SCAN_IGNORED_DIRS,
+    )
+    return sorted(set(html_files))
 
 
 def resolve_changed_html_files(diff_range: str) -> List[str]:
@@ -66,26 +83,43 @@ def resolve_changed_html_files(diff_range: str) -> List[str]:
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
-        description="Run internal broken-link checks for changed HTML files in CI."
+        description="Run internal broken-link checks for HTML files in CI."
     )
     parser.add_argument(
         "--diff-range",
         default=os.environ.get("GITHUB_DIFF_RANGE"),
         help="Git diff range to inspect, for example BASE_SHA...HEAD_SHA.",
     )
+    parser.add_argument(
+        "--all",
+        action="store_true",
+        default=os.environ.get("LINK_CHECK_ALL", "").lower() in ("1", "true", "yes"),
+        help=(
+            "Scan every HTML file in the repository instead of only the files "
+            "changed in the diff range. Use this to catch links that break when "
+            "new files or folders are added."
+        ),
+    )
     return parser.parse_args()
 
 
 def main() -> int:
     args = parse_args()
-    if not args.diff_range:
-        print("No diff range supplied; skipping internal broken-link CI check.")
-        return 0
+    if args.all:
+        html_files = resolve_all_html_files()
+        if not html_files:
+            print("No HTML files found to check.")
+            return 0
+        print(f"Scanning all {len(html_files)} HTML files for internal broken links.")
+    else:
+        if not args.diff_range:
+            print("No diff range supplied; skipping internal broken-link CI check.")
+            return 0
 
-    html_files = resolve_changed_html_files(args.diff_range)
-    if not html_files:
-        print("No changed HTML files found in the selected diff range.")
-        return 0
+        html_files = resolve_changed_html_files(args.diff_range)
+        if not html_files:
+            print("No changed HTML files found in the selected diff range.")
+            return 0
 
     checker = LinkChecker(
         check_external=False,
