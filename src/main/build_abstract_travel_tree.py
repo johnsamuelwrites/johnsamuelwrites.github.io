@@ -234,6 +234,9 @@ def build_all_pages() -> int:
 def main() -> int:
     write_tree_manifest()
     count = build_all_pages()
+    from bind_abstract_content import main as bind_content
+
+    bind_content()
     print(f"Wrote abstract-tree.csv and {count} abstract HTML pages")
     return 0
 
