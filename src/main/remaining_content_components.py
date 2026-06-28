@@ -19,37 +19,6 @@ FIXED = {
     "John Samuel": "Q42761025",
     "My Travels": "Q3062",
     "Travel": "Q3062",
-    "Sections": "Q3831",
-    "2009": "Q3832",
-    "No results found": "Q3833",
-}
-REUSED_LABELS = {
-    "Ph.D Theses": "Q3688",
-    "PhD students": "Q3697",
-    "Masters": "Q3698",
-    "Journals": "Q3699",
-    "Mathematical contributions": "Q3717",
-    "Conferences, Seminars and Workshops Attended": "Q3734",
-    "Other Sites": "Q3651",
-    "Other sites": "Q3651",
-    "Personal Blog": "Q3665",
-}
-RECENT_ITEMS = {
-    "musée gallo-romain de Saint-Romain-en-Gal": "Q3816",
-    "Museo del Prado": "Q3817",
-    "Museo Nacional Centro de Arte Reina Sofía": "Q3818",
-    "Narbo Via": "Q3819",
-    "Nedbalka Gallery": "Q3820",
-    "Peggy Guggenheim Collection": "Q3821",
-    "Vasamuseet": "Q3822",
-    "The Journey to a Name": "Q3823",
-    "Years of Reflection": "Q3824",
-    "Inspired by Simplicity": "Q3825",
-    "A Humble Legacy": "Q3826",
-    "Emotional Decision": "Q3827",
-    "The Latin Choice": "Q3828",
-    "My Signature": "Q3829",
-    "The Landing Page Image": "Q3830",
 }
 DYNAMIC_NO_RESULTS = (
     "No results found",
@@ -64,7 +33,7 @@ DYNAMIC_NO_RESULTS = (
 
 
 def existing_labels() -> dict[str, str]:
-    result = {**FIXED, **REUSED_LABELS, **RECENT_ITEMS}
+    result = dict(FIXED)
     for export in ("concepts.csv", "abstractid.csv"):
         with (REPO_ROOT / export).open(
             encoding="utf-8-sig", newline=""

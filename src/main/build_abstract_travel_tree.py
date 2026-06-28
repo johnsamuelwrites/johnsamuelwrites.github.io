@@ -14,8 +14,6 @@ from place_abstract_quickstatements import city_groups, country_groups
 
 
 ROOT = REPO_ROOT / "Q315/Q3062"
-ARCHITECTURE_ITEM = "Q3019"
-MODERN_ARCHITECTURE = REPO_ROOT / "en/photography/architecture.html"
 
 
 def assigned(path: Path) -> list[str]:
@@ -59,48 +57,6 @@ def write_tree_manifest() -> None:
                     "city",
                 )
             )
-
-
-def local_place_replacements() -> dict[str, str]:
-    replacements = {
-        "Q31": "Q3068",
-        "Q35": "Q3070",
-        "Q33": "Q3072",
-        "Q142": "Q3073",
-        "Q183": "Q3074",
-        "Q38": "Q3077",
-        "Q45": "Q3082",
-        "Q36": "Q3081",
-        "Q29": "Q3085",
-        "Q34": "Q3086",
-        "Q55": "Q3088",
-        "Q237": "Q3089",
-    }
-    labels_path = REPO_ROOT.parent / "Q42761025/data/labels.csv"
-    labels: dict[str, str] = {}
-    with labels_path.open(encoding="utf-8-sig", newline="") as source:
-        for row in csv.DictReader(source):
-            labels.setdefault(row["en"], row["identifier"])
-    with (REPO_ROOT / "cities.csv").open(
-        encoding="utf-8-sig", newline=""
-    ) as source:
-        for row in csv.DictReader(source):
-            legacy = labels.get(row["label"])
-            if legacy:
-                replacements[legacy] = row["item"].rstrip("/").split("/")[-1]
-    return replacements
-
-
-def build_architecture_pilot() -> None:
-    architecture = next(
-        group for group in groups() if group["en"].stem == "architecture"
-    )
-    build_abstract_page(
-        MODERN_ARCHITECTURE,
-        ROOT / f"{ARCHITECTURE_ITEM}.html",
-        ARCHITECTURE_ITEM,
-        architecture,
-    )
 
 
 def visible_identifiers() -> dict[str, str]:
@@ -237,9 +193,6 @@ def main() -> int:
     from bind_abstract_content import main as bind_content
 
     bind_content()
-    from repair_abstract_links import main as repair_links
-
-    repair_links()
     print(f"Wrote abstract-tree.csv and {count} abstract HTML pages")
     return 0
 

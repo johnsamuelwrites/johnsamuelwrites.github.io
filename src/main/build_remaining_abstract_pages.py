@@ -15,7 +15,6 @@ from remaining_abstract_quickstatements import GROUPS
 
 
 ABSTRACT_EXPORT = REPO_ROOT / "abstractid.csv"
-MISSING_CONCRETE_FIRST = 3576
 NESTING = {
     "research": ("Q315", "index.html"),
     "cv-detailed": ("research", None),
@@ -88,17 +87,17 @@ def concrete_bindings() -> dict[str, str]:
         for row in csv.DictReader(source):
             path = unquote(urlsplit(row["url"]).path).lstrip("/")
             result[path] = qid(row["item"])
-    missing = [
-        row["path"]
-        for row in csv.DictReader(
-            (REPO_ROOT / "remaining-abstract-pages.template.csv").open(
-                encoding="utf-8-sig", newline=""
-            )
+    required = {
+        path
+        for paths in GROUPS.values()
+        for path in paths.values()
+    }
+    missing = sorted(required - set(result))
+    if missing:
+        raise ValueError(
+            "pages.csv is missing concrete page items: "
+            + ", ".join(missing)
         )
-        if row["path"] not in result
-    ]
-    for offset, path in enumerate(dict.fromkeys(missing)):
-        result[path] = f"Q{MISSING_CONCRETE_FIRST + offset}"
     return result
 
 
@@ -152,19 +151,6 @@ def write_manifests(
             ("abstract_item", "group", "language", "path", "abstract_path")
         )
         writer.writerows(rows)
-    recovered = [
-        (path, item)
-        for path, item in concrete.items()
-        if MISSING_CONCRETE_FIRST <= int(item[1:]) <= 3630
-    ]
-    with (REPO_ROOT / "remaining-concrete-pages-recovered.csv").open(
-        "w", encoding="utf-8", newline=""
-    ) as destination:
-        writer = csv.writer(destination)
-        writer.writerow(("path", "item"))
-        writer.writerows(recovered)
-
-
 def build(abstract: dict[str, str]) -> int:
     count = 0
     for key, item in abstract.items():
@@ -192,9 +178,6 @@ def main() -> int:
     concrete = concrete_bindings()
     write_manifests(abstract, concrete)
     count = build(abstract)
-    from repair_abstract_links import main as repair_links
-
-    repair_links()
     missing = sorted(set(GROUPS) - set(abstract))
     print(
         f"Built {count} non-travel abstract pages; "
