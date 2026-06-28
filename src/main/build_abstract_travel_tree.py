@@ -237,6 +237,9 @@ def main() -> int:
     from bind_abstract_content import main as bind_content
 
     bind_content()
+    from repair_abstract_links import main as repair_links
+
+    repair_links()
     print(f"Wrote abstract-tree.csv and {count} abstract HTML pages")
     return 0
 

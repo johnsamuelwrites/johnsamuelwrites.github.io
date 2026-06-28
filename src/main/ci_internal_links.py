@@ -100,12 +100,32 @@ def parse_args() -> argparse.Namespace:
             "new files or folders are added."
         ),
     )
+    parser.add_argument(
+        "--root",
+        type=Path,
+        help="Scan every HTML file under this path (for example Q315).",
+    )
     return parser.parse_args()
 
 
 def main() -> int:
     args = parse_args()
-    if args.all:
+    if args.root:
+        root = args.root.resolve()
+        html_files = collect_html_files(
+            [str(root)],
+            recursive=True,
+            exclude_dirs=FULL_SCAN_IGNORED_DIRS,
+        )
+        html_files = sorted(set(html_files))
+        if not html_files:
+            print(f"No HTML files found under {args.root}.")
+            return 0
+        print(
+            f"Scanning {len(html_files)} HTML files under {args.root} "
+            "for internal broken links."
+        )
+    elif args.all:
         html_files = resolve_all_html_files()
         if not html_files:
             print("No HTML files found to check.")

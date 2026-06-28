@@ -31,6 +31,30 @@ ABSTRACT_LABELS = {
     "cv-detailed": "Detailed curriculum vitae",
     "search": "Website search",
 }
+HOME_LINKS = {
+    "research/research.html": "../en/research/research.html",
+    "teaching/index.html": "../en/teaching/index.html",
+    "writings/index.html": "Q3638/index.html",
+    "linguistics/index.html": "../en/linguistics/index.html",
+    "travel/index.html": "Q3062/index.html",
+    "research/index.html": "Q3636/index.html",
+    "./writings/Iohannes.html": "Q3638/Q3644.html",
+    "./about.html": "Q3633.html",
+    "./blog.html": "Q3634.html",
+    "./writings/quotes.html": "Q3638/Q3639.html",
+    "disclaimer.html": "Q3635.html",
+    "./teaching/archives.html": "../en/teaching/archives.html",
+    "./travel/index.html": "Q3062/index.html",
+    "photography/countries.html": "Q3062/Q3026.html",
+    "./research/research.html": "../en/research/research.html",
+    "./writings/books-i-read.html": "Q3638/Q3640.html",
+    "./writings/films-series-documentaries.html": "Q3638/Q3641.html",
+    "linguistics/learning-language.html": "../en/linguistics/learning-language.html",
+    "./writings/music.html": "Q3638/Q3642.html",
+    "./writings/museums-galleries.html": "Q3638/Q3643.html",
+    "./blog/blogs-list.html": "../en/blog/blogs-list.html",
+    "./search.html": "Q3647.html",
+}
 
 
 def qid(value: str) -> str:
@@ -154,6 +178,11 @@ def build(abstract: dict[str, str]) -> int:
             item,
             pages,
         )
+        if key == "home":
+            html = target_for(key, item, abstract).read_text(encoding="utf-8")
+            for old, new in HOME_LINKS.items():
+                html = html.replace(f'href="{old}"', f'href="{new}"')
+            target_for(key, item, abstract).write_text(html, encoding="utf-8")
         count += 1
     return count
 
@@ -163,6 +192,9 @@ def main() -> int:
     concrete = concrete_bindings()
     write_manifests(abstract, concrete)
     count = build(abstract)
+    from repair_abstract_links import main as repair_links
+
+    repair_links()
     missing = sorted(set(GROUPS) - set(abstract))
     print(
         f"Built {count} non-travel abstract pages; "
