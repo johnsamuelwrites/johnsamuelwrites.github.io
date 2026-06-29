@@ -108,6 +108,87 @@ class AbstractCSSAssetsTests(unittest.TestCase):
             (self.root / self.group.pages[0]).read_text(encoding="utf-8"),
         )
 
+    def test_authoritative_page_css_replaces_translated_drift(self):
+        group = type(self.group)(
+            identifier=self.group.identifier,
+            asset=self.group.asset,
+            pages=self.group.pages,
+            authoritative_page=self.group.pages[0],
+        )
+        translated = self.root / group.pages[1]
+        translated.write_text(
+            translated.read_text(encoding="utf-8").replace("navy", "maroon"),
+            encoding="utf-8",
+        )
+
+        migrate_group(group, self.root)
+
+        self.assertEqual(
+            (self.root / group.asset).read_text(encoding="utf-8"),
+            "body { color: navy; }\n",
+        )
+        self.assertNotIn(
+            "<style>", translated.read_text(encoding="utf-8")
+        )
+
+
+class CollectionDiscoveryTests(unittest.TestCase):
+    def test_collection_discovers_abstract_page_and_language_alternates(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            abstract = root / "Q315/Q9"
+            abstract.mkdir(parents=True)
+            pages = {
+                "en": root / "en/topic.html",
+                "fr": root / "fr/sujet.html",
+            }
+            for page in pages.values():
+                page.parent.mkdir(parents=True)
+                page.write_text("<html></html>", encoding="utf-8")
+            (abstract / "index.html").write_text(
+                '<link rel="alternate" hreflang="en" '
+                'href="../../en/topic.html">\n'
+                '<link rel="alternate" hreflang="fr" '
+                'href="../../fr/sujet.html">\n'
+                "<style>body { color: navy; }</style>",
+                encoding="utf-8",
+            )
+            manifest = root / "manifest.json"
+            manifest.write_text(
+                json.dumps(
+                    {
+                        "version": 1,
+                        "groups": [],
+                        "collections": [
+                            {
+                                "id": "test",
+                                "abstract_root": "Q315/Q9",
+                                "asset_directory": "Q315/assets/css/pages",
+                                "index_asset": "Q315/assets/css/collections/Q9.css",
+                                "languages": ["en", "fr"],
+                            }
+                        ],
+                    }
+                ),
+                encoding="utf-8",
+            )
+
+            groups = load_groups(manifest, root)
+
+            self.assertEqual(len(groups), 1)
+            self.assertEqual(groups[0].identifier, "Q9")
+            self.assertEqual(
+                groups[0].asset, Path("Q315/assets/css/collections/Q9.css")
+            )
+            self.assertEqual(
+                groups[0].pages,
+                (
+                    Path("Q315/Q9/index.html"),
+                    Path("en/topic.html"),
+                    Path("fr/sujet.html"),
+                ),
+            )
+
 
 if __name__ == "__main__":
     unittest.main()

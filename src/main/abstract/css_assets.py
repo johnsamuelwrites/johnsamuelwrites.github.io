@@ -15,8 +15,10 @@ import os
 import re
 import textwrap
 from dataclasses import dataclass
+from html.parser import HTMLParser
 from pathlib import Path
 from typing import Sequence
+from urllib.parse import unquote, urlsplit
 
 
 HERE = Path(__file__).resolve().parent
@@ -46,9 +48,107 @@ class CSSGroup:
     identifier: str
     asset: Path
     pages: tuple[Path, ...]
+    authoritative_page: Path | None = None
 
 
-def load_groups(manifest_path: Path) -> list[CSSGroup]:
+class _AlternateParser(HTMLParser):
+    """Collect local ``hreflang`` alternate links without external packages."""
+
+    def __init__(self) -> None:
+        super().__init__()
+        self.alternates: list[tuple[str, str]] = []
+
+    def handle_starttag(
+        self, tag: str, attrs: list[tuple[str, str | None]]
+    ) -> None:
+        attributes = dict(attrs)
+        rel = (attributes.get("rel") or "").split()
+        language = attributes.get("hreflang")
+        href = attributes.get("href")
+        if tag.lower() == "link" and "alternate" in rel and language and href:
+            self.alternates.append((language, href))
+
+
+def _repo_relative(path: Path, repo_root: Path, context: str) -> Path:
+    try:
+        return path.resolve().relative_to(repo_root.resolve())
+    except ValueError as error:
+        raise CSSAssetError(f"{context}: path escapes the repository") from error
+
+
+def _collection_groups(raw: dict, repo_root: Path) -> list[CSSGroup]:
+    collection_id = raw.get("id", "")
+    abstract_root = Path(raw["abstract_root"])
+    asset_directory = Path(raw["asset_directory"])
+    languages = tuple(raw.get("languages", []))
+    if not collection_id or not languages:
+        raise CSSAssetError(
+            "collection IDs and language lists must be non-empty"
+        )
+
+    root_path = repo_root / abstract_root
+    if not root_path.is_dir():
+        raise CSSAssetError(f"{abstract_root}: abstract collection does not exist")
+
+    groups: list[CSSGroup] = []
+    identifiers: set[str] = set()
+    for abstract_path in sorted(root_path.rglob("*.html")):
+        identifier = (
+            abstract_path.parent.name
+            if abstract_path.name == "index.html"
+            else abstract_path.stem
+        )
+        if not re.fullmatch(r"Q[0-9]+", identifier):
+            raise CSSAssetError(
+                f"{abstract_path.relative_to(repo_root)}: cannot derive a QID"
+            )
+        if identifier in identifiers:
+            raise CSSAssetError(
+                f"{collection_id}: duplicate abstract page ID {identifier}"
+            )
+
+        parser = _AlternateParser()
+        parser.feed(abstract_path.read_text(encoding="utf-8"))
+        by_language: dict[str, Path] = {}
+        for language, href in parser.alternates:
+            parsed = urlsplit(href)
+            if parsed.scheme or parsed.netloc:
+                continue
+            target = abstract_path.parent / unquote(parsed.path)
+            by_language[language] = _repo_relative(
+                target, repo_root, str(abstract_path.relative_to(repo_root))
+            )
+        missing = [language for language in languages if language not in by_language]
+        extras = sorted(set(by_language) - set(languages))
+        if missing or extras:
+            raise CSSAssetError(
+                f"{abstract_path.relative_to(repo_root)}: alternate languages "
+                f"missing={missing!r}, unexpected={extras!r}"
+            )
+
+        abstract_relative = abstract_path.relative_to(repo_root)
+        if abstract_path == root_path / "index.html" and raw.get("index_asset"):
+            asset = Path(raw["index_asset"])
+        else:
+            asset = asset_directory / f"{identifier}.css"
+        groups.append(
+            CSSGroup(
+                identifier=identifier,
+                asset=asset,
+                pages=(
+                    abstract_relative,
+                    *(by_language[language] for language in languages),
+                ),
+                authoritative_page=abstract_relative,
+            )
+        )
+        identifiers.add(identifier)
+    return groups
+
+
+def load_groups(
+    manifest_path: Path, repo_root: Path = DEFAULT_REPO_ROOT
+) -> list[CSSGroup]:
     """Load and minimally validate a CSS asset manifest."""
     data = json.loads(manifest_path.read_text(encoding="utf-8"))
     if data.get("version") != 1:
@@ -73,9 +173,22 @@ def load_groups(manifest_path: Path) -> list[CSSGroup]:
                 identifier=identifier,
                 asset=Path(raw["asset"]),
                 pages=pages,
+                authoritative_page=(
+                    Path(raw["authoritative_page"])
+                    if raw.get("authoritative_page")
+                    else None
+                ),
             )
         )
         identifiers.add(identifier)
+    for collection in data.get("collections", []):
+        for group in _collection_groups(collection, repo_root):
+            if group.identifier in identifiers:
+                raise CSSAssetError(
+                    f"{manifest_path}: duplicate group ID {group.identifier}"
+                )
+            groups.append(group)
+            identifiers.add(group.identifier)
     return groups
 
 
@@ -111,6 +224,24 @@ def _page_state(html: str, group: CSSGroup) -> tuple[list[str], list[str]]:
 def _select_css(
     group: CSSGroup, repo_root: Path, page_html: dict[Path, str]
 ) -> str:
+    asset_path = repo_root / group.asset
+    if group.authoritative_page is not None:
+        authority_html = page_html[group.authoritative_page]
+        authority_styles, _links = _page_state(authority_html, group)
+        if len(authority_styles) > 1:
+            raise CSSAssetError(
+                f"{group.authoritative_page}: expected at most one inline "
+                f"style block, found {len(authority_styles)}"
+            )
+        if authority_styles:
+            return authority_styles[0]
+        if asset_path.exists():
+            return canonical_css(asset_path.read_text(encoding="utf-8"))
+        raise CSSAssetError(
+            f"{group.identifier}: authoritative page has no inline CSS and "
+            "the canonical asset does not exist"
+        )
+
     candidates: list[tuple[Path, str]] = []
     for page, html in page_html.items():
         styles, _links = _page_state(html, group)
@@ -122,7 +253,6 @@ def _select_css(
         if styles:
             candidates.append((page, styles[0]))
 
-    asset_path = repo_root / group.asset
     if asset_path.exists():
         candidates.append(
             (group.asset, canonical_css(asset_path.read_text(encoding="utf-8")))
@@ -270,8 +400,10 @@ def build_parser() -> argparse.ArgumentParser:
 def main(argv: Sequence[str] | None = None) -> int:
     args = build_parser().parse_args(argv)
     repo_root = args.repo_root.resolve()
-    groups = selected_groups(load_groups(args.manifest), args.group)
     try:
+        groups = selected_groups(
+            load_groups(args.manifest, repo_root), args.group
+        )
         if args.command == "migrate":
             changed = sum(migrate_group(group, repo_root) for group in groups)
             print(f"Migrated {len(groups)} CSS group(s); changed {changed} file(s)")

@@ -1,5 +1,14 @@
 # Roadmap
 
+## Implementation status
+
+The travel CSS migration is complete. All 156 abstract pages beneath
+`Q315/Q3062`, including nested country and city pages, own canonical
+stylesheets under `Q315/assets/css/`. Their eight language renderings reference
+those assets rather than embedding copies. Collection discovery and CI
+validation automatically include future travel pages exposed through all eight
+`hreflang` links.
+
 ## Phase 0 — Record and measure
 
 - Keep this architecture under version control.

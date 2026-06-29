@@ -52,6 +52,14 @@ safe and produces no changes. Future page families should be added to the
 manifest only after their styles have been compared and their intended sharing
 boundary—component, collection, or page—has been chosen.
 
+A collection entry discovers every abstract HTML file recursively and obtains
+its rendered pages from `hreflang` links. The abstract page is authoritative:
+when an older translation has CSS drift, migration deliberately replaces that
+copy with a reference to the abstract page's stylesheet. Missing or unexpected
+languages, duplicate QIDs, paths outside the repository, and missing pages are
+errors. This lets a newly added travel page enter the same process without
+adding nine paths by hand.
+
 ## First pilot
 
 Use a small vertical slice from travel:
