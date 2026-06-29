@@ -80,6 +80,65 @@ The pilot should include:
 - navigation and language alternates;
 - one shared collection stylesheet.
 
+The content portion begins with the hero description in
+`Q315/Q3062/index.html`. Its three sentences have pilot translations in all
+eight current languages. The Malayalam, Punjabi, Hindi, and European Portuguese
+values were added to the pilot explicitly rather than treating missing content
+or copied English as translations.
+
+Prepare the five required Wikibase items—one function, one composed paragraph,
+and three sentences—with:
+
+```bash
+python src/main/abstract/prepare_q3062_hero.py prepare
+```
+
+After importing the generated QuickStatements, enter the returned local QIDs
+in `pilots/Q3062-hero-bindings.csv`. Create the three properties listed in
+`QUERYING.md` with their declared datatypes, enter their property IDs, and run:
+
+```bash
+python src/main/abstract/prepare_q3062_hero.py check-bindings
+python src/main/abstract/prepare_q3062_hero.py write-structure
+```
+
+Import the generated structural QuickStatements. Only then should the visible
+pilot paragraph be replaced by its `<q-call>`.
+This gate prevents bootstrap tokens or guessed QIDs from entering canonical
+Q315 HTML.
+
+Once the binding check passes and all eight language values are present in the
+pilot data, apply the guarded replacement:
+
+```bash
+python src/main/abstract/prepare_q3062_hero.py bind
+```
+
+`bind` refuses to modify Q315 if a QID is absent, reused, malformed, or if any
+sentence translation is missing. It is also safe to run again after binding.
+
+## Rendering from Wikibase
+
+The Q3062 pilot uses a committed, deterministic snapshot rather than contacting
+the live Wikibase during every site build:
+
+```bash
+# Explicitly refresh after reviewed Wikibase changes.
+python src/main/abstract/wikibase_snapshot.py
+
+# Render the eight concrete pages.
+python src/main/abstract/render_q3062_hero.py
+
+# CI/no-write mode.
+python src/main/abstract/render_q3062_hero.py --check
+```
+
+The resolver reads the constructor from `P41`, finds sentence membership via
+`P21`, orders statements by the `P42` qualifier, and selects the requested
+language from `P40`. Function implementation bindings are explicit in
+`function-implementations.json`. Concrete HTML records Q3838 and Q3837 as
+provenance and is never used as the rendering source.
+
 ## Initial implementation order
 
 1. Define qualified ID parsing: `local:Q…` and `wikidata:Q…`.
@@ -136,6 +195,54 @@ python -m src.main.abstract.renderer.render --collection Q3062 --check
 
 The exact CLI can change when implementation begins; deterministic input and
 `--check` behaviour are part of the contract.
+
+## Collection-wide travel preparation
+
+Prepare remaining travel content against the offline exports maintained by the
+sibling `Q42761025` repository:
+
+```bash
+python src/main/abstract/prepare_travel_content.py
+```
+
+This produces unmatched item proposals in
+`travel-content.quickstatements`, semantic occurrences in
+`travel-content-manifest.csv`, and absent or likely copied translations in
+`travel-content-missing.csv`. Regenerate after every offline label export and
+before importing a batch, so existing items are never proposed twice.
+
+Every generated content item carries `P40` (`monolingual content`) values for
+all eight working languages. Short content is also used as complete multilingual
+labels; longer content uses a token label and keeps the full text in `P40`.
+Likely copied source-language placeholders are still written to
+`travel-content-missing.csv` for human review, but they are not omitted from the
+QuickStatements batch.
+
+Validate a generated batch before import:
+
+```bash
+python src/main/abstract/prepare_travel_content.py --check
+```
+
+If a generated text binding duplicates a better existing Wikibase item, record
+the canonical item in `travel-content-overrides.csv` before regenerating. The
+override key is the stable slot from `travel-content-manifest.csv`:
+
+```csv
+page,tag,class,role,occurrence,qid,note
+Q3073,p,hero-subtitle,,0,QXXXX,prefer existing canonical subtitle item
+```
+
+Then rerun:
+
+```bash
+python src/main/abstract/prepare_travel_content.py
+python src/main/abstract/bind_travel_manifest.py
+```
+
+The binder keeps `data-content="local:Q…"` and changes the visible Q315 text of
+bound elements to the QID itself. Labels from `../Q42761025/data/` are for
+rendering language pages, not for making Q315 visibly English.
 
 ## Migration safety
 

@@ -9,6 +9,14 @@ those assets rather than embedding copies. Collection discovery and CI
 validation automatically include future travel pages exposed through all eight
 `hreflang` links.
 
+The first abstract-content pilot is in preparation on the Q3062 hero
+description. The versioned HTML contract, qualified-QID validator, typed
+monolingual-text value, function registry, concatenate implementation, complete
+eight-language sentence set, and QuickStatements preparation workflow are
+implemented. Q315 now contains the production function call, and a pinned
+Wikibase snapshot deterministically renders Q3838 into all eight concrete
+language pages. CI rejects stale generated output.
+
 ## Phase 0 — Record and measure
 
 - Keep this architecture under version control.

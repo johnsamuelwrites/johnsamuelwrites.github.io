@@ -28,6 +28,8 @@ units, and functions. Language HTML and CSS are build products.
 - [ROADMAP.md](ROADMAP.md) gives staged milestones and acceptance criteria.
 - [DECISIONS.md](DECISIONS.md) records the initial architectural decisions that
   should remain stable while the implementation evolves.
+- [QUERYING.md](QUERYING.md) defines the queryable Wikibase graph and example
+  SPARQL shapes for abstract content.
 
 ## Current status
 
