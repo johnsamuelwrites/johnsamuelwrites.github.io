@@ -16,8 +16,7 @@ Existing local properties are reused:
 - `P8`: instance of;
 - `P21`: part of.
 
-Three properties must be created once in the local Wikibase and entered in
-`pilots/Q3062-hero-bindings.csv`:
+Three properties must exist once in the local Wikibase:
 
 | Binding token | Datatype | Purpose |
 | --- | --- | --- |
@@ -27,20 +26,9 @@ Three properties must be created once in the local Wikibase and entered in
 
 Property IDs are not guessed because an incorrect datatype cannot be repaired
 by changing a QuickStatement. The three class items—abstract function,
-abstract paragraph, and abstract sentence—are created by the initial pilot
-QuickStatements.
-
-After importing those items and creating the properties:
-
-```bash
-python src/main/abstract/prepare_q3062_hero.py prepare
-# Fill Q3062-hero-bindings.csv with returned QIDs and property IDs.
-python src/main/abstract/prepare_q3062_hero.py check-bindings
-python src/main/abstract/prepare_q3062_hero.py write-structure
-```
-
-Import `Q3062-hero-structure.quickstatements` to add types, membership,
-constructor, ordered composition, and monolingual values.
+abstract paragraph, and abstract sentence—are bootstrap concepts in the local
+Wikibase. Local pilot QuickStatements and snapshots generated during
+experimentation are working artifacts, not repository sources of truth.
 
 ## Example SPARQL shapes
 

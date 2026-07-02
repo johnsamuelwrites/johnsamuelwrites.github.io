@@ -80,64 +80,16 @@ The pilot should include:
 - navigation and language alternates;
 - one shared collection stylesheet.
 
-The content portion begins with the hero description in
-`Q315/Q3062/index.html`. Its three sentences have pilot translations in all
-eight current languages. The Malayalam, Punjabi, Hindi, and European Portuguese
-values were added to the pilot explicitly rather than treating missing content
-or copied English as translations.
-
-Prepare the five required Wikibase items—one function, one composed paragraph,
-and three sentences—with:
-
-```bash
-python src/main/abstract/prepare_q3062_hero.py prepare
-```
-
-After importing the generated QuickStatements, enter the returned local QIDs
-in `pilots/Q3062-hero-bindings.csv`. Create the three properties listed in
-`QUERYING.md` with their declared datatypes, enter their property IDs, and run:
-
-```bash
-python src/main/abstract/prepare_q3062_hero.py check-bindings
-python src/main/abstract/prepare_q3062_hero.py write-structure
-```
-
-Import the generated structural QuickStatements. Only then should the visible
-pilot paragraph be replaced by its `<q-call>`.
-This gate prevents bootstrap tokens or guessed QIDs from entering canonical
-Q315 HTML.
-
-Once the binding check passes and all eight language values are present in the
-pilot data, apply the guarded replacement:
-
-```bash
-python src/main/abstract/prepare_q3062_hero.py bind
-```
-
-`bind` refuses to modify Q315 if a QID is absent, reused, malformed, or if any
-sentence translation is missing. It is also safe to run again after binding.
-
-## Rendering from Wikibase
-
-The Q3062 pilot uses a committed, deterministic snapshot rather than contacting
-the live Wikibase during every site build:
-
-```bash
-# Explicitly refresh after reviewed Wikibase changes.
-python src/main/abstract/wikibase_snapshot.py
-
-# Render the eight concrete pages.
-python src/main/abstract/render_q3062_hero.py
-
-# CI/no-write mode.
-python src/main/abstract/render_q3062_hero.py --check
-```
+The first Q3062 hero experiment produced local pilot files and snapshots while
+the abstract model was being explored. Those generated files are intentionally
+not committed. The durable parts are the Q315 HTML contract, the function
+registry, the offline Wikibase resolver, and the collection-wide travel
+inventory/binding tools.
 
 The resolver reads the constructor from `P41`, finds sentence membership via
 `P21`, orders statements by the `P42` qualifier, and selects the requested
 language from `P40`. Function implementation bindings are explicit in
-`function-implementations.json`. Concrete HTML records Q3838 and Q3837 as
-provenance and is never used as the rendering source.
+`function-implementations.json`.
 
 ## Initial implementation order
 
@@ -147,7 +99,7 @@ provenance and is never used as the rendering source.
 4. Implement typed values and the function registry.
 5. Implement label resolution and `concatenate`.
 6. Extract the travel style block into canonical CSS.
-7. render the four pilot pages into all eight languages;
+7. render abstract pages into all eight languages from offline snapshots;
 8. compare structure, links, accessibility, and screenshots;
 9. add deterministic regeneration to CI.
 
@@ -205,11 +157,12 @@ sibling `Q42761025` repository:
 python src/main/abstract/prepare_travel_content.py
 ```
 
-This produces unmatched item proposals in
-`travel-content.quickstatements`, semantic occurrences in
-`travel-content-manifest.csv`, and absent or likely copied translations in
-`travel-content-missing.csv`. Regenerate after every offline label export and
-before importing a batch, so existing items are never proposed twice.
+This produces generated working files such as `travel-content.quickstatements`,
+`travel-content-manifest.csv`, `travel-content-pending-manifest.csv`, and
+`travel-content-missing.csv`. They depend on the current offline export in
+`../Q42761025/data/`, so they are ignored by Git. Regenerate after every offline
+label export and before importing a batch, so existing items are never proposed
+twice.
 
 Every generated content item carries `P40` (`monolingual content`) values for
 all eight working languages. Short content is also used as complete multilingual
