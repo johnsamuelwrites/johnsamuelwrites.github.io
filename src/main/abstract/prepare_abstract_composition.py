@@ -166,11 +166,19 @@ def plan(
             english = values[0]
             if not english or not is_prose(english):
                 continue
+            segmented = segment(values)
+            # Only a genuinely multi-sentence slot is a composition. A single
+            # sentence is an atomic content item — wrapping it in a one-part
+            # paragraph would duplicate its identity (paragraph and sentence
+            # would hash to the same token) and adds no structure. Those slots
+            # are left to prepare_missing_content.py as flat content items.
+            if len(segmented) < 2:
+                continue
             paragraph_token = content_token(values)
             composition = paragraphs.get(paragraph_token)
             if composition is None:
                 composition = Composition(paragraph_token, values)
-                for ordinal, sentence in enumerate(segment(values), 1):
+                for sentence in segmented:
                     token = content_token(sentence)
                     sentence_values.setdefault(token, sentence)
                     composition.sentences.append((token, sentence))
@@ -494,7 +502,10 @@ def main() -> int:
         print(f"ERROR: {error}", file=sys.stderr)
         return 1
 
+    referenced = {row["token"] for row in rows}
     for token, qids in sorted(duplicates.items()):
+        if token not in referenced:
+            continue
         print(
             f"WARNING: token {token} imported as duplicate items "
             f"{', '.join(qids)}; merge them in Wikibase",
