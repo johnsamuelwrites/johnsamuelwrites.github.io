@@ -339,7 +339,14 @@ def inventory(
             # Link destination identity and visible link text are independent.
             # "Read more about me" must not resolve to the destination page's
             # shorter "About" label merely because its href contains that QID.
-            if token in by_token:
+            # Prefer an already-finalized multilingual item over a temporary
+            # import-token item. A stale export can allow a duplicate token
+            # item to be created; once the canonical item is visible again,
+            # reconciliation must bind to it instead of trying to give the
+            # duplicate its already-used English label.
+            if qid:
+                status = "existing-exact"
+            elif token in by_token:
                 status = "existing-import-token"
                 qid = by_token[token]
             elif legacy_token in by_token:
@@ -347,8 +354,6 @@ def inventory(
                 # alignment replaced unsafe occurrence-paired translations.
                 status = "existing-import-token"
                 qid = by_token[legacy_token]
-            elif qid:
-                status = "existing-exact"
             elif len(candidates) == 1:
                 status = "existing-english-review"
                 qid = candidates[0]

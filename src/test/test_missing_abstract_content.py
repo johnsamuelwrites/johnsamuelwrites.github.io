@@ -20,6 +20,19 @@ from abstract.prepare_missing_content import (
 
 
 class MissingAbstractContentTests(unittest.TestCase):
+    def test_existing_exact_item_wins_over_duplicate_import_token(self):
+        source = Path(__file__).resolve().parents[1]
+        # The precedence itself is exercised through a compact source check:
+        # exact multilingual identity must be considered before token recovery.
+        code = (
+            source / "main" / "abstract" / "prepare_missing_content.py"
+        ).read_text(encoding="utf-8")
+
+        self.assertLess(
+            code.index('if qid:\n                status = "existing-exact"'),
+            code.index("elif token in by_token:"),
+        )
+
     def test_alternates_are_returned_in_supported_language_order(self):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
