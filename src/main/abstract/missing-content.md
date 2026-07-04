@@ -50,6 +50,7 @@ This creates three ignored working files:
 src/main/abstract/missing-content-review.csv
 src/main/abstract/missing-content.quickstatements
 src/main/abstract/missing-content-partial.quickstatements
+src/main/abstract/missing-content-label-updates.quickstatements
 ```
 
 The generator:
@@ -62,7 +63,8 @@ The generator:
    separately as reusable local entities;
 6. resolves links to local `Q….html` pages as entity references;
 7. compares multilingual values with the offline Wikibase exports;
-8. prepares separate deduplicated imports for complete items and for partial
+8. forces native (English-page) labels on the proper-name list pages below;
+9. prepares separate deduplicated imports for complete items and for partial
    items that currently have at least English and French.
 
 Complete items can move through the eight-language review immediately.
@@ -74,6 +76,33 @@ expose alignment errors.
 Never edit `missing-content.quickstatements` as the source of truth. Correct
 translations in the localized pages or review data, then regenerate it.
 
+### Native-label list pages (never translated)
+
+Some abstract pages are curated lists of proper names — film, book, series and
+museum titles, and verbatim quotes — whose English page already carries the
+authoritative label for every entry (for example, a French film keeps its
+French title on the English page). These titles must **not** be translated:
+the English value is always the correct one. The generator recognises these
+pages by their English source path and reuses the English value verbatim for
+every language, so both the `P40` content values and the finalized labels stay
+native and no per-language translation or `P40` replacement is emitted. Rows
+from these pages are marked with `native_labels = 1` in the review CSV.
+
+The current native-label pages (`NATIVE_LABEL_SOURCES` in
+`prepare_missing_content.py`) are:
+
+```text
+en/writings/books-i-read.html               (Books I Read)
+en/writings/films-series-documentaries.html (Films, Series and Documentaries I watched)
+en/writings/music.html                      (Music I Listen)
+en/writings/museums-galleries.html          (Museums and Galleries I visited)
+en/writings/quotes.html                     (Quotes)
+```
+
+To add another such page, append its English source path to that set. Do not
+translate these entries in the localized pages or review data; the English
+page is the single source of truth for their labels.
+
 ## 2. Review the inventory
 
 `missing-content-review.csv` identifies a DOM slot with:
@@ -82,8 +111,10 @@ translations in the localized pages or review data, then regenerate it.
 page, path, tag, class, role, occurrence
 ```
 
-It also contains `status`, `qid`, candidate QIDs, an import `token`, the
-canonical text, and the eight localized values.
+It also contains `native_labels` (`1` for proper-name list pages whose labels
+are never translated), `status`, `qid`, candidate QIDs, an import `token`, the
+canonical text, and the eight localized values. For `native_labels` rows the
+eight values are all identical to the English label by design.
 
 Interpret statuses as follows:
 
@@ -115,7 +146,9 @@ the local Wikibase instance.
 `missing-content-partial.quickstatements` is a separate import batch. Import it
 only after verifying each available value against its page context. Missing
 languages are deliberately absent from `P40`; never insert an English fallback
-as though it were a translation.
+as though it were a translation. The one exception is the native-label list
+pages above: there the English value is the genuine native label for every
+language, not a fallback, so it is reused verbatim by design.
 
 Machine-assisted values for languages such as Malayalam, Punjabi, and Hindi
 must be held for human review before they are merged into an eight-language
@@ -136,6 +169,12 @@ Record the QID returned for every `M…` token. In
 `missing-content-review.csv`, place that QID in the `qid` column of every row
 carrying the token. Also fill reviewed QIDs for ambiguous rows. A blank `qid`
 means "do not bind".
+
+For large batches, refresh `labels-wikibase.csv` instead of copying QIDs by
+hand and rerun the generator. It reconciles the temporary
+`M… abstract content` English labels automatically and writes
+`missing-content-label-updates.quickstatements`. Import that batch to replace
+the temporary labels with the reviewed labels in all eight languages.
 
 ## 4. Bind reviewed QIDs
 

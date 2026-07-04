@@ -14,7 +14,12 @@ sys.path.insert(0, str(HERE.parent))
 
 from abstract.css_assets import DEFAULT_REPO_ROOT
 from abstract.discover_content_migration import discover
-from abstract.prepare_missing_content import inventory, page_sources
+from abstract.prepare_missing_content import (
+    DEFAULT_TRANSLATIONS,
+    inventory,
+    load_translations,
+    page_sources,
+)
 from abstract.prepare_travel_content import LANGUAGES
 from abstract.validate_abstract_html import validate
 from abstract.verify_content_roundtrip import verify as verify_roundtrip
@@ -69,7 +74,12 @@ def verify(
             }
         )
 
-    content_rows = inventory(repo_root, data_dir, page_sources(repo_root, page))
+    content_rows = inventory(
+        repo_root,
+        data_dir,
+        page_sources(repo_root, page),
+        load_translations(DEFAULT_TRANSLATIONS),
+    )
     statuses = Counter(row["status"] for row in content_rows)
     unresolved = sum(
         count

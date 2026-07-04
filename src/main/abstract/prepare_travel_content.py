@@ -233,7 +233,12 @@ def load_generated_translations(
 
 
 def quote(value: str) -> str:
-    return value.replace("\\", "\\\\").replace('"', '\\"').replace("\n", " ")
+    return (
+        value.replace("\\", "\\\\")
+        .replace("|", "\\|")
+        .replace('"', '\\"')
+        .replace("\n", " ")
+    )
 
 
 def monolingual_value(language: str, value: str) -> str:
