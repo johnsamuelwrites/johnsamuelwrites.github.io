@@ -21,15 +21,19 @@ units, and functions. Language HTML and CSS are build products.
 
 ## Documents
 
-- [ARCHITECTURE.md](ARCHITECTURE.md) defines authority, abstract HTML, function
+- [architecture.md](architecture.md) defines authority, abstract HTML, function
   calls, translation, and CSS ownership.
-- [DEVELOPMENT.md](DEVELOPMENT.md) proposes repository layout, validation, and
+- [development.md](development.md) proposes repository layout, validation, and
   the first executable pilot.
-- [ROADMAP.md](ROADMAP.md) gives staged milestones and acceptance criteria.
-- [DECISIONS.md](DECISIONS.md) records the initial architectural decisions that
+- [roadmap.md](roadmap.md) gives staged milestones and acceptance criteria.
+- [decisions.md](decisions.md) records the initial architectural decisions that
   should remain stable while the implementation evolves.
-- [QUERYING.md](QUERYING.md) defines the queryable Wikibase graph and example
+- [querying.md](querying.md) defines the queryable Wikibase graph and example
   SPARQL shapes for abstract content.
+- [content-migration.md](content-migration.md) defines the incremental,
+  repository-wide migration of legacy English and French articles.
+- [missing-content.md](missing-content.md) is the narrower operator guide for
+  binding residual prose in Q315 pages that already exist.
 
 ## Current status
 
@@ -42,3 +46,9 @@ composition input is Q315.
 No existing generated page is declared disposable merely by this plan. A
 collection becomes generated-only after it passes the round-trip and visual
 checks described in the roadmap.
+
+Repository-wide discovery is available through
+`discover_content_migration.py`. It builds a generated registry rather than a
+hand-written list. Pairing rules, content extraction, abstract authoring, and
+collection cutover remain incremental implementation stages; the registry
+does not pretend that unpaired legacy pages have already been migrated.

@@ -1,5 +1,10 @@
 #!/usr/bin/env python3
-"""Prepare Q3062 hero items and bind real Wikibase QIDs after import."""
+"""Prepare abstract-paragraph items and bind real Wikibase QIDs after import.
+
+The page, its composed-paragraph identity, labels, and target CSS class all
+come from a pilot descriptor (``--pilot``) rather than being hard-coded, so the
+same tool bootstraps a composed paragraph on any abstract page.
+"""
 
 from __future__ import annotations
 
@@ -12,16 +17,7 @@ from typing import Sequence
 
 
 HERE = Path(__file__).resolve().parent
-DEFAULT_PILOT = HERE / "pilots" / "Q3062-hero.json"
-DEFAULT_QUICKSTATEMENTS = HERE / "pilots" / "Q3062-hero.quickstatements"
-DEFAULT_BINDINGS = HERE / "pilots" / "Q3062-hero-bindings.csv"
-DEFAULT_STRUCTURE = HERE / "pilots" / "Q3062-hero-structure.quickstatements"
-DEFAULT_PROPERTIES = HERE / "pilots" / "Q3062-hero-properties.csv"
-DEFAULT_ABSTRACT_PAGE = HERE.parents[2] / "Q315" / "Q3062" / "index.html"
-HERO_PARAGRAPH = re.compile(
-    r'(?P<indent>^[ \t]*)<p\s+class="hero-description"[^>]*>.*?</p>',
-    flags=re.MULTILINE | re.DOTALL,
-)
+REPO_ROOT = HERE.parents[2]
 
 
 def quote(value: str) -> str:
@@ -30,6 +26,26 @@ def quote(value: str) -> str:
 
 def load_pilot(path: Path) -> dict:
     return json.loads(path.read_text(encoding="utf-8"))
+
+
+def page_qid(pilot: dict) -> str:
+    page = pilot.get("page", "")
+    return page.removeprefix("local:") if page.startswith("local:") else page
+
+
+def paragraph_class(pilot: dict) -> str:
+    css_class = pilot.get("paragraph_class", "")
+    if not css_class:
+        raise ValueError("pilot descriptor must define 'paragraph_class'")
+    return css_class
+
+
+def paragraph_regex(pilot: dict) -> re.Pattern[str]:
+    css_class = re.escape(paragraph_class(pilot))
+    return re.compile(
+        rf'(?P<indent>^[ \t]*)<p\s+class="{css_class}"[^>]*>.*?</p>',
+        flags=re.MULTILINE | re.DOTALL,
+    )
 
 
 def missing_translations(pilot: dict) -> dict[str, list[str]]:
@@ -60,23 +76,40 @@ def quickstatements(
             )
         )
     if not bindings.get(pilot["function_token"]):
-        function = [
-            "CREATE",
-            'LAST|Len|"concatenate monolingual text"',
-            'LAST|Den|"deterministic abstract function joining ordered '
-            'monolingual text parts"',
-        ]
-        blocks.append("\n".join(function))
+        function_label = pilot.get("function_label", "concatenate monolingual text")
+        function_description = pilot.get(
+            "function_description",
+            "deterministic abstract function joining ordered monolingual "
+            "text parts",
+        )
+        blocks.append(
+            "\n".join(
+                (
+                    "CREATE",
+                    f'LAST|Len|"{quote(function_label)}"',
+                    f'LAST|Den|"{quote(function_description)}"',
+                )
+            )
+        )
 
     if not bindings.get(pilot["paragraph_token"]):
-        paragraph = [
-            "CREATE",
-            'LAST|Len|"Q3062 hero description"',
-            'LAST|Den|"language-independent paragraph composed from abstract '
-            'content items"',
-            "LAST|P8|Q3185",
-        ]
-        blocks.append("\n".join(paragraph))
+        paragraph_label = pilot.get(
+            "paragraph_label", f"{page_qid(pilot)} composed paragraph"
+        )
+        paragraph_description = pilot.get(
+            "paragraph_description",
+            "language-independent paragraph composed from abstract content items",
+        )
+        blocks.append(
+            "\n".join(
+                (
+                    "CREATE",
+                    f'LAST|Len|"{quote(paragraph_label)}"',
+                    f'LAST|Den|"{quote(paragraph_description)}"',
+                    "LAST|P8|Q3185",
+                )
+            )
+        )
     for part in pilot["parts"]:
         if bindings.get(part["token"]):
             continue
@@ -177,7 +210,7 @@ def structural_quickstatements(pilot: dict, bindings: dict[str, str]) -> str:
     statements = [
         f'{function}|{instance_of}|{bindings["ABSTRACT_FUNCTION_CLASS"]}',
         f'{paragraph}|{instance_of}|{bindings["ABSTRACT_PARAGRAPH_CLASS"]}',
-        f"{paragraph}|{part_of}|Q3062",
+        f"{paragraph}|{part_of}|{page_qid(pilot)}",
         f"{paragraph}|{constructor_property}|{function}",
     ]
     for index, part in enumerate(pilot["parts"], 1):
@@ -223,7 +256,7 @@ def check(pilot_path: Path, bindings: Path) -> int:
         for error in errors:
             print(f"ERROR: {error}")
         return 1
-    print("Q3062 hero pilot has complete real-QID bindings")
+    print(f"{page_qid(pilot)} paragraph pilot has complete real-QID bindings")
     return 0
 
 
@@ -248,7 +281,7 @@ def abstract_markup(pilot: dict, bindings: dict[str, str], indent: str) -> str:
     child = indent + "    "
     grandchild = child + "    "
     lines = [
-        f'{indent}<p id="{paragraph}" class="hero-description" '
+        f'{indent}<p id="{paragraph}" class="{paragraph_class(pilot)}" '
         f'data-content="local:{paragraph}">',
         f'{child}<q-call data-function="local:{function}">',
         f'{grandchild}<q-arg data-name="parts">',
@@ -283,63 +316,84 @@ def bind(pilot_path: Path, bindings_path: Path, abstract_page: Path) -> int:
         print("Q315 was not changed")
         return 1
 
+    regex = paragraph_regex(pilot)
     source = abstract_page.read_text(encoding="utf-8")
-    match = HERO_PARAGRAPH.search(source)
+    match = regex.search(source)
     if match is None:
         paragraph_qid = bindings[pilot["paragraph_token"]]
         if (
             f'data-content="local:{paragraph_qid}"' in source
             and "<q-call" in source
         ):
-            print("Q3062 hero pilot is already bound")
+            print(f"{page_qid(pilot)} paragraph pilot is already bound")
             return 0
-        print("ERROR: expected exactly one unbound hero-description paragraph")
+        print(
+            "ERROR: expected exactly one unbound "
+            f'"{paragraph_class(pilot)}" paragraph'
+        )
         print("Q315 was not changed")
         return 1
-    if len(HERO_PARAGRAPH.findall(source)) != 1:
-        print("ERROR: expected exactly one unbound hero-description paragraph")
+    if len(regex.findall(source)) != 1:
+        print(
+            "ERROR: expected exactly one unbound "
+            f'"{paragraph_class(pilot)}" paragraph'
+        )
         print("Q315 was not changed")
         return 1
 
     replacement = abstract_markup(pilot, bindings, match.group("indent"))
     abstract_page.write_text(
-        HERO_PARAGRAPH.sub(replacement, source, count=1),
+        regex.sub(replacement, source, count=1),
         encoding="utf-8",
     )
-    print(f"Bound Q3062 hero abstract markup in {abstract_page}")
+    print(f"Bound {page_qid(pilot)} abstract markup in {abstract_page}")
     return 0
+
+
+def default_abstract_page(pilot_path: Path) -> Path:
+    return REPO_ROOT / "Q315" / page_qid(load_pilot(pilot_path)) / "index.html"
 
 
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--pilot", type=Path, default=DEFAULT_PILOT)
+    parser.add_argument(
+        "--pilot",
+        type=Path,
+        required=True,
+        help="abstract-paragraph descriptor JSON",
+    )
     subparsers = parser.add_subparsers(dest="command", required=True)
     prepare_parser = subparsers.add_parser("prepare")
-    prepare_parser.add_argument("--output", type=Path, default=DEFAULT_QUICKSTATEMENTS)
-    prepare_parser.add_argument("--bindings", type=Path, default=DEFAULT_BINDINGS)
-    prepare_parser.add_argument("--properties", type=Path, default=DEFAULT_PROPERTIES)
+    prepare_parser.add_argument("--output", type=Path)
+    prepare_parser.add_argument("--bindings", type=Path)
+    prepare_parser.add_argument("--properties", type=Path)
     check_parser = subparsers.add_parser("check-bindings")
-    check_parser.add_argument("--bindings", type=Path, default=DEFAULT_BINDINGS)
+    check_parser.add_argument("--bindings", type=Path)
     structure_parser = subparsers.add_parser("write-structure")
-    structure_parser.add_argument("--bindings", type=Path, default=DEFAULT_BINDINGS)
-    structure_parser.add_argument("--output", type=Path, default=DEFAULT_STRUCTURE)
+    structure_parser.add_argument("--bindings", type=Path)
+    structure_parser.add_argument("--output", type=Path)
     bind_parser = subparsers.add_parser("bind")
-    bind_parser.add_argument("--bindings", type=Path, default=DEFAULT_BINDINGS)
-    bind_parser.add_argument(
-        "--abstract-page", type=Path, default=DEFAULT_ABSTRACT_PAGE
-    )
+    bind_parser.add_argument("--bindings", type=Path)
+    bind_parser.add_argument("--abstract-page", type=Path)
     return parser
 
 
 def main(argv: Sequence[str] | None = None) -> int:
     args = build_parser().parse_args(argv)
+    pilot = args.pilot
+    stem = pilot.stem
+    bindings = getattr(args, "bindings", None) or pilot.with_name(f"{stem}-bindings.csv")
     if args.command == "prepare":
-        return prepare(args.pilot, args.output, args.bindings, args.properties)
+        output = args.output or pilot.with_name(f"{stem}.quickstatements")
+        properties = args.properties or pilot.with_name(f"{stem}-properties.csv")
+        return prepare(pilot, output, bindings, properties)
     if args.command == "check-bindings":
-        return check(args.pilot, args.bindings)
+        return check(pilot, bindings)
     if args.command == "write-structure":
-        return write_structure(args.pilot, args.bindings, args.output)
-    return bind(args.pilot, args.bindings, args.abstract_page)
+        output = args.output or pilot.with_name(f"{stem}-structure.quickstatements")
+        return write_structure(pilot, bindings, output)
+    abstract_page = args.abstract_page or default_abstract_page(pilot)
+    return bind(pilot, bindings, abstract_page)
 
 
 if __name__ == "__main__":

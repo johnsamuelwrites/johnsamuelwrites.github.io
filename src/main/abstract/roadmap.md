@@ -9,13 +9,13 @@ those assets rather than embedding copies. Collection discovery and CI
 validation automatically include future travel pages exposed through all eight
 `hreflang` links.
 
-The first abstract-content pilot is in preparation on the Q3062 hero
-description. The versioned HTML contract, qualified-QID validator, typed
-monolingual-text value, function registry, concatenate implementation, complete
-eight-language sentence set, and QuickStatements preparation workflow are
-implemented. Q315 now contains the production function call, and a pinned
-Wikibase snapshot deterministically renders Q3838 into all eight concrete
-language pages. CI rejects stale generated output.
+The first abstract-content pilot targets the Q3062 hero description. The
+versioned HTML contract, qualified-QID validator, typed monolingual-text value,
+function registry, concatenate implementation, complete eight-language sentence
+set, and QuickStatements preparation workflow are implemented. Q315 now contains
+the production function call, and `render_abstract.py` deterministically renders
+the composed paragraph from a pinned Wikibase snapshot into all eight concrete
+language pages. Its `--check` mode detects stale generated output.
 
 ## Phase 0 — Record and measure
 
@@ -26,6 +26,10 @@ language pages. CI rejects stale generated output.
 - Choose the four-page travel pilot and capture current screenshots.
 
 Exit criterion: the pilot inputs and expected outputs are known.
+
+Abstract pages are discovered from the repository rather than a committed batch
+file. Their structural gate is `verify_content_migration.py`; `--release-ready`
+is the stricter content and cutover gate.
 
 ## Phase 1 — Abstract HTML contract
 
@@ -68,11 +72,17 @@ repository diff.
 
 ## Phase 5 — Remaining Q315 collections
 
-- Migrate one structurally similar collection at a time.
+- Discover and pair the thousands of legacy English and French articles in a
+  generated page registry.
+- Migrate one template family within one collection at a time.
+- Permit partial English/French content imports while tracking the other six
+  languages in a QID-keyed translation matrix.
 - Expand the small function set only when a real page requires it.
-- Track content and function coverage in a generated report.
+- Track page ownership, content, translation, and function coverage in
+  generated reports.
 
-Exit criterion: all current Q315 pages are canonical abstract inputs.
+Exit criterion: every logical article has a reviewed identity and migration
+state; all generated-owned pages rebuild solely from Q315 and Wikibase.
 
 ## Phase 6 — Prove future-language support
 

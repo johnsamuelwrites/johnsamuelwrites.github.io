@@ -163,6 +163,8 @@ def existing_content(data_dir: Path) -> dict[tuple[str, ...], str]:
     if labels_path.exists():
         with labels_path.open(encoding="utf-8-sig", newline="") as source:
             for row in csv.DictReader(source):
+                if row.get("itemtype") and row["itemtype"].strip() != "Q3185":
+                    continue
                 identifier = row.get("identifier", "").strip()
                 values = tuple(
                     exported_text(row.get(language, "")) for language in LANGUAGES
@@ -272,7 +274,7 @@ def validate_quickstatements(path: Path) -> list[str]:
         english_labels = [line for line in block if line.startswith("LAST|Len|")]
         token_only_label = (
             len(english_labels) == 1
-            and english_labels[0].endswith(' travel content"')
+            and english_labels[0].endswith(' content"')
         )
         if token_only_label:
             continue

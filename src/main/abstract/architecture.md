@@ -13,6 +13,13 @@ There is one source of truth for each kind of information:
 | Images and other media | existing media store plus QID-based metadata |
 | Rendered language pages | generated output; never an upstream source |
 
+During conversion, existing `en/` and `fr/` pages are read-only migration
+inputs used to establish identity, structure, and initial translations. This
+temporary role does not make either language authoritative. Once a page is
+marked generated-owned, rendered language HTML is no longer accepted as an
+input for that page. The incremental process and ownership states are defined
+in `content-migration.md`.
+
 The renderer must use a versioned Wikibase export or snapshot. A build must not
 change merely because a live service changed between two invocations.
 

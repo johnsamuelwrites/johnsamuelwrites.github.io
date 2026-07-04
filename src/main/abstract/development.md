@@ -7,10 +7,10 @@ The documentation is committed first. Implementation can then grow beside it:
 ```text
 src/main/abstract/
   README.md
-  ARCHITECTURE.md
-  DEVELOPMENT.md
-  ROADMAP.md
-  DECISIONS.md
+  architecture.md
+  development.md
+  roadmap.md
+  decisions.md
   schema/
     abstract-html.schema.json
     function-signature.schema.json
@@ -28,10 +28,12 @@ src/main/abstract/
     fixtures/
 ```
 
-The implementation should reuse existing path, HTML validation, link checking,
-and Wikibase import helpers where their responsibilities are already clear.
-Imports from the old scripts into the new renderer should be avoided when they
-implicitly make English HTML authoritative.
+The current implementation is still flat under `src/main/abstract/`; the tree
+above is the target layout once the renderer lands. The implementation should
+reuse existing path, HTML validation, link checking, and Wikibase import
+helpers where their responsibilities are already clear. Imports from the old
+scripts into the new renderer should be avoided when they implicitly make
+English HTML authoritative.
 
 ## Canonical CSS manager
 
@@ -99,9 +101,9 @@ language from `P40`. Function implementation bindings are explicit in
 4. Implement typed values and the function registry.
 5. Implement label resolution and `concatenate`.
 6. Extract the travel style block into canonical CSS.
-7. render abstract pages into all eight languages from offline snapshots;
-8. compare structure, links, accessibility, and screenshots;
-9. add deterministic regeneration to CI.
+7. Render abstract pages into all eight languages from offline snapshots.
+8. Compare structure, links, accessibility, and screenshots.
+9. Add deterministic regeneration to CI.
 
 ## Validation rules
 
@@ -197,6 +199,38 @@ The binder keeps `data-content="local:Q…"` and changes the visible Q315 text o
 bound elements to the QID itself. Labels from `../Q42761025/data/` are for
 rendering language pages, not for making Q315 visibly English.
 
+## Migration tooling
+
+Two operator workflows build on the modules above. Their step-by-step
+procedures are documented once, in the guides linked below; this section only
+names the entry points so they are discoverable from the development plan.
+
+Residual text in already-authored Q315 pages is inventoried, reviewed, and
+bound with:
+
+```bash
+python src/main/abstract/prepare_missing_content.py
+python src/main/abstract/bind_reviewed_content.py
+```
+
+The pages are discovered from the repository (every page under `Q315/` that
+declares `data-abstract-page`); there is no committed source list. See
+[`missing-content.md`](missing-content.md) for the review statuses, import
+rules, and the round-trip completion check.
+
+Repository-wide discovery of legacy English/French articles and their Q315
+counterparts is generated with:
+
+```bash
+python src/main/abstract/discover_content_migration.py
+```
+
+Every discovered abstract page is then checked end to end with
+`verify_content_migration.py` (add `--release-ready` for the cutover gate, or
+`--page Q3062` to scope a single page). See
+[`content-migration.md`](content-migration.md) for the registry schema, the
+staged process, and the deliberately unresolved `unpaired` review queue.
+
 ## Migration safety
 
 Existing language pages remain review material until a pilot is proven. For
@@ -209,7 +243,6 @@ each migrated page:
 5. obtain human review for all eight languages;
 6. switch the committed pages to generated ownership.
 
-The current `build_abstract_travel_tree.py`,
-`bind_abstract_content.py`, and `refresh_travel_pages.py` remain useful for
-inventory and import. Once Q315 is authoritative, they must not overwrite
-canonical abstract documents from English pages.
+The current `prepare_travel_content.py` and `bind_travel_manifest.py` remain
+useful for inventory and import. Once Q315 is authoritative, they must not
+overwrite canonical abstract documents from English pages.
