@@ -230,6 +230,22 @@ def content_token(values: tuple[str, ...]) -> str:
     return "M" + hashlib.sha256(payload).hexdigest()[:12].upper()
 
 
+def reconciled_item(
+    exact_qid: str,
+    token: str,
+    legacy_token: str,
+    by_token: dict[str, str],
+) -> tuple[str, str] | None:
+    """Resolve canonical identity before considering temporary import items."""
+    if exact_qid:
+        return "existing-exact", exact_qid
+    if token in by_token:
+        return "existing-import-token", by_token[token]
+    if legacy_token in by_token:
+        return "existing-import-token", by_token[legacy_token]
+    return None
+
+
 def load_translations(path: Path) -> dict[str, dict[str, str]]:
     """Read reviewed translations keyed by stable content token and language."""
     result: dict[str, dict[str, str]] = {}
@@ -344,16 +360,9 @@ def inventory(
             # item to be created; once the canonical item is visible again,
             # reconciliation must bind to it instead of trying to give the
             # duplicate its already-used English label.
-            if qid:
-                status = "existing-exact"
-            elif token in by_token:
-                status = "existing-import-token"
-                qid = by_token[token]
-            elif legacy_token in by_token:
-                # Reconcile items imported before canonical-English-only
-                # alignment replaced unsafe occurrence-paired translations.
-                status = "existing-import-token"
-                qid = by_token[legacy_token]
+            reconciled = reconciled_item(qid, token, legacy_token, by_token)
+            if reconciled:
+                status, qid = reconciled
             elif len(candidates) == 1:
                 status = "existing-english-review"
                 qid = candidates[0]

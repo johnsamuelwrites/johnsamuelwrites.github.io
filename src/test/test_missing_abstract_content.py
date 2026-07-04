@@ -13,6 +13,7 @@ from abstract.prepare_missing_content import (
     content_token,
     fill_translations,
     load_translations,
+    reconciled_item,
     write_label_updates,
     write_partial_quickstatements,
     write_quickstatements,
@@ -21,16 +22,14 @@ from abstract.prepare_missing_content import (
 
 class MissingAbstractContentTests(unittest.TestCase):
     def test_existing_exact_item_wins_over_duplicate_import_token(self):
-        source = Path(__file__).resolve().parents[1]
-        # The precedence itself is exercised through a compact source check:
-        # exact multilingual identity must be considered before token recovery.
-        code = (
-            source / "main" / "abstract" / "prepare_missing_content.py"
-        ).read_text(encoding="utf-8")
-
-        self.assertLess(
-            code.index('if qid:\n                status = "existing-exact"'),
-            code.index("elif token in by_token:"),
+        self.assertEqual(
+            reconciled_item(
+                "Q6176",
+                "MNEW",
+                "MLEGACY",
+                {"MNEW": "Q7494", "MLEGACY": "Q7495"},
+            ),
+            ("existing-exact", "Q6176"),
         )
 
     def test_alternates_are_returned_in_supported_language_order(self):
