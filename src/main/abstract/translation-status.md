@@ -14,10 +14,15 @@ change translations.
 - 60 bound content items still have an `M… abstract content` English label.
 - The union of those problems is 442 QIDs across 18 canonical files.
 - One human-readable content slot is still unbound.
-- The content round-trip comparison reports 604 mismatching page/language
-  combinations across all 170 canonical pages. This includes structural and
-  wording differences in legacy language pages; it must not be interpreted as
-  604 missing translations.
+- The content round-trip comparison originally reported 604 mismatching
+  page/language combinations across all 170 canonical pages. Of these, only 8
+  failed purely on a genuinely missing label (57 more mixed missing labels with
+  wording drift); the remaining 539 failed purely because a legacy language page
+  phrases the correct canonical content differently. It must not be interpreted
+  as 604 missing translations.
+- Rendering canonical labels into the bound slots (see "Content round-trip via
+  in-place rendering") is the fix for the wording bucket. The Q3045 pilot has
+  been rendered; the global count is now 600.
 
 ## Conservative page-gated batch
 
@@ -94,11 +99,36 @@ identified as token `M67F96434DBE6`. It is the long Jonathan Tennant/SocArXiv
 bibliography entry. The Malayalam and Punjabi drafts are visibly corrupted
 and must be reviewed before the item is imported and bound.
 
+## Content round-trip via in-place rendering
+
+`render_page.py` makes Q315 authoritative without rewriting whole pages or
+breaking navigation. It substitutes only the bound `data-content`/`data-entity`
+text nodes in each legacy language page with that entity's Wikibase label for the
+language, addressed by the shared `(tag, class, role, occurrence)` slot
+signature, and injects a `Q315 renderer` generator meta so the page's migration
+ownership flips from `legacy` to `abstract`. Chrome, links and unbound content
+are left untouched; composed `<q-call>` paragraphs remain `render_abstract.py`'s
+responsibility. Use `--check` for a dry run and `--page QID` to scope to one page.
+
+- 157 of 170 pages have every bound QID labelled in all eight languages and are
+  renderable now; 13 (`Q3646, Q315, Q3634, Q3636, Q3633, Q3638, Q3635, Q3640,
+  Q3641, Q3642, Q3643, Q3644, Q3647`) are blocked by the still-missing labels and
+  are skipped with a message until those labels land.
+- **Pilot (`Q3045`, "seas"):** rendered into all eight language pages. `en`, `fr`,
+  `pt`, `es`, `it` now round-trip clean; the `ml`/`pa`/`hi` legacy pages lack the
+  `hero-subtitle` paragraph entirely, so `Q4079` cannot be placed and is reported
+  as an unplaced slot (a structural page fix, not a translation gap). The pilot
+  also upgraded several `ml`/`pa`/`hi` slots that still carried English text to
+  proper localized labels.
+- The renderer is faithful to the label store: where a canonical label is less
+  localized than the legacy text (e.g. `it` "Marsiglia" replaced by "Marseille"),
+  the render surfaces it. Those are label-quality fixes to make in
+  `labels-wikibase.csv`, not renderer defects.
+
 ## Round-trip limitation
 
-`verify_content_roundtrip.py` currently reports `mismatch` for 604
-page/language checks. The largest concentrations are `Q3634`, `Q3646`, and
-`Q3636`. Besides missing labels, this comparison detects differing wording,
-ordering, and structure in legacy localized HTML. It should become a strict
-completion gate only after those pages are regenerated from Q315 and the
-Wikibase snapshot.
+Before the in-place rollout completes, `verify_content_roundtrip.py` still reports
+`mismatch` (600 after the Q3045 pilot). The largest concentrations remain `Q3634`,
+`Q3646`, and `Q3636`. It becomes a strict completion gate once the 157 renderable
+pages are rendered and the residual structural gaps (unplaced slots) and the 13
+label-blocked pages are reconciled.
