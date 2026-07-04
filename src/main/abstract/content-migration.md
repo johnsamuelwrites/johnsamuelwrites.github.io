@@ -71,6 +71,24 @@ legacy pages remain explicit `unpaired` rows; later route rules or reviewed
 identity mappings must resolve them. The command does not guess from titles or
 translated directory names.
 
+Discovery, verification, inventory and round-trip all key on the
+`data-abstract-page="local:Q…"` declaration on a canonical page's `<html>`
+element. A page authored without it is invisible to the whole pipeline even
+when it already carries complete alternates and bindings, so its legacy
+alternates stay `unpaired`. The page QID is the identity already encoded in the
+page's own path under `Q315/`, so it is stamped rather than guessed:
+
+```bash
+python src/main/abstract/bind_abstract_page_qids.py --check   # report only
+python src/main/abstract/bind_abstract_page_qids.py           # stamp
+```
+
+The tool derives `Q3027` from `Q315/Q3062/Q3027.html`, `Q3062` from
+`Q315/Q3062/index.html`, and `Q315` from `Q315/index.html`. It refuses any
+collision or a declaration that disagrees with the path, is idempotent, and
+changes nothing else in the document. Run it before discovery whenever new
+canonical pages are added.
+
 Recommended migration states are:
 
 ```text
@@ -357,12 +375,9 @@ becoming the migration authority for thousands of articles.
 The verifier operates on the discovered abstract pages themselves; there is no
 committed page list. Every page under `Q315/` that declares
 `data-abstract-page` is included automatically, so a newly authored page is
-covered without editing a hand-written batch file. Currently this is:
-
-```text
-Q315   → Q315/index.html
-Q3062 → Q315/Q3062/index.html
-```
+covered without editing a hand-written batch file. Once
+`bind_abstract_page_qids.py` has stamped the identities, this is every
+canonical page under `Q315/`, not a hand-picked pair.
 
 Run the structural pipeline check for every abstract page with:
 
@@ -406,3 +421,40 @@ QID coverage without round-trip equivalence is not release-ready. After
 rendering is enabled for the complete pages, the same check must also observe
 `generated-owner`, blank legacy source fields, and language paths retained
 solely as targets.
+
+## Correcting already-bound content
+
+The round-trip verifier reports *that* a binding fails to reproduce a page. It
+does not say what the page shows instead, and it cannot tell a genuinely wrong
+translation apart from a language page that never had the slot. That
+reconciliation is a separate command:
+
+```bash
+python src/main/abstract/prepare_content_corrections.py
+```
+
+It aligns every already-bound slot to its slot in each language page and
+classifies the difference into `content-corrections-review.csv`:
+
+| Status | Meaning | Action |
+| --- | --- | --- |
+| `match` | stored value equals the page value | none |
+| `differs` | the page renders a different non-empty value | correct or review |
+| `wikibase-missing` | the item has no value for a language the page shows | add from evidence |
+| `page-absent` | the language page lacks the slot entirely | page-completeness backlog; never a Wikibase edit |
+| `page-degraded` | the page value is a corrupted rendering (replacement character or `?` for an accent) | fix the page, not Wikibase |
+
+Only a small, defensible subset reaches
+`content-corrections.quickstatements`. Occurrence-based slot keys drift between
+structurally divergent language pages, so a correction is emitted only when
+
+- English confirms the alignment (the item's stored English equals the English
+  page value at that slot), and
+- the page value is the *same content up to typography* (case, accent, spacing,
+  punctuation). A wholly different string is occurrence drift, not a
+  translation fix, and stays review-only.
+
+Additions are refused when the page merely echoes the English text, since that
+is an untranslated page rather than a translation. Nothing overwrites a good
+Wikibase value with an absent or damaged page value. As with every generator
+here, the QuickStatements are reviewed material and are imported by hand.
