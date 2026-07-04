@@ -36,6 +36,7 @@ import html
 import re
 import sys
 from collections import Counter
+from html.parser import HTMLParser
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
@@ -62,6 +63,7 @@ DEFAULT_PARTIAL_QUICKSTATEMENTS = HERE / "abstract-composition-partial.quickstat
 DEFAULT_REVIEW = HERE / "abstract-composition-review.csv"
 DEFAULT_STRUCTURE = HERE / "abstract-composition-structure.quickstatements"
 DEFAULT_MARKUP = HERE / "abstract-composition-markup.txt"
+DEFAULT_TRANSLATIONS = HERE / "abstract-composition-translations.csv"
 
 ABSTRACT_PARAGRAPH_CLASS = "Q3835"
 ABSTRACT_SENTENCE_CLASS = "Q3836"
@@ -132,9 +134,43 @@ class Composition:
         self.sentences: list[tuple[str, tuple[str, ...]]] = []
 
 
+def load_translations(path: Path) -> dict[str, dict[str, str]]:
+    """Read reviewed translations that fill a sentence's missing languages.
+
+    The long-format file has ``token,language,text`` rows. The token is the
+    sentence's stable identity — the same ``M…`` shown in the review CSV — so a
+    filled translation never changes which item the sentence is, it only adds a
+    language it was missing. Only empty languages are ever filled; a value the
+    source pages already provide is never overwritten.
+    """
+    result: dict[str, dict[str, str]] = {}
+    if not path.exists():
+        return result
+    with path.open(encoding="utf-8-sig", newline="") as source:
+        for row in csv.DictReader(source):
+            token = (row.get("token") or "").strip()
+            language = (row.get("language") or "").strip()
+            text = (row.get("text") or "").strip()
+            if token and language in LANGUAGES and text:
+                result.setdefault(token, {})[language] = text
+    return result
+
+
+def _fill(sentence: tuple[str, ...], fills: dict[str, str]) -> tuple[str, ...]:
+    if not fills:
+        return sentence
+    return tuple(
+        value if value else fills.get(language, "")
+        for language, value in zip(LANGUAGES, sentence)
+    )
+
+
 def plan(
-    repo_root: Path, sources: list[tuple[str, Path]]
+    repo_root: Path,
+    sources: list[tuple[str, Path]],
+    translations: dict[str, dict[str, str]] | None = None,
 ) -> tuple[list[Composition], dict[str, tuple[str, ...]], list[dict[str, str]]]:
+    translations = translations or {}
     paragraphs: dict[str, Composition] = {}
     sentence_values: dict[str, tuple[str, ...]] = {}
     slot_rows: list[dict[str, str]] = []
@@ -179,9 +215,13 @@ def plan(
             if composition is None:
                 composition = Composition(paragraph_token, values)
                 for sentence in segmented:
+                    # The token is the source sentence's identity; reviewed
+                    # translations then fill the languages the pages lacked
+                    # without changing that identity.
                     token = content_token(sentence)
-                    sentence_values.setdefault(token, sentence)
-                    composition.sentences.append((token, sentence))
+                    filled = _fill(sentence, translations.get(token, {}))
+                    sentence_values.setdefault(token, filled)
+                    composition.sentences.append((token, filled))
                 paragraphs[paragraph_token] = composition
             tag, class_name, role, occurrence = key
             slot_rows.append(
@@ -227,7 +267,9 @@ def _paragraph_block(token: str) -> str:
 
 
 def create_quickstatements(
-    compositions: list[Composition], sentence_values: dict[str, tuple[str, ...]]
+    compositions: list[Composition],
+    sentence_values: dict[str, tuple[str, ...]],
+    already_imported: set[str] | None = None,
 ) -> tuple[str, str]:
     """Return ``(complete, partial)`` create batches.
 
@@ -235,13 +277,22 @@ def create_quickstatements(
     is missing a language is held in the partial batch as an explicit
     translation backlog, never padded with an English fallback. Paragraph items
     carry no monolingual value, so they always accompany the complete batch.
+
+    Tokens already present in the export are skipped so the batch is safe to
+    re-run: Wikibase refuses a second item with the same label and description,
+    so re-emitting an imported item would fail the whole import.
     """
+    imported = already_imported or set()
     complete: list[str] = []
     partial: list[str] = []
     for token, values in sentence_values.items():
+        if token in imported:
+            continue
         block = _sentence_block(token, values)
         (complete if all(values) else partial).append(block)
-    complete.extend(_paragraph_block(c.token) for c in compositions)
+    complete.extend(
+        _paragraph_block(c.token) for c in compositions if c.token not in imported
+    )
     return (
         "\n\n".join(complete) + ("\n" if complete else ""),
         "\n\n".join(partial) + ("\n" if partial else ""),
@@ -412,11 +463,11 @@ def structure_quickstatements(
     return "\n".join(statements) + ("\n" if statements else "")
 
 
-def markup_for(
+def markup_lines(
     slot: dict[str, str],
     composition_rows: list[dict[str, str]],
     bindings: dict[str, str],
-) -> str:
+) -> list[str]:
     paragraph = bindings[slot["paragraph_token"]]
     function = bindings[COMPOSE_FUNCTION_TOKEN]
     sentences = [
@@ -436,8 +487,111 @@ def markup_for(
         for sentence in sentences
     )
     lines.extend(("        </q-arg>", "    </q-call>", f"</{tag}>"))
-    header = f'# {slot["page"]} {tag}.{slot["class"]}[{slot["occurrence"]}]'
-    return header + "\n" + "\n".join(lines)
+    return lines
+
+
+def markup_for(
+    slot: dict[str, str],
+    composition_rows: list[dict[str, str]],
+    bindings: dict[str, str],
+) -> str:
+    header = f'# {slot["page"]} {slot["tag"]}.{slot["class"]}[{slot["occurrence"]}]'
+    return header + "\n" + "\n".join(markup_lines(slot, composition_rows, bindings))
+
+
+class SlotSpans(HTMLParser):
+    """Record the raw character span of each requested ``slots`` key.
+
+    The key ``(tag, class, role, occurrence)`` is counted exactly as
+    :class:`~abstract.prepare_travel_content.DirectTextSlots` counts it, so a
+    binder can locate the very element a slot came from — including a bare
+    ``<p>`` identified only by its occurrence — and replace it by offset rather
+    than by a fragile text match.
+    """
+
+    def __init__(self, text: str, targets: set[tuple[str, str, str, int]]) -> None:
+        super().__init__(convert_charrefs=True)
+        self.text = text
+        self.line_starts = [0]
+        for index, character in enumerate(text):
+            if character == "\n":
+                self.line_starts.append(index + 1)
+        self.targets = targets
+        self.counts: Counter[tuple[str, str, str]] = Counter()
+        self.stack: list[tuple[str, tuple[str, str, str, int], int]] = []
+        self.spans: dict[tuple[str, str, str, int], tuple[int, int]] = {}
+
+    def _offset(self) -> int:
+        line, column = self.getpos()
+        return self.line_starts[line - 1] + column
+
+    def handle_starttag(self, tag, attrs) -> None:
+        values = dict(attrs)
+        base = (
+            tag,
+            ".".join(sorted((values.get("class") or "").split())),
+            values.get("role") or "",
+        )
+        key = (*base, self.counts[base])
+        self.counts[base] += 1
+        self.stack.append((tag, key, self._offset()))
+
+    def handle_endtag(self, tag) -> None:
+        if tag not in [entry[0] for entry in self.stack]:
+            return
+        while self.stack:
+            current_tag, key, start = self.stack.pop()
+            if current_tag == tag:
+                if key in self.targets:
+                    close = self.text.index(">", self._offset()) + 1
+                    self.spans[key] = (start, close)
+                break
+
+
+def bind(
+    repo_root: Path,
+    rows: list[dict[str, str]],
+    slot_rows: list[dict[str, str]],
+    bindings: dict[str, str],
+    resolved: set[str],
+    check: bool,
+) -> tuple[list[str], list[str]]:
+    by_page: dict[str, list[dict[str, str]]] = {}
+    for slot in slot_rows:
+        if slot["paragraph_token"] in resolved:
+            by_page.setdefault(slot["path"], []).append(slot)
+    changed: list[str] = []
+    errors: list[str] = []
+    for path, slots_ in sorted(by_page.items()):
+        source = (repo_root / path).read_text(encoding="utf-8")
+        targets = {
+            (slot["tag"], slot["class"], slot["role"], int(slot["occurrence"]))
+            for slot in slots_
+        }
+        locator = SlotSpans(source, targets)
+        locator.feed(source)
+        locator.close()
+        replacements: list[tuple[int, int, str]] = []
+        for slot in slots_:
+            key = (slot["tag"], slot["class"], slot["role"], int(slot["occurrence"]))
+            span = locator.spans.get(key)
+            if span is None:
+                errors.append(f"{path}: could not locate slot {key}")
+                continue
+            start, end = span
+            line_start = source.rfind("\n", 0, start) + 1
+            prefix = source[line_start:start]
+            indent = prefix if not prefix.strip() else ""
+            block = ("\n" + indent).join(markup_lines(slot, rows, bindings))
+            replacements.append((start, end, block))
+        updated = source
+        for start, end, block in sorted(replacements, reverse=True):
+            updated = updated[:start] + block + updated[end:]
+        if updated != source:
+            changed.append(path)
+            if not check:
+                (repo_root / path).write_text(updated, encoding="utf-8")
+    return changed, errors
 
 
 def main() -> int:
@@ -452,9 +606,25 @@ def main() -> int:
         default=DEFAULT_PARTIAL_QUICKSTATEMENTS,
     )
     parser.add_argument("--review", type=Path, default=DEFAULT_REVIEW)
+    parser.add_argument(
+        "--translations",
+        type=Path,
+        default=DEFAULT_TRANSLATIONS,
+        help="reviewed token,language,text file filling missing languages",
+    )
     parser.add_argument("--structure", action="store_true", help="emit phase-2 links + markup")
     parser.add_argument("--structure-output", type=Path, default=DEFAULT_STRUCTURE)
     parser.add_argument("--markup-output", type=Path, default=DEFAULT_MARKUP)
+    parser.add_argument(
+        "--bind",
+        action="store_true",
+        help="replace resolved prose slots in the abstract pages with q-call markup",
+    )
+    parser.add_argument(
+        "--check",
+        action="store_true",
+        help="with --bind, report which pages would change without writing",
+    )
     parser.add_argument(
         "--function-qid",
         default="",
@@ -464,26 +634,44 @@ def main() -> int:
     try:
         repo_root = args.repo_root.resolve()
         sources = page_sources(repo_root, args.page)
-        compositions, sentence_values, slot_rows = plan(repo_root, sources)
+        translations = load_translations(args.translations)
+        compositions, sentence_values, slot_rows = plan(
+            repo_root, sources, translations
+        )
     except (OSError, ValueError) as error:
         print(f"ERROR: {error}", file=sys.stderr)
         return 1
 
-    if not args.structure:
-        complete, partial = create_quickstatements(compositions, sentence_values)
+    if not args.structure and not args.bind:
+        try:
+            imported, duplicates = imported_tokens(args.data_dir.resolve())
+        except (OSError, ValueError) as error:
+            print(f"ERROR: {error}", file=sys.stderr)
+            return 1
+        already = set(imported) | set(duplicates)
+        complete, partial = create_quickstatements(
+            compositions, sentence_values, already
+        )
         args.quickstatements.write_text(complete, encoding="utf-8")
         args.partial_quickstatements.write_text(partial, encoding="utf-8")
         write_review(args.review, compositions, sentence_values, slot_rows)
         multi = sum(1 for composition in compositions if len(composition.sentences) > 1)
-        complete_count = sum(1 for values in sentence_values.values() if all(values))
+        complete_count = sum(
+            1
+            for token, values in sentence_values.items()
+            if all(values) and token not in already
+        )
+        skipped = sum(1 for token in sentence_values if token in already) + sum(
+            1 for c in compositions if c.token in already
+        )
         print(
             f"Planned {len(compositions)} paragraphs "
             f"({multi} multi-sentence) from {len(sentence_values)} unique sentences "
             f"across {len(slot_rows)} prose slots"
         )
         print(
-            f"{complete_count} sentences complete in all eight languages; "
-            f"{len(sentence_values) - complete_count} held as translation backlog"
+            f"{complete_count} new complete sentences to import; "
+            f"{skipped} item(s) already in the export were skipped"
         )
         return 0
 
@@ -513,6 +701,18 @@ def main() -> int:
         )
     resolved = resolved_paragraph_tokens(rows, bindings)
     paragraph_total = sum(1 for row in rows if row["kind"] == "paragraph")
+
+    if args.bind:
+        changed, errors = bind(repo_root, rows, slot_rows, bindings, resolved, args.check)
+        for error in errors:
+            print(f"ERROR: {error}", file=sys.stderr)
+        verb = "Would bind" if args.check else "Bound"
+        print(
+            f"{verb} {len(resolved)} resolved paragraph(s) across "
+            f"{len(changed)} abstract page(s): {', '.join(sorted(changed)) or 'none'}"
+        )
+        return 1 if errors else 0
+
     args.structure_output.write_text(
         structure_quickstatements(rows, slot_rows, bindings, resolved),
         encoding="utf-8",

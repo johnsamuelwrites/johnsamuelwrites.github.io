@@ -161,10 +161,28 @@ language into sentences and proposes an abstract paragraph (`Q3835`) built from
 ordered abstract sentences (`Q3836`) by the compose function. Because a
 paragraph shares one ordered set of sentence items across all languages, a
 multi-sentence split is used only when the present languages agree on the
-sentence count; otherwise the slot stays a single-sentence paragraph. Work is
-two-phase — create the items, reconcile QIDs, then emit the `P21`/`P41`/`P42`
-links and the `<q-call>` markup — because plain QuickStatements cannot link
-two items created in one batch.
+sentence count; a single-sentence slot is not composed at all — it is an atomic
+content item left to `prepare_missing_content.py`, since wrapping it would give
+the paragraph and its one sentence the same identity.
+
+Work is two-phase, because plain QuickStatements cannot link two items created
+in one batch:
+
+1. the default run writes the create batches
+   (`abstract-composition.quickstatements` for sentences complete in all eight
+   languages plus the paragraph items, `-partial` for the translation backlog)
+   and the reconciliation manifest `abstract-composition-review.csv`;
+2. after import, `--structure` reads each returned QID straight from the export
+   — the items carry their `M…` token as their label — resolves the function
+   automatically, and emits the `P21`/`P41`/`P42` links plus the `<q-call>`
+   markup for every paragraph whose sentences are all imported. A token that
+   resolves to two QIDs is a duplicated item and is reported for merging rather
+   than linked to an arbitrary copy.
+
+`--bind` then replaces each resolved prose slot in its abstract page with that
+`<q-call>` markup, locating the element by its exact `(tag, class, role,
+occurrence)` key so a bare `<p>` is matched by position, not by fragile text.
+`--bind --check` reports the pages that would change without writing.
 
 ## 4. Rendering and fallback
 

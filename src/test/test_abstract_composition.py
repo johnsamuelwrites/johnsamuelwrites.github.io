@@ -8,10 +8,13 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "main"))
 from abstract.functions.text import compose_ordered_paragraph
 from abstract.prepare_abstract_composition import (
     COMPOSE_FUNCTION_TOKEN,
+    bind,
     is_prose,
     plan,
+    read_review,
     segment,
     structure_quickstatements,
+    write_review,
 )
 from abstract.prepare_travel_content import LANGUAGES
 from abstract.wikibase_resolver import WikibaseResolver
@@ -162,6 +165,31 @@ class PipelineTests(unittest.TestCase):
             self.assertIn("Q9001|P41|Q9000", output)
             self.assertIn("Q9001|P21|Q10", output)
             self.assertIn('Q9001|P42|"1"', output)
+
+    def test_bind_replaces_the_prose_slot_with_qcall_markup(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            self._build(root)
+            compositions, sentence_values, slot_rows = plan(
+                root, [("Q10", Path("Q315/Q10/index.html"))]
+            )
+            review = root / "review.csv"
+            write_review(review, compositions, sentence_values, slot_rows)
+            rows = read_review(review)
+            bindings = {COMPOSE_FUNCTION_TOKEN: "Q9000"}
+            for index, row in enumerate(rows, 1):
+                bindings[row["token"]] = f"Q90{index:02d}"
+            resolved = {compositions[0].token}
+
+            changed, errors = bind(root, rows, slot_rows, bindings, resolved, check=False)
+            self.assertEqual(errors, [])
+            self.assertEqual(changed, ["Q315/Q10/index.html"])
+
+            page = (root / "Q315/Q10/index.html").read_text(encoding="utf-8")
+            paragraph_qid = bindings[compositions[0].token]
+            self.assertIn(f'<p class="lead" data-content="local:{paragraph_qid}">', page)
+            self.assertIn('<q-call data-function="local:Q9000">', page)
+            self.assertNotIn("I started photography years back.", page)  # prose gone
 
 
 def _item(qid):
