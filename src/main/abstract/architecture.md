@@ -135,6 +135,37 @@ For a paragraph whose translated meaning requires different ordering, the
 Wikibase statement or language rule may provide an ordered argument variant.
 The abstract article still declares the semantic parts once.
 
+### Implemented functions
+
+The registry (`functions/text.py`, keyed by QID in `render_abstract.py`)
+currently holds two deterministic constructors:
+
+- `concatenate monolingual text` (`Q3837`) — a generic language-checked join
+  whose separator is a caller argument;
+- `compose ordered paragraph` — joins ordered sentences into a paragraph using
+  the *language's* inter-sentence spacing rather than a caller-supplied
+  separator, so one abstract paragraph spaces correctly in every language.
+
+The second is proposed for import by
+`abstract-functions.quickstatements` (one `CREATE … P8|Q3834` block). After
+import, map its returned QID to `compose_ordered_paragraph` in
+`function-implementations.json`, exactly as `Q3837` is mapped today.
+
+### Composing prose instead of storing it flat
+
+`prepare_missing_content.py` proposes a flat `Q3185` item per text slot, which
+is correct for an atomic label but stores prose as one opaque string per
+language. `prepare_abstract_composition.py` is the prose path: for every
+unbound slot whose text carries sentence-terminal punctuation it segments each
+language into sentences and proposes an abstract paragraph (`Q3835`) built from
+ordered abstract sentences (`Q3836`) by the compose function. Because a
+paragraph shares one ordered set of sentence items across all languages, a
+multi-sentence split is used only when the present languages agree on the
+sentence count; otherwise the slot stays a single-sentence paragraph. Work is
+two-phase — create the items, reconcile QIDs, then emit the `P21`/`P41`/`P42`
+links and the `<q-call>` markup — because plain QuickStatements cannot link
+two items created in one batch.
+
 ## 4. Rendering and fallback
 
 For each target language, the renderer:

@@ -26,7 +26,10 @@ sys.path.insert(0, str(HERE.parent))
 from abstract.css_assets import DEFAULT_REPO_ROOT
 from abstract.discover_content_migration import discover
 from abstract.functions.registry import FunctionRegistry
-from abstract.functions.text import concatenate_monolingual_text
+from abstract.functions.text import (
+    compose_ordered_paragraph,
+    concatenate_monolingual_text,
+)
 from abstract.prepare_travel_content import LANGUAGES
 from abstract.wikibase_resolver import WikibaseResolver
 
@@ -84,7 +87,10 @@ def composed_paragraphs(path: Path) -> list[ComposedParagraph]:
 
 def registry(path: Path) -> FunctionRegistry:
     mappings = json.loads(path.read_text(encoding="utf-8"))
-    builtins = {"concatenate_monolingual_text": concatenate_monolingual_text}
+    builtins = {
+        "concatenate_monolingual_text": concatenate_monolingual_text,
+        "compose_ordered_paragraph": compose_ordered_paragraph,
+    }
     result = FunctionRegistry()
     for qid, implementation in mappings.items():
         if implementation not in builtins:

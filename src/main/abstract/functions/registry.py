@@ -5,12 +5,13 @@ from __future__ import annotations
 from collections.abc import Callable
 
 from ..model import FunctionCall
-from .text import concatenate_monolingual_text
+from .text import compose_ordered_paragraph, concatenate_monolingual_text
 
 
-# This bootstrap key is intentionally not a QID. The binding command replaces
-# it with a real local QID after the Wikibase item has been created.
+# These bootstrap keys are intentionally not QIDs. The binding command replaces
+# each with a real local QID after the Wikibase function item has been created.
 CONCATENATE_BOOTSTRAP_KEY = "bootstrap:concatenate-monolingual-text"
+COMPOSE_PARAGRAPH_BOOTSTRAP_KEY = "bootstrap:compose-ordered-paragraph"
 
 
 class FunctionRegistry:
@@ -36,4 +37,8 @@ default_registry = FunctionRegistry()
 default_registry.register(
     CONCATENATE_BOOTSTRAP_KEY,
     concatenate_monolingual_text,
+)
+default_registry.register(
+    COMPOSE_PARAGRAPH_BOOTSTRAP_KEY,
+    compose_ordered_paragraph,
 )
