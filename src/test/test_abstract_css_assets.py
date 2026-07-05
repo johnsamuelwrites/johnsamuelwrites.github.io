@@ -189,6 +189,78 @@ class CollectionDiscoveryTests(unittest.TestCase):
                 ),
             )
 
+    def test_document_discovery_uses_canonical_page_and_alternates(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            abstract = root / "Q315/Q42.html"
+            abstract.parent.mkdir(parents=True)
+            (root / "en").mkdir()
+            (root / "fr").mkdir()
+            (root / "en/page.html").write_text("<html></html>", encoding="utf-8")
+            (root / "fr/page.html").write_text("<html></html>", encoding="utf-8")
+            abstract.write_text(
+                '<link rel="alternate" hreflang="en" href="../en/page.html">\n'
+                '<link rel="alternate" hreflang="fr" href="../fr/page.html">\n'
+                "<style>body { color: navy; }</style>",
+                encoding="utf-8",
+            )
+            manifest = root / "manifest.json"
+            manifest.write_text(
+                json.dumps(
+                    {
+                        "version": 1,
+                        "groups": [],
+                        "documents": [
+                            {
+                                "asset_directory": "Q315/assets/css/pages",
+                                "languages": ["en", "fr"],
+                                "abstract_pages": ["Q315/Q42.html"],
+                            }
+                        ],
+                        "coverage_roots": ["Q315"],
+                    }
+                ),
+                encoding="utf-8",
+            )
+
+            group = load_groups(manifest, root)[0]
+
+            self.assertEqual(group.identifier, "Q42")
+            self.assertEqual(
+                group.asset, Path("Q315/assets/css/pages/Q42.css")
+            )
+            self.assertEqual(group.authoritative_page, Path("Q315/Q42.html"))
+            self.assertEqual(
+                group.pages,
+                (
+                    Path("Q315/Q42.html"),
+                    Path("en/page.html"),
+                    Path("fr/page.html"),
+                ),
+            )
+
+    def test_coverage_rejects_unassigned_abstract_html(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            (root / "Q315").mkdir()
+            (root / "Q315/Q1.html").write_text("<html></html>", encoding="utf-8")
+            manifest = root / "manifest.json"
+            manifest.write_text(
+                json.dumps(
+                    {
+                        "version": 1,
+                        "groups": [],
+                        "coverage_roots": ["Q315"],
+                    }
+                ),
+                encoding="utf-8",
+            )
+
+            with self.assertRaisesRegex(
+                CSSAssetError, "HTML pages without canonical CSS groups"
+            ):
+                load_groups(manifest, root)
+
 
 if __name__ == "__main__":
     unittest.main()

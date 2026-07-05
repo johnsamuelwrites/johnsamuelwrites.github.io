@@ -1,10 +1,12 @@
 #!/usr/bin/env python3
 """Move duplicated page CSS into canonical assets owned by Q315.
 
-Groups are declared in ``css-assets.json``. Migration is deliberately strict:
-every inline style block in a group must be identical before any file is
-changed. Once migrated, ``check`` verifies that every page still references the
-canonical asset with the correct relative URL.
+Groups are declared or discovered from canonical documents in
+``css-assets.json``. Migration is deliberately strict: every inline style block
+in a group must be identical before any file is changed, unless the canonical
+Q315 document is explicitly authoritative. Once migrated, ``check`` verifies
+that every page still references the canonical asset with the correct relative
+URL.
 """
 
 from __future__ import annotations
@@ -150,6 +152,54 @@ def _collection_groups(raw: dict, repo_root: Path) -> list[CSSGroup]:
     return groups
 
 
+def _document_group(
+    abstract_relative: Path,
+    asset_directory: Path,
+    languages: tuple[str, ...],
+    repo_root: Path,
+) -> CSSGroup:
+    abstract_path = repo_root / abstract_relative
+    if not abstract_path.is_file():
+        raise CSSAssetError(f"{abstract_relative}: abstract document does not exist")
+
+    identifier = (
+        abstract_path.parent.name
+        if abstract_path.name == "index.html"
+        else abstract_path.stem
+    )
+    if not re.fullmatch(r"Q[0-9]+", identifier):
+        raise CSSAssetError(f"{abstract_relative}: cannot derive a QID")
+
+    parser = _AlternateParser()
+    parser.feed(abstract_path.read_text(encoding="utf-8"))
+    by_language: dict[str, Path] = {}
+    for language, href in parser.alternates:
+        parsed = urlsplit(href)
+        if parsed.scheme or parsed.netloc:
+            continue
+        target = abstract_path.parent / unquote(parsed.path)
+        by_language[language] = _repo_relative(
+            target, repo_root, str(abstract_relative)
+        )
+    missing = [language for language in languages if language not in by_language]
+    extras = sorted(set(by_language) - set(languages))
+    if missing or extras:
+        raise CSSAssetError(
+            f"{abstract_relative}: alternate languages missing={missing!r}, "
+            f"unexpected={extras!r}"
+        )
+
+    return CSSGroup(
+        identifier=identifier,
+        asset=asset_directory / f"{identifier}.css",
+        pages=(
+            abstract_relative,
+            *(by_language[language] for language in languages),
+        ),
+        authoritative_page=abstract_relative,
+    )
+
+
 def load_groups(
     manifest_path: Path, repo_root: Path = DEFAULT_REPO_ROOT
 ) -> list[CSSGroup]:
@@ -193,6 +243,44 @@ def load_groups(
                 )
             groups.append(group)
             identifiers.add(group.identifier)
+
+    for documents in data.get("documents", []):
+        languages = tuple(documents.get("languages", []))
+        if not languages:
+            raise CSSAssetError("document language lists must be non-empty")
+        asset_directory = Path(documents["asset_directory"])
+        for page in documents.get("abstract_pages", []):
+            group = _document_group(
+                Path(page), asset_directory, languages, repo_root
+            )
+            if group.identifier in identifiers:
+                raise CSSAssetError(
+                    f"{manifest_path}: duplicate group ID {group.identifier}"
+                )
+            groups.append(group)
+            identifiers.add(group.identifier)
+
+    assigned_pages: dict[Path, str] = {}
+    for group in groups:
+        for page in group.pages:
+            previous = assigned_pages.get(page)
+            if previous is not None:
+                raise CSSAssetError(
+                    f"{page}: assigned to both {previous} and {group.identifier}"
+                )
+            assigned_pages[page] = group.identifier
+    for raw_root in data.get("coverage_roots", []):
+        coverage_root = repo_root / Path(raw_root)
+        expected = {
+            path.relative_to(repo_root)
+            for path in coverage_root.rglob("*.html")
+        }
+        missing = sorted(expected - assigned_pages.keys())
+        if missing:
+            raise CSSAssetError(
+                f"{raw_root}: HTML pages without canonical CSS groups: "
+                + ", ".join(str(path) for path in missing)
+            )
     return groups
 
 
