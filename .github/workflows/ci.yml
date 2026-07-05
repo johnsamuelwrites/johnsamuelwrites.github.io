@@ -55,3 +55,14 @@ jobs:
           python src/main/abstract/verify_content_roundtrip.py \
             --max-mismatches 214 \
             --report "${RUNNER_TEMP}/q315-content-roundtrip.json"
+
+      - name: Check every Q315 page has one language-switcher footer
+        # Every page rendered from Q315 must carry exactly one styled language
+        # switcher (the travel "langlist" grid or the section "lang-selector"
+        # buttons) linking all its languages including itself, current one
+        # highlighted, with no duplicate or bare language-switcher nav. The budget
+        # is a ratchet: only ever lower it as the remaining section pages are
+        # fixed; it reaches 0 when every Q315 page conforms.
+        run: |
+          python src/main/abstract/verify_language_footer.py \
+            --max-failing-pages 106
