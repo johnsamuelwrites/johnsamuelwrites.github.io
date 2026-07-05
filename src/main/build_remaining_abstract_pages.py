@@ -4,6 +4,8 @@
 from __future__ import annotations
 
 import csv
+import html
+import os
 import re
 from pathlib import Path
 from urllib.parse import unquote, urlsplit
@@ -54,6 +56,58 @@ HOME_LINKS = {
     "./blog/blogs-list.html": "Q3638/Q7949.html",
     "./search.html": "Q3647.html",
 }
+
+
+def rebase_missing_article_links(source: Path, target: Path) -> int:
+    """Rebase copied anchors that only resolve from the English source page.
+
+    ``build_abstract_page`` historically copied relative links unchanged because
+    the travel source and abstract trees have matching layouts.  The remaining
+    abstract pages are nested by QID instead, so an article link such as
+    ``human-languages.html`` must be expressed relative to the original English
+    page.  Existing Q315 links are deliberately retained.
+    """
+    document = target.read_text(encoding="utf-8")
+    changed = 0
+
+    def rewrite(match: re.Match[str]) -> str:
+        nonlocal changed
+        href = html.unescape(match.group("href"))
+        parsed = urlsplit(href)
+        if (
+            parsed.scheme
+            or parsed.netloc
+            or not parsed.path
+            or parsed.path.startswith("/")
+        ):
+            return match.group(0)
+
+        current_target = (target.parent / unquote(parsed.path)).resolve()
+        source_target = (source.parent / unquote(parsed.path)).resolve()
+        if current_target.exists() or not source_target.exists():
+            return match.group(0)
+
+        rebased = os.path.relpath(source_target, target.parent).replace(os.sep, "/")
+        if parsed.query:
+            rebased += f"?{parsed.query}"
+        if parsed.fragment:
+            rebased += f"#{parsed.fragment}"
+        changed += 1
+        return (
+            f'{match.group("prefix")}{html.escape(rebased, quote=True)}'
+            f'{match.group("quote")}'
+        )
+
+    document = re.sub(
+        r'(?P<prefix><a\b[^>]*?\bhref=(?P<quote>["\']))'
+        r'(?P<href>.*?)(?P=quote)',
+        rewrite,
+        document,
+        flags=re.IGNORECASE,
+    )
+    if changed:
+        target.write_text(document, encoding="utf-8")
+    return changed
 
 
 def qid(value: str) -> str:
@@ -163,6 +217,10 @@ def build(abstract: dict[str, str]) -> int:
             target_for(key, item, abstract),
             item,
             pages,
+        )
+        rebase_missing_article_links(
+            pages["en"],
+            target_for(key, item, abstract),
         )
         if key == "home":
             html = target_for(key, item, abstract).read_text(encoding="utf-8")
