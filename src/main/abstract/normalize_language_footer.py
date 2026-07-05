@@ -182,22 +182,44 @@ def _anchor_in_footer(text: str) -> tuple[int, int, str] | None:
     return None
 
 
-def _add_footer(
-    repo_root: Path, page: Path, current: str, group: dict[str, str], text: str
-) -> str | None:
-    """Create a footer holding the switcher on a page that lacks one."""
+def _plant_placeholder(text: str) -> tuple[str, str] | None:
+    """Insert the anchor placeholder where the footer switcher belongs.
+
+    Returns ``(text_with_placeholder, indent)`` or ``None`` when the page has no
+    footer and no ``</main>``/``</body>`` to hang one on. The placeholder marks
+    the single spot the rendered switcher will occupy; every other language list
+    is stripped afterwards, so the placeholder is what protects the survivor.
+    """
+    if FOOTER_RE.search(text):
+        anchor = _anchor_in_footer(text)
+        if anchor is not None:
+            start, end, indent = anchor
+            return text[:start] + _PLACEHOLDER + text[end:], indent
+        # A footer with no recognised list: place one just before </footer>.
+        close = FOOTER_CLOSE_RE.search(text)
+        if not close:
+            return None
+        indent = close.group("indent") + "    "
+        planted = (
+            text[: close.start()]
+            + _PLACEHOLDER
+            + "\n"
+            + close.group(0)
+            + text[close.end() :]
+        )
+        return planted, indent
+
+    # No footer at all: build one after </main> (or before </body>).
     match = MAIN_CLOSE_RE.search(text) or BODY_CLOSE_RE.search(text)
     if not match:
         return None
-    indent = match.group("indent")
-    selector = render_selector(repo_root, page, current, group, indent + "    ")
-    footer = f'{indent}<footer class="footer">\n{selector}\n{indent}</footer>\n'
+    outer = match.group("indent")
+    footer = f'{outer}<footer class="footer">\n{_PLACEHOLDER}\n{outer}</footer>\n'
     if match.re is MAIN_CLOSE_RE:
-        # Place the footer after </main>.
-        insert_at = match.end()
-        return text[:insert_at] + "\n" + footer + text[insert_at:]
-    # Place it before </body>.
-    return text[: match.start()] + footer + text[match.start() :]
+        planted = text[: match.end()] + "\n" + footer + text[match.end() :]
+    else:
+        planted = text[: match.start()] + footer + text[match.start() :]
+    return planted, outer + "    "
 
 
 def normalize(
@@ -205,36 +227,19 @@ def normalize(
 ) -> tuple[str, bool]:
     """Return ``(new_text, changed)`` for a single page."""
     original = page.read_text(encoding="utf-8")
-    if not FOOTER_RE.search(original):
-        created = _add_footer(repo_root, page, current, group, original)
-        if created is None:
-            return original, False
-        return inject_css_link(repo_root, page, created), True
 
-    anchor = _anchor_in_footer(original)
-    if anchor is not None:
-        start, end, indent = anchor
-        text = original[:start] + _PLACEHOLDER + original[end:]
-    else:
-        # No list in the footer: place one just before </footer>.
-        close = FOOTER_CLOSE_RE.search(original)
-        if not close:
-            return original, False
-        indent = close.group("indent") + "    "
-        text = (
-            original[: close.start()]
-            + _PLACEHOLDER
-            + "\n"
-            + close.group(0)
-            + original[close.end() :]
-        )
+    planted = _plant_placeholder(original)
+    if planted is None:
+        return original, False
+    text, indent = planted
 
-    # Remove every other language list left on the page (a top-of-page selector,
-    # a redundant nav, a second grid); the anchor is safe behind its placeholder.
+    # Remove every language list left on the page -- a top-of-page selector, a
+    # redundant nav, a second grid, a list outside the footer. The survivor is
+    # safe behind its placeholder.
     for pattern in _ANCHOR_PATTERNS:
         text = pattern.sub("", text)
 
-    # The placeholder consumed the anchor's own leading indent, so the rendered
+    # The placeholder sits at the switcher's own indentation, so the rendered
     # selector (which carries that indent) drops straight in.
     selector = render_selector(repo_root, page, current, group, indent)
     text = text.replace(_PLACEHOLDER, selector, 1)
