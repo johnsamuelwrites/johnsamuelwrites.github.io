@@ -121,16 +121,46 @@ def _locator(paragraph: ComposedParagraph) -> re.Pattern[str]:
 
 
 def update_page(
-    source: str, paragraph: ComposedParagraph, text: str, function: str
+    source: str,
+    paragraph: ComposedParagraph,
+    text: str,
+    function: str,
+    previous_values: Sequence[str] = (),
 ) -> str:
     locator = _locator(paragraph)
     matches = locator.findall(source)
-    if len(matches) != 1:
+    if len(matches) == 1:
+        match = locator.search(source)
+    else:
+        tag = re.escape(paragraph.tag)
+        candidates = {
+            re.sub(r"\s+", " ", value).strip()
+            for value in previous_values
+            if value
+        }
+        fallback = re.compile(
+            rf"(?P<indent>^[ \t]*)<{tag}\b[^>]*>(?P<body>.*?)</{tag}>",
+            flags=re.MULTILINE | re.DOTALL,
+        )
+        text_matches = []
+        for candidate in fallback.finditer(source):
+            visible = re.sub(r"<[^>]+>", "", candidate.group("body"))
+            visible = re.sub(r"\s+", " ", html.unescape(visible)).strip()
+            if visible in candidates:
+                text_matches.append(candidate)
+        if len(text_matches) != 1:
+            raise ValueError(
+                f"expected exactly one '{paragraph.css_class}' "
+                f"{paragraph.tag} for {paragraph.item}, found {len(matches)} "
+                f"by marker/class and {len(text_matches)} by previous text"
+            )
+        match = text_matches[0]
+        locator = re.compile(re.escape(match.group(0)))
+    if match is None:
         raise ValueError(
             f"expected exactly one '{paragraph.css_class}' "
             f"{paragraph.tag} for {paragraph.item}, found {len(matches)}"
         )
-    match = locator.search(source)
     return locator.sub(
         paragraph_markup(paragraph, text, function, match.group("indent")),
         source,
@@ -144,6 +174,7 @@ def render(
     implementations: Path,
     page: str,
     check: bool,
+    items: frozenset[str] = frozenset(),
 ) -> int:
     runtime = registry(implementations)
     rows = [
@@ -158,6 +189,10 @@ def render(
     changed: list[str] = []
     for row in sorted(rows, key=lambda row: row["page_qid"]):
         paragraphs = composed_paragraphs(repo_root / row["abstract_path"])
+        if items:
+            paragraphs = [
+                paragraph for paragraph in paragraphs if paragraph.item in items
+            ]
         if not paragraphs:
             continue
         snapshot = snapshots / f"{row['page_qid']}.json"
@@ -178,9 +213,28 @@ def render(
                 path = repo_root / relative
                 source = path.read_text(encoding="utf-8")
                 value = runtime.evaluate(resolver.call(resolved, language))
-                updated = update_page(
-                    source, paragraph, value.text, resolved.function
+                entity = resolver.entities[paragraph.item]
+                previous_values = [
+                    entity.get("labels", {}).get(language, {}).get("value", "")
+                ]
+                previous_values.extend(
+                    statement["mainsnak"]["datavalue"]["value"]["text"]
+                    for statement in entity["claims"].get("P40", [])
+                    if statement["mainsnak"]["datavalue"]["value"]["language"]
+                    == language
                 )
+                try:
+                    updated = update_page(
+                        source,
+                        paragraph,
+                        value.text,
+                        resolved.function,
+                        previous_values,
+                    )
+                except ValueError as error:
+                    raise ValueError(
+                        f"{relative} ({language}): {error}"
+                    ) from error
                 if updated != source:
                     changed.append(relative)
                     if not check:
@@ -207,6 +261,12 @@ def main(argv: Sequence[str] | None = None) -> int:
         "--page", default="", help="restrict rendering to a single page QID"
     )
     parser.add_argument("--check", action="store_true")
+    parser.add_argument(
+        "--item",
+        action="append",
+        default=[],
+        help="restrict rendering to a composed paragraph QID (repeatable)",
+    )
     args = parser.parse_args(argv)
     return render(
         args.repo_root.resolve(),
@@ -214,6 +274,7 @@ def main(argv: Sequence[str] | None = None) -> int:
         args.implementations,
         args.page,
         args.check,
+        frozenset(args.item),
     )
 
 

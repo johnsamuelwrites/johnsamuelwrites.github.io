@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import re
 import urllib.parse
 import urllib.request
 from pathlib import Path
@@ -22,22 +23,25 @@ DEFAULT_OUTPUT = (
 
 
 def fetch(api: str, entity_ids: Sequence[str]) -> dict:
-    query = urllib.parse.urlencode(
-        {
-            "action": "wbgetentities",
-            "ids": "|".join(entity_ids),
-            "format": "json",
-        }
-    )
-    request = urllib.request.Request(
-        f"{api}?{query}",
-        headers={"User-Agent": "Q315-abstract-renderer/1.0"},
-    )
-    with urllib.request.urlopen(request, timeout=30) as response:
-        payload = json.load(response)
-    if payload.get("success") != 1:
-        raise ValueError("Wikibase did not return a successful entity response")
-    entities = payload.get("entities", {})
+    entities = {}
+    for start in range(0, len(entity_ids), 50):
+        chunk = entity_ids[start : start + 50]
+        query = urllib.parse.urlencode(
+            {
+                "action": "wbgetentities",
+                "ids": "|".join(chunk),
+                "format": "json",
+            }
+        )
+        request = urllib.request.Request(
+            f"{api}?{query}",
+            headers={"User-Agent": "Q315-abstract-renderer/1.0"},
+        )
+        with urllib.request.urlopen(request, timeout=30) as response:
+            payload = json.load(response)
+        if payload.get("success") != 1:
+            raise ValueError("Wikibase did not return a successful entity response")
+        entities.update(payload.get("entities", {}))
     missing = sorted(set(entity_ids) - set(entities))
     if missing:
         raise ValueError(f"Wikibase response omitted: {', '.join(missing)}")
@@ -53,8 +57,20 @@ def main(argv: Sequence[str] | None = None) -> int:
     parser.add_argument("--api", default=DEFAULT_API)
     parser.add_argument("--output", type=Path, default=DEFAULT_OUTPUT)
     parser.add_argument("--entity", action="append", dest="entities")
+    parser.add_argument(
+        "--source-html",
+        type=Path,
+        help="include every local QID referenced by a canonical HTML page",
+    )
     args = parser.parse_args(argv)
-    snapshot = fetch(args.api, args.entities or DEFAULT_ENTITIES)
+    entities = set(args.entities or DEFAULT_ENTITIES)
+    if args.source_html:
+        entities.update(re.findall(r"local:(Q[1-9][0-9]*)", args.source_html.read_text()))
+        entities.update({"P40", "P41", "P42"})
+    ordered = sorted(
+        entities, key=lambda value: (value[0], int(value[1:]))
+    )
+    snapshot = fetch(args.api, ordered)
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(
         json.dumps(snapshot, ensure_ascii=False, indent=2, sort_keys=True) + "\n",
