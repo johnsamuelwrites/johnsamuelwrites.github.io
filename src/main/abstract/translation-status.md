@@ -4,8 +4,40 @@ Status checked: 4 July 2026, using the refreshed
 `../Q42761025/data/labels-wikibase.csv`.
 
 Supported languages are `en`, `fr`, `ml`, `pa`, `hi`, `pt`, `es`, and `it`.
-This report is diagnostic only. It does not import Wikibase statements or
-change translations.
+
+## Update — 5 July 2026: rendering, structural repair, and a corrupt export
+
+The round-trip is now driven from Q315 by three tools, and the label source has
+been replaced because the SPARQL export was found to be corrupt.
+
+- **`render_page.py`** rewrites the atomic bound slots of each language page to
+  the entity's Wikibase label, in place, and flips migration ownership to
+  `abstract`. **`repair_structure.py`** inserts template-defined bound children
+  that a language page omits (e.g. a gallery-card's `card-description`) where the
+  parent container still lines up one-for-one; container-divergent pages (the big
+  index pages missing whole entries) are skipped for regeneration.
+- **The export was corrupt, not just stale.** `all-multilingual-labels.rq` times
+  out on the endpoint and returns partial, **value-misaligned** rows — e.g. the
+  CSV listed Christina Perri's French label as "Bruno Mars", Dan Brown's as "Dan
+  Brun". Wikibase itself was correct. **`fetch_wikibase_labels.py`** now rebuilds
+  the labels CSV from the reliable `wbgetentities` API into
+  `src/main/abstract/data/labels-wikibase.csv`, which is the **canonical label
+  store** for this repository and the default `--data-dir` for every abstract
+  tool (`css_assets.DEFAULT_DATA_DIR`). The broken SPARQL export is no longer
+  read.
+- **Native-label normalization.** Seven genuine native-rule deviations (five
+  translated film titles, "Giuseppe Verdi", "MO Museum") were set to English
+  verbatim in Wikibase via `wikibase_write.py`. Legitimately translated chrome
+  (the "Writings" nav, "Museum" type, locations) was deliberately left alone.
+- **Result.** From a clean baseline of 607 (correct labels, nothing rendered),
+  render + repair reach **438** round-trip mismatches with **231 checks improved
+  and 0 regressions**. Only 6 remain label-driven (three still-temporary items,
+  `Q7792`/`Q7852`/`Q7853`); the other 432 are structural — the large index pages
+  (`Q3634`/`Q3636`/`Q3646`, whose language versions list ~170 entries where the
+  template has ~800) that need regeneration, not insertion.
+
+Everything below predates this update and is kept for history; several counts in
+it were computed against the corrupt export.
 
 ## Summary
 
@@ -21,8 +53,9 @@ change translations.
   phrases the correct canonical content differently. It must not be interpreted
   as 604 missing translations.
 - Rendering canonical labels into the bound slots (see "Content round-trip via
-  in-place rendering") is the fix for the wording bucket. The Q3045 pilot has
-  been rendered; the global count is now 600.
+  in-place rendering") is the fix for the wording bucket. All 157 renderable
+  pages have now been rendered; the global count is 587 and every rendered page
+  is `render_ownership: abstract`.
 
 ## Conservative page-gated batch
 
@@ -110,25 +143,77 @@ ownership flips from `legacy` to `abstract`. Chrome, links and unbound content
 are left untouched; composed `<q-call>` paragraphs remain `render_abstract.py`'s
 responsibility. Use `--check` for a dry run and `--page QID` to scope to one page.
 
-- 157 of 170 pages have every bound QID labelled in all eight languages and are
-  renderable now; 13 (`Q3646, Q315, Q3634, Q3636, Q3633, Q3638, Q3635, Q3640,
-  Q3641, Q3642, Q3643, Q3644, Q3647`) are blocked by the still-missing labels and
-  are skipped with a message until those labels land.
-- **Pilot (`Q3045`, "seas"):** rendered into all eight language pages. `en`, `fr`,
-  `pt`, `es`, `it` now round-trip clean; the `ml`/`pa`/`hi` legacy pages lack the
-  `hero-subtitle` paragraph entirely, so `Q4079` cannot be placed and is reported
-  as an unplaced slot (a structural page fix, not a translation gap). The pilot
-  also upgraded several `ml`/`pa`/`hi` slots that still carried English text to
-  proper localized labels.
-- The renderer is faithful to the label store: where a canonical label is less
-  localized than the legacy text (e.g. `it` "Marsiglia" replaced by "Marseille"),
-  the render surfaces it. Those are label-quality fixes to make in
-  `labels-wikibase.csv`, not renderer defects.
+A slot is rewritten only when the legacy page holds the **same number** of
+same-signature elements as the template. Where the counts differ — for example a
+language switcher that omits the current language, so the template has eight
+`inLanguage` spans and the page has seven — occurrence `N` addresses different
+content, so the whole signature group is left alone and reported as unplaced
+rather than shifted. This is the guard `prepare_missing_content.py` already uses.
+
+- 157 of 170 pages rendered against the current export; 13 (`Q3646, Q315, Q3634,
+  Q3636, Q3633, Q3638, Q3635, Q3640, Q3641, Q3642, Q3643, Q3644, Q3647`) were
+  skipped because 34 bound QIDs have empty labels **in the export**. Those 34 items
+  (9 page/section entities of type `Q3017`/`Q26`, 25 `Q3185` content items) were
+  checked against the live Wikibase and **all 34 carry complete labels in all
+  eight languages** — the blocker is an incomplete `labels-wikibase.csv`, not
+  missing translation. A demo with the 34 rows filled renders all 170 pages and
+  drops the round-trip to 560 with the entire missing-label bucket (104 checks)
+  eliminated, leaving only structural gaps.
+- **Root cause of the incomplete export.** `queries/all-multilingual-labels.rq`
+  times out on the wikibase.cloud SPARQL endpoint (HTTP 504) and returns a
+  partial result, so items are silently dropped; a re-export refreshed only 4 of
+  the 34. The query has a redundant mandatory `?item rdfs:label ?anyLabel` triple
+  that cross-joins every item against all its labels, and eight `OPTIONAL`
+  `FILTER(LANG())` label joins under a `GROUP BY` over the whole item set — too
+  heavy for the endpoint's timeout. Scoped `VALUES` queries return every dropped
+  item (e.g. `Q3650` "Linguistics") with all eight labels, confirming the data is
+  present and only the full query truncates. Fix in the exporter (not this repo):
+  drop the `?anyLabel` cross-join and either paginate (`LIMIT`/`OFFSET` or split
+  by `itemtype`) so each chunk completes under the timeout, or fetch labels via
+  the `wbgetentities` API instead of SPARQL.
+- The batch produced 100 slot-text rewrites (every other page change is only the
+  generator meta) and flipped all 157 pages to `abstract` ownership. The
+  round-trip fell from 600 to 587 with **no regressions**; residual mismatches
+  are the 458 unplaced slots plus the 13 skipped pages.
+- **Unplaced slots** are bound entities whose template signature is absent from a
+  legacy page (e.g. `Q3045`'s `hero-subtitle` paragraph is missing from the
+  `ml`/`pa`/`hi` pages). These need a structural page fix, not a translation, and
+  are what stop the round-trip from reaching `equivalent`.
+- Rendering also upgraded slots that still carried English text on non-English
+  pages to proper localized labels. It is faithful to the label store: where a
+  canonical label is *less* localized than the legacy text (e.g. `it` "Marsiglia"
+  replaced by "Marseille"), the render surfaces it — a label-quality fix to make
+  in `labels-wikibase.csv`, not a renderer defect.
+
+## Structural gaps and the repair pilot
+
+Every remaining round-trip failure is now **structural**: the language page lacks
+an element the template binds, so its label has nowhere to land. The 458 unplaced
+slots are concentrated — 47 pages, 110 QIDs — and dominated by a few repeating
+components: `p.card-description` (132), `p.hero-subtitle` (141) and unclassed
+`span` (152, largely the hero blurb, nav and language switcher). Most affect the
+`ml`/`pa`/`hi` travel/gallery pages, which were built before those components
+existed; the translated content already lives in Wikibase.
+
+**Pilot (`Q3062`, travel index):** the `ml`/`pa`/`hi` pages carry all 44
+gallery-cards in the *same order* as the template but omit the `card-description`
+paragraph, and omit the `hero-subtitle`. A positional insertion — map card N to
+template card N (order verified identical), add the missing `<p>` filled with the
+entity's Wikibase label — took the page from three fully-broken languages (45 gaps
+each) to **7 of 8 clean** (`en fr ml pa hi es it`; only `pt` retains one unrelated
+search-nav `span`). Global round-trip fell 587 → 583. This confirms the fix is a
+small, reliable **element insertion**, not a page rebuild.
+
+`card-description` + `hero-subtitle` (and the close cousins `city-description`,
+`quote-author`) account for roughly 300 of the 458 unplaced slots, so generalizing
+this insertion across the ~40 affected pages should close most structural gaps.
+The residual unclassed-`span` bucket (hero blurb / nav / search, plus language-
+switcher metadata that arguably should not be round-trip content) is a smaller,
+separate pattern.
 
 ## Round-trip limitation
 
-Before the in-place rollout completes, `verify_content_roundtrip.py` still reports
-`mismatch` (600 after the Q3045 pilot). The largest concentrations remain `Q3634`,
-`Q3646`, and `Q3636`. It becomes a strict completion gate once the 157 renderable
-pages are rendered and the residual structural gaps (unplaced slots) and the 13
-label-blocked pages are reconciled.
+`verify_content_roundtrip.py` reports `mismatch` (583 after the Q3062 pilot). It
+becomes a strict completion gate once (a) the export is refreshed so the 13
+label-blocked pages render, and (b) the structural-insertion repair is generalized
+from the pilot to the remaining travel/gallery pages.

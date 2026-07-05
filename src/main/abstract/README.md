@@ -53,6 +53,42 @@ hand-written list. Pairing rules, content extraction, abstract authoring, and
 collection cutover remain incremental implementation stages; the registry
 does not pretend that unpaired legacy pages have already been migrated.
 
+## Rendering language pages from Q315
+
+Three tools drive the content round-trip from Q315, reading the canonical label
+store at `src/main/abstract/data/labels-wikibase.csv` (the default `--data-dir`).
+
+1. `fetch_wikibase_labels.py` rebuilds that label store directly from the
+   Wikibase `wbgetentities` API. This replaces the SPARQL export
+   (`all-multilingual-labels.rq`), which times out on the endpoint and returns
+   partial, value-misaligned rows — it dropped bound items and shuffled labels
+   between entities. Re-run it whenever Wikibase labels change:
+
+   ```bash
+   python3 src/main/abstract/fetch_wikibase_labels.py
+   ```
+
+2. `render_page.py` rewrites each bound `data-content`/`data-entity` text slot in
+   the language pages to the entity's label, in place, and adds a `Q315 renderer`
+   generator meta so ownership becomes `abstract`. A slot is only rewritten when
+   the page holds the same number of same-signature elements as the template.
+
+3. `repair_structure.py` inserts template-defined bound children a language page
+   omits (e.g. a gallery-card's `card-description`), mapped positionally, only
+   where the parent container count matches. Container-divergent pages (large
+   index pages missing whole entries) are skipped for regeneration.
+
+```bash
+python3 src/main/abstract/render_page.py --check      # dry run
+python3 src/main/abstract/render_page.py
+python3 src/main/abstract/repair_structure.py
+python3 src/main/abstract/verify_content_roundtrip.py
+```
+
+Both renderers take `--page QID` to scope to a single page. `verify_content_roundtrip.py`
+is the completion gate; residual mismatches are structural (index pages that need
+regeneration), not missing translations.
+
 ## Direct Wikibase bot
 
 The generated QuickStatements can be validated and written directly through
