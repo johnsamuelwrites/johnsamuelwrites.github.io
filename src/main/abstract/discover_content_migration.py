@@ -104,19 +104,38 @@ def abstract_index(repo_root: Path) -> tuple[dict[Path, PageMetadata], dict[Path
     return pages, by_rendered_path
 
 
+# Some language indexes are produced by a different generator: blog.py builds
+# one blog page per language listing only that language's own articles. Such a
+# page is a generated aggregation, not a translation of a Q315 template, so the
+# render, structural-repair and round-trip tools must skip it — otherwise the
+# round-trip compares the aggregation against itself and reports every article
+# it lacks in another language as "missing". A page is recognised by its English
+# target, which blog.py owns.
+EXTERNALLY_GENERATED_INDEXES = frozenset({"en/blog.html"})
+
+
+def _externally_generated(metadata: PageMetadata) -> bool:
+    return any(
+        target.as_posix() in EXTERNALLY_GENERATED_INDEXES
+        for target in metadata.alternates.values()
+    )
+
+
 def abstract_sources(repo_root: Path, page: str = "") -> list[tuple[str, Path]]:
     """Return ``(page_qid, abstract_path)`` for every discovered abstract page.
 
     The set of abstract pages is derived from the repository itself: any page
     under ``Q315/`` that declares ``data-abstract-page``. This replaces the
     hand-written page-list CSVs the pilots used, so newly authored abstract
-    pages are picked up automatically. An optional ``page`` QID scopes the
-    result to a single abstract page.
+    pages are picked up automatically. Pages whose language targets are produced
+    by another generator (see ``EXTERNALLY_GENERATED_INDEXES``) are excluded. An
+    optional ``page`` QID scopes the result to a single abstract page.
     """
     pages, _ = abstract_index(repo_root)
     sources = sorted(
         (metadata.qid, relative)
         for relative, metadata in pages.items()
+        if not _externally_generated(metadata)
     )
     if page:
         sources = [row for row in sources if row[0] == page]

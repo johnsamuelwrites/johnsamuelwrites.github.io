@@ -5,7 +5,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "main"))
 
-from abstract.discover_content_migration import discover
+from abstract.discover_content_migration import abstract_sources, discover
 
 
 def page(alternates, *, abstract="", generated=False):
@@ -54,6 +54,37 @@ class ContentMigrationDiscoveryTests(unittest.TestCase):
             self.assertEqual(rows[0]["render_ownership"], "legacy")
             self.assertEqual(rows[0]["en_source"], "en/topic.html")
             self.assertEqual(rows[0]["target_fr"], "fr/sujet.html")
+
+    def test_blog_index_is_excluded_from_abstract_sources(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            for relative in (
+                "en/blog.html", "fr/blog.html",
+                "en/topic.html", "fr/sujet.html",
+                "Q315/Q3634.html", "Q315/Q10.html",
+            ):
+                (root / relative).parent.mkdir(parents=True, exist_ok=True)
+                (root / relative).write_text(page({}), encoding="utf-8")
+            # Blog index abstract page: its English target is a blog.py output.
+            (root / "Q315/Q3634.html").write_text(
+                page(
+                    {"en": "../en/blog.html", "fr": "../fr/blog.html"},
+                    abstract="Q3634",
+                ),
+                encoding="utf-8",
+            )
+            (root / "Q315/Q10.html").write_text(
+                page(
+                    {"en": "../en/topic.html", "fr": "../fr/sujet.html"},
+                    abstract="Q10",
+                ),
+                encoding="utf-8",
+            )
+
+            qids = {qid for qid, _ in abstract_sources(root)}
+
+            self.assertIn("Q10", qids)
+            self.assertNotIn("Q3634", qids)
 
     def test_generated_pages_are_targets_and_never_migration_sources(self):
         with tempfile.TemporaryDirectory() as directory:

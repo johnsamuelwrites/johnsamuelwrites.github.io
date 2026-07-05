@@ -36,6 +36,9 @@ from abstract.prepare_travel_content import LANGUAGES
 DEFAULT_DATA = DEFAULT_DATA_DIR
 API = "https://jsamwrites.wikibase.cloud/w/api.php"
 QID = re.compile(r"Q[1-9][0-9]*")
+# Composed paragraph (Q3835) and sentence (Q3836) types take precedence over the
+# generic content type (Q3185) when an item carries several P8 values.
+COMPOSED_TYPES = frozenset({"Q3835", "Q3836"})
 
 
 class _Bound(HTMLParser):
@@ -97,12 +100,16 @@ def fetch(ids: list[str], pause: float) -> dict[str, dict[str, str]]:
                 language: entity.get("labels", {}).get(language, {}).get("value", "")
                 for language in LANGUAGES
             }
-            itemtype = ""
-            for claim in entity.get("claims", {}).get("P8", []):
-                value = claim.get("mainsnak", {}).get("datavalue", {}).get("value", {})
-                if value.get("id"):
-                    itemtype = value["id"]
-                    break
+            p8 = [
+                claim.get("mainsnak", {}).get("datavalue", {}).get("value", {}).get("id")
+                for claim in entity.get("claims", {}).get("P8", [])
+            ]
+            p8 = [value for value in p8 if value]
+            # A composed paragraph/sentence carries both Q3185 and Q3835/Q3836.
+            # The composed type must win so the renderers treat it as composed
+            # (rendered by render_abstract) and never overwrite it with a label.
+            composed = next((value for value in p8 if value in COMPOSED_TYPES), "")
+            itemtype = composed or (p8[0] if p8 else "")
             result[qid] = {"identifier": qid, "itemtype": itemtype, **labels}
         if pause:
             time.sleep(pause)

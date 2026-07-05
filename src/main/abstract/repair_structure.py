@@ -30,7 +30,7 @@ HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE.parent))
 
 from abstract.css_assets import DEFAULT_DATA_DIR, DEFAULT_REPO_ROOT
-from abstract.discover_content_migration import discover
+from abstract.discover_content_migration import EXTERNALLY_GENERATED_INDEXES, discover
 from abstract.prepare_travel_content import LANGUAGES, TEXT_TAGS
 
 DEFAULT_DATA = DEFAULT_DATA_DIR
@@ -219,7 +219,9 @@ def repair(repo_root: Path, data_dir: Path, page: str, check: bool) -> int:
     labels = load_labels(data_dir)
     rows = [
         row for row in discover(repo_root)
-        if row["abstract_path"] and (not page or row["page_qid"] == page)
+        if row["abstract_path"]
+        and (not page or row["page_qid"] == page)
+        and row.get("target_en", "") not in EXTERNALLY_GENERATED_INDEXES
     ]
     if page and not rows:
         raise ValueError(f"no abstract page declares QID {page}")

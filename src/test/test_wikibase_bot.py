@@ -55,6 +55,27 @@ class WikibaseWriterTests(unittest.TestCase):
             {"language": "fr", "text": "Bonjour"},
         )
 
+    def test_builds_claim_with_qualifier(self):
+        with tempfile.TemporaryDirectory() as directory:
+            source = Path(directory) / "input.quickstatements"
+            source.write_text('Q9|P21|Q5|P42|"3"\n', encoding="utf-8")
+            operation = parse(source)[0]
+        data = build_data(
+            operation, {"P21": "wikibase-item", "P42": "string"}
+        )
+        claim = data["claims"]["P21"][0]
+        self.assertEqual(claim["mainsnak"]["datavalue"]["value"]["id"], "Q5")
+        qualifier = claim["qualifiers"]["P42"][0]
+        self.assertEqual(qualifier["datavalue"], {"value": "3", "type": "string"})
+
+    def test_rejects_four_field_line(self):
+        with tempfile.TemporaryDirectory() as directory:
+            source = Path(directory) / "input.quickstatements"
+            source.write_text("Q9|P21|Q5|P42\n", encoding="utf-8")
+            operation = parse(source)[0]
+        with self.assertRaises(ValueError):
+            build_data(operation, {"P21": "wikibase-item"})
+
     def test_rejects_wrong_item_value(self):
         with self.assertRaises(ValueError):
             datavalue("not-an-item", "wikibase-item")

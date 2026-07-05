@@ -131,11 +131,18 @@ def build_data(operation: Operation, datatypes: dict[str, str]) -> dict:
     for number, parts in operation.lines:
         if parts[0] == "CREATE":
             continue
-        if len(parts) != 3:
-            raise ValueError(f"line {number}: expected three pipe-separated fields")
+        # A claim is "subject|property|value"; an optional trailing
+        # "qualifier-property|qualifier-value" pair adds one qualifier snak,
+        # which is how ordered abstract sentences carry their P42 ordinal.
+        if len(parts) not in (3, 5):
+            raise ValueError(
+                f"line {number}: expected three or five pipe-separated fields"
+            )
         command, value = parts[1], parts[2]
         term = TERM_RE.fullmatch(command)
         if term:
+            if len(parts) != 3:
+                raise ValueError(f"line {number}: terms take no qualifier")
             kind, language = term.groups()
             target = {"L": "labels", "D": "descriptions", "A": "aliases"}[kind]
             term_value = {"language": language, "value": unquoted(value)}
@@ -159,16 +166,39 @@ def build_data(operation: Operation, datatypes: dict[str, str]) -> dict:
             "type": "statement",
             "rank": "normal",
         }
+        if len(parts) == 5:
+            qualifier_property, qualifier_value = parts[3], parts[4]
+            if not PROPERTY_RE.fullmatch(qualifier_property):
+                raise ValueError(
+                    f"line {number}: unsupported qualifier {qualifier_property!r}"
+                )
+            qualifier_datatype = datatypes.get(qualifier_property)
+            if not qualifier_datatype:
+                raise ValueError(
+                    f"line {number}: datatype unavailable for {qualifier_property}"
+                )
+            claim["qualifiers"] = {
+                qualifier_property: [
+                    {
+                        "snaktype": "value",
+                        "property": qualifier_property,
+                        "datatype": qualifier_datatype,
+                        "datavalue": datavalue(qualifier_value, qualifier_datatype),
+                    }
+                ]
+            }
         data["claims"].setdefault(command, []).append(claim)
     return {key: value for key, value in data.items() if value}
 
 
 def property_datatypes(client: WikibaseClient, operations: list[Operation]) -> dict[str, str]:
     properties = sorted({
-        parts[1]
+        part
         for operation in operations
         for _, parts in operation.lines
-        if len(parts) > 1 and PROPERTY_RE.fullmatch(parts[1])
+        # index 1 is the mainsnak property; index 3 is an optional qualifier property
+        for part in (parts[1:2] + parts[3:4])
+        if PROPERTY_RE.fullmatch(part)
     })
     entities = client.entities(properties)
     return {
