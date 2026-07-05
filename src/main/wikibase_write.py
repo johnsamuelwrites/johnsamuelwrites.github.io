@@ -76,8 +76,15 @@ def parse(path: Path) -> list[Operation]:
             current = Operation(None, [(number, parts)])
             operations.append(current)
         elif ENTITY_RE.fullmatch(subject):
-            current = Operation(subject, [(number, parts)])
-            operations.append(current)
+            # Consecutive statements for one existing entity belong in one
+            # wbeditentity request. Besides being substantially faster for
+            # multilingual label batches, this avoids exhausting Wikibase's
+            # edit throttle eight times per item.
+            if current is not None and current.subject == subject:
+                current.lines.append((number, parts))
+            else:
+                current = Operation(subject, [(number, parts)])
+                operations.append(current)
         elif subject == "LAST":
             if current is None or current.subject is not None:
                 raise ValueError(f"{path}:{number}: LAST must follow CREATE")

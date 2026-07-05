@@ -79,6 +79,11 @@ COMPOSE_FUNCTION_TOKEN = "FN_COMPOSE_ORDERED_PARAGRAPH"
 # content. The danda (।) serves Hindi and Punjabi.
 SENTENCE_BOUNDARY = re.compile(r"(?<=[.!?।؟])\s+")
 TERMINAL_PUNCTUATION = re.compile(r"[.!?।؟]")
+# Atomic rendering uses Wikibase labels, whose limit is 250 characters, even
+# though P40 monolingual text allows 400. Keep every composed part below both
+# limits so the label-based renderer can never replace full prose with an
+# ellipsis-truncated label.
+MAX_MONOLINGUAL_PART_LENGTH = 240
 
 
 def split_sentences(text: str) -> list[str]:
@@ -99,6 +104,62 @@ def is_prose(english: str) -> bool:
     """
     stripped = english.strip()
     return bool(stripped) and stripped[-1] in ".!?।؟"
+
+
+def _balanced_chunks(text: str, count: int) -> list[str]:
+    """Split text into exactly ``count`` non-empty, word-boundary chunks."""
+    words = text.split()
+    if count <= 1 or len(words) <= 1:
+        return [text.strip()]
+    count = min(count, len(words))
+    chunks: list[str] = []
+    start = 0
+    remaining_length = sum(len(word) for word in words) + len(words) - 1
+    for index in range(count - 1):
+        remaining_chunks = count - index
+        target = max(1, remaining_length // remaining_chunks)
+        end = start + 1
+        length = len(words[start])
+        maximum_end = len(words) - (remaining_chunks - 1)
+        while end < maximum_end:
+            candidate = length + 1 + len(words[end])
+            if candidate > target:
+                break
+            length = candidate
+            end += 1
+        chunks.append(" ".join(words[start:end]))
+        remaining_length -= length + 1
+        start = end
+    chunks.append(" ".join(words[start:]))
+    return chunks
+
+
+def _long_aligned_chunks(values: tuple[str, ...]) -> list[tuple[str, ...]]:
+    """Return aligned chunks whose present values fit Wikibase's text limit."""
+    minimum = max(
+        2,
+        max(
+            (len(value) + MAX_MONOLINGUAL_PART_LENGTH - 1)
+            // MAX_MONOLINGUAL_PART_LENGTH
+            for value in values
+            if value
+        ),
+    )
+    for count in range(minimum, 33):
+        per_language = [
+            _balanced_chunks(value, count) if value else [""] * count
+            for value in values
+        ]
+        if (
+            all(len(chunks) == count for chunks in per_language)
+            and max(len(chunk) for chunks in per_language for chunk in chunks)
+            <= MAX_MONOLINGUAL_PART_LENGTH
+        ):
+            return [
+                tuple(chunks[index] for chunks in per_language)
+                for index in range(count)
+            ]
+    raise ValueError("prose cannot be split below the monolingual text limit")
 
 
 def segment(values: tuple[str, ...]) -> list[tuple[str, ...]]:
@@ -122,6 +183,8 @@ def segment(values: tuple[str, ...]) -> list[tuple[str, ...]]:
                 )
                 for index in range(count)
             ]
+    if any(len(value) > MAX_MONOLINGUAL_PART_LENGTH for value in values):
+        return _long_aligned_chunks(values)
     return [values]
 
 

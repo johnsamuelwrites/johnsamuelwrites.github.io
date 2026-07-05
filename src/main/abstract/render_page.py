@@ -22,6 +22,7 @@ from __future__ import annotations
 import argparse
 import csv
 import html
+import re
 import sys
 from collections import Counter
 from dataclasses import dataclass
@@ -240,7 +241,12 @@ class SlotRewriter(HTMLParser):
 
 def inject_generator_meta(text: str) -> str:
     """Add the Q315-renderer generator meta once, right after ``<head>``."""
-    if 'name="generator" content="Q315 renderer"' in text:
+    if re.search(
+        r'<meta\b(?=[^>]*\bname="generator")'
+        r'(?=[^>]*\bcontent="Q315 renderer")[^>]*>',
+        text,
+        flags=re.IGNORECASE,
+    ):
         return text
     marker = "<head>"
     index = text.find(marker)

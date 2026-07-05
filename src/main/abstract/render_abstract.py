@@ -195,11 +195,24 @@ def update_page(
     occurrence_hint: int | None = None,
 ) -> str:
     locator = _locator(paragraph)
+    # A rendered marker identifies the paragraph more precisely than a shared
+    # CSS class (for example ten research cards all use
+    # ``research-description``). Prefer it before the class-based locator.
+    tag = re.escape(paragraph.tag)
+    marker_locator = re.compile(
+        rf"(?P<indent>^[ \t]*)<{tag}\b[^>]*"
+        rf'data-q315-source="local:{paragraph.item}"[^>]*>'
+        rf"(?P<body>.*?)</{tag}>",
+        flags=re.MULTILINE | re.DOTALL,
+    )
+    marker_matches = marker_locator.findall(source)
     matches = locator.findall(source)
-    if len(matches) == 1:
+    if len(marker_matches) == 1:
+        locator = marker_locator
+        match = locator.search(source)
+    elif len(matches) == 1:
         match = locator.search(source)
     else:
-        tag = re.escape(paragraph.tag)
         candidates = {
             re.sub(r"\s+", " ", value).strip()
             for value in previous_values

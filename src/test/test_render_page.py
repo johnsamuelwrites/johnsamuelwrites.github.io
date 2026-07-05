@@ -146,6 +146,14 @@ class GeneratorMetaTests(unittest.TestCase):
         self.assertEqual(twice, once)
         self.assertLess(once.index("Q315 renderer"), once.index("<title>"))
 
+    def test_existing_meta_is_detected_regardless_of_attribute_order(self):
+        source = (
+            '<html><head><meta content="Q315 renderer" name="generator"/>'
+            "</head><body></body></html>"
+        )
+
+        self.assertEqual(inject_generator_meta(source), source)
+
 
 def template_bindings_from_string(source):
     import tempfile

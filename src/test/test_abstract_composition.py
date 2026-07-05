@@ -55,6 +55,22 @@ class SegmentationTests(unittest.TestCase):
         )
         self.assertEqual(len(segment(values)), 1)
 
+    def test_oversized_single_sentence_is_split_without_truncation(self):
+        values = tuple(
+            " ".join(f"{language}{index}" for index in range(120)) + "."
+            for language in LANGUAGES
+        )
+        parts = segment(values)
+        self.assertGreater(len(parts), 1)
+        self.assertTrue(
+            all(len(value) <= 240 for part in parts for value in part)
+        )
+        for language_index, original in enumerate(values):
+            self.assertEqual(
+                " ".join(part[language_index] for part in parts),
+                original,
+            )
+
 
 class PipelineTests(unittest.TestCase):
     def _build(self, root: Path) -> None:

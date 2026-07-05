@@ -93,6 +93,66 @@ documented 214-pair structural round-trip baseline. It also validates every
 HTML document below `Q315/`; passing a directory to `validate_abstract_html.py`
 discovers its HTML files recursively.
 
+## Migrating pages linked by the Q315 home page
+
+Home-page destinations must point to canonical Q315 documents once migrated;
+do not leave an `../en/` link as the canonical destination. A migration creates
+one abstract page item, links every concrete page through `P12`, adds all eight
+`hreflang` alternates, and registers the canonical document in
+`css-assets.json`. Inline CSS is extracted once to
+`Q315/assets/css/pages/<QID>.css`; the Q315 document and all language renderings
+reference that shared asset.
+
+Machine-translated pages are drafts. Preserve native labels for curated
+collections by adding their English source path to
+`prepare_missing_content.NATIVE_LABEL_SOURCES`. This includes the Blogs I Read
+collection: page chrome and explanatory prose are translated, while official
+blog titles remain verbatim in every language.
+
+Personal names are also invariant content. In particular, always preserve
+`John Samuel` literally in every language: do not transliterate it or replace
+it with localized forms such as `Juan Samuel`, `João Samuel`, or
+`Giovanni Samuele`. Apply this rule to labels and full `P40` values, including
+names embedded in titles, credits, speaker lists, and copyright sentences.
+
+Official names can have a different authoritative source language from the
+page being migrated. The teaching pages are the reference example: French is
+authoritative for course names, while the English names are translations.
+Inventory those names from the original French page before machine
+translation, store the official French value in `P40` and the French label,
+and bind every repeated occurrence to that item. Do not merge two course items
+only because their English translations happen to match: “Chimie et
+Numérique” and “Chimie et Informatique” intentionally remain distinct.
+
+Generated HTML must retain a doctype, comments as comment nodes, and structural
+indentation. Translation code must explicitly skip `Comment` and `Doctype`
+nodes; treating them as ordinary text turns comments into visible page
+content. Run the abstract HTML validator after formatting because formatting
+must not alter bound slot signatures.
+
+Reuse established localized routes before creating a filename. `index.html`
+remains stable for collection roots; article filenames are localized (for
+example `fr/recherche/recherche.html` and
+`hi/भाषाविज्ञान/भाषा सीखना.html`). Record the localized path segment in `P38`
+and the language-root-relative path in `P39`. Every concrete page and its Q315
+document must expose the same eight routes in both `hreflang` metadata and a
+visible footer language switcher.
+
+Teaching links follow source ownership. English teaching pages retain their
+original course links, which may lead onward to French slides. French teaching
+pages retain the original official `cours/...` links. Course links in the
+other six generated languages point to the corresponding English course page;
+do not synthesize localized course directories that do not exist.
+
+Run composed prose before atomic content preparation. Multi-sentence prose and
+any single sentence whose monolingual value exceeds the Wikibase limit are
+split into ordered parts and rendered with `compose_ordered_paragraph`.
+`prepare_abstract_composition.py` keeps each generated part below 240
+characters, leaving safety margin beneath both the 250-character label limit
+used by atomic rendering and Wikibase's 400-character P40 limit.
+Only residual atomic slots should then pass through
+`prepare_missing_content.py` and `bind_reviewed_content.py`.
+
 ## Direct Wikibase bot
 
 The generated QuickStatements can be validated and written directly through

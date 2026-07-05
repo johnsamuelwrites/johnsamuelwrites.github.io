@@ -5,6 +5,37 @@ Status checked: 4 July 2026, using the refreshed
 
 Supported languages are `en`, `fr`, `ml`, `pa`, `hi`, `pt`, `es`, and `it`.
 
+## Update — 5 July 2026: Q315 home-linked pages
+
+- Six English-only destinations linked by `Q315/index.html` were assigned
+  abstract page items: research projects (`Q7944`), teaching (`Q7945`),
+  teaching archives (`Q7946`), linguistics (`Q7947`), learning a language
+  (`Q7948`), and Blogs I Read (`Q7949`).
+- Draft pages now exist in all eight supported languages and share Q315-owned
+  stylesheets. The Q315 home links target the canonical abstract documents.
+- Official blog titles are native labels and remain untranslated; only the
+  Blogs page interface and explanatory text are translated.
+- Oversized single-sentence prose now follows the composed-paragraph path.
+  Ordered chunks stay below the Wikibase monolingual-text limit and are
+  recomposed by `Q4182` without truncation.
+- Follow-up correction: the original French teaching pages are authoritative
+  for official course names. Nine current-course items were corrected in
+  Wikibase, twelve archive-only course items (`Q8334`–`Q8345`) and one
+  typography-specific archive item (`Q8346`) were added, and all 87 archive
+  occurrences were bound. The original 9 current and 87 archived French names
+  now match exactly. Generated translations and Q315 pages were structurally
+  indented, with doctypes and translated comments restored correctly.
+- The two 250-character-truncated research descriptions were replaced by
+  ordered compositions (`Q8347`–`Q8352`); the rendered English research text
+  now matches its original in full.
+- Existing localized article routes are reused, newly added Portuguese,
+  Spanish, and Italian filenames are translated, and `P38`/`P39` now record
+  all 48 concrete routes. Every migrated page has an eight-language footer
+  switcher matching its `hreflang` links.
+- Original French teaching links remain authoritative. The six other generated
+  languages point course cards to English course pages; English retains its
+  own established links, including links onward to French slide material.
+
 ## Update — 5 July 2026: remaining truncated items
 
 - The eight research/CV items `Q6284`, `Q7486`, `Q7602`, `Q7845`, `Q7846`,

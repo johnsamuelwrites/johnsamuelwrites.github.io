@@ -33,6 +33,17 @@ class WikibaseWriterTests(unittest.TestCase):
         self.assertIsNone(operations[0].subject)
         self.assertEqual(operations[1].subject, "Q1")
 
+    def test_parse_groups_consecutive_lines_for_existing_entity(self):
+        with tempfile.TemporaryDirectory() as directory:
+            source = Path(directory) / "input.quickstatements"
+            source.write_text(
+                'Q1|Len|"One"\nQ1|Lfr|"Un"\nQ2|Len|"Two"\n',
+                encoding="utf-8",
+            )
+            operations = parse(source)
+        self.assertEqual(len(operations), 2)
+        self.assertEqual(len(operations[0].lines), 2)
+
     def test_builds_terms_and_typed_claims(self):
         with tempfile.TemporaryDirectory() as directory:
             source = Path(directory) / "input.quickstatements"

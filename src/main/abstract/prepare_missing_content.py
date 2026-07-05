@@ -49,6 +49,7 @@ NATIVE_LABEL_SOURCES = frozenset(
         "en/writings/music.html",
         "en/writings/museums-galleries.html",
         "en/writings/quotes.html",
+        "en/blog/blogs-list.html",
     }
 )
 
