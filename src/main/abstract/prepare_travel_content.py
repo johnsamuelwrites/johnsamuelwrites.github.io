@@ -14,14 +14,19 @@ from pathlib import Path
 HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE.parent))
 
-from abstract.css_assets import DEFAULT_MANIFEST, DEFAULT_REPO_ROOT, load_groups
+from abstract.css_assets import (
+    DEFAULT_DATA_DIR,
+    DEFAULT_MANIFEST,
+    DEFAULT_REPO_ROOT,
+    load_groups,
+)
 
 
 LANGUAGES = ("en", "fr", "ml", "pa", "hi", "pt", "es", "it")
 TEXT_TAGS = {"p", "h1", "h2", "h3", "h4", "h5", "h6", "a", "span", "button", "label", "li", "figcaption"}
 QID_TEXT = re.compile(r"(?:Q[0-9]+\s*)+")
 MOJIBAKE_MARKERS = ("Ã", "â")
-DEFAULT_DATA = DEFAULT_REPO_ROOT.parent / "Q42761025" / "data"
+DEFAULT_DATA = DEFAULT_DATA_DIR
 DEFAULT_OUTPUT = HERE / "travel-content.quickstatements"
 DEFAULT_MANIFEST_OUTPUT = HERE / "travel-content-manifest.csv"
 DEFAULT_PENDING_MANIFEST_OUTPUT = HERE / "travel-content-pending-manifest.csv"

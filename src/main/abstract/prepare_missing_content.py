@@ -17,7 +17,7 @@ from urllib.parse import unquote, urlparse
 HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE.parent))
 
-from abstract.css_assets import DEFAULT_REPO_ROOT
+from abstract.css_assets import DEFAULT_DATA_DIR, DEFAULT_REPO_ROOT
 from abstract.discover_content_migration import abstract_sources
 from abstract.prepare_travel_content import (
     LANGUAGES,
@@ -520,7 +520,7 @@ def write_partial_quickstatements(path: Path, rows: list[dict[str, str]]) -> int
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--repo-root", type=Path, default=DEFAULT_REPO_ROOT)
-    parser.add_argument("--data-dir", type=Path, default=DEFAULT_REPO_ROOT.parent / "Q42761025" / "data")
+    parser.add_argument("--data-dir", type=Path, default=DEFAULT_DATA_DIR)
     parser.add_argument(
         "--page",
         default="",

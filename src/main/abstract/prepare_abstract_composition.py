@@ -42,7 +42,7 @@ from pathlib import Path
 HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE.parent))
 
-from abstract.css_assets import DEFAULT_REPO_ROOT
+from abstract.css_assets import DEFAULT_DATA_DIR, DEFAULT_REPO_ROOT
 from abstract.prepare_missing_content import (
     alternate_pages,
     content_token,
@@ -57,7 +57,7 @@ from abstract.prepare_travel_content import (
     slots,
 )
 
-DEFAULT_DATA = DEFAULT_REPO_ROOT.parent / "Q42761025" / "data"
+DEFAULT_DATA = DEFAULT_DATA_DIR
 DEFAULT_QUICKSTATEMENTS = HERE / "abstract-composition.quickstatements"
 DEFAULT_PARTIAL_QUICKSTATEMENTS = HERE / "abstract-composition-partial.quickstatements"
 DEFAULT_REVIEW = HERE / "abstract-composition-review.csv"
