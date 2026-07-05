@@ -11,7 +11,7 @@ from abstract.functions.registry import (
 )
 from abstract.model import FunctionCall, MonolingualText
 from abstract.prepare_travel_content import validate_quickstatements
-from abstract.validate_abstract_html import validate
+from abstract.validate_abstract_html import html_documents, validate
 
 
 class AbstractFunctionTests(unittest.TestCase):
@@ -83,6 +83,19 @@ class AbstractHTMLValidatorTests(unittest.TestCase):
         )
         self.assertEqual(len(errors), 1)
         self.assertIn("contained in q-call", errors[0])
+
+    def test_directories_are_discovered_recursively(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            nested = root / "nested"
+            nested.mkdir()
+            page = nested / "page.html"
+            page.write_text("<html></html>", encoding="utf-8")
+
+            documents, errors = html_documents([root])
+
+            self.assertEqual(documents, [page])
+            self.assertEqual(errors, [])
 
 
 class TravelContentQuickStatementsTests(unittest.TestCase):

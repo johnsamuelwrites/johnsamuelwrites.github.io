@@ -146,6 +146,14 @@ def main() -> int:
         default="",
         help="restrict verification to a single abstract page QID",
     )
+    parser.add_argument(
+        "--max-mismatches",
+        type=int,
+        help=(
+            "fail only when mismatch count exceeds this known structural "
+            "baseline (default: require complete equivalence)"
+        ),
+    )
     parser.add_argument("--report", type=Path, default=DEFAULT_REPORT)
     args = parser.parse_args()
     repo_root = args.repo_root.resolve()
@@ -160,6 +168,8 @@ def main() -> int:
         f"Round-trip status: {report['status']}; "
         f"language-page mismatches: {report['mismatch_count']}"
     )
+    if args.max_mismatches is not None:
+        return 0 if report["mismatch_count"] <= args.max_mismatches else 1
     return 0 if report["status"] == "equivalent" else 1
 
 

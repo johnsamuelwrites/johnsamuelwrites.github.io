@@ -86,23 +86,38 @@ def validate(path: Path) -> list[str]:
 
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("paths", type=Path, nargs="+")
+    parser.add_argument(
+        "paths",
+        type=Path,
+        nargs="+",
+        help="HTML files or directories to search recursively",
+    )
     return parser
+
+
+def html_documents(paths: Sequence[Path]) -> tuple[list[Path], list[str]]:
+    documents: list[Path] = []
+    errors: list[str] = []
+    for path in paths:
+        if path.is_dir():
+            documents.extend(sorted(path.rglob("*.html")))
+        elif path.is_file():
+            documents.append(path)
+        else:
+            errors.append(f"{path}: file or directory does not exist")
+    return documents, errors
 
 
 def main(argv: Sequence[str] | None = None) -> int:
     args = build_parser().parse_args(argv)
-    errors: list[str] = []
-    for path in args.paths:
-        if not path.is_file():
-            errors.append(f"{path}: file does not exist")
-        else:
-            errors.extend(validate(path))
+    documents, errors = html_documents(args.paths)
+    for path in documents:
+        errors.extend(validate(path))
     if errors:
         for error in errors:
             print(f"ERROR: {error}")
         return 1
-    print(f"Validated {len(args.paths)} abstract HTML document(s)")
+    print(f"Validated {len(documents)} abstract HTML document(s)")
     return 0
 
 

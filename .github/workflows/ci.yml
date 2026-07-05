@@ -35,11 +35,23 @@ jobs:
       - name: Check internal broken links across the whole site
         run: python src/main/ci_internal_links.py --all
 
-      - name: Check generated abstract pages
+      - name: Check Q315 links
         run: python src/main/ci_internal_links.py --root Q315
 
       - name: Check canonical abstract CSS references
         run: python src/main/abstract/css_assets.py check
 
-      - name: Check abstract HTML contract pilot
-        run: python src/main/abstract/validate_abstract_html.py Q315/Q3062/index.html
+      - name: Check every canonical Q315 document
+        run: python src/main/abstract/validate_abstract_html.py Q315
+
+      - name: Check rendered Q315 labels are current
+        run: python src/main/abstract/render_page.py --check
+
+      - name: Check Q315 structural repairs are current
+        run: python src/main/abstract/repair_structure.py --check
+
+      - name: Check Q315 round-trip has no regressions
+        run: |
+          python src/main/abstract/verify_content_roundtrip.py \
+            --max-mismatches 214 \
+            --report "${RUNNER_TEMP}/q315-content-roundtrip.json"

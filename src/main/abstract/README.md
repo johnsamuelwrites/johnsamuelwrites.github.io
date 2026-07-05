@@ -88,6 +88,10 @@ python3 src/main/abstract/verify_content_roundtrip.py
 Both renderers take `--page QID` to scope to a single page. `verify_content_roundtrip.py`
 is the completion gate; residual mismatches are structural and must be placed
 inside their corresponding canonical containers, not appended elsewhere.
+CI runs both renderers in `--check` mode and rejects any increase over the
+documented 214-pair structural round-trip baseline. It also validates every
+HTML document below `Q315/`; passing a directory to `validate_abstract_html.py`
+discovers its HTML files recursively.
 
 ## Direct Wikibase bot
 
@@ -96,7 +100,7 @@ the MediaWiki API. Validation is the default and does not require credentials:
 
 ```bash
 python3 src/main/wikibase_write.py \
-  src/main/abstract/missing-label-updates.quickstatements
+  /path/to/generated-batch.quickstatements
 ```
 
 Create a dedicated bot password in the Wikibase user preferences, copy
@@ -105,7 +109,7 @@ enable writes:
 
 ```bash
 python3 src/main/wikibase_write.py \
-  src/main/abstract/missing-label-updates.quickstatements --apply
+  /path/to/generated-batch.quickstatements --apply
 ```
 
 The writer supports the commands generated in this repository: `CREATE`,
