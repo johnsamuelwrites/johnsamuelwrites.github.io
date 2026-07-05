@@ -150,7 +150,9 @@ _PLACEHOLDER = "\x00LANG-SWITCHER-ANCHOR\x00"
 
 def inject_css_link(repo_root: Path, page: Path, text: str) -> str:
     """Ensure the page links the shared switcher stylesheet, once."""
-    if SWITCHER_CSS in text:
+    # Match by basename: the relative href differs by page depth (``../`` vs
+    # ``../../Q315/``), so the repo-relative path is not a reliable substring.
+    if Path(SWITCHER_CSS).name in text:
         return text
     href = os.path.relpath(repo_root / SWITCHER_CSS, page.parent).replace(os.sep, "/")
     match = HEAD_CLOSE_RE.search(text)
@@ -257,28 +259,42 @@ def rows_for(repo_root: Path, page_qid: str) -> list[dict[str, str]]:
     ]
 
 
+def _targets(row: dict[str, str]) -> list[tuple[str, str, str]]:
+    """Yield ``(language, current, relative)`` pairs to normalize for a row.
+
+    For language pages the current language is the page's own; for the Q315
+    template the footer is language-neutral, so it is rendered from the ``en``
+    perspective (the template is built from the English page) and written once.
+    """
+    group = {
+        language: row[f"target_{language}"]
+        for language in LANGUAGES
+        if row[f"target_{language}"]
+    }
+    return group, [(language, language, relative) for language, relative in group.items()]
+
+
 def run(
-    repo_root: Path, page_qid: str, apply: bool, audit: bool
+    repo_root: Path, page_qid: str, apply: bool, audit: bool, templates: bool
 ) -> int:
     changed: list[str] = []
     no_anchor: list[str] = []
     for row in sorted(rows_for(repo_root, page_qid), key=lambda row: row["page_qid"]):
-        group = {
-            language: row[f"target_{language}"]
-            for language in LANGUAGES
-            if row[f"target_{language}"]
-        }
-        for language, relative in group.items():
+        group, pages = _targets(row)
+        if templates:
+            # The abstract template carries the same footer that its language
+            # pages do; keep it consistent so a regeneration cannot reintroduce
+            # the old switcher. Rendered from the "en" perspective.
+            pages = [("en", "en", row["abstract_path"])] if row["abstract_path"] else []
+        for current, _, relative in pages:
             page = repo_root / relative
             if not page.is_file():
                 continue
-            new_text, did_change = normalize(repo_root, page, language, group)
-            if audit:
-                if 'class="lang-selector"' not in new_text:
-                    no_anchor.append(relative)
-                continue
+            new_text, did_change = normalize(repo_root, page, current, group)
             if 'class="lang-selector"' not in new_text:
                 no_anchor.append(relative)
+                continue
+            if audit:
                 continue
             if did_change:
                 changed.append(relative)
@@ -288,8 +304,9 @@ def run(
     for relative in sorted(no_anchor):
         print(f"NO-ANCHOR {relative}")
     verb = "Rewrote" if (apply and not audit) else "Would rewrite"
+    kind = "template(s)" if templates else "page(s)"
     print(
-        f"{verb} {len(changed)} page(s); "
+        f"{verb} {len(changed)} {kind}; "
         f"{len(no_anchor)} with no language list to rewrite"
     )
     return 0
@@ -303,10 +320,17 @@ def main(argv: Sequence[str] | None = None) -> int:
     parser.add_argument(
         "--audit",
         action="store_true",
-        help="only report CSS readiness; never rewrite",
+        help="report pages that lack a language list to rewrite; never write",
+    )
+    parser.add_argument(
+        "--templates",
+        action="store_true",
+        help="normalize the Q315 abstract templates instead of the language pages",
     )
     args = parser.parse_args(argv)
-    return run(args.repo_root.resolve(), args.page, args.apply, args.audit)
+    return run(
+        args.repo_root.resolve(), args.page, args.apply, args.audit, args.templates
+    )
 
 
 if __name__ == "__main__":
