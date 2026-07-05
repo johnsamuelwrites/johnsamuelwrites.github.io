@@ -24,6 +24,10 @@ from urllib.parse import unquote, urlsplit
 HERE = Path(__file__).resolve().parent
 DEFAULT_REPO_ROOT = HERE.parents[2]
 DEFAULT_MANIFEST = HERE / "css-assets.json"
+# Canonical multilingual label store for this repository. It is rebuilt from the
+# Wikibase ``wbgetentities`` API by ``fetch_wikibase_labels.py`` because the
+# upstream SPARQL export drops rows and misaligns label values.
+DEFAULT_DATA_DIR = HERE / "data"
 
 STYLE_BLOCK = re.compile(
     r"(?P<indent>^[ \t]*)<style(?:\s[^>]*)?>(?P<css>.*?)</style>",

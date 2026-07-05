@@ -32,11 +32,11 @@ from typing import Sequence
 HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE.parent))
 
-from abstract.css_assets import DEFAULT_REPO_ROOT
+from abstract.css_assets import DEFAULT_DATA_DIR, DEFAULT_REPO_ROOT
 from abstract.discover_content_migration import discover
 from abstract.prepare_travel_content import LANGUAGES, TEXT_TAGS
 
-DEFAULT_DATA = DEFAULT_REPO_ROOT.parent / "Q42761025" / "data"
+DEFAULT_DATA = DEFAULT_DATA_DIR
 
 # Function-composed results (abstract paragraphs/sentences) are realized by
 # render_abstract.py from a pinned snapshot, not by substituting the label of the
@@ -91,10 +91,35 @@ class TemplateBindings(HTMLParser):
                 self.bindings[key] = value.removeprefix("local:")
 
 
-def template_bindings(path: Path) -> dict[Signature, str]:
+def template_slots(path: Path) -> tuple[dict[Signature, str], Counter[tuple[str, str, str]]]:
+    """Return the template's bound ``signature -> qid`` map and its base counts."""
     parser = TemplateBindings()
     parser.feed(path.read_text(encoding="utf-8"))
-    return parser.bindings
+    return parser.bindings, parser.counts
+
+
+def template_bindings(path: Path) -> dict[Signature, str]:
+    return template_slots(path)[0]
+
+
+class _BaseCounter(HTMLParser):
+    """Count ``(tag, class, role)`` occurrences the way ``SlotRewriter`` does."""
+
+    def __init__(self) -> None:
+        super().__init__()
+        self.counts: Counter[tuple[str, str, str]] = Counter()
+
+    def handle_starttag(self, tag, attrs) -> None:
+        self.counts[_base_signature(tag, attrs)] += 1
+
+    def handle_startendtag(self, tag, attrs) -> None:
+        self.counts[_base_signature(tag, attrs)] += 1
+
+
+def base_counts(source: str) -> Counter[tuple[str, str, str]]:
+    parser = _BaseCounter()
+    parser.feed(source)
+    return parser.counts
 
 
 @dataclass
@@ -112,10 +137,22 @@ class SlotRewriter(HTMLParser):
     styles, entities and every unbound byte pass through unchanged.
     """
 
-    def __init__(self, source: str, targets: dict[Signature, str]) -> None:
+    def __init__(
+        self,
+        source: str,
+        targets: dict[Signature, str],
+        template_counts: Counter[tuple[str, str, str]] | None = None,
+    ) -> None:
         super().__init__(convert_charrefs=True)
         self.source = source
         self.targets = targets
+        # A slot is only aligned by occurrence index when the language page has
+        # the same number of same-signature elements as the template. Where the
+        # counts differ (e.g. a language switcher that omits the current
+        # language), occurrence N addresses different content and must not be
+        # rewritten.
+        self.template_counts = template_counts
+        self.local_counts = base_counts(source)
         self._line_starts = self._compute_line_starts(source)
         self.counts: Counter[tuple[str, str, str]] = Counter()
         self.stack: list[_Frame] = []
@@ -173,7 +210,12 @@ class SlotRewriter(HTMLParser):
     def _finalize(self, frame: _Frame, end: int) -> None:
         if frame.key not in self.targets:
             return
-        if frame.had_child or frame.tag not in TEXT_TAGS:
+        base = frame.key[:3]
+        count_mismatch = (
+            self.template_counts is not None
+            and self.template_counts.get(base) != self.local_counts.get(base)
+        )
+        if frame.had_child or frame.tag not in TEXT_TAGS or count_mismatch:
             self.structural.add(frame.key)
             return
         target = self.targets[frame.key]
@@ -229,9 +271,10 @@ def render(
     skipped_pages = 0
     for row in sorted(rows, key=lambda row: row["page_qid"]):
         abstract = repo_root / row["abstract_path"]
+        bindings, template_counts = template_slots(abstract)
         atomic = {
             key: qid
-            for key, qid in template_bindings(abstract).items()
+            for key, qid in bindings.items()
             if labels.get(qid, {}).get("itemtype", "").strip() not in COMPOSED_ITEMTYPES
         }
         targets = [
@@ -259,7 +302,7 @@ def render(
             replacements = {
                 key: labels[qid][language].strip() for key, qid in atomic.items()
             }
-            rewriter = SlotRewriter(source, replacements)
+            rewriter = SlotRewriter(source, replacements, template_counts)
             updated = inject_generator_meta(rewriter.rewrite())
             for key in sorted(rewriter.absent):
                 structural.append((row["page_qid"], language, f"{key} -> {atomic[key]}"))

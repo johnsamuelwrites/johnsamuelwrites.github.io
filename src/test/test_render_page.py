@@ -85,6 +85,34 @@ class SlotRewriterTests(unittest.TestCase):
         )
         self.assertEqual(rw.rewritten, {("h2", "t", "", 0)})
 
+    def test_count_mismatch_blocks_occurrence_alignment(self):
+        # Template lists 3 same-signature spans; the legacy page lists only 2
+        # (e.g. a language switcher omitting the current language). Occurrence
+        # alignment is unreliable, so nothing is rewritten.
+        from collections import Counter
+
+        source = '<span class="l">Français</span><span class="l">Italiano</span>'
+        targets = {("span", "l", "", 0): "English", ("span", "l", "", 1): "Français"}
+        template_counts = Counter({("span", "l", ""): 3})
+        rewriter = SlotRewriter(source, targets, template_counts)
+        result = rewriter.rewrite()
+
+        self.assertEqual(result, source)
+        self.assertEqual(rewriter.rewritten, set())
+        self.assertEqual(rewriter.structural, set(targets))
+
+    def test_matching_counts_allow_alignment(self):
+        from collections import Counter
+
+        source = '<span class="l">Old</span><span class="l">Keep</span>'
+        targets = {("span", "l", "", 0): "New"}
+        template_counts = Counter({("span", "l", ""): 2})
+        rewriter = SlotRewriter(source, targets, template_counts)
+        result = rewriter.rewrite()
+
+        self.assertEqual(result, '<span class="l">New</span><span class="l">Keep</span>')
+        self.assertEqual(rewriter.rewritten, {("span", "l", "", 0)})
+
     def test_occurrence_index_skips_void_children(self):
         source = '<p class="a">one<img/></p><p class="a">two</p>'
         result, rw = rewrite(source, {("p", "a", "", 1): "TWO"})

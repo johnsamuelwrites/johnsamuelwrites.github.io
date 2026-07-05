@@ -52,3 +52,43 @@ Repository-wide discovery is available through
 hand-written list. Pairing rules, content extraction, abstract authoring, and
 collection cutover remain incremental implementation stages; the registry
 does not pretend that unpaired legacy pages have already been migrated.
+
+## Direct Wikibase bot
+
+The generated QuickStatements can be validated and written directly through
+the MediaWiki API. Validation is the default and does not require credentials:
+
+```bash
+python3 src/main/wikibase_write.py \
+  src/main/abstract/missing-label-updates.quickstatements
+```
+
+Create a dedicated bot password in the Wikibase user preferences, copy
+`.env.example` to the ignored `.env`, fill in the two values, and explicitly
+enable writes:
+
+```bash
+python3 src/main/wikibase_write.py \
+  src/main/abstract/missing-label-updates.quickstatements --apply
+```
+
+The writer supports the commands generated in this repository: `CREATE`,
+`LAST`, labels, descriptions, aliases, item-valued claims, strings, URLs,
+external IDs, Commons media, and monolingual text. It discovers property
+datatypes before writing. A sibling `.state.json` file makes a stopped import
+resumable; do not delete it until the batch has been checked. Use `--limit 1`
+for a first live test. `.env` is ignored by Git and should have mode `0600`.
+Environment values supplied by a secret manager or CI override `.env`. Avoid
+putting passwords on command lines, in committed files, or in the normal
+account password field; rotate the bot password if it is ever exposed.
+
+Fetch selected entities or a complete item/property backup:
+
+```bash
+python3 src/main/wikibase_fetch.py --entity Q315 --entity Q3190 \
+  --output /tmp/entities.json
+python3 src/main/wikibase_fetch.py --all --output /tmp/wikibase.json
+```
+
+Both commands default to the repository's Wikibase Cloud instance. Use
+`--api https://example.org/w/api.php` for another Wikibase.

@@ -17,11 +17,11 @@ from pathlib import Path
 HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE.parent))
 
-from abstract.css_assets import DEFAULT_REPO_ROOT
+from abstract.css_assets import DEFAULT_DATA_DIR, DEFAULT_REPO_ROOT
 from abstract.prepare_missing_content import alternate_pages, page_sources
 from abstract.prepare_travel_content import LANGUAGES, content_bindings, quote, slots
 
-DEFAULT_DATA = DEFAULT_REPO_ROOT.parent / "Q42761025" / "data"
+DEFAULT_DATA = DEFAULT_DATA_DIR
 DEFAULT_TRANSLATIONS = HERE / "missing-label-translations.csv"
 DEFAULT_QUICKSTATEMENTS = HERE / "missing-label-updates.quickstatements"
 API = "https://jsamwrites.wikibase.cloud/w/api.php"
