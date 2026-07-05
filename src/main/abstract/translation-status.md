@@ -5,6 +5,32 @@ Status checked: 4 July 2026, using the refreshed
 
 Supported languages are `en`, `fr`, `ml`, `pa`, `hi`, `pt`, `es`, and `it`.
 
+## Update — 5 July 2026: remaining truncated items
+
+- The eight research/CV items `Q6284`, `Q7486`, `Q7602`, `Q7845`, `Q7846`,
+  `Q7855`, `Q7856`, and `Q7858` are now composed paragraphs in Wikibase.
+- `Q4045` is also composed from two ordered sentences (`Q7942`/`Q7943`), fixing
+  its stale `T0204 travel content` English label and the truncated French,
+  Spanish, and Italian renderings. Its eight language pages now contain the full
+  P40 text and pass `render_abstract --check`.
+- No bound atomic `Q3185` item now has a label of 250 characters or more in the
+  canonical label store.
+- The research items cannot all be flattened into plain rendered text: e.g.
+  `Q7845` contains the inline Detailed CV link where its P40 has `()`, and the
+  long citations similarly interleave author/title links. They need structured
+  inline composition (or a renderer that preserves the linked nodes), not a
+  destructive single-string substitution.
+- `render_page --check` reports zero rewrites and zero pages skipped for missing
+  labels. It still diagnoses structurally unplaced slots; those must be merged
+  into their corresponding Q315 containers rather than emitted as a separate
+  recovery section.
+- After removing the rejected recovery sections, the honest round-trip baseline
+  is again **214 mismatching language-page pairs**.
+- Inline-composed research/CV values now preserve their existing bold titles and
+  anchors while replacing the multilingual text around them. Both Q3636 and
+  Q3646 pass scoped `render_abstract --check`. The focused regression suite
+  passes (32 tests).
+
 ## Update — 5 July 2026: rendering, structural repair, and a corrupt export
 
 The round-trip is now driven from Q315 by three tools, and the label source has

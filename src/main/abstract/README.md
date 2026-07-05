@@ -86,8 +86,8 @@ python3 src/main/abstract/verify_content_roundtrip.py
 ```
 
 Both renderers take `--page QID` to scope to a single page. `verify_content_roundtrip.py`
-is the completion gate; residual mismatches are structural (index pages that need
-regeneration), not missing translations.
+is the completion gate; residual mismatches are structural and must be placed
+inside their corresponding canonical containers, not appended elsewhere.
 
 ## Direct Wikibase bot
 

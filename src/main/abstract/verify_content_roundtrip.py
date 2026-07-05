@@ -95,7 +95,10 @@ def verify(
                 ) or (
                     kind == "data-entity" and itemtype == "Q3185"
                 )
-                value = row.get(language, "").strip()
+                # DirectTextSlots normalizes all HTML whitespace (including
+                # non-breaking spaces), so normalize labels identically before
+                # comparing the canonical expectation with rendered text.
+                value = " ".join(row.get(language, "").split())
                 if not value or wrong_type:
                     unresolved.append(
                         {
