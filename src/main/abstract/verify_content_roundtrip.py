@@ -7,6 +7,7 @@ import argparse
 import csv
 import json
 import sys
+import unicodedata
 from collections import Counter
 from html.parser import HTMLParser
 from pathlib import Path
@@ -27,10 +28,42 @@ DEFAULT_REPORT = HERE / "content-roundtrip.json"
 # by a hard-coded QID.
 COMPOSED_RESULT_ITEMTYPES = frozenset({"Q3835"})
 
+# Typographic variants that render identically but differ by code point. A
+# content round-trip checks whether the *visible text* is reproducible, so these
+# are folded to a single representative on both the label and page-text sides
+# before comparison.
+TYPOGRAPHIC_FOLDS = {
+    "’": "'",  # right single quote
+    "‘": "'",  # left single quote
+    "‛": "'",  # single high-reversed-9 quote
+    "′": "'",  # prime
+    "“": '"',  # left double quote
+    "”": '"',  # right double quote
+    "„": '"',  # low double quote
+    "″": '"',  # double prime
+    "—": "-",  # em dash
+    "–": "-",  # en dash
+    "−": "-",  # minus sign
+    "…": "...",  # ellipsis
+    " ": " ",  # non-breaking space
+}
+_TYPOGRAPHIC_TABLE = {ord(key): value for key, value in TYPOGRAPHIC_FOLDS.items()}
+
 
 def canonical_value(value: str) -> str:
     """Decode the CSV export representation and normalize visible whitespace."""
-    return " ".join(value.replace('\\"', '"').split())
+    return normalize_text(value.replace('\\"', '"'))
+
+
+def normalize_text(value: str) -> str:
+    """Fold typographic variants and collapse whitespace for text equivalence.
+
+    Applied identically to abstract labels and to rendered page text so that
+    typographic-only differences (curly vs straight quotes, em dash vs hyphen,
+    non-breaking spaces) are not reported as content drift.
+    """
+    folded = unicodedata.normalize("NFC", value).translate(_TYPOGRAPHIC_TABLE)
+    return " ".join(folded.split())
 
 
 class Bindings(HTMLParser):
@@ -84,7 +117,9 @@ def verify(
         page_bindings = bindings(abstract)
         targets = alternate_pages(repo_root, abstract)
         for language, target in zip(LANGUAGES, targets):
-            available = Counter(slots(target).values())
+            available = Counter(
+                normalize_text(value) for value in slots(target).values()
+            )
             missing = []
             unresolved = []
             expected = Counter()

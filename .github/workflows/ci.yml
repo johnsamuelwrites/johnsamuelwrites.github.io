@@ -51,9 +51,14 @@ jobs:
         run: python src/main/abstract/repair_structure.py --check
 
       - name: Check Q315 round-trip has no regressions
+        # Ratchet: only ever lower this budget as page-language pairs are made
+        # reproducible from their abstract bindings. It reaches 0 when every
+        # rendered page round-trips. Lowered 214 -> 70 after Q3640 (books) was
+        # aligned across all 8 languages; -> 68 after the es Teaching
+        # ("Enseñanza") pages were reconciled.
         run: |
           python src/main/abstract/verify_content_roundtrip.py \
-            --max-mismatches 214 \
+            --max-mismatches 68 \
             --report "${RUNNER_TEMP}/q315-content-roundtrip.json"
 
       - name: Check every Q315 page has one language-switcher footer
