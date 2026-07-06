@@ -42,6 +42,11 @@ def main() -> int:
     parser.add_argument("--repo-root", type=Path, default=DEFAULT_REPO_ROOT)
     parser.add_argument("--review", type=Path, default=DEFAULT_REVIEW)
     parser.add_argument("--check", action="store_true")
+    parser.add_argument(
+        "--replace-existing",
+        action="store_true",
+        help="replace an existing local data-content binding at reviewed slots",
+    )
     args = parser.parse_args()
     root = args.repo_root.resolve()
     try:
@@ -51,7 +56,13 @@ def main() -> int:
         return 1
     changed = 0
     for relative, bindings in pages.items():
-        _, output, errors = bind_page(root, relative.stem, relative, bindings)
+        _, output, errors = bind_page(
+            root,
+            relative.stem,
+            relative,
+            bindings,
+            replace_existing=args.replace_existing,
+        )
         if errors:
             for error in errors:
                 print(f"ERROR: {error}", file=sys.stderr)

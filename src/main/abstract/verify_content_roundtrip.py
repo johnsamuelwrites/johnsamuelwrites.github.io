@@ -28,6 +28,11 @@ DEFAULT_REPORT = HERE / "content-roundtrip.json"
 COMPOSED_RESULT_ITEMTYPES = frozenset({"Q3835"})
 
 
+def canonical_value(value: str) -> str:
+    """Decode the CSV export representation and normalize visible whitespace."""
+    return " ".join(value.replace('\\"', '"').split())
+
+
 class Bindings(HTMLParser):
     def __init__(self) -> None:
         super().__init__()
@@ -98,7 +103,7 @@ def verify(
                 # DirectTextSlots normalizes all HTML whitespace (including
                 # non-breaking spaces), so normalize labels identically before
                 # comparing the canonical expectation with rendered text.
-                value = " ".join(row.get(language, "").split())
+                value = canonical_value(row.get(language, ""))
                 if not value or wrong_type:
                     unresolved.append(
                         {

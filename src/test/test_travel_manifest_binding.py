@@ -106,6 +106,35 @@ class TravelManifestBindingTests(unittest.TestCase):
             self.assertEqual(errors, [])
             self.assertEqual(output, '<p data-content="local:Q4013">Q4013</p>')
 
+    def test_existing_binding_requires_explicit_replacement_opt_in(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            page = root / "page.html"
+            page.write_text(
+                '<p data-content="local:Q1">Q1</p>',
+                encoding="utf-8",
+            )
+            binding = {("p", "", "", 0): "Q2"}
+
+            _, unchanged, errors = bind_page(
+                root, "Q1", Path("page.html"), binding
+            )
+            _, replaced, replacement_errors = bind_page(
+                root,
+                "Q1",
+                Path("page.html"),
+                binding,
+                replace_existing=True,
+            )
+
+            self.assertEqual(unchanged, page.read_text(encoding="utf-8"))
+            self.assertTrue(errors)
+            self.assertEqual(replacement_errors, [])
+            self.assertEqual(
+                replaced,
+                '<p data-content="local:Q2">Q2</p>',
+            )
+
 
 if __name__ == "__main__":
     unittest.main()

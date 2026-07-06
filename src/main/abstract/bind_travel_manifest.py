@@ -47,11 +47,13 @@ class StartTagBinder(HTMLParser):
         source: str,
         page: str,
         bindings: dict[tuple[str, str, str, int], str],
+        replace_existing: bool = False,
     ) -> None:
         super().__init__(convert_charrefs=False)
         self.source = source
         self.page = page
         self.bindings = bindings
+        self.replace_existing = replace_existing
         self.counts: Counter[tuple[str, str, str]] = Counter()
         self.cursor = 0
         self.insertions: list[tuple[int, str]] = []
@@ -123,7 +125,7 @@ class StartTagBinder(HTMLParser):
         content_start = start + len(start_tag)
         if existing:
             if existing.group("value") != expected:
-                if existing.group("value") in self.owned_values:
+                if self.replace_existing or existing.group("value") in self.owned_values:
                     self.replacements.append(
                         (
                             start + existing.start(),
@@ -189,10 +191,11 @@ def bind_page(
     page: str,
     relative: Path,
     bindings: dict[tuple[str, str, str, int], str],
+    replace_existing: bool = False,
 ) -> tuple[Path, str, list[str]]:
     path = repo_root / relative
     source = path.read_text(encoding="utf-8")
-    parser = StartTagBinder(source, page, bindings)
+    parser = StartTagBinder(source, page, bindings, replace_existing)
     parser.feed(source)
     parser.close()
     if parser.errors:
