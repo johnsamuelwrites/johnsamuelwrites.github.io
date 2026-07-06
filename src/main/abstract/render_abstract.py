@@ -333,6 +333,7 @@ def render(
 
     rendered_pages = 0
     changed: list[str] = []
+    errors: list[str] = []
     for row in sorted(rows, key=lambda row: row["page_qid"]):
         paragraphs = composed_paragraphs(repo_root / row["abstract_path"])
         if items:
@@ -354,12 +355,20 @@ def render(
             if row[f"target_{language}"]
         ]
         for paragraph in paragraphs:
-            resolved = resolver.paragraph(paragraph.item)
+            try:
+                resolved = resolver.paragraph(paragraph.item)
+            except (ValueError, KeyError) as error:
+                errors.append(f"{row['page_qid']} {paragraph.item}: {error}")
+                continue
             occurrence_hint: int | None = None
             for language, relative in targets:
                 path = repo_root / relative
                 source = path.read_text(encoding="utf-8")
-                value = runtime.evaluate(resolver.call(resolved, language))
+                try:
+                    value = runtime.evaluate(resolver.call(resolved, language))
+                except (ValueError, KeyError) as error:
+                    errors.append(f"{relative} ({language}) {paragraph.item}: {error}")
+                    continue
                 entity = resolver.entities[paragraph.item]
                 previous_values = [
                     entity.get("labels", {}).get(language, {}).get("value", "")
@@ -380,9 +389,12 @@ def render(
                         occurrence_hint,
                     )
                 except ValueError as error:
-                    raise ValueError(
-                        f"{relative} ({language}): {error}"
-                    ) from error
+                    # A single page that cannot be located must not abort the
+                    # whole batch: record it and keep rendering the rest, so one
+                    # un-migrated legacy page does not block every composed
+                    # paragraph across the site.
+                    errors.append(f"{relative} ({language}): {error}")
+                    continue
                 if updated != source:
                     changed.append(relative)
                     if not check:
@@ -408,13 +420,17 @@ def render(
                     )
         rendered_pages += 1
 
+    for message in errors:
+        print(f"UNPLACED {message}", file=sys.stderr)
     if check and changed:
         for relative in changed:
             print(f"STALE: {relative}")
-        return 1
     action = "Validated" if check else "Rendered"
-    print(f"{action} composed paragraphs for {rendered_pages} abstract page(s)")
-    return 0
+    print(
+        f"{action} composed paragraphs for {rendered_pages} abstract page(s); "
+        f"{len(errors)} paragraph(s) could not be placed"
+    )
+    return 1 if (errors or (check and changed)) else 0
 
 
 def main(argv: Sequence[str] | None = None) -> int:
