@@ -6,6 +6,7 @@ import sys
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "main"))
 
+from config import ALLOWED_UNREFERENCED_HTML_FILES, EXCLUDED_DIRECTORIES
 from html_generator import HTMLTranslator
 from manifest import BuildManifest, fingerprint_paths
 from metadata import update_metadata_content
@@ -33,6 +34,12 @@ class StaticSiteToolTests(unittest.TestCase):
 
     def test_search_index_path_uses_language_root(self):
         self.assertEqual(search_index_path("en"), REPO_ROOT / "en" / "search-index.json")
+
+    def test_default_site_check_exclusions_skip_tooling_and_known_entrypoints(self):
+        self.assertIn("src", EXCLUDED_DIRECTORIES)
+        self.assertIn("ui", EXCLUDED_DIRECTORIES)
+        self.assertIn("404.html", ALLOWED_UNREFERENCED_HTML_FILES)
+        self.assertIn("license.html", ALLOWED_UNREFERENCED_HTML_FILES)
 
     def test_update_metadata_content_inserts_jsonld(self):
         existing_repo_file = REPO_ROOT / "index.html"

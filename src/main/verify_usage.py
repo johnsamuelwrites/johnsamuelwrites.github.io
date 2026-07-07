@@ -11,7 +11,7 @@ from pathlib import Path
 from html.parser import HTMLParser
 from typing import Dict, Set, List, Iterable
 
-from config import EXCLUDED_DIRECTORIES
+from config import ALLOWED_UNREFERENCED_HTML_FILES, EXCLUDED_DIRECTORIES
 from links import collect_html_files
 
 
@@ -211,7 +211,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--exclude-files",
         nargs="*",
-        default=[],
+        default=list(ALLOWED_UNREFERENCED_HTML_FILES),
         help="HTML files (names or root-relative paths) to exclude.",
     )
     parser.add_argument(

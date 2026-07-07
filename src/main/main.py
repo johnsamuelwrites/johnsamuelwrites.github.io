@@ -15,7 +15,7 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Iterable
 
-from config import EXCLUDED_DIRECTORIES
+from config import ALLOWED_UNREFERENCED_HTML_FILES, EXCLUDED_DIRECTORIES
 
 @dataclass(frozen=True)
 class CommandSpec:
@@ -152,7 +152,14 @@ def run_builtin_command(command_name: str, forwarded_args: list[str]) -> int | N
             for argument in ("--exclude-dir", exclude_dir)
         ]
         links_args = ["--recursive", "--no-external", *exclude_args, "."]
-        verify_args = [".", "--exclude-dirs", *EXCLUDED_DIRECTORIES, "--json-report"]
+        verify_args = [
+            ".",
+            "--exclude-dirs",
+            *EXCLUDED_DIRECTORIES,
+            "--exclude-files",
+            *ALLOWED_UNREFERENCED_HTML_FILES,
+            "--json-report",
+        ]
         if parsed.json_report_dir:
             report_dir = Path(parsed.json_report_dir)
             report_dir.mkdir(parents=True, exist_ok=True)
