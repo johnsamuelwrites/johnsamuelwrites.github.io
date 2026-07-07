@@ -27,9 +27,9 @@
                 <a href="./index.html" class="nav-brand">Q42761025</a>
                 <ul class="nav-menu">
                     <li><a href="Q3636/index.html" data-content="local:Q4180">Q4180</a></li>
-                    <li><a href="../en/teaching/index.html" data-content="local:Q4181">Q4181</a></li>
+                    <li><a href="Q7945/index.html" data-content="local:Q4181">Q4181</a></li>
                     <li><a href="Q3638/index.html" data-content="local:Q4050">Q4050</a></li>
-                    <li><a href="../en/linguistics/index.html" data-content="local:Q3650">Q3650</a></li>
+                    <li><a href="Q7947/index.html" data-content="local:Q3650">Q3650</a></li>
                     <li><a href="Q3062/index.html">Q3062</a></li>
                     <li><a href="Q3647.html">Q3647</a></li>
                 </ul>
@@ -55,9 +55,9 @@
                     <button class="filter-btn" data-category="teaching" data-content="local:Q4181">Q4181</button>
                     <button class="filter-btn" data-category="writings" data-content="local:Q4050">Q4050</button>
                     <button class="filter-btn" data-category="linguistics" data-content="local:Q3650">Q3650</button>
-                    <button class="filter-btn" data-category="photography" data-content="local:Q3190">Q3190</button>
                     <button class="filter-btn" data-category="travel">Q3062</button>
-                    <button class="filter-btn" data-category="blog" data-content="local:Q4169">Q4169</button>
+                    <button class="filter-btn" data-category="general">Q3667</button>
+                    <button class="filter-btn" data-category="search">Q3647</button>
                 </div>
             </div>
 
@@ -79,22 +79,16 @@
 
 
         <script>
-            // Simple client-side search implementation
-            // This will be enhanced when we generate a proper search index
-
             let searchData = [];
             let currentCategory = 'all';
 
             // Initialize search
             async function initSearch() {
                 try {
-                    // Try to load search index
                     const response = await fetch('./search-index.json');
                     if (response.ok) {
                         searchData = await response.json();
                     } else {
-                        // Fallback to basic crawling if index doesn't exist
-                        console.log('Search index not found. Using basic search.');
                         searchData = await generateBasicIndex();
                     }
                 } catch (error) {
@@ -103,17 +97,16 @@
                 }
             }
 
-            // Generate basic index by crawling known pages
             async function generateBasicIndex() {
                 const pages = [
-                    { url: './about.html', title: 'About', category: 'general' },
-                    { url: './blog.html', title: 'Blog', category: 'blog' },
-                    { url: './research/index.html', title: 'Research', category: 'research' },
-                    { url: './teaching/index.html', title: 'Teaching', category: 'teaching' },
-                    { url: './writings/index.html', title: 'Writings', category: 'writings' },
-                    { url: './linguistics/index.html', title: 'Linguistics', category: 'linguistics' },
-                    { url: './travel/index.html', title: 'Travel', category: 'travel' },
-                    { url: './photography/countries.html', title: 'Countries I Visited', category: 'photography' },
+                    { qid: 'Q315', url: './index.html', title: 'Q315', category: 'general' },
+                    { qid: 'Q3633', url: './Q3633.html', title: 'Q3633', category: 'general' },
+                    { qid: 'Q3634', url: './Q3634.html', title: 'Q3634', category: 'writings' },
+                    { qid: 'Q3636', url: './Q3636/index.html', title: 'Q3636', category: 'research' },
+                    { qid: 'Q3638', url: './Q3638/index.html', title: 'Q3638', category: 'writings' },
+                    { qid: 'Q7945', url: './Q7945/index.html', title: 'Q7945', category: 'teaching' },
+                    { qid: 'Q7947', url: './Q7947/index.html', title: 'Q7947', category: 'linguistics' },
+                    { qid: 'Q3062', url: './Q3062/index.html', title: 'Q3062', category: 'travel' },
                 ];
                 return pages;
             }
@@ -134,22 +127,29 @@
                     }
 
                     // Search in title and content
-                    const searchText = `${item.title} ${item.content || ''} ${item.url}`.toLowerCase();
+                    const searchText = `${item.qid || ''} ${item.title} ${item.content || ''} ${item.url}`.toLowerCase();
                     return searchTerms.every(term => searchText.includes(term));
                 });
 
                 // Sort by relevance (title matches first)
                 results.sort((a, b) => {
-                    const aTitle = a.title.toLowerCase();
-                    const bTitle = b.title.toLowerCase();
-                    const aScore = searchTerms.reduce((score, term) =>
-                        score + (aTitle.includes(term) ? 10 : 1), 0);
-                    const bScore = searchTerms.reduce((score, term) =>
-                        score + (bTitle.includes(term) ? 10 : 1), 0);
-                    return bScore - aScore;
+                    return relevanceScore(b, searchTerms) - relevanceScore(a, searchTerms);
                 });
 
                 displayResults(results, query);
+            }
+
+            function relevanceScore(item, searchTerms) {
+                const qid = (item.qid || '').toLowerCase();
+                const title = item.title.toLowerCase();
+                const url = item.url.toLowerCase();
+                return searchTerms.reduce((score, term) => {
+                    if (qid === term) return score + 100;
+                    if (qid.includes(term)) return score + 50;
+                    if (title.includes(term)) return score + 20;
+                    if (url.includes(term)) return score + 10;
+                    return score + 1;
+                }, 0);
             }
 
             // Display results
@@ -175,20 +175,22 @@
                     return;
                 }
 
-                stats.innerHTML = `Found ${results.length} result${results.length !== 1 ? 's' : ''} for "${query}"`;
+                stats.textContent = `Found ${results.length} result${results.length !== 1 ? 's' : ''} for "${query}"`;
 
                 container.innerHTML = results.map(result => {
                     const excerpt = getExcerpt(result.content || result.title, query);
                     const categoryLabel = result.category || 'general';
+                    const qid = result.qid ? `<span class="result-qid">${escapeHtml(result.qid)}</span>` : '';
 
                     return `
                     <div class="result-card">
-                        <span class="result-category">${categoryLabel}</span>
+                        <span class="result-category">${escapeHtml(categoryLabel)}</span>
+                        ${qid}
                         <h2 class="result-title">
-                            <a href="${result.url}">${highlightText(result.title, query)}</a>
+                            <a href="${escapeHtml(result.url)}">${highlightText(result.title, query)}</a>
                         </h2>
                         <p class="result-excerpt">${excerpt}</p>
-                        <a href="${result.url}" class="result-url">${result.url} →</a>
+                        <a href="${escapeHtml(result.url)}" class="result-url">${escapeHtml(result.url)} →</a>
                     </div>
                 `;
                 }).join('');
@@ -196,9 +198,9 @@
 
             // Highlight search terms
             function highlightText(text, query) {
-                if (!query) return text;
+                if (!query) return escapeHtml(text);
                 const terms = query.split(/\s+/);
-                let highlighted = text;
+                let highlighted = escapeHtml(text);
                 terms.forEach(term => {
                     const regex = new RegExp(`(${escapeRegex(term)})`, 'gi');
                     highlighted = highlighted.replace(regex, '<mark>$1</mark>');
@@ -241,6 +243,16 @@
             // Escape regex special characters
             function escapeRegex(string) {
                 return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+            }
+
+            function escapeHtml(string) {
+                return String(string).replace(/[&<>"']/g, character => ({
+                    '&': '&amp;',
+                    '<': '&lt;',
+                    '>': '&gt;',
+                    '"': '&quot;',
+                    "'": '&#39;'
+                }[character]));
             }
 
             // Event listeners

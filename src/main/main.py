@@ -37,6 +37,12 @@ COMMANDS: tuple[CommandSpec, ...] = (
         "Generate search indexes for all supported languages.",
         ("build_all_search_indexes",),
     ),
+    CommandSpec(
+        "build-q315-indexes",
+        "build_q315_indexes.py",
+        "Generate Q315 page registry and search index.",
+        ("build_q315_indexes",),
+    ),
     CommandSpec("check", "", "Run the default static-site validation workflow."),
     CommandSpec("check-db", "check_db.py", "Inspect translation path mappings.", ("check_db",)),
     CommandSpec("ci-internal-links", "ci_internal_links.py", "Run CI internal-link checks.", ("ci_internal_links",)),
@@ -176,7 +182,7 @@ def run_builtin_command(command_name: str, forwarded_args: list[str]) -> int | N
     if command_name == "build":
         parser = argparse.ArgumentParser(
             prog="python src/main/main.py build",
-            description="Run the default static-site build: blog, search indexes, and overview.",
+            description="Run the default static-site build: blog, search indexes, Q315 indexes, and overview.",
         )
         parser.add_argument(
             "--force",
@@ -200,6 +206,7 @@ def run_builtin_command(command_name: str, forwarded_args: list[str]) -> int | N
             (
                 ("blog.py", blog_args),
                 ("build-all-search-indexes.py", search_args),
+                ("build_q315_indexes.py", []),
                 ("generate_overview.py", overview_args),
             )
         )

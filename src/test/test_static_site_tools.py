@@ -7,6 +7,7 @@ import sys
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "main"))
 
 from config import ALLOWED_UNREFERENCED_HTML_FILES, EXCLUDED_DIRECTORIES
+from build_q315_indexes import collect_q315_pages, load_english_labels
 from html_generator import HTMLTranslator
 from manifest import BuildManifest, fingerprint_paths
 from metadata import update_metadata_content
@@ -40,6 +41,15 @@ class StaticSiteToolTests(unittest.TestCase):
         self.assertIn("ui", EXCLUDED_DIRECTORIES)
         self.assertIn("404.html", ALLOWED_UNREFERENCED_HTML_FILES)
         self.assertIn("license.html", ALLOWED_UNREFERENCED_HTML_FILES)
+
+    def test_q315_index_uses_wikibase_labels_and_qid_routes(self):
+        labels = load_english_labels()
+        pages = {page.qid: page for page in collect_q315_pages(labels=labels)}
+
+        self.assertIn("Q3639", pages)
+        self.assertEqual(pages["Q3639"].title, "Quotes")
+        self.assertEqual(pages["Q3639"].url, "Q3638/Q3639.html")
+        self.assertNotIn("../en/", pages["Q3639"].url)
 
     def test_update_metadata_content_inserts_jsonld(self):
         existing_repo_file = REPO_ROOT / "index.html"
