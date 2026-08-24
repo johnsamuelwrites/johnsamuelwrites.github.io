@@ -97,6 +97,20 @@ class AbstractBindingParser(HTMLParser):
                 break
 
 
+class ClassedTagCounter(HTMLParser):
+    """Count classed structural elements used as page-level visual scaffolding."""
+
+    def __init__(self) -> None:
+        super().__init__()
+        self.counts: dict[tuple[str, str], int] = {}
+
+    def handle_starttag(self, tag, attrs) -> None:
+        values = dict(attrs)
+        for css_class in (values.get("class") or "").split():
+            key = (tag, css_class)
+            self.counts[key] = self.counts.get(key, 0) + 1
+
+
 def load_labels(data_dir: Path) -> dict[str, dict[str, str]]:
     with (data_dir / "labels-wikibase.csv").open(
         encoding="utf-8-sig", newline=""
@@ -108,6 +122,12 @@ def abstract_slots(path: Path) -> list[BoundSlot]:
     parser = AbstractBindingParser()
     parser.feed(path.read_text(encoding="utf-8"))
     return parser.slots
+
+
+def classed_tag_counts(path: Path) -> dict[tuple[str, str], int]:
+    parser = ClassedTagCounter()
+    parser.feed(path.read_text(encoding="utf-8"))
+    return parser.counts
 
 
 def _class_tokens(value: str) -> set[str]:
@@ -223,9 +243,50 @@ def bare_parentheses_errors(repo_root: Path, page: str = "") -> list[str]:
     return errors
 
 
+STRUCTURAL_PARITY_KEYS = ((("svg", "hero-svg"), "hero SVG"),)
+
+
+def structural_parity_errors(repo_root: Path, page: str = "") -> list[str]:
+    """Check static visual structure that text round-trip cannot see."""
+    errors: list[str] = []
+    rows = [
+        row
+        for row in discover(repo_root)
+        if row["abstract_path"] and (not page or row["page_qid"] == page)
+    ]
+    if page and not rows:
+        raise ValueError(f"no abstract page declares QID {page}")
+    for row in rows:
+        abstract_path = repo_root / row["abstract_path"]
+        expected = classed_tag_counts(abstract_path)
+        for language in LANGUAGES:
+            relative = row.get(f"target_{language}") or ""
+            if not relative:
+                continue
+            target = repo_root / relative
+            if not target.is_file():
+                continue
+            actual = classed_tag_counts(target)
+            for key, label in STRUCTURAL_PARITY_KEYS:
+                expected_count = expected.get(key, 0)
+                if expected_count == 0:
+                    continue
+                actual_count = actual.get(key, 0)
+                if actual_count != expected_count:
+                    tag, css_class = key
+                    errors.append(
+                        f"{relative}: {label} count differs from "
+                        f"{row['abstract_path']} ({tag}.{css_class}: "
+                        f"expected {expected_count}, found {actual_count})"
+                    )
+    return errors
+
+
 def validate(repo_root: Path, data_dir: Path, page: str = "") -> list[str]:
-    return untranslated_label_errors(repo_root, data_dir, page) + bare_parentheses_errors(
-        repo_root, page
+    return (
+        untranslated_label_errors(repo_root, data_dir, page)
+        + bare_parentheses_errors(repo_root, page)
+        + structural_parity_errors(repo_root, page)
     )
 
 

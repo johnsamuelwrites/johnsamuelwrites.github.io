@@ -1,9 +1,12 @@
 import sys
+import tempfile
 import unittest
 from pathlib import Path
+from unittest.mock import patch
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "main"))
 
+from abstract import validate_rendered_pages as guard
 from abstract.validate_rendered_pages import BoundSlot, is_prose_slot, visible_text
 
 
@@ -37,6 +40,33 @@ class VisibleTextTests(unittest.TestCase):
 
     def test_bare_parentheses_remain_visible(self):
         self.assertIn("()", visible_text("collaboration. ()"))
+
+
+class StructuralParityTests(unittest.TestCase):
+    def test_reports_missing_hero_svg_from_rendered_language_page(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            (root / "Q315").mkdir()
+            (root / "Q315" / "page.html").write_text(
+                '<section><svg class="hero-svg"></svg></section>',
+                encoding="utf-8",
+            )
+            (root / "ml.html").write_text("<section></section>", encoding="utf-8")
+            rows = [
+                {
+                    "page_qid": "QTEST",
+                    "abstract_path": "Q315/page.html",
+                    "target_ml": "ml.html",
+                }
+            ]
+
+            with patch.object(guard, "discover", return_value=rows), patch.object(
+                guard, "LANGUAGES", ("ml",)
+            ):
+                errors = guard.structural_parity_errors(root, "QTEST")
+
+        self.assertEqual(1, len(errors))
+        self.assertIn("hero SVG count differs", errors[0])
 
 
 if __name__ == "__main__":

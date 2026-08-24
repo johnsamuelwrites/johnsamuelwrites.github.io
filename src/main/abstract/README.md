@@ -88,7 +88,8 @@ python3 src/main/abstract/verify_content_roundtrip.py
 
 Both renderers and `validate_rendered_pages.py` take `--page QID` to scope to a
 single page. `validate_rendered_pages.py` catches untranslated prose labels in
-translated pages and bare `()` placeholders in Q315-owned rendered content.
+translated pages, bare `()` placeholders in Q315-owned rendered content, and
+static visual drift such as a rendered language page losing a Q315 hero SVG.
 `verify_content_roundtrip.py` is the completion gate; residual mismatches are
 structural and must be placed inside their corresponding canonical containers,
 not appended elsewhere.
