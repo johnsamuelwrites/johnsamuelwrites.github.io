@@ -70,6 +70,17 @@ INSTANCE_OF_PROPERTY = "P8"
 WIKIDATA_ITEM_PROPERTY = "P4"
 MONOLINGUAL_CONTENT_PROPERTY = "P40"
 CONTENT_RENDER_FUNCTION = "Q4182"
+TRAILING_URL_RE = re.compile(r"(?:,\s*|\s+)(https?://[^\s<]+)\s*$")
+LINK_TEXT = {
+    "en": "Link",
+    "fr": "Lien",
+    "ml": "ലിങ്ക്",
+    "pa": "ਲਿੰਕ",
+    "hi": "लिंक",
+    "pt": "Link",
+    "es": "Enlace",
+    "it": "Collegamento",
+}
 
 
 @dataclass(frozen=True)
@@ -2014,7 +2025,22 @@ def build_q315_cv_entry_html(row: ContentRow) -> str:
 
 def build_cv_entry_html(row: ContentRow, language: str) -> str:
     attrs = q315_binding_attrs(row)
-    return f'<p class="conference"{attrs}>{esc(cv_content(row, language))}</p>'
+    return f'<p class="conference"{attrs}>{cv_content_html(row, language)}</p>'
+
+
+def cv_content_html(row: ContentRow, language: str) -> str:
+    content = cv_content(row, language)
+    match = TRAILING_URL_RE.search(content)
+    href = ""
+    if match:
+        href = match.group(1)
+        content = content[:match.start()].rstrip(" ,")
+    title, separator, rest = content.partition(",")
+    title_html = f"<b>{esc(title.strip())}</b>" if title.strip() else ""
+    body_html = f"{title_html}{esc(separator + rest)}"
+    if href:
+        body_html += f' (<a href="{esc(href)}">{esc(LINK_TEXT.get(language, "Link"))}</a>)'
+    return body_html
 
 
 def cv_year_heading_html(row: ContentRow, *, q315: bool = False, language: str = "en") -> str:

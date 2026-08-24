@@ -8,6 +8,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "main"))
 
 from abstract import validate_rendered_pages as guard
 from abstract.validate_rendered_pages import BoundSlot, is_prose_slot, visible_text
+from abstract.verify_content_roundtrip import rendered_bound_values, rendered_equivalent_values
 
 
 class ProseSlotTests(unittest.TestCase):
@@ -67,6 +68,32 @@ class StructuralParityTests(unittest.TestCase):
 
         self.assertEqual(1, len(errors))
         self.assertIn("hero SVG count differs", errors[0])
+
+
+class RoundTripRenderedTextTests(unittest.TestCase):
+    def test_rendered_bound_text_includes_inline_markup(self):
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "page.html"
+            path.write_text(
+                '<p data-q315-source="local:Q1"><b>Title</b>, Author</p>',
+                encoding="utf-8",
+            )
+
+            self.assertEqual(["Title, Author"], rendered_bound_values(path))
+
+    def test_rendered_equivalent_values_accepts_link_label(self):
+        self.assertIn(
+            "Title, Author, Venue, 2026 (Link)",
+            rendered_equivalent_values(
+                "Title, Author, Venue, 2026, https://example.org/paper"
+            ),
+        )
+        self.assertIn(
+            "Title, Author, Venue, 2026 (Lien)",
+            rendered_equivalent_values(
+                "Title, Author, Venue, 2026, https://example.org/paper"
+            ),
+        )
 
 
 if __name__ == "__main__":

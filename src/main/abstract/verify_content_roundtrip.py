@@ -6,6 +6,7 @@ from __future__ import annotations
 import argparse
 import csv
 import json
+import re
 import sys
 import unicodedata
 from collections import Counter
@@ -48,6 +49,8 @@ TYPOGRAPHIC_FOLDS = {
     " ": " ",  # non-breaking space
 }
 _TYPOGRAPHIC_TABLE = {ord(key): value for key, value in TYPOGRAPHIC_FOLDS.items()}
+TRAILING_URL_RE = re.compile(r"(?:,\s*|\s+)(https?://\S+)\s*$")
+LINK_TEXTS = ("Link", "Lien", "ലിങ്ക്", "ਲਿੰਕ", "लिंक", "Enlace", "Collegamento")
 
 
 def canonical_value(value: str) -> str:
@@ -64,6 +67,20 @@ def normalize_text(value: str) -> str:
     """
     folded = unicodedata.normalize("NFC", value).translate(_TYPOGRAPHIC_TABLE)
     return " ".join(folded.split())
+
+
+def rendered_equivalent_values(value: str) -> set[str]:
+    """Return visible-text forms equivalent to a source label.
+
+    CV labels store the concrete URL in Wikibase, while rendered CV pages use
+    the long-standing visible convention ``(<a>Link</a>)``.
+    """
+    result = {value}
+    match = TRAILING_URL_RE.search(value)
+    if match:
+        prefix = value[:match.start()].rstrip(" ,")
+        result.update(f"{prefix} ({link_text})" for link_text in LINK_TEXTS)
+    return result
 
 
 class Bindings(HTMLParser):
@@ -88,6 +105,36 @@ class Bindings(HTMLParser):
             self.call_depth -= 1
 
 
+class RenderedBoundText(HTMLParser):
+    """Collect visible text inside rendered Q315-owned elements."""
+
+    def __init__(self) -> None:
+        super().__init__(convert_charrefs=True)
+        self.stack: list[tuple[bool, list[str]]] = []
+        self.values: list[str] = []
+
+    def handle_starttag(self, tag, attrs) -> None:
+        values = dict(attrs)
+        starts_bound = (values.get("data-q315-source") or "").startswith("local:")
+        active = starts_bound or bool(self.stack and self.stack[-1][0])
+        self.stack.append((active, []))
+
+    def handle_endtag(self, tag) -> None:
+        if not self.stack:
+            return
+        active, parts = self.stack.pop()
+        text = normalize_text("".join(parts))
+        if active and text:
+            if self.stack and self.stack[-1][0]:
+                self.stack[-1][1].append(text)
+            else:
+                self.values.append(text)
+
+    def handle_data(self, data) -> None:
+        if self.stack and self.stack[-1][0]:
+            self.stack[-1][1].append(data)
+
+
 def labels(data_dir: Path) -> dict[str, dict[str, str]]:
     result = {}
     with (data_dir / "labels-wikibase.csv").open(
@@ -102,6 +149,12 @@ def bindings(path: Path) -> list[tuple[str, str]]:
     parser = Bindings()
     parser.feed(path.read_text(encoding="utf-8"))
     return parser.qids
+
+
+def rendered_bound_values(path: Path) -> list[str]:
+    parser = RenderedBoundText()
+    parser.feed(path.read_text(encoding="utf-8"))
+    return parser.values
 
 
 def verify(
@@ -120,6 +173,7 @@ def verify(
             available = Counter(
                 normalize_text(value) for value in slots(target).values()
             )
+            available.update(rendered_bound_values(target))
             missing = []
             unresolved = []
             expected = Counter()
@@ -151,12 +205,13 @@ def verify(
                 else:
                     expected[value] += 1
             for value, count in expected.items():
-                if available[value] < count:
+                found = max(available[equivalent] for equivalent in rendered_equivalent_values(value))
+                if found < count:
                     missing.append(
                         {
                             "text": value,
                             "expected": count,
-                            "found": available[value],
+                            "found": found,
                         }
                     )
             entry = {

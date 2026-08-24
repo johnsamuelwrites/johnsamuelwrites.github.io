@@ -20,6 +20,7 @@ from content_update import (
     content_texts_for_wikibase,
     read_rows,
     render_content,
+    render_cv_text,
     render_q315_family,
     render_q315_content,
     render_q315_cv_text,
@@ -305,6 +306,53 @@ class ContentUpdateTests(unittest.TestCase):
         self.assertIn('data-q315-source="local:Q4304"', updated)
         self.assertIn('data-q315-parts="local:Q4634 local:Q4635"', updated)
         self.assertIn('data-q315-source="local:Q6323"', updated)
+
+    def test_cv_render_formats_title_and_trailing_url(self):
+        row = ContentRow(
+            family="cv",
+            row_number=2,
+            data={
+                "type": "CVEntry",
+                "section": "journals",
+                "year": "2026",
+                "content": (
+                    "Example Article, Alice Example, Journal Name, 2026, "
+                    "https://doi.org/10.0000/example"
+                ),
+                "local_qid": "Q9000",
+            },
+        )
+        html = '<section id="journals"><h3>Journals</h3></section>'
+
+        updated, added, skipped, repaired = render_cv_text(html, [row], "en")
+
+        self.assertEqual(added, 1)
+        self.assertEqual(skipped, 0)
+        self.assertEqual(repaired, 0)
+        self.assertIn("<b>Example Article</b>, Alice Example", updated)
+        self.assertIn(
+            '2026 (<a href="https://doi.org/10.0000/example">Link</a>)',
+            updated,
+        )
+        self.assertIn('data-q315-source="local:Q9000"', updated)
+
+    def test_cv_render_localizes_link_text(self):
+        row = ContentRow(
+            family="cv",
+            row_number=2,
+            data={
+                "type": "CVEntry",
+                "section": "journals",
+                "year": "2026",
+                "content": "Example Article, Alice Example, 2026, https://example.org",
+                "local_qid": "Q9000",
+            },
+        )
+        html = '<section id="journals"><h3>Journals</h3></section>'
+
+        updated, _added, _skipped, _repaired = render_cv_text(html, [row], "fr")
+
+        self.assertIn('(<a href="https://example.org">Lien</a>)', updated)
 
     def test_q315_ordered_list_appends_local_qid_entry(self):
         row = ContentRow(

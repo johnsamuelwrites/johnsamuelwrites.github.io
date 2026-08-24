@@ -110,6 +110,17 @@ def fetch(ids: list[str], pause: float) -> dict[str, dict[str, str]]:
             # (rendered by render_abstract) and never overwrite it with a label.
             composed = next((value for value in p8 if value in COMPOSED_TYPES), "")
             itemtype = composed or (p8[0] if p8 else "")
+            p40 = {}
+            for claim in entity.get("claims", {}).get("P40", []):
+                value = claim.get("mainsnak", {}).get("datavalue", {}).get("value", {})
+                language = value.get("language", "")
+                text = value.get("text", "")
+                if language in labels and text:
+                    p40[language] = text
+            for language, text in p40.items():
+                label = labels.get(language, "")
+                if not label or label.endswith("..."):
+                    labels[language] = text
             result[qid] = {"identifier": qid, "itemtype": itemtype, **labels}
         if pause:
             time.sleep(pause)
