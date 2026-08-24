@@ -34,6 +34,7 @@ from abstract.prepare_travel_content import LANGUAGES
 
 # Autonyms shown on each button, matching the site's existing switchers.
 LANGUAGE_NAMES = {
+    "q315": "Q315",
     "en": "English",
     "fr": "Français",
     "ml": "മലയാളം",
@@ -43,6 +44,7 @@ LANGUAGE_NAMES = {
     "es": "Español",
     "it": "Italiano",
 }
+SWITCHER_LINKS = ("q315", *LANGUAGES)
 
 # Rules a page's resolved CSS must provide for the button switcher to render as
 # designed. Checked textually against the page and its linked stylesheets.
@@ -89,16 +91,18 @@ def render_buttons(
 ) -> str:
     """Render the ``lang-btn`` anchors (no wrapping ``lang-selector``)."""
     lines: list[str] = []
-    for language in LANGUAGES:
+    for language in SWITCHER_LINKS:
         target = group.get(language)
         if not target:
             continue
         href = os.path.relpath(repo_root / target, page.parent).replace(os.sep, "/")
         classes = "lang-btn active" if language == current else "lang-btn"
         name = html.escape(LANGUAGE_NAMES[language])
+        hreflang = "x-default" if language == "q315" else language
+        lang = "zxx" if language == "q315" else language
         lines.append(
             f'{indent}<a class="{classes}" href="{html.escape(href)}" '
-            f'hreflang="{language}" lang="{language}">{name}</a>'
+            f'hreflang="{hreflang}" lang="{lang}">{name}</a>'
         )
     return "\n".join(lines)
 
@@ -229,7 +233,13 @@ def normalize(
 ) -> tuple[str, bool]:
     """Return ``(new_text, changed)`` for a single page."""
     original = page.read_text(encoding="utf-8")
+    return normalize_text(repo_root, page, current, group, original)
 
+
+def normalize_text(
+    repo_root: Path, page: Path, current: str, group: dict[str, str], original: str
+) -> tuple[str, bool]:
+    """Return ``(new_text, changed)`` for supplied page text."""
     planted = _plant_placeholder(original)
     if planted is None:
         return original, False
@@ -267,11 +277,18 @@ def _targets(row: dict[str, str]) -> list[tuple[str, str, str]]:
     perspective (the template is built from the English page) and written once.
     """
     group = {
+        "q315": row["abstract_path"],
+        **{
         language: row[f"target_{language}"]
         for language in LANGUAGES
         if row[f"target_{language}"]
+        },
     }
-    return group, [(language, language, relative) for language, relative in group.items()]
+    return group, [
+        (language, language, row[f"target_{language}"])
+        for language in LANGUAGES
+        if row[f"target_{language}"]
+    ]
 
 
 def run(
@@ -284,8 +301,8 @@ def run(
         if templates:
             # The abstract template carries the same footer that its language
             # pages do; keep it consistent so a regeneration cannot reintroduce
-            # the old switcher. Rendered from the "en" perspective.
-            pages = [("en", "en", row["abstract_path"])] if row["abstract_path"] else []
+            # the old switcher. Rendered from the Q315 perspective.
+            pages = [("q315", "q315", row["abstract_path"])] if row["abstract_path"] else []
         for current, _, relative in pages:
             page = repo_root / relative
             if not page.is_file():

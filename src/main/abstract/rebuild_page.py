@@ -20,6 +20,7 @@ sys.path.insert(0, str(HERE.parent))
 
 from abstract.css_assets import DEFAULT_DATA_DIR, DEFAULT_REPO_ROOT
 from abstract.discover_content_migration import discover
+from abstract.normalize_language_footer import normalize_text
 from abstract.prepare_travel_content import LANGUAGES, TEXT_TAGS
 from abstract.render_page import GENERATOR_META
 
@@ -277,6 +278,21 @@ def rebuild(repo_root: Path, data_dir: Path, page: str, language: str, check: bo
         abstract_path=abstract_path,
         target_path=target_path,
         abstract_targets=concrete_target_map(rows, language),
+    )
+    group = {
+        "q315": row["abstract_path"],
+        **{
+            target_language: row[f"target_{target_language}"]
+            for target_language in LANGUAGES
+            if row[f"target_{target_language}"]
+        },
+    }
+    output, _ = normalize_text(
+        repo_root,
+        repo_root / target_path,
+        language,
+        group,
+        output,
     )
     current = (repo_root / target_path).read_text(encoding="utf-8")
     if output == current:

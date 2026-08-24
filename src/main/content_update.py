@@ -292,11 +292,16 @@ def read_rows(family: FamilyConfig, csv_path: Path) -> list[ContentRow]:
         reader = csv.DictReader(handle)
         if not reader.fieldnames:
             raise ContentUpdateError(f"{csv_path}: missing CSV header")
-        rows = [
-            ContentRow(family=family.name, row_number=index, data=_clean_row(row))
-            for index, row in enumerate(reader, start=2)
-            if any(value.strip() for value in row.values() if value)
-        ]
+        rows = []
+        for index, row in enumerate(reader, start=2):
+            if row.get(None):
+                raise ContentUpdateError(
+                    f"{csv_path}: line {index}: too many CSV fields"
+                )
+            if any(value.strip() for value in row.values() if value):
+                rows.append(
+                    ContentRow(family=family.name, row_number=index, data=_clean_row(row))
+                )
 
     validate_rows(family, rows, csv_path)
     return rows
@@ -325,11 +330,16 @@ def read_rows_with_header(family: FamilyConfig, csv_path: Path) -> tuple[list[st
         reader = csv.DictReader(handle)
         if not reader.fieldnames:
             raise ContentUpdateError(f"{csv_path}: missing CSV header")
-        rows = [
-            ContentRow(family=family.name, row_number=index, data=_clean_row(row))
-            for index, row in enumerate(reader, start=2)
-            if any(value.strip() for value in row.values() if value)
-        ]
+        rows = []
+        for index, row in enumerate(reader, start=2):
+            if row.get(None):
+                raise ContentUpdateError(
+                    f"{csv_path}: line {index}: too many CSV fields"
+                )
+            if any(value.strip() for value in row.values() if value):
+                rows.append(
+                    ContentRow(family=family.name, row_number=index, data=_clean_row(row))
+                )
     validate_rows(family, rows, csv_path)
     return list(reader.fieldnames), rows
 
@@ -920,6 +930,7 @@ def find_photography_grid(soup: BeautifulSoup, row: ContentRow) -> Tag | None:
             sibling = heading.find_next(["div", "section"], class_=re.compile(r"(gallery|photo)-grid"))
             if isinstance(sibling, Tag):
                 return sibling
+        return None
     links = soup.find("div", class_="links")
     if isinstance(links, Tag):
         linked_list = links.find("ul")

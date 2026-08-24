@@ -1,5 +1,6 @@
 import unittest
 import html as html_lib
+import tempfile
 from pathlib import Path
 
 import sys
@@ -16,6 +17,7 @@ from content_update import (
     build_wikibase_content_item_data,
     build_wikibase_repair_data,
     canonical_wikidata_url,
+    read_rows,
     render_content,
     render_q315_family,
     render_q315_content,
@@ -428,6 +430,40 @@ class ContentUpdateTests(unittest.TestCase):
         self.assertIn('data-q315-source="local:Q5000"', updated)
         self.assertIn('src="https://example.org/bridge.jpg"', updated)
         self.assertIn("Lyon", updated)
+
+    def test_photography_page_rejects_missing_section(self):
+        row = ContentRow(
+            family="photographies",
+            row_number=2,
+            data={
+                "type": "Photograph",
+                "page": "en/photography/bridges.html",
+                "section": "Italy",
+                "title": "A new bridge",
+                "src": "https://example.org/bridge.jpg",
+            },
+        )
+        html = """
+        <html><body>
+            <h3 class="country-title">France</h3>
+            <div class="gallery-grid"></div>
+        </body></html>
+        """
+
+        with self.assertRaises(ContentUpdateError):
+            render_photography_page(html, [row], "en")
+
+    def test_csv_rows_reject_extra_fields(self):
+        with tempfile.TemporaryDirectory() as directory:
+            csv_path = Path(directory) / "photographies.csv"
+            csv_path.write_text(
+                "id,type,page,section,title,alt,src,href,location,year,card_class,data_location,local_qid\n"
+                ",Photograph,en/photography/example.html,France,Title,,https://example.org/a.jpg,,,,photo-card,,,Photograph\n",
+                encoding="utf-8",
+            )
+
+            with self.assertRaises(ContentUpdateError):
+                read_rows(FAMILIES["photographies"], csv_path)
 
     def test_photography_page_clones_q315_links_card(self):
         row = ContentRow(

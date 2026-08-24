@@ -33,7 +33,7 @@ from pathlib import Path
 from typing import Sequence
 from urllib.parse import unquote, urlsplit
 
-_LANGPAGE_ID = re.compile(r"([a-z]{2})page$")
+_LANGPAGE_ID = re.compile(r"((?:[a-z]{2}|q315))page$")
 # Classes that mark the current language in a langlist switcher.
 _CURRENT_CLASSES = {"highlight", "active"}
 
@@ -43,6 +43,8 @@ sys.path.insert(0, str(HERE.parent))
 from abstract.css_assets import DEFAULT_REPO_ROOT
 from abstract.discover_content_migration import EXTERNALLY_GENERATED_INDEXES, discover
 from abstract.prepare_travel_content import LANGUAGES
+
+SWITCHER_LINKS = ("q315", *LANGUAGES)
 
 
 @dataclass
@@ -222,9 +224,12 @@ def verify(repo_root: Path, page_qid: str = "") -> list[PageResult]:
     results: list[PageResult] = []
     for row in sorted(rows, key=lambda row: row["page_qid"]):
         group = {
+            "q315": row["abstract_path"],
+            **{
             language: row[f"target_{language}"]
             for language in LANGUAGES
             if row[f"target_{language}"]
+            },
         }
         for language, relative in group.items():
             if not (repo_root / relative).is_file():

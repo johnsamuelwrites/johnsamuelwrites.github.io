@@ -14,6 +14,7 @@ from abstract.verify_language_footer import FooterParser, verify_page
 
 
 GROUP = {
+    "q315": "Q315/Q10.html",
     "en": "en/teaching/index.html",
     "fr": "fr/enseignement/index.html",
     "it": "it/insegnamento/index.html",
@@ -51,6 +52,8 @@ def _write(directory: Path, relative: str, text: str) -> Path:
 LANGLIST_FOOTER = """<!doctype html><html><body>
   <footer>
    <ul class="language-grid" id="langlist">
+    <li id="q315page"><span lang="zxx"><a class="langlink"
+       href="../../Q315/Q10.html"><span>Q315</span></a></span></li>
     <li class="highlight" id="enpage"><span lang="en"><a class="langlink"
        href="../../en/teaching/index.html"><span>English</span></a></span></li>
     <li id="frpage"><span lang="fr"><a class="langlink"
@@ -80,8 +83,8 @@ class FooterParserTests(unittest.TestCase):
         self.assertEqual(parser.language_switcher_count, 0)
         self.assertEqual(len(parser.switchers), 1)
         links = parser.switchers[0]
-        self.assertEqual([link.language for link in links], ["en", "fr", "it"])
-        self.assertEqual([link.active for link in links], [True, False, False])
+        self.assertEqual([link.language for link in links], ["q315", "en", "fr", "it"])
+        self.assertEqual([link.active for link in links], [False, True, False, False])
 
 
 class NormalizeTests(unittest.TestCase):
@@ -96,9 +99,10 @@ class NormalizeTests(unittest.TestCase):
             self.assertTrue(changed)
             self.assertNotIn("language-switcher", text)
             # One button per group language, current language active.
-            self.assertEqual(text.count('class="lang-btn"'), 2)
+            self.assertEqual(text.count('class="lang-btn"'), 3)
             self.assertEqual(text.count('class="lang-btn active"'), 1)
             self.assertIn('class="lang-btn active" href="index.html"', text)
+            self.assertIn('href="../../Q315/Q10.html"', text)
             # Copyright content is preserved.
             self.assertIn("John Samuel", text)
 
@@ -120,6 +124,7 @@ class NormalizeTests(unittest.TestCase):
             selector = render_selector(root, page, "it", GROUP, "     ")
             self.assertIn('href="index.html"', selector)
             self.assertIn('href="../../en/teaching/index.html"', selector)
+            self.assertIn('href="../../Q315/Q10.html"', selector)
 
 
 class VerifierTests(unittest.TestCase):
