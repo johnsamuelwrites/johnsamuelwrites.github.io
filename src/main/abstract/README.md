@@ -82,12 +82,16 @@ store at `src/main/abstract/data/labels-wikibase.csv` (the default `--data-dir`)
 python3 src/main/abstract/render_page.py --check      # dry run
 python3 src/main/abstract/render_page.py
 python3 src/main/abstract/repair_structure.py
+python3 src/main/abstract/validate_rendered_pages.py
 python3 src/main/abstract/verify_content_roundtrip.py
 ```
 
-Both renderers take `--page QID` to scope to a single page. `verify_content_roundtrip.py`
-is the completion gate; residual mismatches are structural and must be placed
-inside their corresponding canonical containers, not appended elsewhere.
+Both renderers and `validate_rendered_pages.py` take `--page QID` to scope to a
+single page. `validate_rendered_pages.py` catches untranslated prose labels in
+translated pages and bare `()` placeholders in Q315-owned rendered content.
+`verify_content_roundtrip.py` is the completion gate; residual mismatches are
+structural and must be placed inside their corresponding canonical containers,
+not appended elsewhere.
 CI runs both renderers in `--check` mode and rejects any increase over the
 documented 214-pair structural round-trip baseline. It also validates every
 HTML document below `Q315/`; passing a directory to `validate_abstract_html.py`

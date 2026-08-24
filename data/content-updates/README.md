@@ -16,11 +16,12 @@ python3 src/main/content_update.py --family books --mode q315-apply
 ```
 
 For Q315-driven pages, render the bound language-page slots after applying the
-Q315 source change, then verify round-trip equivalence. Example for the detailed
-CV:
+Q315 source change, then run the rendered-page guard and verify round-trip
+equivalence. Example for the detailed CV:
 
 ```sh
 python3 src/main/abstract/render_page.py --page Q3646
+python3 src/main/abstract/validate_rendered_pages.py --page Q3646
 python3 src/main/abstract/verify_content_roundtrip.py --page Q3646
 ```
 
@@ -95,6 +96,7 @@ The canonical multilingual photography/travel workflow is:
 python3 src/main/abstract/prepare_travel_content.py
 python3 src/main/abstract/bind_travel_manifest.py
 python3 src/main/abstract/render_page.py --check
+python3 src/main/abstract/validate_rendered_pages.py
 python3 src/main/abstract/verify_content_roundtrip.py
 ```
 
@@ -114,6 +116,7 @@ python3 src/main/content_update.py --family cv --mode wikibase-plan
 python3 src/main/content_update.py --family cv --mode wikibase-apply --allow-create
 python3 src/main/content_update.py --family cv --mode q315-apply
 python3 src/main/abstract/render_page.py --page Q3646
+python3 src/main/abstract/validate_rendered_pages.py --page Q3646
 python3 src/main/abstract/verify_content_roundtrip.py --page Q3646
 ```
 
