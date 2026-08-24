@@ -157,6 +157,9 @@ def _structured_markup(
     if prefix_match:
         prefix = prefix_match.group("prefix").strip()
         remainder = remainder[prefix_match.end():]
+        prefix_text = _normalized_text(prefix)
+        if prefix_text and _normalized_text(text).startswith(prefix_text):
+            prefix = ""
     anchors = re.findall(r"<a\b[^>]*>.*?</a>", remainder, re.DOTALL | re.IGNORECASE)
     rendered = html.escape(text)
     for anchor in anchors:

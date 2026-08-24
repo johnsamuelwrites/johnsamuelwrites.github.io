@@ -81,6 +81,16 @@ LINK_TEXT = {
     "es": "Enlace",
     "it": "Collegamento",
 }
+CV_SIMPLE_PATHS = {
+    "en": "en/research/index.html",
+    "fr": "fr/recherche/index.html",
+    "ml": "ml/ഗവേഷണം/index.html",
+    "pa": "pa/ਖੋਜ/index.html",
+    "hi": "hi/अनुसंधान/index.html",
+    "pt": "pt/pesquisa/index.html",
+    "es": "es/investigación/index.html",
+    "it": "it/ricerca/index.html",
+}
 
 
 @dataclass(frozen=True)
@@ -476,6 +486,7 @@ def default_fieldnames(family: FamilyConfig) -> list[str]:
             "year_qid",
             "content",
             "simple_content",
+            "part_qids",
             "wikidata_url",
             "local_qid",
             "simple_local_qid",
@@ -765,6 +776,14 @@ def validate_rows(family: FamilyConfig, rows: list[ContentRow], csv_path: Path) 
         for page in photography_target_pages(rows):
             if not (REPO_ROOT / page).exists():
                 errors.append(f"missing target page: {page}")
+    elif family.name == "cv":
+        for target in family.targets():
+            if not target.path.exists():
+                errors.append(f"missing target page: {to_repo_relative(target.path)}")
+        for relative_path in CV_SIMPLE_PATHS.values():
+            path = REPO_ROOT / relative_path
+            if not path.exists():
+                errors.append(f"missing target page: {to_repo_relative(path)}")
     else:
         for target in family.targets():
             if not target.path.exists():
@@ -778,6 +797,8 @@ def validate_rows(family: FamilyConfig, rows: list[ContentRow], csv_path: Path) 
 def render_family(family: FamilyConfig, rows: list[ContentRow], *, apply: bool) -> list[PageChange]:
     if family.name == "photographies":
         return render_photography_family(rows, apply=apply)
+    if family.name == "cv":
+        return render_cv_family(rows, apply=apply)
     changes = []
     for target in family.targets():
         original = target.path.read_text(encoding="utf-8")
@@ -793,6 +814,56 @@ def render_family(family: FamilyConfig, rows: list[ContentRow], *, apply: bool) 
                 family=family.name,
                 path=target.path,
                 language=target.language,
+                added=added,
+                skipped=skipped,
+                repaired=repaired,
+                changed=changed,
+            )
+        )
+    return changes
+
+
+def render_cv_family(rows: list[ContentRow], *, apply: bool) -> list[PageChange]:
+    changes = []
+    detailed_rows = [row for row in rows if cv_targets(row) & {"detailed"}]
+    simple_rows = [row for row in rows if cv_targets(row) & {"simple"}]
+
+    for target in FAMILIES["cv"].targets():
+        original = target.path.read_text(encoding="utf-8")
+        try:
+            updated, added, skipped, repaired = render_cv_text(original, detailed_rows, target.language)
+        except ContentUpdateError as exc:
+            raise ContentUpdateError(f"{to_repo_relative(target.path)}: {exc}") from exc
+        changed = updated != original
+        if apply and changed:
+            rewrite_text_file(target.path, lambda _content, updated=updated: updated)
+        changes.append(
+            PageChange(
+                family="cv",
+                path=target.path,
+                language=target.language,
+                added=added,
+                skipped=skipped,
+                repaired=repaired,
+                changed=changed,
+            )
+        )
+
+    for language, relative_path in CV_SIMPLE_PATHS.items():
+        path = REPO_ROOT / relative_path
+        original = path.read_text(encoding="utf-8")
+        try:
+            updated, added, skipped, repaired = render_cv_simple_text(original, simple_rows, language)
+        except ContentUpdateError as exc:
+            raise ContentUpdateError(f"{to_repo_relative(path)}: {exc}") from exc
+        changed = updated != original
+        if apply and changed:
+            rewrite_text_file(path, lambda _content, updated=updated: updated)
+        changes.append(
+            PageChange(
+                family="cv",
+                path=path,
+                language=language,
                 added=added,
                 skipped=skipped,
                 repaired=repaired,
@@ -1872,10 +1943,48 @@ def render_q315_cv_simple_text(
         grid_open_start, grid_open_end, grid_close_start, _grid_close_end = grid_bounds
         grid_inner = updated[grid_open_end:grid_close_start]
         block = build_q315_cv_simple_card_html(row)
-        replacement = insert_block(grid_inner, r"\s*<div\b[^>]*class=[\"'][^\"']*bento-card[^\"']*[\"'][\s\S]*?</div>", block, False)
+        replacement = insert_cv_simple_card(grid_inner, row, block)
         updated = updated[:grid_open_end] + replacement + updated[grid_close_start:]
         added += 1
     return updated, added, skipped, repaired
+
+
+def render_cv_simple_text(
+    html_content: str,
+    rows: list[ContentRow],
+    language: str,
+) -> tuple[str, int, int, int]:
+    updated = html_content
+    added = 0
+    skipped = 0
+    repaired = 0
+    for row in rows:
+        if cv_simple_entry_exists(updated, row, language=language):
+            skipped += 1
+            continue
+        simple_qid = cv_simple_local_qid(row)
+        if not simple_qid:
+            raise ContentUpdateError(f"cv:{row.row_number}: simple_local_qid is required for simple CV updates")
+        grid_bounds = find_cv_simple_grid_bounds(updated, row)
+        if not grid_bounds:
+            raise ContentUpdateError(
+                f"cv:{row.row_number}: simple CV section not found: {row.data.get('section', '').strip()}"
+            )
+        _grid_open_start, grid_open_end, grid_close_start, _grid_close_end = grid_bounds
+        grid_inner = updated[grid_open_end:grid_close_start]
+        block = build_cv_simple_card_html(row, language)
+        replacement = insert_cv_simple_card(grid_inner, row, block)
+        updated = updated[:grid_open_end] + replacement + updated[grid_close_start:]
+        added += 1
+    return updated, added, skipped, repaired
+
+
+def cv_simple_entry_exists(html_content: str, row: ContentRow, *, language: str) -> bool:
+    simple_qid = cv_simple_local_qid(row)
+    if simple_qid and re.search(rf"\blocal:{re.escape(simple_qid)}\b|\b{re.escape(simple_qid)}\b", html_content):
+        return True
+    expected = normalize_text(cv_simple_content(row, language))
+    return bool(expected and normalize_text(strip_tags(html_content)).find(expected) >= 0)
 
 
 def find_cv_simple_grid_bounds(html_content: str, row: ContentRow) -> tuple[int, int, int, int] | None:
@@ -1898,14 +2007,51 @@ def find_cv_simple_grid_bounds(html_content: str, row: ContentRow) -> tuple[int,
 
 
 def build_q315_cv_simple_card_html(row: ContentRow) -> str:
+    body = q315_cv_content_html(
+        "p",
+        "",
+        cv_simple_local_qid(row),
+        split_qids(row.data.get("part_qids", "")),
+    )
     return "\n".join(
         [
             '<div class="bento-card">',
             f'    <h3>{esc(cv_year_key(row))}</h3>',
-            f'    <p data-content="local:{esc(cv_simple_local_qid(row))}">{esc(cv_simple_local_qid(row))}</p>',
+            indent_block(body, "    "),
             "</div>",
         ]
     )
+
+
+def build_cv_simple_card_html(row: ContentRow, language: str) -> str:
+    simple_qid = cv_simple_local_qid(row)
+    attrs = q315_source_attrs(simple_qid)
+    body = f'<p{attrs}>{cv_content_html(row, language, content=cv_simple_content(row, language))}</p>'
+    return "\n".join(
+        [
+            '<div class="bento-card">',
+            f'    <h3><span class="year-badge">{esc(cv_year_value(row, language=language))}</span></h3>',
+            indent_block(body, "    "),
+            "</div>",
+        ]
+    )
+
+
+def insert_cv_simple_card(grid_inner: str, row: ContentRow, block: str) -> str:
+    card_pattern = r"\s*<div\b[^>]*class=[\"'][^\"']*bento-card[^\"']*[\"'][\s\S]*?</div>"
+    new_year_number = cv_year_number(cv_year_value(row)) or cv_year_number(cv_year_key(row))
+    if new_year_number is not None:
+        for match in re.finditer(card_pattern, grid_inner, flags=re.IGNORECASE):
+            heading = re.search(r"<h3\b[^>]*>([\s\S]*?)</h3>", match.group(0), flags=re.IGNORECASE)
+            if not heading:
+                continue
+            existing_year_number = cv_year_number(strip_tags(heading.group(1)).strip())
+            if existing_year_number is not None and existing_year_number < new_year_number:
+                indent_match = re.search(r"\n([ \t]*)<div\b", match.group(0))
+                indent = indent_match.group(1) if indent_match else " " * 16
+                insertion = "\n" + indent_block(block.strip(), indent)
+                return grid_inner[: match.start()] + insertion + grid_inner[match.start() :]
+    return insert_block(grid_inner, card_pattern, block, False)
 
 
 def render_cv_text(
@@ -1989,7 +2135,7 @@ def insert_cv_entry(
 
     for start, open_end, next_start, _block, existing_year in year_blocks:
         if existing_year == year_key or existing_year == year:
-            return section_html[:next_start].rstrip() + entry + section_html[next_start:]
+            return section_html[:next_start] + entry + section_html[next_start:]
 
     heading = "\n" + indent_block(heading_html.strip(), indent) + entry
     new_year_number = cv_year_number(year)
@@ -2020,7 +2166,30 @@ def cv_year_blocks(section_html: str) -> list[tuple[int, int, int, str, str]]:
 
 def build_q315_cv_entry_html(row: ContentRow) -> str:
     ensure_local_qid(row)
-    return f'<p class="conference" data-content="local:{esc(row.local_qid)}">{esc(row.local_qid)}</p>'
+    return q315_cv_content_html("p", "conference", row.local_qid, split_qids(row.data.get("part_qids", "")))
+
+
+def q315_cv_content_html(
+    tag: str,
+    css_class: str,
+    qid: str,
+    part_qids: list[str],
+) -> str:
+    if not part_qids:
+        class_attr = f' class="{esc(css_class)}"' if css_class else ""
+        return f'<{tag}{class_attr} data-content="local:{esc(qid)}">{esc(qid)}</{tag}>'
+    class_attr = f' class="{esc(css_class)}"' if css_class else ""
+    lines = [
+        f'<{tag}{class_attr} data-content="local:{esc(qid)}">',
+        f'    <q-call data-function="local:{CONTENT_RENDER_FUNCTION}">',
+        '        <q-arg data-name="parts">',
+    ]
+    lines.extend(
+        f'            <span data-content="local:{esc(part_qid)}">{esc(part_qid)}</span>'
+        for part_qid in part_qids
+    )
+    lines.extend(['        </q-arg>', '    </q-call>', f'</{tag}>'])
+    return "\n".join(lines)
 
 
 def build_cv_entry_html(row: ContentRow, language: str) -> str:
@@ -2028,13 +2197,18 @@ def build_cv_entry_html(row: ContentRow, language: str) -> str:
     return f'<p class="conference"{attrs}>{cv_content_html(row, language)}</p>'
 
 
-def cv_content_html(row: ContentRow, language: str) -> str:
-    content = cv_content(row, language)
+def cv_content_html(row: ContentRow, language: str, *, content: str | None = None) -> str:
+    content = cv_content(row, language) if content is None else content
     match = TRAILING_URL_RE.search(content)
     href = ""
     if match:
         href = match.group(1)
         content = content[:match.start()].rstrip(" ,")
+    if split_qids(row.data.get("part_qids", "")):
+        body_html = esc(content)
+        if href:
+            body_html += f' (<a href="{esc(href)}">{esc(LINK_TEXT.get(language, "Link"))}</a>)'
+        return body_html
     title, separator, rest = content.partition(",")
     title_html = f"<b>{esc(title.strip())}</b>" if title.strip() else ""
     body_html = f"{title_html}{esc(separator + rest)}"
@@ -2771,7 +2945,7 @@ def wikibase_content_item_missing_claims(
     entity = client.entities([local_qid]).get(local_qid, {})
     if entity.get("missing"):
         return True
-    if row.family == "quotes" and split_qids(row.data.get("part_qids", "")):
+    if row.family in {"quotes", "cv"} and split_qids(row.data.get("part_qids", "")):
         return False
     claims = entity.get("claims", {})
     if not has_item_claim(claims, INSTANCE_OF_PROPERTY, ABSTRACT_CONTENT_ITEM):

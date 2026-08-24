@@ -102,12 +102,22 @@ python3 src/main/abstract/verify_content_roundtrip.py
 
 ## Detailed CV
 
-`cv.csv` appends entries to `Q315/Q3636/Q3646.html`, the Q315 source for the
-detailed CV. Use `section` for the HTML section id, such as `journals`,
-`conferences`, `preprints`, `postersdemo`, `talks`, or `panels`. Use either
-`year` or `year_qid`; if `year` already exists in the abstract labels, the tool
-finds the local year QID automatically. Use `content` for the CV line and leave
-`local_qid` empty until `wikibase-apply` fills it.
+`cv.csv` appends entries to the Q315 CV sources. Use `target=detailed` for only
+the detailed CV, `target=simple` for only the research index summary, or
+`target=both` for both. Use `section` for the HTML section id, such as
+`journals`, `conferences`, `preprints`, `postersdemo`, `talks`, `panels`, or
+`participation`. The `participation` section is for conferences, seminars, and
+workshops attended. Use either `year` or `year_qid`; if `year` already exists in
+the abstract labels, the tool finds the local year QID automatically. Use
+`content` for the CV line and leave `local_qid` empty until `wikibase-apply`
+fills it.
+
+Example row for an attended conference or workshop:
+
+```csv
+id,type,target,section,year,year_qid,content,simple_content,part_qids,wikidata_url,local_qid,simple_local_qid
+,CVEntry,both,participation,2026,,"Example Conference, City, Country, Jun 2026, https://example.org",,,,,
+```
 
 The common flow is:
 
@@ -124,3 +134,10 @@ Optional columns `content_fr`, `content_ml`, `content_pa`, `content_hi`,
 `content_pt`, `content_es`, and `content_it` may be used for localized CV text.
 When they are empty, the English/canonical `content` value is used for every
 language.
+
+When only part of an entry needs translation, such as a month name or visible
+link text, prefer the existing Q315 composition model over duplicating the whole
+CV line in every `content_<language>` column. Create or reuse fragment content
+items for the translatable parts, bind the composed paragraph item with
+`<q-call data-function="local:Q4182">`, and let the Q315 renderer combine those
+fragments for each language.

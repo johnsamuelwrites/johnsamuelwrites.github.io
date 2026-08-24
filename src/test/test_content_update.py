@@ -20,9 +20,11 @@ from content_update import (
     content_texts_for_wikibase,
     read_rows,
     render_content,
+    render_cv_simple_text,
     render_cv_text,
     render_q315_family,
     render_q315_content,
+    render_q315_cv_simple_text,
     render_q315_cv_text,
     render_photography_page,
     slugify,
@@ -353,6 +355,118 @@ class ContentUpdateTests(unittest.TestCase):
         updated, _added, _skipped, _repaired = render_cv_text(html, [row], "fr")
 
         self.assertIn('(<a href="https://example.org">Lien</a>)', updated)
+
+    def test_cv_render_keeps_composed_part_rows_plain(self):
+        row = ContentRow(
+            family="cv",
+            row_number=2,
+            data={
+                "type": "CVEntry",
+                "section": "participation",
+                "year": "2026",
+                "content": "Wikimania 2026, July 2026, https://example.org/event",
+                "local_qid": "Q8665",
+                "part_qids": "Q8659 Q8661 Q8663 Q8664",
+            },
+        )
+        html = '<section id="participation"><h3>Participation</h3></section>'
+
+        updated, added, skipped, repaired = render_cv_text(html, [row], "en")
+
+        self.assertEqual(added, 1)
+        self.assertEqual(skipped, 0)
+        self.assertEqual(repaired, 0)
+        self.assertIn(
+            'Wikimania 2026, July 2026 (<a href="https://example.org/event">Link</a>)',
+            updated,
+        )
+        self.assertNotIn("<b>Wikimania 2026</b>", updated)
+
+    def test_q315_cv_render_uses_part_qids(self):
+        row = ContentRow(
+            family="cv",
+            row_number=2,
+            data={
+                "type": "CVEntry",
+                "section": "participation",
+                "year": "2026",
+                "content": "Wikimania 2026, July 2026, https://example.org/event",
+                "local_qid": "Q8665",
+                "part_qids": "Q8659 Q8661 Q8663 Q8664",
+            },
+        )
+        html = '<section id="participation"><h3>Participation</h3></section>'
+
+        updated, added, skipped, repaired = render_q315_cv_text(html, [row])
+
+        self.assertEqual(added, 1)
+        self.assertEqual(skipped, 0)
+        self.assertEqual(repaired, 0)
+        self.assertIn('data-content="local:Q8665"', updated)
+        self.assertIn('<q-call data-function="local:Q4182">', updated)
+        self.assertIn('data-content="local:Q8659">Q8659</span>', updated)
+        self.assertIn('data-content="local:Q8661">Q8661</span>', updated)
+
+    def test_q315_cv_simple_render_uses_part_qids(self):
+        row = ContentRow(
+            family="cv",
+            row_number=2,
+            data={
+                "type": "CVEntry",
+                "section": "participation",
+                "year": "2026",
+                "local_qid": "Q8665",
+                "simple_local_qid": "Q8665",
+                "part_qids": "Q8659 Q8661 Q8663 Q8664",
+            },
+        )
+        html = """
+        <div class="section-header" id="participation"><h2>Participation</h2></div>
+        <div class="bento-grid"></div>
+        """
+
+        updated, added, skipped, repaired = render_q315_cv_simple_text(html, [row])
+
+        self.assertEqual(added, 1)
+        self.assertEqual(skipped, 0)
+        self.assertEqual(repaired, 0)
+        self.assertIn('<div class="bento-card">', updated)
+        self.assertIn('data-content="local:Q8665"', updated)
+        self.assertIn('<q-call data-function="local:Q4182">', updated)
+
+    def test_cv_simple_render_uses_q315_binding(self):
+        row = ContentRow(
+            family="cv",
+            row_number=2,
+            data={
+                "type": "CVEntry",
+                "target": "simple",
+                "section": "participation",
+                "year": "2026",
+                "content": "Wikimania 2026, July 2026, https://example.org/event",
+                "local_qid": "Q8665",
+                "simple_local_qid": "Q8665",
+                "part_qids": "Q8659 Q8661 Q8663 Q8664",
+            },
+        )
+        html = """
+        <div class="section-header" id="participation"><h2>Participation</h2></div>
+        <div class="bento-grid">
+            <div class="bento-card">
+                <h3><span class="year-badge">2025</span></h3>
+                <p>Older event</p>
+            </div>
+        </div>
+        """
+
+        updated, added, skipped, repaired = render_cv_simple_text(html, [row], "en")
+
+        self.assertEqual(added, 1)
+        self.assertEqual(skipped, 0)
+        self.assertEqual(repaired, 0)
+        self.assertIn('data-q315-source="local:Q8665"', updated)
+        self.assertLess(updated.index("Wikimania 2026"), updated.index("Older event"))
+        self.assertNotIn("<b>Wikimania 2026</b>", updated)
 
     def test_q315_ordered_list_appends_local_qid_entry(self):
         row = ContentRow(
