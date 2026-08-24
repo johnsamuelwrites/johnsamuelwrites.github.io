@@ -1,0 +1,931 @@
+<!DOCTYPE html>
+<html lang="en">
+
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="shortcut icon" href="../../../../../images/logo/favicon.png" />
+        <title>Flux de travail du pipeline de Deep Learning</title>
+        <style>
+            * {
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
+            }
+
+            :root {
+                /* Neural Network Theme - Light & Scientific */
+                --bg-primary: #fafbfd;
+                --bg-secondary: #f0f4f9;
+                --accent-neural: #6b8cff;
+                --accent-synapse: #4a6edb;
+                --accent-deep: #2d4a8e;
+                --accent-gradient: #8fa3ff;
+                --text-primary: #1a2740;
+                --text-secondary: #4a5a7a;
+                --shadow-neural: rgba(107, 140, 255, 0.15);
+                --shadow-deep: rgba(45, 74, 142, 0.08);
+                --border-light: rgba(107, 140, 255, 0.12);
+            }
+
+            body {
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+                background: var(--bg-primary);
+                color: var(--text-primary);
+                line-height: 1.6;
+                overflow-x: hidden;
+            }
+
+            /* Fixed Navigation */
+            nav {
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                background: rgba(250, 251, 253, 0.85);
+                backdrop-filter: blur(12px);
+                -webkit-backdrop-filter: blur(12px);
+                padding: 1.2rem 3rem;
+                z-index: 1000;
+                border-bottom: 1px solid var(--border-light);
+                box-shadow: 0 2px 20px var(--shadow-deep);
+            }
+
+            .nav-content {
+                max-width: 1400px;
+                margin: 0 auto;
+                display: flex;
+                align-items: center;
+                gap: 1.5rem;
+                font-size: 0.95rem;
+            }
+
+            .nav-name {
+                font-weight: 700;
+                color: var(--accent-deep);
+                font-size: 1.1rem;
+                letter-spacing: -0.01em;
+                text-decoration: none;
+            }
+
+            .nav-separator {
+                color: var(--border-light);
+                font-weight: 300;
+            }
+
+            .nav-section {
+                color: var(--text-secondary);
+                font-weight: 500;
+                text-decoration: none;
+            }
+
+            .nav-link {
+                color: var(--accent-neural);
+                text-decoration: none;
+                padding: 0.4rem 0.8rem;
+                border-radius: 6px;
+                transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            }
+
+            .nav-section a {
+                text-decoration: none;
+            }
+
+            .nav-link:hover {
+                background: rgba(107, 140, 255, 0.08);
+                color: var(--accent-synapse);
+            }
+
+            /* Hero Section */
+            .hero {
+                margin-top: 80px;
+                padding: 6rem 3rem 5rem;
+                background: linear-gradient(135deg, #fafbfd 0%, #f0f4f9 100%);
+                position: relative;
+                overflow: hidden;
+            }
+
+            .hero::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background:
+                    radial-gradient(circle at 20% 30%, rgba(107, 140, 255, 0.05) 0%, transparent 50%),
+                    radial-gradient(circle at 80% 70%, rgba(74, 110, 219, 0.05) 0%, transparent 50%);
+                pointer-events: none;
+            }
+
+            .hero-content {
+                max-width: 1400px;
+                margin: 0 auto;
+                display: grid;
+                grid-template-columns: 1fr 400px;
+                gap: 5rem;
+                align-items: center;
+                position: relative;
+            }
+
+            .hero-text h1 {
+                font-size: 4.5rem;
+                font-weight: 800;
+                line-height: 1.1;
+                letter-spacing: -0.03em;
+                color: var(--accent-deep);
+                margin-bottom: 1.5rem;
+                background: linear-gradient(135deg, var(--accent-deep) 0%, var(--accent-neural) 100%);
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                background-clip: text;
+            }
+
+            .hero-description {
+                font-size: 1.2rem;
+                color: var(--text-secondary);
+                line-height: 1.8;
+                background: rgba(255, 255, 255, 0.6);
+                padding: 2rem;
+                border-radius: 16px;
+                border: 1px solid var(--border-light);
+                box-shadow: 0 4px 20px var(--shadow-deep);
+            }
+
+            /* Animated Neural Network SVG */
+            .hero-visual {
+                display: flex;
+                justify-content: center;
+                align-items: center;
+            }
+
+            .neural-svg {
+                width: 100%;
+                max-width: 400px;
+                height: auto;
+                filter: drop-shadow(0 8px 24px var(--shadow-neural));
+            }
+
+            /* Main Content */
+            main {
+                max-width: 1400px;
+                margin: 0 auto;
+                padding: 4rem 3rem 6rem;
+            }
+
+            .section-title {
+                font-size: 2.5rem;
+                font-weight: 700;
+                color: var(--accent-deep);
+                margin: 4rem 0 3rem;
+                display: flex;
+                align-items: center;
+                gap: 1.5rem;
+                letter-spacing: -0.02em;
+            }
+
+            .section-title::before {
+                content: '';
+                width: 60px;
+                height: 5px;
+                background: linear-gradient(90deg, var(--accent-neural), var(--accent-gradient));
+                border-radius: 10px;
+                animation: pulse-glow 3s ease-in-out infinite;
+            }
+
+            @keyframes pulse-glow {
+
+                0%,
+                100% {
+                    opacity: 1;
+                    transform: scaleX(1);
+                }
+
+                50% {
+                    opacity: 0.6;
+                    transform: scaleX(1.1);
+                }
+            }
+
+            /* Pipeline Grid - Bento Style */
+            .pipeline-grid {
+                display: grid;
+                grid-template-columns: repeat(3, 1fr);
+                gap: 2rem;
+                margin-bottom: 3rem;
+            }
+
+            /* Featured Cards Span Multiple Columns */
+            .pipeline-card.featured {
+                grid-column: span 2;
+            }
+
+            .pipeline-card {
+                background: white;
+                border-radius: 20px;
+                padding: 2.5rem;
+                border: 2px solid var(--border-light);
+                position: relative;
+                overflow: hidden;
+                transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+                box-shadow: 0 4px 12px var(--shadow-deep);
+            }
+
+            .pipeline-card::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background:
+                    repeating-linear-gradient(45deg,
+                        transparent,
+                        transparent 10px,
+                        rgba(107, 140, 255, 0.02) 10px,
+                        rgba(107, 140, 255, 0.02) 20px);
+                opacity: 0;
+                transition: opacity 0.4s ease;
+                pointer-events: none;
+            }
+
+            .pipeline-card:hover::before {
+                opacity: 1;
+            }
+
+            .pipeline-card:hover {
+                transform: translateY(-12px) scale(1.02);
+                box-shadow:
+                    0 12px 40px var(--shadow-neural),
+                    0 6px 20px var(--shadow-deep);
+                border-color: var(--accent-neural);
+            }
+
+            .card-badge {
+                display: inline-block;
+                background: linear-gradient(135deg, var(--accent-neural), var(--accent-gradient));
+                color: white;
+                padding: 0.5rem 1.2rem;
+                border-radius: 20px;
+                font-size: 0.85rem;
+                font-weight: 600;
+                margin-bottom: 1.5rem;
+                letter-spacing: 0.03em;
+                text-transform: uppercase;
+            }
+
+            .card-icon {
+                width: 100px;
+                height: 100px;
+                background: linear-gradient(135deg, rgba(107, 140, 255, 0.1), rgba(143, 163, 255, 0.1));
+                border-radius: 50% 40% 50% 40%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                margin-bottom: 1.5rem;
+                font-size: 3rem;
+                transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+                animation: morph 6s ease-in-out infinite;
+            }
+
+            @keyframes morph {
+
+                0%,
+                100% {
+                    border-radius: 50% 40% 50% 40%;
+                }
+
+                25% {
+                    border-radius: 40% 50% 40% 50%;
+                }
+
+                50% {
+                    border-radius: 50% 50% 40% 40%;
+                }
+
+                75% {
+                    border-radius: 40% 40% 50% 50%;
+                }
+            }
+
+            .pipeline-card:hover .card-icon {
+                transform: scale(1.15) rotate(10deg);
+                background: linear-gradient(135deg, rgba(107, 140, 255, 0.2), rgba(143, 163, 255, 0.2));
+            }
+
+            .card-title {
+                font-size: 1.6rem;
+                font-weight: 700;
+                color: var(--accent-deep);
+                margin-bottom: 1rem;
+                letter-spacing: -0.01em;
+                line-height: 1.3;
+            }
+
+            .card-description {
+                font-size: 1.05rem;
+                color: var(--text-secondary);
+                line-height: 1.7;
+                margin-bottom: 1.5rem;
+            }
+
+            .card-details {
+                list-style: none;
+                padding-left: 0;
+            }
+
+            .card-details li {
+                padding: 0.6rem 0;
+                padding-left: 1.8rem;
+                position: relative;
+                font-size: 0.95rem;
+                color: var(--text-secondary);
+                line-height: 1.6;
+            }
+
+            .card-details li::before {
+                content: '→';
+                position: absolute;
+                left: 0;
+                color: var(--accent-neural);
+                font-weight: 700;
+            }
+
+            /* Advanced Techniques Section */
+            .advanced-grid {
+                display: grid;
+                grid-template-columns: repeat(2, 1fr);
+                gap: 2rem;
+                margin-top: 3rem;
+            }
+
+            .advanced-card {
+                background: linear-gradient(135deg, rgba(107, 140, 255, 0.03), rgba(143, 163, 255, 0.03));
+                border-radius: 16px;
+                padding: 2rem;
+                border: 2px solid var(--border-light);
+                transition: all 0.3s ease;
+            }
+
+            .advanced-card:hover {
+                transform: translateY(-8px);
+                border-color: var(--accent-neural);
+                box-shadow: 0 8px 30px var(--shadow-neural);
+            }
+
+            .advanced-card h3 {
+                font-size: 1.4rem;
+                color: var(--accent-synapse);
+                margin-bottom: 1rem;
+                display: flex;
+                align-items: center;
+                gap: 0.8rem;
+            }
+
+            .advanced-card h3::before {
+                content: '⚡';
+                font-size: 1.6rem;
+            }
+
+            /* Footer */
+            footer {
+                background: var(--bg-secondary);
+                border-top: 2px solid var(--border-light);
+                padding: 3rem;
+                margin-top: 6rem;
+            }
+
+            .footer-content {
+                max-width: 1400px;
+                margin: 0 auto;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                flex-wrap: wrap;
+                gap: 2rem;
+            }
+
+            .language-selector {
+                display: flex;
+                gap: 1rem;
+            }
+
+            .lang-btn {
+                padding: 0.6rem 1.2rem;
+                background: white;
+                border: 2px solid var(--border-light);
+                border-radius: 8px;
+                color: var(--text-secondary);
+                text-decoration: none;
+                font-weight: 500;
+                transition: all 0.3s ease;
+            }
+
+            .lang-btn:hover {
+                background: var(--accent-neural);
+                color: white;
+                border-color: var(--accent-neural);
+                transform: translateY(-2px);
+            }
+
+            .footer-info {
+                color: var(--text-secondary);
+                font-size: 0.95rem;
+            }
+
+            /* Responsive Design */
+            @media (max-width: 1200px) {
+                .pipeline-grid {
+                    grid-template-columns: repeat(2, 1fr);
+                }
+
+                .pipeline-card.featured {
+                    grid-column: span 1;
+                }
+            }
+
+            @media (max-width: 768px) {
+                nav {
+                    padding: 1rem 1.5rem;
+                }
+
+                .nav-content {
+                    flex-direction: column;
+                    align-items: flex-start;
+                    gap: 0.5rem;
+                }
+
+                .hero {
+                    padding: 4rem 1.5rem 3rem;
+                }
+
+                .hero-content {
+                    grid-template-columns: 1fr;
+                    gap: 3rem;
+                }
+
+                .hero-text h1 {
+                    font-size: 2.5rem;
+                }
+
+                .hero-description {
+                    font-size: 1.05rem;
+                    padding: 1.5rem;
+                }
+
+                main {
+                    padding: 2rem 1.5rem 4rem;
+                }
+
+                .section-title {
+                    font-size: 1.8rem;
+                    margin: 3rem 0 2rem;
+                }
+
+                .pipeline-grid,
+                .advanced-grid {
+                    grid-template-columns: 1fr;
+                    gap: 1.5rem;
+                }
+
+                .pipeline-card {
+                    padding: 1.8rem;
+                }
+
+                .card-title {
+                    font-size: 1.3rem;
+                }
+
+                .footer-content {
+                    flex-direction: column;
+                    text-align: center;
+                }
+            }
+
+            /* Accessibility */
+            a:focus,
+            button:focus {
+                outline: 3px solid var(--accent-neural);
+                outline-offset: 2px;
+            }
+        </style>
+    </head>
+
+    <body>
+        <!-- Fixed Navigation -->
+        <nav>
+            <div class="nav-content">
+                <div><a href="../../../../apropos.html" class="nav-name">John Samuel</a></div>
+                <span class="nav-separator">|</span>
+                <a href="../../../../index.html" class="nav-section">Home</a>
+                <span class="nav-separator">|</span>
+                <a href="./index.html" class="nav-section">AI and Deep Learning</a>
+                <a href="#" class="nav-link">Pipeline Workflow</a>
+            </div>
+        </nav>
+
+        <!-- Hero Section -->
+        <section class="hero">
+            <div class="hero-content">
+                <div class="hero-text">
+                    <h1>Pipeline de Deep Learning</h1>
+                    <div class="hero-description">
+                        Un cadre de flux de travail complet pour la construction, l'entraînement et le déploiement de
+                        modèles
+                        d'apprentissage profond dans n'importe quel domaine — de la vision par ordinateur au traitement
+                        du
+                        langage naturel, de l'analyse audio aux systèmes multimodaux. Ce pipeline englobe le cycle de
+                        vie
+                        complet, de la définition du problème jusqu'à la surveillance en production.
+                    </div>
+                </div>
+                <div class="hero-visual">
+                    <svg class="neural-svg" viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg">
+                        <!-- Background Neural Network Pattern -->
+                        <defs>
+                            <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" style="stop-color:#6b8cff;stop-opacity:0.3" />
+                                <stop offset="100%" style="stop-color:#8fa3ff;stop-opacity:0.3" />
+                            </linearGradient>
+                            <linearGradient id="grad2" x1="0%" y1="0%" x2="100%" y2="0%">
+                                <stop offset="0%" style="stop-color:#4a6edb;stop-opacity:0.6" />
+                                <stop offset="100%" style="stop-color:#6b8cff;stop-opacity:0.6" />
+                            </linearGradient>
+                        </defs>
+
+                        <!-- Connection Lines (Synapses) -->
+                        <g opacity="0.3">
+                            <line x1="80" y1="100" x2="200" y2="150" stroke="#6b8cff" stroke-width="2">
+                                <animate attributeName="opacity" values="0.3;0.7;0.3" dur="3s"
+                                    repeatCount="indefinite" />
+                            </line>
+                            <line x1="80" y1="200" x2="200" y2="150" stroke="#6b8cff" stroke-width="2">
+                                <animate attributeName="opacity" values="0.3;0.7;0.3" dur="3.5s"
+                                    repeatCount="indefinite" />
+                            </line>
+                            <line x1="80" y1="300" x2="200" y2="250" stroke="#6b8cff" stroke-width="2">
+                                <animate attributeName="opacity" values="0.3;0.7;0.3" dur="4s"
+                                    repeatCount="indefinite" />
+                            </line>
+                            <line x1="200" y1="150" x2="320" y2="200" stroke="#4a6edb" stroke-width="2">
+                                <animate attributeName="opacity" values="0.3;0.7;0.3" dur="3.2s"
+                                    repeatCount="indefinite" />
+                            </line>
+                            <line x1="200" y1="250" x2="320" y2="200" stroke="#4a6edb" stroke-width="2">
+                                <animate attributeName="opacity" values="0.3;0.7;0.3" dur="3.8s"
+                                    repeatCount="indefinite" />
+                            </line>
+                        </g>
+
+                        <!-- Input Layer Neurons -->
+                        <circle cx="80" cy="100" r="20" fill="url(#grad1)">
+                            <animate attributeName="r" values="20;24;20" dur="4s" repeatCount="indefinite" />
+                        </circle>
+                        <circle cx="80" cy="200" r="20" fill="url(#grad1)">
+                            <animate attributeName="r" values="20;24;20" dur="4.5s" repeatCount="indefinite" />
+                        </circle>
+                        <circle cx="80" cy="300" r="20" fill="url(#grad1)">
+                            <animate attributeName="r" values="20;24;20" dur="5s" repeatCount="indefinite" />
+                        </circle>
+
+                        <!-- Hidden Layer Neurons -->
+                        <circle cx="200" cy="150" r="28" fill="url(#grad2)">
+                            <animate attributeName="r" values="28;34;28" dur="3.5s" repeatCount="indefinite" />
+                            <animate attributeName="opacity" values="0.8;1;0.8" dur="3s" repeatCount="indefinite" />
+                        </circle>
+                        <circle cx="200" cy="250" r="28" fill="url(#grad2)">
+                            <animate attributeName="r" values="28;34;28" dur="4s" repeatCount="indefinite" />
+                            <animate attributeName="opacity" values="0.8;1;0.8" dur="3.5s" repeatCount="indefinite" />
+                        </circle>
+
+                        <!-- Output Layer Neuron -->
+                        <circle cx="320" cy="200" r="32" fill="#4a6edb" opacity="0.7">
+                            <animate attributeName="r" values="32;38;32" dur="3s" repeatCount="indefinite" />
+                            <animate attributeName="opacity" values="0.7;1;0.7" dur="2.5s" repeatCount="indefinite" />
+                        </circle>
+
+                        <!-- Data Flow Particles -->
+                        <circle r="4" fill="#6b8cff">
+                            <animateMotion dur="3s" repeatCount="indefinite">
+                                <mpath href="#path1" />
+                            </animateMotion>
+                        </circle>
+                        <path id="path1" d="M 80,100 Q 140,120 200,150" fill="none" opacity="0" />
+
+                        <circle r="4" fill="#8fa3ff">
+                            <animateMotion dur="3.5s" repeatCount="indefinite" begin="0.5s">
+                                <mpath href="#path2" />
+                            </animateMotion>
+                        </circle>
+                        <path id="path2" d="M 200,150 Q 260,170 320,200" fill="none" opacity="0" />
+
+                        <!-- Floating Abstract Shapes -->
+                        <ellipse cx="140" cy="80" rx="40" ry="15" fill="#6b8cff" opacity="0.1">
+                            <animateTransform attributeName="transform" type="rotate" from="0 140 80" to="360 140 80"
+                                dur="20s" repeatCount="indefinite" />
+                        </ellipse>
+
+                        <ellipse cx="260" cy="320" rx="35" ry="18" fill="#4a6edb" opacity="0.1">
+                            <animateTransform attributeName="transform" type="rotate" from="0 260 320" to="-360 260 320"
+                                dur="25s" repeatCount="indefinite" />
+                        </ellipse>
+
+                        <!-- Central Data Processing Symbol -->
+                        <g transform="translate(200, 200)">
+                            <polygon points="0,-60 52,-30 52,30 0,60 -52,30 -52,-30" fill="none" stroke="#6b8cff"
+                                stroke-width="2" opacity="0.3">
+                                <animateTransform attributeName="transform" type="rotate" from="0" to="360" dur="30s"
+                                    repeatCount="indefinite" />
+                            </polygon>
+                        </g>
+                    </svg>
+                </div>
+            </div>
+        </section>
+
+        <!-- Main Content -->
+        <!-- Main Content -->
+        <main>
+            <!-- Foundation Stage -->
+            <h2 class="section-title">Phase de fondation</h2>
+            <div class="pipeline-grid">
+                <div class="pipeline-card featured">
+                    <span class="card-badge">Étape 01</span>
+                    <div class="card-icon">🧭</div>
+                    <h3 class="card-title">Définition du problème et compréhension des données</h3>
+                    <p class="card-description">
+                        Établir le cadre fondamental de votre projet d’apprentissage profond en définissant clairement
+                        les
+                        objectifs, en comprenant les caractéristiques des données et en identifiant les contraintes qui
+                        guideront toutes les décisions ultérieures.
+                    </p>
+                    <ul class="card-details">
+                        <li>Définir le type de tâche (classification, régression, génération, apprentissage par
+                            renforcement)</li>
+                        <li>Comprendre le domaine, la modalité des données et les métriques de performance</li>
+                        <li>Identifier les contraintes (latence, interprétabilité, plateforme de déploiement)</li>
+                        <li>Établir des attentes de performance de référence</li>
+                        <li>Documenter les exigences métier et les critères de succès</li>
+                    </ul>
+                </div>
+
+                <div class="pipeline-card">
+                    <span class="card-badge">Étape 02</span>
+                    <div class="card-icon">🧹</div>
+                    <h3 class="card-title">Collecte et prétraitement des données</h3>
+                    <p class="card-description">
+                        Acquérir, nettoyer et préparer les données pour l’entraînement du modèle à l’aide de techniques
+                        systématiques de prétraitement et d’augmentation.
+                    </p>
+                    <ul class="card-details">
+                        <li>Acquisition et simulation de données</li>
+                        <li>Nettoyage : bruit, valeurs manquantes, doublons</li>
+                        <li>Augmentation : retournements, injection de bruit, mixup</li>
+                        <li>Ingénierie des caractéristiques et préparation des embeddings</li>
+                        <li>Normalisation, tokenisation, encodage</li>
+                        <li>Découpage entraînement/validation/test</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Architecture Stage -->
+            <h2 class="section-title">Phase d’architecture</h2>
+            <div class="pipeline-grid">
+                <div class="pipeline-card">
+                    <span class="card-badge">Étape 03</span>
+                    <div class="card-icon">🏗️</div>
+                    <h3 class="card-title">Conception du modèle et recherche d’architecture</h3>
+                    <p class="card-description">
+                        Concevoir et sélectionner l’architecture de réseau neuronal optimale pour votre domaine de
+                        problème et
+                        vos contraintes spécifiques.
+                    </p>
+                    <ul class="card-details">
+                        <li>Sélection d’architecture : CNN, RNN, Transformers, GNN, diffusion</li>
+                        <li>Sélection des hyperparamètres : couches, taux d’apprentissage, optimiseurs</li>
+                        <li>Apprentissage par transfert et stratégies de fine-tuning</li>
+                        <li>Recherche d’architecture neuronale (NAS) lorsque pertinent</li>
+                    </ul>
+                </div>
+
+                <div class="pipeline-card">
+                    <span class="card-badge">Étape 04</span>
+                    <div class="card-icon">⚙️</div>
+                    <h3 class="card-title">Compilation et configuration du modèle</h3>
+                    <p class="card-description">
+                        Configurer les paramètres d’entraînement, les stratégies d’optimisation et les systèmes de suivi
+                        pour
+                        un entraînement efficace du modèle.
+                    </p>
+                    <ul class="card-details">
+                        <li>Définir les fonctions de perte et les métriques d’évaluation</li>
+                        <li>Sélectionner l’optimiseur et les stratégies de taux d’apprentissage</li>
+                        <li>Configurer les callbacks : arrêt anticipé, sauvegarde de checkpoints</li>
+                        <li>Mettre en place l’infrastructure de journalisation et de monitoring</li>
+                    </ul>
+                </div>
+
+                <div class="pipeline-card featured">
+                    <span class="card-badge">Étape 05</span>
+                    <div class="card-icon">🧠</div>
+                    <h3 class="card-title">Entraînement et validation du modèle</h3>
+                    <p class="card-description">
+                        Exécuter le processus d’entraînement avec un suivi continu, des techniques de régularisation et
+                        une
+                        validation afin d’assurer la convergence et la généralisation du modèle.
+                    </p>
+                    <ul class="card-details">
+                        <li>Surveiller les phénomènes de surapprentissage et de sous-apprentissage</li>
+                        <li>Appliquer des régularisations : dropout, weight decay, lissage des labels</li>
+                        <li>Mettre en œuvre l’entraînement distribué ou en précision mixte pour les grands modèles</li>
+                        <li>Validation continue et journalisation des performances</li>
+                        <li>Ajustement dynamique du taux d’apprentissage et clipping des gradients</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Evaluation Stage -->
+            <h2 class="section-title">Phase d’évaluation et d’analyse</h2>
+            <div class="pipeline-grid">
+                <div class="pipeline-card featured">
+                    <span class="card-badge">Étape 06</span>
+                    <div class="card-icon">📊</div>
+                    <h3 class="card-title">Évaluation du modèle (approfondie)</h3>
+                    <p class="card-description">
+                        Évaluation complète au-delà des métriques de base, incluant des tests de robustesse, la
+                        validation
+                        croisée et l’analyse d’équité afin de garantir la fiabilité du modèle.
+                    </p>
+                    <ul class="card-details">
+                        <li>Évaluer sur plusieurs jeux de données et domaines</li>
+                        <li>Validation croisée pour évaluer la stabilité</li>
+                        <li>Tests de calibration et de robustesse (attaques adverses, données hors distribution)</li>
+                        <li>Analyse des biais et de l’équité entre différents groupes</li>
+                        <li>Analyse des erreurs et investigation des cas d’échec</li>
+                    </ul>
+                </div>
+
+                <div class="pipeline-card">
+                    <span class="card-badge">Étape 07</span>
+                    <div class="card-icon">🔍</div>
+                    <h3 class="card-title">Interprétation et explicabilité du modèle</h3>
+                    <p class="card-description">
+                        Comprendre les processus de décision du modèle à l’aide de techniques d’interprétation et de
+                        méthodes
+                        de visualisation.
+                    </p>
+                    <ul class="card-details">
+                        <li>Importance des caractéristiques et cartes de saillance</li>
+                        <li>Explications SHAP / LIME</li>
+                        <li>Propagation de la pertinence couche par couche (LRP)</li>
+                        <li>Visualisation de l’attention pour les transformers</li>
+                        <li>Vecteurs d’activation de concepts</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Deployment Stage -->
+            <h2 class="section-title">Phase de déploiement</h2>
+            <div class="pipeline-grid">
+                <div class="pipeline-card">
+                    <span class="card-badge">Étape 08</span>
+                    <div class="card-icon">🚀</div>
+                    <h3 class="card-title">Optimisation et compression</h3>
+                    <p class="card-description">
+                        Optimiser les modèles pour le déploiement en production grâce à la compression, la
+                        quantification et
+                        des améliorations d’efficacité.
+                    </p>
+                    <ul class="card-details">
+                        <li>Élagage et quantification des modèles</li>
+                        <li>Distillation de connaissances</li>
+                        <li>Simplification de l’architecture pour le déploiement en périphérie</li>
+                        <li>Profilage de la latence et de la mémoire</li>
+                        <li>Optimisation spécifique au matériel</li>
+                    </ul>
+                </div>
+
+                <div class="pipeline-card">
+                    <span class="card-badge">Étape 09</span>
+                    <div class="card-icon">🧩</div>
+                    <h3 class="card-title">Déploiement et mise en service</h3>
+                    <p class="card-description">
+                        Déployer les modèles dans des environnements de production avec une infrastructure de service et
+                        des
+                        points d’accès API appropriés.
+                    </p>
+                    <ul class="card-details">
+                        <li>Export vers des formats de production (ONNX, TorchScript, TensorRT)</li>
+                        <li>Déploiement sur des plateformes edge, cloud ou web</li>
+                        <li>Mise en place d’API et de pipelines de streaming</li>
+                        <li>Optimisation de l’inférence en temps réel</li>
+                        <li>Stratégies d’équilibrage de charge et de montée en charge</li>
+                    </ul>
+                </div>
+
+                <div class="pipeline-card featured">
+                    <span class="card-badge">Étape 10</span>
+                    <div class="card-icon">📈</div>
+                    <h3 class="card-title">Surveillance, retours et maintenance</h3>
+                    <p class="card-description">
+                        Surveiller en continu les performances du modèle en production, détecter les dérives et mettre
+                        en
+                        place des boucles de rétroaction pour l’amélioration et la maintenance continues.
+                    </p>
+                    <ul class="card-details">
+                        <li>Évaluation continue à partir de flux de données en temps réel</li>
+                        <li>Détection de dérive des données et des concepts</li>
+                        <li>Pipelines automatisés de réentraînement des modèles</li>
+                        <li>Cadres d’expérimentation et de tests A/B</li>
+                        <li>Intégration de retours humains dans la boucle</li>
+                        <li>Alertes en cas de dégradation des performances</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Advanced Techniques -->
+            <h2 class="section-title">Techniques avancées et de pointe</h2>
+            <div class="advanced-grid">
+                <div class="advanced-card">
+                    <h3>Intégration multimodale</h3>
+                    <p class="card-description">
+                        Combiner plusieurs modalités de données (texte, image, audio, vidéo) pour des représentations
+                        plus
+                        riches et des modèles plus puissants. Les techniques incluent l’attention inter-modale, les
+                        architectures de fusion et les espaces d’embeddings unifiés.
+                    </p>
+                </div>
+
+                <div class="advanced-card">
+                    <h3>Apprentissage auto-supervisé et contrastif</h3>
+                    <p class="card-description">
+                        Exploiter les données non annotées grâce à des méthodes de pré-entraînement auto-supervisé
+                        telles que
+                        SimCLR, CLIP et la modélisation du langage masqué, afin d’apprendre des représentations robustes
+                        avant
+                        l’ajustement fin.
+                    </p>
+                </div>
+
+                <div class="advanced-card">
+                    <h3>Apprentissage par renforcement et RLHF</h3>
+                    <p class="card-description">
+                        Intégrer des retours humains et des techniques d’apprentissage par renforcement pour aligner le
+                        comportement des modèles sur les préférences humaines, notamment pour les modèles génératifs et
+                        les
+                        systèmes interactifs.
+                    </p>
+                </div>
+
+                <div class="advanced-card">
+                    <h3>Apprentissage fédéré et respectueux de la vie privée</h3>
+                    <p class="card-description">
+                        Entraîner des modèles sur des sources de données décentralisées tout en préservant la
+                        confidentialité
+                        grâce à des techniques telles que la confidentialité différentielle, le calcul multipartite
+                        sécurisé
+                        et l’agrégation fédérée.
+                    </p>
+                </div>
+
+                <div class="advanced-card">
+                    <h3>Recherche d’architecture neuronale (NAS)</h3>
+                    <p class="card-description">
+                        Automatiser la conception des architectures à l’aide d’algorithmes évolutionnaires, de
+                        l’apprentissage par renforcement ou de méthodes basées sur le gradient afin de découvrir des
+                        structures de réseaux optimales pour des tâches spécifiques.
+                    </p>
+                </div>
+
+                <div class="advanced-card">
+                    <h3>Impact éthique et environnemental</h3>
+                    <p class="card-description">
+                        Évaluer et réduire l’impact environnemental grâce à un entraînement efficace, au suivi carbone,
+                        et
+                        prendre en compte les implications éthiques, notamment l’équité, la responsabilité et la
+                        transparence
+                        des systèmes d’IA.
+                    </p>
+                </div>
+            </div>
+        </main>
+
+
+        <!-- Footer -->
+        <footer>
+            <div class="footer-content">
+                <div class="language-selector">
+                    <a href="../../../../../en/teaching/courses/2025/AI-DeepLearning/pipeline.html"
+                        class="lang-btn">English</a>
+                    <a href="../../../../../fr/enseignement/cours/2025/IA-DeepLearning/pipeline.html"
+                        class="lang-btn">Français</a>
+                </div>
+                <div class="footer-info">
+                    <p>&copy; 2025 John Samuel | <a href="http://creativecommons.org/licenses/by-sa/4.0/">CC BY-SA
+                            4.0</a></p>
+                </div>
+            </div>
+        </footer>
+    </body>
+
+</html>
