@@ -509,7 +509,7 @@ class ContentUpdateTests(unittest.TestCase):
         self.assertIn('alt=""', updated)
         self.assertIn("azure-scan", updated)
 
-    def test_q315_photography_family_uses_dynamic_pages(self):
+    def test_q315_photography_family_uses_travel_pipeline(self):
         row = ContentRow(
             family="photographies",
             row_number=2,
@@ -524,11 +524,8 @@ class ContentUpdateTests(unittest.TestCase):
             },
         )
 
-        changes = render_q315_family(FAMILIES["photographies"], [row], apply=False)
-
-        self.assertEqual(len(changes), 1)
-        self.assertEqual(changes[0].family, "photographies")
-        self.assertEqual(changes[0].language, "en")
+        with self.assertRaisesRegex(ContentUpdateError, "abstract travel pipeline"):
+            render_q315_family(FAMILIES["photographies"], [row], apply=False)
 
     def test_q315_cv_appends_under_existing_year(self):
         row = ContentRow(

@@ -15,13 +15,13 @@ Apply changes:
 python3 src/main/content_update.py --family books --mode q315-apply
 ```
 
-For Q315-driven pages, rebuild the generated language pages after applying the
-Q315 source change. Example for the detailed CV:
+For Q315-driven pages, render the bound language-page slots after applying the
+Q315 source change, then verify round-trip equivalence. Example for the detailed
+CV:
 
 ```sh
-for lang in en fr ml pa hi pt es it; do
-  python3 src/main/abstract/rebuild_page.py --page Q3646 --language "$lang"
-done
+python3 src/main/abstract/render_page.py --page Q3646
+python3 src/main/abstract/verify_content_roundtrip.py --page Q3646
 ```
 
 Plan local Wikibase changes:
@@ -79,15 +79,14 @@ quote. Use `part_qids` for long quotes that are already split into multiple
 content items because of Wikibase text limits, and `attribution_qid` for the
 author/source line.
 
-For photographies, each row represents one Q315 abstract travel/gallery
-placement of one image on one canonical page. Use `page` for the Q315 target
-page. The row is keyed by `page + src`, so the same image may appear on several
-abstract pages. Use `section` to choose the QID/literal gallery subsection
-heading, `src` for the image URL, and optional `href`, `location`, `year`,
-`card_class`, and `data_location` to match the local Q315 page style. The
-renderer appends by cloning an existing card in the target section, preserving
-page-specific decoration. Use `q315-preview` and `q315-apply` for photography;
-plain `preview`/`apply` is retained for legacy rendered-page repair workflows.
+For photographies, each row represents one travel/gallery placement of one image.
+The row is keyed by `page + src`, so the same image may appear on several pages.
+Use `section` to choose the QID/literal gallery subsection heading, `src` for the
+image URL, and optional `href`, `location`, `year`, `card_class`, and
+`data_location` to match the local page style. Do not use `q315-preview` or
+`q315-apply` for photography; Q315 abstract photography/travel pages are owned by
+the manifest workflow below. Plain `preview`/`apply` is retained only for legacy
+rendered-page repair workflows.
 
 Do not use `content_update.py --family photographies --mode wikibase-*`.
 The canonical multilingual photography/travel workflow is:
@@ -114,10 +113,8 @@ The common flow is:
 python3 src/main/content_update.py --family cv --mode wikibase-plan
 python3 src/main/content_update.py --family cv --mode wikibase-apply --allow-create
 python3 src/main/content_update.py --family cv --mode q315-apply
-for lang in en fr ml pa hi pt es it; do
-  python3 src/main/abstract/rebuild_page.py --page Q3646 --language "$lang"
-done
-python3 src/main/abstract/verify_content_roundtrip.py
+python3 src/main/abstract/render_page.py --page Q3646
+python3 src/main/abstract/verify_content_roundtrip.py --page Q3646
 ```
 
 Optional columns `content_fr`, `content_ml`, `content_pa`, `content_hi`,

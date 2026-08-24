@@ -793,7 +793,11 @@ def render_family(family: FamilyConfig, rows: list[ContentRow], *, apply: bool) 
 
 def render_q315_family(family: FamilyConfig, rows: list[ContentRow], *, apply: bool) -> list[PageChange]:
     if family.name == "photographies":
-        return render_photography_family(rows, apply=apply)
+        raise ContentUpdateError(
+            "photographies use the Q315 abstract travel pipeline; use "
+            "src/main/abstract/prepare_travel_content.py and "
+            "src/main/abstract/bind_travel_manifest.py instead"
+        )
     if family.name == "cv":
         return render_q315_cv_family(rows, apply=apply)
     target = family.q315_target
@@ -3138,8 +3142,9 @@ def parse_args(argv: list[str]) -> argparse.Namespace:
         default="preview",
         help=(
             "validate checks CSV and targets; preview computes rendered page changes; "
-            "apply rewrites rendered pages; q315-preview computes abstract source changes; "
-            "q315-apply rewrites abstract source pages; extract backfills CSV rows from existing pages; "
+            "apply rewrites rendered pages; q315-preview computes abstract source changes "
+            "for non-photography Q315 families; q315-apply rewrites abstract source pages; "
+            "extract backfills CSV rows from existing pages; "
             "wikibase-plan checks local Wikibase; wikibase-apply binds/repairs local "
             "Wikibase items and writes local_qid."
         ),
