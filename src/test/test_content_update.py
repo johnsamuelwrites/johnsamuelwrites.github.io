@@ -17,10 +17,12 @@ from content_update import (
     build_wikibase_content_item_data,
     build_wikibase_repair_data,
     canonical_wikidata_url,
+    content_texts_for_wikibase,
     read_rows,
     render_content,
     render_q315_family,
     render_q315_content,
+    render_q315_cv_text,
     render_photography_page,
     slugify,
     validate_rows,
@@ -527,6 +529,90 @@ class ContentUpdateTests(unittest.TestCase):
         self.assertEqual(len(changes), 1)
         self.assertEqual(changes[0].family, "photographies")
         self.assertEqual(changes[0].language, "en")
+
+    def test_q315_cv_appends_under_existing_year(self):
+        row = ContentRow(
+            family="cv",
+            row_number=2,
+            data={
+                "type": "CVEntry",
+                "section": "journals",
+                "year": "2026",
+                "content": "A new journal article.",
+                "local_qid": "Q9001",
+            },
+        )
+        html = """
+        <html><body>
+            <section id="journals">
+                <h3>Q3699</h3>
+                <h4 class="year">Q3668</h4>
+                <p class="conference" data-content="local:Q8401">Q8401</p>
+                <h4 class="year">Q3669</h4>
+                <p class="conference" data-content="local:Q8402">Q8402</p>
+            </section>
+        </body></html>
+        """
+
+        updated, added, skipped, repaired = render_q315_cv_text(html, [row])
+
+        self.assertEqual(added, 1)
+        self.assertEqual(skipped, 0)
+        self.assertEqual(repaired, 0)
+        self.assertIn('<p class="conference" data-content="local:Q9001">Q9001</p>', updated)
+        self.assertLess(updated.index("Q9001"), updated.index("Q3669"))
+
+    def test_q315_cv_creates_new_year_heading(self):
+        row = ContentRow(
+            family="cv",
+            row_number=2,
+            data={
+                "type": "CVEntry",
+                "section": "conferences",
+                "year": "2026",
+                "content": "A new conference paper.",
+                "local_qid": "Q9002",
+            },
+        )
+        html = """
+        <html><body>
+            <section id="conferences">
+                <h3>Q3708</h3>
+                <h4 class="year">Q3669</h4>
+                <p class="conference" data-content="local:Q8402">Q8402</p>
+            </section>
+        </body></html>
+        """
+
+        updated, added, skipped, repaired = render_q315_cv_text(html, [row])
+
+        self.assertEqual(added, 1)
+        self.assertEqual(skipped, 0)
+        self.assertEqual(repaired, 0)
+        self.assertIn('<h4 class="year">Q3668</h4>', updated)
+        self.assertLess(updated.index("Q3668"), updated.index("Q3669"))
+
+    def test_cv_wikibase_payload_can_use_localized_content(self):
+        row = ContentRow(
+            family="cv",
+            row_number=2,
+            data={
+                "type": "CVEntry",
+                "section": "talks",
+                "year": "2026",
+                "content": "English entry",
+                "content_fr": "Entrée française",
+            },
+        )
+
+        data = build_wikibase_content_item_data(
+            "English entry",
+            "",
+            content_texts_for_wikibase(row),
+        )
+
+        p40 = data["claims"][MONOLINGUAL_CONTENT_PROPERTY]
+        self.assertTrue(any(claim["mainsnak"]["datavalue"]["value"]["language"] == "fr" and claim["mainsnak"]["datavalue"]["value"]["text"] == "Entrée française" for claim in p40))
 
 
 if __name__ == "__main__":

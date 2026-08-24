@@ -15,6 +15,15 @@ Apply changes:
 python3 src/main/content_update.py --family books --mode q315-apply
 ```
 
+For Q315-driven pages, rebuild the generated language pages after applying the
+Q315 source change. Example for the detailed CV:
+
+```sh
+for lang in en fr ml pa hi pt es it; do
+  python3 src/main/abstract/rebuild_page.py --page Q3646 --language "$lang"
+done
+```
+
 Plan local Wikibase changes:
 
 ```sh
@@ -38,6 +47,8 @@ Wikidata policy:
 - `photographies.csv`: `wikidata_url` is not used by this append helper.
   Photography Wikibase/content binding is owned by the Q315 abstract travel
   pipeline under `src/main/abstract/`.
+- `cv.csv`: `wikidata_url` is optional and should be used only when the CV row
+  itself has a linked publication or external Wikidata identity.
 - `films-series-documentaries.csv`, `museums-galleries.csv`, and `music.csv` require
   `wikidata_url`.
 
@@ -87,3 +98,29 @@ python3 src/main/abstract/bind_travel_manifest.py
 python3 src/main/abstract/render_page.py --check
 python3 src/main/abstract/verify_content_roundtrip.py
 ```
+
+## Detailed CV
+
+`cv.csv` appends entries to `Q315/Q3636/Q3646.html`, the Q315 source for the
+detailed CV. Use `section` for the HTML section id, such as `journals`,
+`conferences`, `preprints`, `postersdemo`, `talks`, or `panels`. Use either
+`year` or `year_qid`; if `year` already exists in the abstract labels, the tool
+finds the local year QID automatically. Use `content` for the CV line and leave
+`local_qid` empty until `wikibase-apply` fills it.
+
+The common flow is:
+
+```sh
+python3 src/main/content_update.py --family cv --mode wikibase-plan
+python3 src/main/content_update.py --family cv --mode wikibase-apply --allow-create
+python3 src/main/content_update.py --family cv --mode q315-apply
+for lang in en fr ml pa hi pt es it; do
+  python3 src/main/abstract/rebuild_page.py --page Q3646 --language "$lang"
+done
+python3 src/main/abstract/verify_content_roundtrip.py
+```
+
+Optional columns `content_fr`, `content_ml`, `content_pa`, `content_hi`,
+`content_pt`, `content_es`, and `content_it` may be used for localized CV text.
+When they are empty, the English/canonical `content` value is used for every
+language.

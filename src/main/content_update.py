@@ -58,6 +58,12 @@ TYPE_ALIASES = {
     "photograph": "Photograph",
     "photography": "Photograph",
     "photo": "Photograph",
+    "cv": "CVEntry",
+    "cv-entry": "CVEntry",
+    "cventry": "CVEntry",
+    "publication": "CVEntry",
+    "conference": "CVEntry",
+    "journal": "CVEntry",
 }
 ABSTRACT_CONTENT_ITEM = "Q3185"
 INSTANCE_OF_PROPERTY = "P8"
@@ -195,6 +201,25 @@ FAMILIES: dict[str, FamilyConfig] = {
         sort_entries=False,
         paths={},
     ),
+    "cv": FamilyConfig(
+        name="cv",
+        csv_name="cv.csv",
+        renderer="detailed-cv",
+        allowed_types=("CVEntry",),
+        wikidata_required=False,
+        sort_entries=False,
+        q315_path="Q315/Q3636/Q3646.html",
+        paths={
+            "en": "en/research/cv-detailed.html",
+            "fr": "fr/recherche/cv-détaillé.html",
+            "ml": "ml/ഗവേഷണം/വിശദമായ-സിവി.html",
+            "pa": "pa/ਖੋਜ/ਵਿਸਤ੍ਰਿਤ-ਸੀਵੀ.html",
+            "hi": "hi/अनुसंधान/विस्तृत-सीवी.html",
+            "pt": "pt/pesquisa/cv-detalhado.html",
+            "es": "es/investigación/cv-detallado.html",
+            "it": "it/ricerca/cv-dettagliato.html",
+        },
+    ),
 }
 
 
@@ -226,6 +251,15 @@ class ContentRow:
                 )
             )
             return f"photo-{hashlib.sha1(key.encode('utf-8')).hexdigest()[:16]}" if key else ""
+        if self.family == "cv":
+            key = "|".join(
+                (
+                    self.data.get("section", ""),
+                    self.data.get("year_qid", "") or self.data.get("year", ""),
+                    self.data.get("content", "") or self.data.get("content_en", ""),
+                )
+            )
+            return f"cv-{hashlib.sha1(key.encode('utf-8')).hexdigest()[:16]}" if key else ""
         return slugify(self.data.get("name", "") or self.data.get("name_en", ""))
 
     @property
@@ -282,6 +316,7 @@ class ExtractedRow:
     year: str = ""
     card_class: str = ""
     data_location: str = ""
+    section_id: str = ""
 
 
 def read_rows(family: FamilyConfig, csv_path: Path) -> list[ContentRow]:
@@ -420,6 +455,20 @@ def default_fieldnames(family: FamilyConfig) -> list[str]:
             "data_location",
             "local_qid",
         ]
+    if family.name == "cv":
+        return [
+            "id",
+            "type",
+            "target",
+            "section",
+            "year",
+            "year_qid",
+            "content",
+            "simple_content",
+            "wikidata_url",
+            "local_qid",
+            "simple_local_qid",
+        ]
     if family.name == "quotes":
         return ["id", "type", "category", "quote", "attribution", "local_qid"]
     fields = ["id", "type", "name", "wikidata_url", "local_qid"]
@@ -433,6 +482,8 @@ def default_fieldnames(family: FamilyConfig) -> list[str]:
 def row_key(row: ContentRow) -> tuple[str, str]:
     if row.family == "photographies":
         return ("page-src", normalize_text(f"{row.data.get('page', '')}|{row.data.get('src', '')}"))
+    if row.family == "cv":
+        return ("cv", normalize_text(f"{row.data.get('section', '')}|{row.data.get('year_qid', '') or row.data.get('year', '')}|{cv_content(row, 'en')}"))
     wikidata = wikidata_qid(row.wikidata_url)
     if wikidata:
         return ("wikidata", wikidata)
@@ -674,6 +725,17 @@ def validate_rows(family: FamilyConfig, rows: list[ContentRow], csv_path: Path) 
                 row.data.get(f"page_{language}", "").strip() for language in LANGUAGES
             ):
                 errors.append(f"line {row.row_number}: missing page or page_<language>")
+        elif family.name == "cv":
+            try:
+                cv_targets(row)
+            except ContentUpdateError as error:
+                errors.append(str(error).replace(f"cv:{row.row_number}: ", f"line {row.row_number}: "))
+            if not row.data.get("section", "").strip():
+                errors.append(f"line {row.row_number}: missing section")
+            if not row.data.get("content", "").strip() and not row.data.get("content_en", "").strip():
+                errors.append(f"line {row.row_number}: missing content")
+            if not row.data.get("year", "").strip() and not row.data.get("year_qid", "").strip():
+                errors.append(f"line {row.row_number}: missing year or year_qid")
         else:
             if not row.data.get("name", "").strip() and not row.data.get("name_en", "").strip():
                 errors.append(f"line {row.row_number}: missing name")
@@ -732,6 +794,8 @@ def render_family(family: FamilyConfig, rows: list[ContentRow], *, apply: bool) 
 def render_q315_family(family: FamilyConfig, rows: list[ContentRow], *, apply: bool) -> list[PageChange]:
     if family.name == "photographies":
         return render_photography_family(rows, apply=apply)
+    if family.name == "cv":
+        return render_q315_cv_family(rows, apply=apply)
     target = family.q315_target
     if not target:
         raise ContentUpdateError(f"{family.name}: Q315 source page is not configured")
@@ -751,6 +815,32 @@ def render_q315_family(family: FamilyConfig, rows: list[ContentRow], *, apply: b
             changed=changed,
         )
     ]
+
+
+def render_q315_cv_family(rows: list[ContentRow], *, apply: bool) -> list[PageChange]:
+    targets = (
+        (REPO_ROOT / "Q315/Q3636/Q3646.html", "cv-detailed", [row for row in rows if cv_targets(row) & {"detailed"}], render_q315_cv_text),
+        (REPO_ROOT / "Q315/Q3636/index.html", "cv-simple", [row for row in rows if cv_targets(row) & {"simple"}], render_q315_cv_simple_text),
+    )
+    changes: list[PageChange] = []
+    for path, language, target_rows, renderer in targets:
+        original = path.read_text(encoding="utf-8")
+        updated, added, skipped, repaired = renderer(original, target_rows)
+        changed = updated != original
+        if apply and changed:
+            rewrite_text_file(path, lambda _content, updated=updated: updated)
+        changes.append(
+            PageChange(
+                family="cv",
+                path=path,
+                language=language,
+                added=added,
+                skipped=skipped,
+                repaired=repaired,
+                changed=changed,
+            )
+        )
+    return changes
 
 
 def render_q315_content(
@@ -786,6 +876,8 @@ def render_q315_content(
         )
     if family.renderer == "quote-grid":
         return render_q315_quotes_text(html_content, rows)
+    if family.renderer == "detailed-cv":
+        return render_q315_cv_text(html_content, rows)
     raise ContentUpdateError(f"Unsupported Q315 renderer: {family.renderer}")
 
 
@@ -1101,6 +1193,8 @@ def render_content_text(
             )
     if family.renderer == "quote-grid":
         return render_quotes_text(html_content, rows, language)
+    if family.renderer == "detailed-cv":
+        return render_cv_text(html_content, rows, language)
     raise ContentUpdateError(f"Unsupported renderer: {family.renderer}")
 
 
@@ -1709,6 +1803,300 @@ def build_q315_quote_card_html(row: ContentRow) -> str:
     return "\n".join(quote_lines)
 
 
+def render_q315_cv_text(
+    html_content: str,
+    rows: list[ContentRow],
+) -> tuple[str, int, int, int]:
+    updated = html_content
+    added = 0
+    skipped = 0
+    repaired = 0
+    for row in rows:
+        ensure_local_qid(row)
+        if cv_entry_exists(updated, row):
+            skipped += 1
+            continue
+        section_bounds = find_cv_section_bounds(updated, row)
+        if not section_bounds:
+            raise ContentUpdateError(
+                f"cv:{row.row_number}: section not found: {row.data.get('section', '').strip()}"
+            )
+        _section_start, section_open_end, section_close_start, _section_close_end = section_bounds
+        section_html = updated[section_open_end:section_close_start]
+        replacement = insert_cv_entry(
+            section_html,
+            row,
+            build_q315_cv_entry_html(row),
+            cv_year_heading_html(row, q315=True),
+        )
+        updated = updated[:section_open_end] + replacement + updated[section_close_start:]
+        added += 1
+    return updated, added, skipped, repaired
+
+
+def render_q315_cv_simple_text(
+    html_content: str,
+    rows: list[ContentRow],
+) -> tuple[str, int, int, int]:
+    updated = html_content
+    added = 0
+    skipped = 0
+    repaired = 0
+    for row in rows:
+        simple_qid = cv_simple_local_qid(row)
+        if simple_qid and re.search(rf"\blocal:{re.escape(simple_qid)}\b|\b{re.escape(simple_qid)}\b", updated):
+            skipped += 1
+            continue
+        if not simple_qid:
+            raise ContentUpdateError(f"cv:{row.row_number}: simple_local_qid is required for simple CV updates")
+        grid_bounds = find_cv_simple_grid_bounds(updated, row)
+        if not grid_bounds:
+            raise ContentUpdateError(
+                f"cv:{row.row_number}: simple CV section not found: {row.data.get('section', '').strip()}"
+            )
+        grid_open_start, grid_open_end, grid_close_start, _grid_close_end = grid_bounds
+        grid_inner = updated[grid_open_end:grid_close_start]
+        block = build_q315_cv_simple_card_html(row)
+        replacement = insert_block(grid_inner, r"\s*<div\b[^>]*class=[\"'][^\"']*bento-card[^\"']*[\"'][\s\S]*?</div>", block, False)
+        updated = updated[:grid_open_end] + replacement + updated[grid_close_start:]
+        added += 1
+    return updated, added, skipped, repaired
+
+
+def find_cv_simple_grid_bounds(html_content: str, row: ContentRow) -> tuple[int, int, int, int] | None:
+    section_id = row.data.get("section", "").strip()
+    if not section_id:
+        return None
+    header = re.search(
+        rf"<div\b(?=[^>]*class=[\"'][^\"']*section-header[^\"']*[\"'])(?=[^>]*\bid=[\"']{re.escape(section_id)}[\"'])[^>]*>",
+        html_content,
+        flags=re.IGNORECASE,
+    )
+    if not header:
+        return None
+    for match in re.finditer(r"<div\b[^>]*>", html_content[header.end() :], flags=re.IGNORECASE):
+        start = header.end() + match.start()
+        open_tag = match.group(0)
+        if re.search(r"class=[\"'][^\"']*bento-grid[^\"']*[\"']", open_tag, flags=re.IGNORECASE):
+            return find_matching_close(html_content, "div", start, start + len(open_tag))
+    return None
+
+
+def build_q315_cv_simple_card_html(row: ContentRow) -> str:
+    return "\n".join(
+        [
+            '<div class="bento-card">',
+            f'    <h3>{esc(cv_year_key(row))}</h3>',
+            f'    <p data-content="local:{esc(cv_simple_local_qid(row))}">{esc(cv_simple_local_qid(row))}</p>',
+            "</div>",
+        ]
+    )
+
+
+def render_cv_text(
+    html_content: str,
+    rows: list[ContentRow],
+    language: str,
+) -> tuple[str, int, int, int]:
+    updated = html_content
+    added = 0
+    skipped = 0
+    repaired = 0
+    for row in rows:
+        if cv_entry_exists(updated, row, language=language):
+            skipped += 1
+            continue
+        section_bounds = find_cv_section_bounds(updated, row)
+        if not section_bounds:
+            raise ContentUpdateError(
+                f"cv:{row.row_number}: section not found: {row.data.get('section', '').strip()}"
+            )
+        _section_start, section_open_end, section_close_start, _section_close_end = section_bounds
+        section_html = updated[section_open_end:section_close_start]
+        replacement = insert_cv_entry(
+            section_html,
+            row,
+            build_cv_entry_html(row, language),
+            cv_year_heading_html(row, language=language),
+        )
+        updated = updated[:section_open_end] + replacement + updated[section_close_start:]
+        added += 1
+    return updated, added, skipped, repaired
+
+
+def cv_targets(row: ContentRow) -> set[str]:
+    target = row.data.get("target", "").strip().casefold() or "both"
+    if target in {"both", "all"}:
+        return {"detailed", "simple"}
+    if target in {"detailed", "detail", "cv-detailed"}:
+        return {"detailed"}
+    if target in {"simple", "concise", "cv-simple"}:
+        return {"simple"}
+    raise ContentUpdateError(f"cv:{row.row_number}: target must be detailed, simple, or both")
+
+
+def cv_simple_local_qid(row: ContentRow) -> str:
+    return row.data.get("simple_local_qid", "").strip()
+
+
+def find_cv_section_bounds(html_content: str, row: ContentRow) -> tuple[int, int, int, int] | None:
+    section_id = row.data.get("section", "").strip()
+    if not section_id:
+        return None
+    for match in re.finditer(r"<section\b[^>]*>", html_content, flags=re.IGNORECASE):
+        open_tag = match.group(0)
+        if not re.search(rf"\bid=[\"']{re.escape(section_id)}[\"']", open_tag):
+            continue
+        return find_matching_close(html_content, "section", match.start(), match.end())
+    return None
+
+
+def cv_entry_exists(html_content: str, row: ContentRow, *, language: str = "en") -> bool:
+    if row.local_qid and re.search(rf"\blocal:{re.escape(row.local_qid)}\b|\b{re.escape(row.local_qid)}\b", html_content):
+        return True
+    expected = normalize_text(cv_content(row, language))
+    return bool(expected and normalize_text(strip_tags(html_content)).find(expected) >= 0)
+
+
+def insert_cv_entry(
+    section_html: str,
+    row: ContentRow,
+    entry_html: str,
+    heading_html: str,
+) -> str:
+    year_key = cv_year_key(row)
+    year = cv_year_value(row)
+    year_blocks = cv_year_blocks(section_html)
+    indent = detect_block_indent(section_html, r"<p\b[^>]*class=[\"'][^\"']*conference")
+    if not indent:
+        indent = " " * 20
+    entry = "\n" + indent_block(entry_html.strip(), indent) + "\n"
+
+    for start, open_end, next_start, _block, existing_year in year_blocks:
+        if existing_year == year_key or existing_year == year:
+            return section_html[:next_start].rstrip() + entry + section_html[next_start:]
+
+    heading = "\n" + indent_block(heading_html.strip(), indent) + entry
+    new_year_number = cv_year_number(year)
+    for start, _open_end, _next_start, _block, existing_year in year_blocks:
+        existing_number = cv_year_number(existing_year)
+        if new_year_number is not None and existing_number is not None and existing_number < new_year_number:
+            return section_html[:start] + heading + section_html[start:]
+
+    insert_at = len(section_html.rstrip())
+    return section_html[:insert_at] + heading + section_html[insert_at:]
+
+
+def cv_year_blocks(section_html: str) -> list[tuple[int, int, int, str, str]]:
+    headings = list(
+        re.finditer(
+            r"<h4\b(?=[^>]*class=[\"'][^\"']*year[^\"']*[\"'])[^>]*>([\s\S]*?)</h4>",
+            section_html,
+            flags=re.IGNORECASE,
+        )
+    )
+    blocks: list[tuple[int, int, int, str, str]] = []
+    for index, heading in enumerate(headings):
+        next_start = headings[index + 1].start() if index + 1 < len(headings) else len(section_html.rstrip())
+        label = strip_tags(heading.group(1)).strip()
+        blocks.append((heading.start(), heading.end(), next_start, section_html[heading.start():next_start], label))
+    return blocks
+
+
+def build_q315_cv_entry_html(row: ContentRow) -> str:
+    ensure_local_qid(row)
+    return f'<p class="conference" data-content="local:{esc(row.local_qid)}">{esc(row.local_qid)}</p>'
+
+
+def build_cv_entry_html(row: ContentRow, language: str) -> str:
+    attrs = q315_binding_attrs(row)
+    return f'<p class="conference"{attrs}>{esc(cv_content(row, language))}</p>'
+
+
+def cv_year_heading_html(row: ContentRow, *, q315: bool = False, language: str = "en") -> str:
+    if q315:
+        return f'<h4 class="year">{esc(cv_year_key(row))}</h4>'
+    return f'<h4 class="year">{esc(cv_year_value(row, language=language))}</h4>'
+
+
+def cv_content(row: ContentRow, language: str) -> str:
+    value = row.data.get(f"content_{language}", "").strip()
+    if not value:
+        value = row.data.get("content", "").strip()
+    if not value:
+        value = row.data.get("content_en", "").strip()
+    if not value:
+        raise ContentUpdateError(f"{row.family}:{row.row_number}: missing content")
+    return value
+
+
+def cv_simple_content(row: ContentRow, language: str) -> str:
+    value = row.data.get(f"simple_content_{language}", "").strip()
+    if not value:
+        value = row.data.get("simple_content", "").strip()
+    return value or cv_content(row, language)
+
+
+def cv_year_key(row: ContentRow) -> str:
+    year_qid = row.data.get("year_qid", "").strip()
+    if year_qid:
+        return year_qid
+    year = row.data.get("year", "").strip()
+    qid = cv_year_qid(year)
+    if not qid:
+        raise ContentUpdateError(
+            f"cv:{row.row_number}: no local year QID found for {year}; fill year_qid"
+        )
+    return qid
+
+
+def cv_year_value(row: ContentRow, *, language: str = "en") -> str:
+    year = row.data.get("year", "").strip()
+    if year:
+        return year
+    year_qid = row.data.get("year_qid", "").strip()
+    return cv_year_label(year_qid, language) or year_qid
+
+
+def cv_year_number(value: str) -> int | None:
+    label = cv_year_label(value, "en") if re.fullmatch(r"Q[1-9][0-9]*", value) else value
+    return int(label) if re.fullmatch(r"[12][0-9]{3}", label or "") else None
+
+
+def cv_year_qid(year: str) -> str:
+    if not year:
+        return ""
+    for qid, row in cv_year_labels().items():
+        if row.get("en", "").strip() == year:
+            return qid
+    return ""
+
+
+def cv_year_label(qid: str, language: str) -> str:
+    if not qid:
+        return ""
+    row = cv_year_labels().get(qid, {})
+    return row.get(language, "").strip() or row.get("en", "").strip()
+
+
+_CV_YEAR_LABELS: dict[str, dict[str, str]] | None = None
+
+
+def cv_year_labels() -> dict[str, dict[str, str]]:
+    global _CV_YEAR_LABELS
+    if _CV_YEAR_LABELS is not None:
+        return _CV_YEAR_LABELS
+    path = REPO_ROOT / "src/main/abstract/data/labels-wikibase.csv"
+    labels: dict[str, dict[str, str]] = {}
+    with path.open(encoding="utf-8-sig", newline="") as source:
+        for row in csv.DictReader(source):
+            value = row.get("en", "").strip()
+            if re.fullmatch(r"[12][0-9]{3}", value):
+                labels[row["identifier"]] = row
+    _CV_YEAR_LABELS = labels
+    return labels
+
+
 def render_content_with_beautifulsoup(
     family: FamilyConfig,
     rows: list[ContentRow],
@@ -2071,6 +2459,7 @@ class WikibaseRowAction:
     wikidata_qid: str
     local_qid: str
     action: str
+    local_field: str = "local_qid"
 
 
 @dataclass
@@ -2093,6 +2482,8 @@ def wikibase_plan_family(
     allow_create: bool = False,
     index: ContentItemIndex | None = None,
 ) -> list[WikibaseRowAction]:
+    if family.name == "cv":
+        return wikibase_plan_cv_family(rows, client, allow_create=allow_create, index=index)
     actions: list[WikibaseRowAction] = []
     for row in rows:
         name = content_text_for_wikibase(row)
@@ -2130,6 +2521,58 @@ def wikibase_plan_family(
     return actions
 
 
+def wikibase_plan_cv_family(
+    rows: list[ContentRow],
+    client: WikibaseClient,
+    *,
+    allow_create: bool = False,
+    index: ContentItemIndex | None = None,
+) -> list[WikibaseRowAction]:
+    actions: list[WikibaseRowAction] = []
+    for row in rows:
+        for variant, local_field, variant_row in cv_wikibase_variants(row):
+            action = wikibase_plan_single_row(
+                FAMILIES["cv"],
+                variant_row,
+                client,
+                allow_create=allow_create,
+                index=index,
+            )
+            action.family = f"cv-{variant}"
+            action.local_field = local_field
+            actions.append(action)
+    return actions
+
+
+def wikibase_plan_single_row(
+    family: FamilyConfig,
+    row: ContentRow,
+    client: WikibaseClient,
+    *,
+    allow_create: bool = False,
+    index: ContentItemIndex | None = None,
+) -> WikibaseRowAction:
+    name = content_text_for_wikibase(row)
+    wikidata = wikidata_qid(row.wikidata_url)
+    if row.local_qid:
+        if wikibase_content_item_missing_claims(client, row.local_qid, row):
+            return WikibaseRowAction(family.name, row.row_number, name, wikidata, row.local_qid, "repair")
+        return WikibaseRowAction(family.name, row.row_number, name, wikidata, row.local_qid, "skip-local-qid")
+    local_qid, lookup_status = find_existing_local_content_item(client, row, index=index)
+    if local_qid:
+        return WikibaseRowAction(family.name, row.row_number, name, wikidata, local_qid, "bind-existing")
+    if lookup_status == "ambiguous":
+        return WikibaseRowAction(family.name, row.row_number, name, wikidata, "", "ambiguous-existing-items")
+    return WikibaseRowAction(
+        family.name,
+        row.row_number,
+        name,
+        wikidata,
+        "",
+        "create" if allow_create else "missing-existing-item",
+    )
+
+
 def wikibase_apply_family(
     family: FamilyConfig,
     rows: list[ContentRow],
@@ -2139,6 +2582,8 @@ def wikibase_apply_family(
     allow_create: bool = False,
     index: ContentItemIndex | None = None,
 ) -> list[WikibaseRowAction]:
+    if family.name == "cv":
+        return wikibase_apply_cv_family(rows, client, summary=summary, allow_create=allow_create, index=index)
     index = index or build_content_item_index(client)
     planned = wikibase_plan_family(family, rows, client, allow_create=allow_create, index=index)
     completed: list[WikibaseRowAction] = []
@@ -2213,6 +2658,81 @@ def wikibase_apply_family(
     return completed
 
 
+def wikibase_apply_cv_family(
+    rows: list[ContentRow],
+    client: WikibaseClient,
+    *,
+    summary: str,
+    allow_create: bool = False,
+    index: ContentItemIndex | None = None,
+) -> list[WikibaseRowAction]:
+    index = index or build_content_item_index(client)
+    completed: list[WikibaseRowAction] = []
+    rows_by_number = {row.row_number: row for row in rows}
+    for row in rows:
+        for variant, local_field, variant_row in cv_wikibase_variants(row):
+            action = wikibase_plan_single_row(
+                FAMILIES["cv"],
+                variant_row,
+                client,
+                allow_create=allow_create,
+                index=index,
+            )
+            action.family = f"cv-{variant}"
+            action.local_field = local_field
+            original_row = rows_by_number[action.row_number]
+            if action.action == "create":
+                if not allow_create:
+                    action.action = "missing-existing-item"
+                    completed.append(action)
+                    continue
+                local_qid = create_local_item_for_row(client, FAMILIES["cv"], variant_row, summary=summary)
+                original_row.data[local_field] = local_qid
+                completed.append(
+                    WikibaseRowAction(
+                        action.family,
+                        action.row_number,
+                        action.name,
+                        action.wikidata_qid,
+                        local_qid,
+                        "created",
+                        local_field,
+                    )
+                )
+            elif action.action == "repair":
+                repair_local_item_for_row(client, FAMILIES["cv"], variant_row, summary=summary)
+                completed.append(action)
+            elif action.action == "bind-existing":
+                original_row.data[local_field] = action.local_qid
+                variant_row.data["local_qid"] = action.local_qid
+                if wikibase_content_item_missing_claims(client, action.local_qid, variant_row):
+                    repair_local_item_for_row(client, FAMILIES["cv"], variant_row, summary=summary)
+                    action.action = "bound-existing-repaired"
+                else:
+                    action.action = "bound-existing"
+                completed.append(action)
+            else:
+                completed.append(action)
+    return completed
+
+
+def cv_wikibase_variants(row: ContentRow) -> list[tuple[str, str, ContentRow]]:
+    variants: list[tuple[str, str, ContentRow]] = []
+    targets = cv_targets(row)
+    if "detailed" in targets:
+        variants.append(("detailed", "local_qid", row))
+    if "simple" in targets:
+        data = dict(row.data)
+        data["content"] = cv_simple_content(row, "en")
+        for language in LANGUAGES:
+            value = row.data.get(f"simple_content_{language}", "").strip()
+            if value:
+                data[f"content_{language}"] = value
+        data["local_qid"] = row.data.get("simple_local_qid", "").strip()
+        variants.append(("simple", "simple_local_qid", ContentRow(row.family, row.row_number, data)))
+    return variants
+
+
 def wikibase_content_item_missing_claims(
     client: WikibaseClient,
     local_qid: str,
@@ -2257,7 +2777,23 @@ def content_text_for_wikibase(row: ContentRow) -> str:
             or row.localized("alt", "en", required=False)
             or title_from_image_src(row.data.get("src", ""))
         )
+    if row.family == "cv":
+        return cv_content(row, "en")
     return row.localized("name", "en", required=True)
+
+
+def content_texts_for_wikibase(row: ContentRow) -> dict[str, str]:
+    if row.family == "cv":
+        return {language: cv_content(row, language) for language in LANGUAGES}
+    field = "quote" if row.family == "quotes" else "name"
+    if row.family == "photographies":
+        field = "title" if row.data.get("title", "").strip() else "alt"
+    values = {
+        language: row.localized(field, language, required=False)
+        for language in LANGUAGES
+    }
+    fallback = content_text_for_wikibase(row)
+    return {language: value or fallback for language, value in values.items()}
 
 
 def find_existing_local_content_item(
@@ -2414,7 +2950,7 @@ def create_local_item_for_row(
     wikidata = wikidata_qid(row.wikidata_url)
     if family.wikidata_required and not wikidata:
         raise ContentUpdateError(f"{family.name}:{row.row_number}: Wikidata QID required for Wikibase create")
-    data = build_wikibase_content_item_data(name, wikidata)
+    data = build_wikibase_content_item_data(name, wikidata, content_texts_for_wikibase(row))
     result = client.edit_entity(data, summary=summary)
     entity_id = result.get("entity", {}).get("id")
     if not entity_id:
@@ -2432,12 +2968,17 @@ def repair_local_item_for_row(
     name = content_text_for_wikibase(row)
     wikidata = wikidata_qid(row.wikidata_url)
     entity = client.entities([row.local_qid]).get(row.local_qid, {})
-    data = build_wikibase_repair_data(name, wikidata, entity.get("claims", {}))
+    data = build_wikibase_repair_data(name, wikidata, entity.get("claims", {}), content_texts_for_wikibase(row))
     client.edit_entity(data, entity_id=row.local_qid, summary=summary)
 
 
-def build_wikibase_content_item_data(name: str, wikidata: str = "") -> dict:
+def build_wikibase_content_item_data(
+    name: str,
+    wikidata: str = "",
+    content_by_language: dict[str, str] | None = None,
+) -> dict:
     label = wikibase_label_text(name)
+    content_by_language = content_by_language or {language: name for language in LANGUAGES}
     data = {
         "labels": {
             language: {"language": language, "value": label}
@@ -2461,7 +3002,7 @@ def build_wikibase_content_item_data(name: str, wikidata: str = "") -> dict:
                 statement(
                     MONOLINGUAL_CONTENT_PROPERTY,
                     "monolingualtext",
-                    datavalue(f'{language}:"{name}"', "monolingualtext"),
+                    datavalue(f'{language}:"{content_by_language[language]}"', "monolingualtext"),
                 )
                 for language in LANGUAGES
             ],
@@ -2478,8 +3019,14 @@ def build_wikibase_content_item_data(name: str, wikidata: str = "") -> dict:
     return data
 
 
-def build_wikibase_repair_data(name: str, wikidata: str, claims: dict) -> dict:
+def build_wikibase_repair_data(
+    name: str,
+    wikidata: str,
+    claims: dict,
+    content_by_language: dict[str, str] | None = None,
+) -> dict:
     label = wikibase_label_text(name)
+    content_by_language = content_by_language or {language: name for language in LANGUAGES}
     data = {
         "labels": {
             language: {"language": language, "value": label}
@@ -2506,7 +3053,7 @@ def build_wikibase_repair_data(name: str, wikidata: str, claims: dict) -> dict:
         statement(
             MONOLINGUAL_CONTENT_PROPERTY,
             "monolingualtext",
-            datavalue(f'{language}:"{name}"', "monolingualtext"),
+            datavalue(f'{language}:"{content_by_language[language]}"', "monolingualtext"),
         )
         for language in LANGUAGES
         if language not in existing_languages
@@ -2557,7 +3104,8 @@ def format_wikibase_actions(actions: list[WikibaseRowAction]) -> str:
         return "No Wikibase rows checked."
     return "\n".join(
         f"{action.family}:{action.row_number}: {action.action}; "
-        f"name={action.name}; wikidata={action.wikidata_qid or '-'}; local={action.local_qid or '-'}"
+        f"name={action.name}; wikidata={action.wikidata_qid or '-'}; "
+        f"{action.local_field}={action.local_qid or '-'}"
         for action in actions
     )
 
