@@ -33,11 +33,13 @@ import csv
 import os
 import re
 import sys
+import time
 from html.parser import HTMLParser
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE.parent))
+sys.path.insert(0, str(HERE))
 
 from abstract.css_assets import DEFAULT_DATA_DIR, DEFAULT_REPO_ROOT
 from abstract.prepare_missing_content import alternate_pages, page_sources
@@ -191,6 +193,52 @@ def write_binding(path: Path, key: tuple, qid: str) -> bool:
     return False
 
 
+def create_with_retry(client: WikibaseClient, key: tuple[str, ...], summary: str) -> str:
+    """Create one content item, surviving the two ways a long run breaks.
+
+    A run this size trips the edit throttle, which reports only a generic
+    ``failed-save``, and outlives the login session, which then fails every
+    write with ``assertuserfailed`` until it is re-established. A description
+    that collides with another item's label is retried once with a qualified
+    description. Returns the new QID, or "" once the attempt is given up -- the
+    tool is resumable, so a skipped item is created by the next run.
+    """
+    texts = dict(zip(LANGUAGES, key))
+    description = None
+    collisions = 0
+    for attempt, delay in enumerate((5, 15, 45, 30, 30, 0)):
+        data = build_wikibase_content_item_data(
+            texts["en"], "", texts,
+            **({"description": description} if description else {}),
+        )
+        try:
+            result = client.edit_entity(data, summary=summary)
+            return result.get("entity", {}).get("id") or ""
+        except WikibaseError as error:
+            if attempt == 5:
+                print(f"  {key[0][:48]!r}: giving up: {error}", file=sys.stderr, flush=True)
+                return ""
+            if is_label_conflict(error):
+                # Several photographs share an English caption while differing
+                # in other languages, so one qualifier is not enough: the second
+                # collision needs a description nothing else holds.
+                collisions += 1
+                suffix = " (image description)" + (
+                    f" {collisions}" if collisions > 1 else ""
+                )
+                description = f"{content_item_description()}{suffix}"
+                continue
+            if "assertuserfailed" in str(error):
+                print("  session expired; signing in again", file=sys.stderr, flush=True)
+                try:
+                    sign_in(client)
+                    continue
+                except Exception as login_error:  # noqa: BLE001 - reported, then retried
+                    print(f"  sign-in failed: {login_error}", file=sys.stderr, flush=True)
+            time.sleep(delay)
+    return ""
+
+
 def parse_args(argv: list[str]) -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--repo-root", type=Path, default=DEFAULT_REPO_ROOT)
@@ -238,33 +286,18 @@ def main(argv: list[str] | None = None) -> int:
 
     resolved = dict(reuse)
     created = 0
+    failed = 0
     for key in create:
         if args.limit and created >= args.limit:
             break
-        texts = dict(zip(LANGUAGES, key))
-        data = build_wikibase_content_item_data(texts["en"], "", texts)
-        try:
-            result = client.edit_entity(data, summary=args.summary)
-        except WikibaseError as error:
-            if not is_label_conflict(error):
-                print(f"  {key[0][:40]!r}: {error}", file=sys.stderr)
-                continue
-            data = build_wikibase_content_item_data(
-                texts["en"], "", texts,
-                description=f"{content_item_description()} (image description)",
-            )
-            try:
-                result = client.edit_entity(data, summary=args.summary)
-            except WikibaseError as retry_error:
-                print(f"  {key[0][:40]!r}: {retry_error}", file=sys.stderr)
-                continue
-        qid = result.get("entity", {}).get("id")
+        qid = create_with_retry(client, key, args.summary)
         if not qid:
+            failed += 1
             continue
         resolved[key] = qid
         created += 1
         if created % 25 == 0:
-            print(f"  created {created}/{len(create)}")
+            print(f"  created {created}/{len(create)}", flush=True)
 
     written = 0
     for key, group in wanted.items():
@@ -278,6 +311,11 @@ def main(argv: list[str] | None = None) -> int:
                 written += 1
 
     print(f"\nCreated {created} content item(s); wrote {written} binding(s).")
+    if failed:
+        print(
+            f"{failed} item(s) could not be created; re-run to retry them.",
+            file=sys.stderr,
+        )
     print("Now run render_page.py, then verify_content_roundtrip.py.")
     return 0
 

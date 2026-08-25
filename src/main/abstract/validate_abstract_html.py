@@ -9,6 +9,12 @@ from html.parser import HTMLParser
 from pathlib import Path
 from typing import Sequence
 
+import sys
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+
+from abstract.render_page import BINDABLE_ATTRIBUTES, CONTENT_ATTRIBUTE_PREFIX
+
 
 QUALIFIED_QID = re.compile(r"^(?:local|wikidata):Q[1-9][0-9]*$")
 
@@ -61,6 +67,24 @@ class AbstractHTMLValidator(HTMLParser):
         for attribute in ("data-entity", "data-content"):
             if attribute in attributes:
                 self.qualified_qid(attributes[attribute], attribute)
+
+        for attribute, value in attributes.items():
+            if not attribute.startswith(CONTENT_ATTRIBUTE_PREFIX):
+                continue
+            bound = attribute.removeprefix(CONTENT_ATTRIBUTE_PREFIX)
+            if bound not in BINDABLE_ATTRIBUTES:
+                # The renderer ignores an attribute it cannot bind, so a typo
+                # like data-content-atl would silently do nothing.
+                self.error(
+                    f"{attribute} is not a bindable attribute; "
+                    f"expected one of {', '.join(sorted(BINDABLE_ATTRIBUTES))}"
+                )
+                continue
+            self.qualified_qid(value, attribute)
+
+    def handle_startendtag(self, tag: str, attrs) -> None:
+        # `<img />` carries attribute bindings and is reported only here.
+        self.handle_starttag(tag, attrs)
 
     def handle_endtag(self, tag: str) -> None:
         if tag == "q-call":

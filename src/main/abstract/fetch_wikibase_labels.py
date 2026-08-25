@@ -7,7 +7,8 @@ in the wrong rows. The primary-database API is reliable and paginates cleanly, s
 this fetcher reproduces the same CSV schema authoritatively.
 
 Items fetched are the union of every identifier already in the current export and
-every QID bound in a Q315 template (``data-content``/``data-entity``), so bound
+every QID bound in a Q315 template (``data-content``/``data-entity``/
+``data-content-<attribute>``), so bound
 items dropped by the broken export are recovered. ``itemtype`` is the item's
 first ``P8`` value, matching the export's column.
 """
@@ -32,6 +33,7 @@ sys.path.insert(0, str(HERE.parent))
 from abstract.css_assets import DEFAULT_DATA_DIR, DEFAULT_REPO_ROOT
 from abstract.discover_content_migration import abstract_sources
 from abstract.prepare_travel_content import LANGUAGES
+from abstract.render_page import CONTENT_ATTRIBUTE_PREFIX
 
 DEFAULT_DATA = DEFAULT_DATA_DIR
 API = "https://jsamwrites.wikibase.cloud/w/api.php"
@@ -48,10 +50,21 @@ class _Bound(HTMLParser):
 
     def handle_starttag(self, tag, attrs) -> None:
         values = dict(attrs)
-        for attr in ("data-content", "data-entity"):
-            value = values.get(attr) or ""
+        for attr, value in values.items():
+            # `data-content-alt` and its siblings bind an attribute rather than a
+            # text node; those items need labels just as much.
+            if attr not in ("data-content", "data-entity") and not attr.startswith(
+                CONTENT_ATTRIBUTE_PREFIX
+            ):
+                continue
+            value = value or ""
             if value.startswith("local:") and QID.fullmatch(value.removeprefix("local:")):
                 self.qids.add(value.removeprefix("local:"))
+
+    def handle_startendtag(self, tag, attrs) -> None:
+        # `<img />` is reported here, and it is the element attribute bindings
+        # exist for.
+        self.handle_starttag(tag, attrs)
 
 
 def bound_qids(repo_root: Path) -> set[str]:

@@ -4,7 +4,14 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "main"))
 
-from abstract.verify_content_roundtrip import canonical_value, normalize_text
+import tempfile
+
+from abstract.verify_content_roundtrip import (
+    Bindings,
+    canonical_value,
+    normalize_text,
+    rendered_attribute_values,
+)
 
 
 class CanonicalValueTests(unittest.TestCase):
@@ -36,6 +43,48 @@ class NormalizeTextTests(unittest.TestCase):
 
     def test_leaves_matching_text_unchanged(self):
         self.assertEqual(normalize_text("Steven Pinker"), "Steven Pinker")
+
+
+class AttributeBindingTests(unittest.TestCase):
+    """A description bound to an attribute has to round-trip like any value.
+
+    Without this the renderer could write an image description that nothing ever
+    checked again -- the exact blind spot that let a wrong French label sit on
+    three pages unnoticed.
+    """
+
+    def collect(self, source):
+        parser = Bindings()
+        parser.feed(source)
+        return parser.qids
+
+    def test_an_attribute_binding_is_collected(self):
+        found = self.collect('<img class="i" data-content-alt="local:Q9" alt="" />')
+        self.assertIn(("data-content-alt", "Q9"), found)
+
+    def test_an_unbindable_attribute_is_ignored(self):
+        self.assertEqual(
+            self.collect('<img data-content-src="local:Q9" alt="" />'), []
+        )
+
+    def test_text_bindings_still_collected_alongside(self):
+        found = self.collect(
+            '<p data-content="local:Q1">Q1</p>'
+            '<img data-content-alt="local:Q2" alt="" />'
+        )
+        self.assertIn(("data-content", "Q1"), found)
+        self.assertIn(("data-content-alt", "Q2"), found)
+
+    def test_rendered_attribute_values_are_read_from_the_page(self):
+        with tempfile.NamedTemporaryFile(
+            "w", suffix=".html", delete=False, encoding="utf-8"
+        ) as handle:
+            handle.write('<img class="i" alt="Arbres à Lyon" src="x" /><p>ignored</p>')
+            path = Path(handle.name)
+        try:
+            self.assertIn("Arbres à Lyon", rendered_attribute_values(path))
+        finally:
+            path.unlink()
 
 
 if __name__ == "__main__":

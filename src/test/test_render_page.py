@@ -4,10 +4,14 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "main"))
 
+from collections import Counter
+
 from abstract.render_page import (
+    BINDABLE_ATTRIBUTES,
     SlotRewriter,
     inject_generator_meta,
     template_bindings,
+    template_slots,
 )
 
 
@@ -153,6 +157,110 @@ class GeneratorMetaTests(unittest.TestCase):
         )
 
         self.assertEqual(inject_generator_meta(source), source)
+
+
+class AttributeSlotTests(unittest.TestCase):
+    """`alt` is content, and content belongs to the abstract layer.
+
+    The renderer could only ever rewrite text nodes, so an image description --
+    the one thing a reader who cannot see the image depends on -- stayed a
+    literal in each language page. `data-content-alt` binds it like any label.
+    """
+
+    IMAGE = '<img class="photo-image" alt="" src="x.jpg" />'
+    SLOT = (("img", "photo-image", "", 0), "alt")
+
+    def rewrite(self, source, attributes, counts=None):
+        rewriter = SlotRewriter(source, {}, counts, attributes)
+        return rewriter.rewrite(), rewriter
+
+    def test_a_bound_attribute_is_written(self):
+        result, rw = self.rewrite(self.IMAGE, {self.SLOT: "Arbres à Lyon"})
+        self.assertIn('alt="Arbres à Lyon"', result)
+        self.assertEqual(rw.attributes_rewritten, {self.SLOT})
+
+    def test_a_matching_value_is_left_alone(self):
+        source = '<img class="photo-image" alt="Trees" src="x.jpg" />'
+        result, rw = self.rewrite(source, {self.SLOT: "Trees"})
+        self.assertEqual(result, source)
+        self.assertEqual(rw.attributes_rewritten, set())
+        self.assertEqual(rw.attributes_applied, {self.SLOT})
+
+    def test_quotes_in_a_description_cannot_break_the_attribute(self):
+        result, _ = self.rewrite(self.IMAGE, {self.SLOT: 'A "quoted" caption'})
+        self.assertIn("&quot;quoted&quot;", result)
+        self.assertEqual(result.count('alt="'), 1)
+
+    def test_other_attributes_and_the_src_are_untouched(self):
+        result, _ = self.rewrite(self.IMAGE, {self.SLOT: "Trees"})
+        self.assertIn('src="x.jpg"', result)
+        self.assertIn('class="photo-image"', result)
+
+    def test_a_count_mismatch_refuses_to_write(self):
+        """Occurrence N is not the same image on both sides; skip, never guess."""
+        counts = Counter({("img", "photo-image", ""): 2})
+        result, rw = self.rewrite(self.IMAGE, {self.SLOT: "Trees"}, counts)
+        self.assertEqual(result, self.IMAGE)
+        self.assertEqual(rw.attributes_rewritten, set())
+
+    def test_an_absent_attribute_is_reported_not_invented(self):
+        source = '<img class="photo-image" src="x.jpg" />'
+        _result, rw = self.rewrite(source, {self.SLOT: "Trees"})
+        self.assertIn(self.SLOT, rw.attributes_absent)
+
+    def test_a_text_slot_and_an_attribute_slot_coexist(self):
+        source = '<figure class="f"><img class="i" alt="" src="x" /></figure><p class="c">old</p>'
+        rewriter = SlotRewriter(
+            source,
+            {("p", "c", "", 0): "nouveau"},
+            None,
+            {(("img", "i", "", 0), "alt"): "description"},
+        )
+        result = rewriter.rewrite()
+        self.assertIn('alt="description"', result)
+        self.assertIn("<p class=\"c\">nouveau</p>", result)
+
+    def test_only_prose_attributes_are_bindable(self):
+        """Binding src or href would have the renderer rewrite a URL from a label."""
+        self.assertIn("alt", BINDABLE_ATTRIBUTES)
+        self.assertNotIn("src", BINDABLE_ATTRIBUTES)
+        self.assertNotIn("href", BINDABLE_ATTRIBUTES)
+
+
+class AttributeBindingDiscoveryTests(unittest.TestCase):
+    def slots(self, source):
+        import tempfile
+
+        with tempfile.NamedTemporaryFile(
+            "w", suffix=".html", delete=False, encoding="utf-8"
+        ) as handle:
+            handle.write(source)
+            path = Path(handle.name)
+        try:
+            return template_slots(path)
+        finally:
+            path.unlink()
+
+    def test_a_self_closing_image_is_discovered(self):
+        _text, _counts, attributes = self.slots(
+            '<img class="photo-image" data-content-alt="local:Q9" alt="" />'
+        )
+        self.assertEqual(attributes[(("img", "photo-image", "", 0), "alt")], "Q9")
+
+    def test_an_unbindable_attribute_is_ignored(self):
+        _text, _counts, attributes = self.slots(
+            '<img class="i" data-content-src="local:Q9" alt="" />'
+        )
+        self.assertEqual(attributes, {})
+
+    def test_text_and_attribute_bindings_are_kept_apart(self):
+        text, _counts, attributes = self.slots(
+            '<figcaption data-content="local:Q1">Q1</figcaption>'
+            '<img class="i" data-content-alt="local:Q2" alt="" />'
+        )
+        self.assertEqual(text[("figcaption", "", "", 0)], "Q1")
+        self.assertEqual(attributes[(("img", "i", "", 0), "alt")], "Q2")
+        self.assertNotIn(("img", "i", "", 0), text)
 
 
 def template_bindings_from_string(source):
