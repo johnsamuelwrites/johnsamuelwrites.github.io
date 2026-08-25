@@ -13,6 +13,7 @@ import sys
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "main"))
 
 import content_update
+from bs4 import BeautifulSoup
 
 from content_update import (
     ABSTRACT_CONTENT_ITEM,
@@ -50,7 +51,6 @@ from content_update import (
     render_q315_content,
     render_q315_cv_simple_text,
     render_q315_cv_text,
-    render_photography_page,
     slugify,
     validate_rows,
     wikidata_qid,
@@ -589,130 +589,16 @@ class ContentUpdateTests(unittest.TestCase):
         self.assertIn('<q-call data-function="local:Q4182">', updated)
         self.assertIn('data-content="local:Q6323">Q6323</p>', updated)
 
-    def test_photography_page_appends_to_section(self):
-        row = ContentRow(
-            family="photographies",
-            row_number=2,
-            data={
-                "type": "Photograph",
-                "page": "en/photography/bridges.html",
-                "section": "France",
-                "title": "A new bridge",
-                "alt": "A new bridge",
-                "src": "https://example.org/bridge.jpg",
-                "location": "Lyon",
-                "local_qid": "Q5000",
-            },
-        )
-        html = """
-        <html><body>
-            <h3 class="country-title">France</h3>
-            <div class="gallery-grid"></div>
-        </body></html>
-        """
-
-        updated, added, skipped, repaired = render_photography_page(html, [row], "en")
-
-        self.assertEqual(added, 1)
-        self.assertEqual(skipped, 0)
-        self.assertEqual(repaired, 0)
-        self.assertIn('data-q315-source="local:Q5000"', updated)
-        self.assertIn('src="https://example.org/bridge.jpg"', updated)
-        self.assertIn("Lyon", updated)
-
-    def test_photography_page_rejects_missing_section(self):
-        row = ContentRow(
-            family="photographies",
-            row_number=2,
-            data={
-                "type": "Photograph",
-                "page": "en/photography/bridges.html",
-                "section": "Italy",
-                "title": "A new bridge",
-                "src": "https://example.org/bridge.jpg",
-            },
-        )
-        html = """
-        <html><body>
-            <h3 class="country-title">France</h3>
-            <div class="gallery-grid"></div>
-        </body></html>
-        """
-
-        with self.assertRaises(ContentUpdateError):
-            render_photography_page(html, [row], "en")
-
     def test_csv_rows_reject_extra_fields(self):
         with tempfile.TemporaryDirectory() as directory:
-            csv_path = Path(directory) / "photographies.csv"
+            csv_path = Path(directory) / "books.csv"
             csv_path.write_text(
-                "id,type,page,section,title,alt,src,href,location,year,card_class,data_location,local_qid\n"
-                ",Photograph,en/photography/example.html,France,Title,,https://example.org/a.jpg,,,,photo-card,,,Photograph\n",
+                "id,type,name,creator,creator_qid,wikidata_url,local_qid\n"
+                ",Book,A Book,An Author,,,Q1,surplus\n",
                 encoding="utf-8",
             )
-
             with self.assertRaises(ContentUpdateError):
-                read_rows(FAMILIES["photographies"], csv_path)
-
-    def test_photography_page_clones_q315_links_card(self):
-        row = ContentRow(
-            family="photographies",
-            row_number=2,
-            data={
-                "type": "Photograph",
-                "page": "Q315/Q3062/Q3025/Q3082/Q3154.html",
-                "section": "Q3154",
-                "title": "A new canal",
-                "src": "https://example.org/canal.jpg",
-                "href": "Q3154.html",
-                "data_location": "Canal",
-            },
-        )
-        html = """
-        <html><body>
-            <section class="city-section">
-                <h4 class="city-name">Q3154</h4>
-                <div class="links">
-                    <ul>
-                        <li>
-                            <a data-location="Bridge" href="Q3154.html">
-                                <div class="azure-scan"></div>
-                                <img alt="" src="https://example.org/old.jpg" />
-                            </a>
-                        </li>
-                    </ul>
-                </div>
-            </section>
-        </body></html>
-        """
-
-        updated, added, skipped, repaired = render_photography_page(html, [row], "en")
-
-        self.assertEqual(added, 1)
-        self.assertEqual(skipped, 0)
-        self.assertEqual(repaired, 0)
-        self.assertIn('data-location="Canal"', updated)
-        self.assertIn('src="https://example.org/canal.jpg"', updated)
-        self.assertIn('alt=""', updated)
-        self.assertIn("azure-scan", updated)
-
-    def test_q315_photography_family_uses_travel_pipeline(self):
-        row = ContentRow(
-            family="photographies",
-            row_number=2,
-            data={
-                "type": "Photograph",
-                "page": "Q315/Q3062/Q3025/Q3082/Q3154.html",
-                "section": "Q3154",
-                "title": "A new canal",
-                "src": "https://example.org/canal.jpg",
-                "href": "Q3154.html",
-                "data_location": "Canal",
-            },
-        )
-
-        with self.assertRaisesRegex(ContentUpdateError, "abstract travel pipeline"):
-            render_q315_family(FAMILIES["photographies"], [row], apply=False)
+                read_rows(FAMILIES["books"], csv_path)
 
     def test_q315_cv_appends_under_existing_year(self):
         row = ContentRow(
@@ -822,9 +708,12 @@ class LegacyApplyGuardTests(unittest.TestCase):
         self.assertTrue(changes)
         self.assertFalse(any(change.changed for change in changes))
 
-    def test_photographies_keeps_the_legacy_apply_path(self):
-        self.assertEqual(FAMILIES["photographies"].q315_path, "")
-        self.assertEqual(render_family(FAMILIES["photographies"], [], apply=True), [])
+    def test_every_family_is_now_q315_owned(self):
+        """Photography was the last family without a Q315 source; it is retired."""
+        self.assertNotIn("photographies", FAMILIES)
+        for name, family in FAMILIES.items():
+            with self.subTest(family=name):
+                self.assertTrue(family.q315_path)
 
 
 class CheckModeTests(unittest.TestCase):
@@ -1238,6 +1127,154 @@ class SourceBindingRepairTests(unittest.TestCase):
         diff = diff_q315_family(family, rows)
         self.assertEqual(diff.missing, ())
         self.assertEqual(diff.orphaned, ())
+
+
+class BindModeTests(unittest.TestCase):
+    """--mode bind adds binding metadata and can never change content."""
+
+    PAGE = """<html><body>
+        <ol class="music-list">
+            <li property="itemListElement" typeof="ListItem">
+                <span typeof="Person"><span property="name">Zaz</span>
+                <link property="sameAs" href="https://www.wikidata.org/wiki/Q3141268" /></span>
+            </li>
+        </ol>
+    </body></html>"""
+
+    @staticmethod
+    def row(name="Zaz", wikidata="Q3141268", local_qid="Q101"):
+        return ContentRow(
+            family="music",
+            row_number=2,
+            data={
+                "type": "Person",
+                "name": name,
+                "wikidata_url": f"https://www.wikidata.org/wiki/{wikidata}",
+                "local_qid": local_qid,
+            },
+        )
+
+    def bind(self, page, rows):
+        return content_update.bind_page(page, FAMILIES["music"], rows, "en")
+
+    def test_an_existing_entry_gains_its_binding(self):
+        updated, bound, already, unmatched = self.bind(self.PAGE, [self.row()])
+        self.assertEqual((bound, already, unmatched), (1, 0, []))
+        self.assertIn('data-q315-source="local:Q101"', updated)
+        self.assertIn('data-q315-function="local:Q4182"', updated)
+
+    def test_binding_is_idempotent(self):
+        once, _, _, _ = self.bind(self.PAGE, [self.row()])
+        twice, bound, already, _ = self.bind(once, [self.row()])
+        self.assertEqual((bound, already), (0, 1))
+        self.assertEqual(twice, once)
+
+    def test_visible_content_is_never_touched(self):
+        updated, _, _, _ = self.bind(self.PAGE, [self.row()])
+        self.assertEqual(
+            BeautifulSoup(updated, "html.parser").get_text(),
+            BeautifulSoup(self.PAGE, "html.parser").get_text(),
+        )
+
+    def test_a_row_with_no_entry_is_reported_never_inserted(self):
+        updated, bound, already, unmatched = self.bind(
+            self.PAGE, [self.row(name="Nobody", wikidata="Q999999", local_qid="Q900")]
+        )
+        self.assertEqual((bound, already), (0, 0))
+        self.assertEqual(len(unmatched), 1)
+        self.assertEqual(updated, self.PAGE)
+        self.assertNotIn("Nobody", updated)
+
+    def test_entry_count_cannot_grow(self):
+        rows = [self.row(), self.row(name="Ghost", wikidata="Q999999", local_qid="Q900")]
+        updated, _, _, _ = self.bind(self.PAGE, rows)
+        self.assertEqual(updated.count("<li"), self.PAGE.count("<li"))
+
+    def test_a_row_without_a_local_qid_is_skipped(self):
+        row = self.row()
+        row.data["local_qid"] = ""
+        updated, bound, already, unmatched = self.bind(self.PAGE, [row])
+        self.assertEqual((bound, already, unmatched), (0, 0, []))
+        self.assertEqual(updated, self.PAGE)
+
+    def test_every_music_page_is_bound(self):
+        """Regression guard for F2: music must not drift back to unbound."""
+        family = FAMILIES["music"]
+        rows = read_rows(family, REPO_ROOT / "data/content-updates" / family.csv_name)
+        for target in family.targets():
+            with self.subTest(language=target.language):
+                _updated, bound, already, unmatched = content_update.bind_page(
+                    target.path.read_text(encoding="utf-8"), family, rows, target.language
+                )
+                self.assertEqual(bound, 0)
+                self.assertEqual(already, len(rows))
+                self.assertEqual(unmatched, [])
+
+
+class ColumnSchemaTests(unittest.TestCase):
+    """The column list is the single declaration of a family's shape."""
+
+    def test_every_family_declares_its_columns(self):
+        self.assertEqual(set(content_update.FAMILY_COLUMNS), set(FAMILIES))
+
+    def test_fieldnames_come_from_the_schema(self):
+        for name, family in FAMILIES.items():
+            with self.subTest(family=name):
+                self.assertEqual(
+                    content_update.default_fieldnames(family),
+                    [c.name for c in content_update.FAMILY_COLUMNS[name]],
+                )
+
+    def test_column_names_are_unique_within_a_family(self):
+        for name, columns in content_update.FAMILY_COLUMNS.items():
+            with self.subTest(family=name):
+                names = [c.name for c in columns]
+                self.assertEqual(len(names), len(set(names)))
+
+    def test_every_alternative_is_itself_a_column(self):
+        for name, columns in content_update.FAMILY_COLUMNS.items():
+            declared = {c.name for c in columns}
+            for column in columns:
+                for alternative in column.alternatives:
+                    with self.subTest(family=name, column=column.name):
+                        self.assertIn(alternative, declared)
+
+    def test_every_qid_column_is_declared(self):
+        """csv_bound_qids reads these, so a missing declaration loses bindings."""
+        for name, columns in content_update.FAMILY_COLUMNS.items():
+            declared = {c.name for c in columns}
+            rows = read_rows(
+                FAMILIES[name], REPO_ROOT / "data/content-updates" / FAMILIES[name].csv_name
+            )
+            used = {k for row in rows for k, v in row.data.items() if k.endswith("_qid") and v}
+            with self.subTest(family=name):
+                self.assertEqual(used - declared - {"attribution_qid"}, set())
+
+    def test_a_required_column_accepts_its_language_variant(self):
+        spec = content_update.ColumnSpec("page", required=True, per_language=True)
+        row = ContentRow(family="books", row_number=2, data={"page_fr": "fr/x.html"})
+        self.assertTrue(spec.satisfied_by(row))
+        self.assertFalse(spec.satisfied_by(ContentRow(family="books", row_number=2, data={})))
+
+    def test_a_required_column_accepts_an_alternative(self):
+        spec = content_update.ColumnSpec("year", required=True, alternatives=("year_qid",))
+        self.assertTrue(spec.satisfied_by(ContentRow(family="cv", row_number=2, data={"year_qid": "Q1"})))
+        self.assertTrue(spec.satisfied_by(ContentRow(family="cv", row_number=2, data={"year": "2026"})))
+        self.assertFalse(spec.satisfied_by(ContentRow(family="cv", row_number=2, data={})))
+
+    def test_whitespace_only_does_not_satisfy_a_column(self):
+        spec = content_update.ColumnSpec("name", required=True)
+        self.assertFalse(spec.satisfied_by(ContentRow(family="books", row_number=2, data={"name": "   "})))
+
+
+class ReaderTests(unittest.TestCase):
+    def test_both_readers_return_the_same_rows(self):
+        family = FAMILIES["quotes"]
+        path = REPO_ROOT / "data/content-updates" / family.csv_name
+        fieldnames, with_header = content_update.read_rows_with_header(family, path)
+        plain = read_rows(family, path)
+        self.assertEqual([r.data for r in plain], [r.data for r in with_header])
+        self.assertTrue(fieldnames)
 
 
 if __name__ == "__main__":

@@ -13,7 +13,7 @@ from paths import REPO_ROOT
 from wikibase_quickstatements import quickstatements_quote
 
 
-LANGUAGES = ("en", "fr", "ml", "pa", "hi", "pt", "es", "it")
+from languages import ORDER as LANGUAGES
 SUPPLEMENTAL_LANGUAGES = ("ml", "pa", "hi")
 TRAVEL_ROOTS = {
     "fr": REPO_ROOT / "fr/voyages",

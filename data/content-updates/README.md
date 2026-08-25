@@ -64,9 +64,6 @@ Wikidata policy:
 
 - `books.csv`: `wikidata_url` may be empty.
 - `quotes.csv`: `wikidata_url` is not used.
-- `photographies.csv`: `wikidata_url` is not used by this append helper.
-  Photography Wikibase/content binding is owned by the Q315 abstract travel
-  pipeline under `src/main/abstract/`.
 - `cv.csv`: `wikidata_url` is optional and should be used only when the CV row
   itself has a linked publication or external Wikidata identity.
 - `films-series-documentaries.csv`, `museums-galleries.csv`, and `music.csv` require
@@ -106,66 +103,11 @@ quote. Use `part_qids` for long quotes that are already split into multiple
 content items because of Wikibase text limits, and `attribution_qid` for the
 author/source line.
 
-For photographies, each row represents one travel/gallery placement of one image.
-The row is keyed by `page + src`, so the same image may appear on several pages.
-Use `section` to choose the QID/literal gallery subsection heading, `src` for the
-image URL, and optional `href`, `location`, `year`, `card_class`, and
-`data_location` to match the local page style. Do not use `q315-preview` or
-`q315-apply` for photography; Q315 abstract photography/travel pages are owned by
-the manifest workflow below. `preview` is retained as a read-only diagnostic,
-and photography is the only family for which `apply` still runs.
+`photographies.csv` is retired. It is kept as an inventory of the 1,136 image
+placements it recorded, but `content_update.py` no longer has a `photographies`
+family and will not read it: photography is owned by the Q315 travel workflow,
+which is the only pipeline that binds and renders it.
 
-Entries on a Q315 source must carry a `data-content="local:Q…"` binding, not the
-bare QID as text: the renderer substitutes a per-language label into a bound slot,
-and an unbound one reaches the page as the literal QID. `q315-apply` repairs
-older entries that were authored unbound.
-
-Items that cannot be bound yet are listed in `UNBOUND_CONTENT_QIDS` in
-`content_update.py` with the reason. Binding an item makes the round-trip
-verifier require its stored label to appear on every language page, so an item
-whose Wikibase label disagrees with the published pages has to be corrected in
-Wikibase first.
-
-Binding is all-or-nothing per container. `render_page.py` places labels by slot
-position, so a container with one unbound entry among bound ones renders the
-bound labels into shifted positions and leaves the unbound slot showing stale
-text, dropping one name from the page and duplicating another. A container
-holding any listed QID is therefore left entirely unbound until it can be bound
-completely. Once the correction is imported, remove the QID from the set and
-run `q315-apply` to bind the whole container in one pass.
-
-`UNBOUND_CONTENT_QIDS` is currently empty: every entry on every Q315 source is
-bound.
-
-Museum names are proper nouns and must read identically in every language, so a
-translated museum name is a Wikibase error, not a translation. Translations are
-Wikibase-driven and reach the pages through `labels-wikibase.csv`, so correcting
-one means editing Wikibase and refreshing that snapshot -- editing the snapshot
-alone only creates drift. The flow is:
-
-```sh
-python3 src/main/wikibase_write.py <corrections>.quickstatements --apply
-python3 src/main/abstract/fetch_wikibase_labels.py
-python3 src/main/content_update.py --family museums --mode q315-apply
-python3 src/main/abstract/render_page.py --page Q3643
-```
-
-QuickStatements files under `src/main/abstract/` are generated review material
-and are gitignored; write one, apply it, then commit the refreshed snapshot and
-the pages it changed. `Q3808` ("MO Museum") was corrected this way: its ml/pa/hi
-label and `P40` values were transliterations, and every other museum already
-carried the Latin name in all eight languages.
-
-`--mode apply` writes rendered language pages directly and therefore bypasses
-Q315. It is refused for every family that has a Q315 source, because the Q315
-renderer rewrites bound markup -- dropping `property="name"` and the `sameAs`
-link -- until the entry matching used by that path no longer recognises an entry
-that is already on the page, and appends a duplicate. Use `q315-apply` followed
-by `src/main/abstract/render_page.py` instead. `--mode preview` stays available
-as a read-only diagnostic and is the easiest way to see which rendered pages have
-drifted from their CSV.
-
-Do not use `content_update.py --family photographies --mode wikibase-*`.
 The canonical multilingual photography/travel workflow is:
 
 ```sh

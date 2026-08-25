@@ -20,18 +20,9 @@ from pathlib import Path
 from paths import REPO_ROOT
 
 
-LANGUAGE_NAMES = {
-    "en": "English",
-    "fr": "Français",
-    "ml": "മലയാളം",
-    "pa": "ਪੰਜਾਬੀ",
-    "hi": "हिन्दी",
-    "pt": "Português",
-    "es": "Español",
-    "it": "Italiano",
-}
+from languages import ENDONYMS as LANGUAGE_NAMES
 
-LANGUAGE_ORDER = ("en", "fr", "ml", "pa", "hi", "pt", "es", "it")
+from languages import ORDER as LANGUAGE_ORDER
 
 TRAVEL_DIRS = {
     "en": Path("en/photography"),

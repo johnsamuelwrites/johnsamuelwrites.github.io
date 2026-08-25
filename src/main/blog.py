@@ -23,6 +23,7 @@ from pytz import timezone
 
 from analyse import WebsiteAnalysis
 from config import SITE_AUTHOR, SITE_URL, SUPPORTED_LANGUAGES
+from languages import ENDONYMS, ORDER
 from git import get_first_latest_modification
 from manifest import BuildManifest
 from paths import REPO_ROOT
@@ -420,16 +421,10 @@ class BlogGenerator:
         articles_by_language: Dict[str, List[ArticleMetadata]],
     ) -> None:
         """Generate the main multilingual blog page."""
-        language_names = {
-            "en": "English",
-            "fr": "Français",
-            "ml": "മലയാളം",
-            "pa": "ਪੰਜਾਬੀ",
-            "hi": "हिन्दी",
-        }
+        language_names = ENDONYMS
 
         language_sections = ""
-        for lang_code in ["en", "fr", "ml", "pa", "hi"]:
+        for lang_code in ORDER:
             if lang_code not in articles_by_language:
                 continue
 

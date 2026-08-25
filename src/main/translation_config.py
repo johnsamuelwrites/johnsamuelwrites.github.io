@@ -6,8 +6,12 @@ Single source of truth for all translation defaults and paths.
 from pathlib import Path
 from paths import REPO_ROOT
 
-SOURCE_LANG = "en"
-DEFAULT_TARGET_LANGS = ["fr", "de", "pt", "nl", "es", "it", "ml", "pa", "hi"]
+from languages import SOURCE, TARGETS
+
+SOURCE_LANG = SOURCE
+# Previously listed "de" and "nl", which the site has never published, and
+# omitted nothing else -- the defaults now follow the registry.
+DEFAULT_TARGET_LANGS = list(TARGETS)
 
 # Data files live outside the repo
 _OUTSIDE_DIR = REPO_ROOT.parent / "photography"

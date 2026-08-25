@@ -10,7 +10,6 @@
 from __future__ import annotations
 
 import argparse
-import copy
 import csv
 import hashlib
 import html
@@ -31,7 +30,7 @@ from paths import REPO_ROOT, to_repo_relative
 from wikibase_api import DEFAULT_API, WikibaseClient, WikibaseError
 from wikibase_write import datavalue, load_env
 
-LANGUAGES = ("en", "fr", "ml", "pa", "hi", "pt", "es", "it")
+from languages import ORDER as LANGUAGES
 WIKIDATA_RE = re.compile(
     r"^https?://www\.wikidata\.org/(?:wiki|entity)/Q[1-9][0-9]*$"
 )
@@ -55,9 +54,6 @@ TYPE_ALIASES = {
     "music-group": "MusicGroup",
     "band": "MusicGroup",
     "quote": "Quote",
-    "photograph": "Photograph",
-    "photography": "Photograph",
-    "photo": "Photograph",
     "cv": "CVEntry",
     "cv-entry": "CVEntry",
     "cventry": "CVEntry",
@@ -104,6 +100,41 @@ CV_SIMPLE_PATHS = {
     "it": "it/ricerca/index.html",
 }
 
+
+@dataclass(frozen=True)
+class ColumnSpec:
+    """One CSV column, and what makes a row valid for it.
+
+    The families used to declare their columns twice -- once as a branch in
+    ``default_fieldnames`` and again as a branch in ``validate_rows`` -- so a new
+    column had to be added in two places and the README described a third
+    version. Both now read this list.
+    """
+
+    name: str
+    #: The row is invalid without a value here (or in one of `alternatives`).
+    required: bool = False
+    #: A `<name>_<language>` column satisfies the requirement too, which is how
+    #: the legacy `name_en` columns still work.
+    per_language: bool = False
+    #: Sibling columns that satisfy the requirement instead, such as `year_qid`
+    #: standing in for `year`.
+    alternatives: tuple[str, ...] = ()
+
+    def satisfied_by(self, row: "ContentRow") -> bool:
+        for column in (self.name, *self.alternatives):
+            if row.data.get(column, "").strip():
+                return True
+            if self.per_language and any(
+                row.data.get(f"{column}_{language}", "").strip() for language in LANGUAGES
+            ):
+                return True
+        return False
+
+
+ID_COLUMNS = (ColumnSpec("id"), ColumnSpec("type"))
+NAMED_ENTRY = (ColumnSpec("name", required=True, per_language=True),)
+WIKIDATA_COLUMNS = (ColumnSpec("wikidata_url"), ColumnSpec("local_qid"))
 
 @dataclass(frozen=True)
 class PageTarget:
@@ -229,15 +260,6 @@ FAMILIES: dict[str, FamilyConfig] = {
             "it": "it/scritti/citazioni.html",
         },
     ),
-    "photographies": FamilyConfig(
-        name="photographies",
-        csv_name="photographies.csv",
-        renderer="photography-gallery",
-        allowed_types=("Photograph",),
-        wikidata_required=False,
-        sort_entries=False,
-        paths={},
-    ),
     "cv": FamilyConfig(
         name="cv",
         csv_name="cv.csv",
@@ -257,6 +279,40 @@ FAMILIES: dict[str, FamilyConfig] = {
             "es": "es/investigación/cv-detallado.html",
             "it": "it/ricerca/cv-dettagliato.html",
         },
+    ),
+}
+
+
+FAMILY_COLUMNS: dict[str, tuple[ColumnSpec, ...]] = {
+    "books": (
+        *ID_COLUMNS,
+        *NAMED_ENTRY,
+        ColumnSpec("creator"),
+        ColumnSpec("creator_qid"),
+        *WIKIDATA_COLUMNS,
+    ),
+    "films": (*ID_COLUMNS, *NAMED_ENTRY, *WIKIDATA_COLUMNS),
+    "music": (*ID_COLUMNS, *NAMED_ENTRY, *WIKIDATA_COLUMNS),
+    "museums": (*ID_COLUMNS, *NAMED_ENTRY, ColumnSpec("type_label"), *WIKIDATA_COLUMNS),
+    "quotes": (
+        *ID_COLUMNS,
+        ColumnSpec("category", required=True, per_language=True),
+        ColumnSpec("quote", required=True, per_language=True),
+        ColumnSpec("attribution", required=True, per_language=True),
+        ColumnSpec("local_qid"),
+    ),
+    "cv": (
+        *ID_COLUMNS,
+        ColumnSpec("target"),
+        ColumnSpec("section", required=True),
+        ColumnSpec("year", required=True, alternatives=("year_qid",)),
+        ColumnSpec("year_qid"),
+        ColumnSpec("content", required=True, per_language=True),
+        ColumnSpec("simple_content"),
+        ColumnSpec("part_qids"),
+        ColumnSpec("wikidata_url"),
+        ColumnSpec("local_qid"),
+        ColumnSpec("simple_local_qid"),
     ),
 }
 
@@ -281,14 +337,6 @@ class ContentRow:
             return qid
         if self.family == "quotes":
             return slugify(self.data.get("quote", "") or self.data.get("quote_en", ""))
-        if self.family == "photographies":
-            key = "|".join(
-                (
-                    self.data.get("page", ""),
-                    self.data.get("src", "") or self.data.get("title", "") or self.data.get("alt", ""),
-                )
-            )
-            return f"photo-{hashlib.sha1(key.encode('utf-8')).hexdigest()[:16]}" if key else ""
         if self.family == "cv":
             key = "|".join(
                 (
@@ -346,39 +394,10 @@ class ExtractedRow:
     creator: str = ""
     creator_qid: str = ""
     type_label: str = ""
-    page: str = ""
-    section: str = ""
-    src: str = ""
-    alt: str = ""
-    href: str = ""
-    location: str = ""
-    year: str = ""
-    card_class: str = ""
-    data_location: str = ""
-    section_id: str = ""
 
 
 def read_rows(family: FamilyConfig, csv_path: Path) -> list[ContentRow]:
-    if not csv_path.exists():
-        raise ContentUpdateError(f"CSV file not found: {csv_path}")
-
-    with csv_path.open("r", encoding="utf-8-sig", newline="") as handle:
-        reader = csv.DictReader(handle)
-        if not reader.fieldnames:
-            raise ContentUpdateError(f"{csv_path}: missing CSV header")
-        rows = []
-        for index, row in enumerate(reader, start=2):
-            if row.get(None):
-                raise ContentUpdateError(
-                    f"{csv_path}: line {index}: too many CSV fields"
-                )
-            if any(value.strip() for value in row.values() if value):
-                rows.append(
-                    ContentRow(family=family.name, row_number=index, data=_clean_row(row))
-                )
-
-    validate_rows(family, rows, csv_path)
-    return rows
+    return read_rows_with_header(family, csv_path)[1]
 
 
 def write_rows(csv_path: Path, fieldnames: list[str], rows: list[ContentRow]) -> None:
@@ -455,22 +474,6 @@ def merge_extracted_rows(
             data["creator_qid"] = item.creator_qid
         if family.name == "museums":
             data["type_label"] = item.type_label
-        if family.name == "photographies":
-            data = {
-                "id": "",
-                "type": "Photograph",
-                "page": item.page,
-                "section": item.section,
-                "title": item.name,
-                "alt": item.alt,
-                "src": item.src,
-                "href": item.href,
-                "location": item.location,
-                "year": item.year,
-                "card_class": item.card_class,
-                "data_location": item.data_location,
-                "local_qid": item.local_qid,
-            }
         rows.append(ContentRow(family=family.name, row_number=len(rows) + 2, data=data))
         row_keys.add(key)
         added += 1
@@ -482,51 +485,10 @@ def merge_extracted_rows(
 
 
 def default_fieldnames(family: FamilyConfig) -> list[str]:
-    if family.name == "photographies":
-        return [
-            "id",
-            "type",
-            "page",
-            "section",
-            "title",
-            "alt",
-            "src",
-            "href",
-            "location",
-            "year",
-            "card_class",
-            "data_location",
-            "local_qid",
-        ]
-    if family.name == "cv":
-        return [
-            "id",
-            "type",
-            "target",
-            "section",
-            "year",
-            "year_qid",
-            "content",
-            "simple_content",
-            "part_qids",
-            "wikidata_url",
-            "local_qid",
-            "simple_local_qid",
-        ]
-    if family.name == "quotes":
-        return ["id", "type", "category", "quote", "attribution", "local_qid"]
-    fields = ["id", "type", "name", "wikidata_url", "local_qid"]
-    if family.name == "books":
-        fields.insert(3, "creator")
-        fields.insert(4, "creator_qid")
-    if family.name == "museums":
-        fields.insert(3, "type_label")
-    return fields
+    return [column.name for column in FAMILY_COLUMNS[family.name]]
 
 
 def row_key(row: ContentRow) -> tuple[str, str]:
-    if row.family == "photographies":
-        return ("page-src", normalize_text(f"{row.data.get('page', '')}|{row.data.get('src', '')}"))
     if row.family == "cv":
         return ("cv", normalize_text(f"{row.data.get('section', '')}|{row.data.get('year_qid', '') or row.data.get('year', '')}|{cv_content(row, 'en')}"))
     wikidata = wikidata_qid(row.wikidata_url)
@@ -536,8 +498,6 @@ def row_key(row: ContentRow) -> tuple[str, str]:
 
 
 def extracted_key(row: ExtractedRow) -> tuple[str, str]:
-    if row.item_type == "Photograph":
-        return ("page-src", normalize_text(f"{row.page}|{row.src}"))
     wikidata = wikidata_qid(row.wikidata_url)
     if wikidata:
         return ("wikidata", wikidata)
@@ -545,8 +505,6 @@ def extracted_key(row: ExtractedRow) -> tuple[str, str]:
 
 
 def extract_existing_rows(family: FamilyConfig) -> list[ExtractedRow]:
-    if family.renderer == "photography-gallery":
-        return extract_photography_rows()
     english_path = family.targets()[0].path
     html_content = english_path.read_text(encoding="utf-8")
     if family.renderer == "ordered-list":
@@ -556,91 +514,6 @@ def extract_existing_rows(family: FamilyConfig) -> list[ExtractedRow]:
     if family.renderer == "quote-grid":
         return extract_quote_rows(html_content)
     raise ContentUpdateError(f"Unsupported renderer: {family.renderer}")
-
-
-def extract_photography_rows() -> list[ExtractedRow]:
-    rows: list[ExtractedRow] = []
-    for path in sorted((REPO_ROOT / "Q315/Q3062").glob("**/*.html")):
-        html_content = path.read_text(encoding="utf-8")
-        soup = BeautifulSoup(html_content, features="html.parser")
-        for image in soup.find_all("img", src=True):
-            if not isinstance(image, Tag):
-                continue
-            src = str(image.get("src", "")).strip()
-            if "/photography/" not in src:
-                continue
-            alt = str(image.get("alt", "")).strip()
-            card = photography_container_for_image(image)
-            if not isinstance(card, Tag):
-                continue
-            section = nearest_photography_section(card)
-            link = card if card.name == "a" else card.find("a", href=True)
-            data_location = str(link.get("data-location", "")).strip() if isinstance(link, Tag) else ""
-            location = card.find(class_=re.compile(r"(photo|bridge|boat)-(location|title)"))
-            year = card.find(class_=re.compile(r"year-badge"))
-            classes = card.get("class", [])
-            if isinstance(classes, str):
-                card_class = classes
-            else:
-                card_class = " ".join(str(value) for value in classes)
-            rows.append(
-                ExtractedRow(
-                    item_type="Photograph",
-                    name=alt or title_from_image_src(src),
-                    wikidata_url="",
-                    local_qid=local_qid_from_tag(card),
-                    page=to_repo_relative(path),
-                    section=section,
-                    src=src,
-                    alt=alt,
-                    href=str(link.get("href", "")).strip() if isinstance(link, Tag) else "",
-                    location=location.get_text(" ", strip=True) if isinstance(location, Tag) else "",
-                    year=year.get_text(" ", strip=True) if isinstance(year, Tag) else "",
-                    card_class=card_class,
-                    data_location=data_location,
-                )
-            )
-    return rows
-
-
-def photography_container_for_image(image: Tag) -> Tag | None:
-    card = image.find_parent(["article", "a"], class_=re.compile(r"(photo|bridge|gallery|boat)-card"))
-    if isinstance(card, Tag):
-        return card
-    link_item = image.find_parent("li")
-    if isinstance(link_item, Tag) and link_item.find_parent("div", class_="links"):
-        return link_item
-    article = image.find_parent("article")
-    if isinstance(article, Tag):
-        return article
-    link = image.find_parent("a")
-    return link if isinstance(link, Tag) else None
-
-
-def nearest_photography_section(card: Tag) -> str:
-    parent = card.parent
-    while isinstance(parent, Tag):
-        heading = None
-        for sibling in parent.find_previous_siblings():
-            if not isinstance(sibling, Tag):
-                continue
-            heading = sibling.find(["h2", "h3", "h4"], class_=re.compile(r"(section|country|city)-title"))
-            if heading:
-                return heading.get_text(" ", strip=True)
-            if sibling.name in {"h2", "h3", "h4"}:
-                return sibling.get_text(" ", strip=True)
-        direct_heading = parent.find(["h2", "h3", "h4"], class_=re.compile(r"(section|country|city)-title"), recursive=False)
-        if direct_heading:
-            return direct_heading.get_text(" ", strip=True)
-        parent = parent.parent
-    return ""
-
-
-def title_from_image_src(src: str) -> str:
-    filename = src.rstrip("/").rsplit("/", 1)[-1]
-    filename = re.sub(r"^\d+px-", "", filename)
-    filename = re.sub(r"\.[A-Za-z0-9]+$", "", filename)
-    return filename.replace("_", " ").replace("-", " ").strip()
 
 
 def extract_ordered_list_rows(html_content: str, family: FamilyConfig) -> list[ExtractedRow]:
@@ -768,34 +641,19 @@ def validate_rows(family: FamilyConfig, rows: list[ContentRow], csv_path: Path) 
             allowed = ", ".join(family.allowed_types)
             errors.append(f"line {row.row_number}: type must be one of {allowed}")
 
-        if family.name == "quotes":
-            if not row.data.get("quote", "").strip() and not row.data.get("quote_en", "").strip():
-                errors.append(f"line {row.row_number}: missing quote")
-            if not row.data.get("attribution", "").strip() and not row.data.get("attribution_en", "").strip():
-                errors.append(f"line {row.row_number}: missing attribution")
-            if not row.data.get("category", "").strip() and not row.data.get("category_en", "").strip():
-                errors.append(f"line {row.row_number}: missing category")
-        elif family.name == "photographies":
-            if not row.data.get("src", "").strip():
-                errors.append(f"line {row.row_number}: missing src")
-            if not row.data.get("page", "").strip() and not any(
-                row.data.get(f"page_{language}", "").strip() for language in LANGUAGES
-            ):
-                errors.append(f"line {row.row_number}: missing page or page_<language>")
-        elif family.name == "cv":
+        for column in FAMILY_COLUMNS[family.name]:
+            if column.required and not column.satisfied_by(row):
+                names = [column.name, *column.alternatives]
+                if column.per_language:
+                    names.append(f"{column.name}_<language>")
+                wanted = " or ".join(names)
+                errors.append(f"line {row.row_number}: missing {wanted}")
+
+        if family.name == "cv":
             try:
                 cv_targets(row)
             except ContentUpdateError as error:
                 errors.append(str(error).replace(f"cv:{row.row_number}: ", f"line {row.row_number}: "))
-            if not row.data.get("section", "").strip():
-                errors.append(f"line {row.row_number}: missing section")
-            if not row.data.get("content", "").strip() and not row.data.get("content_en", "").strip():
-                errors.append(f"line {row.row_number}: missing content")
-            if not row.data.get("year", "").strip() and not row.data.get("year_qid", "").strip():
-                errors.append(f"line {row.row_number}: missing year or year_qid")
-        else:
-            if not row.data.get("name", "").strip() and not row.data.get("name_en", "").strip():
-                errors.append(f"line {row.row_number}: missing name")
 
         wikidata_url = row.wikidata_url
         if family.wikidata_required and not wikidata_url:
@@ -807,11 +665,7 @@ def validate_rows(family: FamilyConfig, rows: list[ContentRow], csv_path: Path) 
                 errors.append(f"line {row.row_number}: duplicate wikidata_url {wikidata_url}")
             seen_wikidata.add(wikidata_url)
 
-    if family.name == "photographies":
-        for page in photography_target_pages(rows):
-            if not (REPO_ROOT / page).exists():
-                errors.append(f"missing target page: {page}")
-    elif family.name == "cv":
+    if family.name == "cv":
         for target in family.targets():
             if not target.path.exists():
                 errors.append(f"missing target page: {to_repo_relative(target.path)}")
@@ -838,8 +692,6 @@ def render_family(family: FamilyConfig, rows: list[ContentRow], *, apply: bool) 
             "src/main/abstract/render_page.py. --mode preview remains available as a "
             "read-only diagnostic."
         )
-    if family.name == "photographies":
-        return render_photography_family(rows, apply=apply)
     if family.name == "cv":
         return render_cv_family(rows, apply=apply)
     changes = []
@@ -917,12 +769,6 @@ def render_cv_family(rows: list[ContentRow], *, apply: bool) -> list[PageChange]
 
 
 def render_q315_family(family: FamilyConfig, rows: list[ContentRow], *, apply: bool) -> list[PageChange]:
-    if family.name == "photographies":
-        raise ContentUpdateError(
-            "photographies use the Q315 abstract travel pipeline; use "
-            "src/main/abstract/prepare_travel_content.py and "
-            "src/main/abstract/bind_travel_manifest.py instead"
-        )
     if family.name == "cv":
         return render_q315_cv_family(rows, apply=apply)
     target = family.q315_target
@@ -1012,244 +858,6 @@ def render_q315_content(
     if family.renderer == "detailed-cv":
         return render_q315_cv_text(html_content, rows)
     raise ContentUpdateError(f"Unsupported Q315 renderer: {family.renderer}")
-
-
-def photography_target_pages(rows: list[ContentRow]) -> list[str]:
-    pages: set[str] = set()
-    for row in rows:
-        for _language, page in photography_pages_for_row(row):
-            if page:
-                pages.add(page)
-    return sorted(pages)
-
-
-def photography_page_for_row(row: ContentRow, language: str) -> str:
-    return (
-        row.data.get(f"page_{language}", "").strip()
-        or row.data.get("page", "").strip()
-    )
-
-
-def photography_pages_for_row(row: ContentRow) -> list[tuple[str, str]]:
-    localized = [
-        (language, row.data.get(f"page_{language}", "").strip())
-        for language in LANGUAGES
-        if row.data.get(f"page_{language}", "").strip()
-    ]
-    if localized:
-        return localized
-    page = row.data.get("page", "").strip()
-    return [(language_from_page(page), page)] if page else []
-
-
-def render_photography_family(rows: list[ContentRow], *, apply: bool) -> list[PageChange]:
-    grouped: dict[str, list[ContentRow]] = {}
-    page_languages: dict[str, str] = {}
-    for row in rows:
-        for language, page in photography_pages_for_row(row):
-            if not page:
-                continue
-            grouped.setdefault(page, []).append(row)
-            page_languages.setdefault(page, language or language_from_page(page))
-
-    changes: list[PageChange] = []
-    for page, page_rows in sorted(grouped.items()):
-        path = REPO_ROOT / page
-        original = path.read_text(encoding="utf-8")
-        updated, added, skipped, repaired = render_photography_page(
-            original,
-            page_rows,
-            page_languages.get(page, "en"),
-        )
-        changed = updated != original
-        if apply and changed:
-            rewrite_text_file(path, lambda _content, updated=updated: updated)
-        changes.append(
-            PageChange(
-                family="photographies",
-                path=path,
-                language=page_languages.get(page, "en"),
-                added=added,
-                skipped=skipped,
-                repaired=repaired,
-                changed=changed,
-            )
-        )
-    return changes
-
-
-def language_from_page(page: str) -> str:
-    prefix = page.split("/", 1)[0]
-    return prefix if prefix in LANGUAGES else "en"
-
-
-def render_photography_page(
-    html_content: str,
-    rows: list[ContentRow],
-    language: str,
-) -> tuple[str, int, int, int]:
-    soup = BeautifulSoup(html_content, features="html.parser")
-    added = 0
-    skipped = 0
-    repaired = 0
-    for row in rows:
-        existing = find_photography_card_by_src(soup, row.data.get("src", ""))
-        if existing:
-            before = str(existing)
-            add_photography_binding(existing, row)
-            skipped += 1
-            if str(existing) != before:
-                repaired += 1
-            continue
-        grid = find_photography_grid(soup, row)
-        if not isinstance(grid, Tag):
-            raise ContentUpdateError(
-                f"photographies:{row.row_number}: gallery grid not found for {row.data.get('page', '')}"
-            )
-        grid.append(soup.new_string("\n"))
-        grid.append(build_photography_card(soup, grid, row, language))
-        grid.append(soup.new_string("\n"))
-        added += 1
-    if added == 0 and repaired == 0:
-        return html_content, added, skipped, repaired
-    return str(soup), added, skipped, repaired
-
-
-def find_photography_card_by_src(soup: BeautifulSoup, src: str) -> Tag | None:
-    if not src:
-        return None
-    image = soup.find("img", attrs={"src": src})
-    if not isinstance(image, Tag):
-        return None
-    return photography_container_for_image(image)
-
-
-def add_photography_binding(card: Tag, row: ContentRow) -> None:
-    if row.local_qid and not card.get("data-q315-source"):
-        card["data-q315-source"] = f"local:{row.local_qid}"
-        card["data-q315-function"] = f"local:{CONTENT_RENDER_FUNCTION}"
-
-
-def find_photography_grid(soup: BeautifulSoup, row: ContentRow) -> Tag | None:
-    expected_section = row.data.get("section", "").strip()
-    if expected_section:
-        for heading in soup.find_all(["h2", "h3", "h4"]):
-            if normalize_text(heading.get_text(" ", strip=True)) != normalize_text(expected_section):
-                continue
-            parent = heading.parent
-            while isinstance(parent, Tag):
-                links = parent.find("div", class_="links")
-                if isinstance(links, Tag):
-                    linked_list = links.find("ul")
-                    if isinstance(linked_list, Tag):
-                        return linked_list
-                grid = parent.find(["div", "section"], class_=re.compile(r"(gallery|photo)-grid"))
-                if isinstance(grid, Tag):
-                    return grid
-                parent = parent.parent
-            sibling_links = heading.find_next("div", class_="links")
-            if isinstance(sibling_links, Tag):
-                linked_list = sibling_links.find("ul")
-                if isinstance(linked_list, Tag):
-                    return linked_list
-            sibling = heading.find_next(["div", "section"], class_=re.compile(r"(gallery|photo)-grid"))
-            if isinstance(sibling, Tag):
-                return sibling
-        return None
-    links = soup.find("div", class_="links")
-    if isinstance(links, Tag):
-        linked_list = links.find("ul")
-        if isinstance(linked_list, Tag):
-            return linked_list
-    return soup.find(["div", "section"], class_=re.compile(r"(gallery|photo)-grid"))
-
-
-def build_photography_card(soup: BeautifulSoup, container: Tag, row: ContentRow, language: str) -> Tag:
-    template = photography_template_card(container)
-    if template:
-        card = copy.copy(template)
-        update_photography_card(card, row, language, abstract=photography_is_abstract_page(row))
-        return card
-
-    classes = row.data.get("card_class", "").strip().split() or ["photo-card"]
-    card = soup.new_tag("article")
-    card["class"] = classes
-    add_photography_binding(card, row)
-
-    href = row.data.get("href", "").strip()
-    container: Tag = card
-    if href:
-        link = soup.new_tag("a", href=href)
-        card.append(link)
-        container = link
-
-    wrapper = soup.new_tag("div")
-    wrapper["class"] = "photo-wrapper"
-    image = soup.new_tag("img")
-    image["class"] = "photo-image"
-    image["src"] = row.data.get("src", "").strip()
-    image["alt"] = row.localized("alt", language, required=False) or row.localized("title", language, required=False)
-    wrapper.append(image)
-    container.append(wrapper)
-
-    location = row.localized("location", language, required=False)
-    if location:
-        info = soup.new_tag("div")
-        info["class"] = "photo-info"
-        title = soup.new_tag("h4")
-        title["class"] = "photo-location"
-        title.string = location
-        info.append(title)
-        container.append(info)
-
-    year = row.data.get("year", "").strip()
-    if year:
-        badge = soup.new_tag("div")
-        badge["class"] = "year-badge"
-        badge.string = year
-        card.append(badge)
-    return card
-
-
-def photography_template_card(container: Tag) -> Tag | None:
-    for child in reversed([child for child in container.find_all(recursive=False) if isinstance(child, Tag)]):
-        if child.find("img", src=True):
-            return child
-    return None
-
-
-def photography_is_abstract_page(row: ContentRow) -> bool:
-    return any(page.startswith("Q315/") for _language, page in photography_pages_for_row(row))
-
-
-def update_photography_card(card: Tag, row: ContentRow, language: str, *, abstract: bool) -> None:
-    image = card.find("img")
-    if isinstance(image, Tag):
-        image["src"] = row.data.get("src", "").strip()
-        alt = row.localized("alt", language, required=False) or row.localized("title", language, required=False)
-        image["alt"] = "" if abstract else alt
-
-    href = row.data.get("href", "").strip()
-    link = card if card.name == "a" else card.find("a", href=True)
-    if href and isinstance(link, Tag):
-        link["href"] = href
-    data_location = row.data.get("data_location", "").strip()
-    if not data_location:
-        data_location = row.localized("location", language, required=False)
-    if data_location and isinstance(link, Tag):
-        link["data-location"] = data_location
-
-    location = row.localized("location", language, required=False)
-    location_node = card.find(class_=re.compile(r"(photo|bridge|boat)-(location|title)"))
-    if location and isinstance(location_node, Tag):
-        location_node.string = location
-
-    year = row.data.get("year", "").strip()
-    year_node = card.find(class_=re.compile(r"year-badge"))
-    if year and isinstance(year_node, Tag):
-        year_node.string = year
-    if row.local_qid:
-        add_photography_binding(card, row)
 
 
 def render_content(
@@ -2785,6 +2393,13 @@ Q315_CONTENT_CONTAINERS = {
     "museum-grid": ("div", r"museums-grid"),
     "quote-grid": ("div", r"quotes-grid"),
 }
+# The entry element each renderer writes inside its container. Used by --mode bind
+# to find an entry that is already on the page, never to create one.
+Q315_ENTRY_PATTERNS = {
+    "ordered-list": r"\s*<li\b[\s\S]*?</li>",
+    "museum-grid": r"\s*<article\b[^>]*class=[\"'][^\"']*museum-card[^\"']*[\"'][\s\S]*?</article>",
+    "quote-grid": r"\s*<div\b[^>]*class=[\"'][^\"']*quote-card[^\"']*[\"'][\s\S]*?</div>",
+}
 
 
 @dataclass(frozen=True)
@@ -2938,6 +2553,114 @@ def q315_creator_pairs(html_content: str) -> dict[str, str]:
         if name_qid and creator_qid:
             pairs[name_qid] = creator_qid
     return pairs
+
+
+@dataclass
+class BindResult:
+    family: str
+    path: Path
+    language: str
+    bound: int
+    already: int
+    unmatched: list[str]
+    changed: bool
+
+
+def container_spans(html_content: str, tag: str, class_pattern: str) -> list[tuple[int, int]]:
+    """Inner bounds of every container the renderer writes entries into."""
+    spans: list[tuple[int, int]] = []
+    for match in re.finditer(rf"<{tag}\b[^>]*>", html_content, re.IGNORECASE):
+        if not re.search(
+            rf"class=[\"'][^\"']*{class_pattern}[^\"']*[\"']", match.group(0), re.IGNORECASE
+        ):
+            continue
+        bounds = find_matching_close(html_content, tag, match.start(), match.end())
+        if bounds:
+            spans.append((bounds[1], bounds[2]))
+    return spans
+
+
+def bind_page(
+    html_content: str,
+    family: FamilyConfig,
+    rows: list[ContentRow],
+    language: str,
+) -> tuple[str, int, int, list[str]]:
+    """Add binding metadata to entries that are already on the page.
+
+    This is the safe complement of the retired apply path: it only ever adds
+    ``data-q315-source``/``data-q315-function`` to an entry that already matches
+    a CSV row, and never inserts, reorders, removes or rewrites content. A row
+    with no matching entry is reported, not created.
+    """
+    tag, class_pattern = Q315_CONTENT_CONTAINERS[family.renderer]
+    entry_pattern = Q315_ENTRY_PATTERNS[family.renderer]
+    bound = already = 0
+    matched: set[int] = set()
+
+    # Right to left, so an edit never invalidates a span not yet visited.
+    for open_end, close_start in reversed(container_spans(html_content, tag, class_pattern)):
+        inner = html_content[open_end:close_start]
+        for row in rows:
+            if not row.local_qid:
+                continue
+            match = matching_block(extract_blocks(inner, entry_pattern), row, language)
+            if not match:
+                continue
+            matched.add(row.row_number)
+            start, end, block = match
+            updated_block = add_q315_binding(block, row)
+            if updated_block != block:
+                inner = inner[:start] + updated_block + inner[end:]
+                bound += 1
+            else:
+                already += 1
+        html_content = html_content[:open_end] + inner + html_content[close_start:]
+
+    unmatched = [row.stable_id for row in rows if row.local_qid and row.row_number not in matched]
+    return html_content, bound, already, unmatched
+
+
+def bind_family(family: FamilyConfig, rows: list[ContentRow], *, apply: bool) -> list[BindResult]:
+    if family.renderer not in Q315_CONTENT_CONTAINERS:
+        raise ContentUpdateError(
+            f"{family.name}: --mode bind does not support the {family.renderer} renderer"
+        )
+    results: list[BindResult] = []
+    for target in family.targets():
+        original = target.path.read_text(encoding="utf-8")
+        updated, bound, already, unmatched = bind_page(original, family, rows, target.language)
+        changed = updated != original
+        if apply and changed:
+            rewrite_text_file(target.path, lambda _content, updated=updated: updated)
+        results.append(
+            BindResult(
+                family=family.name,
+                path=target.path,
+                language=target.language,
+                bound=bound,
+                already=already,
+                unmatched=unmatched,
+                changed=changed,
+            )
+        )
+    return results
+
+
+def format_bind_results(results: list[BindResult]) -> str:
+    if not results:
+        return "No pages bound."
+    lines = []
+    for result in results:
+        lines.append(
+            f"{result.family}:{result.language}: "
+            f"{'changed' if result.changed else 'unchanged'}; "
+            f"bound={result.bound}, already={result.already}, "
+            f"unmatched={len(result.unmatched)}; {to_repo_relative(result.path)}"
+        )
+        for stable_id in result.unmatched[:5]:
+            lines.append(f"  - no entry on the page for {stable_id}")
+    return "\n".join(lines)
 
 
 def format_changes(changes: list[PageChange]) -> str:
@@ -3274,12 +2997,6 @@ def monolingual_claim_languages(claims: dict, property_id: str) -> set[str]:
 def content_text_for_wikibase(row: ContentRow) -> str:
     if row.family == "quotes":
         return row.localized("quote", "en")
-    if row.family == "photographies":
-        return (
-            row.localized("title", "en", required=False)
-            or row.localized("alt", "en", required=False)
-            or title_from_image_src(row.data.get("src", ""))
-        )
     if row.family == "cv":
         return cv_content(row, "en")
     return row.localized("name", "en", required=True)
@@ -3289,8 +3006,6 @@ def content_texts_for_wikibase(row: ContentRow) -> dict[str, str]:
     if row.family == "cv":
         return {language: cv_content(row, language) for language in LANGUAGES}
     field = "quote" if row.family == "quotes" else "name"
-    if row.family == "photographies":
-        field = "title" if row.data.get("title", "").strip() else "alt"
     values = {
         language: row.localized(field, language, required=False)
         for language in LANGUAGES
@@ -3632,6 +3347,7 @@ def parse_args(argv: list[str]) -> argparse.Namespace:
             "validate",
             "check",
             "diff",
+            "bind",
             "preview",
             "apply",
             "q315-preview",
@@ -3646,8 +3362,10 @@ def parse_args(argv: list[str]) -> argparse.Namespace:
             "source is already in sync with its CSV and exits non-zero otherwise; "
             "preview computes rendered page changes; "
             "apply rewrites rendered pages; q315-preview computes abstract source changes "
-            "for non-photography Q315 families; q315-apply rewrites abstract source pages; "
+            "q315-apply rewrites abstract source pages; "
             "diff reports QID bindings present on one side only; "
+            "bind adds binding metadata to entries already on the rendered pages "
+            "without inserting or rewriting any content; "
             "extract backfills CSV rows and QID columns from existing pages; "
             "wikibase-plan checks local Wikibase; wikibase-apply binds/repairs local "
             "Wikibase items and writes local_qid."
@@ -3660,6 +3378,11 @@ def parse_args(argv: list[str]) -> argparse.Namespace:
         help="Credential file for wikibase-apply.",
     )
     parser.add_argument("--api", default=None, help="Wikibase API endpoint.")
+    parser.add_argument(
+        "--apply",
+        action="store_true",
+        help="For --mode bind: write the binding metadata. Default is a dry run.",
+    )
     parser.add_argument("--summary", default="Import curated content item")
     parser.add_argument(
         "--allow-create",
@@ -3677,17 +3400,12 @@ def main(argv: list[str] | None = None) -> int:
     try:
         all_changes: list[PageChange] = []
         all_diffs: list[QidDiff] = []
+        all_binds: list[BindResult] = []
         all_wikibase_actions: list[WikibaseRowAction] = []
         extract_reports: list[str] = []
         client: WikibaseClient | None = None
         content_index: ContentItemIndex | None = None
         if args.mode in {"wikibase-plan", "wikibase-apply"}:
-            if "photographies" in selected:
-                raise ContentUpdateError(
-                    "photographies use the Q315 abstract travel pipeline for Wikibase "
-                    "bindings; use src/main/abstract/prepare_travel_content.py and "
-                    "src/main/abstract/bind_travel_manifest.py instead"
-                )
             load_env(args.env_file)
             api = args.api or os.getenv("WIKIBASE_API", DEFAULT_API)
             client = WikibaseClient(api, pause=0.25 if args.mode == "wikibase-apply" else 0)
@@ -3740,13 +3458,14 @@ def main(argv: list[str] | None = None) -> int:
             if args.mode in {"q315-preview", "q315-apply"}:
                 all_changes.extend(render_q315_family(family, rows, apply=args.mode == "q315-apply"))
             elif args.mode == "check":
-                # Families without a Q315 source (photographies) are covered by
-                # read_rows validation alone; they have no abstract page to compare.
                 if family.q315_path:
                     all_changes.extend(render_q315_family(family, rows, apply=False))
             elif args.mode == "diff":
                 if family.q315_path:
                     all_diffs.append(diff_q315_family(family, rows))
+            elif args.mode == "bind":
+                if family.renderer in Q315_CONTENT_CONTAINERS:
+                    all_binds.extend(bind_family(family, rows, apply=args.apply))
             elif args.mode not in {"validate", "wikibase-plan", "wikibase-apply"}:
                 all_changes.extend(render_family(family, rows, apply=args.mode == "apply"))
         if args.mode == "validate":
@@ -3763,6 +3482,10 @@ def main(argv: list[str] | None = None) -> int:
                 )
                 return 1
             print("\nCheck passed: every Q315 source is in sync with its CSV.")
+        elif args.mode == "bind":
+            print(format_bind_results(all_binds))
+            if not args.apply:
+                print("\nDry run only; pass --apply to write.")
         elif args.mode == "diff":
             print(format_qid_diffs(all_diffs))
             drifted = [diff for diff in all_diffs if not diff.clean]

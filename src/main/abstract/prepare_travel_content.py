@@ -22,7 +22,7 @@ from abstract.css_assets import (
 )
 
 
-LANGUAGES = ("en", "fr", "ml", "pa", "hi", "pt", "es", "it")
+from languages import ORDER as LANGUAGES
 TEXT_TAGS = {"p", "h1", "h2", "h3", "h4", "h5", "h6", "a", "span", "button", "label", "li", "figcaption"}
 QID_TEXT = re.compile(r"(?:Q[0-9]+\s*)+")
 MOJIBAKE_MARKERS = ("Ã", "â")

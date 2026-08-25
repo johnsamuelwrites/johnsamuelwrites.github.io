@@ -8,19 +8,12 @@
 
 from __future__ import annotations
 
+from languages import ENGLISH_NAMES
+
 SITE_URL = "https://johnsamuel.info"
 SITE_AUTHOR = "John Samuel"
 
-SUPPORTED_LANGUAGES: dict[str, str] = {
-    "en": "English",
-    "fr": "Francais",
-    "pt": "Portuguese",
-    "es": "Spanish",
-    "it": "Italian",
-    "ml": "Malayalam",
-    "pa": "Punjabi",
-    "hi": "Hindi",
-}
+SUPPORTED_LANGUAGES: dict[str, str] = dict(ENGLISH_NAMES)
 
 CATEGORY_MAP: dict[str, str] = {
     "research": "research",
