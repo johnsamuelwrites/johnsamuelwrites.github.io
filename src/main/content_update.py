@@ -65,6 +65,18 @@ TYPE_ALIASES = {
     "conference": "CVEntry",
     "journal": "CVEntry",
 }
+# Items that cannot be bound on their Q315 source yet. Binding one makes the
+# round-trip verifier require its stored label to appear on every language page,
+# so an item whose Wikibase value disagrees with the published pages must be
+# corrected in Wikibase first.
+#
+# Binding is all-or-nothing per container: render_page.py places labels by slot
+# *position*, so a container holding one unbound entry among bound ones renders
+# the bound labels into shifted positions and leaves the unbound slot showing
+# stale text -- dropping one name from the page and duplicating another. A
+# container with any QID listed here is therefore left entirely unbound until it
+# can be bound completely. See museum_entries_are_bindable().
+UNBOUND_CONTENT_QIDS: frozenset[str] = frozenset()
 ABSTRACT_CONTENT_ITEM = "Q3185"
 INSTANCE_OF_PROPERTY = "P8"
 WIKIDATA_ITEM_PROPERTY = "P4"
@@ -989,7 +1001,11 @@ def render_q315_content(
             language="en",
             build_block=build_q315_museum_card_html,
             sort_entries=False,
-            repair_block=repair_q315_block,
+            repair_block=(
+                repair_q315_museum_block
+                if museum_entries_are_bindable(rows)
+                else repair_q315_block
+            ),
         )
     if family.renderer == "quote-grid":
         return render_q315_quotes_text(html_content, rows)
@@ -1566,6 +1582,33 @@ def repair_q315_block(block: str, row: ContentRow) -> str:
     return block
 
 
+def repair_q315_museum_block(block: str, row: ContentRow) -> str:
+    """Bind the museum name heading.
+
+    Older sources wrote the heading as bare QID text -- ``<h2 class="museum-name"
+    typeof="Museum">Q3792</h2>`` -- with no ``data-content``, so the renderer had
+    nothing to substitute a per-language label into and the literal QID would
+    reach the page. The QID already being present as text is exactly why the
+    generic repair skips these blocks, so handle the heading first.
+    """
+    if row.local_qid and row.local_qid not in UNBOUND_CONTENT_QIDS:
+        block = bind_first_tag(block, r"h2", r"museum-name", row.local_qid)
+    return repair_q315_block(block, row)
+
+
+def bind_first_tag(block: str, tag: str, class_name: str, qid: str) -> str:
+    """Add ``data-content="local:<qid>"`` to the first matching unbound tag."""
+    match = re.search(
+        rf"<{tag}\b[^>]*class=[\"'][^\"']*{class_name}[^\"']*[\"'][^>]*>",
+        block,
+        re.IGNORECASE,
+    )
+    if not match or "data-content=" in match.group(0):
+        return block
+    insert_at = match.end() - 1
+    return block[:insert_at] + f' data-content="local:{esc(qid)}"' + block[insert_at:]
+
+
 def add_attrs_to_first_tag(block: str, tag: str, class_name: str, attrs: str) -> str:
     if not attrs:
         return block
@@ -1674,7 +1717,8 @@ def build_q315_museum_card_html(row: ContentRow) -> str:
         [
             '<article class="museum-card">',
             '    <div class="museum-icon"></div>',
-            f'    <h2 class="museum-name" typeof="{esc(row.item_type)}">{esc(row.local_qid)}</h2>',
+            f'    <h2 class="museum-name" typeof="{esc(row.item_type)}"'
+            f'{museum_name_binding(row)}>{esc(row.local_qid)}</h2>',
             f'    <link property="sameAs" href="{esc(row.wikidata_url)}" />',
             f'    <span class="museum-type" data-content="local:{museum_type_label_qid(row)}">{museum_type_label_qid(row)}</span>',
             "</article>",
@@ -1700,6 +1744,17 @@ def build_museum_list_item_html(row: ContentRow, language: str) -> str:
 def ensure_local_qid(row: ContentRow) -> None:
     if not row.local_qid:
         raise ContentUpdateError(f"{row.family}:{row.row_number}: local_qid is required for Q315 source updates")
+
+
+def museum_entries_are_bindable(rows: list[ContentRow]) -> bool:
+    """True when every museum can be bound, so the grid can be bound as a whole."""
+    return not any(row.local_qid in UNBOUND_CONTENT_QIDS for row in rows)
+
+
+def museum_name_binding(row: ContentRow) -> str:
+    if row.local_qid in UNBOUND_CONTENT_QIDS:
+        return ""
+    return f' data-content="local:{esc(row.local_qid)}"'
 
 
 def museum_type_label_qid(row: ContentRow) -> str:
@@ -1770,6 +1825,10 @@ def render_q315_quotes_text(
         ensure_local_qid(row)
         if row.local_qid in updated:
             skipped += 1
+            repaired_text = repair_q315_quote_attribution(updated, row)
+            if repaired_text != updated:
+                updated = repaired_text
+                repaired += 1
             continue
         section_bounds = find_quote_section_bounds(updated, row, "en")
         if not section_bounds:
@@ -1795,6 +1854,41 @@ def render_q315_quotes_text(
         updated = updated[:section_start] + section_html + updated[section_close_start:]
         added += 1
     return updated, added, skipped, repaired
+
+
+def repair_q315_quote_attribution(html_content: str, row: ContentRow) -> str:
+    """Bind a quote's author line when the source wrote it as bare QID text.
+
+    Split quotes predate the ``attribution_qid`` column, so their author line was
+    authored as ``<p class="quote-author">Q6325</p>`` with no binding and the
+    renderer had no label to substitute per language.
+    """
+    attribution_qid = row.data.get("attribution_qid", "").strip()
+    if not re.fullmatch(r"Q[1-9][0-9]*", attribution_qid):
+        return html_content
+    card = find_quote_card_bounds(html_content, row)
+    if not card:
+        return html_content
+    start, end = card
+    block = html_content[start:end]
+    bound = bind_first_tag(block, r"p", r"quote-author", attribution_qid)
+    if bound == block:
+        return html_content
+    return html_content[:start] + bound + html_content[end:]
+
+
+def find_quote_card_bounds(html_content: str, row: ContentRow) -> tuple[int, int] | None:
+    """Locate the quote card that carries this row's content binding."""
+    for match in re.finditer(
+        r"<div\b[^>]*class=[\"'][^\"']*quote-card[^\"']*[\"'][^>]*>", html_content
+    ):
+        bounds = find_matching_close(html_content, "div", match.start(), match.end())
+        if not bounds:
+            continue
+        card = html_content[bounds[0] : bounds[3]]
+        if re.search(rf"local:{re.escape(row.local_qid)}\b", card):
+            return bounds[0], bounds[3]
+    return None
 
 
 def find_quote_section_bounds(

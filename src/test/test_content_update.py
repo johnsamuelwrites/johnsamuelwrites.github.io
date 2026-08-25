@@ -1,7 +1,9 @@
 import unittest
 import html as html_lib
 import io
+import re
 import tempfile
+from unittest import mock
 from contextlib import redirect_stderr, redirect_stdout
 from dataclasses import replace
 from pathlib import Path
@@ -10,6 +12,8 @@ import sys
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "main"))
 
+import content_update
+
 from content_update import (
     ABSTRACT_CONTENT_ITEM,
     ContentRow,
@@ -17,7 +21,11 @@ from content_update import (
     FAMILIES,
     INSTANCE_OF_PROPERTY,
     MONOLINGUAL_CONTENT_PROPERTY,
+    UNBOUND_CONTENT_QIDS,
+    bind_first_tag,
     build_q315_list_item_html,
+    build_q315_museum_card_html,
+    build_q315_quote_card_html,
     build_wikibase_content_item_data,
     build_wikibase_repair_data,
     backfill_q315_qids,
@@ -28,7 +36,10 @@ from content_update import (
     content_texts_for_wikibase,
     main,
     normalize_text,
+    museum_entries_are_bindable,
     q315_content_qids,
+    repair_q315_museum_block,
+    repair_q315_quote_attribution,
     q315_creator_pairs,
     read_rows,
     render_content,
@@ -1047,6 +1058,186 @@ class BindingDiffTests(unittest.TestCase):
         )
         markup = build_q315_list_item_html(FAMILIES["books"], row)
         self.assertIn(">Someone<", markup)
+
+
+class SourceBindingRepairTests(unittest.TestCase):
+    """Q315 sources must bind every entry, not carry a bare QID as text."""
+
+    @staticmethod
+    def museum_row(local_qid, item_type="Museum"):
+        return ContentRow(
+            family="museums",
+            row_number=2,
+            data={
+                "type": item_type,
+                "name": "A Museum",
+                "wikidata_url": "https://www.wikidata.org/wiki/Q1",
+                "local_qid": local_qid,
+            },
+        )
+
+    def test_bind_first_tag_adds_the_binding_once(self):
+        block = '<h2 class="museum-name" typeof="Museum">Q10</h2>'
+        bound = bind_first_tag(block, r"h2", r"museum-name", "Q10")
+        self.assertEqual(
+            bound, '<h2 class="museum-name" typeof="Museum" data-content="local:Q10">Q10</h2>'
+        )
+        self.assertEqual(bind_first_tag(bound, r"h2", r"museum-name", "Q10"), bound)
+
+    def test_bind_first_tag_ignores_a_tag_that_is_already_bound(self):
+        block = '<h2 class="museum-name" data-content="local:Q99">Q99</h2>'
+        self.assertEqual(bind_first_tag(block, r"h2", r"museum-name", "Q10"), block)
+
+    def test_museum_repair_binds_a_bare_qid_heading(self):
+        block = (
+            '<article class="museum-card">'
+            '<h2 class="museum-name" typeof="Museum">Q10</h2>'
+            '<span class="museum-type" data-content="local:Q3351">Q3351</span>'
+            "</article>"
+        )
+        repaired = repair_q315_museum_block(block, self.museum_row("Q10"))
+        self.assertIn('data-content="local:Q10"', repaired)
+
+    def test_museum_repair_is_idempotent(self):
+        block = '<article class="museum-card"><h2 class="museum-name">Q10</h2></article>'
+        row = self.museum_row("Q10")
+        once = repair_q315_museum_block(block, row)
+        self.assertEqual(repair_q315_museum_block(once, row), once)
+
+    def test_new_museum_card_is_born_bound(self):
+        markup = build_q315_museum_card_html(self.museum_row("Q10"))
+        self.assertIn('data-content="local:Q10"', markup)
+
+    def test_blocked_items_are_left_unbound(self):
+        qid = "Q4242"
+        with mock.patch.object(content_update, "UNBOUND_CONTENT_QIDS", frozenset({qid})):
+            block = f'<article class="museum-card"><h2 class="museum-name">{qid}</h2></article>'
+            self.assertEqual(repair_q315_museum_block(block, self.museum_row(qid)), block)
+            markup = build_q315_museum_card_html(self.museum_row(qid))
+            # The type-label binding is unrelated and must stay; only the name is unbound.
+            self.assertIn(f'<h2 class="museum-name" typeof="Museum">{qid}</h2>', markup)
+            self.assertIn('class="museum-type" data-content=', markup)
+
+    def test_nothing_is_currently_blocked(self):
+        self.assertEqual(UNBOUND_CONTENT_QIDS, frozenset())
+
+    def test_quote_attribution_repair_binds_the_author_line(self):
+        row = ContentRow(
+            family="quotes",
+            row_number=2,
+            data={
+                "type": "Quote",
+                "category": "Art",
+                "quote": "A quote",
+                "attribution": "Someone",
+                "local_qid": "Q10",
+                "attribution_qid": "Q11",
+            },
+        )
+        html = (
+            '<div class="quotes-grid">'
+            '<div class="quote-card">'
+            '<p class="quote-text" data-content="local:Q10">Q10</p>'
+            '<p class="quote-author">Q11</p>'
+            "</div></div>"
+        )
+        repaired = repair_q315_quote_attribution(html, row)
+        self.assertIn('<p class="quote-author" data-content="local:Q11">Q11</p>', repaired)
+        self.assertEqual(repair_q315_quote_attribution(repaired, row), repaired)
+
+    def test_quote_attribution_repair_skips_rows_without_a_qid(self):
+        row = ContentRow(
+            family="quotes",
+            row_number=2,
+            data={
+                "type": "Quote",
+                "category": "Art",
+                "quote": "A quote",
+                "attribution": "Someone",
+                "local_qid": "Q10",
+            },
+        )
+        html = '<div class="quote-card"><p class="quote-text" data-content="local:Q10">Q10</p><p class="quote-author">Someone</p></div>'
+        self.assertEqual(repair_q315_quote_attribution(html, row), html)
+
+    def test_quote_attribution_repair_targets_the_matching_card(self):
+        row = ContentRow(
+            family="quotes",
+            row_number=2,
+            data={
+                "type": "Quote",
+                "category": "Art",
+                "quote": "A quote",
+                "attribution": "Someone",
+                "local_qid": "Q20",
+                "attribution_qid": "Q21",
+            },
+        )
+        html = (
+            '<div class="quote-card"><p class="quote-text" data-content="local:Q10">Q10</p>'
+            '<p class="quote-author">Q11</p></div>'
+            '<div class="quote-card"><p class="quote-text" data-content="local:Q20">Q20</p>'
+            '<p class="quote-author">Q21</p></div>'
+        )
+        repaired = repair_q315_quote_attribution(html, row)
+        self.assertIn('<p class="quote-author">Q11</p>', repaired)
+        self.assertIn('<p class="quote-author" data-content="local:Q21">Q21</p>', repaired)
+
+    def test_quote_builder_already_binds_a_known_attribution(self):
+        row = ContentRow(
+            family="quotes",
+            row_number=2,
+            data={
+                "type": "Quote",
+                "category": "Art",
+                "quote": "A quote",
+                "attribution": "Someone",
+                "local_qid": "Q10",
+                "attribution_qid": "Q11",
+            },
+        )
+        self.assertIn('data-content="local:Q11"', build_q315_quote_card_html(row))
+
+    def test_quote_source_has_no_unbound_entries(self):
+        """Regression guard: every quote entry on the source carries its binding."""
+        family = FAMILIES["quotes"]
+        rows = read_rows(family, REPO_ROOT / "data/content-updates" / family.csv_name)
+        self.assertEqual(diff_q315_family(family, rows).missing, ())
+
+    def test_a_container_with_a_blocked_entry_stays_wholly_unbound(self):
+        """Positional rendering makes partial binding unsafe, so bind all or none."""
+        blocked = "Q4242"
+        with mock.patch.object(content_update, "UNBOUND_CONTENT_QIDS", frozenset({blocked})):
+            self.assertFalse(
+                museum_entries_are_bindable([self.museum_row("Q10"), self.museum_row(blocked)])
+            )
+            self.assertTrue(
+                museum_entries_are_bindable([self.museum_row("Q10"), self.museum_row("Q20")])
+            )
+
+    def test_a_blocked_entry_leaves_the_whole_museum_source_untouched(self):
+        family = FAMILIES["museums"]
+        rows = read_rows(family, REPO_ROOT / "data/content-updates" / family.csv_name)
+        source = family.q315_target.read_text(encoding="utf-8")
+        with mock.patch.object(
+            content_update, "UNBOUND_CONTENT_QIDS", frozenset({rows[0].local_qid})
+        ):
+            self.assertFalse(museum_entries_are_bindable(rows))
+            unbound_source = re.sub(r' data-content="local:Q\d+"(?=>Q)', "", source)
+            updated, added, _skipped, repaired = render_q315_content(
+                family, rows, unbound_source
+            )
+        self.assertEqual((added, repaired), (0, 0))
+        self.assertEqual(updated, unbound_source)
+
+    def test_museums_source_binds_every_entry(self):
+        """Regression guard: all 31 museum names carry their binding."""
+        family = FAMILIES["museums"]
+        rows = read_rows(family, REPO_ROOT / "data/content-updates" / family.csv_name)
+        self.assertTrue(museum_entries_are_bindable(rows))
+        diff = diff_q315_family(family, rows)
+        self.assertEqual(diff.missing, ())
+        self.assertEqual(diff.orphaned, ())
 
 
 if __name__ == "__main__":
