@@ -19,6 +19,7 @@ import os
 import re
 import sys
 import unicodedata
+from collections import Counter
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Iterable
@@ -1475,15 +1476,59 @@ def block_has_entry(block: str, row: ContentRow, language: str) -> bool:
         return True
     if row.family == "quotes":
         return False
+    if block_identifies_other_entry(block, row):
+        # The block names a different work. Two works can share a title -- the
+        # British and American "Queer as Folk" -- so falling through to the name
+        # comparison here would match the wrong entry and leave the right one
+        # unbound, which is how duplicates got appended in the first place.
+        return False
     expected = normalize_text(row.localized("name", language))
-    for value in re.findall(
-        r"<span\b[^>]*property=[\"']name[\"'][^>]*>([\s\S]*?)</span>",
-        block,
-        flags=re.IGNORECASE,
-    ):
-        if normalize_text(strip_tags(value)) == expected:
-            return True
-    return False
+    return expected in entry_name_candidates(block)
+
+
+NAME_SPAN = re.compile(
+    r'''<span\b[^>]*property=["']name["'][^>]*>([\s\S]*?)</span>''', re.IGNORECASE
+)
+# Legacy language pages carry the name as the heading's own text, with none of
+# the RDFa the Q315 renderer emits. The heading is still the entry's name, and
+# these names are never translated, so it is a sound match.
+NAME_HEADING = re.compile(
+    r'''<h\d\b[^>]*class=["'][^"']*(?:museum|quote|book|media|music)-name[^"']*["'][^>]*>'''
+    r"([\s\S]*?)</h\d>",
+    re.IGNORECASE,
+)
+
+
+def entry_name_candidates(block: str) -> set[str]:
+    """Every text on an entry that can stand for its name, normalized."""
+    candidates = {
+        normalize_text(strip_tags(value)) for value in NAME_SPAN.findall(block)
+    }
+    candidates.update(
+        normalize_text(strip_tags(value)) for value in NAME_HEADING.findall(block)
+    )
+    candidates.discard("")
+    return candidates
+
+
+def block_identifies_other_entry(block: str, row: ContentRow) -> bool:
+    """True when the block carries an identifier that contradicts ``row``.
+
+    A block bound to another content item, or carrying a different Wikidata
+    entity, is a different entry however closely the names agree.
+    """
+    bound = re.search(r'data-q315-source=["\']local:(Q\d+)["\']', block)
+    if bound and row.local_qid and bound.group(1) != row.local_qid:
+        return True
+    if not row.wikidata_url:
+        return False
+    return bool(
+        re.search(
+            r"<link\b(?=[^>]*property=[\"']sameAs[\"'])[^>]*href=[\"'][^\"']*wikidata\.org[^\"']*[\"']",
+            block,
+            flags=re.IGNORECASE,
+        )
+    )
 
 
 def q315_binding_attrs(row: ContentRow) -> str:
@@ -2782,6 +2827,7 @@ Q315_CONTENT_CONTAINERS = {
 }
 # The entry element each renderer writes inside its container. Used by --mode bind
 # to find an entry that is already on the page, never to create one.
+BOUND_SOURCE = re.compile(r'data-q315-source=["\']local:(Q\d+)["\']')
 Q315_ENTRY_PATTERNS = {
     "ordered-list": r"\s*<li\b[\s\S]*?</li>",
     "museum-grid": r"\s*<article\b[^>]*class=[\"'][^\"']*museum-card[^\"']*[\"'][\s\S]*?</article>",
@@ -3006,6 +3052,129 @@ def bind_page(
 
     unmatched = [row.stable_id for row in rows if row.local_qid and row.row_number not in matched]
     return html_content, bound, already, unmatched
+
+
+@dataclass(frozen=True)
+class ParityReport:
+    family: str
+    entries: dict[str, int]
+    bound: dict[str, int]
+    duplicates: dict[str, tuple[str, ...]]
+    expected: int
+    source_duplicates: tuple[str, ...] = ()
+
+    @property
+    def problems(self) -> list[str]:
+        found = []
+        if self.source_duplicates:
+            shown = ", ".join(self.source_duplicates[:5])
+            found.append(
+                f"the Q315 source lists a content item more than once ({shown}); "
+                "--mode diff compares QID sets and cannot see a repeat"
+            )
+        if len(set(self.entries.values())) > 1:
+            agreed = Counter(self.entries.values()).most_common(1)[0][0]
+            odd = ", ".join(
+                f"{language}={count}"
+                for language, count in sorted(self.entries.items())
+                if count != agreed
+            )
+            found.append(
+                f"language pages disagree on entry count "
+                f"(most carry {agreed}; {odd})"
+            )
+        for language in sorted(self.entries):
+            unbound = self.entries[language] - self.bound[language]
+            if unbound:
+                found.append(f"{language}: {unbound} entr(y/ies) carry no Q315 binding")
+            if self.duplicates[language]:
+                shown = ", ".join(self.duplicates[language][:5])
+                found.append(f"{language}: content item bound twice ({shown})")
+            if self.expected and self.bound[language] != self.expected:
+                found.append(
+                    f"{language}: {self.bound[language]} bound entr(y/ies) "
+                    f"but the CSV has {self.expected} row(s)"
+                )
+        return found
+
+
+def parity_family(family: FamilyConfig, rows: list[ContentRow]) -> ParityReport:
+    """Check that every language page carries the same entries as its siblings.
+
+    The families are legacy pages that `render_page.py` does not regenerate, so
+    nothing else notices when one language drifts -- gains a duplicate, loses an
+    entry, or never receives a binding. This compares the languages against each
+    other and against the CSV.
+    """
+    entry_pattern = Q315_ENTRY_PATTERNS[family.renderer]
+    tag, class_pattern = Q315_CONTENT_CONTAINERS[family.renderer]
+    entries: dict[str, int] = {}
+    bound: dict[str, int] = {}
+    duplicates: dict[str, tuple[str, ...]] = {}
+    for target in family.targets():
+        html_content = target.path.read_text(encoding="utf-8")
+        blocks = []
+        for open_end, close_start in container_spans(html_content, tag, class_pattern):
+            blocks.extend(
+                block for _start, _end, block in
+                extract_blocks(html_content[open_end:close_start], entry_pattern)
+            )
+        qids = [
+            match.group(1)
+            for match in (BOUND_SOURCE.search(block) for block in blocks)
+            if match
+        ]
+        seen: set[str] = set()
+        repeated = tuple(sorted({qid for qid in qids if qid in seen or seen.add(qid)}))
+        entries[target.language] = len(blocks)
+        bound[target.language] = len(qids)
+        duplicates[target.language] = repeated
+    expected = sum(1 for row in rows if row.local_qid) if family.mirrors_q315 else 0
+    return ParityReport(
+        family=family.name,
+        entries=entries,
+        bound=bound,
+        duplicates=duplicates,
+        expected=expected,
+        source_duplicates=repeated_source_entries(family),
+    )
+
+
+def repeated_source_entries(family: FamilyConfig) -> tuple[str, ...]:
+    """Content items the Q315 source lists more than once."""
+    source = family.q315_target
+    if not source or not source.exists():
+        return ()
+    tag, class_pattern = Q315_CONTENT_CONTAINERS[family.renderer]
+    entry_pattern = Q315_ENTRY_PATTERNS[family.renderer]
+    html_content = source.read_text(encoding="utf-8")
+    qids: list[str] = []
+    for open_end, close_start in container_spans(html_content, tag, class_pattern):
+        for _start, _end, block in extract_blocks(
+            html_content[open_end:close_start], entry_pattern
+        ):
+            found = re.search(r'data-content="local:(Q\d+)"', block)
+            if found:
+                qids.append(found.group(1))
+    return tuple(sorted(qid for qid, count in Counter(qids).items() if count > 1))
+
+
+def format_parity_reports(reports: list[ParityReport]) -> str:
+    if not reports:
+        return "No families checked for parity."
+    lines = []
+    for report in reports:
+        problems = report.problems
+        counts = ", ".join(
+            f"{language}={count}" for language, count in sorted(report.entries.items())
+        )
+        lines.append(
+            f"{report.family}: {'DRIFT' if problems else 'in parity'}; "
+            f"entries {counts}"
+        )
+        for problem in problems:
+            lines.append(f"  - {problem}")
+    return "\n".join(lines)
 
 
 def bind_family(family: FamilyConfig, rows: list[ContentRow], *, apply: bool) -> list[BindResult]:
@@ -3563,12 +3732,28 @@ def create_local_item_for_row(
     wikidata = wikidata_qid(row.wikidata_url)
     if family.wikidata_required and not wikidata:
         raise ContentUpdateError(f"{family.name}:{row.row_number}: Wikidata QID required for Wikibase create")
-    data = build_wikibase_content_item_data(name, wikidata, content_texts_for_wikibase(row))
-    result = client.edit_entity(data, summary=summary)
+    texts = content_texts_for_wikibase(row)
+    data = build_wikibase_content_item_data(name, wikidata, texts)
+    try:
+        result = client.edit_entity(data, summary=summary)
+    except WikibaseError as exc:
+        if not is_label_conflict(exc) or not wikidata:
+            raise
+        # Another item already holds this label with the generic description;
+        # qualify ours with the Wikidata QID and retry once.
+        data = build_wikibase_content_item_data(
+            name, wikidata, texts, description=content_item_description(wikidata)
+        )
+        result = client.edit_entity(data, summary=summary)
     entity_id = result.get("entity", {}).get("id")
     if not entity_id:
         raise WikibaseError(f"creation did not return entity id: {result}")
     return entity_id
+
+
+def is_label_conflict(error: Exception) -> bool:
+    message = str(error).lower()
+    return "label-description" in message or "already has label" in message
 
 
 def repair_local_item_for_row(
@@ -3585,10 +3770,28 @@ def repair_local_item_for_row(
     client.edit_entity(data, entity_id=row.local_qid, summary=summary)
 
 
+CONTENT_ITEM_DESCRIPTION = "language-independent content component used by an abstract page"
+
+
+def content_item_description(wikidata: str = "") -> str:
+    """Wikibase rejects two items sharing a label *and* description in a language.
+
+    Every content item is created with the same generic description, so two works
+    that legitimately share a title (the British and American "Queer as Folk")
+    collide. Qualifying the description with the Wikidata QID separates them;
+    descriptions are metadata and are never rendered.
+    """
+    if not wikidata:
+        return CONTENT_ITEM_DESCRIPTION
+    return f"{CONTENT_ITEM_DESCRIPTION} ({wikidata})"
+
+
 def build_wikibase_content_item_data(
     name: str,
     wikidata: str = "",
     content_by_language: dict[str, str] | None = None,
+    *,
+    description: str = CONTENT_ITEM_DESCRIPTION,
 ) -> dict:
     label = wikibase_label_text(name)
     content_by_language = content_by_language or {language: name for language in LANGUAGES}
@@ -3600,7 +3803,7 @@ def build_wikibase_content_item_data(
         "descriptions": {
             "en": {
                 "language": "en",
-                "value": "language-independent content component used by an abstract page",
+                "value": description,
             }
         },
         "claims": {
@@ -3743,6 +3946,7 @@ def parse_args(argv: list[str]) -> argparse.Namespace:
             "check",
             "diff",
             "bind",
+            "parity",
             "preview",
             "apply",
             "q315-preview",
@@ -3761,6 +3965,8 @@ def parse_args(argv: list[str]) -> argparse.Namespace:
             "diff reports QID bindings present on one side only; "
             "bind adds binding metadata to entries already on the rendered pages "
             "without inserting or rewriting any content; "
+            "parity asserts every language page of a family carries the same bound "
+            "entries as its siblings and as the CSV; "
             "extract backfills CSV rows and QID columns from existing pages; "
             "wikibase-plan checks local Wikibase; wikibase-apply binds/repairs local "
             "Wikibase items and writes local_qid."
@@ -3796,6 +4002,7 @@ def main(argv: list[str] | None = None) -> int:
         all_changes: list[PageChange] = []
         all_diffs: list[QidDiff] = []
         all_binds: list[BindResult] = []
+        all_parity: list[ParityReport] = []
         all_wikibase_actions: list[WikibaseRowAction] = []
         extract_reports: list[str] = []
         client: WikibaseClient | None = None
@@ -3867,6 +4074,9 @@ def main(argv: list[str] | None = None) -> int:
             elif args.mode == "bind":
                 if family.renderer in Q315_CONTENT_CONTAINERS:
                     all_binds.extend(bind_family(family, rows, apply=args.apply))
+            elif args.mode == "parity":
+                if family.renderer in Q315_CONTENT_CONTAINERS and family.paths:
+                    all_parity.append(parity_family(family, rows))
             elif args.mode not in {"validate", "wikibase-plan", "wikibase-apply"}:
                 all_changes.extend(render_family(family, rows, apply=args.mode == "apply"))
         if args.mode == "validate":
@@ -3887,6 +4097,17 @@ def main(argv: list[str] | None = None) -> int:
             print(format_bind_results(all_binds))
             if not args.apply:
                 print("\nDry run only; pass --apply to write.")
+        elif args.mode == "parity":
+            print(format_parity_reports(all_parity))
+            drifted = [report for report in all_parity if report.problems]
+            if drifted:
+                print(
+                    f"\n{len(drifted)} family/families have drifted between languages. "
+                    "Run --mode bind to bind entries the pages already carry.",
+                    file=sys.stderr,
+                )
+                return 1
+            print("\nParity holds: every language page carries the same bound entries.")
         elif args.mode == "diff":
             print(format_qid_diffs(all_diffs))
             drifted = [diff for diff in all_diffs if not diff.clean]

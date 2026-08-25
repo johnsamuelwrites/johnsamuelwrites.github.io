@@ -24,6 +24,7 @@ from content_update import (
     MONOLINGUAL_CONTENT_PROPERTY,
     UNBOUND_CONTENT_QIDS,
     bind_first_tag,
+    block_has_entry,
     build_q315_list_item_html,
     build_q315_museum_card_html,
     build_q315_quote_card_html,
@@ -34,9 +35,11 @@ from content_update import (
     derived_q315_qids,
     diff_q315_family,
     canonical_wikidata_url,
+    content_item_description,
     content_texts_for_wikibase,
     main,
     normalize_text,
+    parity_family,
     museum_entries_are_bindable,
     q315_content_qids,
     repair_q315_museum_block,
@@ -1387,6 +1390,116 @@ class ReaderTests(unittest.TestCase):
         plain = read_rows(family, path)
         self.assertEqual([r.data for r in plain], [r.data for r in with_header])
         self.assertTrue(fieldnames)
+
+
+class ContradictingEntryTests(unittest.TestCase):
+    """A block naming a different work must never match on its title alone.
+
+    Two works can share a title -- the British and American "Queer as Folk" --
+    so a name comparison that ignores the identifiers binds the wrong entry and
+    leaves the right one unbound.
+    """
+
+    @staticmethod
+    def row(local_qid="Q100", wikidata="Q23623"):
+        return ContentRow(
+            family="films",
+            row_number=2,
+            data={
+                "type": "TVSeries",
+                "name": "Queer as Folk",
+                "wikidata_url": f"https://www.wikidata.org/wiki/{wikidata}",
+                "local_qid": local_qid,
+            },
+        )
+
+    def test_a_matching_wikidata_url_is_a_match(self):
+        block = (
+            '<li><span typeof="TVSeries"><span property="name">Queer as Folk</span>'
+            '<link property="sameAs" href="https://www.wikidata.org/wiki/Q23623" />'
+            "</span></li>"
+        )
+        self.assertTrue(block_has_entry(block, self.row(), "en"))
+
+    def test_a_different_wikidata_url_is_not_a_match(self):
+        block = (
+            '<li><span typeof="TVSeries"><span property="name">Queer as Folk</span>'
+            '<link property="sameAs" href="https://www.wikidata.org/wiki/Q23619" />'
+            "</span></li>"
+        )
+        self.assertFalse(block_has_entry(block, self.row(), "en"))
+
+    def test_a_block_bound_to_another_item_is_not_a_match(self):
+        block = (
+            '<li data-q315-source="local:Q999"><span typeof="TVSeries">'
+            '<span property="name">Queer as Folk</span></span></li>'
+        )
+        self.assertFalse(block_has_entry(block, self.row(), "en"))
+
+    def test_a_name_only_block_still_matches(self):
+        block = '<li><span property="name">Queer as Folk</span></li>'
+        self.assertTrue(block_has_entry(block, self.row(), "en"))
+
+    def test_a_legacy_heading_matches_without_rdfa(self):
+        row = ContentRow(
+            family="museums",
+            row_number=2,
+            data={"type": "Museum", "name": "Abbamuseet", "local_qid": "Q100"},
+        )
+        block = '<article class="museum-card"><h2 class="museum-name">Abbamuseet</h2></article>'
+        self.assertTrue(block_has_entry(block, row, "ml"))
+
+
+class ContentItemDescriptionTests(unittest.TestCase):
+    def test_a_plain_description_carries_no_qid(self):
+        self.assertNotIn("(", content_item_description())
+
+    def test_the_wikidata_qid_disambiguates_a_shared_label(self):
+        self.assertTrue(content_item_description("Q23619").endswith("(Q23619)"))
+
+    def test_two_works_sharing_a_title_get_different_descriptions(self):
+        self.assertNotEqual(
+            content_item_description("Q23619"), content_item_description("Q23623")
+        )
+
+
+class ParityModeTests(unittest.TestCase):
+    """Every language page of a family must carry the same bound entries."""
+
+    def report(self, family_name):
+        family = FAMILIES[family_name]
+        rows = read_rows(family, REPO_ROOT / "data/content-updates" / family.csv_name)
+        return parity_family(family, rows)
+
+    def test_every_list_family_is_in_parity(self):
+        for family_name in ("books", "films", "museums", "music", "quotes"):
+            with self.subTest(family=family_name):
+                self.assertEqual(self.report(family_name).problems, [])
+
+    def test_a_family_agrees_with_its_csv(self):
+        for family_name in ("books", "films", "museums", "music", "quotes"):
+            with self.subTest(family=family_name):
+                report = self.report(family_name)
+                self.assertEqual(set(report.bound.values()), {report.expected})
+
+    def test_a_missing_entry_is_reported(self):
+        report = self.report("museums")
+        broken = replace(report, entries={**report.entries, "ml": report.entries["ml"] - 1})
+        self.assertTrue(
+            any("disagree on entry count" in problem for problem in broken.problems)
+        )
+
+    def test_an_unbound_entry_is_reported(self):
+        report = self.report("museums")
+        broken = replace(report, bound={**report.bound, "ml": report.bound["ml"] - 1})
+        self.assertTrue(
+            any("no Q315 binding" in problem for problem in broken.problems)
+        )
+
+    def test_a_twice_bound_content_item_is_reported(self):
+        report = self.report("museums")
+        broken = replace(report, duplicates={**report.duplicates, "ml": ("Q3792",)})
+        self.assertTrue(any("bound twice" in problem for problem in broken.problems))
 
 
 if __name__ == "__main__":
