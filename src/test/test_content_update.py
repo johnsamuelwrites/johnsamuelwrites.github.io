@@ -830,6 +830,66 @@ class LegacyApplyGuardTests(unittest.TestCase):
         self.assertEqual(FAMILIES["photographies"].q315_path, "")
         self.assertEqual(render_family(FAMILIES["photographies"], [], apply=True), [])
 
+    def test_no_family_would_gain_an_entry_from_the_legacy_path(self):
+        """The duplicate-appending failure mode the guard was added for is gone.
+
+        `apply` used to append an entry it had already written, because the Q315
+        renderer strips the markup `block_has_entry` recognised it by. Every
+        family is now a no-op through that path, so a regression here means an
+        entry has stopped being recognised again.
+        """
+        for name, family in FAMILIES.items():
+            if not family.paths:
+                continue
+            rows = read_rows(family, REPO_ROOT / "data/content-updates" / family.csv_name)
+            with self.subTest(family=name):
+                for change in render_family(family, rows, apply=False):
+                    self.assertEqual(change.added, 0, f"{name}:{change.language}")
+                    self.assertFalse(change.changed, f"{name}:{change.language}")
+
+
+class StrippedMarkupRecognitionTests(unittest.TestCase):
+    """An entry stays recognisable after the Q315 renderer rewrites it.
+
+    This is what the retired apply path got wrong: the renderer drops
+    `property="name"` and the `sameAs` link, so a matcher that needs them stops
+    seeing an entry it wrote and appends a second copy. Each shape a rendered
+    entry can take has to keep matching its row.
+    """
+
+    ROW = ContentRow(
+        family="films",
+        row_number=2,
+        data={
+            "type": "Movie",
+            "name": "Some Film",
+            "wikidata_url": "https://www.wikidata.org/wiki/Q1",
+            "local_qid": "Q101",
+        },
+    )
+
+    def matches(self, block):
+        return block_has_entry(block, self.ROW, "en")
+
+    def test_a_bound_entry_stripped_of_name_and_sameas_still_matches(self):
+        self.assertTrue(
+            self.matches(
+                '<li data-q315-source="local:Q101" '
+                'data-q315-function="local:Q4182"><span>Q101</span></li>'
+            )
+        )
+
+    def test_a_bound_entry_showing_its_label_still_matches(self):
+        self.assertTrue(
+            self.matches('<li data-q315-source="local:Q101"><span>Some Film</span></li>')
+        )
+
+    def test_an_unbound_entry_with_only_a_heading_still_matches(self):
+        self.assertTrue(self.matches('<li><h2 class="media-name">Some Film</h2></li>'))
+
+    def test_an_unrelated_entry_never_matches(self):
+        self.assertFalse(self.matches("<li><span>Different Film</span></li>"))
+
 
 class CheckModeTests(unittest.TestCase):
     """--mode check asserts each Q315 source is already in sync with its CSV."""

@@ -744,11 +744,11 @@ def render_family(family: FamilyConfig, rows: list[ContentRow], *, apply: bool) 
         return render_photography_family(rows, apply=apply)
     if apply and family.q315_path:
         raise ContentUpdateError(
-            f"{family.name}: rendered language pages are generated from {family.q315_path}; "
-            "writing them directly would bypass Q315 and can duplicate entries whose "
-            "markup the renderer has already rewritten. Use --mode q315-apply, then "
-            "src/main/abstract/render_page.py. --mode preview remains available as a "
-            "read-only diagnostic."
+            f"{family.name}: rendered language pages are generated from {family.q315_path}, "
+            "so authoring into them directly would bypass Q315 and give the family a "
+            "second source of truth. Use --mode q315-apply, then "
+            "src/main/abstract/render_page.py. --mode bind adds missing binding "
+            "metadata, and --mode preview remains available as a read-only diagnostic."
         )
     if family.name == "cv":
         return render_cv_family(rows, apply=apply)
