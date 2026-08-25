@@ -47,6 +47,15 @@ COMPOSED_ITEMTYPES = frozenset({"Q3835", "Q3836"})
 GENERATOR_META = '<meta name="generator" content="Q315 renderer" />'
 
 Signature = tuple[str, str, str, int]
+AttributeSlot = tuple[Signature, str]
+
+# An attribute carries content too -- an image's `alt` is its description, and it
+# is as language-specific as any text node. `data-content` binds an element's
+# text; `data-content-<attribute>` binds one of its attributes, so a single
+# abstract page can own both. Only attributes that hold prose are eligible:
+# binding `src` or `href` would make the renderer rewrite a URL from a label.
+CONTENT_ATTRIBUTE_PREFIX = "data-content-"
+BINDABLE_ATTRIBUTES = frozenset({"alt", "title", "aria-label", "placeholder"})
 
 
 def load_labels(data_dir: Path) -> dict[str, dict[str, str]]:
@@ -79,6 +88,7 @@ class TemplateBindings(HTMLParser):
         super().__init__()
         self.counts: Counter[tuple[str, str, str]] = Counter()
         self.bindings: dict[Signature, str] = {}
+        self.attributes: dict[AttributeSlot, str] = {}
 
     def handle_starttag(self, tag, attrs) -> None:
         base = _base_signature(tag, attrs)
@@ -90,13 +100,27 @@ class TemplateBindings(HTMLParser):
             value = values.get(attr) or ""
             if value.startswith("local:"):
                 self.bindings[key] = value.removeprefix("local:")
+        for name, value in values.items():
+            if not name.startswith(CONTENT_ATTRIBUTE_PREFIX):
+                continue
+            attribute = name.removeprefix(CONTENT_ATTRIBUTE_PREFIX)
+            if attribute not in BINDABLE_ATTRIBUTES or not (value or "").startswith("local:"):
+                continue
+            self.attributes[(key, attribute)] = value.removeprefix("local:")
+
+    def handle_startendtag(self, tag, attrs) -> None:
+        # `<img />` is the element attribute slots exist for, and HTMLParser
+        # reports a self-closing tag here instead of handle_starttag.
+        self.handle_starttag(tag, attrs)
 
 
-def template_slots(path: Path) -> tuple[dict[Signature, str], Counter[tuple[str, str, str]]]:
-    """Return the template's bound ``signature -> qid`` map and its base counts."""
+def template_slots(
+    path: Path,
+) -> tuple[dict[Signature, str], Counter[tuple[str, str, str]], dict[AttributeSlot, str]]:
+    """Return the template's bound text slots, base counts and attribute slots."""
     parser = TemplateBindings()
     parser.feed(path.read_text(encoding="utf-8"))
-    return parser.bindings, parser.counts
+    return parser.bindings, parser.counts, parser.attributes
 
 
 def template_bindings(path: Path) -> dict[Signature, str]:
@@ -143,6 +167,7 @@ class SlotRewriter(HTMLParser):
         source: str,
         targets: dict[Signature, str],
         template_counts: Counter[tuple[str, str, str]] | None = None,
+        attribute_targets: dict[AttributeSlot, str] | None = None,
     ) -> None:
         super().__init__(convert_charrefs=True)
         self.source = source
@@ -157,10 +182,13 @@ class SlotRewriter(HTMLParser):
         self._line_starts = self._compute_line_starts(source)
         self.counts: Counter[tuple[str, str, str]] = Counter()
         self.stack: list[_Frame] = []
-        self.regions: list[tuple[int, int, str]] = []
+        self.regions: list[tuple[int, int, str, bool]] = []
         self.applied: set[Signature] = set()
         self.rewritten: set[Signature] = set()
         self.structural: set[Signature] = set()
+        self.attribute_targets = attribute_targets or {}
+        self.attributes_applied: set[AttributeSlot] = set()
+        self.attributes_rewritten: set[AttributeSlot] = set()
 
     @staticmethod
     def _compute_line_starts(source: str) -> list[int]:
@@ -182,17 +210,50 @@ class SlotRewriter(HTMLParser):
         if self.stack:
             self.stack[-1].had_child = True
         start = self._absolute(self.getpos())
+        self._rewrite_attributes(key, attrs, start)
         inner_start = start + len(self.get_starttag_text() or "")
         self.stack.append(_Frame(tag, key, inner_start))
 
     def handle_startendtag(self, tag, attrs) -> None:
         # A void element (<img/>, <br/>) consumes an occurrence index but has no
         # inner text slot; mark the parent as having a child so it is never
-        # treated as a pure-text slot.
+        # treated as a pure-text slot. Its attributes can still be bound.
         base = _base_signature(tag, attrs)
+        index = self.counts[base]
         self.counts[base] += 1
+        self._rewrite_attributes((*base, index), attrs, self._absolute(self.getpos()))
         if self.stack:
             self.stack[-1].had_child = True
+
+    def _rewrite_attributes(self, key: Signature, attrs, start: int) -> None:
+        """Replace bound attribute values inside this element's start tag."""
+        if not self.attribute_targets:
+            return
+        base = key[:3]
+        if (
+            self.template_counts is not None
+            and self.template_counts.get(base) != self.local_counts.get(base)
+        ):
+            # Same rule as text slots: when the counts differ, occurrence N is
+            # not the same element on both sides and must not be written.
+            return
+        text = self.get_starttag_text() or ""
+        for (slot_key, attribute), target in self.attribute_targets.items():
+            if slot_key != key:
+                continue
+            match = re.search(
+                rf'\b{re.escape(attribute)}\s*=\s*"([^"]*)"', text, flags=re.IGNORECASE
+            )
+            if not match:
+                # The language page has no such attribute to fill.
+                continue
+            self.attributes_applied.add((slot_key, attribute))
+            if html.unescape(match.group(1)) == target:
+                continue
+            self.regions.append(
+                (start + match.start(1), start + match.end(1), target, True)
+            )
+            self.attributes_rewritten.add((slot_key, attribute))
 
     def handle_endtag(self, tag) -> None:
         if tag not in (frame.tag for frame in self.stack):
@@ -223,20 +284,25 @@ class SlotRewriter(HTMLParser):
         current = " ".join(html.unescape(self.source[frame.inner_start : end]).split())
         self.applied.add(frame.key)
         if current != target:
-            self.regions.append((frame.inner_start, end, target))
+            self.regions.append((frame.inner_start, end, target, False))
             self.rewritten.add(frame.key)
 
     def rewrite(self) -> str:
         self.feed(self.source)
         self.close()
         result = self.source
-        for start, end, text in sorted(self.regions, reverse=True):
-            result = result[:start] + html.escape(text, quote=False) + result[end:]
+        for start, end, text, is_attribute in sorted(self.regions, reverse=True):
+            escaped = html.escape(text, quote=is_attribute)
+            result = result[:start] + escaped + result[end:]
         return result
 
     @property
     def absent(self) -> set[Signature]:
         return set(self.targets) - self.applied - self.structural
+
+    @property
+    def attributes_absent(self) -> set[AttributeSlot]:
+        return set(self.attribute_targets) - self.attributes_applied
 
 
 def inject_generator_meta(text: str) -> str:
@@ -275,14 +341,20 @@ def render(
 
     changed: list[str] = []
     rewritten_slots = 0
+    rewritten_attributes = 0
     structural: list[tuple[str, str, str]] = []
     skipped_pages = 0
     for row in sorted(rows, key=lambda row: row["page_qid"]):
         abstract = repo_root / row["abstract_path"]
-        bindings, template_counts = template_slots(abstract)
+        bindings, template_counts, attribute_bindings = template_slots(abstract)
         atomic = {
             key: qid
             for key, qid in bindings.items()
+            if labels.get(qid, {}).get("itemtype", "").strip() not in COMPOSED_ITEMTYPES
+        }
+        attribute_atomic = {
+            key: qid
+            for key, qid in attribute_bindings.items()
             if labels.get(qid, {}).get("itemtype", "").strip() not in COMPOSED_ITEMTYPES
         }
         targets = [
@@ -293,7 +365,7 @@ def render(
         missing = sorted(
             {
                 qid
-                for qid in atomic.values()
+                for qid in (*atomic.values(), *attribute_atomic.values())
                 for language, _ in targets
                 if not labels.get(qid, {}).get(language, "").strip()
             },
@@ -310,13 +382,28 @@ def render(
             replacements = {
                 key: labels[qid][language].strip() for key, qid in atomic.items()
             }
-            rewriter = SlotRewriter(source, replacements, template_counts)
+            attribute_replacements = {
+                key: labels[qid][language].strip()
+                for key, qid in attribute_atomic.items()
+            }
+            rewriter = SlotRewriter(
+                source, replacements, template_counts, attribute_replacements
+            )
             updated = inject_generator_meta(rewriter.rewrite())
             for key in sorted(rewriter.absent):
                 structural.append((row["page_qid"], language, f"{key} -> {atomic[key]}"))
+            for key, attribute in sorted(rewriter.attributes_absent):
+                structural.append(
+                    (
+                        row["page_qid"],
+                        language,
+                        f"{key}@{attribute} -> {attribute_atomic[(key, attribute)]}",
+                    )
+                )
             if updated != source:
                 changed.append(relative)
                 rewritten_slots += len(rewriter.rewritten)
+                rewritten_attributes += len(rewriter.attributes_rewritten)
                 if not check:
                     path.write_text(updated, encoding="utf-8")
 
@@ -329,6 +416,7 @@ def render(
     print(
         f"{action} {len(changed)} language page(s); "
         f"{rewritten_slots} slot text rewrites; "
+        f"{rewritten_attributes} attribute rewrites; "
         f"{skipped_pages} page(s) skipped for missing labels; "
         f"{len(structural)} unplaced slot(s)"
     )

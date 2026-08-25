@@ -19,6 +19,7 @@ sys.path.insert(0, str(HERE.parent))
 from abstract.css_assets import DEFAULT_DATA_DIR, DEFAULT_REPO_ROOT
 from abstract.prepare_missing_content import alternate_pages, page_sources
 from abstract.prepare_travel_content import LANGUAGES, slots
+from abstract.render_page import BINDABLE_ATTRIBUTES, CONTENT_ATTRIBUTE_PREFIX
 
 DEFAULT_DATA = DEFAULT_DATA_DIR
 DEFAULT_REPORT = HERE / "content-roundtrip.json"
@@ -99,10 +100,36 @@ class Bindings(HTMLParser):
             value = values.get(kind, "")
             if value.startswith("local:"):
                 self.qids.append((kind, value.removeprefix("local:")))
+        for name, value in values.items():
+            # `data-content-alt` and friends bind an attribute rather than a
+            # text node; the value they carry is still content and still has to
+            # round-trip.
+            if not name.startswith(CONTENT_ATTRIBUTE_PREFIX):
+                continue
+            if name.removeprefix(CONTENT_ATTRIBUTE_PREFIX) not in BINDABLE_ATTRIBUTES:
+                continue
+            if (value or "").startswith("local:"):
+                self.qids.append((name, value.removeprefix("local:")))
 
     def handle_endtag(self, tag) -> None:
         if tag == "q-call":
             self.call_depth -= 1
+
+
+class RenderedAttributes(HTMLParser):
+    """Collect the values of every bindable attribute on a rendered page."""
+
+    def __init__(self) -> None:
+        super().__init__(convert_charrefs=True)
+        self.values: list[str] = []
+
+    def handle_starttag(self, tag, attrs) -> None:
+        for name, value in attrs:
+            if name in BINDABLE_ATTRIBUTES and (value or "").strip():
+                self.values.append(normalize_text(value))
+
+    def handle_startendtag(self, tag, attrs) -> None:
+        self.handle_starttag(tag, attrs)
 
 
 class RenderedBoundText(HTMLParser):
@@ -157,6 +184,12 @@ def rendered_bound_values(path: Path) -> list[str]:
     return parser.values
 
 
+def rendered_attribute_values(path: Path) -> list[str]:
+    parser = RenderedAttributes()
+    parser.feed(path.read_text(encoding="utf-8"))
+    return parser.values
+
+
 def verify(
     repo_root: Path,
     data_dir: Path,
@@ -174,6 +207,7 @@ def verify(
                 normalize_text(value) for value in slots(target).values()
             )
             available.update(rendered_bound_values(target))
+            available.update(rendered_attribute_values(target))
             missing = []
             unresolved = []
             expected = Counter()
@@ -184,9 +218,10 @@ def verify(
                     # Function-composed result: verified by evaluating its
                     # constructor, not by matching the result entity's label.
                     continue
-                wrong_type = (
-                    kind == "data-content" and itemtype and itemtype != "Q3185"
-                ) or (
+                content_kind = kind == "data-content" or kind.startswith(
+                    CONTENT_ATTRIBUTE_PREFIX
+                )
+                wrong_type = (content_kind and itemtype and itemtype != "Q3185") or (
                     kind == "data-entity" and itemtype == "Q3185"
                 )
                 # DirectTextSlots normalizes all HTML whitespace (including
