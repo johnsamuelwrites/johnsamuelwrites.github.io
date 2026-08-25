@@ -30,6 +30,7 @@ from __future__ import annotations
 import argparse
 import collections
 import csv
+import json
 import os
 import re
 import sys
@@ -46,6 +47,7 @@ from abstract.prepare_missing_content import alternate_pages, page_sources
 from abstract.prepare_travel_content import LANGUAGES
 from abstract.render_page import _base_signature, base_counts
 from content_update import (
+    wikibase_label_text,
     ABSTRACT_CONTENT_ITEM,
     build_wikibase_content_item_data,
     content_item_description,
@@ -208,7 +210,7 @@ def create_with_retry(client: WikibaseClient, key: tuple[str, ...], summary: str
     collisions = 0
     for attempt, delay in enumerate((5, 15, 45, 30, 30, 0)):
         data = build_wikibase_content_item_data(
-            texts["en"], "", texts,
+            texts["en"], "", texts, translated_labels=True,
             **({"description": description} if description else {}),
         )
         try:
@@ -239,6 +241,61 @@ def create_with_retry(client: WikibaseClient, key: tuple[str, ...], summary: str
     return ""
 
 
+def repair_labels(client: WikibaseClient, resolved: dict, summary: str) -> tuple[int, int]:
+    """Give each item the label its own language should show.
+
+    The item builder writes one label in every language by default, because the
+    families it was written for hold names, which must not be translated. These
+    items hold descriptions, which must be -- and the label, not P40, is what
+    the label export and therefore the renderer reads.
+    """
+    repaired = failed = 0
+    by_qid = resolved
+    items = sorted(by_qid)
+    for start in range(0, len(items), 50):
+        batch = client.entities(items[start : start + 50])
+        for qid, entity in batch.items():
+            if "missing" in entity:
+                continue
+            texts = dict(zip(LANGUAGES, by_qid[qid]))
+            wanted = {
+                language: wikibase_label_text(texts[language]) for language in LANGUAGES
+            }
+            current = {
+                language: entity.get("labels", {}).get(language, {}).get("value", "")
+                for language in LANGUAGES
+            }
+            changed = {
+                language: {"language": language, "value": value}
+                for language, value in wanted.items()
+                if current.get(language) != value
+            }
+            # P40 is the content store and must agree with the label, or a
+            # later fetch falling back to it would reintroduce the old text.
+            claims = []
+            for claim in entity.get("claims", {}).get("P40", []):
+                value = claim.get("mainsnak", {}).get("datavalue", {}).get("value", {})
+                language = value.get("language")
+                if language in texts and value.get("text") != texts[language]:
+                    replacement = json.loads(json.dumps(claim))
+                    replacement["mainsnak"]["datavalue"]["value"]["text"] = texts[language]
+                    claims.append(replacement)
+            if not changed and not claims:
+                continue
+            data = {}
+            if changed:
+                data["labels"] = changed
+            if claims:
+                data["claims"] = claims
+            if write_with_retry(client, qid, data, summary):
+                repaired += 1
+            else:
+                failed += 1
+            if (repaired + failed) % 25 == 0:
+                print(f"  repaired {repaired}/{len(items)}", flush=True)
+    return repaired, failed
+
+
 def parse_args(argv: list[str]) -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--repo-root", type=Path, default=DEFAULT_REPO_ROOT)
@@ -247,6 +304,11 @@ def parse_args(argv: list[str]) -> argparse.Namespace:
     parser.add_argument("--env-file", type=Path, default=DEFAULT_REPO_ROOT / ".env")
     parser.add_argument("--api", default=None)
     parser.add_argument("--limit", type=int, default=0, help="stop after N new items")
+    parser.add_argument(
+        "--repair-labels",
+        action="store_true",
+        help="give existing items the label their own language should show",
+    )
     parser.add_argument("--pause", type=float, default=0.6)
     parser.add_argument(
         "--summary", default="Image description as an abstract content component"
@@ -283,6 +345,20 @@ def main(argv: list[str] | None = None) -> int:
     load_env(args.env_file)
     client = WikibaseClient(args.api or os.getenv("WIKIBASE_API", DEFAULT_API), pause=args.pause)
     sign_in(client)
+
+    if args.repair_labels:
+        # Keyed by QID, not by description: two slots can end up with the same
+        # eight strings (a mojibake repair made two of them identical) while
+        # holding different items, and a description-keyed map drops one.
+        bound: dict[str, tuple[str, ...]] = {}
+        for slot in slots:
+            if slot["bound"]:
+                bound[slot["bound"]] = tuple(
+                    slot["values"][language] for language in LANGUAGES
+                )
+        repaired, failed = repair_labels(client, bound, args.summary)
+        print(f"\nRepaired labels on {repaired} item(s); {failed} failed.")
+        return 1 if failed else 0
 
     resolved = dict(reuse)
     created = 0

@@ -3792,12 +3792,30 @@ def build_wikibase_content_item_data(
     content_by_language: dict[str, str] | None = None,
     *,
     description: str = CONTENT_ITEM_DESCRIPTION,
+    translated_labels: bool = False,
 ) -> dict:
+    """Build one abstract content item.
+
+    By default every language gets the same label, which is right for the
+    families this was written for: a title or a person's name must not be
+    translated. Content that *is* translated -- an image description, a caption
+    -- needs ``translated_labels``, because the label is what
+    ``fetch_wikibase_labels.py`` exports and therefore what ``render_page.py``
+    writes into each language page. Leaving it English there would render the
+    English description on all eight.
+    """
     label = wikibase_label_text(name)
     content_by_language = content_by_language or {language: name for language in LANGUAGES}
     data = {
         "labels": {
-            language: {"language": language, "value": label}
+            language: {
+                "language": language,
+                "value": (
+                    wikibase_label_text(content_by_language[language])
+                    if translated_labels
+                    else label
+                ),
+            }
             for language in LANGUAGES
         },
         "descriptions": {
