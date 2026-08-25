@@ -21,6 +21,19 @@ Assert every CSV is already in sync with its Q315 source (this is what CI runs):
 python3 src/main/content_update.py --mode check
 ```
 
+Compare QID bindings in both directions -- CSV rows whose QIDs are absent from the
+Q315 source, and QIDs bound on the source that no CSV row claims:
+
+```sh
+python3 src/main/content_update.py --mode diff
+```
+
+`check` answers "would applying this CSV change the source?". `diff` answers
+"do the two sides bind the same content items?", which catches entries added to a
+source by hand and CSV columns that point at nothing. `diff` reports orphans only
+for families whose CSV mirrors the whole source; `cv.csv` only appends, so its
+source legitimately holds entries the CSV never mentions.
+
 For Q315-driven pages, render the bound language-page slots after applying the
 Q315 source change, then run the rendered-page guard and verify round-trip
 equivalence. Example for the detailed CV:
@@ -63,6 +76,13 @@ These five families use canonical names/titles, not translated labels. Use
 `name`, `creator`, `quote`, `attribution`, and `category` as monolingual fields;
 the same values are rendered on every language page. Legacy language-specific
 columns such as `name_en` are still accepted as a compatibility fallback.
+
+`books.csv` also has a `creator_qid` column holding the author's content-item
+QID. When it is set, the author is rendered as a bound content item and the Q315
+renderer supplies the label for each language; when it is empty, the plain
+`creator` text is written into the source and reads identically in all eight
+languages. Leave it empty only for works with no author. `--mode extract`
+backfills it from the Q315 source for rows that already have a binding there.
 
 The `id` column is optional. When it is empty, the tool generates a stable local
 identifier from the Wikidata QID when available, otherwise from the canonical

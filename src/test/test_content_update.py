@@ -3,6 +3,7 @@ import html as html_lib
 import io
 import tempfile
 from contextlib import redirect_stderr, redirect_stdout
+from dataclasses import replace
 from pathlib import Path
 
 import sys
@@ -16,12 +17,19 @@ from content_update import (
     FAMILIES,
     INSTANCE_OF_PROPERTY,
     MONOLINGUAL_CONTENT_PROPERTY,
+    build_q315_list_item_html,
     build_wikibase_content_item_data,
     build_wikibase_repair_data,
+    backfill_q315_qids,
+    csv_bound_qids,
+    derived_q315_qids,
+    diff_q315_family,
     canonical_wikidata_url,
     content_texts_for_wikibase,
     main,
     normalize_text,
+    q315_content_qids,
+    q315_creator_pairs,
     read_rows,
     render_content,
     render_family,
@@ -36,6 +44,7 @@ from content_update import (
     validate_rows,
     wikidata_qid,
 )
+from paths import REPO_ROOT
 
 
 class ContentUpdateTests(unittest.TestCase):
@@ -894,6 +903,150 @@ class UnicodeIdentityTests(unittest.TestCase):
         decomposed = unicodedata.normalize("NFD", composed)
         self.assertNotEqual(composed, decomposed)
         self.assertEqual(normalize_text(composed), normalize_text(decomposed))
+
+
+class BindingDiffTests(unittest.TestCase):
+    """--mode diff compares CSV QID columns against the Q315 source both ways."""
+
+    BOOK_PAGE = """<html><body>
+        <nav><ol class="breadcrumb">
+            <li><span property="name" data-content="local:Q4050">Q4050</span></li>
+        </ol></nav>
+        <ol class="book-list">
+            <li class="book-item">
+                <span class="book-title" typeof="Book"><span property="name" data-content="local:Q10">Q10</span></span>
+                <span class="book-author" data-content="local:Q11">Q11</span>
+            </li>
+            <li class="book-item">
+                <span class="book-title" typeof="Book"><span property="name" data-content="local:Q20">Q20</span></span>
+                <span class="book-author" data-content="local:Q21">Q21</span>
+            </li>
+        </ol>
+    </body></html>"""
+
+    @staticmethod
+    def book_row(name, local_qid, creator_qid=""):
+        return ContentRow(
+            family="books",
+            row_number=2,
+            data={
+                "type": "Book",
+                "name": name,
+                "creator": "Someone" if creator_qid else "",
+                "creator_qid": creator_qid,
+                "local_qid": local_qid,
+            },
+        )
+
+    def test_csv_bound_qids_collects_every_qid_column(self):
+        row = ContentRow(
+            family="quotes",
+            row_number=2,
+            data={
+                "type": "Quote",
+                "quote": "A quote",
+                "attribution": "Someone",
+                "category": "Art",
+                "local_qid": "Q1",
+                "attribution_qid": "Q2",
+                "part_qids": "Q3;Q4",
+            },
+        )
+        self.assertEqual(csv_bound_qids(row), {"Q1", "Q2", "Q3", "Q4"})
+
+    def test_csv_bound_qids_ignores_blank_and_malformed_values(self):
+        row = ContentRow(
+            family="books",
+            row_number=2,
+            data={"type": "Book", "name": "A", "local_qid": "Q1", "creator_qid": "not-a-qid"},
+        )
+        self.assertEqual(csv_bound_qids(row), {"Q1"})
+
+    def test_content_qids_ignore_bindings_outside_the_entry_container(self):
+        qids = q315_content_qids(FAMILIES["books"], self.BOOK_PAGE)
+        self.assertEqual(qids, {"Q10", "Q11", "Q20", "Q21"})
+        self.assertNotIn("Q4050", qids)
+
+    def test_creator_pairs_map_name_qid_to_author_qid(self):
+        self.assertEqual(q315_creator_pairs(self.BOOK_PAGE), {"Q10": "Q11", "Q20": "Q21"})
+
+    def test_backfill_fills_only_empty_creator_qids(self):
+        rows = [self.book_row("First", "Q10"), self.book_row("Second", "Q20", "Q999")]
+        with tempfile.TemporaryDirectory() as directory:
+            source = Path(directory) / "Q3640.html"
+            source.write_text(self.BOOK_PAGE, encoding="utf-8")
+            family = replace(FAMILIES["books"], q315_path=str(source))
+            filled = backfill_q315_qids(family, rows)
+        self.assertEqual(filled, 1)
+        self.assertEqual(rows[0].data["creator_qid"], "Q11")
+        self.assertEqual(rows[1].data["creator_qid"], "Q999")
+
+    def test_derived_qids_cover_museum_type_labels(self):
+        museum = ContentRow(
+            family="museums",
+            row_number=2,
+            data={"type": "Museum", "name": "A Museum", "local_qid": "Q1"},
+        )
+        gallery = ContentRow(
+            family="museums",
+            row_number=3,
+            data={"type": "ArtGallery", "name": "A Gallery", "local_qid": "Q2"},
+        )
+        self.assertEqual(
+            derived_q315_qids(FAMILIES["museums"], [museum, gallery]),
+            {"Q3351", "Q7478"},
+        )
+        self.assertEqual(derived_q315_qids(FAMILIES["books"], []), set())
+
+    def test_diff_reports_both_directions(self):
+        rows = [self.book_row("First", "Q10", "Q11"), self.book_row("Ghost", "Q99", "Q98")]
+        with tempfile.TemporaryDirectory() as directory:
+            source = Path(directory) / "Q3640.html"
+            source.write_text(self.BOOK_PAGE, encoding="utf-8")
+            family = replace(FAMILIES["books"], q315_path=str(source))
+            diff = diff_q315_family(family, rows)
+        self.assertEqual(diff.missing, ("Q98", "Q99"))
+        self.assertEqual(diff.orphaned, ("Q20", "Q21"))
+        self.assertFalse(diff.clean)
+
+    def test_diff_is_clean_when_both_sides_agree(self):
+        rows = [self.book_row("First", "Q10", "Q11"), self.book_row("Second", "Q20", "Q21")]
+        with tempfile.TemporaryDirectory() as directory:
+            source = Path(directory) / "Q3640.html"
+            source.write_text(self.BOOK_PAGE, encoding="utf-8")
+            family = replace(FAMILIES["books"], q315_path=str(source))
+            diff = diff_q315_family(family, rows)
+        self.assertTrue(diff.clean)
+        self.assertEqual(diff.checked, 4)
+
+    def test_append_only_families_report_no_orphans(self):
+        self.assertFalse(FAMILIES["cv"].mirrors_q315)
+        for name in ("books", "films", "music", "museums", "quotes"):
+            with self.subTest(family=name):
+                self.assertTrue(FAMILIES[name].mirrors_q315)
+
+    def test_books_csv_round_trips_its_author_bindings(self):
+        """Regression guard: books.csv must express every binding on Q3640."""
+        family = FAMILIES["books"]
+        rows = read_rows(family, REPO_ROOT / "data/content-updates" / family.csv_name)
+        diff = diff_q315_family(family, rows)
+        self.assertEqual(diff.missing, ())
+        self.assertEqual(diff.orphaned, ())
+
+    def test_new_book_row_renders_a_bound_author(self):
+        row = self.book_row("A New Book", "Q500", "Q501")
+        markup = build_q315_list_item_html(FAMILIES["books"], row)
+        self.assertIn('data-content="local:Q501"', markup)
+        self.assertIn('data-content="local:Q500"', markup)
+
+    def test_book_row_without_a_creator_qid_falls_back_to_plain_text(self):
+        row = ContentRow(
+            family="books",
+            row_number=2,
+            data={"type": "Book", "name": "A New Book", "creator": "Someone", "local_qid": "Q500"},
+        )
+        markup = build_q315_list_item_html(FAMILIES["books"], row)
+        self.assertIn(">Someone<", markup)
 
 
 if __name__ == "__main__":

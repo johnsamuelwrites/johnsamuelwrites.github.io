@@ -109,6 +109,10 @@ class FamilyConfig:
     wikidata_required: bool
     sort_entries: bool = True
     q315_path: str = ""
+    # True when the CSV holds every entry on the Q315 source, so a binding on the
+    # page with no CSV row is a real orphan. cv.csv only appends, so its source
+    # legitimately carries entries the CSV never mentions.
+    mirrors_q315: bool = True
 
     def targets(self) -> list[PageTarget]:
         return [
@@ -229,6 +233,7 @@ FAMILIES: dict[str, FamilyConfig] = {
         allowed_types=("CVEntry",),
         wikidata_required=False,
         sort_entries=False,
+        mirrors_q315=False,
         q315_path="Q315/Q3636/Q3646.html",
         paths={
             "en": "en/research/cv-detailed.html",
@@ -327,6 +332,7 @@ class ExtractedRow:
     wikidata_url: str
     local_qid: str = ""
     creator: str = ""
+    creator_qid: str = ""
     type_label: str = ""
     page: str = ""
     section: str = ""
@@ -434,6 +440,7 @@ def merge_extracted_rows(
             }
         if family.name == "books":
             data["creator"] = item.creator
+            data["creator_qid"] = item.creator_qid
         if family.name == "museums":
             data["type_label"] = item.type_label
         if family.name == "photographies":
@@ -455,8 +462,11 @@ def merge_extracted_rows(
         rows.append(ContentRow(family=family.name, row_number=len(rows) + 2, data=data))
         row_keys.add(key)
         added += 1
+    backfilled = backfill_q315_qids(family, rows)
+    if backfilled and "creator_qid" not in fieldnames:
+        fieldnames = default_fieldnames(family)
     write_rows(csv_path, fieldnames, rows)
-    return len(extracted), added
+    return len(extracted), added, backfilled
 
 
 def default_fieldnames(family: FamilyConfig) -> list[str]:
@@ -496,6 +506,7 @@ def default_fieldnames(family: FamilyConfig) -> list[str]:
     fields = ["id", "type", "name", "wikidata_url", "local_qid"]
     if family.name == "books":
         fields.insert(3, "creator")
+        fields.insert(4, "creator_qid")
     if family.name == "museums":
         fields.insert(3, "type_label")
     return fields
@@ -637,9 +648,11 @@ def extract_ordered_list_rows(html_content: str, family: FamilyConfig) -> list[E
             wikidata = same_as["href"].strip()
         local_qid = local_qid_from_tag(item)
         creator = ""
+        creator_qid = ""
         creator_node = item.find("span", class_="book-author")
         if creator_node:
             creator = creator_node.get_text(" ", strip=True)
+            creator_qid = content_qid_from_tag(creator_node)
         rows.append(
             ExtractedRow(
                 item_type=str(type_node.get("typeof", "")).strip(),
@@ -647,6 +660,7 @@ def extract_ordered_list_rows(html_content: str, family: FamilyConfig) -> list[E
                 wikidata_url=wikidata,
                 local_qid=local_qid,
                 creator=creator,
+                creator_qid=creator_qid,
             )
         )
     return rows
@@ -706,6 +720,15 @@ def local_qid_from_tag(tag: Tag) -> str:
     source = tag.get("data-q315-source", "")
     match = re.fullmatch(r"local:(Q[1-9][0-9]*)", source)
     return match.group(1) if match else ""
+
+
+def content_qid_from_tag(tag: Tag) -> str:
+    """Read the ``data-content="local:Q…"`` binding an abstract page carries."""
+    for attribute in ("data-content", "data-entity"):
+        match = re.fullmatch(r"local:(Q[1-9][0-9]*)", str(tag.get(attribute, "")))
+        if match:
+            return match.group(1)
+    return ""
 
 
 def _clean_row(row: dict[str, str | None]) -> dict[str, str]:
@@ -2658,6 +2681,171 @@ def discover_csv_paths(input_dir: Path, selected: Iterable[str]) -> dict[str, Pa
     }
 
 
+LOCAL_BINDING_RE = re.compile(r"local:(Q[1-9][0-9]*)")
+QID_BINDING_RE = re.compile(r"data-(?:content|entity)=[\"']local:(Q[1-9][0-9]*)[\"']")
+QID_COLUMNS = ("local_qid", "creator_qid", "attribution_qid", "simple_local_qid")
+# The container each Q315 renderer writes entries into, so a binding elsewhere on
+# the page (breadcrumbs, intro prose) is not mistaken for a content orphan.
+Q315_CONTENT_CONTAINERS = {
+    "ordered-list": ("ol", r"(book-list|media-list|music-list)"),
+    "museum-grid": ("div", r"museums-grid"),
+    "quote-grid": ("div", r"quotes-grid"),
+}
+
+
+@dataclass(frozen=True)
+class QidDiff:
+    family: str
+    path: Path
+    missing: tuple[str, ...]
+    orphaned: tuple[str, ...]
+    checked: int
+
+    @property
+    def clean(self) -> bool:
+        return not self.missing and not self.orphaned
+
+
+def qid_number(qid: str) -> int:
+    return int(qid[1:])
+
+
+def csv_bound_qids(row: ContentRow) -> set[str]:
+    """Every content-item QID a single CSV row claims to bind."""
+    qids = set()
+    for column in QID_COLUMNS:
+        value = row.data.get(column, "").strip()
+        if re.fullmatch(r"Q[1-9][0-9]*", value):
+            qids.add(value)
+    qids.update(split_qids(row.data.get("part_qids", "")))
+    return qids
+
+
+def derived_q315_qids(family: FamilyConfig, rows: list[ContentRow]) -> set[str]:
+    """QIDs the Q315 renderer emits from a row without the CSV naming them.
+
+    Museum type labels are chosen from the row's item type rather than stored in
+    a column, so they are bound on the source with no CSV field to point at them.
+    """
+    if family.renderer == "museum-grid":
+        return {museum_type_label_qid(row) for row in rows}
+    return set()
+
+
+def q315_content_containers(html_content: str, tag: str, class_pattern: str) -> list[str]:
+    inners: list[str] = []
+    for match in re.finditer(rf"<{tag}\b[^>]*>", html_content, re.IGNORECASE):
+        if not re.search(
+            rf"class=[\"'][^\"']*{class_pattern}[^\"']*[\"']",
+            match.group(0),
+            re.IGNORECASE,
+        ):
+            continue
+        bounds = find_matching_close(html_content, tag, match.start(), match.end())
+        if bounds:
+            inners.append(html_content[bounds[1] : bounds[2]])
+    return inners
+
+
+def q315_content_qids(family: FamilyConfig, html_content: str) -> set[str]:
+    """QIDs bound inside the family's content container on its Q315 source."""
+    spec = Q315_CONTENT_CONTAINERS.get(family.renderer)
+    if not spec:
+        return set()
+    qids: set[str] = set()
+    for inner in q315_content_containers(html_content, *spec):
+        qids.update(QID_BINDING_RE.findall(inner))
+    return qids
+
+
+def diff_q315_family(family: FamilyConfig, rows: list[ContentRow]) -> QidDiff:
+    target = family.q315_target
+    if not target:
+        raise ContentUpdateError(f"{family.name}: Q315 source page is not configured")
+    html_content = target.read_text(encoding="utf-8")
+
+    expected: set[str] = set()
+    for row in rows:
+        expected |= csv_bound_qids(row)
+    expected |= derived_q315_qids(family, rows)
+
+    # A CSV binding counts as present anywhere in the document: composed
+    # paragraphs and split quotes reference their parts outside the entry markup.
+    document = set(LOCAL_BINDING_RE.findall(html_content))
+    missing = tuple(sorted(expected - document, key=qid_number))
+
+    orphaned: tuple[str, ...] = ()
+    if family.mirrors_q315:
+        orphaned = tuple(sorted(q315_content_qids(family, html_content) - expected, key=qid_number))
+
+    return QidDiff(
+        family=family.name,
+        path=target,
+        missing=missing,
+        orphaned=orphaned,
+        checked=len(expected),
+    )
+
+
+def format_qid_diffs(diffs: list[QidDiff]) -> str:
+    if not diffs:
+        return "No families compared."
+    lines: list[str] = []
+    for diff in diffs:
+        header = (
+            f"{diff.family}: {diff.checked} CSV binding(s); "
+            f"missing={len(diff.missing)}, orphaned={len(diff.orphaned)}; "
+            f"{to_repo_relative(diff.path)}"
+        )
+        lines.append(header)
+        for qid in diff.missing:
+            lines.append(f"  - missing:  {qid} is bound by the CSV but absent from the source")
+        for qid in diff.orphaned:
+            lines.append(f"  - orphaned: {qid} is bound on the source but has no CSV row")
+    return "\n".join(lines)
+
+
+def backfill_q315_qids(family: FamilyConfig, rows: list[ContentRow]) -> int:
+    """Recover QID columns the CSV cannot otherwise express from the Q315 source.
+
+    ``build_q315_list_item_html`` renders a book's author as a bound content item
+    when ``creator_qid`` is set, but nothing ever wrote that column, so the
+    bindings already on the abstract page were invisible to the CSV. Pair them
+    back up by the name QID, which both sides share.
+    """
+    if family.name != "books":
+        return 0
+    target = family.q315_target
+    if not target or not target.exists():
+        return 0
+    pairs = q315_creator_pairs(target.read_text(encoding="utf-8"))
+    filled = 0
+    for row in rows:
+        if row.data.get("creator_qid", "").strip():
+            continue
+        creator_qid = pairs.get(row.local_qid, "")
+        if creator_qid:
+            row.data["creator_qid"] = creator_qid
+            filled += 1
+    return filled
+
+
+def q315_creator_pairs(html_content: str) -> dict[str, str]:
+    """Map each book's name QID to its author QID on the abstract source."""
+    soup = BeautifulSoup(html_content, features="html.parser")
+    pairs: dict[str, str] = {}
+    for item in soup.find_all("li"):
+        name_node = item.find(attrs={"property": "name"})
+        creator_node = item.find("span", class_="book-author")
+        if not isinstance(name_node, Tag) or not isinstance(creator_node, Tag):
+            continue
+        name_qid = content_qid_from_tag(name_node)
+        creator_qid = content_qid_from_tag(creator_node)
+        if name_qid and creator_qid:
+            pairs[name_qid] = creator_qid
+    return pairs
+
+
 def format_changes(changes: list[PageChange]) -> str:
     if not changes:
         return "No target pages checked."
@@ -3349,6 +3537,7 @@ def parse_args(argv: list[str]) -> argparse.Namespace:
         choices=(
             "validate",
             "check",
+            "diff",
             "preview",
             "apply",
             "q315-preview",
@@ -3364,7 +3553,8 @@ def parse_args(argv: list[str]) -> argparse.Namespace:
             "preview computes rendered page changes; "
             "apply rewrites rendered pages; q315-preview computes abstract source changes "
             "for non-photography Q315 families; q315-apply rewrites abstract source pages; "
-            "extract backfills CSV rows from existing pages; "
+            "diff reports QID bindings present on one side only; "
+            "extract backfills CSV rows and QID columns from existing pages; "
             "wikibase-plan checks local Wikibase; wikibase-apply binds/repairs local "
             "Wikibase items and writes local_qid."
         ),
@@ -3392,6 +3582,7 @@ def main(argv: list[str] | None = None) -> int:
 
     try:
         all_changes: list[PageChange] = []
+        all_diffs: list[QidDiff] = []
         all_wikibase_actions: list[WikibaseRowAction] = []
         extract_reports: list[str] = []
         client: WikibaseClient | None = None
@@ -3417,9 +3608,10 @@ def main(argv: list[str] | None = None) -> int:
         for family_name in selected:
             family = FAMILIES[family_name]
             if args.mode == "extract":
-                extracted, added = merge_extracted_rows(family, csv_paths[family_name])
+                extracted, added, backfilled = merge_extracted_rows(family, csv_paths[family_name])
                 extract_reports.append(
-                    f"{family.name}: extracted={extracted}, added={added}; "
+                    f"{family.name}: extracted={extracted}, added={added}, "
+                    f"backfilled={backfilled}; "
                     f"{to_repo_relative(csv_paths[family_name])}"
                 )
                 continue
@@ -3458,6 +3650,9 @@ def main(argv: list[str] | None = None) -> int:
                 # read_rows validation alone; they have no abstract page to compare.
                 if family.q315_path:
                     all_changes.extend(render_q315_family(family, rows, apply=False))
+            elif args.mode == "diff":
+                if family.q315_path:
+                    all_diffs.append(diff_q315_family(family, rows))
             elif args.mode not in {"validate", "wikibase-plan", "wikibase-apply"}:
                 all_changes.extend(render_family(family, rows, apply=args.mode == "apply"))
         if args.mode == "validate":
@@ -3474,6 +3669,16 @@ def main(argv: list[str] | None = None) -> int:
                 )
                 return 1
             print("\nCheck passed: every Q315 source is in sync with its CSV.")
+        elif args.mode == "diff":
+            print(format_qid_diffs(all_diffs))
+            drifted = [diff for diff in all_diffs if not diff.clean]
+            if drifted:
+                print(
+                    f"\n{len(drifted)} family/families have bindings on one side only.",
+                    file=sys.stderr,
+                )
+                return 1
+            print("\nNo binding drift: every CSV QID is on its source, and vice versa.")
         elif args.mode == "extract":
             print("\n".join(extract_reports))
         elif args.mode in {"wikibase-plan", "wikibase-apply"}:
