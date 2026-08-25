@@ -795,6 +795,14 @@ def validate_rows(family: FamilyConfig, rows: list[ContentRow], csv_path: Path) 
 
 
 def render_family(family: FamilyConfig, rows: list[ContentRow], *, apply: bool) -> list[PageChange]:
+    if apply and family.q315_path:
+        raise ContentUpdateError(
+            f"{family.name}: rendered language pages are generated from {family.q315_path}; "
+            "writing them directly would bypass Q315 and can duplicate entries whose "
+            "markup the renderer has already rewritten. Use --mode q315-apply, then "
+            "src/main/abstract/render_page.py. --mode preview remains available as a "
+            "read-only diagnostic."
+        )
     if family.name == "photographies":
         return render_photography_family(rows, apply=apply)
     if family.name == "cv":
@@ -2614,7 +2622,8 @@ def sort_children_by_name(container: Tag) -> None:
 
 
 def normalize_text(value: str) -> str:
-    return " ".join(value.casefold().split())
+    folded = unicodedata.normalize("NFC", value).casefold()
+    return unicodedata.normalize("NFC", " ".join(folded.split()))
 
 
 def canonical_wikidata_url(wikidata_url: str) -> str:
@@ -2630,8 +2639,16 @@ def wikidata_qid(wikidata_url: str) -> str:
 def slugify(value: str) -> str:
     normalized = unicodedata.normalize("NFKD", value)
     ascii_text = normalized.encode("ascii", "ignore").decode("ascii")
-    slug = re.sub(r"[^a-zA-Z0-9]+", "-", ascii_text).strip("-").lower()
-    return slug[:80].strip("-")
+    slug = re.sub(r"[^a-zA-Z0-9]+", "-", ascii_text).strip("-").lower()[:80].strip("-")
+    if slug:
+        return slug
+    # Names written entirely in a non-Latin script leave nothing behind after the
+    # ASCII fold. Fall back to a digest so the row still gets a stable id instead
+    # of failing validation.
+    collapsed = normalize_text(value)
+    if not collapsed:
+        return ""
+    return f"x-{hashlib.sha1(collapsed.encode('utf-8')).hexdigest()[:16]}"
 
 
 def discover_csv_paths(input_dir: Path, selected: Iterable[str]) -> dict[str, Path]:
@@ -3331,6 +3348,7 @@ def parse_args(argv: list[str]) -> argparse.Namespace:
         "--mode",
         choices=(
             "validate",
+            "check",
             "preview",
             "apply",
             "q315-preview",
@@ -3341,7 +3359,9 @@ def parse_args(argv: list[str]) -> argparse.Namespace:
         ),
         default="preview",
         help=(
-            "validate checks CSV and targets; preview computes rendered page changes; "
+            "validate checks CSV and targets; check additionally asserts every Q315 "
+            "source is already in sync with its CSV and exits non-zero otherwise; "
+            "preview computes rendered page changes; "
             "apply rewrites rendered pages; q315-preview computes abstract source changes "
             "for non-photography Q315 families; q315-apply rewrites abstract source pages; "
             "extract backfills CSV rows from existing pages; "
@@ -3433,10 +3453,27 @@ def main(argv: list[str] | None = None) -> int:
                 rows = read_rows(family, csv_paths[family_name])
             if args.mode in {"q315-preview", "q315-apply"}:
                 all_changes.extend(render_q315_family(family, rows, apply=args.mode == "q315-apply"))
+            elif args.mode == "check":
+                # Families without a Q315 source (photographies) are covered by
+                # read_rows validation alone; they have no abstract page to compare.
+                if family.q315_path:
+                    all_changes.extend(render_q315_family(family, rows, apply=False))
             elif args.mode not in {"validate", "wikibase-plan", "wikibase-apply"}:
                 all_changes.extend(render_family(family, rows, apply=args.mode == "apply"))
         if args.mode == "validate":
             print("Validation passed.")
+        elif args.mode == "check":
+            drifted = [change for change in all_changes if change.changed]
+            print(format_changes(all_changes))
+            if drifted:
+                print(
+                    "\nCheck failed: "
+                    f"{len(drifted)} Q315 source(s) are out of sync with their CSV. "
+                    "Run --mode q315-apply, then src/main/abstract/render_page.py.",
+                    file=sys.stderr,
+                )
+                return 1
+            print("\nCheck passed: every Q315 source is in sync with its CSV.")
         elif args.mode == "extract":
             print("\n".join(extract_reports))
         elif args.mode in {"wikibase-plan", "wikibase-apply"}:

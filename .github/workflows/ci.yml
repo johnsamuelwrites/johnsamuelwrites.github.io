@@ -53,6 +53,13 @@ jobs:
       - name: Check rendered Q315 prose and links
         run: python src/main/abstract/validate_rendered_pages.py
 
+      - name: Check content-update CSVs are in sync with their Q315 sources
+        # Validates every CSV in data/content-updates and asserts that applying it
+        # to its Q315 abstract source would be a no-op. Not a ratchet: it starts at
+        # zero drift and must stay there. A failure means a CSV row was added or
+        # edited without running --mode q315-apply and re-rendering.
+        run: python src/main/content_update.py --mode check
+
       - name: Check Q315 round-trip has no regressions
         # Ratchet: only ever lower this budget as page-language pairs are made
         # reproducible from their abstract bindings. It reaches 0 when every

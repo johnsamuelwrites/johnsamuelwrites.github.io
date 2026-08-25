@@ -1,6 +1,8 @@
 import unittest
 import html as html_lib
+import io
 import tempfile
+from contextlib import redirect_stderr, redirect_stdout
 from pathlib import Path
 
 import sys
@@ -18,8 +20,11 @@ from content_update import (
     build_wikibase_repair_data,
     canonical_wikidata_url,
     content_texts_for_wikibase,
+    main,
+    normalize_text,
     read_rows,
     render_content,
+    render_family,
     render_cv_simple_text,
     render_cv_text,
     render_q315_family,
@@ -772,6 +777,123 @@ class ContentUpdateTests(unittest.TestCase):
 
         p40 = data["claims"][MONOLINGUAL_CONTENT_PROPERTY]
         self.assertTrue(any(claim["mainsnak"]["datavalue"]["value"]["language"] == "fr" and claim["mainsnak"]["datavalue"]["value"]["text"] == "Entrée française" for claim in p40))
+
+
+class LegacyApplyGuardTests(unittest.TestCase):
+    """--mode apply must not write pages that the Q315 renderer owns."""
+
+    def test_apply_refuses_for_q315_owned_family(self):
+        with self.assertRaises(ContentUpdateError) as raised:
+            render_family(FAMILIES["museums"], [], apply=True)
+        message = str(raised.exception)
+        self.assertIn("Q315/Q3638/Q3643.html", message)
+        self.assertIn("q315-apply", message)
+
+    def test_every_q315_owned_family_is_guarded(self):
+        for name, family in FAMILIES.items():
+            if not family.q315_path:
+                continue
+            with self.subTest(family=name):
+                with self.assertRaises(ContentUpdateError):
+                    render_family(family, [], apply=True)
+
+    def test_preview_stays_available_as_a_diagnostic(self):
+        changes = render_family(FAMILIES["museums"], [], apply=False)
+        self.assertTrue(changes)
+        self.assertFalse(any(change.changed for change in changes))
+
+    def test_photographies_keeps_the_legacy_apply_path(self):
+        self.assertEqual(FAMILIES["photographies"].q315_path, "")
+        self.assertEqual(render_family(FAMILIES["photographies"], [], apply=True), [])
+
+
+class CheckModeTests(unittest.TestCase):
+    """--mode check asserts each Q315 source is already in sync with its CSV."""
+
+    BOOKS_HEADER = "id,type,name,creator,wikidata_url,local_qid\n"
+
+    @staticmethod
+    def run_check(*argv):
+        """Run the CLI with its reporting captured, returning the exit code."""
+        out, err = io.StringIO(), io.StringIO()
+        with redirect_stdout(out), redirect_stderr(err):
+            exit_code = main(["--mode", "check", *argv])
+        return exit_code, out.getvalue() + err.getvalue()
+
+    def test_check_passes_when_the_source_is_in_sync(self):
+        exit_code, report = self.run_check("--family", "books")
+        self.assertEqual(exit_code, 0)
+        self.assertIn("Check passed", report)
+
+    def test_check_fails_when_a_csv_row_is_missing_from_the_source(self):
+        with tempfile.TemporaryDirectory() as directory:
+            (Path(directory) / "books.csv").write_text(
+                self.BOOKS_HEADER
+                + ",Book,A Book That Is Not On The Abstract Page,Nobody,,Q999999\n",
+                encoding="utf-8",
+            )
+            exit_code, report = self.run_check(
+                "--family", "books", "--input-dir", directory
+            )
+        self.assertEqual(exit_code, 1)
+        self.assertIn("out of sync", report)
+        self.assertIn("added=1", report)
+
+    def test_check_does_not_write_to_the_source_page(self):
+        source = FAMILIES["books"].q315_target
+        before = source.read_text(encoding="utf-8")
+        with tempfile.TemporaryDirectory() as directory:
+            (Path(directory) / "books.csv").write_text(
+                self.BOOKS_HEADER
+                + ",Book,A Book That Is Not On The Abstract Page,Nobody,,Q999999\n",
+                encoding="utf-8",
+            )
+            self.run_check("--family", "books", "--input-dir", directory)
+        self.assertEqual(source.read_text(encoding="utf-8"), before)
+
+    def test_check_covers_every_family_with_a_q315_source(self):
+        exit_code, report = self.run_check()
+        self.assertEqual(exit_code, 0)
+        for name, family in FAMILIES.items():
+            with self.subTest(family=name):
+                if family.q315_path:
+                    self.assertIn(family.q315_path, report)
+
+
+class UnicodeIdentityTests(unittest.TestCase):
+    """Names outside the Latin script must still produce ids and match reliably."""
+
+    def test_slugify_falls_back_to_a_digest_for_non_latin_names(self):
+        for name in ("സംഗീതം", "ਸੰਗੀਤ", "संगीत"):
+            with self.subTest(name=name):
+                self.assertTrue(slugify(name))
+
+    def test_slugify_keeps_distinct_names_distinct(self):
+        self.assertNotEqual(
+            slugify("സംഗീതം"),
+            slugify("ਸੰਗੀਤ"),
+        )
+
+    def test_slugify_is_unchanged_for_ascii_names(self):
+        self.assertEqual(slugify("The Trial"), "the-trial")
+        self.assertEqual(slugify(""), "")
+
+    def test_non_latin_row_gets_a_stable_id(self):
+        row = ContentRow(
+            family="books",
+            row_number=2,
+            data={"type": "Book", "name": "സംഗീതം"},
+        )
+        self.assertTrue(row.stable_id)
+        validate_rows(FAMILIES["books"], [row], Path("books.csv"))
+
+    def test_normalize_text_matches_across_unicode_forms(self):
+        import unicodedata
+
+        composed = "Mus\u00e9e"
+        decomposed = unicodedata.normalize("NFD", composed)
+        self.assertNotEqual(composed, decomposed)
+        self.assertEqual(normalize_text(composed), normalize_text(decomposed))
 
 
 if __name__ == "__main__":

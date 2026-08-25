@@ -15,6 +15,12 @@ Apply changes:
 python3 src/main/content_update.py --family books --mode q315-apply
 ```
 
+Assert every CSV is already in sync with its Q315 source (this is what CI runs):
+
+```sh
+python3 src/main/content_update.py --mode check
+```
+
 For Q315-driven pages, render the bound language-page slots after applying the
 Q315 source change, then run the rendered-page guard and verify round-trip
 equivalence. Example for the detailed CV:
@@ -86,8 +92,17 @@ Use `section` to choose the QID/literal gallery subsection heading, `src` for th
 image URL, and optional `href`, `location`, `year`, `card_class`, and
 `data_location` to match the local page style. Do not use `q315-preview` or
 `q315-apply` for photography; Q315 abstract photography/travel pages are owned by
-the manifest workflow below. Plain `preview`/`apply` is retained only for legacy
-rendered-page repair workflows.
+the manifest workflow below. `preview` is retained as a read-only diagnostic,
+and photography is the only family for which `apply` still runs.
+
+`--mode apply` writes rendered language pages directly and therefore bypasses
+Q315. It is refused for every family that has a Q315 source, because the Q315
+renderer rewrites bound markup -- dropping `property="name"` and the `sameAs`
+link -- until the entry matching used by that path no longer recognises an entry
+that is already on the page, and appends a duplicate. Use `q315-apply` followed
+by `src/main/abstract/render_page.py` instead. `--mode preview` stays available
+as a read-only diagnostic and is the easiest way to see which rendered pages have
+drifted from their CSV.
 
 Do not use `content_update.py --family photographies --mode wikibase-*`.
 The canonical multilingual photography/travel workflow is:
