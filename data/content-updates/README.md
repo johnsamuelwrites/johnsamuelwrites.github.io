@@ -64,6 +64,9 @@ Wikidata policy:
 
 - `books.csv`: `wikidata_url` may be empty.
 - `quotes.csv`: `wikidata_url` is not used.
+- `photographies.csv`: `wikidata_url` is not used by this append helper.
+  Photography Wikibase/content binding is owned by the Q315 abstract travel
+  pipeline under `src/main/abstract/`.
 - `cv.csv`: `wikidata_url` is optional and should be used only when the CV row
   itself has a linked publication or external Wikidata identity.
 - `films-series-documentaries.csv`, `museums-galleries.csv`, and `music.csv` require
@@ -103,10 +106,26 @@ quote. Use `part_qids` for long quotes that are already split into multiple
 content items because of Wikibase text limits, and `attribution_qid` for the
 author/source line.
 
-`photographies.csv` is retired. It is kept as an inventory of the 1,136 image
-placements it recorded, but `content_update.py` no longer has a `photographies`
-family and will not read it: photography is owned by the Q315 travel workflow,
-which is the only pipeline that binds and renders it.
+For photographies, each row represents one travel/gallery placement of one image,
+keyed by `page + src`, so the same image may appear on several pages. Use
+`section` to choose the QID/literal gallery subsection heading, `src` for the
+image URL, and optional `href`, `location`, `year`, `card_class` and
+`data_location` to match the local page style.
+
+Adding a photo is a CSV append plus `apply`:
+
+```sh
+python3 src/main/content_update.py --family photographies --mode validate
+python3 src/main/content_update.py --family photographies --mode preview
+python3 src/main/content_update.py --family photographies --mode apply
+```
+
+`photographies` is the one family `--mode apply` still serves, because it has no
+`q315_path`: its `page` column already points at the Q315 travel sources, so
+apply writes the card into the abstract page directly rather than into a
+generated language page. Do not use `q315-preview`/`q315-apply` or the
+`wikibase-*` modes for it -- binding and translating travel content is owned by
+the manifest workflow below.
 
 The canonical multilingual photography/travel workflow is:
 

@@ -48,6 +48,7 @@ from content_update import (
     render_cv_simple_text,
     render_cv_text,
     render_q315_family,
+    render_photography_page,
     render_q315_content,
     render_q315_cv_simple_text,
     render_q315_cv_text,
@@ -600,6 +601,119 @@ class ContentUpdateTests(unittest.TestCase):
             with self.assertRaises(ContentUpdateError):
                 read_rows(FAMILIES["books"], csv_path)
 
+    def test_photography_page_appends_to_section(self):
+        row = ContentRow(
+            family="photographies",
+            row_number=2,
+            data={
+                "type": "Photograph",
+                "page": "en/photography/bridges.html",
+                "section": "France",
+                "title": "A new bridge",
+                "alt": "A new bridge",
+                "src": "https://example.org/bridge.jpg",
+                "location": "Lyon",
+                "local_qid": "Q5000",
+            },
+        )
+        html = """
+        <html><body>
+            <h3 class="country-title">France</h3>
+            <div class="gallery-grid"></div>
+        </body></html>
+        """
+
+        updated, added, skipped, repaired = render_photography_page(html, [row], "en")
+
+        self.assertEqual(added, 1)
+        self.assertEqual(skipped, 0)
+        self.assertEqual(repaired, 0)
+        self.assertIn('data-q315-source="local:Q5000"', updated)
+        self.assertIn('src="https://example.org/bridge.jpg"', updated)
+        self.assertIn("Lyon", updated)
+
+    def test_photography_page_rejects_missing_section(self):
+        row = ContentRow(
+            family="photographies",
+            row_number=2,
+            data={
+                "type": "Photograph",
+                "page": "en/photography/bridges.html",
+                "section": "Italy",
+                "title": "A new bridge",
+                "src": "https://example.org/bridge.jpg",
+            },
+        )
+        html = """
+        <html><body>
+            <h3 class="country-title">France</h3>
+            <div class="gallery-grid"></div>
+        </body></html>
+        """
+
+        with self.assertRaises(ContentUpdateError):
+            render_photography_page(html, [row], "en")
+
+    def test_photography_page_clones_q315_links_card(self):
+        row = ContentRow(
+            family="photographies",
+            row_number=2,
+            data={
+                "type": "Photograph",
+                "page": "Q315/Q3062/Q3025/Q3082/Q3154.html",
+                "section": "Q3154",
+                "title": "A new canal",
+                "src": "https://example.org/canal.jpg",
+                "href": "Q3154.html",
+                "data_location": "Canal",
+            },
+        )
+        html = """
+        <html><body>
+            <section class="city-section">
+                <h4 class="city-name">Q3154</h4>
+                <div class="links">
+                    <ul>
+                        <li>
+                            <a data-location="Bridge" href="Q3154.html">
+                                <div class="azure-scan"></div>
+                                <img alt="" src="https://example.org/old.jpg" />
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </section>
+        </body></html>
+        """
+
+        updated, added, skipped, repaired = render_photography_page(html, [row], "en")
+
+        self.assertEqual(added, 1)
+        self.assertEqual(skipped, 0)
+        self.assertEqual(repaired, 0)
+        self.assertIn('data-location="Canal"', updated)
+        self.assertIn('src="https://example.org/canal.jpg"', updated)
+        self.assertIn('alt=""', updated)
+        self.assertIn("azure-scan", updated)
+
+    def test_q315_photography_family_uses_travel_pipeline(self):
+        row = ContentRow(
+            family="photographies",
+            row_number=2,
+            data={
+                "type": "Photograph",
+                "page": "Q315/Q3062/Q3025/Q3082/Q3154.html",
+                "section": "Q3154",
+                "title": "A new canal",
+                "src": "https://example.org/canal.jpg",
+                "href": "Q3154.html",
+                "data_location": "Canal",
+            },
+        )
+
+        with self.assertRaisesRegex(ContentUpdateError, "abstract travel pipeline"):
+            render_q315_family(FAMILIES["photographies"], [row], apply=False)
+
     def test_q315_cv_appends_under_existing_year(self):
         row = ContentRow(
             family="cv",
@@ -708,12 +822,10 @@ class LegacyApplyGuardTests(unittest.TestCase):
         self.assertTrue(changes)
         self.assertFalse(any(change.changed for change in changes))
 
-    def test_every_family_is_now_q315_owned(self):
-        """Photography was the last family without a Q315 source; it is retired."""
-        self.assertNotIn("photographies", FAMILIES)
-        for name, family in FAMILIES.items():
-            with self.subTest(family=name):
-                self.assertTrue(family.q315_path)
+    def test_photographies_keeps_the_legacy_apply_path(self):
+        """Photography has no Q315 source, so apply stays available for it."""
+        self.assertEqual(FAMILIES["photographies"].q315_path, "")
+        self.assertEqual(render_family(FAMILIES["photographies"], [], apply=True), [])
 
 
 class CheckModeTests(unittest.TestCase):
@@ -1252,7 +1364,7 @@ class ColumnSchemaTests(unittest.TestCase):
 
     def test_a_required_column_accepts_its_language_variant(self):
         spec = content_update.ColumnSpec("page", required=True, per_language=True)
-        row = ContentRow(family="books", row_number=2, data={"page_fr": "fr/x.html"})
+        row = ContentRow(family="photographies", row_number=2, data={"page_fr": "fr/x.html"})
         self.assertTrue(spec.satisfied_by(row))
         self.assertFalse(spec.satisfied_by(ContentRow(family="books", row_number=2, data={})))
 
