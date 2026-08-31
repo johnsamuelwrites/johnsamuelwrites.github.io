@@ -1,3 +1,37 @@
+# v1.3
+===============================================================================
+
+### Added
+- Q315-driven multilingual site generation for core pages, travel galleries, writings, research pages, and CV pages
+- New Q315 abstract content model, Wikibase label snapshot, renderer scripts, repair tools, and round-trip validation tests
+- New language coverage and generated pages for Portuguese, Spanish, Italian, Hindi, Punjabi, and Malayalam sections
+- New search indexes, language switchers, and shared CSS assets across generated language pages
+- New 2026 and 2026-2027 academic content, course archives, teaching pages, and course index updates
+- New and updated teaching material, slides, plans, examples, images, and course pages for C, CPDE, CGP, AI/deep learning, data processing, and related modules
+- New interactive games and demonstrations, including the Data Science Pipeline game and related project/game pages
+- New multilingual project pages for Drawing, Colour, 3D, and the multilingual programming language project
+- New HDR/Habilitation details, PhD defense details, DBKDA 2026 article, JOSS article, and academic publication updates
+- New CV entries for 2026 journal/conference publications, participations, posters, and talks, including Wikimania 2026 and LGBTQI+ research events
+- New glossary, workshop article, photography captions/galleries, films, books, museums, music, blog, and search-index content
+- New CI checks and tests for links, abstract HTML, language footers, Q315 rendering, Wikibase content, and generated page consistency
+
+### Changed
+- Migrated large parts of the site from hand-authored multilingual pages toward Q315/Wikibase as the source of truth
+- Reworked translation workflows, content update tooling, QID binding, label fetching, and generated-page synchronization
+- Consolidated language configuration, paths, metadata, page templates, and shared static-site utilities under `src/main`
+- Improved layouts, cards, typography, footer behavior, image alt handling, and shared visual assets
+- Updated course slides, teaching material, project pages, archives, CV pages, multilingual navigation, and footer language links
+- Refined Q315 abstract compositions, QID-based page bindings, native-label handling, path mappings, and generated page ownership
+
+### Fixed
+- Corrected broken links, paths, titles, identifiers, footer language links, and generated search data
+- Repaired escaped quotations, image alt labels, Q315 bindings, and label/content mismatches
+- Improved validation coverage for generated pages, HTML structure, Wikibase writes, content round-trips, and static-site checks
+
+### Removed
+- Replaced older duplicated Q315/language-page structures with generated Q315-owned pages where the migration is now authoritative
+
+
 # v1.2
 ===============================================================================
 
