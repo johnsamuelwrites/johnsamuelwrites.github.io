@@ -2,7 +2,7 @@
 
 <head>
     <meta charset="utf-8" />
-    <title>Principes des Langages de Programmation : Les expressions lambda (2026-2027): John Samuel</title>
+    <title>Principes des Langages de Programmation : Programmation fonctionnelle (2026-2027): John Samuel</title>
     <link rel="shortcut icon" href="../../../../../images/logo/favicon.png" />
     <style type="text/css">
         body {
@@ -37,9 +37,9 @@
         }
 
         .content h1,
-        h2,
-        h3,
-        h4 {
+        .content h2,
+        .content h3,
+        .content h4 {
             color: #1B80CF;
         }
 
@@ -68,6 +68,42 @@
             flex-wrap: wrap;
         }
 
+        .content .question {
+            font-size: 3.6vmin;
+            font-weight: bold;
+            line-height: 1.5em;
+            width: 92%;
+            margin: 6vmin 0 2vmin 0;
+        }
+
+        .content>img {
+            max-width: 100%;
+            max-height: 100%;
+        }
+
+        .content>code,
+        .content .highlight {
+            max-width: 100%;
+            overflow-x: auto;
+        }
+
+        .content .codepair {
+            display: flex;
+            flex-wrap: nowrap;
+            width: 100%;
+            gap: 1vmax;
+        }
+
+        .content .codepair>code {
+            width: 50%;
+            overflow-x: auto;
+        }
+
+        .content .codepair pre {
+            font-size: 82%;
+            line-height: 1.35;
+        }
+
         .content .gridcontent {
             display: grid;
             grid-template-columns: auto auto auto auto;
@@ -88,6 +124,13 @@
             padding-left: 1vmax;
             width: 50%;
             margin-bottom: 1vmax;
+        }
+
+        .content .topicheading sup,
+        .content .topicheading sub,
+        .content .topicsubheading sup,
+        .content .topicsubheading sub {
+            line-height: 0;
         }
 
         .content table {
@@ -345,6 +388,37 @@
 
         /* Literal.Number.Oct */
 
+        /* écrans 4:3 : ligne plus courte, donc contenu légèrement resserré */
+        @media (min-width: 641px) and (max-aspect-ratio: 7/5) {
+            .content {
+                font-size: 2.45vmin;
+                line-height: 1.5em;
+            }
+
+            .content .flexcontent {
+                font-size: 2.45vmin;
+            }
+
+            .content li {
+                line-height: 1.5em;
+            }
+
+            .content td {
+                padding-top: 0.6vmax;
+                padding-bottom: 0.6vmax;
+            }
+
+            .content figure img {
+                max-width: 39vmin;
+                max-height: 39vmin;
+            }
+
+            .content .highlight pre,
+            .content>code {
+                font-size: 90%;
+            }
+        }
+
         @media (max-width: 640px),
         screen and (orientation: portrait) {
             body {
@@ -374,9 +448,9 @@
             }
 
             .content h1,
-            h2,
-            h3,
-            h4 {
+            .content h2,
+            .content h3,
+            .content h4 {
                 width: 100%;
             }
 
@@ -415,7 +489,7 @@
         <div class="content">
             <h1 style="font-size:3.5vmin">Principes des Langages de Programmation</br>
                 <span style="line-height:3.5vmax;font-size:3.0vmin">
-                    Les expressions lambda<span>
+                    Programmation fonctionnelle<span>
             </h1>
             <p><b>John Samuel</b></br>
                 CPE Lyon<br /><br />
@@ -429,7 +503,6 @@
         <div class="footer">
             <div class="contact">Principes des Langages de Programmation | John Samuel</div>
             <div class="navigation">1
-
                 <a class="next" href="#slide2"></a>
             </div>
         </div>
@@ -441,8 +514,11 @@
         <div class="content">
             <h3 class="topicsubheading">Objectifs</h3>
             <ul>
+                <li>Fonctions pures, effets de bord et immuabilité</li>
                 <li>Les expressions lambda</li>
                 <li>Les expressions lambda en Python</li>
+                <li>Fonctions d'ordre supérieur : <code>map</code>, <code>filter</code>, <code>reduce</code></li>
+                <li>Types algébriques et filtrage par motif</li>
             </ul>
         </div>
         <div class="footer">
@@ -455,17 +531,59 @@
     </section>
     <section class="slide" id="slide3">
         <div class="header">
-            <h1>4.1. Les expressions lambda</h1>
+            <h1>4.1. Fonctions pures et effets de bord</h1>
         </div>
         <div class="content">
-            <h3 class="topicsubheading">Les expressions lambda</h3>
+            <h3 class="topicsubheading">Fonctions pures, effets de bord, immuabilité</h3>
+            <ul>
+                <li>Une <b>fonction pure</b> renvoie toujours la même sortie pour la même entrée, et n'a aucun effet
+                    observable en dehors de sa valeur de retour.</li>
+                <li>Un <b>effet de bord</b> : écrire dans une variable globale, modifier un paramètre à travers un
+                    pointeur, lire une entrée, afficher un résultat.</li>
+                <li>L'<b>immuabilité</b> : une valeur ne change pas après sa création ; on en produit une
+                    nouvelle.</li>
+            </ul>
+            <div class="codepair">
+                <code>
+<div class="highlight"><pre><span></span><span class="c1">/* impur : modifie le tableau de l'appelant */</span>
+<span class="kt">void</span> <span class="nf">doubler</span><span class="p">(</span><span class="kt">int</span> <span class="n">t</span><span class="p">[],</span> <span class="kt">size_t</span> <span class="n">n</span><span class="p">)</span> <span class="p">{</span>
+  <span class="k">for</span> <span class="p">(</span><span class="kt">size_t</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">n</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span>
+    <span class="n">t</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">*=</span> <span class="mi">2</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+                </code>
+                <code>
+<div class="highlight"><pre><span></span><span class="c1">/* pur : produit une nouvelle valeur */</span>
+<span class="kt">int</span> <span class="nf">double_de</span><span class="p">(</span><span class="kt">int</span> <span class="n">x</span><span class="p">)</span> <span class="p">{</span>
+  <span class="k">return</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">x</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+                </code>
+            </div>
+            <p>La seconde se teste sans contexte, se met en cache, et s'exécute en parallèle sans risque. La
+                première non : c'est tout l'intérêt du paradigme.</p>
+        </div>
+        <div class="footer">
+            <div class="contact">Principes des Langages de Programmation | John Samuel</div>
+            <div class="navigation">3
+                <a class="prev" href="#slide2"></a>
+                <a class="next" href="#slide4"></a>
+            </div>
+        </div>
+    </section>
+    <section class="slide" id="slide4">
+        <div class="header">
+            <h1>4.2. Les expressions lambda</h1>
+        </div>
+        <div class="content">
+            <h3 class="topicheading">Les expressions lambda</h3>
             <ul>
                 <li>Une expression lambda est une fonction anonyme qui peut être définie et utilisée dans des contextes
 			spécifiques. Contrairement aux fonctions traditionnelles, les expressions lambda n'ont pas besoin de nom, ce qui en fait des fonctions "anonymes".</li>
 		<li>Elles sont couramment utilisées lorsque vous avez besoin d'une
                     fonction rapide à usage unique.</li>
             </ul>
-            <h4>Caractéristiques clés</h4>
+            <h4 class="topicsubheading">Caractéristiques clés</h4>
             <ol type="1">
                 <li><strong>Anonyme</strong> : Les lambdas n’ont pas de noms explicites.</li>
                 <li><strong>En ligne</strong> : Elles sont définies directement dans le code environnant.</li>
@@ -478,15 +596,15 @@
         </div>
         <div class="footer">
             <div class="contact">Principes des Langages de Programmation | John Samuel</div>
-            <div class="navigation">3
-                <a class="prev" href="#slide2"></a>
-                <a class="next" href="#slide4"></a>
+            <div class="navigation">4
+                <a class="prev" href="#slide3"></a>
+                <a class="next" href="#slide5"></a>
             </div>
         </div>
     </section>
-    <section class="slide" id="slide4">
+    <section class="slide" id="slide5">
         <div class="header">
-            <h1>4.1. Les expressions lambda</h1>
+            <h1>4.2. Les expressions lambda</h1>
         </div>
         <div class="content">
             <h3 class="topicsubheading">Syntaxe</h3>
@@ -500,15 +618,15 @@
         </div>
         <div class="footer">
             <div class="contact">Principes des Langages de Programmation | John Samuel</div>
-            <div class="navigation">4
-                <a class="prev" href="#slide3"></a>
-                <a class="next" href="#slide5"></a>
+            <div class="navigation">5
+                <a class="prev" href="#slide4"></a>
+                <a class="next" href="#slide6"></a>
             </div>
         </div>
     </section>
-    <section class="slide" id="slide5">
+    <section class="slide" id="slide6">
         <div class="header">
-            <h1>4.1. Les expressions lambda</h1>
+            <h1>4.2. Les expressions lambda</h1>
         </div>
         <div class="content">
             <h3 class="topicsubheading">Exemples dans différents langages de programmation</h3>
@@ -524,15 +642,15 @@
         </div>
         <div class="footer">
             <div class="contact">Principes des Langages de Programmation | John Samuel</div>
-            <div class="navigation">5
-                <a class="prev" href="#slide4"></a>
-                <a class="next" href="#slide6"></a>
+            <div class="navigation">6
+                <a class="prev" href="#slide5"></a>
+                <a class="next" href="#slide7"></a>
             </div>
         </div>
     </section>
-    <section class="slide" id="slide6">
+    <section class="slide" id="slide7">
         <div class="header">
-            <h1>4.1. Les expressions lambda</h1>
+            <h1>4.2. Les expressions lambda</h1>
         </div>
         <div class="content">
             <h3 class="topicsubheading">Python</h3>
@@ -556,15 +674,15 @@
         </div>
         <div class="footer">
             <div class="contact">Principes des Langages de Programmation | John Samuel</div>
-            <div class="navigation">6
-                <a class="prev" href="#slide5"></a>
-                <a class="next" href="#slide7"></a>
+            <div class="navigation">7
+                <a class="prev" href="#slide6"></a>
+                <a class="next" href="#slide8"></a>
             </div>
         </div>
     </section>
-    <section class="slide" id="slide7">
+    <section class="slide" id="slide8">
         <div class="header">
-            <h1>4.1. Les expressions lambda</h1>
+            <h1>4.2. Les expressions lambda</h1>
         </div>
         <div class="content">
             <h3 class="topicsubheading">Python</h3>
@@ -587,15 +705,15 @@
         </div>
         <div class="footer">
             <div class="contact">Principes des Langages de Programmation | John Samuel</div>
-            <div class="navigation">7
-                <a class="prev" href="#slide6"></a>
-                <a class="next" href="#slide8"></a>
+            <div class="navigation">8
+                <a class="prev" href="#slide7"></a>
+                <a class="next" href="#slide9"></a>
             </div>
         </div>
     </section>
-    <section class="slide" id="slide8">
+    <section class="slide" id="slide9">
         <div class="header">
-            <h1>4.1. Les expressions lambda</h1>
+            <h1>4.2. Les expressions lambda</h1>
         </div>
         <div class="content">
             <h3 class="topicsubheading">Python</h3>
@@ -624,15 +742,15 @@
         </div>
         <div class="footer">
             <div class="contact">Principes des Langages de Programmation | John Samuel</div>
-            <div class="navigation">8
-                <a class="prev" href="#slide7"></a>
-                <a class="next" href="#slide9"></a>
+            <div class="navigation">9
+                <a class="prev" href="#slide8"></a>
+                <a class="next" href="#slide10"></a>
             </div>
         </div>
     </section>
-    <section class="slide" id="slide9">
+    <section class="slide" id="slide10">
         <div class="header">
-            <h1>4.1. Les expressions lambda</h1>
+            <h1>4.2. Les expressions lambda</h1>
         </div>
         <div class="content">
             <h3 class="topicsubheading">Python</h3>
@@ -657,15 +775,15 @@
         </div>
         <div class="footer">
             <div class="contact">Principes des Langages de Programmation | John Samuel</div>
-            <div class="navigation">9
-                <a class="prev" href="#slide8"></a>
-                <a class="next" href="#slide10"></a>
+            <div class="navigation">10
+                <a class="prev" href="#slide9"></a>
+                <a class="next" href="#slide11"></a>
             </div>
         </div>
     </section>
-    <section class="slide" id="slide10">
+    <section class="slide" id="slide11">
         <div class="header">
-            <h1>4.1. Les expressions lambda</h1>
+            <h1>4.2. Les expressions lambda</h1>
         </div>
         <div class="content">
             <h3 class="topicsubheading">JavaScript</h3>
@@ -682,18 +800,17 @@
         </div>
 
 
-        </div>
         <div class="footer">
             <div class="contact">Principes des Langages de Programmation | John Samuel</div>
-            <div class="navigation">10
-                <a class="prev" href="#slide9"></a>
-                <a class="next" href="#slide11"></a>
+            <div class="navigation">11
+                <a class="prev" href="#slide10"></a>
+                <a class="next" href="#slide12"></a>
             </div>
         </div>
     </section>
-    <section class="slide" id="slide11">
+    <section class="slide" id="slide12">
         <div class="header">
-            <h1>4.1. Les expressions lambda</h1>
+            <h1>4.2. Les expressions lambda</h1>
         </div>
         <div class="content">
             <h3 class="topicsubheading">C++</h3>
@@ -715,15 +832,15 @@
         </div>
         <div class="footer">
             <div class="contact">Principes des Langages de Programmation | John Samuel</div>
-            <div class="navigation">11
-                <a class="prev" href="#slide10"></a>
-                <a class="next" href="#slide12"></a>
+            <div class="navigation">12
+                <a class="prev" href="#slide11"></a>
+                <a class="next" href="#slide13"></a>
             </div>
         </div>
     </section>
-    <section class="slide" id="slide12">
+    <section class="slide" id="slide13">
         <div class="header">
-            <h1>4.1. Les expressions lambda</h1>
+            <h1>4.2. Les expressions lambda</h1>
         </div>
         <div class="content">
             <h3 class="topicsubheading">C++</h3>
@@ -747,15 +864,15 @@
         </div>
         <div class="footer">
             <div class="contact">Principes des Langages de Programmation | John Samuel</div>
-            <div class="navigation">12
-                <a class="prev" href="#slide11"></a>
-                <a class="next" href="#slide13"></a>
+            <div class="navigation">13
+                <a class="prev" href="#slide12"></a>
+                <a class="next" href="#slide14"></a>
             </div>
         </div>
     </section>
-    <section class="slide" id="slide13">
+    <section class="slide" id="slide14">
         <div class="header">
-            <h1>4.2. Les expressions lambda en Python</h1>
+            <h1>4.3. Les expressions lambda en Python</h1>
         </div>
         <div class="content">
             <h3 class="topicsubheading">1. Affectation à une variable</h3>
@@ -774,25 +891,6 @@
         </div>
         <div class="footer">
             <div class="contact">Principes des Langages de Programmation | John Samuel</div>
-            <div class="navigation">13
-                <a class="prev" href="#slide12"></a>
-                <a class="next" href="#slide14"></a>
-            </div>
-        </div>
-    </section>
-    <section class="slide" id="slide14">
-        <div class="header">
-            <h1>4.2. Les expressions lambda en Python</h1>
-        </div>
-        <div class="content">
-            <h3 class="topicsubheading">2. Passage en Argument à une Fonction</h3>
-            <p>Les lambdas sont souvent utilisées comme arguments pour d’autres fonctions, notamment dans des fonctions
-                de rappel (callbacks) ou des méthodes qui prennent une fonction en paramètre.</p>
-<p>Un callback est une fonction qui est passée en argument à une autre fonction, afin d’être appelée plus tard par cette dernière. En d’autres termes, un callback est une fonction qui est “appelée en retour” par une autre fonction.</p>
-            </div>
-        </div>
-        <div class="footer">
-            <div class="contact">Principes des Langages de Programmation | John Samuel</div>
             <div class="navigation">14
                 <a class="prev" href="#slide13"></a>
                 <a class="next" href="#slide15"></a>
@@ -801,7 +899,25 @@
     </section>
     <section class="slide" id="slide15">
         <div class="header">
-            <h1>4.2. Les expressions lambda en Python</h1>
+            <h1>4.3. Les expressions lambda en Python</h1>
+        </div>
+        <div class="content">
+            <h3 class="topicsubheading">2. Passage en Argument à une Fonction</h3>
+            <p>Les lambdas sont souvent utilisées comme arguments pour d’autres fonctions, notamment dans des fonctions
+                de rappel (callbacks) ou des méthodes qui prennent une fonction en paramètre.</p>
+<p>Un callback est une fonction qui est passée en argument à une autre fonction, afin d’être appelée plus tard par cette dernière. En d’autres termes, un callback est une fonction qui est “appelée en retour” par une autre fonction.</p>
+            </div>
+        <div class="footer">
+            <div class="contact">Principes des Langages de Programmation | John Samuel</div>
+            <div class="navigation">15
+                <a class="prev" href="#slide14"></a>
+                <a class="next" href="#slide16"></a>
+            </div>
+        </div>
+    </section>
+    <section class="slide" id="slide16">
+        <div class="header">
+            <h1>4.3. Les expressions lambda en Python</h1>
         </div>
         <div class="content">
             <h3 class="topicsubheading">2. Passage en Argument à une Fonction</h3>
@@ -817,30 +933,6 @@
 <span class="n">appel_fonction</span><span class="p">(</span><span class="n">callback</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span>
 </pre></div>
             </div>
-        </div>
-        <div class="footer">
-            <div class="contact">Principes des Langages de Programmation | John Samuel</div>
-            <div class="navigation">15
-                <a class="prev" href="#slide14"></a>
-                <a class="next" href="#slide16"></a>
-            </div>
-        </div>
-    </section>
-    <section class="slide" id="slide16">
-        <div class="header">
-            <h1>4.2. Les expressions lambda en Python</h1>
-        </div>
-        <div class="content">
-            <h3 class="topicsubheading">2. Passage en Argument à une Fonction</h3>
-	    <p><strong>Exemple : callback</strong></p>
-<p>Dans cet exemple, la fonction <code>appel_fonction</code> prend deux paramètres : <code>callback</code> et <code>param</code>. Le paramètre <code>callback</code> est une fonction qui sera appelée avec le paramètre <code>param</code>. La fonction lambda est définie comme un callback qui prend un paramètre <code>x</code> et renvoie son carré.</p>
-<p>Lorsque nous appelons la fonction <code>appel_fonction</code> avec le callback et le paramètre <code>5</code>, la fonction lambda est appelée avec le paramètre <code>5</code> et le résultat est imprimé.</p>
-<p>Le résultat de l’exécution de ce code sera :</p>
-<pre><code>Le résultat de la fonction est : 25</code></pre>
-<p>Cet exemple montre comment utiliser une fonction lambda comme callback en Python. La fonction lambda est définie à la volée et peut être utilisée comme une fonction normale, mais elle est anonyme et ne peut pas être appelée directement.</p>
-<p>Il est important de noter que les callbacks peuvent être utilisés pour de nombreuses choses, comme la gestion des événements, la création de fonctions de rappel, etc. Les callbacks sont très utiles en programmation fonctionnelle et sont utilisés dans de nombreux frameworks et bibliothèques Python.</p>
-            </div>
-        </div>
         <div class="footer">
             <div class="contact">Principes des Langages de Programmation | John Samuel</div>
             <div class="navigation">16
@@ -851,7 +943,30 @@
     </section>
     <section class="slide" id="slide17">
         <div class="header">
-            <h1>4.2. Les expressions lambda en Python</h1>
+            <h1>4.3. Les expressions lambda en Python</h1>
+        </div>
+        <div class="content">
+            <h3 class="topicsubheading">2. Passage en Argument à une Fonction</h3>
+	    <p><strong>Exemple : callback</strong></p>
+<p><code>appel_fonction</code> prend deux paramètres : <code>callback</code>, une fonction, et
+                <code>param</code>, la valeur à lui passer. La lambda joue ici le rôle de callback : elle reçoit
+                <code>x</code> et renvoie son carré.</p>
+            <p>Appelée avec <code>5</code>, elle produit :</p>
+            <pre><code>Le résultat de la fonction est : 25</code></pre>
+            <p>La lambda est définie à la volée et utilisée comme une fonction ordinaire, mais elle reste anonyme.
+                C'est l'idiome des callbacks : gestion d'événements, tris, traitements paramétrés.</p>
+            </div>
+        <div class="footer">
+            <div class="contact">Principes des Langages de Programmation | John Samuel</div>
+            <div class="navigation">17
+                <a class="prev" href="#slide16"></a>
+                <a class="next" href="#slide18"></a>
+            </div>
+        </div>
+    </section>
+    <section class="slide" id="slide18">
+        <div class="header">
+            <h1>4.3. Les expressions lambda en Python</h1>
         </div>
         <div class="content">
             <h3 class="topicsubheading">2. Passage en Argument à une Fonction</h3>
@@ -870,15 +985,15 @@
         </div>
         <div class="footer">
             <div class="contact">Principes des Langages de Programmation | John Samuel</div>
-            <div class="navigation">17
-                <a class="prev" href="#slide16"></a>
-                <a class="next" href="#slide18"></a>
+            <div class="navigation">18
+                <a class="prev" href="#slide17"></a>
+                <a class="next" href="#slide19"></a>
             </div>
         </div>
     </section>
-    <section class="slide" id="slide18">
+    <section class="slide" id="slide19">
         <div class="header">
-            <h1>4.2. Les expressions lambda en Python</h1>
+            <h1>4.3. Les expressions lambda en Python</h1>
         </div>
         <div class="content">
             <h3 class="topicsubheading">2. Passage en Argument à une Fonction</h3>
@@ -895,15 +1010,15 @@
         </div>
         <div class="footer">
             <div class="contact">Principes des Langages de Programmation | John Samuel</div>
-            <div class="navigation">18
-                <a class="prev" href="#slide17"></a>
-                <a class="next" href="#slide19"></a>
+            <div class="navigation">19
+                <a class="prev" href="#slide18"></a>
+                <a class="next" href="#slide20"></a>
             </div>
         </div>
     </section>
-    <section class="slide" id="slide19">
+    <section class="slide" id="slide20">
         <div class="header">
-            <h1>4.2. Les expressions lambda en Python</h1>
+            <h1>4.3. Les expressions lambda en Python</h1>
         </div>
         <div class="content">
             <h3 class="topicsubheading">2. Passage en Argument à une Fonction</h3>
@@ -923,18 +1038,17 @@
 <p>Cette lambda prend un seul paramètre <code>x</code> (qui représente un élément de la liste) et renvoie <code>True</code> si <code>x</code> est pair, c’est-à-dire lorsque <code>x % 2 == 0</code>.</p>
 
             </div>
-        </div>
         <div class="footer">
             <div class="contact">Principes des Langages de Programmation | John Samuel</div>
-            <div class="navigation">19
-                <a class="prev" href="#slide18"></a>
-                <a class="next" href="#slide20"></a>
+            <div class="navigation">20
+                <a class="prev" href="#slide19"></a>
+                <a class="next" href="#slide21"></a>
             </div>
         </div>
     </section>
-    <section class="slide" id="slide20">
+    <section class="slide" id="slide21">
         <div class="header">
-            <h1>4.2. Les expressions lambda en Python</h1>
+            <h1>4.3. Les expressions lambda en Python</h1>
         </div>
         <div class="content">
             <h3 class="topicsubheading">2. Passage en Argument à une Fonction</h3>
@@ -953,18 +1067,17 @@
 </ul>
 
             </div>
-        </div>
         <div class="footer">
             <div class="contact">Principes des Langages de Programmation | John Samuel</div>
-            <div class="navigation">20
-                <a class="prev" href="#slide19"></a>
-                <a class="next" href="#slide21"></a>
+            <div class="navigation">21
+                <a class="prev" href="#slide20"></a>
+                <a class="next" href="#slide22"></a>
             </div>
         </div>
     </section>
-    <section class="slide" id="slide21">
+    <section class="slide" id="slide22">
         <div class="header">
-            <h1>4.2. Les expressions lambda en Python</h1>
+            <h1>4.3. Les expressions lambda en Python</h1>
         </div>
         <div class="content">
             <h3 class="topicsubheading">3. Retour d’une Fonction</h3>
@@ -979,15 +1092,15 @@
         </div>
         <div class="footer">
             <div class="contact">Principes des Langages de Programmation | John Samuel</div>
-            <div class="navigation">21
-                <a class="prev" href="#slide20"></a>
-                <a class="next" href="#slide22"></a>
+            <div class="navigation">22
+                <a class="prev" href="#slide21"></a>
+                <a class="next" href="#slide23"></a>
             </div>
         </div>
     </section>
-    <section class="slide" id="slide22">
+    <section class="slide" id="slide23">
         <div class="header">
-            <h1>4.2. Les expressions lambda en Python</h1>
+            <h1>4.3. Les expressions lambda en Python</h1>
         </div>
         <div class="content">
             <h3 class="topicsubheading">3. Retour d’une Fonction</h3>
@@ -1006,15 +1119,15 @@
         </div>
         <div class="footer">
             <div class="contact">Principes des Langages de Programmation | John Samuel</div>
-            <div class="navigation">22
-                <a class="prev" href="#slide21"></a>
-                <a class="next" href="#slide23"></a>
+            <div class="navigation">23
+                <a class="prev" href="#slide22"></a>
+                <a class="next" href="#slide24"></a>
             </div>
         </div>
     </section>
-    <section class="slide" id="slide23">
+    <section class="slide" id="slide24">
         <div class="header">
-            <h1>4.2. Les expressions lambda en Python</h1>
+            <h1>4.3. Les expressions lambda en Python</h1>
         </div>
         <div class="content">
             <h3 class="topicsubheading">4. Utilisation dans des Collections ou des Itérations</h3>
@@ -1033,15 +1146,15 @@
         </div>
         <div class="footer">
             <div class="contact">Principes des Langages de Programmation | John Samuel</div>
-            <div class="navigation">23
-                <a class="prev" href="#slide22"></a>
-                <a class="next" href="#slide24"></a>
+            <div class="navigation">24
+                <a class="prev" href="#slide23"></a>
+                <a class="next" href="#slide25"></a>
             </div>
         </div>
     </section>
-    <section class="slide" id="slide24">
+    <section class="slide" id="slide25">
         <div class="header">
-            <h1>4.2. Les expressions lambda en Python</h1>
+            <h1>4.3. Les expressions lambda en Python</h1>
         </div>
         <div class="content">
             <h3 class="topicsubheading">5. Fonctions Anonymes Temporaires</h3>
@@ -1057,15 +1170,15 @@
         </div>
         <div class="footer">
             <div class="contact">Principes des Langages de Programmation | John Samuel</div>
-            <div class="navigation">24
-                <a class="prev" href="#slide23"></a>
-                <a class="next" href="#slide25"></a>
+            <div class="navigation">25
+                <a class="prev" href="#slide24"></a>
+                <a class="next" href="#slide26"></a>
             </div>
         </div>
     </section>
-    <section class="slide" id="slide25">
+    <section class="slide" id="slide26">
         <div class="header">
-            <h1>4.2. Les expressions lambda en Python</h1>
+            <h1>4.3. Les expressions lambda en Python</h1>
         </div>
         <div class="content">
             <h3 class="topicsubheading">6. Fermetures (Closures)</h3>
@@ -1082,15 +1195,15 @@
         </div>
         <div class="footer">
             <div class="contact">Principes des Langages de Programmation | John Samuel</div>
-            <div class="navigation">25
-                <a class="prev" href="#slide24"></a>
-                <a class="next" href="#slide26"></a>
+            <div class="navigation">26
+                <a class="prev" href="#slide25"></a>
+                <a class="next" href="#slide27"></a>
             </div>
         </div>
     </section>
-    <section class="slide" id="slide26">
+    <section class="slide" id="slide27">
         <div class="header">
-            <h1>4.2. Les expressions lambda en Python</h1>
+            <h1>4.3. Les expressions lambda en Python</h1>
         </div>
         <div class="content">
             <h3 class="topicsubheading">6. Fermetures (Closures)</h3>
@@ -1108,15 +1221,15 @@
         </div>
         <div class="footer">
             <div class="contact">Principes des Langages de Programmation | John Samuel</div>
-            <div class="navigation">26
-                <a class="prev" href="#slide25"></a>
-                <a class="next" href="#slide27"></a>
+            <div class="navigation">27
+                <a class="prev" href="#slide26"></a>
+                <a class="next" href="#slide28"></a>
             </div>
         </div>
     </section>
-    <section class="slide" id="slide27">
+    <section class="slide" id="slide28">
         <div class="header">
-            <h1>4.2. Les expressions lambda en Python</h1>
+            <h1>4.3. Les expressions lambda en Python</h1>
         </div>
         <div class="content">
             <h3 class="topicsubheading">6. Fermetures (Closures)</h3>
@@ -1135,15 +1248,15 @@
         </div>
         <div class="footer">
             <div class="contact">Principes des Langages de Programmation | John Samuel</div>
-            <div class="navigation">27
-                <a class="prev" href="#slide26"></a>
-                <a class="next" href="#slide28"></a>
+            <div class="navigation">28
+                <a class="prev" href="#slide27"></a>
+                <a class="next" href="#slide29"></a>
             </div>
         </div>
     </section>
-    <section class="slide" id="slide28">
+    <section class="slide" id="slide29">
         <div class="header">
-            <h1>4.2. Les expressions lambda en Python</h1>
+            <h1>4.3. Les expressions lambda en Python</h1>
         </div>
         <div class="content">
             <h3 class="topicsubheading">6. Fermetures (Closures)</h3>
@@ -1161,15 +1274,15 @@
         </div>
         <div class="footer">
             <div class="contact">Principes des Langages de Programmation | John Samuel</div>
-            <div class="navigation">28
-                <a class="prev" href="#slide27"></a>
-                <a class="next" href="#slide29"></a>
+            <div class="navigation">29
+                <a class="prev" href="#slide28"></a>
+                <a class="next" href="#slide30"></a>
             </div>
         </div>
     </section>
-    <section class="slide" id="slide29">
+    <section class="slide" id="slide30">
         <div class="header">
-            <h1>4.2. Les expressions lambda en Python</h1>
+            <h1>4.3. Les expressions lambda en Python</h1>
         </div>
         <div class="content">
             <h3 class="topicsubheading">6. Fermetures (Closures)</h3>
@@ -1186,15 +1299,15 @@
         </div>
         <div class="footer">
             <div class="contact">Principes des Langages de Programmation | John Samuel</div>
-            <div class="navigation">29
-                <a class="prev" href="#slide28"></a>
-                <a class="next" href="#slide30"></a>
+            <div class="navigation">30
+                <a class="prev" href="#slide29"></a>
+                <a class="next" href="#slide31"></a>
             </div>
         </div>
     </section>
-    <section class="slide" id="slide30">
+    <section class="slide" id="slide31">
         <div class="header">
-            <h1>4.2. Les expressions lambda en Python</h1>
+            <h1>4.3. Les expressions lambda en Python</h1>
         </div>
         <div class="content">
             <h3 class="topicsubheading">7. Utilisation dans des fonctions d’ordre supérieur</h3>
@@ -1209,15 +1322,15 @@
         </div>
         <div class="footer">
             <div class="contact">Principes des Langages de Programmation | John Samuel</div>
-            <div class="navigation">30
-                <a class="prev" href="#slide29"></a>
-                <a class="next" href="#slide31"></a>
+            <div class="navigation">31
+                <a class="prev" href="#slide30"></a>
+                <a class="next" href="#slide32"></a>
             </div>
         </div>
     </section>
-    <section class="slide" id="slide31">
+    <section class="slide" id="slide32">
         <div class="header">
-            <h1>4.2. Les expressions lambda en Python</h1>
+            <h1>4.3. Les expressions lambda en Python</h1>
         </div>
         <div class="content">
             <h3 class="topicsubheading">7. Utilisation dans des fonctions d’ordre supérieur</h3>
@@ -1236,24 +1349,24 @@
         </div>
         <div class="footer">
             <div class="contact">Principes des Langages de Programmation | John Samuel</div>
-            <div class="navigation">31
-                <a class="prev" href="#slide30"></a>
-                <a class="next" href="#slide32"></a>
+            <div class="navigation">32
+                <a class="prev" href="#slide31"></a>
+                <a class="next" href="#slide33"></a>
             </div>
         </div>
     </section>
-    <section class="slide" id="slide32">
+    <section class="slide" id="slide33">
         <div class="header">
-            <h1>4.2. Les expressions lambda en Python</h1>
+            <h1>4.3. Les expressions lambda en Python</h1>
         </div>
         <div class="content">
-            <h3 class="topicsubheading">7. Utilisation dans des fonctions d’ordre supérieur</h3>
+            <h3 class="topicheading">7. Utilisation dans des fonctions d’ordre supérieur</h3>
             <p><strong>Exemple : Utilisation avec <code>reduce</code></strong></p>
             <div class="highlight">
 <span class="n">somme</span> <span class="o">=</span> <span class="n">reduce</span><span class="p">(</span><span class="k">lambda</span> <span class="n">acc</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">acc</span> <span class="o">+</span> <span class="n">x</span><span class="p">,</span> <span class="n">nombres</span><span class="p">)</span>
 </pre>
 </div>
-            <h4 id="fonctionnement-de-reduce">Fonctionnement de <code>reduce</code> :</h4>
+            <h4 class="topicsubheading">Fonctionnement de <code>reduce</code> :</h4>
             <ul>
                 <li>La fonction <code>reduce</code> prend <strong>deux arguments principaux</strong> :
                     <ol type="1">
@@ -1266,15 +1379,15 @@
         </div>
         <div class="footer">
             <div class="contact">Principes des Langages de Programmation | John Samuel</div>
-            <div class="navigation">32
-                <a class="prev" href="#slide31"></a>
-                <a class="next" href="#slide33"></a>
+            <div class="navigation">33
+                <a class="prev" href="#slide32"></a>
+                <a class="next" href="#slide34"></a>
             </div>
         </div>
     </section>
-    <section class="slide" id="slide33">
+    <section class="slide" id="slide34">
         <div class="header">
-            <h1>4.2. Les expressions lambda en Python</h1>
+            <h1>4.3. Les expressions lambda en Python</h1>
         </div>
         <div class="content">
             <h3 class="topicsubheading">7. Utilisation dans des fonctions d’ordre supérieur</h3>
@@ -1295,20 +1408,20 @@
         </div>
         <div class="footer">
             <div class="contact">Principes des Langages de Programmation | John Samuel</div>
-            <div class="navigation">33
-                <a class="prev" href="#slide32"></a>
-                <a class="next" href="#slide34"></a>
+            <div class="navigation">34
+                <a class="prev" href="#slide33"></a>
+                <a class="next" href="#slide35"></a>
             </div>
         </div>
     </section>
-    <section class="slide" id="slide34">
+    <section class="slide" id="slide35">
         <div class="header">
-            <h1>4.2. Les expressions lambda en Python</h1>
+            <h1>4.3. Les expressions lambda en Python</h1>
         </div>
         <div class="content">
-            <h3 class="topicsubheading">7. Utilisation dans des fonctions d’ordre supérieur</h3>
+            <h3 class="topicheading">7. Utilisation dans des fonctions d’ordre supérieur</h3>
             <p><strong>Exemple : Utilisation avec <code>reduce</code></strong></p>
-            <h4 id="comment-reduce-fonctionne-étape-par-étape">Comment <code>reduce</code> fonctionne étape par étape :
+            <h4 class="topicsubheading">Comment <code>reduce</code> fonctionne étape par étape :
             </h4>
             <ul>
                 <li>Au départ, <code>reduce</code> prend les deux premiers éléments de la liste : <code>1</code> et
@@ -1340,18 +1453,18 @@
         </div>
         <div class="footer">
             <div class="contact">Principes des Langages de Programmation | John Samuel</div>
-            <div class="navigation">34
-                <a class="prev" href="#slide33"></a>
-                <a class="next" href="#slide35"></a>
+            <div class="navigation">35
+                <a class="prev" href="#slide34"></a>
+                <a class="next" href="#slide36"></a>
             </div>
         </div>
     </section>
-    <section class="slide" id="slide35">
+    <section class="slide" id="slide36">
         <div class="header">
-            <h1>4.2. Les expressions lambda en Python</h1>
+            <h1>4.3. Les expressions lambda en Python</h1>
         </div>
         <div class="content">
-            <h3 id="résumé-des-avantages-des-expressions-lambda-en-python"><strong>Résumé des avantages des expressions
+            <h3 class="topicsubheading"><strong>Résumé des avantages des expressions
                     lambda en Python</strong></h3>
             <ol type="1">
                 <li><strong>Concision</strong> : Permettent d’écrire des fonctions simples en une seule ligne.</li>
@@ -1367,18 +1480,112 @@
         </div>
         <div class="footer">
             <div class="contact">Principes des Langages de Programmation | John Samuel</div>
-            <div class="navigation">35
-                <a class="prev" href="#slide34"></a>
-                <a class="next" href="#slide36"></a>
+            <div class="navigation">36
+                <a class="prev" href="#slide35"></a>
+                <a class="next" href="#slide37"></a>
             </div>
         </div>
     </section>
-    <section class="slide" id="slide36">
+    <section class="slide" id="slide37">
         <div class="header">
-            <h1>3. Principes des Langages de Programmation : Références</h1>
+            <h1>4.4. Fonctions d'ordre supérieur</h1>
         </div>
         <div class="content">
-            <h1>Références</h1>
+            <h3 class="topicsubheading">map, filter, reduce</h3>
+            <p>Une <b>fonction d'ordre supérieur</b> prend une fonction en paramètre, ou en renvoie une.</p>
+            <code>
+<div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">reduce</span>
+<span class="n">nombres</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">6</span><span class="p">]</span>
+
+<span class="n">carres</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span> <span class="o">**</span> <span class="mi">2</span><span class="p">,</span> <span class="n">nombres</span><span class="p">))</span>   <span class="c1"># [1, 4, 9, 16, 25, 36]</span>
+<span class="n">pairs</span>  <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">filter</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span> <span class="o">%</span> <span class="mi">2</span> <span class="o">==</span> <span class="mi">0</span><span class="p">,</span> <span class="n">nombres</span><span class="p">))</span>  <span class="c1"># [2, 4, 6]</span>
+<span class="n">somme</span>  <span class="o">=</span> <span class="n">reduce</span><span class="p">(</span><span class="k">lambda</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">:</span> <span class="n">a</span> <span class="o">+</span> <span class="n">b</span><span class="p">,</span> <span class="n">nombres</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>   <span class="c1"># 21</span>
+</pre></div>
+            </code>
+            <ul>
+                <li><code>map</code> : transformer chaque élément &mdash; <code>filter</code> : en retenir certains
+                    &mdash; <code>reduce</code> : les replier en une seule valeur.</li>
+                <li>Aucune de ces trois n'écrit de boucle explicite : c'est le pas <i>impératif &rarr;
+                        déclaratif</i>.</li>
+            </ul>
+        </div>
+        <div class="footer">
+            <div class="contact">Principes des Langages de Programmation | John Samuel</div>
+            <div class="navigation">37
+                <a class="prev" href="#slide36"></a>
+                <a class="next" href="#slide38"></a>
+            </div>
+        </div>
+    </section>
+    <section class="slide" id="slide38">
+        <div class="header">
+            <h1>4.4. Fonctions d'ordre supérieur</h1>
+        </div>
+        <div class="content">
+            <h3 class="topicsubheading">Et en C ?</h3>
+            <p>C possède le <b>mécanisme</b> — le pointeur de fonction — sans la syntaxe ni les garanties.</p>
+            <code>
+<div class="highlight"><pre><span></span><span class="c1">/* map, version C */</span>
+<span class="kt">void</span> <span class="nf">appliquer</span><span class="p">(</span><span class="kt">int</span> <span class="n">t</span><span class="p">[],</span> <span class="kt">size_t</span> <span class="n">n</span><span class="p">,</span> <span class="kt">int</span> <span class="p">(</span><span class="o">*</span><span class="n">f</span><span class="p">)(</span><span class="kt">int</span><span class="p">))</span> <span class="p">{</span>
+  <span class="k">for</span> <span class="p">(</span><span class="kt">size_t</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">n</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span>
+    <span class="n">t</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">f</span><span class="p">(</span><span class="n">t</span><span class="p">[</span><span class="n">i</span><span class="p">]);</span>
+<span class="p">}</span>
+
+<span class="kt">int</span> <span class="nf">carre</span><span class="p">(</span><span class="kt">int</span> <span class="n">x</span><span class="p">)</span> <span class="p">{</span> <span class="k">return</span> <span class="n">x</span> <span class="o">*</span> <span class="n">x</span><span class="p">;</span> <span class="p">}</span>
+<span class="n">appliquer</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="n">carre</span><span class="p">);</span>
+</pre></div>
+            </code>
+            <p>C'est l'idiome de <code>qsort</code>. <b>Ce que C n'a pas</b> : les fermetures, l'immuabilité, une
+                valeur construite plutôt que mutée. <b>Un paradigme n'est pas une propriété du langage</b> : c'est
+                une façon d'organiser le calcul, que le langage rend plus ou moins confortable.</p>
+        </div>
+        <div class="footer">
+            <div class="contact">Principes des Langages de Programmation | John Samuel</div>
+            <div class="navigation">38
+                <a class="prev" href="#slide37"></a>
+                <a class="next" href="#slide39"></a>
+            </div>
+        </div>
+    </section>
+    <section class="slide" id="slide39">
+        <div class="header">
+            <h1>4.5. Types algébriques et filtrage par motif</h1>
+        </div>
+        <div class="content">
+            <h3 class="topicsubheading">Représenter « une valeur, ou une erreur »</h3>
+            <p>En C, trois réponses coexistent, et aucune n'oblige l'appelant à vérifier : une valeur sentinelle
+                (<code>-1</code>, <code>NULL</code>), un code d'erreur, ou <code>errno</code>. Les <b>types
+                    somme</b>, eux, font de l'échec un cas du type :</p>
+            <code>
+<div class="highlight"><pre><span></span><span class="c1">// Rust : le type dit qu'il y a deux cas possibles</span>
+<span class="k">fn</span> <span class="nf">diviser</span><span class="p">(</span><span class="n">a</span><span class="p">:</span> <span class="kt">i32</span><span class="p">,</span> <span class="n">b</span><span class="p">:</span> <span class="kt">i32</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Option</span><span class="o">&lt;</span><span class="kt">i32</span><span class="o">&gt;</span> <span class="p">{</span>
+    <span class="k">if</span> <span class="n">b</span> <span class="o">==</span> <span class="mi">0</span> <span class="p">{</span> <span class="n">None</span> <span class="p">}</span> <span class="k">else</span> <span class="p">{</span> <span class="n">Some</span><span class="p">(</span><span class="n">a</span> <span class="o">/</span> <span class="n">b</span><span class="p">)</span> <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="k">match</span> <span class="nf">diviser</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">Some</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="fm">println!</span><span class="p">(</span><span class="s">"résultat : {v}"</span><span class="p">),</span>
+    <span class="n">None</span>    <span class="o">=&gt;</span> <span class="fm">println!</span><span class="p">(</span><span class="s">"division par zéro"</span><span class="p">),</span>
+<span class="p">}</span>
+</pre></div>
+            </code>
+            <p>Le compilateur vérifie l'<b>exhaustivité</b> : oublier un cas est une erreur de compilation
+                (Python 3.10 : <code>match</code>/<code>case</code>). Rendre les états incorrects <i>impossibles à
+                    écrire</i> : le typage statique poussé jusqu'au bout.</p>
+        </div>
+        <div class="footer">
+            <div class="contact">Principes des Langages de Programmation | John Samuel</div>
+            <div class="navigation">39
+                <a class="prev" href="#slide38"></a>
+                <a class="next" href="#slide40"></a>
+            </div>
+        </div>
+    </section>
+    <section class="slide" id="slide40">
+        <div class="header">
+            <h1>4. Principes des Langages de Programmation : Références</h1>
+        </div>
+        <div class="content">
+            <h3 class="topicsubheading">Références</h3>
             <ul>
                 <li><a
                         href="https://fr.wikipedia.org/wiki/Lambda-calcul">https://fr.wikipedia.org/wiki/Lambda-calcul</a>
@@ -1388,12 +1595,18 @@
                 <li><a
                         href="https://fr.wikipedia.org/wiki/Fermeture_(informatique)">https://fr.wikipedia.org/wiki/Fermeture_(informatique)</a>
                 </li>
+                <li><a href="https://fr.wikipedia.org/wiki/Type_alg%C3%A9brique_de_donn%C3%A9es">Type algébrique de
+                        données</a></li>
+                <li><a href="https://fr.wikipedia.org/wiki/Filtrage_par_motif">Filtrage par motif</a></li>
+                <li><a href="https://docs.python.org/3/library/functools.html">functools &mdash; Higher-order
+                        functions</a></li>
+                <li><a href="https://doc.rust-lang.org/std/option/">std::option &mdash; Rust</a></li>
             </ul>
         </div>
         <div class="footer">
             <div class="contact">Principes des Langages de Programmation | John Samuel</div>
-            <div class="navigation">36
-                <a class="prev" href="#slide35"></a>
+            <div class="navigation">40
+                <a class="prev" href="#slide39"></a>
             </div>
         </div>
     </section>
@@ -1407,7 +1620,7 @@
                 if (!Number.isNaN(slideIdString)) {
                     slideId = parseInt(slideIdString);
                     if (isIncrement) {
-                        if (slideId < 36) {
+                        if (slideId < 40) {
                             slideId = slideId + 1;
                         }
                     } else {
