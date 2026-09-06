@@ -1525,7 +1525,7 @@ tableau.c:15:13: error: type of formal parameter 1 is incomplete<br />
             </div>
             <div class="content">
                 <h3 class="topicheading">operators.h (bonne pratique)</h3>
-                <code>
+                <code style="width:44%">
 				<span style="color:purple">#ifndef</span> OPERATORS_H <br/>
 				<span style="color:purple">#define</span> OPERATORS_H <br/> 
                                 <span style="color: green">extern int</span>
@@ -1543,16 +1543,16 @@ tableau.c:15:13: error: type of formal parameter 1 is incomplete<br />
 		        <span style="color: purple">#include</span>
                         <span style="color: red">"operators.h"</span> // 2eme fois, mais pas d'erreurs <br><br />
 		 	</code>
-                <p>À la deuxième inclusion, <span style="color:purple">#ifndef</span> OPERATORS_H est faux : le
-                    contenu n'est pas inclus une seconde fois, ce qui évite les déclarations multiples.</p>
-                <ul>
-                    <li>Le garde ne protège que <b>dans un fichier .c</b>. Si deux fichiers .c incluent un en-tête qui
-                        <i>définit</i> <code>int num = 20;</code>, l'éditeur de liens refuse :
-                        <code>multiple definition of `num'</code>.</li>
-                    <li>D'où la règle : l'en-tête <b>déclare</b> (<code>extern int num;</code>), un seul fichier .c
-                        <b>définit</b> (<code>int num = 20;</code>).</li>
-                    <li>N'utilisez pas de nom commençant par deux tirets bas
-                        (<code>__OPERATORS_H__</code>) : ces identifiants sont réservés à l'implémentation.</li>
+                <p style="width:36%">À la deuxième inclusion, <span style="color:purple">#ifndef</span>
+                    OPERATORS_H est faux : le contenu n'est pas inclus une seconde fois.</p>
+                <ul style="width:36%">
+                    <li>Le garde ne protège que <b>dans un fichier .c</b>. Un en-tête qui <i>définit</i>
+                        <code>int num = 20;</code> et qui est inclus par deux .c donne
+                        <code>multiple definition of `num'</code> à l'édition de liens.</li>
+                    <li>La règle : l'en-tête <b>déclare</b> (<code>extern int num;</code>), un seul .c
+                        <b>définit</b>.</li>
+                    <li>Pas de nom en double tiret bas : <code>__OPERATORS_H__</code> est réservé à
+                        l'implémentation.</li>
                 </ul>
             </div>
             <div class="footer">
@@ -1569,7 +1569,7 @@ tableau.c:15:13: error: type of formal parameter 1 is incomplete<br />
             </div>
             <div class="content">
                 <h3 class="topicsubheading">Fonction macro</h3>
-                <code>
+                <code style="width:44%">
 				<span style="color:purple">#ifndef</span> PI <br>
 				<span style="color:purple">#define</span> PI 3.14159<br>
 				<span style="color:purple">#endif</span><br><br>
@@ -1582,19 +1582,17 @@ tableau.c:15:13: error: type of formal parameter 1 is incomplete<br />
 					&nbsp;<span style="color:green">return</span>(PI * square(<span style="color:blue">rayon)</span>);<br>
 					}<br>
 		 	</code>
-                <ul>
-                    <li><code>square(value)</code> est une <b>fonction macro</b> : elle est remplacée par son texte,
-                        <code>value * value</code>.</li>
-                    <li><span style="color:red">Remarque :</span> il n'y a pas d'espace entre <code>square</code> et
-                        <code>(</code> — sinon le préprocesseur définirait une macro objet valant
-                        <code>(value) ((value) * (value))</code>.</li>
-                    <li><span style="color:red">Les parenthèses sont obligatoires.</span> Écrit
-                        <code>#define square(value) value * value</code>, l'appel <code>square(a + b)</code>
-                        devient <code>a + b * a + b</code> — et non <code>(a+b)&sup2;</code>. Parenthésez
-                        <b>chaque paramètre et le résultat entier</b>.</li>
-                    <li>Le paramètre est évalué autant de fois qu'il apparaît :
-                        <code>square(i++)</code> incrémente <code>i</code> deux fois. Une fonction
-                        <code>static inline</code> n'a aucun de ces défauts.</li>
+                <ul style="width:44%">
+                    <li><code>square(value)</code> est une <b>fonction macro</b> : elle est remplacée par son
+                        texte.</li>
+                    <li>Pas d'espace entre <code>square</code> et <code>(</code>, sinon c'est une macro
+                        <i>objet</i>.</li>
+                    <li><span style="color:red">Les parenthèses sont obligatoires.</span> Sans elles,
+                        <code>square(a + b)</code> devient <code>a + b * a + b</code>, pas
+                        <code>(a+b)&sup2;</code>.</li>
+                    <li>Le paramètre est évalué deux fois : <code>square(i++)</code> incrémente
+                        <code>i</code> deux fois. Une fonction <code>static inline</code> n'a aucun de ces
+                        défauts.</li>
                 </ul>
             </div>
             <div class="footer">
@@ -2224,7 +2222,8 @@ static_assert(sizeof(struct entete) == 14,
                           &nbsp;<span style="color: green">while</span>(1) {<br />
                           &nbsp;&nbsp;&nbsp;<span style="color: green">int</span> <span style="color: blue">numero</span>;<br />
                           &nbsp;&nbsp;&nbsp;<span style="color: green">char</span> <span style="color: blue">strnum</span>[50];<br />
-                          &nbsp;&nbsp;&nbsp;<span style="color: green">if</span> (<span style="color: blue">fgets</span>(<span style="color: blue">strnum</span>, sizeof(<span style="color: blue">strnum</span>), <span style="color: red">stdin</span>) == <span style="color: blue">NULL</span>) <span style="color: green">break</span>;<br />
+                          &nbsp;&nbsp;&nbsp;<span style="color: green">if</span> (<span style="color: blue">fgets</span>(<span style="color: blue">strnum</span>, sizeof(<span style="color: blue">strnum</span>),<br />
+                          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: red">stdin</span>) == <span style="color: blue">NULL</span>) <span style="color: green">break</span>;<br />
                           &nbsp;&nbsp;&nbsp;<span style="color: green">if</span>(<span style="color: blue">strcmp</span>(<span style="color: blue">strnum</span>, <span style="color: red">"FIN\n"</span>) == 0) {<br />
                           &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: green">break</span>;<br />
                           &nbsp;&nbsp;&nbsp;}<br />
@@ -2318,7 +2317,9 @@ static_assert(sizeof(struct entete) == 14,
                 <h3 class="topicsubheading">Parcours d'une liste simplement chaînée</h3>
                 <code>
                           <span style="color: green">void</span> <span style="color: blue">parcours</span>(<span style="color: green">struct</span> <span style="color: blue">element *premier</span>) {<br />
-                          &nbsp;&nbsp;&nbsp;<span style="color: green">struct</span> <span style="color: blue">element *elem</span> = <span style="color: blue">premier->suivant</span>; <span style="color: gray">// premier est une sentinelle : son numero n'est jamais initialisé</span><br />
+                          &nbsp;&nbsp;&nbsp;<span style="color: green">struct</span> <span style="color: blue">element *elem</span> = <span style="color: blue">premier->suivant</span>;<br />
+                          &nbsp;&nbsp;&nbsp;<span style="color: gray">// premier est une sentinelle :</span><br />
+                          &nbsp;&nbsp;&nbsp;<span style="color: gray">// son numero n'est jamais initialisé</span><br />
                           &nbsp;&nbsp;&nbsp;<span style="color: green">while</span>(<span style="color: blue">elem</span> != <span style="color: red">NULL</span>) {<br />
                           &nbsp;&nbsp;&nbsp;<span style="color: blue">printf(<span style="color: red">"%u\n"</span>, <span style="color: blue">elem->numero</span>);<br />
                           &nbsp;&nbsp;&nbsp;<span style="color: blue">elem</span> = <span style="color: blue">elem->suivant</span>;<br />
@@ -2651,17 +2652,20 @@ static_assert(sizeof(struct entete) == 14,
             </div>
             <div class="content">
                 <h3 class="topicsubheading">La saisie d'entiers par l'utilisateur</h3>
-                <code>
+                <code style="line-height:1.45em">
                           &nbsp;  <span style="color: green">while</span> (1) {<br />
                           &nbsp;&nbsp;    <span style="color: green">char</span> <span style="color:blue">strnum</span>[50];<br />
-                          &nbsp;&nbsp;    <span style="color: green">if</span> (<span style="color:blue">fgets</span>(<span style="color:blue">strnum</span>, <span style="color: green">sizeof</span>(<span style="color:blue">strnum</span>), <span style="color:red">stdin</span>) == <span style="color:blue">NULL</span>) <span style="color: green">break</span>; <span style="color: gray">// fin de fichier</span><br />
+                          &nbsp;&nbsp;    <span style="color: green">if</span> (<span style="color:blue">fgets</span>(<span style="color:blue">strnum</span>, <span style="color: green">sizeof</span>(<span style="color:blue">strnum</span>),<br />
+                          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:red">stdin</span>) == <span style="color:blue">NULL</span>) <span style="color: green">break</span>;<br />
                           &nbsp;&nbsp;    <span style="color: green">if</span>(strcmp(strnum</span>, <span style="color:red">"FIN\n"</span>) == 0) {<br />
                           &nbsp;&nbsp;&nbsp;      <span style="color: green">break</span>;<br />
                           &nbsp;&nbsp;    }<br />
                           &nbsp;<br />
-                          &nbsp;&nbsp;    <span style="color: green">struct</span> <span style="color:blue">element *elem</span> = <span style="color:blue">malloc</span>(<span style="color: green">sizeof</span>(<span style="color:blue">*elem</span>)); <span style="color: gray">// après le test : sinon fuite</span><br />
+                          &nbsp;&nbsp;    <span style="color: gray">// alloué après le test : sinon fuite</span><br />
+                          &nbsp;&nbsp;    <span style="color: green">struct</span> <span style="color:blue">element *elem</span> = <span style="color:blue">malloc</span>(<span style="color: green">sizeof</span>(<span style="color:blue">*elem</span>));<br />
                           &nbsp;&nbsp;    <span style="color: green">if</span> (<span style="color:blue">elem</span> == <span style="color:blue">NULL</span>) <span style="color: green">break</span>;<br />
-                          &nbsp;&nbsp;    <span style="color: green">if</span> (<span style="color:blue">sscanf</span>(<span style="color:blue">strnum</span>, <span style="color: red">"%d"</span>, <span style="color:blue">&elem->num</span>) != 1) { <span style="color:blue">free</span>(elem); <span style="color: green">continue</span>; }<br />
+                          &nbsp;&nbsp;    <span style="color: green">if</span> (<span style="color:blue">sscanf</span>(<span style="color:blue">strnum</span>, <span style="color: red">"%d"</span>, <span style="color:blue">&elem->num</span>) != 1)<br />
+                          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; { <span style="color:blue">free</span>(elem); <span style="color: green">continue</span>; }<br />
                           &nbsp;&nbsp;    <span style="color:blue">insertion_fin</span>(<span style="color:blue">&liste, elem</span>);<br />
                           &nbsp;  }<br />
                           &nbsp;<br />
@@ -2798,7 +2802,7 @@ static_assert(sizeof(struct entete) == 14,
                 <h1>3.8. Les erreurs: perror</h1>
             </div>
             <div class="content">
-                <code>
+                <code style="line-height:1.32em">
 					<span style="color: purple">#include</span>
                                         <span style="color: red">&lt;stdio.h&gt; </span>// en-têtes(headers) <br>
 					<span style="color: purple">#include</span>
@@ -2814,7 +2818,10 @@ static_assert(sizeof(struct entete) == 14,
 				{ <br />
                                      &nbsp;<span style="color: green">struct stat</span>  <span style="color: blue">sf</span>;<br />
                                      &nbsp;<span style="color: green">int</span>  <span style="color: blue">status</span>;<br />
-                                     &nbsp;<span style="color: green">if</span> (<span style="color: blue">argc</span> &lt; 2) { <span style="color: blue">fprintf</span>(stderr, <span style="color: red">"Usage: stats fichier\n"</span>); <span style="color: green">return</span>(EXIT_FAILURE); }<br />
+                                     &nbsp;<span style="color: green">if</span> (<span style="color: blue">argc</span> &lt; 2) {<br />
+                                     &nbsp;&nbsp;<span style="color: blue">fprintf</span>(stderr, <span style="color: red">"Usage: stats fichier\n"</span>);<br />
+                                     &nbsp;&nbsp;<span style="color: green">return</span>(EXIT_FAILURE);<br />
+                                     &nbsp;}<br />
                                      &nbsp;<span style="color: blue">status</span> = <span style="color: blue">stat</span> (<span style="color: blue">argv[1]</span>, &sf);<br />
                                      &nbsp;<span style="color: green">if</span> (<span style="color: blue">status</span> == -1) {<br />
                                      &nbsp;&nbsp;<span style="color: blue">perror</span>(<span style="color: red">"Stats"</span>);<br />
@@ -3101,11 +3108,9 @@ static_assert(sizeof(struct entete) == 14,
                       &nbsp;memset(&server_addr, 0, sizeof(server_addr));<br />
                       &nbsp;server_addr.sin_family = AF_INET;<br />
                       &nbsp;server_addr.sin_port = htons(PORT);<br />
-                      &nbsp;<span style="color: blue">// adresse du serveur à joindre (ici la machine locale)</span><br />
-                      &nbsp;<span style="color: green">if</span> (inet_pton(AF_INET, <span style="color: red">"127.0.0.1"</span>, &amp;server_addr.sin_addr) != 1) {<br />
-                      &nbsp;&nbsp;perror(<span style="color: red">"inet_pton"</span>);<br />
-                      &nbsp;&nbsp;<span style="color: green">return</span> -1;<br />
-                      &nbsp;}<br />
+                      &nbsp;<span style="color: blue">// l'adresse à joindre, pas INADDR_ANY</span><br />
+                      &nbsp;inet_pton(AF_INET, <span style="color: red">"127.0.0.1"</span>,<br />
+                      &nbsp;&nbsp;&nbsp;&amp;server_addr.sin_addr);<br />
                     <br />
                       &nbsp;<span style="color: blue">//Se connecter au serveur</span><br />
                       &nbsp;<span style="color: green">int</span> connect_status = connect(socketfd, (struct sockaddr *) <br />

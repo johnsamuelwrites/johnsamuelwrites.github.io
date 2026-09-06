@@ -863,7 +863,8 @@ x -&gt; x * 2             <span style="color: gray">// Java : flèche fine</span
 
 <span class="w">    </span><span class="c1">// Lambda dans une fonction for_each</span>
 <span class="w">    </span><span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span><span class="w"> </span><span class="n">nombres</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="mi">3</span><span class="p">,</span><span class="w"> </span><span class="mi">4</span><span class="p">};</span><span class="w"></span>
-<span class="w">    </span><span class="n">std</span><span class="o">::</span><span class="n">for_each</span><span class="p">(</span><span class="n">nombres</span><span class="p">.</span><span class="n">begin</span><span class="p">(),</span><span class="w"> </span><span class="n">nombres</span><span class="p">.</span><span class="n">end</span><span class="p">(),</span><span class="w"> </span><span class="p">[](</span><span class="kt">int</span><span class="w"> </span><span class="o">&amp;</span><span class="n">n</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">n</span><span class="w"> </span><span class="o">*=</span><span class="w"> </span><span class="n">n</span><span class="p">;</span><span class="w"> </span><span class="p">});</span><span class="w"></span>
+<span class="w">    </span><span class="n">std</span><span class="o">::</span><span class="n">for_each</span><span class="p">(</span><span class="n">nombres</span><span class="p">.</span><span class="n">begin</span><span class="p">(),</span><span class="w"> </span><span class="n">nombres</span><span class="p">.</span><span class="n">end</span><span class="p">(),</span><span class="w"></span>
+<span class="w">                  </span><span class="p">[](</span><span class="kt">int</span><span class="w"> </span><span class="o">&amp;</span><span class="n">n</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">n</span><span class="w"> </span><span class="o">*=</span><span class="w"> </span><span class="n">n</span><span class="p">;</span><span class="w"> </span><span class="p">});</span><span class="w"></span>
 
 <span class="w">    </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">n</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="n">nombres</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
 <span class="w">        </span><span class="n">std</span><span class="o">::</span><span class="n">cout</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="n">n</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="s">&quot; &quot;</span><span class="p">;</span><span class="w">  </span><span class="c1">// Résultat : 1 4 9 16</span>
@@ -871,10 +872,10 @@ x -&gt; x * 2             <span style="color: gray">// Java : flèche fine</span
 <span class="p">}</span><span class="w"></span>
 </pre>
             </div>
-            <p><span style="color:red">Remarque :</span> <code>for_each</code> avec <code>int &amp;n</code>
-                <b>modifie le vecteur en place</b> — c'est un effet de bord, l'inverse de la fonction pure de la
-                page 3. La version sans effet de bord construit une nouvelle valeur :
-                <code>std::transform(v.begin(), v.end(), std::back_inserter(carres), [](int n){ return n * n; });</code></p>
+            <p style="width:40%"><span style="color:red">Remarque :</span> <code>for_each</code> avec
+                <code>int &amp;n</code> <b>modifie le vecteur en place</b> — un effet de bord, l'inverse de la
+                fonction pure vue plus haut. Sans effet de bord, on construit une nouvelle valeur avec
+                <code>std::transform</code>.</p>
         </div>
         <div class="footer">
             <div class="contact">Principes des Langages de Programmation | John Samuel</div>
@@ -1486,27 +1487,23 @@ x -&gt; x * 2             <span style="color: gray">// Java : flèche fine</span
         <div class="content">
             <h3 class="topicsubheading"><strong>Résumé des avantages des expressions
                     lambda en Python</strong></h3>
-            <ol type="1">
+            <ol type="1" style="width:44%">
                 <li><strong>Concision</strong> : Permettent d’écrire des fonctions simples en une seule ligne.</li>
                 <li><strong>Flexibilité</strong> : Peuvent être utilisées à divers endroits où une fonction est requise.
                 </li>
                 <li><strong>Lisibilité</strong> : Facilitent la compréhension du code en évitant des définitions de
                     fonctions multiples pour des opérations simples.</li>
             </ol>
-            <p>Les expressions lambda sont un outil puissant dans Python, facilitant l’écriture de code plus propre et
-                plus efficace, surtout lorsqu’elles sont utilisées en combinaison avec des fonctions d’ordre supérieur
-                et des opérations sur des collections.</p>
-            <p><span style="color:red">Deux limites à connaître :</span></p>
-            <ul>
-                <li>Une lambda ne contient qu'une <b>expression</b> : ni instruction, ni boucle, ni
-                    <code>try</code>.</li>
+            <p style="width:44%">Les expressions lambda facilitent l’écriture de code concis, surtout combinées
+                avec des fonctions d’ordre supérieur.</p>
+            <p style="width:44%"><span style="color:red">Trois limites à connaître :</span></p>
+            <ul style="width:44%">
+                <li>Une lambda ne contient qu'une <b>expression</b> : ni instruction, ni boucle.</li>
                 <li><b>Ne l'affectez pas à un nom</b> : <code>addition = lambda x, y: x + y</code> est signalé par
-                    PEP 8 (E731). Écrivez <code>def addition(x, y): return x + y</code> — la fonction obtient un vrai
-                    nom, utile dans les traces d'erreur. La lambda est faite pour être passée <i>en argument</i>,
-                    anonymement.</li>
-                <li>En Python, <code>map</code> et <code>filter</code> s'écrivent souvent plus lisiblement avec une
-                    liste en compréhension : <code>[x ** 2 for x in nombres]</code>,
-                    <code>[x for x in nombres if x % 2 == 0]</code>.</li>
+                    PEP 8 (E731). Préférez <code>def</code> — la fonction obtient un vrai nom, utile dans les traces
+                    d'erreur.</li>
+                <li><code>map</code> et <code>filter</code> s'écrivent souvent mieux en compréhension :
+                    <code>[x ** 2 for x in nombres]</code>.</li>
             </ul>
             <hr />
         </div>
@@ -1585,7 +1582,7 @@ x -&gt; x * 2             <span style="color: gray">// Java : flèche fine</span
         </div>
         <div class="content">
             <h3 class="topicsubheading">Représenter « une valeur, ou une erreur »</h3>
-            <p>En C, trois réponses coexistent, et aucune n'oblige l'appelant à vérifier : une valeur sentinelle
+            <p style="width:44%">En C, trois réponses coexistent, et aucune n'oblige l'appelant à vérifier : une valeur sentinelle
                 (<code>-1</code>, <code>NULL</code>), un code d'erreur, ou <code>errno</code>. Les <b>types
                     somme</b>, eux, font de l'échec un cas du type :</p>
             <code>
@@ -1600,13 +1597,12 @@ x -&gt; x * 2             <span style="color: gray">// Java : flèche fine</span
 <span class="p">}</span>
 </pre></div>
             </code>
-            <p>En Rust, le compilateur vérifie l'<b>exhaustivité</b> : oublier un cas est une erreur de
-                compilation. Rendre les états incorrects <i>impossibles à écrire</i> : le typage statique poussé
-                jusqu'au bout.</p>
-            <p><span style="color:red">Nuance :</span> Python 3.10 offre la même <i>syntaxe</i> de filtrage
-                (<code>match</code>/<code>case</code>), mais <b>aucune vérification d'exhaustivité</b> : un
-                <code>match</code> qui ne couvre pas tous les cas ne déclenche aucune erreur — il ne fait rien. La
-                syntaxe est empruntée, la garantie ne l'est pas.</p>
+            <p style="width:44%">En Rust, le compilateur vérifie l'<b>exhaustivité</b> : oublier un cas est une
+                erreur de compilation. Rendre les états incorrects <i>impossibles à écrire</i>.</p>
+            <p style="width:44%"><span style="color:red">Nuance :</span> Python 3.10 offre la même
+                <i>syntaxe</i> (<code>match</code>/<code>case</code>) mais <b>aucune vérification
+                d'exhaustivité</b> : un <code>match</code> incomplet ne déclenche rien. La syntaxe est empruntée,
+                la garantie ne l'est pas.</p>
         </div>
         <div class="footer">
             <div class="contact">Principes des Langages de Programmation | John Samuel</div>
