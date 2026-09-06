@@ -500,14 +500,14 @@
         <div class="header">
         </div>
         <div class="content">
-            <h1 style="font-size:3.5vmin">Principes des Langages de Programmation</br>
+            <h1 style="font-size:3.5vmin">Principes des Langages de Programmation<br />
                 <span style="line-height:3.5vmax;font-size:3.0vmin">
                     La chaîne de compilation<span>
             </h1>
-            <p><b>John Samuel</b></br>
+            <p><b>John Samuel</b><br />
                 CPE Lyon<br /><br />
                 <b>Année</b>: 2026-2027<br />
-                <b>Courriel</b>: john.samuel@cpe.fr</br>
+                <b>Courriel</b>: john.samuel@cpe.fr<br />
                 <a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/"><img
                         alt="Creative Commons License" style="border-width:0"
                         src="../../../../../en/teaching/courses/2017/C/88x31.png" /></a>
@@ -552,7 +552,7 @@
         <div class="content">
             <h3 class="topicsubheading">6 étapes de la chaîne de compilation</h3>
             <figure>
-                <img src="../../../../../en/teaching/courses/2017/C/images/compiler.svg" height="400vh" />
+                <img src="../../../../../en/teaching/courses/2017/C/images/compiler.svg" height="400" />
             </figure>
         </div>
         <div class="footer">
@@ -809,9 +809,9 @@
                 les directives d'inclusion (#include) et de remplacement de macros (#define). Le résultat est
                 généralement un fichier source modifié avec ces directives résolues.</p>
             <h4 class="topicsubheading">cercle.c</h4>
-            <code><span style="color:purple">#ifndef</span> PI</br>
-			<span style="color:purple">#define</span> PI 3.14159</br>
-			<span style="color:purple">#endif</span></br></br>
+            <code><span style="color:purple">#ifndef</span> PI<br />
+			<span style="color:purple">#define</span> PI 3.14159<br />
+			<span style="color:purple">#endif</span><br /><br />
 
 			<span style="color:green">float</span> <span style="color:blue">aire</span>(
 			<span style="color:green">float</span> <span style="color:blue">rayon</span>) { <br>
@@ -833,20 +833,20 @@
             <h1>3.1. La chaîne de compilation</h1>
         </div>
         <div class="content">
-            <h3 class="topicsubheading">1. Préprocesseur</h3>
+            <h3 class="topicsubheading">Avec gcc (1/5) : le préprocesseur</h3>
             <code>
                   $ gcc -E cercle.c
-		  # 1 "cercle.c"</br>
-# 1 "<built-in>"</br>
-# 1 "<command-line>"</br>
-# 31 "<command-line>"</br>
-# 1 "/usr/include/stdc-predef.h" 1 3 4</br>
-# 32 "<command-line>" 2</br>
-# 1 "cercle.c"</br>
-</br>
-float aire(float rayon) {</br>
-  return(3.14 * rayon * rayon);</br>
-}</br>
+		  # 1 "cercle.c"<br />
+# 1 "<built-in>"<br />
+# 1 "<command-line>"<br />
+# 31 "<command-line>"<br />
+# 1 "/usr/include/stdc-predef.h" 1 3 4<br />
+# 32 "<command-line>" 2<br />
+# 1 "cercle.c"<br />
+<br />
+float aire(float rayon) {<br />
+  return(3.14159 * rayon * rayon);<br />
+}<br />
                   </code>
             <p>Le résultat affiche le code source après le traitement des directives de préprocesseur. Cela peut inclure
                 des inclusions de fichiers, la résolution de macros et d'autres transformations avant la compilation
@@ -865,15 +865,15 @@ float aire(float rayon) {</br>
             <h1>3.1. La chaîne de compilation</h1>
         </div>
         <div class="content">
-            <h3 class="topicsubheading">2. Langage intermédiaire</h3>
+            <h3 class="topicsubheading">Avec gcc (2/5) : le langage intermédiaire</h3>
             <p>Ces étapes montrent comment le code source est transformé en diverses représentations intermédiaires
                 avant d'atteindre le code machine final. Chacune de ces étapes permet une analyse et une optimisation du
                 code à différents niveaux.</p>
             <code>
-                  $ gcc -v bonjour.c # les étapes importantes</br>
-                  $ gcc -save-temps -v bonjour.c # les fichiers *.i, *.s</br>
-                  $ gcc -fdump-tree-all bonjour.c</br>
-                  $ gcc -fdump-rtl-all bonjour.c</br>
+                  $ gcc -v bonjour.c # les étapes importantes<br />
+                  $ gcc -save-temps -v bonjour.c # les fichiers *.i, *.s<br />
+                  $ gcc -fdump-tree-all bonjour.c<br />
+                  $ gcc -fdump-rtl-all bonjour.c<br />
                   </code>
         </div>
         <div class="footer">
@@ -889,21 +889,22 @@ float aire(float rayon) {</br>
             <h1>3.1. La chaîne de compilation</h1>
         </div>
         <div class="content">
-            <h3 class="topicsubheading">2. Langage intermédiaire</h3>
-            <p>Ce code généré montre comment les opérations mathématiques sont exprimées en AST (Abstract Syntax Tree -
-                arbre de syntaxe abstraite).</p>
+            <h3 class="topicsubheading">Avec gcc (2/5) : le langage intermédiaire</h3>
+            <p>Ce code généré montre la représentation <b>GIMPLE</b> de GCC : une forme intermédiaire à trois
+                adresses, produite <i>après</i> l'arbre de syntaxe abstraite (AST). Chaque expression y est décomposée
+                en opérations élémentaires (<code>_1</code>, <code>_2</code>...).</p>
             <code>
-                  $ gcc -fdump-tree-all -c cercle.c</br>
-		  $ cat cercle.c.005t.gimple</br>
-aire (float rayon)</br>
-{</br>
-  float D.1914;</br>
-  _1 = (double) rayon;</br>
-  _2 = _1 * 3.140000000000000124344978758017532527446746826171875e+0;</br>
-  _3 = (double) rayon;</br>
-  _4 = _2 * _3;</br>
-  D.1914 = (float) _4;</br>
-  return D.1914;</br>
+                  $ gcc -fdump-tree-all -c cercle.c<br />
+		  $ cat cercle.c.005t.gimple<br />
+aire (float rayon)<br />
+{<br />
+  float D.1914;<br />
+  _1 = (double) rayon;<br />
+  _2 = _1 * 3.14158999999999988261834005243144929409027099609375e+0;<br />
+  _3 = (double) rayon;<br />
+  _4 = _2 * _3;<br />
+  D.1914 = (float) _4;<br />
+  return D.1914;<br />
 }
                   </code>
         </div>
@@ -920,9 +921,9 @@ aire (float rayon)</br>
             <h1>3.1. La chaîne de compilation</h1>
         </div>
         <div class="content">
-            <h3 class="topicsubheading">3. Optimisation de code</h3>
+            <h3 class="topicsubheading">Avec gcc (3/5) : l'optimisation de code</h3>
             <code>
-                  $ gcc -O2 bonjour.c</br>
+                  $ gcc -O2 bonjour.c<br />
                   </code>
             <ul>
                 <li>-O1 : Niveau d'optimisation 1. Il applique des optimisations
@@ -938,9 +939,9 @@ aire (float rayon)</br>
                 <li>-Os : Optimisation de la taille du binaire. Il cherche à
                     réduire la taille du fichier exécutable, ce qui peut être utile dans des
                     environnements avec des contraintes de stockage.</li>
-                <li>-Ofast : Niveau d'optimisation élevé. Il applique des
-                    optimisations maximales, souvent au détriment de la taille du fichier
-                    exécutable. Utilisé pour obtenir la meilleure performance possible.</li>
+                <li>-Ofast : <span style="color:red">déconseillé</span> (et déprécié depuis GCC 14). Il active
+                    <code>-ffast-math</code>, qui autorise le compilateur à violer IEEE 754 : les résultats en
+                    virgule flottante changent.</li>
                 <li>-Og : Optimisation pour le débogage. Il optimise le code
                     tout en conservant des informations de débogage utiles. </li>
             </ul>
@@ -959,11 +960,11 @@ aire (float rayon)</br>
             <h1>3.1. La chaîne de compilation</h1>
         </div>
         <div class="content">
-            <h3 class="topicsubheading">4. Génération de code natif</h3>
+            <h3 class="topicsubheading">Avec gcc (4/5) : la génération de code natif</h3>
             <p>L'option -S indique au compilateur de produire le code assembleur au lieu de générer un exécutable. Le
                 résultat de cette étape est un fichier avec l'extension .s, qui contient le code assembleur généré.</p>
             <code>
-                  $ gcc -S bonjour.c</br>
+                  $ gcc -S bonjour.c<br />
                   $ cat bonjour.s
                   </code>
         </div>
@@ -980,11 +981,11 @@ aire (float rayon)</br>
             <h1>3.1. La chaîne de compilation</h1>
         </div>
         <div class="content">
-            <h3 class="topicheading">4. Génération de code natif et l'optimisation de code</h3>
+            <h3 class="topicheading">Avec gcc (4/5) : génération de code natif et optimisation</h3>
             <code style="width:40%">
-                  <span style="color: green">int</span> <span style="color:blue">main</span>() {</br>
-                  &nbsp;&nbsp;<span style="color: green">int</span> <span style="color: blue">num</span> = 2 + 3;</br>
-                  &nbsp;&nbsp;<span style="color: green">return</span>(0);</br>
+                  <span style="color: green">int</span> <span style="color:blue">main</span>() {<br />
+                  &nbsp;&nbsp;<span style="color: green">int</span> <span style="color: blue">num</span> = 2 + 3;<br />
+                  &nbsp;&nbsp;<span style="color: green">return</span>(0);<br />
                   }
                   </code>
             <h4 class="topicsubheading">Compilation (Pas d'optimisations)</h4>
@@ -1008,23 +1009,23 @@ aire (float rayon)</br>
             <h1>3.1. La chaîne de compilation</h1>
         </div>
         <div class="content">
-            <h3 class="topicheading">4. Génération de code natif et l'optimisation de code</h3>
+            <h3 class="topicheading">Avec gcc (4/5) : génération de code natif et optimisation</h3>
             <h4 class="topicsubheading" style="width:40%">somme.s</h4>
             <code style="width:40%">
-                    main:</br>
-                    .LFB0:</br>
-                    &nbsp;&nbsp;.cfi_startproc</br>
-                    &nbsp;&nbsp;pushq   %rbp</br>
-                    &nbsp;&nbsp;.cfi_def_cfa_offset 16</br>
-                    &nbsp;&nbsp;.cfi_offset 6, -16</br>
-                    &nbsp;&nbsp;movq    %rsp, %rbp</br>
-                    &nbsp;&nbsp;.cfi_def_cfa_register 6</br>
-                    &nbsp;&nbsp;movl    $5, -4(%rbp)</br>
-                    &nbsp;&nbsp;movl    $0, %eax</br>
-                    &nbsp;&nbsp;popq    %rbp</br>
-                    &nbsp;&nbsp;.cfi_def_cfa 7, 8</br>
-                    &nbsp;&nbsp;ret</br>
-                    &nbsp;&nbsp;.cfi_endproc</br>
+                    main:<br />
+                    .LFB0:<br />
+                    &nbsp;&nbsp;.cfi_startproc<br />
+                    &nbsp;&nbsp;pushq   %rbp<br />
+                    &nbsp;&nbsp;.cfi_def_cfa_offset 16<br />
+                    &nbsp;&nbsp;.cfi_offset 6, -16<br />
+                    &nbsp;&nbsp;movq    %rsp, %rbp<br />
+                    &nbsp;&nbsp;.cfi_def_cfa_register 6<br />
+                    &nbsp;&nbsp;movl    $5, -4(%rbp)<br />
+                    &nbsp;&nbsp;movl    $0, %eax<br />
+                    &nbsp;&nbsp;popq    %rbp<br />
+                    &nbsp;&nbsp;.cfi_def_cfa 7, 8<br />
+                    &nbsp;&nbsp;ret<br />
+                    &nbsp;&nbsp;.cfi_endproc<br />
                   </code>
         </div>
         <div class="footer">
@@ -1040,11 +1041,11 @@ aire (float rayon)</br>
             <h1>3.1. La chaîne de compilation</h1>
         </div>
         <div class="content">
-            <h3 class="topicheading">4. Génération de code natif et l'optimisation de code</h3>
+            <h3 class="topicheading">Avec gcc (4/5) : génération de code natif et optimisation</h3>
             <code style="width:30%">
-                  <span style="color: green">int</span> <span style="color:blue">main</span>() {</br>
-                  &nbsp;&nbsp;<span style="color: green">int</span> <span style="color: blue">num</span> = 2 + 3;</br>
-                  &nbsp;&nbsp;<span style="color: green">return</span>(0);</br>
+                  <span style="color: green">int</span> <span style="color:blue">main</span>() {<br />
+                  &nbsp;&nbsp;<span style="color: green">int</span> <span style="color: blue">num</span> = 2 + 3;<br />
+                  &nbsp;&nbsp;<span style="color: green">return</span>(0);<br />
                   }
                   </code>
             <code style="width:20%">
@@ -1052,12 +1053,12 @@ aire (float rayon)</br>
                   </code>
             <code style="width:20%">
                   <h4 class="topicsubheading">somme.s</h4>
-                    main:</br>
-                    .LFB0:</br>
-                    &nbsp;&nbsp;.cfi_startproc</br>
-                    &nbsp;&nbsp;xorl    %eax, %eax</br>
-                    &nbsp;&nbsp;ret</br>
-                    &nbsp;&nbsp;.cfi_endproc</br>
+                    main:<br />
+                    .LFB0:<br />
+                    &nbsp;&nbsp;.cfi_startproc<br />
+                    &nbsp;&nbsp;xorl    %eax, %eax<br />
+                    &nbsp;&nbsp;ret<br />
+                    &nbsp;&nbsp;.cfi_endproc<br />
                   </code>
             <p style="width:40%">
                 <b>Compilation (optimisation: 2)</b> :
@@ -1080,12 +1081,12 @@ aire (float rayon)</br>
             <h1>3.1. La chaîne de compilation</h1>
         </div>
         <div class="content">
-            <h3 class="topicheading">4. Génération de code</h3>
+            <h3 class="topicheading">Avec gcc (4/5) : génération de code</h3>
             <h4 class="topicsubheading">sur une machine d'architecture 64 bits</h4>
             <code>
-                  $ gcc bonjour.c</br>
-                  $ file a.out </br>
-                  &nbsp;a.out: ELF 64-bit LSB shared object, x86-64</br>
+                  $ gcc bonjour.c<br />
+                  $ file a.out <br />
+                  &nbsp;a.out: ELF 64-bit LSB shared object, x86-64<br />
                   </code>
             <p>Cela signifie que le programme compilé est conçu pour être exécuté sur une machine d'architecture 64
                 bits, spécifiquement une architecture x86-64.</p>
@@ -1103,20 +1104,20 @@ aire (float rayon)</br>
             <h1>3.1. La chaîne de compilation</h1>
         </div>
         <div class="content">
-            <h3 class="topicheading">4. Génération de code</h3>
+            <h3 class="topicheading">Avec gcc (4/5) : génération de code</h3>
             <h4 class="topicsubheading">sur une machine d'architecture 64 bits</h4>
             <p>Cette commande indique au compilateur GCC de générer un exécutable 32 bits en utilisant l'architecture
                 i686 (Intel 80386). L'option -m32 spécifie que l'exécutable doit être compilé en tant qu'application 32
                 bits.</p>
             <code>
-                  $ gcc -march=i686 -m32 bonjour.c</br>
+                  $ gcc -march=i686 -m32 bonjour.c<br />
             </code>
             <p>Cette commande est similaire à la précédente, mais elle génère également le code assembleur (-S) pour le
                 programme.</p>
             <code>
-                  $ gcc -S -march=i686 -m32 bonjour.c</br>
-                  $ file ./a.out </br>
-                  &nbsp;./a.out: ELF 32-bit LSB shared object, Intel 80386</br>
+                  $ gcc -S -march=i686 -m32 bonjour.c<br />
+                  $ file ./a.out <br />
+                  &nbsp;./a.out: ELF 32-bit LSB shared object, Intel 80386<br />
                   </code>
         </div>
         <div class="footer">
@@ -1132,18 +1133,18 @@ aire (float rayon)</br>
             <h1>3.1. La chaîne de compilation</h1>
         </div>
         <div class="content">
-            <h3 class="topicsubheading">5. Code objet</h3>
+            <h3 class="topicsubheading">Avec gcc (5/5) : le code objet</h3>
             <p>Cette commande compile le fichier source "client.c" en un fichier objet "client.o". L'option -c indique
                 au compilateur de générer uniquement le fichier objet sans produire d'exécutable. Cela permet de diviser
                 le processus de compilation en deux étapes.</p>
             <code>
-                $ gcc -c client.c </br>
-                $ gcc -c color.c </br>
+                $ gcc -c client.c <br />
+                $ gcc -c color.c <br />
             </code>
             <p>Cette commande prend les fichiers objets "color.o" et "client.o" et les compile en un exécutable nommé
                 "color". Le compilateur lie les fichiers objets pour créer l'exécutable final.</p>
             <code>
-                $ gcc -o color color.o client.o </br>
+                $ gcc -o color color.o client.o <br />
                 </code>
             <p>Cette approche est couramment utilisée pour séparer la compilation en plusieurs étapes, ce qui peut être
                 utile dans des projets plus importants où différentes parties du programme sont gérées séparément avant
@@ -1162,7 +1163,7 @@ aire (float rayon)</br>
             <h1>3.1. La chaîne de compilation</h1>
         </div>
         <div class="content">
-            <h3 class="topicsubheading">5. Code objet (Modifications et recompilation)</h3>
+            <h3 class="topicsubheading">Avec gcc (5/5) : code objet, modifications et recompilation</h3>
             <code>
 		                    $ gcc -c client.c color.c <br>
                 $ gcc -o client client.o color.o <br>
@@ -1412,7 +1413,7 @@ aire (float rayon)</br>
             <h3 class="topicsubheading">2. <strong>Analyse syntaxique (Parsing)</strong></h3>
             <div class="highlight">
                 <pre><span></span><span class="kn">import</span> <span class="nn">ast</span>
-<span class="kn">import</span> <span class="nn">astpretty</span>
+<span class="kn">import</span> <span class="nn">ast</span>
 
 <span class="n">code</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span>
 <span class="s2">def somme(a, b):</span>
@@ -1423,7 +1424,7 @@ aire (float rayon)</br>
 <span class="n">arbre</span> <span class="o">=</span> <span class="n">ast</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">code</span><span class="p">)</span>
 
 <span class="c1"># Afficher l&#39;AST avec indentation</span>
-<span class="n">astpretty</span><span class="o">.</span><span class="n">pprint</span><span class="p">(</span><span class="n">arbre</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">ast</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">arbre</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="mi">4</span><span class="p">))</span>
 </pre>
             </div>
         </div>
@@ -1476,9 +1477,11 @@ aire (float rayon)</br>
             <p>Une fois l’AST validé, Python compile cet arbre en <strong>bytecode</strong>, un ensemble d’instructions
                 de bas niveau que la machine virtuelle Python peut exécuter. Le bytecode est indépendant de la machine,
                 ce qui permet à Python d’être portable sur différentes plates-formes (Windows, Linux, macOS, etc.).</p>
-            <p>Le bytecode est stocké dans des fichiers <strong><code>.pyc</code></strong> (ou <code>.pyo</code> pour
-                les fichiers optimisés) dans un répertoire <code>__pycache__</code>. Ces fichiers permettent d’éviter
-                une recompilation lors des exécutions ultérieures, accélérant ainsi le démarrage des programmes.</p>
+            <p>Le bytecode est stocké dans des fichiers <strong><code>.pyc</code></strong> dans un répertoire
+                <code>__pycache__</code>. Ces fichiers permettent d’éviter une recompilation lors des exécutions
+                ultérieures, accélérant ainsi le démarrage des programmes. Les versions optimisées portent un suffixe
+                <code>.opt-1.pyc</code> / <code>.opt-2.pyc</code> ; l'ancienne extension <code>.pyo</code> a été
+                supprimée en Python 3.5.</p>
         </div>
         <div class="footer">
             <div class="contact">Principes des Langages de Programmation | John Samuel</div>
@@ -1498,7 +1501,7 @@ aire (float rayon)</br>
             <p>Pour <code>x = 5 + 10</code>, le bytecode pourrait ressembler à ceci :</p>
             <p><code>LOAD_CONST 5</code>
                 <br><code>LOAD_CONST 10</code>
-                <br> <code>BINARY_ADD</code>
+                <br> <code>BINARY_OP 0 (+)</code>
                 <br><code>STORE_NAME x</code>
             </p>
         </div>
@@ -1543,11 +1546,16 @@ aire (float rayon)</br>
         <div class="content">
             <h3 class="topicsubheading">3. <strong>Compilation en bytecode</strong></h3>
             <div class="highlight">
-                <pre><span></span>  3           0 LOAD_FAST                0 (a)
-              2 LOAD_FAST                1 (b)
-              4 BINARY_ADD
-              6 RETURN_VALUE
+                <pre><span></span>  2           0 RESUME                   0
+
+  3           2 LOAD_FAST                0 (a)
+              4 LOAD_FAST                1 (b)
+              6 BINARY_OP                0 (+)
+             10 RETURN_VALUE
 </pre>
+                <p><i>Sortie de Python 3.12. Le jeu d'instructions change d'une version à l'autre :
+                    <code>BINARY_ADD</code> a été remplacé par <code>BINARY_OP</code> en 3.11, et
+                    <code>RESUME</code> y a été ajouté. Le bytecode n'est pas une interface stable.</i></p>
             </div>
         </div>
         <div class="footer">
@@ -1660,11 +1668,11 @@ aire (float rayon)</br>
             </div>
             <p>Les fichiers <code>.pyc</code> sont généralement stockés dans un dossier nommé <code>__pycache__</code>
                 dans le même répertoire que le fichier source. Leur nom inclut une partie indiquant la version de Python
-                utilisée, par exemple <code>mon_script.cpython-310.pyc</code> pour Python 3.10.</p>
+                utilisée, par exemple <code>mon_script.cpython-312.pyc</code> pour Python 3.12.</p>
             <p>Pour exécuter un fichier <code>.pyc</code>, vous pouvez utiliser directement la commande python en
                 spécifiant le fichier </code>.pyc</code>.</p>
             <div class="highlight">
-                <pre><span></span>python __pycache__/mon_script.cpython-310.pyc
+                <pre><span></span>python __pycache__/mon_script.cpython-312.pyc
 </pre>
             </div>
         </div>
@@ -1735,7 +1743,7 @@ aire (float rayon)</br>
             <ul>
                 <li>Langage C, Claude Delannoy</li>
                 <li><a
-                        href="https://fr.wikipedia.org/wiki/Alignement_en_m%C3%A9moire">https://fr.wikipedia.org/wiki/Alignement_en_mémoire</a>
+                        href="https://docs.python.org/3/library/dis.html">dis — Désassembleur de bytecode Python</a>
                 </li>
                 <li><a href="https://fr.wikipedia.org/wiki/Compilateur">https://fr.wikipedia.org/wiki/Compilateur</a>
                 </li>
