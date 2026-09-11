@@ -149,6 +149,13 @@ the abstract labels, the tool finds the local year QID automatically. Use
 `content` for the CV line and leave `local_qid` empty until `wikibase-apply`
 fills it.
 
+Keep attendance entries in descending chronological order within each year,
+using the start date for date ranges and preserving the order of same-day
+events. Apply the same order to both Q315 sources and every language rendering.
+The append tool does not sort entries within an existing year automatically;
+check their placement after adding an event. The attendance-order tests cover
+all dated years and the composed entries in both CV views.
+
 Example row for an attended conference or workshop:
 
 ```csv
