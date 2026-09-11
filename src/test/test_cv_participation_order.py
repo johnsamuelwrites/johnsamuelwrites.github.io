@@ -2,6 +2,7 @@
 
 import csv
 import re
+import sys
 import unittest
 from pathlib import Path
 
@@ -9,6 +10,10 @@ from bs4 import BeautifulSoup
 
 
 ROOT = Path(__file__).resolve().parents[2]
+sys.path.insert(0, str(ROOT / "src/main"))
+
+from abstract.discover_content_migration import discover
+
 MONTHS = (
     "January February March April May June July August September October November December"
 ).split()
@@ -57,8 +62,10 @@ class AttendanceOrderTests(unittest.TestCase):
                 rows, key=lambda r: start_date(r["content"], r["year"]), reverse=True
             )
         ]
-        with (ROOT / "src/main/abstract/content-migration-registry.csv").open() as source:
-            pages = [r for r in csv.DictReader(source) if r["page_qid"] in ("Q3636", "Q3646")]
+        # The exported registry is an ignored local cache, absent in CI.
+        # Discover the committed Q315 pages and their language routes instead.
+        pages = [r for r in discover(ROOT) if r["page_qid"] in ("Q3636", "Q3646")]
+        self.assertEqual({page["page_qid"] for page in pages}, {"Q3636", "Q3646"})
         for page in pages:
             paths = [page["abstract_path"]] + [
                 page["target_" + language]
