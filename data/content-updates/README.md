@@ -172,6 +172,11 @@ Optional columns `content_fr`, `content_ml`, `content_pa`, `content_hi`,
 When they are empty, the English/canonical `content` value is used for every
 language.
 
+Preserve published titles and author names, but localize month and country
+names in citation metadata. For existing atomic entries, populate the localized
+columns and update the matching Wikibase labels and full `P40` values together;
+correcting only rendered HTML will not survive a later import or render.
+
 When only part of an entry needs translation, such as a month name or visible
 link text, prefer the existing Q315 composition model over duplicating the whole
 CV line in every `content_<language>` column. Create or reuse fragment content
