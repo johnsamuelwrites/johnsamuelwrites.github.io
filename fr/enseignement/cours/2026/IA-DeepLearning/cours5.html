@@ -677,6 +677,38 @@ Licensed under the BSD license, see LICENSE for details.
                 font-size: 2.5vmin;
             }
         }
+    
+        /* ---- v2 layout (prototype): term/definition rows, cards, takeaway, notes ---- */
+        .slide.v2 .content { line-height: 1.45em; }
+        .slide.v2 .content p { margin: 0.2em 0 0.7em 0; width: 92%; }
+        .slide.v2 .content ul { list-style: none; margin: 0; padding: 0; width: 92%; }
+        .slide.v2 .content li { line-height: 1.45em; margin-bottom: 0.75em; }
+        .slide.v2 .content li:has(> b:first-child) { display: flex; gap: 1.2em; align-items: baseline; }
+        .slide.v2 .content li > b:first-child { flex: 0 0 26%; color: #1B80CF; }
+        .slide.v2 .content .label { display: inline-block; width: auto; font-weight: bold; color: #78002E;
+            text-transform: uppercase; letter-spacing: 0.06em; font-size: 78%;
+            border-bottom: 0.25vmax solid #78002E; margin: 0.2em 0 1em 0; }
+        .slide.v2 .content .takeaway { margin-top: auto; width: 92%; background-color: #E1F5FE;
+            border-left: 0.6vmax solid #1B80CF; padding: 0.45em 1em; border-radius: 0 1vmax 1vmax 0; }
+        .slide.v2 .content .takeaway::before { content: "À retenir — "; font-weight: bold; color: #1B80CF; }
+        .slide.v2 .content .cards { display: grid; grid-template-columns: 1fr 1fr; gap: 1vmax; width: 92%; }
+        .slide.v2 .content .card { background-color: #E1F5FE; border-radius: 1vmax; overflow: hidden; }
+        .slide.v2 .content .card h4 { margin: 0; padding: 0.3em 0.8em; background-color: #1B80CF; color: #FFFFFF;
+            font-size: 100%; width: auto; }
+        .slide.v2 .content .card p { margin: 0; padding: 0.5em 0.8em; width: auto; }
+        .slide.v2 .content .eq { width: 92%; margin: 0 0 0.45em 0; display: flex; gap: 1.2em; align-items: baseline;
+            background-color: #F4F8FB; border-radius: 0.8vmax; padding: 0.3em 1em; }
+        .slide.v2 .content .eq b { flex: 0 0 26%; color: #1B80CF; }
+        .slide.v2 .content .eq i { color: #555555; font-size: 85%; margin-left: auto; }
+        .slide.v2 .content .row { display: flex; gap: 2vmax; width: 92%; align-items: flex-start; }
+        .slide.v2 .content .row > * { width: auto; flex: 1 1 0; }
+        .slide.v2 .content .row figure { margin: 0; }
+        .slide.v2 .content .row li > b:first-child { flex-basis: 36%; }
+        .slide.v2 .content .takeaway { margin-bottom: 0.8vmax; }
+        .slide.v2 .content figure svg { width: 100%; height: auto; display: block; }
+        .slide.v2 .content .notes { display: none; }
+        body.notes .slide.v2 .content .notes { display: block; color: #555555; font-size: 85%; font-style: italic;
+            margin-top: 0.15em; }
     </style>
     <script src="../../2021/MachineLearning/tex-mml-chtml.js" id="MathJax-script"></script>
 </head>
@@ -2210,7 +2242,60 @@ Licensed under the BSD license, see LICENSE for details.
             </div>
         </div>
     </section>
-    <section class="slide" id="slide56">
+
+    <section class="slide v2" id="slide56">
+        <div class="header">
+            <h1>A.6. Détection d'objets : R-CNN</h1>
+        </div>
+        <div class="content">
+
+            <h1 class="topicsubheading">R-CNN : de l'image aux boîtes</h1>
+            <figure style="width:92%;max-width:92%;margin:0">
+<svg style="max-height:56vh;width:auto;max-width:100%;margin:0 auto" viewBox="0 0 1240 360" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Pipeline R-CNN">
+<defs><marker id="ah" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#00549d"/></marker></defs>
+<rect x="12" y="40" width="222" height="120" rx="14" fill="#FFFFFF" stroke="#1B80CF" stroke-width="3"/>
+<rect x="38" y="54" width="170" height="92" rx="4" fill="#F4F8FB" stroke="#999" stroke-width="2"/>
+<rect x="56" y="80" width="58" height="56" rx="4" fill="none" stroke="#78002E" stroke-width="3" stroke-dasharray="6 4"/>
+<rect x="130" y="68" width="60" height="44" rx="4" fill="none" stroke="#78002E" stroke-width="3" stroke-dasharray="6 4"/>
+<text x="123.0" y="190" font-size="16" font-weight="normal" fill="#78002E" text-anchor="middle" font-family="Arial, sans-serif" font-style="italic">image + régions candidates</text>
+<line x1="237" y1="100.0" x2="257" y2="100.0" stroke="#00549d" stroke-width="3" marker-end="url(#ah)"/>
+<rect x="260" y="40" width="222" height="120" rx="14" fill="#E1F5FE" stroke="#1B80CF" stroke-width="3"/>
+<text x="371.0" y="90" font-size="21" font-weight="bold" fill="#00549d" text-anchor="middle" font-family="Arial, sans-serif">Propositions</text>
+<text x="371.0" y="120" font-size="19" font-weight="normal" fill="#333" text-anchor="middle" font-family="Arial, sans-serif">de régions</text>
+<text x="371.0" y="190" font-size="16" font-weight="normal" fill="#555" text-anchor="middle" font-family="Arial, sans-serif" font-style="italic">~2 000 par image, Selective Search</text>
+<line x1="485" y1="100.0" x2="505" y2="100.0" stroke="#00549d" stroke-width="3" marker-end="url(#ah)"/>
+<rect x="508" y="40" width="222" height="120" rx="14" fill="#E1F5FE" stroke="#1B80CF" stroke-width="3"/>
+<text x="619.0" y="90" font-size="21" font-weight="bold" fill="#00549d" text-anchor="middle" font-family="Arial, sans-serif">CNN</text>
+<text x="619.0" y="120" font-size="19" font-weight="normal" fill="#333" text-anchor="middle" font-family="Arial, sans-serif">par région</text>
+<text x="619.0" y="190" font-size="16" font-weight="normal" fill="#555" text-anchor="middle" font-family="Arial, sans-serif" font-style="italic">redimensionnée en 227×227</text>
+<line x1="733" y1="100.0" x2="753" y2="100.0" stroke="#00549d" stroke-width="3" marker-end="url(#ah)"/>
+<rect x="756" y="40" width="222" height="120" rx="14" fill="#E1F5FE" stroke="#1B80CF" stroke-width="3"/>
+<text x="867.0" y="90" font-size="21" font-weight="bold" fill="#00549d" text-anchor="middle" font-family="Arial, sans-serif">SVM + régression</text>
+<text x="867.0" y="120" font-size="19" font-weight="normal" fill="#333" text-anchor="middle" font-family="Arial, sans-serif">par classe</text>
+<text x="867.0" y="190" font-size="16" font-weight="normal" fill="#555" text-anchor="middle" font-family="Arial, sans-serif" font-style="italic">objet ? + affinage de la boîte</text>
+<line x1="981" y1="100.0" x2="1001" y2="100.0" stroke="#00549d" stroke-width="3" marker-end="url(#ah)"/>
+<rect x="1004" y="40" width="222" height="120" rx="14" fill="#FFFFFF" stroke="#1B80CF" stroke-width="3"/>
+<text x="1115.0" y="90" font-size="21" font-weight="bold" fill="#00549d" text-anchor="middle" font-family="Arial, sans-serif">Objets détectés</text>
+<text x="1115.0" y="120" font-size="19" font-weight="normal" fill="#333" text-anchor="middle" font-family="Arial, sans-serif">classe + boîte</text>
+<rect x="12" y="230" width="1216" height="112" rx="12" fill="#F4F8FB" stroke="#1B80CF" stroke-width="1"/>
+<text x="30" y="262" font-size="19" font-weight="bold" fill="#1B80CF" text-anchor="start" font-family="Arial, sans-serif">Évolutions</text>
+<text x="30" y="292" font-size="17" font-weight="normal" fill="#333" text-anchor="start" font-family="Arial, sans-serif">Fast R-CNN (2015) : un seul passage du CNN sur l'image entière   •   Faster R-CNN (2015) : propositions apprises par un réseau (RPN)</text>
+<text x="30" y="322" font-size="17" font-weight="normal" fill="#333" text-anchor="start" font-family="Arial, sans-serif">YOLO, SSD (2016) : une seule passe, temps réel   •   DETR (2020) : Transformer, plus de propositions de régions</text>
+</svg>
+            </figure>
+            <p class="takeaway">Le CNN ne fait que classer des imagettes : la <b>localisation</b> vient des
+                propositions de régions, pas du réseau — d'où la lenteur (2 000 passages par image) que Fast/Faster
+                R-CNN puis YOLO ont éliminée.</p>
+        </div>
+        <div class="footer">
+            <div class="contact">Intelligence artificielle et Deep Learning | John Samuel</div>
+            <div class="navigation">56
+                <a class="prev" href="#slide55"></a>
+                <a class="next" href="#slide57"></a>
+            </div>
+        </div>
+    </section>
+    <section class="slide" id="slide57">
         <div class="header">
             <h1>A.6. Détection d'objets : R-CNN</h1>
         </div>
@@ -2228,13 +2313,13 @@ Licensed under the BSD license, see LICENSE for details.
         </div>
         <div class="footer">
             <div class="contact">Intelligence artificielle et Deep Learning | John Samuel</div>
-            <div class="navigation">56
-                <a class="prev" href="#slide55"></a>
-                <a class="next" href="#slide57"></a>
+            <div class="navigation">57
+                <a class="prev" href="#slide56"></a>
+                <a class="next" href="#slide58"></a>
             </div>
         </div>
     </section>
-    <section class="slide" id="slide57">
+    <section class="slide" id="slide58">
         <div class="header">
             <h1>A.6. Détection d'objets : R-CNN</h1>
         </div>
@@ -2253,13 +2338,13 @@ Licensed under the BSD license, see LICENSE for details.
         </div>
         <div class="footer">
             <div class="contact">Intelligence artificielle et Deep Learning | John Samuel</div>
-            <div class="navigation">57
-                <a class="prev" href="#slide56"></a>
-                <a class="next" href="#slide58"></a>
+            <div class="navigation">58
+                <a class="prev" href="#slide57"></a>
+                <a class="next" href="#slide59"></a>
             </div>
         </div>
     </section>
-    <section class="slide" id="slide58">
+    <section class="slide" id="slide59">
         <div class="header">
             <h1>A.7. Traduction automatique : approches historiques</h1>
         </div>
@@ -2277,13 +2362,13 @@ Licensed under the BSD license, see LICENSE for details.
             </ul>
         <div class="footer">
             <div class="contact">Intelligence artificielle et Deep Learning | John Samuel</div>
-            <div class="navigation">58
-                <a class="prev" href="#slide57"></a>
-                <a class="next" href="#slide59"></a>
+            <div class="navigation">59
+                <a class="prev" href="#slide58"></a>
+                <a class="next" href="#slide60"></a>
             </div>
         </div>
     </section>
-    <section class="slide" id="slide59">
+    <section class="slide" id="slide60">
         <div class="header">
             <h1>A.7. Traduction automatique : approches historiques</h1>
         </div>
@@ -2298,13 +2383,13 @@ Licensed under the BSD license, see LICENSE for details.
         </div>
         <div class="footer">
             <div class="contact">Intelligence artificielle et Deep Learning | John Samuel</div>
-            <div class="navigation">59
-                <a class="prev" href="#slide58"></a>
-                <a class="next" href="#slide60"></a>
+            <div class="navigation">60
+                <a class="prev" href="#slide59"></a>
+                <a class="next" href="#slide61"></a>
             </div>
         </div>
     </section>
-    <section class="slide" id="slide60">
+    <section class="slide" id="slide61">
         <div class="header">
             <h1>A.7. Traduction automatique : approches historiques</h1>
         </div>
@@ -2325,13 +2410,13 @@ Licensed under the BSD license, see LICENSE for details.
         </div>
         <div class="footer">
             <div class="contact">Intelligence artificielle et Deep Learning | John Samuel</div>
-            <div class="navigation">60
-                <a class="prev" href="#slide59"></a>
-                <a class="next" href="#slide61"></a>
+            <div class="navigation">61
+                <a class="prev" href="#slide60"></a>
+                <a class="next" href="#slide62"></a>
             </div>
         </div>
     </section>
-    <section class="slide" id="slide61">
+    <section class="slide" id="slide62">
         <div class="header">
             <h1>A.7. Traduction automatique : approches historiques</h1>
         </div>
@@ -2351,13 +2436,13 @@ Licensed under the BSD license, see LICENSE for details.
         </div>
         <div class="footer">
             <div class="contact">Intelligence artificielle et Deep Learning | John Samuel</div>
-            <div class="navigation">61
-                <a class="prev" href="#slide60"></a>
-                <a class="next" href="#slide62"></a>
+            <div class="navigation">62
+                <a class="prev" href="#slide61"></a>
+                <a class="next" href="#slide63"></a>
             </div>
         </div>
     </section>
-    <section class="slide" id="slide62">
+    <section class="slide" id="slide63">
         <div class="header">
             <h1>A.7. Traduction automatique : approches historiques</h1>
         </div>
@@ -2375,13 +2460,13 @@ Licensed under the BSD license, see LICENSE for details.
         </div>
         <div class="footer">
             <div class="contact">Intelligence artificielle et Deep Learning | John Samuel</div>
-            <div class="navigation">62
-                <a class="prev" href="#slide61"></a>
-                <a class="next" href="#slide63"></a>
+            <div class="navigation">63
+                <a class="prev" href="#slide62"></a>
+                <a class="next" href="#slide64"></a>
             </div>
         </div>
     </section>
-    <section class="slide" id="slide63">
+    <section class="slide" id="slide64">
         <div class="header">
             <h1>A.7. Traduction automatique : approches historiques</h1>
         </div>
@@ -2402,13 +2487,13 @@ Licensed under the BSD license, see LICENSE for details.
         </div>
         <div class="footer">
             <div class="contact">Intelligence artificielle et Deep Learning | John Samuel</div>
-            <div class="navigation">63
-                <a class="prev" href="#slide62"></a>
-                <a class="next" href="#slide64"></a>
+            <div class="navigation">64
+                <a class="prev" href="#slide63"></a>
+                <a class="next" href="#slide65"></a>
             </div>
         </div>
     </section>
-    <section class="slide" id="slide64">
+    <section class="slide" id="slide65">
         <div class="header">
             <h1>A.7. Traduction automatique : approches historiques</h1>
         </div>
@@ -2429,14 +2514,14 @@ Licensed under the BSD license, see LICENSE for details.
         </div>
         <div class="footer">
             <div class="contact">Intelligence artificielle et Deep Learning | John Samuel</div>
-            <div class="navigation">64
-                <a class="prev" href="#slide63"></a>
-                <a class="next" href="#slide65"></a>
+            <div class="navigation">65
+                <a class="prev" href="#slide64"></a>
+                <a class="next" href="#slide66"></a>
             </div>
         </div>
     </section>
 
-    <section class="slide" id="slide65">
+    <section class="slide" id="slide66">
         <div class="header">
             <h1>Références</h1>
         </div>
@@ -2459,14 +2544,14 @@ Licensed under the BSD license, see LICENSE for details.
         </div>
         <div class="footer">
             <div class="contact">Intelligence artificielle et Deep Learning | John Samuel</div>
-            <div class="navigation">65
-                <a class="prev" href="#slide64"></a>
-                <a class="next" href="#slide66"></a>
+            <div class="navigation">66
+                <a class="prev" href="#slide65"></a>
+                <a class="next" href="#slide67"></a>
             </div>
         </div>
     </section>
 
-    <section class="slide" id="slide66">
+    <section class="slide" id="slide67">
         <div class="header">
             <h1>Références</h1>
         </div>
@@ -2485,13 +2570,13 @@ Licensed under the BSD license, see LICENSE for details.
         </div>
         <div class="footer">
             <div class="contact">Intelligence artificielle et Deep Learning | John Samuel</div>
-            <div class="navigation">66
-                <a class="prev" href="#slide65"></a>
-                <a class="next" href="#slide67"></a>
+            <div class="navigation">67
+                <a class="prev" href="#slide66"></a>
+                <a class="next" href="#slide68"></a>
             </div>
         </div>
     </section>
-    <section class="slide" id="slide67">
+    <section class="slide" id="slide68">
         <div class="header">
             <h1>Références:</h1>
         </div>
@@ -2512,13 +2597,13 @@ Licensed under the BSD license, see LICENSE for details.
         </div>
         <div class="footer">
             <div class="contact">Intelligence artificielle et Deep Learning | John Samuel</div>
-            <div class="navigation">67
-                <a class="prev" href="#slide66"></a>
-                <a class="next" href="#slide68"></a>
+            <div class="navigation">68
+                <a class="prev" href="#slide67"></a>
+                <a class="next" href="#slide69"></a>
             </div>
         </div>
     </section>
-    <section class="slide" id="slide68">
+    <section class="slide" id="slide69">
         <div class="header">
             <h1>Références:</h1>
         </div>
@@ -2557,14 +2642,14 @@ Licensed under the BSD license, see LICENSE for details.
         </div>
         <div class="footer">
             <div class="contact">Intelligence artificielle et Deep Learning | John Samuel</div>
-            <div class="navigation">68
-                <a class="prev" href="#slide67"></a>
-                <a class="next" href="#slide69"></a>
+            <div class="navigation">69
+                <a class="prev" href="#slide68"></a>
+                <a class="next" href="#slide70"></a>
             </div>
         </div>
     </section>
 
-    <section class="slide" id="slide69">
+    <section class="slide" id="slide70">
         <div class="header">
             <h1>Références:</h1>
         </div>
@@ -2597,13 +2682,13 @@ Licensed under the BSD license, see LICENSE for details.
         </div>
         <div class="footer">
             <div class="contact">Intelligence artificielle et Deep Learning | John Samuel</div>
-            <div class="navigation">69
-                <a class="prev" href="#slide68"></a>
-                <a class="next" href="#slide70"></a>
+            <div class="navigation">70
+                <a class="prev" href="#slide69"></a>
+                <a class="next" href="#slide71"></a>
             </div>
         </div>
     </section>
-    <section class="slide" id="slide70">
+    <section class="slide" id="slide71">
         <div class="header">
             <h1>Références:</h1>
         </div>
@@ -2619,8 +2704,8 @@ Licensed under the BSD license, see LICENSE for details.
         </div>
         <div class="footer">
             <div class="contact">Intelligence artificielle et Deep Learning | John Samuel</div>
-            <div class="navigation">70
-                <a class="prev" href="#slide69"></a>
+            <div class="navigation">71
+                <a class="prev" href="#slide70"></a>
             </div>
         </div>
     </section>
@@ -2634,7 +2719,7 @@ Licensed under the BSD license, see LICENSE for details.
                 if (!Number.isNaN(slideIdString)) {
                     slideId = parseInt(slideIdString);
                     if (isIncrement) {
-                        if (slideId < 70) {
+                        if (slideId < 71) {
                             slideId = slideId + 1;
                         }
                     } else {
@@ -2670,6 +2755,9 @@ Licensed under the BSD license, see LICENSE for details.
             } else if (event.keyCode == '40') {
                 // down
                 changeCurrentURLSlideNumber(true);
+            } else if (event.keyCode == '78') {
+                // n : afficher / masquer les notes
+                document.body.classList.toggle('notes');
             }
         }
         document.body.onmouseup = function (event) {

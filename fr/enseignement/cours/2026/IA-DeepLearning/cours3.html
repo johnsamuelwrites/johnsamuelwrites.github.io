@@ -677,6 +677,38 @@ Licensed under the BSD license, see LICENSE for details.
                 font-size: 2.5vmin;
             }
         }
+    
+        /* ---- v2 layout (prototype): term/definition rows, cards, takeaway, notes ---- */
+        .slide.v2 .content { line-height: 1.45em; }
+        .slide.v2 .content p { margin: 0.2em 0 0.7em 0; width: 92%; }
+        .slide.v2 .content ul { list-style: none; margin: 0; padding: 0; width: 92%; }
+        .slide.v2 .content li { line-height: 1.45em; margin-bottom: 0.75em; }
+        .slide.v2 .content li:has(> b:first-child) { display: flex; gap: 1.2em; align-items: baseline; }
+        .slide.v2 .content li > b:first-child { flex: 0 0 26%; color: #1B80CF; }
+        .slide.v2 .content .label { display: inline-block; width: auto; font-weight: bold; color: #78002E;
+            text-transform: uppercase; letter-spacing: 0.06em; font-size: 78%;
+            border-bottom: 0.25vmax solid #78002E; margin: 0.2em 0 1em 0; }
+        .slide.v2 .content .takeaway { margin-top: auto; width: 92%; background-color: #E1F5FE;
+            border-left: 0.6vmax solid #1B80CF; padding: 0.45em 1em; border-radius: 0 1vmax 1vmax 0; }
+        .slide.v2 .content .takeaway::before { content: "À retenir — "; font-weight: bold; color: #1B80CF; }
+        .slide.v2 .content .cards { display: grid; grid-template-columns: 1fr 1fr; gap: 1vmax; width: 92%; }
+        .slide.v2 .content .card { background-color: #E1F5FE; border-radius: 1vmax; overflow: hidden; }
+        .slide.v2 .content .card h4 { margin: 0; padding: 0.3em 0.8em; background-color: #1B80CF; color: #FFFFFF;
+            font-size: 100%; width: auto; }
+        .slide.v2 .content .card p { margin: 0; padding: 0.5em 0.8em; width: auto; }
+        .slide.v2 .content .eq { width: 92%; margin: 0 0 0.45em 0; display: flex; gap: 1.2em; align-items: baseline;
+            background-color: #F4F8FB; border-radius: 0.8vmax; padding: 0.3em 1em; }
+        .slide.v2 .content .eq b { flex: 0 0 26%; color: #1B80CF; }
+        .slide.v2 .content .eq i { color: #555555; font-size: 85%; margin-left: auto; }
+        .slide.v2 .content .row { display: flex; gap: 2vmax; width: 92%; align-items: flex-start; }
+        .slide.v2 .content .row > * { width: auto; flex: 1 1 0; }
+        .slide.v2 .content .row figure { margin: 0; }
+        .slide.v2 .content .row li > b:first-child { flex-basis: 36%; }
+        .slide.v2 .content .takeaway { margin-bottom: 0.8vmax; }
+        .slide.v2 .content figure svg { width: 100%; height: auto; display: block; }
+        .slide.v2 .content .notes { display: none; }
+        body.notes .slide.v2 .content .notes { display: block; color: #555555; font-size: 85%; font-style: italic;
+            margin-top: 0.15em; }
     </style>
     <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="MathJax-script"></script>
 </head>
@@ -2181,25 +2213,28 @@ Licensed under the BSD license, see LICENSE for details.
             </div>
         </div>
     </section>
-    <section class="slide" id="slide55">
+
+    <section class="slide v2" id="slide55">
         <div class="header">
             <h1>3.3. Réseau de neurones récurrents</h1>
         </div>
         <div class="content">
-            <h1 class="topicsubheading">Réseau de neurones récurrents</h1>
-            <p>Les réseaux de neurones récurrents (RNN) sont un type de réseau de neurones où les connexions entre les
-                nœuds forment un graphe dirigé le long d'une séquence temporelle. Cela leur permet de présenter un
-                comportement dynamique temporel, ce qui les rend particulièrement adaptés au traitement de séquences de
-                données. </p>
+
+            <h1 class="topicsubheading">Réseau de neurones récurrents (RNN)</h1>
+            <p>Un réseau de neurones où les connexions forment un graphe dirigé le long d'une séquence : la sortie à
+                l'instant \(t\) dépend de l'entrée courante <em>et</em> de ce que le réseau a vu avant.</p>
             <ul>
-                <li><b>Connexions Temporelles</b> : Les connexions entre les nœuds d'un RNN forment un graphe dirigé qui
-                    suit une séquence temporelle. Chaque nœud prend en compte l'entrée actuelle ainsi que l'état interne
-                    (mémoire) du réseau provenant de l'instant temporel précédent.</li>
-                <li><b>État Interne (Mémoire)</b> : Les RNN utilisent leur état interne ou mémoire pour traiter des
-                    séquences d'entrées de longueur variable. Cela permet au réseau de mémoriser des informations
-                    importantes provenant des instants temporels précédents et de les utiliser pour influencer les
-                    prédictions actuelles.</li>
+                <li><b>Connexions temporelles</b><span>Chaque nœud combine l'entrée actuelle et l'état interne
+                        provenant de l'instant précédent.
+                        <span class="notes">Les connexions forment un graphe dirigé qui suit la séquence temporelle,
+                            ce qui donne au réseau un comportement dynamique.</span></span></li>
+                <li><b>État interne (mémoire)</b><span>Permet de traiter des séquences de longueur variable en
+                        mémorisant ce qui compte des instants précédents.
+                        <span class="notes">Les informations retenues influencent les prédictions actuelles : c'est
+                            ce qui distingue un RNN d'un réseau à propagation avant.</span></span></li>
             </ul>
+            <p class="takeaway">Le même neurone est appliqué à chaque pas de temps ; seul l'état caché \(h_t\) circule
+                d'un pas au suivant.</p>
         </div>
         <div class="footer">
             <div class="contact">Intelligence artificielle et Deep Learning | John Samuel</div>
@@ -2209,20 +2244,26 @@ Licensed under the BSD license, see LICENSE for details.
             </div>
         </div>
     </section>
-    <section class="slide" id="slide56">
+
+    <section class="slide v2" id="slide56">
         <div class="header">
             <h1>3.3. Réseau de neurones récurrents</h1>
         </div>
         <div class="content">
-            <h1 class="topicsubheading">Réseau de neurones récurrents</h1>
-            <p>Les RNN sont largement utilisés dans des applications qui impliquent des données séquentielles, notamment
-                :</p>
-            <ul>
-                <li><b>Reconnaissance de l'écriture manuscrite</b> : Les RNN peuvent être utilisés pour reconnaître des
-                    séquences de caractères dans une séquence d'écriture manuscrite.</li>
-                <li><b>Reconnaissance vocale</b> : En traitant des séquences temporelles de signaux audio, les RNN
-                    peuvent être employés pour la reconnaissance vocale.</li>
-            </ul>
+
+            <h1 class="topicsubheading">Déroulement dans le temps et applications</h1>
+            <div class="row">
+                <figure style="flex:0 0 52%">
+                    <img src="../../../../../en/teaching/courses/2019/MachineLearning/Recurrent_neural_network_unfold.svg" style="max-width:100%;max-height:44vmin" />
+                    <figcaption>Un RNN « déroulé » : la même cellule, un pas de temps par colonne</figcaption>
+                </figure>
+                <ul style="flex:1 1 0">
+                    <li><b>Écriture manuscrite</b><span>Reconnaître une suite de caractères dans un tracé.</span></li>
+                    <li><b>Reconnaissance vocale</b><span>Traiter la séquence temporelle d'un signal audio.</span></li>
+                    <li><b>Texte</b><span>Prédire le mot suivant, traduire, classer une phrase.</span></li>
+                    <li><b>Séries temporelles</b><span>Prévoir une valeur future (capteurs, finance, météo).</span></li>
+                </ul>
+            </div>
         </div>
         <div class="footer">
             <div class="contact">Intelligence artificielle et Deep Learning | John Samuel</div>
@@ -2232,17 +2273,31 @@ Licensed under the BSD license, see LICENSE for details.
             </div>
         </div>
     </section>
-    <section class="slide" id="slide57">
+
+    <section class="slide v2" id="slide57">
         <div class="header">
             <h1>3.3. Réseau de neurones récurrents</h1>
         </div>
         <div class="content">
-            <h1 class="topicsubheading">Réseau de neurones récurrents</h1>
-            <figure>
-                <img src="../../../../../en/teaching/courses/2019/MachineLearning/Recurrent_neural_network_unfold.svg"
-                    height="480vh" />
-                <figcaption>Réseau de neurones récurrents</figcaption>
-            </figure>
+
+            <h1 class="topicsubheading">Le neurone récurrent</h1>
+            <ul>
+                <li><b>Entrée courante \(x_t\)</b><span>La donnée observée à l'instant \(t\).
+                        <span class="notes">Par exemple une caractéristique d'une séquence à cet instant : un mot, un
+                            échantillon audio, une mesure.</span></span></li>
+                <li><b>État caché précédent \(h_{t-1}\)</b><span>La mémoire du réseau, héritée de l'instant
+                        \(t-1\).
+                        <span class="notes">C'est lui qui transporte les informations passées jusqu'au pas de temps
+                            courant.</span></span></li>
+                <li><b>Poids \(w\)</b><span>Un poids par connexion : ils fixent l'importance relative de \(x_t\) et
+                        de \(h_{t-1}\).</span></li>
+                <li><b>Fonction d'activation</b><span>Non linéaire (tanh en général) : elle combine les entrées et
+                        produit la sortie.
+                        <span class="notes">La non-linéarité permet d'apprendre des relations complexes dans les
+                            données séquentielles.</span></span></li>
+                <li><b>État caché \(h_t\)</b><span>La sortie à l'instant \(t\), qui devient la mémoire transmise à
+                        l'instant \(t+1\).</span></li>
+            </ul>
         </div>
         <div class="footer">
             <div class="contact">Intelligence artificielle et Deep Learning | John Samuel</div>
@@ -2252,24 +2307,24 @@ Licensed under the BSD license, see LICENSE for details.
             </div>
         </div>
     </section>
-    <section class="slide" id="slide58">
+
+    <section class="slide v2" id="slide58">
         <div class="header">
             <h1>3.3. Réseau de neurones récurrents</h1>
         </div>
         <div class="content">
-            <h1 class="topicsubheading">Réseau de neurones récurrents</h1>
-            <p>Dans un réseau de neurones récurrents (RNN), le neurone, également appelé unité récurrente, est l'élément
-                de base qui permet au réseau de traiter des données séquentielles en maintenant un état interne ou une
-                mémoire.</p>
-            <p><b>Entrées :</b> Le neurone RNN reçoit deux types d'entrées :</p>
-            <ul>
-                <li><b>Entrée courante</b> (\(x_t\)) : L'entrée actuelle à l'instant temporel \(t\). Elle peut
-                    représenter une caractéristique spécifique d'une séquence à cet instant.</li>
-                <li><b>État caché précédent</b> (\(h_{t-1}\)) : L'état caché provenant de l'instant temporel précédent
-                    (\(t-1\)). Cet état représente la mémoire du réseau et est essentiel pour capturer les informations
-                    passées.</li>
 
+            <h1 class="topicsubheading">Formule générale</h1>
+            <div class="eq"><b>Sortie à l'instant \(t\)</b>\(h_t = f(w_{hx} \cdot x_t + w_{hh} \cdot h_{t-1} +
+                b_h)\)</div>
+            <ul>
+                <li><b>\(w_{hx}\)</b><span>poids de l'entrée courante</span></li>
+                <li><b>\(w_{hh}\)</b><span>poids de l'état caché précédent (la récurrence)</span></li>
+                <li><b>\(b_h\)</b><span>biais</span></li>
+                <li><b>\(f\)</b><span>fonction d'activation, généralement tanh</span></li>
             </ul>
+            <p class="takeaway">\(w_{hx}\), \(w_{hh}\) et \(b_h\) sont <em>les mêmes</em> à chaque pas de temps :
+                un RNN n'a pas plus de paramètres qu'une seule cellule, quelle que soit la longueur de la séquence.</p>
         </div>
         <div class="footer">
             <div class="contact">Intelligence artificielle et Deep Learning | John Samuel</div>
@@ -2279,25 +2334,26 @@ Licensed under the BSD license, see LICENSE for details.
             </div>
         </div>
     </section>
-    <section class="slide" id="slide59">
+
+    <section class="slide v2" id="slide59">
         <div class="header">
             <h1>3.3. Réseau de neurones récurrents</h1>
         </div>
         <div class="content">
-            <h1 class="topicsubheading">Réseau de neurones récurrents</h1>
-            <ul>
-                <li><b>Poids</b> : Chaque connexion entre l'entrée courante, l'état caché précédent et le neurone a un
-                    poids associé (\(w\)). Ces poids déterminent l'importance respective des différentes entrées pour le
-                    neurone.</li>
-                <li><b>Fonction d'activation</b> : Le neurone RNN utilise une fonction d'activation pour combiner les
-                    entrées et générer une sortie. La fonction d'activation est généralement non linéaire et permet au
-                    réseau d'apprendre des relations complexes dans les données séquentielles.</li>
-                <li><b>État caché (Mémoire)</b> : La sortie du neurone à l'instant \(t\), souvent notée \(h_t\), devient
-                    l'état caché qui sera utilisé pour influencer la sortie à l'instant suivant (\(t+1\)). Cet état
-                    caché représente la mémoire du réseau et permet de conserver des informations importantes sur la
-                    séquence.</li>
-                <ul>
 
+            <h1 class="topicsubheading">Réseau de neurones récurrents</h1>
+            <span class="label">Avantages</span>
+            <ul>
+                <li><b>Traitement séquentiel</b><span>Conçus pour les données ordonnées : parole, traduction,
+                        prédiction temporelle.</span></li>
+                <li><b>Dépendances temporelles</b><span>La mémoire interne modélise le contexte des instants
+                        précédents.
+                        <span class="notes">Adaptés aux problèmes où comprendre le contexte temporel est
+                            essentiel.</span></span></li>
+                <li><b>Paramètres partagés</b><span>La même cellule sert à chaque pas de temps : peu de paramètres,
+                        réutilisables.</span></li>
+                <li><b>Longueur variable</b><span>Une séquence de 5 ou de 500 éléments passe dans le même réseau.</span></li>
+            </ul>
         </div>
         <div class="footer">
             <div class="contact">Intelligence artificielle et Deep Learning | John Samuel</div>
@@ -2307,24 +2363,29 @@ Licensed under the BSD license, see LICENSE for details.
             </div>
         </div>
     </section>
-    <section class="slide" id="slide60">
+
+    <section class="slide v2" id="slide60">
         <div class="header">
             <h1>3.3. Réseau de neurones récurrents</h1>
         </div>
         <div class="content">
-            <h1 class="topicsubheading">Réseau de neurones récurrents</h1>
 
-            <p><b>Formule Générale</b> : La sortie du neurone à l'instant \(t\) est calculée comme suit :</p>
-            <p>
-                \[ h_t = \text{fonction_activation}(w_{hx} \cdot x_t + w_{hh} \cdot h_{t-1} + b_h) \]
-                \(w_{hx}\) et \(w_{hh}\) sont les poids associés aux entrées actuelles et à l'état caché précédent,
-                respectivement.
-                \(b_h\) est le terme de biais.
-            </p>
-            <p>Le rôle principal du neurone dans un RNN est de traiter séquentiellement les données en maintenant une
-                mémoire du passé à travers l'état caché. Cette capacité à conserver des informations antérieures permet
-                au RNN de modéliser des dépendances à long terme dans les séquences temporelles, ce qui est crucial pour
-                des tâches telles que la reconnaissance de la parole, la traduction automatique, etc.</p>
+            <h1 class="topicsubheading">Réseau de neurones récurrents</h1>
+            <span class="label">Limites</span>
+            <ul>
+                <li><b>Gradient qui disparaît ou explose</b><span>Sur de longues séquences, le gradient
+                        rétropropagé s'annule ou diverge : l'apprentissage devient difficile.</span></li>
+                <li><b>Dépendances très longues</b><span>En pratique, la mémoire s'estompe au bout de quelques
+                        dizaines de pas.</span></li>
+                <li><b>Calcul séquentiel</b><span>Le pas \(t\) attend le pas \(t-1\) : impossible de paralléliser sur
+                        la longueur de la séquence.
+                        <span class="notes">C'est cette limite qui a motivé l'architecture Transformer (attention,
+                            calcul parallèle sur toute la séquence), aujourd'hui dominante pour le texte
+                            (voir 4.7).</span></span></li>
+                <li><b>Sensibilité à l'ordre</b><span>Une permutation des éléments change le résultat.</span></li>
+            </ul>
+            <p class="takeaway">Deux réponses : les <b>LSTM / GRU</b> (portes) pour le gradient ; le
+                <b>Transformer</b> (attention, voir 4.7) pour le calcul parallèle.</p>
         </div>
         <div class="footer">
             <div class="contact">Intelligence artificielle et Deep Learning | John Samuel</div>
@@ -2334,23 +2395,25 @@ Licensed under the BSD license, see LICENSE for details.
             </div>
         </div>
     </section>
-    <section class="slide" id="slide61">
+
+    <section class="slide v2" id="slide61">
         <div class="header">
             <h1>3.3. Réseau de neurones récurrents</h1>
         </div>
         <div class="content">
-            <h1 class="topicsubheading">Réseau de neurones récurrents</h1>
-            <p><b>Avantages</b></p>
-            <li><b>Traitement séquentiel</b> : Les RNN sont spécialement conçus pour traiter des données séquentielles,
-                ce qui en fait un choix naturel pour des tâches telles que la reconnaissance vocale, la traduction
-                automatique et la prédiction temporelle.</li>
-            <li><b>Capacité à gérer les dépendances temporelles</b> : Les RNN peuvent modéliser les dépendances à long
-                terme dans les séquences temporelles en utilisant leur mémoire interne. Cela les rend adaptés à des
-                problèmes où la compréhension du contexte temporel est essentielle.</li>
-            <li><b>Architecture réutilisable</b> : La même architecture neuronale peut être utilisée à chaque instant
-                temporel, facilitant ainsi la réutilisation des paramètres du modèle.</li>
-            <li><b>Flexibilité dans la taille des séquences</b> : Les RNN peuvent traiter des séquences de longueurs
-                variables, ce qui les rend adaptés à des données où la longueur de la séquence peut varier.</li>
+
+            <h1 class="topicsubheading">Long short-term memory (LSTM) [Hochreiter 1997]</h1>
+            <div class="row">
+                <p style="flex:1 1 0">Une cellule récurrente conçue pour résoudre le problème du gradient qui
+                    disparaît : un <b>état de cellule</b> \(c_t\) traverse le temps presque sans transformation, et
+                    trois <b>portes</b> décident ce qu'on y écrit, ce qu'on y oublie et ce qu'on en lit.</p>
+                <figure style="flex:0 0 46%">
+                    <img src="../../../../../en/teaching/courses/2019/MachineLearning/Long_Short-Term_Memory.svg" style="max-width:100%;max-height:40vmin" />
+                    <figcaption>Cellule LSTM</figcaption>
+                </figure>
+            </div>
+            <p class="takeaway">Le RNN simple a une seule mémoire \(h_t\) réécrite à chaque pas ; le LSTM en ajoute
+                une seconde, \(c_t\), protégée par des portes.</p>
         </div>
         <div class="footer">
             <div class="contact">Intelligence artificielle et Deep Learning | John Samuel</div>
@@ -2360,29 +2423,31 @@ Licensed under the BSD license, see LICENSE for details.
             </div>
         </div>
     </section>
-    <section class="slide" id="slide62">
+
+    <section class="slide v2" id="slide62">
         <div class="header">
             <h1>3.3. Réseau de neurones récurrents</h1>
         </div>
         <div class="content">
-            <h1 class="topicsubheading">Réseau de neurones récurrents</h1>
-            <p><b>Limites</b></p>
-            <li><b>Problème du gradient qui disparaît ou explose</b> : L'entraînement de RNN sur de longues séquences
-                peut entraîner des problèmes de gradients qui disparaissent ou explosent, ce qui rend l'apprentissage
-                difficile.</li>
-            <li><b>Manque de captation de dépendances à très long terme</b> : Malgré la capacité à gérer des dépendances
-                à long terme, les RNN peuvent avoir du mal à capturer des dépendances très à long terme dans les
-                séquences.</li>
-            <li><b>Calculs séquentiels</b> : Les RNN effectuent des calculs de manière séquentielle, ce qui peut
-                entraîner une lenteur dans le traitement par rapport à certaines architectures parallèles. C'est cette
-                limite qui a motivé l'architecture Transformer (attention, calcul parallèle sur toute la séquence),
-                aujourd'hui dominante pour le texte (voir 4.7).</li>
-            <li><b>Sensibilité à l'ordre des éléments</b> : Les RNN sont sensibles à l'ordre des éléments dans une
-                séquence, et des permutations peuvent affecter le résultat du modèle.</li>
-            <li><b>Architectures améliorées nécessaires</b> : Des architectures améliorées, telles que les LSTM (Long
-                Short-Term Memory) et les GRU (Gated Recurrent Unit), sont souvent nécessaires pour atténuer les
-                problèmes de gradient et améliorer la capacité du modèle à conserver des informations sur de longues
-                séquences.</li>
+
+            <h1 class="topicsubheading">LSTM : composants</h1>
+            <div class="cards">
+                <div class="card"><h4>Cellule \(c_t\)</h4>
+                    <p>La mémoire à long terme : elle stocke et régule l'information sur des intervalles de temps
+                        arbitraires. Elle peut être écrite, lue et modifiée.</p></div>
+                <div class="card"><h4>Porte d'oubli \(f_t\)</h4>
+                    <p>Décide quelles parties de l'information existante dans la cellule doivent être
+                        effacées.</p></div>
+                <div class="card"><h4>Porte d'entrée \(i_t\)</h4>
+                    <p>Décide quels éléments de la nouvelle information doivent être ajoutés à la cellule.</p></div>
+                <div class="card"><h4>Porte de sortie \(o_t\)</h4>
+                    <p>Décide quelle partie de la cellule est exposée en sortie, dans \(h_t\).</p></div>
+            </div>
+            <p class="notes">Ensemble, ces composants permettent à une unité LSTM de maintenir et de gérer des
+                informations sur des périodes étendues ; les trois portes fournissent un mécanisme de régulation fin
+                du flux d'information à travers la cellule.</p>
+            <p class="takeaway">Chaque porte est une sigmoïde \(\sigma \in [0,1]\) : 0 = bloquer, 1 = laisser
+                passer.</p>
         </div>
         <div class="footer">
             <div class="contact">Intelligence artificielle et Deep Learning | John Samuel</div>
@@ -2392,22 +2457,24 @@ Licensed under the BSD license, see LICENSE for details.
             </div>
         </div>
     </section>
-    <section class="slide" id="slide63">
+
+    <section class="slide v2" id="slide63">
         <div class="header">
             <h1>3.3. Réseau de neurones récurrents</h1>
         </div>
         <div class="content">
-            <h1 class="topicsubheading">Réseau récurrent à mémoire court et long terme</h1>
-            <h1 class="topicsubheading">Long short-term memory (LSTM) network</h1>
-            <p>Les unités LSTM sont une variation de l'architecture des réseaux neuronaux récurrents (RNN) conçue pour
-                résoudre le problème du gradient qui disparaît ou explose lors de l'entraînement de séquences à long
-                terme. Elles sont particulièrement utiles pour modéliser les dépendances à long terme dans les séquences
-                temporelles, telles que des séquences de mots dans le langage naturel.</p>
-            <figure>
-                <img src="../../../../../en/teaching/courses/2019/MachineLearning/Long_Short-Term_Memory.svg "
-                    height="200px" />
-                <figcaption>LSTM</figcaption>
-            </figure>
+
+            <h1 class="topicsubheading">LSTM : équations</h1>
+            <p>À l'instant \(t\) : entrée \(x_t\), sortie précédente \(h_{t-1}\), état de cellule précédent
+                \(c_{t-1}\).</p>
+            <div class="eq"><b>Porte d'oubli</b>\(f_t = \sigma(W_{f} \cdot x_t + U_{f} \cdot h_{t-1} + b_f)\)</div>
+            <div class="eq"><b>Porte d'entrée</b>\(i_t = \sigma(W_{i} \cdot x_t + U_{i} \cdot h_{t-1} + b_i)\)</div>
+            <div class="eq"><b>Candidat</b>\(\tilde{c}_t = \tanh(W_{c} \cdot x_t + U_{c} \cdot h_{t-1} + b_c)\)
+                <i>nouvelle information proposée</i></div>
+            <div class="eq"><b>Cellule</b>\(c_t = f_t \odot c_{t-1} + i_t \odot \tilde{c}_t\)
+                <i>oublier, puis écrire</i></div>
+            <div class="eq"><b>Porte de sortie</b>\(o_t = \sigma(W_{o} \cdot x_t + U_{o} \cdot h_{t-1} + b_o)\)</div>
+            <div class="eq"><b>Sortie</b>\(h_t = o_t \odot \tanh(c_t)\) <i>lire</i></div>
         </div>
         <div class="footer">
             <div class="contact">Intelligence artificielle et Deep Learning | John Samuel</div>
@@ -2417,25 +2484,28 @@ Licensed under the BSD license, see LICENSE for details.
             </div>
         </div>
     </section>
-    <section class="slide" id="slide64">
+
+    <section class="slide v2" id="slide64">
         <div class="header">
             <h1>3.3. Réseau de neurones récurrents</h1>
         </div>
         <div class="content">
-            <h1 class="topicsubheading">Long short-term memory (LSTM) network</h1>
+
+            <h1 class="topicsubheading">LSTM : lecture des équations</h1>
             <ul>
-                <li><b>Connexions de retour d'information</b> : Les connexions de retour d'information font référence à
-                    la capacité d'une unité LSTM à maintenir une mémoire à long terme en conservant des informations
-                    provenant d'itérations précédentes dans la séquence temporelle. Cette capacité à conserver des
-                    informations sur des intervalles de temps arbitraires est ce qui permet aux LSTM de gérer
-                    efficacement les dépendances à long terme dans les données séquentielles.</li>
-                <li><b>Cellule LSTM</b> : La cellule LSTM est l'unité de mémoire principale. Elle stocke et régule
-                    l'information sur des intervalles de temps arbitraires. La cellule peut être considérée comme une
-                    mémoire à long terme qui peut être écrite, lue et modifiée.</li>
-                <li><b>Porte d'entrée (Input Gate)</b>: La porte d'entrée détermine quels éléments de la nouvelle
-                    information doivent être ajoutés à la cellule. Elle utilise une fonction d'activation pour contrôler
-                    cet ajout.</li>
+                <li><b>\(\sigma\), \(\tanh\)</b><span>sigmoïde (portes, dans \([0,1]\)) et tangente hyperbolique
+                        (contenu, dans \([-1,1]\))</span></li>
+                <li><b>\(W\), \(U\), \(b\)</b><span>poids de l'entrée, poids de la récurrence et biais, propres à
+                        chaque porte (indices \(f, i, c, o\))</span></li>
+                <li><b>\(\odot\)</b><span>produit élément par élément</span></li>
+                <li><b>Pourquoi ça marche</b><span>Si \(f_t \approx 1\) et \(i_t \approx 0\), alors
+                        \(c_t \approx c_{t-1}\) : le gradient traverse le temps sans s'annuler.
+                        <span class="notes">Ces formules permettent aux LSTM de maintenir et de gérer l'information
+                            sur des intervalles de temps arbitraires, ce qui les rend efficaces pour la modélisation
+                            de séquences complexes.</span></span></li>
             </ul>
+            <p class="takeaway">Quatre fois plus de paramètres qu'un RNN simple de même taille (quatre jeux
+                \(W, U, b\)).</p>
         </div>
         <div class="footer">
             <div class="contact">Intelligence artificielle et Deep Learning | John Samuel</div>
@@ -2445,24 +2515,25 @@ Licensed under the BSD license, see LICENSE for details.
             </div>
         </div>
     </section>
-    <section class="slide" id="slide65">
+
+    <section class="slide v2" id="slide65">
         <div class="header">
             <h1>3.3. Réseau de neurones récurrents</h1>
         </div>
         <div class="content">
-            <h1 class="topicsubheading">Long short-term memory (LSTM) network</h1>
-            <ul>
-                <li><b>Porte de sortie (Output Gate)</b> : La porte de sortie décide quelle partie de l'information
-                    stockée dans la cellule doit être exposée à la sortie du LSTM. Elle utilise une fonction
-                    d'activation pour effectuer cette sélection.</li>
-                <li><b>Porte d'oubli (Forget Gate)</b> : La porte d'oubli permet au LSTM de supprimer des informations
-                    de la cellule. Elle détermine quelles parties de l'information existante dans la cellule doivent
-                    être oubliées.</li>
-            </ul>
-            <p>Ensemble, ces composants permettent à une unité LSTM de maintenir et de gérer des informations sur des
-                périodes de temps étendues, ce qui en fait un choix puissant pour la modélisation de séquences
-                temporelles complexes. Les portes d'entrée, de sortie et d'oubli fournissent un mécanisme de régulation
-                fin pour contrôler le flux d'informations à travers la cellule.</p>
+
+            <h1 class="topicsubheading">Gated Recurrent Unit (GRU) [Cho 2014]</h1>
+            <p>Une simplification du LSTM : deux portes au lieu de trois, pas d'état de cellule séparé (\(h_t\) joue
+                les deux rôles). Moins de paramètres, entraînement plus rapide, performances souvent comparables.</p>
+            <div class="eq"><b>Porte de mise à jour</b>\(z_t = \sigma(W_{z} \cdot x_t + U_{z} \cdot h_{t-1} + b_z)\)
+                <i>combien conserver</i></div>
+            <div class="eq"><b>Porte de réinitialisation</b>\(r_t = \sigma(W_{r} \cdot x_t + U_{r} \cdot h_{t-1} +
+                b_r)\) <i>combien relire</i></div>
+            <div class="eq"><b>État candidat</b>\(\tilde{h}_t = \tanh(W_{h} \cdot x_t + U_{h} \cdot (r_t \odot
+                h_{t-1}) + b_h)\)</div>
+            <div class="eq"><b>Nouvel état</b>\(h_t = (1 - z_t) \odot h_{t-1} + z_t \odot \tilde{h}_t\)</div>
+            <p class="takeaway">Quand \(z_t \to 0\), l'état est simplement recopié : c'est ce qui conserve une
+                information sur de longues séquences.</p>
         </div>
         <div class="footer">
             <div class="contact">Intelligence artificielle et Deep Learning | John Samuel</div>
@@ -2473,115 +2544,6 @@ Licensed under the BSD license, see LICENSE for details.
         </div>
     </section>
     <section class="slide" id="slide66">
-        <div class="header">
-            <h1>3.3. Réseau de neurones récurrents</h1>
-        </div>
-        <div class="content">
-            <h1 class="topicsubheading">Long short-term memory (LSTM) network</h1>
-            <p>Supposons que \(x_t\) soit l'entrée à l'instant de temps \(t\), \(h_{t-1}\) soit la sortie de la couche
-                LSTM à l'instant de temps précédent \(t-1\), et \(c_{t-1}\) soit l'état de la cellule à l'instant de
-                temps précédent \(t-1\).</p>
-
-            <p><b>Porte d'entrée (Input Gate)</b> :</p>
-            <ul>
-                <li> \(i_t = \sigma(W_{ii} \cdot x_t + b_{ii} + W_{hi} \cdot h_{t-1} + b_{hi})\) (Activation)</li>
-                <li>\(\tilde{c}_t = \tanh(W_{ic} \cdot x_t + b_{ic} + W_{hc} \cdot h_{t-1} + b_{hc})\) (Nouvelles
-                    données de cellule proposées)</li>
-                <li>\(f_t = \sigma(W_{if} \cdot x_t + b_{if} + W_{hf} \cdot h_{t-1} + b_{hf})\) (Porte d'Oubli)</li>
-            </ul>
-        </div>
-        <div class="footer">
-            <div class="contact">Intelligence artificielle et Deep Learning | John Samuel</div>
-            <div class="navigation">66
-                <a class="prev" href="#slide65"></a>
-                <a class="next" href="#slide67"></a>
-            </div>
-        </div>
-    </section>
-    <section class="slide" id="slide67">
-        <div class="header">
-            <h1>3.3. Réseau de neurones récurrents</h1>
-        </div>
-        <div class="content">
-            <h1 class="topicsubheading">Long short-term memory (LSTM) network</h1>
-            <p><b>Mise à jour de la cellule</b> :</p>
-            <ul>
-                <li>\(c_t = f_t \cdot c_{t-1} + i_t \cdot \tilde{c}_t\) (Mise à jour de l'état de la cellule)</li>
-            </ul>
-            <p><b>Porte de sortie (Output Gate)</b> :</p>
-            <ul>
-                <li>\(o_t = \sigma(W_{io} \cdot x_t + b_{io} + W_{ho} \cdot h_{t-1} + b_{ho})\) (Activation)</li>
-                <li>\(h_t = o_t \cdot \tanh(c_t)\) (Sortie)</li>
-            </ul>
-        </div>
-        <div class="footer">
-            <div class="contact">Intelligence artificielle et Deep Learning | John Samuel</div>
-            <div class="navigation">67
-                <a class="prev" href="#slide66"></a>
-                <a class="next" href="#slide68"></a>
-            </div>
-        </div>
-    </section>
-    <section class="slide" id="slide68">
-        <div class="header">
-            <h1>3.3. Réseau de neurones récurrents</h1>
-        </div>
-        <div class="content">
-            <h1 class="topicsubheading">Long short-term memory (LSTM) network</h1>
-            <p>Dans ces équations :</p>
-            <ul>
-                <li>\(\sigma\) est la fonction sigmoïde.</li>
-                <li>\(\tanh\) est la fonction tangente hyperbolique.</li>
-                <li>\(W\) et \(b\) représentent les poids et les biais, respectivement, associés à différentes portes et
-                    entrées.</li>
-                <li>Les indices \(ii, ic, if, io\) indiquent les poids spécifiques pour les différentes portes.</li>
-            </ul>
-
-            <p>Ces équations décrivent le flux d'information à travers une unité LSTM, avec des portes d'entrée, de
-                sortie et d'oubli régulant l'interaction entre l'entrée, l'état de la cellule et la sortie. Ces formules
-                permettent aux LSTM de maintenir et de gérer l'information sur des intervalles de temps arbitraires, ce
-                qui les rend efficaces pour la modélisation de séquences temporelles complexes.</p>
-        </div>
-        <div class="footer">
-            <div class="contact">Intelligence artificielle et Deep Learning | John Samuel</div>
-            <div class="navigation">68
-                <a class="prev" href="#slide67"></a>
-                <a class="next" href="#slide69"></a>
-            </div>
-        </div>
-    </section>
-
-    <section class="slide" id="slide69">
-        <div class="header">
-            <h1>3.3. Réseau de neurones récurrents</h1>
-        </div>
-        <div class="content">
-
-            <h1 class="topicsubheading">Gated Recurrent Unit (GRU) [Cho 2014]</h1>
-            <p>Le GRU est une simplification du LSTM : deux portes au lieu de trois et pas d'état de cellule séparé
-                (\(h_t\) joue les deux rôles). Moins de paramètres, entraînement plus rapide, performances souvent
-                comparables.</p>
-            <ul>
-                <li><b>Porte de mise à jour (Update Gate)</b> : \(z_t = \sigma(W_{z} \cdot x_t + U_{z} \cdot h_{t-1} +
-                    b_z)\) — quelle part de l'état précédent conserver.</li>
-                <li><b>Porte de réinitialisation (Reset Gate)</b> : \(r_t = \sigma(W_{r} \cdot x_t + U_{r} \cdot
-                    h_{t-1} + b_r)\) — quelle part de l'état précédent utiliser pour proposer le nouvel état.</li>
-                <li><b>État candidat</b> : \(\tilde{h}_t = \tanh(W_{h} \cdot x_t + U_{h} \cdot (r_t \odot h_{t-1}) +
-                    b_h)\)</li>
-                <li><b>Nouvel état</b> : \(h_t = (1 - z_t) \odot h_{t-1} + z_t \odot \tilde{h}_t\)</li>
-            </ul>
-            <p>\(\odot\) est le produit élément par élément. Quand \(z_t \to 0\), l'état est simplement recopié : c'est
-                ce qui permet de conserver une information sur de longues séquences.</p>
-        </div>
-        <div class="footer">
-            <div class="contact">Intelligence artificielle et Deep Learning | John Samuel</div>
-            <div class="navigation">69
-                <a class="prev" href="#slide68"></a>
-                <a class="next" href="#slide70"></a>
-            </div>
-        </div>
-    </section>
-    <section class="slide" id="slide70">
         <div class="header">
             <h1>3.4. Réseaux de neurones convolutionnels</h1>
         </div>
@@ -2597,13 +2559,13 @@ Licensed under the BSD license, see LICENSE for details.
         </div>
         <div class="footer">
             <div class="contact">Intelligence artificielle et Deep Learning | John Samuel</div>
-            <div class="navigation">70
-                <a class="prev" href="#slide69"></a>
-                <a class="next" href="#slide71"></a>
+            <div class="navigation">66
+                <a class="prev" href="#slide65"></a>
+                <a class="next" href="#slide67"></a>
             </div>
         </div>
     </section>
-    <section class="slide" id="slide71">
+    <section class="slide" id="slide67">
         <div class="header">
             <h1>3.4. Réseaux de neurones convolutionnels</h1>
         </div>
@@ -2616,13 +2578,13 @@ Licensed under the BSD license, see LICENSE for details.
         </div>
         <div class="footer">
             <div class="contact">Intelligence artificielle et Deep Learning | John Samuel</div>
-            <div class="navigation">71
-                <a class="prev" href="#slide70"></a>
-                <a class="next" href="#slide72"></a>
+            <div class="navigation">67
+                <a class="prev" href="#slide66"></a>
+                <a class="next" href="#slide68"></a>
             </div>
         </div>
     </section>
-    <section class="slide" id="slide72">
+    <section class="slide" id="slide68">
         <div class="header">
             <h1>3.4. Réseaux de neurones convolutionnels</h1>
         </div>
@@ -2639,13 +2601,13 @@ Licensed under the BSD license, see LICENSE for details.
         </div>
         <div class="footer">
             <div class="contact">Intelligence artificielle et Deep Learning | John Samuel</div>
-            <div class="navigation">72
-                <a class="prev" href="#slide71"></a>
-                <a class="next" href="#slide73"></a>
+            <div class="navigation">68
+                <a class="prev" href="#slide67"></a>
+                <a class="next" href="#slide69"></a>
             </div>
         </div>
     </section>
-    <section class="slide" id="slide73">
+    <section class="slide" id="slide69">
         <div class="header">
             <h1>3.4. Réseaux de neurones convolutionnels</h1>
         </div>
@@ -2662,13 +2624,13 @@ Licensed under the BSD license, see LICENSE for details.
         </div>
         <div class="footer">
             <div class="contact">Intelligence artificielle et Deep Learning | John Samuel</div>
-            <div class="navigation">73
-                <a class="prev" href="#slide72"></a>
-                <a class="next" href="#slide74"></a>
+            <div class="navigation">69
+                <a class="prev" href="#slide68"></a>
+                <a class="next" href="#slide70"></a>
             </div>
         </div>
     </section>
-    <section class="slide" id="slide74">
+    <section class="slide" id="slide70">
         <div class="header">
             <h1>3.4. Réseaux de neurones convolutionnels</h1>
         </div>
@@ -2688,13 +2650,13 @@ Licensed under the BSD license, see LICENSE for details.
         </div>
         <div class="footer">
             <div class="contact">Intelligence artificielle et Deep Learning | John Samuel</div>
-            <div class="navigation">74
-                <a class="prev" href="#slide73"></a>
-                <a class="next" href="#slide75"></a>
+            <div class="navigation">70
+                <a class="prev" href="#slide69"></a>
+                <a class="next" href="#slide71"></a>
             </div>
         </div>
     </section>
-    <section class="slide" id="slide75">
+    <section class="slide" id="slide71">
         <div class="header">
             <h1>3.4. Réseaux de neurones convolutionnels</h1>
         </div>
@@ -2718,13 +2680,13 @@ Licensed under the BSD license, see LICENSE for details.
         </div>
         <div class="footer">
             <div class="contact">Intelligence artificielle et Deep Learning | John Samuel</div>
-            <div class="navigation">75
-                <a class="prev" href="#slide74"></a>
-                <a class="next" href="#slide76"></a>
+            <div class="navigation">71
+                <a class="prev" href="#slide70"></a>
+                <a class="next" href="#slide72"></a>
             </div>
         </div>
     </section>
-    <section class="slide" id="slide76">
+    <section class="slide" id="slide72">
         <div class="header">
             <h1>3.4. Réseaux de neurones convolutionnels</h1>
         </div>
@@ -2748,13 +2710,13 @@ Licensed under the BSD license, see LICENSE for details.
         </div>
         <div class="footer">
             <div class="contact">Intelligence artificielle et Deep Learning | John Samuel</div>
-            <div class="navigation">76
-                <a class="prev" href="#slide75"></a>
-                <a class="next" href="#slide77"></a>
+            <div class="navigation">72
+                <a class="prev" href="#slide71"></a>
+                <a class="next" href="#slide73"></a>
             </div>
         </div>
     </section>
-    <section class="slide" id="slide77">
+    <section class="slide" id="slide73">
         <div class="header">
             <h1>3.4. Réseaux de neurones convolutionnels</h1>
         </div>
@@ -2774,13 +2736,13 @@ Licensed under the BSD license, see LICENSE for details.
         </div>
         <div class="footer">
             <div class="contact">Intelligence artificielle et Deep Learning | John Samuel</div>
-            <div class="navigation">77
-                <a class="prev" href="#slide76"></a>
-                <a class="next" href="#slide78"></a>
+            <div class="navigation">73
+                <a class="prev" href="#slide72"></a>
+                <a class="next" href="#slide74"></a>
             </div>
         </div>
     </section>
-    <section class="slide" id="slide78">
+    <section class="slide" id="slide74">
         <div class="header">
             <h1>3.4. Réseaux de neurones convolutionnels</h1>
         </div>
@@ -2796,13 +2758,13 @@ Licensed under the BSD license, see LICENSE for details.
         </div>
         <div class="footer">
             <div class="contact">Intelligence artificielle et Deep Learning | John Samuel</div>
-            <div class="navigation">78
-                <a class="prev" href="#slide77"></a>
-                <a class="next" href="#slide79"></a>
+            <div class="navigation">74
+                <a class="prev" href="#slide73"></a>
+                <a class="next" href="#slide75"></a>
             </div>
         </div>
     </section>
-    <section class="slide" id="slide79">
+    <section class="slide" id="slide75">
         <div class="header">
             <h1>3.4. Réseaux de neurones convolutionnels</h1>
         </div>
@@ -2822,13 +2784,13 @@ Licensed under the BSD license, see LICENSE for details.
         </div>
         <div class="footer">
             <div class="contact">Intelligence artificielle et Deep Learning | John Samuel</div>
-            <div class="navigation">79
-                <a class="prev" href="#slide78"></a>
-                <a class="next" href="#slide80"></a>
+            <div class="navigation">75
+                <a class="prev" href="#slide74"></a>
+                <a class="next" href="#slide76"></a>
             </div>
         </div>
     </section>
-    <section class="slide" id="slide80">
+    <section class="slide" id="slide76">
         <div class="header">
             <h1>3.4. Réseaux de neurones convolutionnels</h1>
         </div>
@@ -2847,13 +2809,13 @@ Licensed under the BSD license, see LICENSE for details.
         </div>
         <div class="footer">
             <div class="contact">Intelligence artificielle et Deep Learning | John Samuel</div>
-            <div class="navigation">80
-                <a class="prev" href="#slide79"></a>
-                <a class="next" href="#slide81"></a>
+            <div class="navigation">76
+                <a class="prev" href="#slide75"></a>
+                <a class="next" href="#slide77"></a>
             </div>
         </div>
     </section>
-    <section class="slide" id="slide81">
+    <section class="slide" id="slide77">
         <div class="header">
             <h1>3.4. Réseaux de neurones convolutionnels</h1>
         </div>
@@ -2870,13 +2832,13 @@ Licensed under the BSD license, see LICENSE for details.
         </div>
         <div class="footer">
             <div class="contact">Intelligence artificielle et Deep Learning | John Samuel</div>
-            <div class="navigation">81
-                <a class="prev" href="#slide80"></a>
-                <a class="next" href="#slide82"></a>
+            <div class="navigation">77
+                <a class="prev" href="#slide76"></a>
+                <a class="next" href="#slide78"></a>
             </div>
         </div>
     </section>
-    <section class="slide" id="slide82">
+    <section class="slide" id="slide78">
         <div class="header">
             <h1>3.4. Réseaux de neurones convolutionnels</h1>
         </div>
@@ -2889,13 +2851,13 @@ Licensed under the BSD license, see LICENSE for details.
         </div>
         <div class="footer">
             <div class="contact">Intelligence artificielle et Deep Learning | John Samuel</div>
-            <div class="navigation">82
-                <a class="prev" href="#slide81"></a>
-                <a class="next" href="#slide83"></a>
+            <div class="navigation">78
+                <a class="prev" href="#slide77"></a>
+                <a class="next" href="#slide79"></a>
             </div>
         </div>
     </section>
-    <section class="slide" id="slide83">
+    <section class="slide" id="slide79">
         <div class="header">
             <h1>3.4. Réseaux de neurones convolutionnels</h1>
         </div>
@@ -2923,13 +2885,13 @@ model.add(layers.<span style="color:red">Conv2D</span>(64, (3, 3), activation='r
         </div>
         <div class="footer">
             <div class="contact">Intelligence artificielle et Deep Learning | John Samuel</div>
-            <div class="navigation">83
-                <a class="prev" href="#slide82"></a>
-                <a class="next" href="#slide84"></a>
+            <div class="navigation">79
+                <a class="prev" href="#slide78"></a>
+                <a class="next" href="#slide80"></a>
             </div>
         </div>
     </section>
-    <section class="slide" id="slide84">
+    <section class="slide" id="slide80">
         <div class="header">
             <h1>3.4. Réseaux de neurones convolutionnels</h1>
         </div>
@@ -2953,13 +2915,13 @@ history = model.fit(train_images, train_labels, epochs=10,
         </div>
         <div class="footer">
             <div class="contact">Intelligence artificielle et Deep Learning | John Samuel</div>
-            <div class="navigation">84
-                <a class="prev" href="#slide83"></a>
-                <a class="next" href="#slide85"></a>
+            <div class="navigation">80
+                <a class="prev" href="#slide79"></a>
+                <a class="next" href="#slide81"></a>
             </div>
         </div>
     </section>
-    <section class="slide" id="slide85">
+    <section class="slide" id="slide81">
         <div class="header">
             <h1>3.4. Réseaux de neurones convolutionnels</h1>
         </div>
@@ -2972,13 +2934,13 @@ history = model.fit(train_images, train_labels, epochs=10,
         </div>
         <div class="footer">
             <div class="contact">Intelligence artificielle et Deep Learning | John Samuel</div>
-            <div class="navigation">85
-                <a class="prev" href="#slide84"></a>
-                <a class="next" href="#slide86"></a>
+            <div class="navigation">81
+                <a class="prev" href="#slide80"></a>
+                <a class="next" href="#slide82"></a>
             </div>
         </div>
     </section>
-    <section class="slide" id="slide86">
+    <section class="slide" id="slide82">
         <div class="header">
             <h1>Références</h1>
         </div>
@@ -2989,6 +2951,8 @@ history = model.fit(train_images, train_labels, epochs=10,
                 <li>[Cho 2014] Cho, Kyunghyun, et al. « Learning Phrase Representations using RNN Encoder–Decoder for
                     Statistical Machine Translation ». Proceedings of EMNLP 2014, p. 1724‑34.
                     https://doi.org/10.3115/v1/D14-1179.</li>
+                <li>[Hochreiter 1997] Hochreiter, Sepp, et Jürgen Schmidhuber. « Long Short-Term Memory ». Neural
+                    Computation, vol. 9, no 8, 1997, p. 1735‑80.</li>
                 <li>[Ho 2020] Ho, Jonathan, Ajay Jain et Pieter Abbeel. « Denoising Diffusion Probabilistic Models ».
                     Advances in Neural Information Processing Systems 33, 2020.</li>
                 <li>[Jaakkola 2019] Jaakkola, H., et al. “Artificial Intelligence Yesterday, Today and Tomorrow.” 2019
@@ -3000,13 +2964,13 @@ history = model.fit(train_images, train_labels, epochs=10,
         </div>
         <div class="footer">
             <div class="contact">Intelligence artificielle et Deep Learning | John Samuel</div>
-            <div class="navigation">86
-                <a class="prev" href="#slide85"></a>
-                <a class="next" href="#slide87"></a>
+            <div class="navigation">82
+                <a class="prev" href="#slide81"></a>
+                <a class="next" href="#slide83"></a>
             </div>
         </div>
     </section>
-    <section class="slide" id="slide87">
+    <section class="slide" id="slide83">
         <div class="header">
             <h1>Références</h1>
         </div>
@@ -3025,13 +2989,13 @@ history = model.fit(train_images, train_labels, epochs=10,
         </div>
         <div class="footer">
             <div class="contact">Intelligence artificielle et Deep Learning | John Samuel</div>
-            <div class="navigation">87
-                <a class="prev" href="#slide86"></a>
-                <a class="next" href="#slide88"></a>
+            <div class="navigation">83
+                <a class="prev" href="#slide82"></a>
+                <a class="next" href="#slide84"></a>
             </div>
         </div>
     </section>
-    <section class="slide" id="slide88">
+    <section class="slide" id="slide84">
         <div class="header">
             <h1>Références:</h1>
         </div>
@@ -3065,13 +3029,13 @@ history = model.fit(train_images, train_labels, epochs=10,
         </div>
         <div class="footer">
             <div class="contact">Intelligence artificielle et Deep Learning | John Samuel</div>
-            <div class="navigation">88
-                <a class="prev" href="#slide87"></a>
-                <a class="next" href="#slide89"></a>
+            <div class="navigation">84
+                <a class="prev" href="#slide83"></a>
+                <a class="next" href="#slide85"></a>
             </div>
         </div>
     </section>
-    <section class="slide" id="slide89">
+    <section class="slide" id="slide85">
         <div class="header">
             <h1>Références:</h1>
         </div>
@@ -3086,13 +3050,13 @@ history = model.fit(train_images, train_labels, epochs=10,
         </div>
         <div class="footer">
             <div class="contact">Intelligence artificielle et Deep Learning | John Samuel</div>
-            <div class="navigation">89
-                <a class="prev" href="#slide88"></a>
-                <a class="next" href="#slide90"></a>
+            <div class="navigation">85
+                <a class="prev" href="#slide84"></a>
+                <a class="next" href="#slide86"></a>
             </div>
         </div>
     </section>
-    <section class="slide" id="slide90">
+    <section class="slide" id="slide86">
         <div class="header">
             <h1>Références:</h1>
         </div>
@@ -3108,8 +3072,8 @@ history = model.fit(train_images, train_labels, epochs=10,
         </div>
         <div class="footer">
             <div class="contact">Intelligence artificielle et Deep Learning | John Samuel</div>
-            <div class="navigation">90
-                <a class="prev" href="#slide89"></a>
+            <div class="navigation">86
+                <a class="prev" href="#slide85"></a>
             </div>
         </div>
     </section>
@@ -3123,7 +3087,7 @@ history = model.fit(train_images, train_labels, epochs=10,
                 if (!Number.isNaN(slideIdString)) {
                     slideId = parseInt(slideIdString);
                     if (isIncrement) {
-                        if (slideId < 90) {
+                        if (slideId < 86) {
                             slideId = slideId + 1;
                         }
                     } else {
@@ -3159,6 +3123,9 @@ history = model.fit(train_images, train_labels, epochs=10,
             } else if (event.keyCode == '40') {
                 // down
                 changeCurrentURLSlideNumber(true);
+            } else if (event.keyCode == '78') {
+                // n : afficher / masquer les notes
+                document.body.classList.toggle('notes');
             }
         }
         document.body.onmouseup = function (event) {

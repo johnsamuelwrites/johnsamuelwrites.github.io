@@ -677,6 +677,38 @@ Licensed under the BSD license, see LICENSE for details.
                 font-size: 2.5vmin;
             }
         }
+    
+        /* ---- v2 layout (prototype): term/definition rows, cards, takeaway, notes ---- */
+        .slide.v2 .content { line-height: 1.45em; }
+        .slide.v2 .content p { margin: 0.2em 0 0.7em 0; width: 92%; }
+        .slide.v2 .content ul { list-style: none; margin: 0; padding: 0; width: 92%; }
+        .slide.v2 .content li { line-height: 1.45em; margin-bottom: 0.75em; }
+        .slide.v2 .content li:has(> b:first-child) { display: flex; gap: 1.2em; align-items: baseline; }
+        .slide.v2 .content li > b:first-child { flex: 0 0 26%; color: #1B80CF; }
+        .slide.v2 .content .label { display: inline-block; width: auto; font-weight: bold; color: #78002E;
+            text-transform: uppercase; letter-spacing: 0.06em; font-size: 78%;
+            border-bottom: 0.25vmax solid #78002E; margin: 0.2em 0 1em 0; }
+        .slide.v2 .content .takeaway { margin-top: auto; width: 92%; background-color: #E1F5FE;
+            border-left: 0.6vmax solid #1B80CF; padding: 0.45em 1em; border-radius: 0 1vmax 1vmax 0; }
+        .slide.v2 .content .takeaway::before { content: "À retenir — "; font-weight: bold; color: #1B80CF; }
+        .slide.v2 .content .cards { display: grid; grid-template-columns: 1fr 1fr; gap: 1vmax; width: 92%; }
+        .slide.v2 .content .card { background-color: #E1F5FE; border-radius: 1vmax; overflow: hidden; }
+        .slide.v2 .content .card h4 { margin: 0; padding: 0.3em 0.8em; background-color: #1B80CF; color: #FFFFFF;
+            font-size: 100%; width: auto; }
+        .slide.v2 .content .card p { margin: 0; padding: 0.5em 0.8em; width: auto; }
+        .slide.v2 .content .eq { width: 92%; margin: 0 0 0.45em 0; display: flex; gap: 1.2em; align-items: baseline;
+            background-color: #F4F8FB; border-radius: 0.8vmax; padding: 0.3em 1em; }
+        .slide.v2 .content .eq b { flex: 0 0 26%; color: #1B80CF; }
+        .slide.v2 .content .eq i { color: #555555; font-size: 85%; margin-left: auto; }
+        .slide.v2 .content .row { display: flex; gap: 2vmax; width: 92%; align-items: flex-start; }
+        .slide.v2 .content .row > * { width: auto; flex: 1 1 0; }
+        .slide.v2 .content .row figure { margin: 0; }
+        .slide.v2 .content .row li > b:first-child { flex-basis: 36%; }
+        .slide.v2 .content .takeaway { margin-bottom: 0.8vmax; }
+        .slide.v2 .content figure svg { width: 100%; height: auto; display: block; }
+        .slide.v2 .content .notes { display: none; }
+        body.notes .slide.v2 .content .notes { display: block; color: #555555; font-size: 85%; font-style: italic;
+            margin-top: 0.15em; }
     </style>
     <script src="../../2021/MachineLearning/tex-mml-chtml.js" id="MathJax-script"></script>
 </head>
@@ -3332,7 +3364,159 @@ Entité: 2,206,488, Début: 72, Fin: 81, Catégorie: CARDINAL
             </div>
         </div>
     </section>
-    <section class="slide" id="slide93">
+
+    <section class="slide v2" id="slide93">
+        <div class="header">
+            <h1>4.7. Modèles de langage Transformer</h1>
+        </div>
+        <div class="content">
+
+            <h3 class="topicsubheading">Trois familles, un même bloc d'attention</h3>
+            <figure style="width:92%;max-width:92%;margin:0">
+<svg style="max-height:56vh;width:auto;max-width:100%;margin:0 auto" viewBox="0 0 1240 470" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Trois familles de Transformers">
+<defs><marker id="ah" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#00549d"/></marker></defs>
+<rect x="10" y="10" width="390" height="450" rx="16" fill="#FFFFFF" stroke="#1B80CF" stroke-width="2"/>
+<rect x="10" y="10" width="390" height="52" rx="16" fill="#1B80CF"/>
+<rect x="10" y="40" width="390" height="22" fill="#1B80CF"/>
+<text x="205" y="44" font-size="24" font-weight="bold" fill="#FFFFFF" text-anchor="middle" font-family="Arial, sans-serif">Encodeur seul</text>
+<text x="205" y="90" font-size="19" font-weight="normal" fill="#78002E" text-anchor="middle" font-family="Arial, sans-serif" font-style="italic">BERT</text>
+<rect x="150.0" y="110" width="110" height="34" rx="8" fill="#1B80CF" stroke="#1B80CF" stroke-width="2"/>
+<text x="205.0" y="133.0" text-anchor="middle" font-size="19" fill="#FFFFFF" font-family="Arial, sans-serif">ciel</text>
+<rect x="45" y="165" width="320" height="150" rx="12" fill="#E1F5FE" stroke="#1B80CF" stroke-width="2"/>
+<rect x="153.0" y="178" width="23" height="23" rx="3" fill="#1B80CF"/>
+<rect x="179.0" y="178" width="23" height="23" rx="3" fill="#1B80CF"/>
+<rect x="205.0" y="178" width="23" height="23" rx="3" fill="#1B80CF"/>
+<rect x="231.0" y="178" width="23" height="23" rx="3" fill="#1B80CF"/>
+<rect x="153.0" y="204" width="23" height="23" rx="3" fill="#1B80CF"/>
+<rect x="179.0" y="204" width="23" height="23" rx="3" fill="#1B80CF"/>
+<rect x="205.0" y="204" width="23" height="23" rx="3" fill="#1B80CF"/>
+<rect x="231.0" y="204" width="23" height="23" rx="3" fill="#1B80CF"/>
+<rect x="153.0" y="230" width="23" height="23" rx="3" fill="#1B80CF"/>
+<rect x="179.0" y="230" width="23" height="23" rx="3" fill="#1B80CF"/>
+<rect x="205.0" y="230" width="23" height="23" rx="3" fill="#1B80CF"/>
+<rect x="231.0" y="230" width="23" height="23" rx="3" fill="#1B80CF"/>
+<rect x="153.0" y="256" width="23" height="23" rx="3" fill="#1B80CF"/>
+<rect x="179.0" y="256" width="23" height="23" rx="3" fill="#1B80CF"/>
+<rect x="205.0" y="256" width="23" height="23" rx="3" fill="#1B80CF"/>
+<rect x="231.0" y="256" width="23" height="23" rx="3" fill="#1B80CF"/>
+<text x="205" y="305" font-size="17" font-weight="normal" fill="#333" text-anchor="middle" font-family="Arial, sans-serif" font-style="italic">attention bidirectionnelle</text>
+<line x1="205" y1="165" x2="205" y2="150" stroke="#00549d" stroke-width="3" marker-end="url(#ah)"/>
+<line x1="205" y1="355" x2="205" y2="320" stroke="#00549d" stroke-width="3" marker-end="url(#ah)"/>
+<rect x="40.0" y="360" width="78" height="34" rx="8" fill="#E1F5FE" stroke="#1B80CF" stroke-width="2"/>
+<text x="79.0" y="383.0" text-anchor="middle" font-size="19" fill="#000" font-family="Arial, sans-serif">le</text>
+<rect x="124.0" y="360" width="78" height="34" rx="8" fill="#E1F5FE" stroke="#1B80CF" stroke-width="2"/>
+<text x="163.0" y="383.0" text-anchor="middle" font-size="19" fill="#000" font-family="Arial, sans-serif">[MASK]</text>
+<rect x="208.0" y="360" width="78" height="34" rx="8" fill="#E1F5FE" stroke="#1B80CF" stroke-width="2"/>
+<text x="247.0" y="383.0" text-anchor="middle" font-size="19" fill="#000" font-family="Arial, sans-serif">est</text>
+<rect x="292.0" y="360" width="78" height="34" rx="8" fill="#E1F5FE" stroke="#1B80CF" stroke-width="2"/>
+<text x="331.0" y="383.0" text-anchor="middle" font-size="19" fill="#000" font-family="Arial, sans-serif">bleu</text>
+<text x="205" y="440" font-size="19" font-weight="bold" fill="#00549d" text-anchor="middle" font-family="Arial, sans-serif">classification, NER, similarité</text>
+<rect x="425" y="10" width="390" height="450" rx="16" fill="#FFFFFF" stroke="#1B80CF" stroke-width="2"/>
+<rect x="425" y="10" width="390" height="52" rx="16" fill="#1B80CF"/>
+<rect x="425" y="40" width="390" height="22" fill="#1B80CF"/>
+<text x="620" y="44" font-size="24" font-weight="bold" fill="#FFFFFF" text-anchor="middle" font-family="Arial, sans-serif">Décodeur seul</text>
+<text x="620" y="90" font-size="19" font-weight="normal" fill="#78002E" text-anchor="middle" font-family="Arial, sans-serif" font-style="italic">GPT, Llama, Claude…</text>
+<rect x="565.0" y="110" width="110" height="34" rx="8" fill="#1B80CF" stroke="#1B80CF" stroke-width="2"/>
+<text x="620.0" y="133.0" text-anchor="middle" font-size="19" fill="#FFFFFF" font-family="Arial, sans-serif">bleu</text>
+<rect x="460" y="165" width="320" height="150" rx="12" fill="#E1F5FE" stroke="#1B80CF" stroke-width="2"/>
+<rect x="568.0" y="178" width="23" height="23" rx="3" fill="#1B80CF"/>
+<rect x="594.0" y="178" width="23" height="23" rx="3" fill="#E1F5FE"/>
+<rect x="620.0" y="178" width="23" height="23" rx="3" fill="#E1F5FE"/>
+<rect x="646.0" y="178" width="23" height="23" rx="3" fill="#E1F5FE"/>
+<rect x="568.0" y="204" width="23" height="23" rx="3" fill="#1B80CF"/>
+<rect x="594.0" y="204" width="23" height="23" rx="3" fill="#1B80CF"/>
+<rect x="620.0" y="204" width="23" height="23" rx="3" fill="#E1F5FE"/>
+<rect x="646.0" y="204" width="23" height="23" rx="3" fill="#E1F5FE"/>
+<rect x="568.0" y="230" width="23" height="23" rx="3" fill="#1B80CF"/>
+<rect x="594.0" y="230" width="23" height="23" rx="3" fill="#1B80CF"/>
+<rect x="620.0" y="230" width="23" height="23" rx="3" fill="#1B80CF"/>
+<rect x="646.0" y="230" width="23" height="23" rx="3" fill="#E1F5FE"/>
+<rect x="568.0" y="256" width="23" height="23" rx="3" fill="#1B80CF"/>
+<rect x="594.0" y="256" width="23" height="23" rx="3" fill="#1B80CF"/>
+<rect x="620.0" y="256" width="23" height="23" rx="3" fill="#1B80CF"/>
+<rect x="646.0" y="256" width="23" height="23" rx="3" fill="#1B80CF"/>
+<text x="620" y="305" font-size="17" font-weight="normal" fill="#333" text-anchor="middle" font-family="Arial, sans-serif" font-style="italic">attention masquée (causale)</text>
+<line x1="620" y1="165" x2="620" y2="150" stroke="#00549d" stroke-width="3" marker-end="url(#ah)"/>
+<line x1="620" y1="355" x2="620" y2="320" stroke="#00549d" stroke-width="3" marker-end="url(#ah)"/>
+<rect x="497.0" y="360" width="78" height="34" rx="8" fill="#E1F5FE" stroke="#1B80CF" stroke-width="2"/>
+<text x="536.0" y="383.0" text-anchor="middle" font-size="19" fill="#000" font-family="Arial, sans-serif">le</text>
+<rect x="581.0" y="360" width="78" height="34" rx="8" fill="#E1F5FE" stroke="#1B80CF" stroke-width="2"/>
+<text x="620.0" y="383.0" text-anchor="middle" font-size="19" fill="#000" font-family="Arial, sans-serif">ciel</text>
+<rect x="665.0" y="360" width="78" height="34" rx="8" fill="#E1F5FE" stroke="#1B80CF" stroke-width="2"/>
+<text x="704.0" y="383.0" text-anchor="middle" font-size="19" fill="#000" font-family="Arial, sans-serif">est</text>
+<text x="620" y="440" font-size="19" font-weight="bold" fill="#00549d" text-anchor="middle" font-family="Arial, sans-serif">génération, dialogue, code</text>
+<rect x="840" y="10" width="390" height="450" rx="16" fill="#FFFFFF" stroke="#1B80CF" stroke-width="2"/>
+<rect x="840" y="10" width="390" height="52" rx="16" fill="#1B80CF"/>
+<rect x="840" y="40" width="390" height="22" fill="#1B80CF"/>
+<text x="1035" y="44" font-size="24" font-weight="bold" fill="#FFFFFF" text-anchor="middle" font-family="Arial, sans-serif">Encodeur-décodeur</text>
+<text x="1035" y="90" font-size="19" font-weight="normal" fill="#78002E" text-anchor="middle" font-family="Arial, sans-serif" font-style="italic">T5, BART, traduction</text>
+<rect x="870.0" y="110" width="78" height="34" rx="8" fill="#1B80CF" stroke="#1B80CF" stroke-width="2"/>
+<text x="909.0" y="133.0" text-anchor="middle" font-size="19" fill="#FFFFFF" font-family="Arial, sans-serif">le</text>
+<rect x="954.0" y="110" width="78" height="34" rx="8" fill="#1B80CF" stroke="#1B80CF" stroke-width="2"/>
+<text x="993.0" y="133.0" text-anchor="middle" font-size="19" fill="#FFFFFF" font-family="Arial, sans-serif">ciel</text>
+<rect x="1038.0" y="110" width="78" height="34" rx="8" fill="#1B80CF" stroke="#1B80CF" stroke-width="2"/>
+<text x="1077.0" y="133.0" text-anchor="middle" font-size="19" fill="#FFFFFF" font-family="Arial, sans-serif">est</text>
+<rect x="1122.0" y="110" width="78" height="34" rx="8" fill="#1B80CF" stroke="#1B80CF" stroke-width="2"/>
+<text x="1161.0" y="133.0" text-anchor="middle" font-size="19" fill="#FFFFFF" font-family="Arial, sans-serif">bleu</text>
+<rect x="875" y="165" width="320" height="150" rx="12" fill="#E1F5FE" stroke="#1B80CF" stroke-width="2"/>
+<rect x="931.0" y="178" width="23" height="23" rx="3" fill="#1B80CF"/>
+<rect x="957.0" y="178" width="23" height="23" rx="3" fill="#1B80CF"/>
+<rect x="983.0" y="178" width="23" height="23" rx="3" fill="#1B80CF"/>
+<rect x="1009.0" y="178" width="23" height="23" rx="3" fill="#1B80CF"/>
+<rect x="1035.0" y="178" width="23" height="23" rx="3" fill="#1B80CF"/>
+<rect x="1061.0" y="178" width="23" height="23" rx="3" fill="#E1F5FE"/>
+<rect x="1087.0" y="178" width="23" height="23" rx="3" fill="#E1F5FE"/>
+<rect x="1113.0" y="178" width="23" height="23" rx="3" fill="#E1F5FE"/>
+<rect x="931.0" y="204" width="23" height="23" rx="3" fill="#1B80CF"/>
+<rect x="957.0" y="204" width="23" height="23" rx="3" fill="#1B80CF"/>
+<rect x="983.0" y="204" width="23" height="23" rx="3" fill="#1B80CF"/>
+<rect x="1009.0" y="204" width="23" height="23" rx="3" fill="#1B80CF"/>
+<rect x="1035.0" y="204" width="23" height="23" rx="3" fill="#1B80CF"/>
+<rect x="1061.0" y="204" width="23" height="23" rx="3" fill="#1B80CF"/>
+<rect x="1087.0" y="204" width="23" height="23" rx="3" fill="#E1F5FE"/>
+<rect x="1113.0" y="204" width="23" height="23" rx="3" fill="#E1F5FE"/>
+<rect x="931.0" y="230" width="23" height="23" rx="3" fill="#1B80CF"/>
+<rect x="957.0" y="230" width="23" height="23" rx="3" fill="#1B80CF"/>
+<rect x="983.0" y="230" width="23" height="23" rx="3" fill="#1B80CF"/>
+<rect x="1009.0" y="230" width="23" height="23" rx="3" fill="#1B80CF"/>
+<rect x="1035.0" y="230" width="23" height="23" rx="3" fill="#1B80CF"/>
+<rect x="1061.0" y="230" width="23" height="23" rx="3" fill="#1B80CF"/>
+<rect x="1087.0" y="230" width="23" height="23" rx="3" fill="#1B80CF"/>
+<rect x="1113.0" y="230" width="23" height="23" rx="3" fill="#E1F5FE"/>
+<rect x="931.0" y="256" width="23" height="23" rx="3" fill="#1B80CF"/>
+<rect x="957.0" y="256" width="23" height="23" rx="3" fill="#1B80CF"/>
+<rect x="983.0" y="256" width="23" height="23" rx="3" fill="#1B80CF"/>
+<rect x="1009.0" y="256" width="23" height="23" rx="3" fill="#1B80CF"/>
+<rect x="1035.0" y="256" width="23" height="23" rx="3" fill="#1B80CF"/>
+<rect x="1061.0" y="256" width="23" height="23" rx="3" fill="#1B80CF"/>
+<rect x="1087.0" y="256" width="23" height="23" rx="3" fill="#1B80CF"/>
+<rect x="1113.0" y="256" width="23" height="23" rx="3" fill="#1B80CF"/>
+<text x="1035" y="305" font-size="17" font-weight="normal" fill="#333" text-anchor="middle" font-family="Arial, sans-serif" font-style="italic">source : totale — cible : causale</text>
+<line x1="1035" y1="165" x2="1035" y2="150" stroke="#00549d" stroke-width="3" marker-end="url(#ah)"/>
+<line x1="1035" y1="355" x2="1035" y2="320" stroke="#00549d" stroke-width="3" marker-end="url(#ah)"/>
+<rect x="870.0" y="360" width="78" height="34" rx="8" fill="#E1F5FE" stroke="#1B80CF" stroke-width="2"/>
+<text x="909.0" y="383.0" text-anchor="middle" font-size="19" fill="#000" font-family="Arial, sans-serif">the</text>
+<rect x="954.0" y="360" width="78" height="34" rx="8" fill="#E1F5FE" stroke="#1B80CF" stroke-width="2"/>
+<text x="993.0" y="383.0" text-anchor="middle" font-size="19" fill="#000" font-family="Arial, sans-serif">sky</text>
+<rect x="1038.0" y="360" width="78" height="34" rx="8" fill="#E1F5FE" stroke="#1B80CF" stroke-width="2"/>
+<text x="1077.0" y="383.0" text-anchor="middle" font-size="19" fill="#000" font-family="Arial, sans-serif">is</text>
+<rect x="1122.0" y="360" width="78" height="34" rx="8" fill="#E1F5FE" stroke="#1B80CF" stroke-width="2"/>
+<text x="1161.0" y="383.0" text-anchor="middle" font-size="19" fill="#000" font-family="Arial, sans-serif">blue</text>
+<text x="1035" y="440" font-size="19" font-weight="bold" fill="#00549d" text-anchor="middle" font-family="Arial, sans-serif">traduction, résumé</text>
+</svg>
+            </figure>
+            <p class="takeaway">Même brique (attention multi-tête), trois <b>masques</b> : BERT voit toute la phrase,
+                GPT ne voit que le passé, l'encodeur-décodeur lit la source en entier et écrit la cible mot à mot.</p>
+        </div>
+        <div class="footer">
+            <div class="contact">Intelligence artificielle et Deep Learning | John Samuel</div>
+            <div class="navigation">93
+                <a class="prev" href="#slide92"></a>
+                <a class="next" href="#slide94"></a>
+            </div>
+        </div>
+    </section>
+    <section class="slide" id="slide94">
         <div class="header">
             <h1>4.7. Modèles de langage Transformer</h1>
         </div>
@@ -3356,13 +3540,13 @@ Entité: 2,206,488, Début: 72, Fin: 81, Catégorie: CARDINAL
         </div>
         <div class="footer">
             <div class="contact">Intelligence artificielle et Deep Learning | John Samuel</div>
-            <div class="navigation">93
-                <a class="prev" href="#slide92"></a>
-                <a class="next" href="#slide94"></a>
+            <div class="navigation">94
+                <a class="prev" href="#slide93"></a>
+                <a class="next" href="#slide95"></a>
             </div>
         </div>
     </section>
-    <section class="slide" id="slide94">
+    <section class="slide" id="slide95">
         <div class="header">
             <h1>4.7. Modèles de langage Transformer</h1>
         </div>
@@ -3384,13 +3568,13 @@ Entité: 2,206,488, Début: 72, Fin: 81, Catégorie: CARDINAL
         </div>
         <div class="footer">
             <div class="contact">Intelligence artificielle et Deep Learning | John Samuel</div>
-            <div class="navigation">94
-                <a class="prev" href="#slide93"></a>
-                <a class="next" href="#slide95"></a>
+            <div class="navigation">95
+                <a class="prev" href="#slide94"></a>
+                <a class="next" href="#slide96"></a>
             </div>
         </div>
     </section>
-    <section class="slide" id="slide95">
+    <section class="slide" id="slide96">
         <div class="header">
             <h1>4.7. Modèles de langage Transformer</h1>
         </div>
@@ -3408,13 +3592,13 @@ Entité: 2,206,488, Début: 72, Fin: 81, Catégorie: CARDINAL
         </div>
         <div class="footer">
             <div class="contact">Intelligence artificielle et Deep Learning | John Samuel</div>
-            <div class="navigation">95
-                <a class="prev" href="#slide94"></a>
-                <a class="next" href="#slide96"></a>
+            <div class="navigation">96
+                <a class="prev" href="#slide95"></a>
+                <a class="next" href="#slide97"></a>
             </div>
         </div>
     </section>
-    <section class="slide" id="slide96">
+    <section class="slide" id="slide97">
         <div class="header">
             <h1>4.7. Modèles de langage Transformer</h1>
         </div>
@@ -3435,13 +3619,13 @@ Entité: 2,206,488, Début: 72, Fin: 81, Catégorie: CARDINAL
         </div>
         <div class="footer">
             <div class="contact">Intelligence artificielle et Deep Learning | John Samuel</div>
-            <div class="navigation">96
-                <a class="prev" href="#slide95"></a>
-                <a class="next" href="#slide97"></a>
+            <div class="navigation">97
+                <a class="prev" href="#slide96"></a>
+                <a class="next" href="#slide98"></a>
             </div>
         </div>
     </section>
-    <section class="slide" id="slide97">
+    <section class="slide" id="slide98">
         <div class="header">
             <h1>4.7. Modèles de langage Transformer</h1>
         </div>
@@ -3465,13 +3649,13 @@ Entité: 2,206,488, Début: 72, Fin: 81, Catégorie: CARDINAL
         </div>
         <div class="footer">
             <div class="contact">Intelligence artificielle et Deep Learning | John Samuel</div>
-            <div class="navigation">97
-                <a class="prev" href="#slide96"></a>
-                <a class="next" href="#slide98"></a>
+            <div class="navigation">98
+                <a class="prev" href="#slide97"></a>
+                <a class="next" href="#slide99"></a>
             </div>
         </div>
     </section>
-    <section class="slide" id="slide98">
+    <section class="slide" id="slide99">
         <div class="header">
             <h1>4.7. Modèles de langage Transformer</h1>
         </div>
@@ -3492,13 +3676,13 @@ Entité: 2,206,488, Début: 72, Fin: 81, Catégorie: CARDINAL
         </div>
         <div class="footer">
             <div class="contact">Intelligence artificielle et Deep Learning | John Samuel</div>
-            <div class="navigation">98
-                <a class="prev" href="#slide97"></a>
-                <a class="next" href="#slide99"></a>
+            <div class="navigation">99
+                <a class="prev" href="#slide98"></a>
+                <a class="next" href="#slide100"></a>
             </div>
         </div>
     </section>
-    <section class="slide" id="slide99">
+    <section class="slide" id="slide100">
         <div class="header">
             <h1>4.7. Modèles de langage Transformer</h1>
         </div>
@@ -3519,13 +3703,13 @@ Entité: 2,206,488, Début: 72, Fin: 81, Catégorie: CARDINAL
         </div>
         <div class="footer">
             <div class="contact">Intelligence artificielle et Deep Learning | John Samuel</div>
-            <div class="navigation">99
-                <a class="prev" href="#slide98"></a>
-                <a class="next" href="#slide100"></a>
+            <div class="navigation">100
+                <a class="prev" href="#slide99"></a>
+                <a class="next" href="#slide101"></a>
             </div>
         </div>
     </section>
-    <section class="slide" id="slide100">
+    <section class="slide" id="slide101">
         <div class="header">
             <h1>4.7. Modèles de langage Transformer</h1>
         </div>
@@ -3547,13 +3731,13 @@ Entité: 2,206,488, Début: 72, Fin: 81, Catégorie: CARDINAL
         </div>
         <div class="footer">
             <div class="contact">Intelligence artificielle et Deep Learning | John Samuel</div>
-            <div class="navigation">100
-                <a class="prev" href="#slide99"></a>
-                <a class="next" href="#slide101"></a>
+            <div class="navigation">101
+                <a class="prev" href="#slide100"></a>
+                <a class="next" href="#slide102"></a>
             </div>
         </div>
     </section>
-    <section class="slide" id="slide101">
+    <section class="slide" id="slide102">
         <div class="header">
             <h1>4.7. Modèles de langage Transformer</h1>
         </div>
@@ -3576,13 +3760,13 @@ Entité: 2,206,488, Début: 72, Fin: 81, Catégorie: CARDINAL
         </div>
         <div class="footer">
             <div class="contact">Intelligence artificielle et Deep Learning | John Samuel</div>
-            <div class="navigation">101
-                <a class="prev" href="#slide100"></a>
-                <a class="next" href="#slide102"></a>
+            <div class="navigation">102
+                <a class="prev" href="#slide101"></a>
+                <a class="next" href="#slide103"></a>
             </div>
         </div>
     </section>
-    <section class="slide" id="slide102">
+    <section class="slide" id="slide103">
         <div class="header">
             <h1>4.7. Modèles de langage Transformer</h1>
         </div>
@@ -3603,13 +3787,13 @@ Entité: 2,206,488, Début: 72, Fin: 81, Catégorie: CARDINAL
         </div>
         <div class="footer">
             <div class="contact">Intelligence artificielle et Deep Learning | John Samuel</div>
-            <div class="navigation">102
-                <a class="prev" href="#slide101"></a>
-                <a class="next" href="#slide103"></a>
+            <div class="navigation">103
+                <a class="prev" href="#slide102"></a>
+                <a class="next" href="#slide104"></a>
             </div>
         </div>
     </section>
-    <section class="slide" id="slide103">
+    <section class="slide" id="slide104">
         <div class="header">
             <h1>4.7. Modèles de langage Transformer</h1>
         </div>
@@ -3633,13 +3817,13 @@ Entité: 2,206,488, Début: 72, Fin: 81, Catégorie: CARDINAL
         </div>
         <div class="footer">
             <div class="contact">Intelligence artificielle et Deep Learning | John Samuel</div>
-            <div class="navigation">103
-                <a class="prev" href="#slide102"></a>
-                <a class="next" href="#slide104"></a>
+            <div class="navigation">104
+                <a class="prev" href="#slide103"></a>
+                <a class="next" href="#slide105"></a>
             </div>
         </div>
     </section>
-    <section class="slide" id="slide104">
+    <section class="slide" id="slide105">
         <div class="header">
             <h1>4.7. Modèles de langage Transformer</h1>
         </div>
@@ -3672,13 +3856,13 @@ Entité: 2,206,488, Début: 72, Fin: 81, Catégorie: CARDINAL
         </div>
         <div class="footer">
             <div class="contact">Intelligence artificielle et Deep Learning | John Samuel</div>
-            <div class="navigation">104
-                <a class="prev" href="#slide103"></a>
-                <a class="next" href="#slide105"></a>
+            <div class="navigation">105
+                <a class="prev" href="#slide104"></a>
+                <a class="next" href="#slide106"></a>
             </div>
         </div>
     </section>
-    <section class="slide" id="slide105">
+    <section class="slide" id="slide106">
         <div class="header">
             <h1>4.7. Modèles de langage Transformer</h1>
         </div>
@@ -3713,13 +3897,13 @@ Entité: 2,206,488, Début: 72, Fin: 81, Catégorie: CARDINAL
         </div>
         <div class="footer">
             <div class="contact">Intelligence artificielle et Deep Learning | John Samuel</div>
-            <div class="navigation">105
-                <a class="prev" href="#slide104"></a>
-                <a class="next" href="#slide106"></a>
+            <div class="navigation">106
+                <a class="prev" href="#slide105"></a>
+                <a class="next" href="#slide107"></a>
             </div>
         </div>
     </section>
-    <section class="slide" id="slide106">
+    <section class="slide" id="slide107">
         <div class="header">
             <h1>4.8. Systèmes de recommandation (Recommender Systems)</h1>
         </div>
@@ -3733,13 +3917,13 @@ Entité: 2,206,488, Début: 72, Fin: 81, Catégorie: CARDINAL
         </div>
         <div class="footer">
             <div class="contact">Intelligence artificielle et Deep Learning | John Samuel</div>
-            <div class="navigation">106
-                <a class="prev" href="#slide105"></a>
-                <a class="next" href="#slide107"></a>
+            <div class="navigation">107
+                <a class="prev" href="#slide106"></a>
+                <a class="next" href="#slide108"></a>
             </div>
         </div>
     </section>
-    <section class="slide" id="slide107">
+    <section class="slide" id="slide108">
         <div class="header">
             <h1>4.8. Systèmes de recommandation (Recommender Systems)</h1>
         </div>
@@ -3757,13 +3941,13 @@ Entité: 2,206,488, Début: 72, Fin: 81, Catégorie: CARDINAL
         </div>
         <div class="footer">
             <div class="contact">Intelligence artificielle et Deep Learning | John Samuel</div>
-            <div class="navigation">107
-                <a class="prev" href="#slide106"></a>
-                <a class="next" href="#slide108"></a>
+            <div class="navigation">108
+                <a class="prev" href="#slide107"></a>
+                <a class="next" href="#slide109"></a>
             </div>
         </div>
     </section>
-    <section class="slide" id="slide108">
+    <section class="slide" id="slide109">
         <div class="header">
             <h1>4.8. Systèmes de recommandation (Recommender Systems)</h1>
         </div>
@@ -3788,13 +3972,13 @@ Entité: 2,206,488, Début: 72, Fin: 81, Catégorie: CARDINAL
         </div>
         <div class="footer">
             <div class="contact">Intelligence artificielle et Deep Learning | John Samuel</div>
-            <div class="navigation">108
-                <a class="prev" href="#slide107"></a>
-                <a class="next" href="#slide109"></a>
+            <div class="navigation">109
+                <a class="prev" href="#slide108"></a>
+                <a class="next" href="#slide110"></a>
             </div>
         </div>
     </section>
-    <section class="slide" id="slide109">
+    <section class="slide" id="slide110">
         <div class="header">
             <h1>4.8. Systèmes de recommandation (Recommender Systems)</h1>
         </div>
@@ -3814,13 +3998,13 @@ Entité: 2,206,488, Début: 72, Fin: 81, Catégorie: CARDINAL
         </div>
         <div class="footer">
             <div class="contact">Intelligence artificielle et Deep Learning | John Samuel</div>
-            <div class="navigation">109
-                <a class="prev" href="#slide108"></a>
-                <a class="next" href="#slide110"></a>
+            <div class="navigation">110
+                <a class="prev" href="#slide109"></a>
+                <a class="next" href="#slide111"></a>
             </div>
         </div>
     </section>
-    <section class="slide" id="slide110">
+    <section class="slide" id="slide111">
         <div class="header">
             <h1>4.8. Systèmes de recommandation (Recommender Systems)</h1>
         </div>
@@ -3833,13 +4017,13 @@ Entité: 2,206,488, Début: 72, Fin: 81, Catégorie: CARDINAL
         </div>
         <div class="footer">
             <div class="contact">Intelligence artificielle et Deep Learning | John Samuel</div>
-            <div class="navigation">110
-                <a class="prev" href="#slide109"></a>
-                <a class="next" href="#slide111"></a>
+            <div class="navigation">111
+                <a class="prev" href="#slide110"></a>
+                <a class="next" href="#slide112"></a>
             </div>
         </div>
     </section>
-    <section class="slide" id="slide111">
+    <section class="slide" id="slide112">
         <div class="header">
             <h1>4.8. Systèmes de recommandation (Recommender Systems)</h1>
         </div>
@@ -3857,13 +4041,13 @@ Entité: 2,206,488, Début: 72, Fin: 81, Catégorie: CARDINAL
         </div>
         <div class="footer">
             <div class="contact">Intelligence artificielle et Deep Learning | John Samuel</div>
-            <div class="navigation">111
-                <a class="prev" href="#slide110"></a>
-                <a class="next" href="#slide112"></a>
+            <div class="navigation">112
+                <a class="prev" href="#slide111"></a>
+                <a class="next" href="#slide113"></a>
             </div>
         </div>
     </section>
-    <section class="slide" id="slide112">
+    <section class="slide" id="slide113">
         <div class="header">
             <h1>4.8. Systèmes de recommandation (Recommender Systems)</h1>
         </div>
@@ -3882,13 +4066,13 @@ Entité: 2,206,488, Début: 72, Fin: 81, Catégorie: CARDINAL
         </div>
         <div class="footer">
             <div class="contact">Intelligence artificielle et Deep Learning | John Samuel</div>
-            <div class="navigation">112
-                <a class="prev" href="#slide111"></a>
-                <a class="next" href="#slide113"></a>
+            <div class="navigation">113
+                <a class="prev" href="#slide112"></a>
+                <a class="next" href="#slide114"></a>
             </div>
         </div>
     </section>
-    <section class="slide" id="slide113">
+    <section class="slide" id="slide114">
         <div class="header">
             <h1>4.8. Systèmes de recommandation (Recommender Systems)</h1>
         </div>
@@ -3907,13 +4091,13 @@ Entité: 2,206,488, Début: 72, Fin: 81, Catégorie: CARDINAL
         </div>
         <div class="footer">
             <div class="contact">Intelligence artificielle et Deep Learning | John Samuel</div>
-            <div class="navigation">113
-                <a class="prev" href="#slide112"></a>
-                <a class="next" href="#slide114"></a>
+            <div class="navigation">114
+                <a class="prev" href="#slide113"></a>
+                <a class="next" href="#slide115"></a>
             </div>
         </div>
     </section>
-    <section class="slide" id="slide114">
+    <section class="slide" id="slide115">
         <div class="header">
             <h1>4.8. Systèmes de recommandation (Recommender Systems)</h1>
         </div>
@@ -3929,13 +4113,13 @@ Entité: 2,206,488, Début: 72, Fin: 81, Catégorie: CARDINAL
         </div>
         <div class="footer">
             <div class="contact">Intelligence artificielle et Deep Learning | John Samuel</div>
-            <div class="navigation">114
-                <a class="prev" href="#slide113"></a>
-                <a class="next" href="#slide115"></a>
+            <div class="navigation">115
+                <a class="prev" href="#slide114"></a>
+                <a class="next" href="#slide116"></a>
             </div>
         </div>
     </section>
-    <section class="slide" id="slide115">
+    <section class="slide" id="slide116">
         <div class="header">
             <h1>4.8. Systèmes de recommandation (Recommender Systems)</h1>
         </div>
@@ -3955,13 +4139,13 @@ Entité: 2,206,488, Début: 72, Fin: 81, Catégorie: CARDINAL
         </div>
         <div class="footer">
             <div class="contact">Intelligence artificielle et Deep Learning | John Samuel</div>
-            <div class="navigation">115
-                <a class="prev" href="#slide114"></a>
-                <a class="next" href="#slide116"></a>
+            <div class="navigation">116
+                <a class="prev" href="#slide115"></a>
+                <a class="next" href="#slide117"></a>
             </div>
         </div>
     </section>
-    <section class="slide" id="slide116">
+    <section class="slide" id="slide117">
         <div class="header">
             <h1>4.8. Systèmes de recommandation (Recommender Systems)</h1>
         </div>
@@ -3976,13 +4160,13 @@ Entité: 2,206,488, Début: 72, Fin: 81, Catégorie: CARDINAL
         </div>
         <div class="footer">
             <div class="contact">Intelligence artificielle et Deep Learning | John Samuel</div>
-            <div class="navigation">116
-                <a class="prev" href="#slide115"></a>
-                <a class="next" href="#slide117"></a>
+            <div class="navigation">117
+                <a class="prev" href="#slide116"></a>
+                <a class="next" href="#slide118"></a>
             </div>
         </div>
     </section>
-    <section class="slide" id="slide117">
+    <section class="slide" id="slide118">
         <div class="header">
             <h1>4.8. Systèmes de recommandation (Recommender Systems)</h1>
         </div>
@@ -4001,13 +4185,13 @@ Entité: 2,206,488, Début: 72, Fin: 81, Catégorie: CARDINAL
         </div>
         <div class="footer">
             <div class="contact">Intelligence artificielle et Deep Learning | John Samuel</div>
-            <div class="navigation">117
-                <a class="prev" href="#slide116"></a>
-                <a class="next" href="#slide118"></a>
+            <div class="navigation">118
+                <a class="prev" href="#slide117"></a>
+                <a class="next" href="#slide119"></a>
             </div>
         </div>
     </section>
-    <section class="slide" id="slide118">
+    <section class="slide" id="slide119">
         <div class="header">
             <h1>4.8. Systèmes de recommandation (Recommender Systems)</h1>
         </div>
@@ -4025,13 +4209,13 @@ Entité: 2,206,488, Début: 72, Fin: 81, Catégorie: CARDINAL
         </div>
         <div class="footer">
             <div class="contact">Intelligence artificielle et Deep Learning | John Samuel</div>
-            <div class="navigation">118
-                <a class="prev" href="#slide117"></a>
-                <a class="next" href="#slide119"></a>
+            <div class="navigation">119
+                <a class="prev" href="#slide118"></a>
+                <a class="next" href="#slide120"></a>
             </div>
         </div>
     </section>
-    <section class="slide" id="slide119">
+    <section class="slide" id="slide120">
         <div class="header">
             <h1>4.8. Systèmes de recommandation (Recommender Systems)</h1>
         </div>
@@ -4049,13 +4233,13 @@ Entité: 2,206,488, Début: 72, Fin: 81, Catégorie: CARDINAL
         </div>
         <div class="footer">
             <div class="contact">Intelligence artificielle et Deep Learning | John Samuel</div>
-            <div class="navigation">119
-                <a class="prev" href="#slide118"></a>
-                <a class="next" href="#slide120"></a>
+            <div class="navigation">120
+                <a class="prev" href="#slide119"></a>
+                <a class="next" href="#slide121"></a>
             </div>
         </div>
     </section>
-    <section class="slide" id="slide120">
+    <section class="slide" id="slide121">
         <div class="header">
             <h1>4.8. Systèmes de recommandation (Recommender Systems)</h1>
         </div>
@@ -4087,13 +4271,13 @@ Entité: 2,206,488, Début: 72, Fin: 81, Catégorie: CARDINAL
         </div>
         <div class="footer">
             <div class="contact">Intelligence artificielle et Deep Learning | John Samuel</div>
-            <div class="navigation">120
-                <a class="prev" href="#slide119"></a>
-                <a class="next" href="#slide121"></a>
+            <div class="navigation">121
+                <a class="prev" href="#slide120"></a>
+                <a class="next" href="#slide122"></a>
             </div>
         </div>
     </section>
-    <section class="slide" id="slide121">
+    <section class="slide" id="slide122">
         <div class="header">
             <h1>4.8. Systèmes de recommandation (Recommender Systems)</h1>
         </div>
@@ -4125,13 +4309,13 @@ Entité: 2,206,488, Début: 72, Fin: 81, Catégorie: CARDINAL
         </div>
         <div class="footer">
             <div class="contact">Intelligence artificielle et Deep Learning | John Samuel</div>
-            <div class="navigation">121
-                <a class="prev" href="#slide120"></a>
-                <a class="next" href="#slide122"></a>
+            <div class="navigation">122
+                <a class="prev" href="#slide121"></a>
+                <a class="next" href="#slide123"></a>
             </div>
         </div>
     </section>
-    <section class="slide" id="slide122">
+    <section class="slide" id="slide123">
         <div class="header">
             <h1>4.8. Systèmes de recommandation (Recommender Systems)</h1>
         </div>
@@ -4148,13 +4332,13 @@ Entité: 2,206,488, Début: 72, Fin: 81, Catégorie: CARDINAL
         </div>
         <div class="footer">
             <div class="contact">Intelligence artificielle et Deep Learning | John Samuel</div>
-            <div class="navigation">122
-                <a class="prev" href="#slide121"></a>
-                <a class="next" href="#slide123"></a>
+            <div class="navigation">123
+                <a class="prev" href="#slide122"></a>
+                <a class="next" href="#slide124"></a>
             </div>
         </div>
     </section>
-    <section class="slide" id="slide123">
+    <section class="slide" id="slide124">
         <div class="header">
             <h1>4.8. Systèmes de recommandation (Recommender Systems)</h1>
         </div>
@@ -4176,13 +4360,13 @@ Entité: 2,206,488, Début: 72, Fin: 81, Catégorie: CARDINAL
         </div>
         <div class="footer">
             <div class="contact">Intelligence artificielle et Deep Learning | John Samuel</div>
-            <div class="navigation">123
-                <a class="prev" href="#slide122"></a>
-                <a class="next" href="#slide124"></a>
+            <div class="navigation">124
+                <a class="prev" href="#slide123"></a>
+                <a class="next" href="#slide125"></a>
             </div>
         </div>
     </section>
-    <section class="slide" id="slide124">
+    <section class="slide" id="slide125">
         <div class="header">
             <h1>4.8. Systèmes de recommandation (Recommender Systems)</h1>
         </div>
@@ -4198,13 +4382,13 @@ Entité: 2,206,488, Début: 72, Fin: 81, Catégorie: CARDINAL
         </div>
         <div class="footer">
             <div class="contact">Intelligence artificielle et Deep Learning | John Samuel</div>
-            <div class="navigation">124
-                <a class="prev" href="#slide123"></a>
-                <a class="next" href="#slide125"></a>
+            <div class="navigation">125
+                <a class="prev" href="#slide124"></a>
+                <a class="next" href="#slide126"></a>
             </div>
         </div>
     </section>
-    <section class="slide" id="slide125">
+    <section class="slide" id="slide126">
         <div class="header">
             <h1>4.8. Systèmes de recommandation (Recommender Systems)</h1>
         </div>
@@ -4221,13 +4405,13 @@ Entité: 2,206,488, Début: 72, Fin: 81, Catégorie: CARDINAL
         </div>
         <div class="footer">
             <div class="contact">Intelligence artificielle et Deep Learning | John Samuel</div>
-            <div class="navigation">125
-                <a class="prev" href="#slide124"></a>
-                <a class="next" href="#slide126"></a>
+            <div class="navigation">126
+                <a class="prev" href="#slide125"></a>
+                <a class="next" href="#slide127"></a>
             </div>
         </div>
     </section>
-    <section class="slide" id="slide126">
+    <section class="slide" id="slide127">
         <div class="header">
             <h1>4.8. Systèmes de recommandation (Recommender Systems)</h1>
         </div>
@@ -4253,13 +4437,13 @@ Entité: 2,206,488, Début: 72, Fin: 81, Catégorie: CARDINAL
         </div>
         <div class="footer">
             <div class="contact">Intelligence artificielle et Deep Learning | John Samuel</div>
-            <div class="navigation">126
-                <a class="prev" href="#slide125"></a>
-                <a class="next" href="#slide127"></a>
+            <div class="navigation">127
+                <a class="prev" href="#slide126"></a>
+                <a class="next" href="#slide128"></a>
             </div>
         </div>
     </section>
-    <section class="slide" id="slide127">
+    <section class="slide" id="slide128">
         <div class="header">
             <h1>4.8. Systèmes de recommandation (Recommender Systems)</h1>
         </div>
@@ -4280,13 +4464,13 @@ Entité: 2,206,488, Début: 72, Fin: 81, Catégorie: CARDINAL
         </div>
         <div class="footer">
             <div class="contact">Intelligence artificielle et Deep Learning | John Samuel</div>
-            <div class="navigation">127
-                <a class="prev" href="#slide126"></a>
-                <a class="next" href="#slide128"></a>
+            <div class="navigation">128
+                <a class="prev" href="#slide127"></a>
+                <a class="next" href="#slide129"></a>
             </div>
         </div>
     </section>
-    <section class="slide" id="slide128">
+    <section class="slide" id="slide129">
         <div class="header">
             <h1>4.8. Systèmes de recommandation (Recommender Systems)</h1>
         </div>
@@ -4302,13 +4486,13 @@ Entité: 2,206,488, Début: 72, Fin: 81, Catégorie: CARDINAL
         </div>
         <div class="footer">
             <div class="contact">Intelligence artificielle et Deep Learning | John Samuel</div>
-            <div class="navigation">128
-                <a class="prev" href="#slide127"></a>
-                <a class="next" href="#slide129"></a>
+            <div class="navigation">129
+                <a class="prev" href="#slide128"></a>
+                <a class="next" href="#slide130"></a>
             </div>
         </div>
     </section>
-    <section class="slide" id="slide129">
+    <section class="slide" id="slide130">
         <div class="header">
             <h1>4.8. Systèmes de recommandation (Recommender Systems)</h1>
         </div>
@@ -4325,13 +4509,13 @@ Entité: 2,206,488, Début: 72, Fin: 81, Catégorie: CARDINAL
         </div>
         <div class="footer">
             <div class="contact">Intelligence artificielle et Deep Learning | John Samuel</div>
-            <div class="navigation">129
-                <a class="prev" href="#slide128"></a>
-                <a class="next" href="#slide130"></a>
+            <div class="navigation">130
+                <a class="prev" href="#slide129"></a>
+                <a class="next" href="#slide131"></a>
             </div>
         </div>
     </section>
-    <section class="slide" id="slide130">
+    <section class="slide" id="slide131">
         <div class="header">
             <h1>4.8. Systèmes de recommandation (Recommender Systems)</h1>
         </div>
@@ -4348,13 +4532,13 @@ Entité: 2,206,488, Début: 72, Fin: 81, Catégorie: CARDINAL
         </div>
         <div class="footer">
             <div class="contact">Intelligence artificielle et Deep Learning | John Samuel</div>
-            <div class="navigation">130
-                <a class="prev" href="#slide129"></a>
-                <a class="next" href="#slide131"></a>
+            <div class="navigation">131
+                <a class="prev" href="#slide130"></a>
+                <a class="next" href="#slide132"></a>
             </div>
         </div>
     </section>
-    <section class="slide" id="slide131">
+    <section class="slide" id="slide132">
         <div class="header">
             <h1>4.8. Systèmes de recommandation (Recommender Systems)</h1>
         </div>
@@ -4374,13 +4558,13 @@ Entité: 2,206,488, Début: 72, Fin: 81, Catégorie: CARDINAL
         </div>
         <div class="footer">
             <div class="contact">Intelligence artificielle et Deep Learning | John Samuel</div>
-            <div class="navigation">131
-                <a class="prev" href="#slide130"></a>
-                <a class="next" href="#slide132"></a>
+            <div class="navigation">132
+                <a class="prev" href="#slide131"></a>
+                <a class="next" href="#slide133"></a>
             </div>
         </div>
     </section>
-    <section class="slide" id="slide132">
+    <section class="slide" id="slide133">
         <div class="header">
             <h1>4.8. Systèmes de recommandation (Recommender Systems)</h1>
         </div>
@@ -4399,13 +4583,13 @@ Entité: 2,206,488, Début: 72, Fin: 81, Catégorie: CARDINAL
         </div>
         <div class="footer">
             <div class="contact">Intelligence artificielle et Deep Learning | John Samuel</div>
-            <div class="navigation">132
-                <a class="prev" href="#slide131"></a>
-                <a class="next" href="#slide133"></a>
+            <div class="navigation">133
+                <a class="prev" href="#slide132"></a>
+                <a class="next" href="#slide134"></a>
             </div>
         </div>
     </section>
-    <section class="slide" id="slide133">
+    <section class="slide" id="slide134">
         <div class="header">
             <h1>4.8. Systèmes de recommandation (Recommender Systems)</h1>
         </div>
@@ -4426,13 +4610,13 @@ Entité: 2,206,488, Début: 72, Fin: 81, Catégorie: CARDINAL
         </div>
         <div class="footer">
             <div class="contact">Intelligence artificielle et Deep Learning | John Samuel</div>
-            <div class="navigation">133
-                <a class="prev" href="#slide132"></a>
-                <a class="next" href="#slide134"></a>
+            <div class="navigation">134
+                <a class="prev" href="#slide133"></a>
+                <a class="next" href="#slide135"></a>
             </div>
         </div>
     </section>
-    <section class="slide" id="slide134">
+    <section class="slide" id="slide135">
         <div class="header">
             <h1>4.8. Systèmes de recommandation (Recommender Systems)</h1>
         </div>
@@ -4450,13 +4634,13 @@ Entité: 2,206,488, Début: 72, Fin: 81, Catégorie: CARDINAL
         </div>
         <div class="footer">
             <div class="contact">Intelligence artificielle et Deep Learning | John Samuel</div>
-            <div class="navigation">134
-                <a class="prev" href="#slide133"></a>
-                <a class="next" href="#slide135"></a>
+            <div class="navigation">135
+                <a class="prev" href="#slide134"></a>
+                <a class="next" href="#slide136"></a>
             </div>
         </div>
     </section>
-    <section class="slide" id="slide135">
+    <section class="slide" id="slide136">
         <div class="header">
             <h1>4.8. Systèmes de recommandation (Recommender Systems)</h1>
         </div>
@@ -4474,13 +4658,13 @@ Entité: 2,206,488, Début: 72, Fin: 81, Catégorie: CARDINAL
         </div>
         <div class="footer">
             <div class="contact">Intelligence artificielle et Deep Learning | John Samuel</div>
-            <div class="navigation">135
-                <a class="prev" href="#slide134"></a>
-                <a class="next" href="#slide136"></a>
+            <div class="navigation">136
+                <a class="prev" href="#slide135"></a>
+                <a class="next" href="#slide137"></a>
             </div>
         </div>
     </section>
-    <section class="slide" id="slide136">
+    <section class="slide" id="slide137">
         <div class="header">
             <h1>4.9. Représentation des connaissances et raisonnement</h1>
         </div>
@@ -4496,13 +4680,13 @@ Entité: 2,206,488, Début: 72, Fin: 81, Catégorie: CARDINAL
         </div>
         <div class="footer">
             <div class="contact">Intelligence artificielle et Deep Learning | John Samuel</div>
-            <div class="navigation">136
-                <a class="prev" href="#slide135"></a>
-                <a class="next" href="#slide137"></a>
+            <div class="navigation">137
+                <a class="prev" href="#slide136"></a>
+                <a class="next" href="#slide138"></a>
             </div>
         </div>
     </section>
-    <section class="slide" id="slide137">
+    <section class="slide" id="slide138">
         <div class="header">
             <h1>4.9. Représentation des connaissances et raisonnement</h1>
         </div>
@@ -4518,13 +4702,13 @@ Entité: 2,206,488, Début: 72, Fin: 81, Catégorie: CARDINAL
         </div>
         <div class="footer">
             <div class="contact">Intelligence artificielle et Deep Learning | John Samuel</div>
-            <div class="navigation">137
-                <a class="prev" href="#slide136"></a>
-                <a class="next" href="#slide138"></a>
+            <div class="navigation">138
+                <a class="prev" href="#slide137"></a>
+                <a class="next" href="#slide139"></a>
             </div>
         </div>
     </section>
-    <section class="slide" id="slide138">
+    <section class="slide" id="slide139">
         <div class="header">
             <h1>4.9. Représentation des connaissances et raisonnement</h1>
         </div>
@@ -4543,13 +4727,13 @@ Entité: 2,206,488, Début: 72, Fin: 81, Catégorie: CARDINAL
         </div>
         <div class="footer">
             <div class="contact">Intelligence artificielle et Deep Learning | John Samuel</div>
-            <div class="navigation">138
-                <a class="prev" href="#slide137"></a>
-                <a class="next" href="#slide139"></a>
+            <div class="navigation">139
+                <a class="prev" href="#slide138"></a>
+                <a class="next" href="#slide140"></a>
             </div>
         </div>
     </section>
-    <section class="slide" id="slide139">
+    <section class="slide" id="slide140">
         <div class="header">
             <h1>4.10. Web sémantique (Semantic Web)</h1>
         </div>
@@ -4563,13 +4747,13 @@ Entité: 2,206,488, Début: 72, Fin: 81, Catégorie: CARDINAL
         </div>
         <div class="footer">
             <div class="contact">Intelligence artificielle et Deep Learning | John Samuel</div>
-            <div class="navigation">139
-                <a class="prev" href="#slide138"></a>
-                <a class="next" href="#slide140"></a>
+            <div class="navigation">140
+                <a class="prev" href="#slide139"></a>
+                <a class="next" href="#slide141"></a>
             </div>
         </div>
     </section>
-    <section class="slide" id="slide140">
+    <section class="slide" id="slide141">
         <div class="header">
             <h1>4.10. Web sémantique (Semantic Web)</h1>
         </div>
@@ -4591,13 +4775,13 @@ Entité: 2,206,488, Début: 72, Fin: 81, Catégorie: CARDINAL
         </div>
         <div class="footer">
             <div class="contact">Intelligence artificielle et Deep Learning | John Samuel</div>
-            <div class="navigation">140
-                <a class="prev" href="#slide139"></a>
-                <a class="next" href="#slide141"></a>
+            <div class="navigation">141
+                <a class="prev" href="#slide140"></a>
+                <a class="next" href="#slide142"></a>
             </div>
         </div>
     </section>
-    <section class="slide" id="slide141">
+    <section class="slide" id="slide142">
         <div class="header">
             <h1>4.10. Web sémantique (Semantic Web)</h1>
         </div>
@@ -4621,13 +4805,13 @@ Entité: 2,206,488, Début: 72, Fin: 81, Catégorie: CARDINAL
         </div>
         <div class="footer">
             <div class="contact">Intelligence artificielle et Deep Learning | John Samuel</div>
-            <div class="navigation">141
-                <a class="prev" href="#slide140"></a>
-                <a class="next" href="#slide142"></a>
+            <div class="navigation">142
+                <a class="prev" href="#slide141"></a>
+                <a class="next" href="#slide143"></a>
             </div>
         </div>
     </section>
-    <section class="slide" id="slide142">
+    <section class="slide" id="slide143">
         <div class="header">
             <h1>4.10. Web sémantique (Semantic Web)</h1>
         </div>
@@ -4648,13 +4832,13 @@ Entité: 2,206,488, Début: 72, Fin: 81, Catégorie: CARDINAL
         </div>
         <div class="footer">
             <div class="contact">Intelligence artificielle et Deep Learning | John Samuel</div>
-            <div class="navigation">142
-                <a class="prev" href="#slide141"></a>
-                <a class="next" href="#slide143"></a>
+            <div class="navigation">143
+                <a class="prev" href="#slide142"></a>
+                <a class="next" href="#slide144"></a>
             </div>
         </div>
     </section>
-    <section class="slide" id="slide143">
+    <section class="slide" id="slide144">
         <div class="header">
             <h1>4.10. Web sémantique (Semantic Web)</h1>
         </div>
@@ -4674,13 +4858,13 @@ Entité: 2,206,488, Début: 72, Fin: 81, Catégorie: CARDINAL
         </div>
         <div class="footer">
             <div class="contact">Intelligence artificielle et Deep Learning | John Samuel</div>
-            <div class="navigation">143
-                <a class="prev" href="#slide142"></a>
-                <a class="next" href="#slide144"></a>
+            <div class="navigation">144
+                <a class="prev" href="#slide143"></a>
+                <a class="next" href="#slide145"></a>
             </div>
         </div>
     </section>
-    <section class="slide" id="slide144">
+    <section class="slide" id="slide145">
         <div class="header">
             <h1>4.10. Web sémantique (Semantic Web)</h1>
         </div>
@@ -4700,13 +4884,13 @@ Entité: 2,206,488, Début: 72, Fin: 81, Catégorie: CARDINAL
         </div>
         <div class="footer">
             <div class="contact">Intelligence artificielle et Deep Learning | John Samuel</div>
-            <div class="navigation">144
-                <a class="prev" href="#slide143"></a>
-                <a class="next" href="#slide145"></a>
+            <div class="navigation">145
+                <a class="prev" href="#slide144"></a>
+                <a class="next" href="#slide146"></a>
             </div>
         </div>
     </section>
-    <section class="slide" id="slide145">
+    <section class="slide" id="slide146">
         <div class="header">
             <h1>4.11. Moteur de règles (Rule Engines)</h1>
         </div>
@@ -4728,13 +4912,13 @@ Entité: 2,206,488, Début: 72, Fin: 81, Catégorie: CARDINAL
         </div>
         <div class="footer">
             <div class="contact">Intelligence artificielle et Deep Learning | John Samuel</div>
-            <div class="navigation">145
-                <a class="prev" href="#slide144"></a>
-                <a class="next" href="#slide146"></a>
+            <div class="navigation">146
+                <a class="prev" href="#slide145"></a>
+                <a class="next" href="#slide147"></a>
             </div>
         </div>
     </section>
-    <section class="slide" id="slide146">
+    <section class="slide" id="slide147">
         <div class="header">
             <h1>4.11. Moteur de règles (Rule Engines)</h1>
         </div>
@@ -4761,13 +4945,13 @@ Entité: 2,206,488, Début: 72, Fin: 81, Catégorie: CARDINAL
         </div>
         <div class="footer">
             <div class="contact">Intelligence artificielle et Deep Learning | John Samuel</div>
-            <div class="navigation">146
-                <a class="prev" href="#slide145"></a>
-                <a class="next" href="#slide147"></a>
+            <div class="navigation">147
+                <a class="prev" href="#slide146"></a>
+                <a class="next" href="#slide148"></a>
             </div>
         </div>
     </section>
-    <section class="slide" id="slide147">
+    <section class="slide" id="slide148">
         <div class="header">
             <h1>4.11. Moteur de règles (Rule Engines)</h1>
         </div>
@@ -4788,13 +4972,13 @@ Entité: 2,206,488, Début: 72, Fin: 81, Catégorie: CARDINAL
         </div>
         <div class="footer">
             <div class="contact">Intelligence artificielle et Deep Learning | John Samuel</div>
-            <div class="navigation">147
-                <a class="prev" href="#slide146"></a>
-                <a class="next" href="#slide148"></a>
+            <div class="navigation">148
+                <a class="prev" href="#slide147"></a>
+                <a class="next" href="#slide149"></a>
             </div>
         </div>
     </section>
-    <section class="slide" id="slide148">
+    <section class="slide" id="slide149">
         <div class="header">
             <h1>4.11. Moteur de règles (Rule Engines)</h1>
         </div>
@@ -4817,13 +5001,13 @@ Entité: 2,206,488, Début: 72, Fin: 81, Catégorie: CARDINAL
         </div>
         <div class="footer">
             <div class="contact">Intelligence artificielle et Deep Learning | John Samuel</div>
-            <div class="navigation">148
-                <a class="prev" href="#slide147"></a>
-                <a class="next" href="#slide149"></a>
+            <div class="navigation">149
+                <a class="prev" href="#slide148"></a>
+                <a class="next" href="#slide150"></a>
             </div>
         </div>
     </section>
-    <section class="slide" id="slide149">
+    <section class="slide" id="slide150">
         <div class="header">
             <h1>4.11. Moteur de règles (Rule Engines)</h1>
         </div>
@@ -4845,13 +5029,13 @@ Entité: 2,206,488, Début: 72, Fin: 81, Catégorie: CARDINAL
         </div>
         <div class="footer">
             <div class="contact">Intelligence artificielle et Deep Learning | John Samuel</div>
-            <div class="navigation">149
-                <a class="prev" href="#slide148"></a>
-                <a class="next" href="#slide150"></a>
+            <div class="navigation">150
+                <a class="prev" href="#slide149"></a>
+                <a class="next" href="#slide151"></a>
             </div>
         </div>
     </section>
-    <section class="slide" id="slide150">
+    <section class="slide" id="slide151">
         <div class="header">
             <h1>4.11. Moteur de règles (Rule Engines)</h1>
         </div>
@@ -4876,13 +5060,13 @@ Entité: 2,206,488, Début: 72, Fin: 81, Catégorie: CARDINAL
         </div>
         <div class="footer">
             <div class="contact">Intelligence artificielle et Deep Learning | John Samuel</div>
-            <div class="navigation">150
-                <a class="prev" href="#slide149"></a>
-                <a class="next" href="#slide151"></a>
+            <div class="navigation">151
+                <a class="prev" href="#slide150"></a>
+                <a class="next" href="#slide152"></a>
             </div>
         </div>
     </section>
-    <section class="slide" id="slide151">
+    <section class="slide" id="slide152">
         <div class="header">
             <h1>4.12. Programmation logique et IA</h1>
         </div>
@@ -4902,13 +5086,13 @@ Entité: 2,206,488, Début: 72, Fin: 81, Catégorie: CARDINAL
         </div>
         <div class="footer">
             <div class="contact">Intelligence artificielle et Deep Learning | John Samuel</div>
-            <div class="navigation">151
-                <a class="prev" href="#slide150"></a>
-                <a class="next" href="#slide152"></a>
+            <div class="navigation">152
+                <a class="prev" href="#slide151"></a>
+                <a class="next" href="#slide153"></a>
             </div>
         </div>
     </section>
-    <section class="slide" id="slide152">
+    <section class="slide" id="slide153">
         <div class="header">
             <h1>4.12. Programmation logique et IA</h1>
         </div>
@@ -4930,13 +5114,13 @@ Entité: 2,206,488, Début: 72, Fin: 81, Catégorie: CARDINAL
         </div>
         <div class="footer">
             <div class="contact">Intelligence artificielle et Deep Learning | John Samuel</div>
-            <div class="navigation">152
-                <a class="prev" href="#slide151"></a>
-                <a class="next" href="#slide153"></a>
+            <div class="navigation">153
+                <a class="prev" href="#slide152"></a>
+                <a class="next" href="#slide154"></a>
             </div>
         </div>
     </section>
-    <section class="slide" id="slide153">
+    <section class="slide" id="slide154">
         <div class="header">
             <h1>4.12. Programmation logique et IA</h1>
         </div>
@@ -4955,13 +5139,13 @@ Entité: 2,206,488, Début: 72, Fin: 81, Catégorie: CARDINAL
         </div>
         <div class="footer">
             <div class="contact">Intelligence artificielle et Deep Learning | John Samuel</div>
-            <div class="navigation">153
-                <a class="prev" href="#slide152"></a>
-                <a class="next" href="#slide154"></a>
+            <div class="navigation">154
+                <a class="prev" href="#slide153"></a>
+                <a class="next" href="#slide155"></a>
             </div>
         </div>
     </section>
-    <section class="slide" id="slide154">
+    <section class="slide" id="slide155">
         <div class="header">
             <h1>4.12. Programmation logique et IA</h1>
         </div>
@@ -4982,13 +5166,13 @@ Entité: 2,206,488, Début: 72, Fin: 81, Catégorie: CARDINAL
         </div>
         <div class="footer">
             <div class="contact">Intelligence artificielle et Deep Learning | John Samuel</div>
-            <div class="navigation">154
-                <a class="prev" href="#slide153"></a>
-                <a class="next" href="#slide155"></a>
+            <div class="navigation">155
+                <a class="prev" href="#slide154"></a>
+                <a class="next" href="#slide156"></a>
             </div>
         </div>
     </section>
-    <section class="slide" id="slide155">
+    <section class="slide" id="slide156">
         <div class="header">
             <h1>4.12. Programmation logique et IA</h1>
         </div>
@@ -5005,13 +5189,13 @@ Entité: 2,206,488, Début: 72, Fin: 81, Catégorie: CARDINAL
         </div>
         <div class="footer">
             <div class="contact">Intelligence artificielle et Deep Learning | John Samuel</div>
-            <div class="navigation">155
-                <a class="prev" href="#slide154"></a>
-                <a class="next" href="#slide156"></a>
+            <div class="navigation">156
+                <a class="prev" href="#slide155"></a>
+                <a class="next" href="#slide157"></a>
             </div>
         </div>
     </section>
-    <section class="slide" id="slide156">
+    <section class="slide" id="slide157">
         <div class="header">
             <h1>4.12. Programmation logique et IA</h1>
         </div>
@@ -5027,13 +5211,13 @@ Entité: 2,206,488, Début: 72, Fin: 81, Catégorie: CARDINAL
         </div>
         <div class="footer">
             <div class="contact">Intelligence artificielle et Deep Learning | John Samuel</div>
-            <div class="navigation">156
-                <a class="prev" href="#slide155"></a>
-                <a class="next" href="#slide157"></a>
+            <div class="navigation">157
+                <a class="prev" href="#slide156"></a>
+                <a class="next" href="#slide158"></a>
             </div>
         </div>
     </section>
-    <section class="slide" id="slide157">
+    <section class="slide" id="slide158">
         <div class="header">
             <h1>4.12. Programmation logique et IA</h1>
         </div>
@@ -5053,13 +5237,13 @@ Entité: 2,206,488, Début: 72, Fin: 81, Catégorie: CARDINAL
         </div>
         <div class="footer">
             <div class="contact">Intelligence artificielle et Deep Learning | John Samuel</div>
-            <div class="navigation">157
-                <a class="prev" href="#slide156"></a>
-                <a class="next" href="#slide158"></a>
+            <div class="navigation">158
+                <a class="prev" href="#slide157"></a>
+                <a class="next" href="#slide159"></a>
             </div>
         </div>
     </section>
-    <section class="slide" id="slide158">
+    <section class="slide" id="slide159">
         <div class="header">
             <h1>4.12. Programmation logique et IA</h1>
         </div>
@@ -5080,13 +5264,13 @@ Entité: 2,206,488, Début: 72, Fin: 81, Catégorie: CARDINAL
         </div>
         <div class="footer">
             <div class="contact">Intelligence artificielle et Deep Learning | John Samuel</div>
-            <div class="navigation">158
-                <a class="prev" href="#slide157"></a>
-                <a class="next" href="#slide159"></a>
+            <div class="navigation">159
+                <a class="prev" href="#slide158"></a>
+                <a class="next" href="#slide160"></a>
             </div>
         </div>
     </section>
-    <section class="slide" id="slide159">
+    <section class="slide" id="slide160">
         <div class="header">
             <h1>4.12. Programmation logique et IA</h1>
         </div>
@@ -5104,13 +5288,13 @@ Entité: 2,206,488, Début: 72, Fin: 81, Catégorie: CARDINAL
         </div>
         <div class="footer">
             <div class="contact">Intelligence artificielle et Deep Learning | John Samuel</div>
-            <div class="navigation">159
-                <a class="prev" href="#slide158"></a>
-                <a class="next" href="#slide160"></a>
+            <div class="navigation">160
+                <a class="prev" href="#slide159"></a>
+                <a class="next" href="#slide161"></a>
             </div>
         </div>
     </section>
-    <section class="slide" id="slide160">
+    <section class="slide" id="slide161">
         <div class="header">
             <h1>4.12. Programmation logique et IA</h1>
         </div>
@@ -5128,13 +5312,13 @@ Entité: 2,206,488, Début: 72, Fin: 81, Catégorie: CARDINAL
         </div>
         <div class="footer">
             <div class="contact">Intelligence artificielle et Deep Learning | John Samuel</div>
-            <div class="navigation">160
-                <a class="prev" href="#slide159"></a>
-                <a class="next" href="#slide161"></a>
+            <div class="navigation">161
+                <a class="prev" href="#slide160"></a>
+                <a class="next" href="#slide162"></a>
             </div>
         </div>
     </section>
-    <section class="slide" id="slide161">
+    <section class="slide" id="slide162">
         <div class="header">
             <h1>4.12. Programmation logique et IA</h1>
         </div>
@@ -5158,13 +5342,13 @@ user compiled, 2 lines read - 241 bytes written, 12239 ms</br>
         </div>
         <div class="footer">
             <div class="contact">Intelligence artificielle et Deep Learning | John Samuel</div>
-            <div class="navigation">161
-                <a class="prev" href="#slide160"></a>
-                <a class="next" href="#slide162"></a>
+            <div class="navigation">162
+                <a class="prev" href="#slide161"></a>
+                <a class="next" href="#slide163"></a>
             </div>
         </div>
     </section>
-    <section class="slide" id="slide162">
+    <section class="slide" id="slide163">
         <div class="header">
             <h1>4.12. Programmation logique et IA</h1>
         </div>
@@ -5183,13 +5367,13 @@ no</br>
         </div>
         <div class="footer">
             <div class="contact">Intelligence artificielle et Deep Learning | John Samuel</div>
-            <div class="navigation">162
-                <a class="prev" href="#slide161"></a>
-                <a class="next" href="#slide163"></a>
+            <div class="navigation">163
+                <a class="prev" href="#slide162"></a>
+                <a class="next" href="#slide164"></a>
             </div>
         </div>
     </section>
-    <section class="slide" id="slide163">
+    <section class="slide" id="slide164">
         <div class="header">
             <h1>4.12. Programmation logique et IA</h1>
         </div>
@@ -5214,13 +5398,13 @@ yes</br>
         </div>
         <div class="footer">
             <div class="contact">Intelligence artificielle et Deep Learning | John Samuel</div>
-            <div class="navigation">163
-                <a class="prev" href="#slide162"></a>
-                <a class="next" href="#slide164"></a>
+            <div class="navigation">164
+                <a class="prev" href="#slide163"></a>
+                <a class="next" href="#slide165"></a>
             </div>
         </div>
     </section>
-    <section class="slide" id="slide164">
+    <section class="slide" id="slide165">
         <div class="header">
             <h1>4.12. Programmation logique et IA</h1>
         </div>
@@ -5245,13 +5429,13 @@ X = peter</br>
         </div>
         <div class="footer">
             <div class="contact">Intelligence artificielle et Deep Learning | John Samuel</div>
-            <div class="navigation">164
-                <a class="prev" href="#slide163"></a>
-                <a class="next" href="#slide165"></a>
+            <div class="navigation">165
+                <a class="prev" href="#slide164"></a>
+                <a class="next" href="#slide166"></a>
             </div>
         </div>
     </section>
-    <section class="slide" id="slide165">
+    <section class="slide" id="slide166">
         <div class="header">
             <h1>4.12. Programmation logique et IA</h1>
         </div>
@@ -5273,13 +5457,13 @@ $ cat friend.pl
         </div>
         <div class="footer">
             <div class="contact">Intelligence artificielle et Deep Learning | John Samuel</div>
-            <div class="navigation">165
-                <a class="prev" href="#slide164"></a>
-                <a class="next" href="#slide166"></a>
+            <div class="navigation">166
+                <a class="prev" href="#slide165"></a>
+                <a class="next" href="#slide167"></a>
             </div>
         </div>
     </section>
-    <section class="slide" id="slide166">
+    <section class="slide" id="slide167">
         <div class="header">
             <h1>4.12. Programmation logique et IA</h1>
         </div>
@@ -5304,13 +5488,13 @@ yes
         </div>
         <div class="footer">
             <div class="contact">Intelligence artificielle et Deep Learning | John Samuel</div>
-            <div class="navigation">166
-                <a class="prev" href="#slide165"></a>
-                <a class="next" href="#slide167"></a>
+            <div class="navigation">167
+                <a class="prev" href="#slide166"></a>
+                <a class="next" href="#slide168"></a>
             </div>
         </div>
     </section>
-    <section class="slide" id="slide167">
+    <section class="slide" id="slide168">
         <div class="header">
             <h1>4.12. Programmation logique et IA</h1>
         </div>
@@ -5336,13 +5520,13 @@ yes
         </div>
         <div class="footer">
             <div class="contact">Intelligence artificielle et Deep Learning | John Samuel</div>
-            <div class="navigation">167
-                <a class="prev" href="#slide166"></a>
-                <a class="next" href="#slide168"></a>
+            <div class="navigation">168
+                <a class="prev" href="#slide167"></a>
+                <a class="next" href="#slide169"></a>
             </div>
         </div>
     </section>
-    <section class="slide" id="slide168">
+    <section class="slide" id="slide169">
         <div class="header">
             <h1>4.12. Programmation logique et IA</h1>
         </div>
@@ -5368,13 +5552,13 @@ $ cat ancetre.pl
         </div>
         <div class="footer">
             <div class="contact">Intelligence artificielle et Deep Learning | John Samuel</div>
-            <div class="navigation">168
-                <a class="prev" href="#slide167"></a>
-                <a class="next" href="#slide169"></a>
+            <div class="navigation">169
+                <a class="prev" href="#slide168"></a>
+                <a class="next" href="#slide170"></a>
             </div>
         </div>
     </section>
-    <section class="slide" id="slide169">
+    <section class="slide" id="slide170">
         <div class="header">
             <h1>4.12. Programmation logique et IA</h1>
         </div>
@@ -5402,13 +5586,13 @@ no
         </div>
         <div class="footer">
             <div class="contact">Intelligence artificielle et Deep Learning | John Samuel</div>
-            <div class="navigation">169
-                <a class="prev" href="#slide168"></a>
-                <a class="next" href="#slide170"></a>
+            <div class="navigation">170
+                <a class="prev" href="#slide169"></a>
+                <a class="next" href="#slide171"></a>
             </div>
         </div>
     </section>
-    <section class="slide" id="slide170">
+    <section class="slide" id="slide171">
         <div class="header">
             <h1>4.12. Programmation logique et IA</h1>
         </div>
@@ -5434,13 +5618,13 @@ no
         </div>
         <div class="footer">
             <div class="contact">Intelligence artificielle et Deep Learning | John Samuel</div>
-            <div class="navigation">170
-                <a class="prev" href="#slide169"></a>
-                <a class="next" href="#slide171"></a>
+            <div class="navigation">171
+                <a class="prev" href="#slide170"></a>
+                <a class="next" href="#slide172"></a>
             </div>
         </div>
     </section>
-    <section class="slide" id="slide171">
+    <section class="slide" id="slide172">
         <div class="header">
             <h1>4.12. Programmation logique et IA</h1>
         </div>
@@ -5458,13 +5642,13 @@ no
         </div>
         <div class="footer">
             <div class="contact">Intelligence artificielle et Deep Learning | John Samuel</div>
-            <div class="navigation">171
-                <a class="prev" href="#slide170"></a>
-                <a class="next" href="#slide172"></a>
+            <div class="navigation">172
+                <a class="prev" href="#slide171"></a>
+                <a class="next" href="#slide173"></a>
             </div>
         </div>
     </section>
-    <section class="slide" id="slide172">
+    <section class="slide" id="slide173">
         <div class="header">
             <h1>4.12. Programmation logique et IA</h1>
         </div>
@@ -5485,13 +5669,13 @@ no
         </div>
         <div class="footer">
             <div class="contact">Intelligence artificielle et Deep Learning | John Samuel</div>
-            <div class="navigation">172
-                <a class="prev" href="#slide171"></a>
-                <a class="next" href="#slide173"></a>
+            <div class="navigation">173
+                <a class="prev" href="#slide172"></a>
+                <a class="next" href="#slide174"></a>
             </div>
         </div>
     </section>
-    <section class="slide" id="slide173">
+    <section class="slide" id="slide174">
         <div class="header">
             <h1>4.12. Programmation logique et IA</h1>
         </div>
@@ -5517,13 +5701,13 @@ Copyright (C) 1999-2020 Daniel Diaz
         </div>
         <div class="footer">
             <div class="contact">Intelligence artificielle et Deep Learning | John Samuel</div>
-            <div class="navigation">173
-                <a class="prev" href="#slide172"></a>
-                <a class="next" href="#slide174"></a>
+            <div class="navigation">174
+                <a class="prev" href="#slide173"></a>
+                <a class="next" href="#slide175"></a>
             </div>
         </div>
     </section>
-    <section class="slide" id="slide174">
+    <section class="slide" id="slide175">
         <div class="header">
             <h1>Références</h1>
         </div>
@@ -5545,13 +5729,13 @@ Copyright (C) 1999-2020 Daniel Diaz
         </div>
         <div class="footer">
             <div class="contact">Intelligence artificielle et Deep Learning | John Samuel</div>
-            <div class="navigation">174
-                <a class="prev" href="#slide173"></a>
-                <a class="next" href="#slide175"></a>
+            <div class="navigation">175
+                <a class="prev" href="#slide174"></a>
+                <a class="next" href="#slide176"></a>
             </div>
         </div>
     </section>
-    <section class="slide" id="slide175">
+    <section class="slide" id="slide176">
         <div class="header">
             <h1>Références</h1>
         </div>
@@ -5577,13 +5761,13 @@ Copyright (C) 1999-2020 Daniel Diaz
         </div>
         <div class="footer">
             <div class="contact">Intelligence artificielle et Deep Learning | John Samuel</div>
-            <div class="navigation">175
-                <a class="prev" href="#slide174"></a>
-                <a class="next" href="#slide176"></a>
+            <div class="navigation">176
+                <a class="prev" href="#slide175"></a>
+                <a class="next" href="#slide177"></a>
             </div>
         </div>
     </section>
-    <section class="slide" id="slide176">
+    <section class="slide" id="slide177">
         <div class="header">
             <h1>Références</h1>
         </div>
@@ -5603,13 +5787,13 @@ Copyright (C) 1999-2020 Daniel Diaz
         </div>
         <div class="footer">
             <div class="contact">Intelligence artificielle et Deep Learning | John Samuel</div>
-            <div class="navigation">176
-                <a class="prev" href="#slide175"></a>
-                <a class="next" href="#slide177"></a>
+            <div class="navigation">177
+                <a class="prev" href="#slide176"></a>
+                <a class="next" href="#slide178"></a>
             </div>
         </div>
     </section>
-    <section class="slide" id="slide177">
+    <section class="slide" id="slide178">
         <div class="header">
             <h1>Références</h1>
         </div>
@@ -5628,14 +5812,14 @@ Copyright (C) 1999-2020 Daniel Diaz
         </div>
         <div class="footer">
             <div class="contact">Intelligence artificielle et Deep Learning | John Samuel</div>
-            <div class="navigation">177
-                <a class="prev" href="#slide176"></a>
-                <a class="next" href="#slide178"></a>
+            <div class="navigation">178
+                <a class="prev" href="#slide177"></a>
+                <a class="next" href="#slide179"></a>
             </div>
         </div>
     </section>
 
-    <section class="slide" id="slide178">
+    <section class="slide" id="slide179">
         <div class="header">
             <h1>Références</h1>
         </div>
@@ -5652,14 +5836,14 @@ Copyright (C) 1999-2020 Daniel Diaz
         </div>
         <div class="footer">
             <div class="contact">Intelligence artificielle et Deep Learning | John Samuel</div>
-            <div class="navigation">178
-                <a class="prev" href="#slide177"></a>
-                <a class="next" href="#slide179"></a>
+            <div class="navigation">179
+                <a class="prev" href="#slide178"></a>
+                <a class="next" href="#slide180"></a>
             </div>
         </div>
     </section>
 
-    <section class="slide" id="slide179">
+    <section class="slide" id="slide180">
         <div class="header">
             <h1>Références</h1>
         </div>
@@ -5691,14 +5875,14 @@ Copyright (C) 1999-2020 Daniel Diaz
         </div>
         <div class="footer">
             <div class="contact">Intelligence artificielle et Deep Learning | John Samuel</div>
-            <div class="navigation">179
-                <a class="prev" href="#slide178"></a>
-                <a class="next" href="#slide180"></a>
+            <div class="navigation">180
+                <a class="prev" href="#slide179"></a>
+                <a class="next" href="#slide181"></a>
             </div>
         </div>
     </section>
 
-    <section class="slide" id="slide180">
+    <section class="slide" id="slide181">
         <div class="header">
             <h1>Références</h1>
         </div>
@@ -5717,13 +5901,13 @@ Copyright (C) 1999-2020 Daniel Diaz
         </div>
         <div class="footer">
             <div class="contact">Intelligence artificielle et Deep Learning | John Samuel</div>
-            <div class="navigation">180
-                <a class="prev" href="#slide179"></a>
-                <a class="next" href="#slide181"></a>
+            <div class="navigation">181
+                <a class="prev" href="#slide180"></a>
+                <a class="next" href="#slide182"></a>
             </div>
         </div>
     </section>
-    <section class="slide" id="slide181">
+    <section class="slide" id="slide182">
         <div class="header">
             <h1>Références:</h1>
         </div>
@@ -5739,8 +5923,8 @@ Copyright (C) 1999-2020 Daniel Diaz
         </div>
         <div class="footer">
             <div class="contact">Intelligence artificielle et Deep Learning | John Samuel</div>
-            <div class="navigation">181
-                <a class="prev" href="#slide180"></a>
+            <div class="navigation">182
+                <a class="prev" href="#slide181"></a>
             </div>
         </div>
     </section>
@@ -5754,7 +5938,7 @@ Copyright (C) 1999-2020 Daniel Diaz
                 if (!Number.isNaN(slideIdString)) {
                     slideId = parseInt(slideIdString);
                     if (isIncrement) {
-                        if (slideId < 181) {
+                        if (slideId < 182) {
                             slideId = slideId + 1;
                         }
                     } else {
@@ -5790,6 +5974,9 @@ Copyright (C) 1999-2020 Daniel Diaz
             } else if (event.keyCode == '40') {
                 // down
                 changeCurrentURLSlideNumber(true);
+            } else if (event.keyCode == '78') {
+                // n : afficher / masquer les notes
+                document.body.classList.toggle('notes');
             }
         }
         document.body.onmouseup = function (event) {
