@@ -37,6 +37,16 @@
     render();
   });
   document.querySelector('#print').addEventListener('click', () => window.print());
+  // Advance from slide content without interrupting reading or interaction.
+  document.addEventListener('click', event => {
+    if (event.defaultPrevented || event.button !== 0 || event.ctrlKey || event.metaKey || event.altKey || event.shiftKey) return;
+    if (!document.body.classList.contains('presenting')) return;
+    if (event.target.closest('.slide') !== slides[index]) return;
+    if (event.target.closest('a,button,input,select,textarea,label,summary,details,[contenteditable],[role="button"],audio,video,iframe')) return;
+    if (window.getSelection()?.toString()) return;
+    go(index + 1);
+  });
+
   document.addEventListener('keydown', event => {
     if (event.ctrlKey || event.metaKey || event.altKey || event.shiftKey) return;
     const target = event.target;
