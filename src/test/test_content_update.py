@@ -1100,6 +1100,39 @@ class BindingDiffTests(unittest.TestCase):
             with self.subTest(family=name):
                 self.assertTrue(FAMILIES[name].mirrors_q315)
 
+    def test_cv_diff_checks_each_variant_in_its_own_source(self):
+        row = ContentRow("cv", 2, {
+            "target": "both", "local_qid": "Q10", "simple_local_qid": "Q20",
+            "part_qids": "Q30",
+        })
+        cases = (
+            ("Q10 Q30", "Q20 Q30", ()),
+            ("Q10 Q20 Q30", "Q30", ("Q20",)),
+            ("Q30", "Q10 Q20 Q30", ("Q10",)),
+            ("Q10 Q30", "Q20", ("Q30",)),
+        )
+        for detailed, simple, missing in cases:
+            with self.subTest(detailed=detailed, simple=simple), tempfile.TemporaryDirectory() as directory:
+                source = Path(directory) / "Q3646.html"
+                for path, qids in ((source, detailed), (source.with_name("index.html"), simple)):
+                    path.write_text("".join(f'<p data-content="local:{qid}">{qid}</p>' for qid in qids.split()), encoding="utf-8")
+                diff = diff_q315_family(replace(FAMILIES["cv"], q315_path=str(source)), [row])
+                self.assertEqual(diff.missing, missing)
+                self.assertEqual(diff.checked, 3)
+                self.assertEqual(diff.orphaned, ())
+
+    def test_cv_diff_respects_single_target_rows(self):
+        for variant, qid, filename in (("detailed", "Q10", "Q3646.html"), ("simple", "Q20", "index.html")):
+            with self.subTest(target=variant), tempfile.TemporaryDirectory() as directory:
+                source = Path(directory) / "Q3646.html"
+                (source.parent / filename).write_text(f'<p data-content="local:{qid}">{qid}</p>', encoding="utf-8")
+                row = ContentRow("cv", 2, {
+                    "target": variant, "local_qid": "Q10", "simple_local_qid": "Q20",
+                })
+                diff = diff_q315_family(replace(FAMILIES["cv"], q315_path=str(source)), [row])
+                self.assertTrue(diff.clean)
+                self.assertEqual(diff.checked, 1)
+
     def test_books_csv_round_trips_its_author_bindings(self):
         """Regression guard: books.csv must express every binding on Q3640."""
         family = FAMILIES["books"]

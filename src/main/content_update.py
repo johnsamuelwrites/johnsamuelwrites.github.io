@@ -2904,6 +2904,33 @@ def diff_q315_family(family: FamilyConfig, rows: list[ContentRow]) -> QidDiff:
     target = family.q315_target
     if not target:
         raise ContentUpdateError(f"{family.name}: Q315 source page is not configured")
+    if family.name == "cv":
+        # The summary and detailed CV may bind different items. Check each
+        # variant against its own source, so a binding on the wrong page cannot
+        # hide a missing entry.
+        expected_by_target: dict[str, set[str]] = {"detailed": set(), "simple": set()}
+        for row in rows:
+            for variant in cv_targets(row):
+                data = dict(row.data)
+                if variant == "simple":
+                    data["local_qid"] = cv_simple_local_qid(row)
+                data.pop("simple_local_qid", None)
+                expected_by_target[variant].update(
+                    csv_bound_qids(ContentRow(row.family, row.row_number, data))
+                )
+        missing: set[str] = set()
+        for variant, path in (("detailed", target), ("simple", target.with_name("index.html"))):
+            expected = expected_by_target[variant]
+            if expected:
+                document = set(LOCAL_BINDING_RE.findall(path.read_text(encoding="utf-8")))
+                missing.update(expected - document)
+        return QidDiff(
+            family=family.name,
+            path=target,
+            missing=tuple(sorted(missing, key=qid_number)),
+            orphaned=(),
+            checked=len(set().union(*expected_by_target.values())),
+        )
     html_content = target.read_text(encoding="utf-8")
 
     expected: set[str] = set()
