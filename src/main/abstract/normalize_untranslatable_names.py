@@ -42,6 +42,7 @@ HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE.parent))
 
 from content_update import FAMILIES, read_rows, split_qids, wikibase_label_text
+from abstract.local_text import text_in_wikibase
 from paths import REPO_ROOT
 from wikibase_api import DEFAULT_API, WikibaseClient, WikibaseError
 from wikibase_write import load_env
@@ -119,6 +120,9 @@ def canonical_values() -> tuple[dict[str, str], list[str]]:
                 # CSV values extracted from indented HTML keep their line breaks.
                 value = " ".join(row.data.get(value_column, "").split())
                 if not qid or not value or qid in EXCLUDED or qid in composed:
+                    continue
+                if value_column == "quote" and not text_in_wikibase(row.data):
+                    # Under copyright: the item holds metadata, never the text.
                     continue
                 if values.get(qid, value) != value:
                     conflicts.append(f"{qid}: {values[qid]!r} vs {value!r}")

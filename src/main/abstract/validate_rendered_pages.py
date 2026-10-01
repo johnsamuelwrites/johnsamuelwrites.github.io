@@ -18,6 +18,7 @@ sys.path.insert(0, str(HERE.parent))
 
 from abstract.css_assets import DEFAULT_DATA_DIR, DEFAULT_REPO_ROOT
 from abstract.discover_content_migration import discover
+from abstract.local_text import overlay
 from abstract.prepare_travel_content import LANGUAGES
 from abstract.render_page import COMPOSED_ITEMTYPES
 from abstract.verify_content_roundtrip import normalize_text
@@ -115,7 +116,7 @@ def load_labels(data_dir: Path) -> dict[str, dict[str, str]]:
     with (data_dir / "labels-wikibase.csv").open(
         encoding="utf-8-sig", newline=""
     ) as source:
-        return {row["identifier"]: row for row in csv.DictReader(source)}
+        return overlay({row["identifier"]: row for row in csv.DictReader(source)})
 
 
 def abstract_slots(path: Path) -> list[BoundSlot]:

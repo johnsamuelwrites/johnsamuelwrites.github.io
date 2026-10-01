@@ -31,6 +31,7 @@ sys.path.insert(0, str(HERE.parent))
 
 from abstract.css_assets import DEFAULT_DATA_DIR, DEFAULT_REPO_ROOT
 from abstract.discover_content_migration import EXTERNALLY_GENERATED_INDEXES, discover
+from abstract.local_text import overlay
 from abstract.prepare_travel_content import LANGUAGES, TEXT_TAGS
 
 DEFAULT_DATA = DEFAULT_DATA_DIR
@@ -120,7 +121,7 @@ class Tree(HTMLParser):
 
 def load_labels(data_dir: Path) -> dict[str, dict[str, str]]:
     with (data_dir / "labels-wikibase.csv").open(encoding="utf-8-sig", newline="") as source:
-        return {row["identifier"]: row for row in csv.DictReader(source)}
+        return overlay({row["identifier"]: row for row in csv.DictReader(source)})
 
 
 def _walk(node: Node):

@@ -27,6 +27,7 @@ from typing import Iterable
 from bs4 import BeautifulSoup
 from bs4.element import Tag
 
+from abstract.local_text import text_in_wikibase
 from file_rewrite import rewrite_text_file
 from paths import REPO_ROOT, to_repo_relative
 from wikibase_api import DEFAULT_API, WikibaseClient, WikibaseError
@@ -314,6 +315,9 @@ FAMILY_COLUMNS: dict[str, tuple[ColumnSpec, ...]] = {
         ColumnSpec("quote", required=True, per_language=True),
         ColumnSpec("attribution", required=True, per_language=True),
         ColumnSpec("local_qid"),
+        # "no" for a quotation still under copyright: the Wikibase holds only its
+        # metadata, and the text renders from this CSV (see abstract/local_text.py).
+        ColumnSpec("text_in_wikibase"),
     ),
     "photographies": (
         *ID_COLUMNS,
@@ -3552,6 +3556,10 @@ def wikibase_content_item_missing_claims(
         return True
     if row.family in {"quotes", "cv"} and split_qids(row.data.get("part_qids", "")):
         return False
+    if is_metadata_only(row):
+        # Its missing P40 values are deliberate; "repairing" them would publish
+        # the copyrighted text.
+        return False
     claims = entity.get("claims", {})
     if not has_item_claim(claims, INSTANCE_OF_PROPERTY, ABSTRACT_CONTENT_ITEM):
         return True
@@ -3577,7 +3585,13 @@ def monolingual_claim_languages(claims: dict, property_id: str) -> set[str]:
     return languages
 
 
+def is_metadata_only(row: ContentRow) -> bool:
+    return row.family == "quotes" and not text_in_wikibase(row.data)
+
+
 def content_text_for_wikibase(row: ContentRow) -> str:
+    if is_metadata_only(row):
+        return f"Quotation by {' '.join(row.localized('attribution', 'en').split())}"
     if row.family == "quotes":
         return row.localized("quote", "en")
     if row.family == "photographies":
@@ -3755,6 +3769,7 @@ def create_local_item_for_row(
     *,
     summary: str,
 ) -> str:
+    refuse_metadata_only_write(row)
     name = content_text_for_wikibase(row)
     wikidata = wikidata_qid(row.wikidata_url)
     if family.wikidata_required and not wikidata:
@@ -3778,6 +3793,15 @@ def create_local_item_for_row(
     return entity_id
 
 
+def refuse_metadata_only_write(row: ContentRow) -> None:
+    """Content items carry their text in P40, which is exactly what must not be stored."""
+    if is_metadata_only(row):
+        raise ContentUpdateError(
+            f"{row.family}:{row.row_number}: text_in_wikibase=no; create or update this "
+            "item with abstract/quote_text_licensing.py, which stores metadata only"
+        )
+
+
 def is_label_conflict(error: Exception) -> bool:
     message = str(error).lower()
     return "label-description" in message or "already has label" in message
@@ -3790,6 +3814,7 @@ def repair_local_item_for_row(
     *,
     summary: str,
 ) -> None:
+    refuse_metadata_only_write(row)
     name = content_text_for_wikibase(row)
     wikidata = wikidata_qid(row.wikidata_url)
     entity = client.entities([row.local_qid]).get(row.local_qid, {})

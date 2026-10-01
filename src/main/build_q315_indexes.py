@@ -13,6 +13,7 @@ from html.parser import HTMLParser
 from pathlib import Path
 from typing import Iterable, Sequence
 
+from abstract.local_text import local_text
 from paths import REPO_ROOT
 
 
@@ -77,6 +78,8 @@ def load_english_labels(path: Path = LABELS_PATH) -> dict[str, str]:
             label = row.get("en", "").strip()
             if qid and label:
                 labels[qid] = label
+    # Quotations the Wikibase holds only as metadata are searched by their text.
+    labels.update({qid: texts["en"] for qid, texts in local_text().items()})
     return labels
 
 

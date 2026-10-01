@@ -17,6 +17,7 @@ HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE.parent))
 
 from abstract.css_assets import DEFAULT_DATA_DIR, DEFAULT_REPO_ROOT
+from abstract.local_text import overlay
 from abstract.prepare_missing_content import alternate_pages, page_sources
 from abstract.prepare_travel_content import LANGUAGES, slots
 from abstract.render_page import BINDABLE_ATTRIBUTES, CONTENT_ATTRIBUTE_PREFIX
@@ -169,7 +170,7 @@ def labels(data_dir: Path) -> dict[str, dict[str, str]]:
     ) as source:
         for row in csv.DictReader(source):
             result[row["identifier"]] = row
-    return result
+    return overlay(result)
 
 
 def bindings(path: Path) -> list[tuple[str, str]]:

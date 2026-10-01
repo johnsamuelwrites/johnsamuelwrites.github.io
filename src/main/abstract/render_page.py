@@ -35,6 +35,7 @@ sys.path.insert(0, str(HERE.parent))
 
 from abstract.css_assets import DEFAULT_DATA_DIR, DEFAULT_REPO_ROOT
 from abstract.discover_content_migration import EXTERNALLY_GENERATED_INDEXES, discover
+from abstract.local_text import overlay
 from abstract.prepare_travel_content import LANGUAGES, TEXT_TAGS
 
 DEFAULT_DATA = DEFAULT_DATA_DIR
@@ -65,7 +66,7 @@ def load_labels(data_dir: Path) -> dict[str, dict[str, str]]:
     ) as source:
         for row in csv.DictReader(source):
             result[row["identifier"]] = row
-    return result
+    return overlay(result)
 
 
 def _base_signature(tag: str, attrs: list[tuple[str, str | None]]) -> tuple[str, str, str]:

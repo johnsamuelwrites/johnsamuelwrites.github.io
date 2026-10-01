@@ -125,7 +125,11 @@ class SplitQuoteTests(unittest.TestCase):
     def test_parts_are_collected_from_the_csv(self):
         parts = split_quote_parts()
         self.assertIn("Q4642", parts)
-        self.assertGreater(len(parts), 10)
+        self.assertGreater(len(parts), 5)
+
+    def test_metadata_only_quotes_have_no_parts(self):
+        # Asimov's quotation is under copyright: its text is not split into items.
+        self.assertNotIn("Q4634", split_quote_parts())
 
     def test_a_part_takes_its_english_p40_as_canonical(self):
         item = entity({"en": "a label"}, {"en": "the original text", "fr": "le texte"})
@@ -139,8 +143,14 @@ class SplitQuoteTests(unittest.TestCase):
 
     def test_plain_quote_items_are_covered(self):
         values, _ = canonical_values()
-        # Q6319 is an unsplit quote, so its text is the CSV value.
-        self.assertEqual(values.get("Q6319"), "Have no fear of perfection — you'll never reach it.")
+        # Q6326 is an unsplit quote, so its text is the CSV value.
+        self.assertEqual(values.get("Q6326"), "A republic, if you can keep it.")
+
+    def test_copyrighted_quote_text_is_never_pushed(self):
+        values, _ = canonical_values()
+        # Q6319 is under copyright (text_in_wikibase=no); its author still is.
+        self.assertNotIn("Q6319", values)
+        self.assertEqual(values.get("Q6320"), "Salvador Dali")
 
 
 class FakeClient:
