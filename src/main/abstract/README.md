@@ -78,10 +78,18 @@ store at `src/main/abstract/data/labels-wikibase.csv` (the default `--data-dir`)
    where the parent container count matches. Container-divergent pages (large
    index pages missing whole entries) are skipped for regeneration.
 
+4. `localize_links.py` points each cross-language link at the page's own
+   language when a counterpart exists. Templates are built from the English
+   page and `render_page.py` never rewrites `href`, so a derived page would
+   otherwise read "Viaggio" while linking to `en/travel/index.html`. Counterparts
+   come from `discover()`; anchors with `hreflang`/`lang`, a schema.org
+   `inLanguage` span, or inside a language switcher are deliberate and kept.
+
 ```bash
 python3 src/main/abstract/render_page.py --check      # dry run
 python3 src/main/abstract/render_page.py
 python3 src/main/abstract/repair_structure.py
+python3 src/main/abstract/localize_links.py
 python3 src/main/abstract/validate_rendered_pages.py
 python3 src/main/abstract/verify_content_roundtrip.py
 ```

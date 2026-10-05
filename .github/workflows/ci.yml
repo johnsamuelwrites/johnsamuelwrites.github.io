@@ -60,6 +60,14 @@ jobs:
         # edited without running --mode q315-apply and re-rendering.
         run: python src/main/content_update.py --mode check
 
+      - name: Check translated pages link to their own language
+        # Q315 templates are built from the English page, so derived language
+        # pages inherit ../../en/ hrefs that render_page.py never rewrites. A
+        # link into another language's tree is allowed only when no counterpart
+        # exists, or when it is marked deliberate (hreflang/lang, a switcher).
+        # Fix with: python src/main/abstract/localize_links.py
+        run: python src/main/abstract/localize_links.py --check
+
       - name: Check CSV and Q315 sources bind the same content items
         # Both directions: a CSV row whose QID is on no source, and a QID bound
         # on a source that no CSV row claims. Catches entries added to a source
