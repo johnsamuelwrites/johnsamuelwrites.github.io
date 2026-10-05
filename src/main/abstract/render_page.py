@@ -83,6 +83,9 @@ class TemplateBindings(HTMLParser):
 
     Occurrence counting mirrors ``DirectTextSlots`` exactly so the produced
     signatures address the same slots that ``slots()`` reads from a language page.
+    A ``<q-call>`` and everything inside it are not counted: a language page
+    carries the realized paragraph text there, never the composition markup, so
+    counting its part ``<span>``s would shift every later span slot.
     """
 
     def __init__(self) -> None:
@@ -90,8 +93,17 @@ class TemplateBindings(HTMLParser):
         self.counts: Counter[tuple[str, str, str]] = Counter()
         self.bindings: dict[Signature, str] = {}
         self.attributes: dict[AttributeSlot, str] = {}
+        self.call_depth = 0
+
+    def handle_endtag(self, tag) -> None:
+        if tag == "q-call" and self.call_depth:
+            self.call_depth -= 1
 
     def handle_starttag(self, tag, attrs) -> None:
+        if tag == "q-call":
+            self.call_depth += 1
+        if self.call_depth:
+            return
         base = _base_signature(tag, attrs)
         index = self.counts[base]
         self.counts[base] += 1

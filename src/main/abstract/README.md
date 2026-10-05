@@ -166,6 +166,40 @@ used by atomic rendering and Wikibase's 400-character P40 limit.
 Only residual atomic slots should then pass through
 `prepare_missing_content.py` and `bind_reviewed_content.py`.
 
+## Migrating a legacy en/fr section
+
+`section_migration.py` migrates legacy English/French pages into Q315 pages
+rendered in every language. Pages are declared in `data/section-pages.csv`
+(key, section, parent page key or external QID, page item, Q315 document,
+title item, naming slot, en/fr item labels, and the path in every language);
+`P38`/`P39` of the page items derive from those paths. Content is seeded from a
+translation table (`section-translations.csv`, a working file) whose rows
+reuse an item or carry the eight values of a new one; created items are
+recorded by token in `data/content-tokens.csv`. Per page:
+
+```bash
+python3 src/main/abstract/section_migration.py pages --section S   # then wikibase_write --apply | tee LOG
+python3 src/main/abstract/section_migration.py register-pages BATCH LOG
+python3 src/main/abstract/section_migration.py hierarchy --section S
+python3 src/main/abstract/section_migration.py content PAGE        # then wikibase_write --apply | tee LOG
+python3 src/main/abstract/section_migration.py register BATCH LOG
+python3 src/main/abstract/section_migration.py structure PAGE      # then wikibase_write --apply
+python3 src/main/abstract/section_migration.py build PAGE
+```
+
+Then register the Q315 document in `css-assets.json` and run
+`css_assets.py migrate --group QID`, snapshot it with `wikibase_snapshot.py`,
+refresh labels, normalize the footers (pages, then `--templates`), and run
+`render_abstract.py --page QID`, `render_page.py` and `localize_links.py`.
+Run `render_abstract.py` per page only: its pinned snapshots can be older than
+edits made since. `fix-routes` realigns `P38`/`P39` after a path changes.
+
+The build reshapes inline markup once in the English source so every slot is
+pure text: a leading `Label:` or `<b>title</b>` becomes a label span and a text
+span, a leading link keeps the link and wraps its text, emphasis inside a
+sentence is unwrapped, and a link inside composed prose is marked `()` in the
+stored text (the convention `render_abstract.py` fills with the anchor).
+
 ## Direct Wikibase bot
 
 The generated QuickStatements can be validated and written directly through

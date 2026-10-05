@@ -262,6 +262,19 @@ class AttributeBindingDiscoveryTests(unittest.TestCase):
         self.assertEqual(attributes[(("img", "i", "", 0), "alt")], "Q2")
         self.assertNotIn(("img", "i", "", 0), text)
 
+    def test_composition_parts_do_not_shift_later_slots(self):
+        # The language page holds the realized paragraph, not the q-call parts,
+        # so the span after the paragraph is span 0 on both sides.
+        text, counts, _attributes = self.slots(
+            '<p data-content="local:Q1"><q-call data-function="local:Q4182">'
+            '<q-arg data-name="parts"><span data-content="local:Q2">Q2</span>'
+            '<span data-content="local:Q3">Q3</span></q-arg></q-call></p>'
+            '<span data-content="local:Q4">Q4</span>'
+        )
+        self.assertEqual(text[("span", "", "", 0)], "Q4")
+        self.assertEqual(counts[("span", "", "")], 1)
+        self.assertNotIn("Q2", text.values())
+
 
 def template_bindings_from_string(source):
     import tempfile
