@@ -689,15 +689,24 @@ class ContentUpdateTests(unittest.TestCase):
         </body></html>
         """
 
-        updated, added, skipped, repaired = render_photography_page(html, [row], "en")
+        with mock.patch.object(content_update, "location_caption_qid", return_value="Q42") as lookup:
+            updated, added, skipped, repaired = render_photography_page(html, [row], "en")
 
+        lookup.assert_called_once_with("Canal")
         self.assertEqual(added, 1)
         self.assertEqual(skipped, 0)
         self.assertEqual(repaired, 0)
-        self.assertIn('data-location="Canal"', updated)
+        # The caption is bound on the abstract page, never written as English.
+        self.assertIn('data-content-data-location="local:Q42"', updated)
+        self.assertIn('data-location="Q42"', updated)
+        self.assertNotIn('data-location="Canal"', updated)
         self.assertIn('src="https://example.org/canal.jpg"', updated)
         self.assertIn('alt=""', updated)
         self.assertIn("azure-scan", updated)
+
+    def test_photography_caption_without_content_item_is_refused(self):
+        with self.assertRaises(content_update.ContentUpdateError):
+            content_update.location_caption_qid("No such caption anywhere 1f3a")
 
     def test_q315_photography_family_uses_travel_pipeline(self):
         row = ContentRow(

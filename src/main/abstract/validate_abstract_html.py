@@ -82,6 +82,19 @@ class AbstractHTMLValidator(HTMLParser):
                 continue
             self.qualified_qid(value, attribute)
 
+        if "data-location" in attributes:
+            # A gallery caption is shown through CSS attr(); a literal here is
+            # English text leaking into the abstract page and every language
+            # page rendered from it.
+            binding = attributes.get(f"{CONTENT_ATTRIBUTE_PREFIX}data-location") or ""
+            expected = binding.removeprefix("local:")
+            if not binding or attributes["data-location"] != expected:
+                self.error(
+                    "data-location must show the QID bound by "
+                    f"{CONTENT_ATTRIBUTE_PREFIX}data-location, found "
+                    f"{attributes['data-location']!r}"
+                )
+
     def handle_startendtag(self, tag: str, attrs) -> None:
         # `<img />` carries attribute bindings and is reported only here.
         self.handle_starttag(tag, attrs)

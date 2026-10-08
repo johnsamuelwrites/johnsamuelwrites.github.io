@@ -55,8 +55,12 @@ AttributeSlot = tuple[Signature, str]
 # text; `data-content-<attribute>` binds one of its attributes, so a single
 # abstract page can own both. Only attributes that hold prose are eligible:
 # binding `src` or `href` would make the renderer rewrite a URL from a label.
+# `data-location` is a gallery card's caption, shown by CSS `attr()`, so it is
+# read as prose; its binding is `data-content-data-location`.
 CONTENT_ATTRIBUTE_PREFIX = "data-content-"
-BINDABLE_ATTRIBUTES = frozenset({"alt", "title", "aria-label", "placeholder"})
+BINDABLE_ATTRIBUTES = frozenset(
+    {"alt", "title", "aria-label", "placeholder", "data-location"}
+)
 
 
 def load_labels(data_dir: Path) -> dict[str, dict[str, str]]:
@@ -255,7 +259,7 @@ class SlotRewriter(HTMLParser):
             if slot_key != key:
                 continue
             match = re.search(
-                rf'\b{re.escape(attribute)}\s*=\s*"([^"]*)"', text, flags=re.IGNORECASE
+                rf'(?<![\w-]){re.escape(attribute)}\s*=\s*"([^"]*)"', text, flags=re.IGNORECASE
             )
             if not match:
                 # The language page has no such attribute to fill.

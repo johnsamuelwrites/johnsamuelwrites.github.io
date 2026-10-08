@@ -94,6 +94,21 @@ python3 src/main/abstract/validate_rendered_pages.py
 python3 src/main/abstract/verify_content_roundtrip.py
 ```
 
+Gallery card captions are shown through CSS `attr(data-location)`, so they are
+bound like `alt`: the abstract page carries `data-location="Q…"
+data-content-data-location="local:Q…"`, and `validate_abstract_html.py` rejects
+a literal caption. `bind_location_captions.py` binds captions to content items
+by English label; captions without an item are created from
+`location-caption-translations.csv`:
+
+```bash
+python3 src/main/abstract/bind_location_captions.py --quickstatements
+python3 src/main/wikibase_write.py src/main/abstract/location-captions.quickstatements --apply
+python3 src/main/abstract/fetch_wikibase_labels.py
+python3 src/main/abstract/bind_location_captions.py --apply
+python3 src/main/abstract/render_page.py
+```
+
 Both renderers and `validate_rendered_pages.py` take `--page QID` to scope to a
 single page. `validate_rendered_pages.py` catches untranslated prose labels in
 translated pages, bare `()` placeholders in Q315-owned rendered content, and

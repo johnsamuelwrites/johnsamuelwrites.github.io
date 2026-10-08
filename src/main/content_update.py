@@ -1221,6 +1221,21 @@ def photography_is_abstract_page(row: ContentRow) -> bool:
     return any(page.startswith("Q315/") for _language, page in photography_pages_for_row(row))
 
 
+def location_caption_qid(caption: str) -> str:
+    """The content item a gallery caption is bound to on an abstract page."""
+    from abstract.bind_location_captions import caption_key, content_items_by_english
+    from abstract.css_assets import DEFAULT_DATA_DIR
+
+    qids = content_items_by_english(DEFAULT_DATA_DIR).get(caption_key(caption))
+    if not qids:
+        raise ContentUpdateError(
+            f"photographies: caption {caption!r} has no content item; add it to "
+            "src/main/abstract/location-caption-translations.csv and run "
+            "src/main/abstract/bind_location_captions.py --quickstatements"
+        )
+    return qids[0]
+
+
 def update_photography_card(card: Tag, row: ContentRow, language: str, *, abstract: bool) -> None:
     image = card.find("img")
     if isinstance(image, Tag):
@@ -1236,7 +1251,16 @@ def update_photography_card(card: Tag, row: ContentRow, language: str, *, abstra
     if not data_location:
         data_location = row.localized("location", language, required=False)
     if data_location and isinstance(link, Tag):
-        link["data-location"] = data_location
+        if abstract:
+            # The caption is shown through CSS attr(), so on an abstract page it
+            # is content like any other: bind it, never write the English literal.
+            qid = location_caption_qid(data_location)
+            link["data-location"] = qid
+            link["data-content-data-location"] = f"local:{qid}"
+        else:
+            link["data-location"] = data_location
+            # The template card may carry another photograph's binding.
+            link.attrs.pop("data-content-data-location", None)
 
     location = row.localized("location", language, required=False)
     location_node = card.find(class_=re.compile(r"(photo|bridge|boat)-(location|title)"))
