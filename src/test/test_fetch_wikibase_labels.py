@@ -11,7 +11,7 @@ import json
 from unittest import mock
 
 from abstract import fetch_wikibase_labels
-from abstract.fetch_wikibase_labels import _Bound, existing_identifiers, items_created_after
+from abstract.fetch_wikibase_labels import _Bound, existing_identifiers, items_created_after, truncated
 
 
 class FetchWikibaseLabelsTests(unittest.TestCase):
@@ -53,6 +53,14 @@ class FetchWikibaseLabelsTests(unittest.TestCase):
         with mock.patch.object(fetch_wikibase_labels.urllib.request, "urlopen",
                                side_effect=lambda *a, **k: next(responses)):
             self.assertEqual(items_created_after(9994, pause=0), {"Q9997", "Q10021"})
+
+
+    def test_a_label_is_only_replaced_when_p40_continues_it(self):
+        long_text = "A very long description " + "x" * 300
+        self.assertTrue(truncated(long_text[:247] + "...", long_text))
+        # A label that ends in an ellipsis on purpose keeps its translation.
+        self.assertFalse(truncated("10+ lieux • Paris, Lyon...", "10+ Locations • Paris, Lyon..."))
+        self.assertFalse(truncated("Bench", "Bench"))
 
 
 if __name__ == "__main__":

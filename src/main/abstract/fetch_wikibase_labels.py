@@ -121,6 +121,18 @@ def items_created_after(newest: int, pause: float) -> set[str]:
             time.sleep(pause)
 
 
+def truncated(label: str, text: str) -> bool:
+    """Whether ``label`` is ``text`` cut to the label length limit.
+
+    A label may legitimately end in "..." ("Paris, Lyon, Marseille..."); it is
+    only a truncation when the full P40 text continues it.
+    """
+    if not label.endswith("..."):
+        return False
+    stem = label[:-3].rstrip()
+    return len(text) > len(stem) and text.startswith(stem) and text != label
+
+
 def fetch(ids: list[str], pause: float) -> dict[str, dict[str, str]]:
     result: dict[str, dict[str, str]] = {}
     for start in range(0, len(ids), 50):
@@ -165,7 +177,7 @@ def fetch(ids: list[str], pause: float) -> dict[str, dict[str, str]]:
                     p40[language] = text
             for language, text in p40.items():
                 label = labels.get(language, "")
-                if not label or label.endswith("..."):
+                if not label or truncated(label, text):
                     labels[language] = text
             result[qid] = {"identifier": qid, "itemtype": itemtype, **labels}
         if pause:
