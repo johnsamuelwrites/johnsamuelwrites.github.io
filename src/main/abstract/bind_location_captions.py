@@ -24,6 +24,11 @@ ones that have a row in ``location-caption-translations.csv`` are written as
 CREATE blocks, to be imported with ``wikibase_write.py`` before re-running this
 tool. Nothing is written to the pages without ``--apply``, and the run is
 resumable: an already-bound card is left alone.
+
+``--attribute`` binds the other prose attributes the same way -- an
+``aria-label``, ``placeholder`` or ``title`` left as an English literal on an
+abstract page -- with their translations in ``interface-label-translations.csv``.
+A value that is already a QID is a reference, not prose, and is left alone.
 """
 
 from __future__ import annotations
@@ -43,17 +48,45 @@ sys.path.insert(0, str(HERE.parent))
 sys.path.insert(0, str(HERE))
 
 from abstract.css_assets import DEFAULT_DATA_DIR, DEFAULT_REPO_ROOT
-from abstract.prepare_missing_content import alternate_pages, page_sources
+from abstract.discover_content_migration import abstract_index
+from abstract.prepare_missing_content import alternate_pages
 from abstract.prepare_travel_content import LANGUAGES, monolingual_value, quote
 from abstract.render_page import CONTENT_ATTRIBUTE_PREFIX, _base_signature, base_counts
 
 ATTRIBUTE = "data-location"
-BINDING = f"{CONTENT_ATTRIBUTE_PREFIX}{ATTRIBUTE}"
 CONTENT_ITEM_TYPE = "Q3185"
-DEFAULT_TRANSLATIONS = HERE / "location-caption-translations.csv"
-DEFAULT_QUICKSTATEMENTS = HERE / "location-captions.quickstatements"
-DESCRIPTION = "caption of a photograph in a travel gallery"
-ATTRIBUTE_VALUE = re.compile(rf'(?<![\w-]){ATTRIBUTE}\s*=\s*"[^"]*"')
+QID_VALUE = re.compile(r"(?:Q[1-9][0-9]*\s*)+")
+
+
+@dataclass(frozen=True)
+class Target:
+    """Where an attribute's translations live and how its items are described."""
+
+    translations: Path
+    quickstatements: Path
+    description: str
+
+
+CAPTIONS = Target(
+    HERE / "location-caption-translations.csv",
+    HERE / "location-captions.quickstatements",
+    "caption of a photograph in a travel gallery",
+)
+INTERFACE = Target(
+    HERE / "interface-label-translations.csv",
+    HERE / "interface-labels.quickstatements",
+    "accessible label or hint text of a page control",
+)
+TARGETS = {
+    "data-location": CAPTIONS,
+    "aria-label": INTERFACE,
+    "placeholder": INTERFACE,
+    "title": INTERFACE,
+}
+
+
+def binding(attribute: str) -> str:
+    return f"{CONTENT_ATTRIBUTE_PREFIX}{attribute}"
 
 
 def normalize(value: str) -> str:
@@ -77,11 +110,12 @@ class Caption:
 
 
 class Captions(HTMLParser):
-    """``signature -> Caption`` for every element carrying ``data-location``."""
+    """``signature -> Caption`` for every element carrying the attribute."""
 
-    def __init__(self, text: str) -> None:
+    def __init__(self, text: str, attribute: str = ATTRIBUTE) -> None:
         super().__init__(convert_charrefs=True)
         self.text = text
+        self.attribute = attribute
         # HTMLParser counts lines on "\n" alone, so offsets must too.
         self.line_offsets = [0]
         for line in text.split("\n"):
@@ -94,7 +128,7 @@ class Captions(HTMLParser):
         index = self.counts[base]
         self.counts[base] += 1
         values = dict(attrs)
-        if ATTRIBUTE not in values:
+        if self.attribute not in values:
             return
         line, column = self.getpos()
         start = self.line_offsets[line - 1] + column
@@ -103,16 +137,16 @@ class Captions(HTMLParser):
             (*base, index),
             start,
             end,
-            normalize(values.get(ATTRIBUTE) or ""),
-            (values.get(BINDING) or "").removeprefix("local:"),
+            normalize(values.get(self.attribute) or ""),
+            (values.get(binding(self.attribute)) or "").removeprefix("local:"),
         )
 
     def handle_startendtag(self, tag, attrs) -> None:
         self.handle_starttag(tag, attrs)
 
 
-def captions(text: str) -> dict[tuple, Caption]:
-    parser = Captions(text)
+def captions(text: str, attribute: str = ATTRIBUTE) -> dict[tuple, Caption]:
+    parser = Captions(text, attribute)
     parser.feed(text)
     parser.close()
     return parser.found
@@ -153,7 +187,7 @@ def content_items_by_english(data_dir: Path, *, untranslated: bool = False) -> d
     return {english: [qid for *_rank, qid in sorted(ranked)] for english, ranked in found.items()}
 
 
-def english_values(repo_root: Path, abstract: Path, text: str) -> dict[tuple, str]:
+def english_values(repo_root: Path, abstract: Path, text: str, attribute: str = ATTRIBUTE) -> dict[tuple, str]:
     """The captions the English page shows, aligned by signature.
 
     The abstract page was written from the English-only CSV column, so its
@@ -169,22 +203,23 @@ def english_values(repo_root: Path, abstract: Path, text: str) -> dict[tuple, st
     english_counts = base_counts(english_text)
     return {
         key: caption.value
-        for key, caption in captions(english_text).items()
+        for key, caption in captions(english_text, attribute).items()
         if english_counts.get(key[:3]) == abstract_counts.get(key[:3]) and caption.value
     }
 
 
-def bind_text(text: str, qids: dict[tuple, str]) -> tuple[str, int]:
+def bind_text(text: str, qids: dict[tuple, str], attribute: str = ATTRIBUTE) -> tuple[str, int]:
     """Rewrite the addressed start tags; returns the new text and the count."""
-    found = captions(text)
+    found = captions(text, attribute)
+    value = re.compile(rf'(?<![\w-]){re.escape(attribute)}\s*=\s*"[^"]*"')
     edits = []
     for key, qid in qids.items():
         caption = found.get(key)
         if caption is None or caption.bound:
             continue
         tag = text[caption.start : caption.end]
-        rewritten, count = ATTRIBUTE_VALUE.subn(
-            f'{BINDING}="local:{qid}" {ATTRIBUTE}="{qid}"', tag, count=1
+        rewritten, count = value.subn(
+            f'{binding(attribute)}="local:{qid}" {attribute}="{qid}"', tag, count=1
         )
         if count:
             edits.append((caption.start, caption.end, rewritten))
@@ -193,22 +228,30 @@ def bind_text(text: str, qids: dict[tuple, str]) -> tuple[str, int]:
     return text, len(edits)
 
 
-def plan(repo_root: Path, data_dir: Path) -> tuple[dict[Path, dict[tuple, str]], dict[str, int], collections.Counter]:
+def plan(
+    repo_root: Path, data_dir: Path, attribute: str = ATTRIBUTE
+) -> tuple[dict[Path, dict[tuple, str]], dict[str, int], collections.Counter]:
     """Bindings to write per page, unresolved captions and their slot counts."""
     items = content_items_by_english(data_dir)
     bindings: dict[Path, dict[tuple, str]] = {}
     unresolved: collections.Counter = collections.Counter()
     stats: collections.Counter = collections.Counter()
-    for _page_qid, relative in page_sources(repo_root):
+    # Every abstract page, including those whose language pages another
+    # generator writes: a literal on the abstract page itself is still a leak.
+    pages, _rendered = abstract_index(repo_root)
+    for relative in sorted(pages):
         abstract = repo_root / relative
         text = abstract.read_text(encoding="utf-8")
-        found = captions(text)
+        found = captions(text, attribute)
         if not found:
             continue
-        english = english_values(repo_root, abstract, text)
+        english = english_values(repo_root, abstract, text, attribute)
         for key, caption in found.items():
             if caption.bound:
                 stats["already bound"] += 1
+                continue
+            if QID_VALUE.fullmatch(caption.value):
+                stats["reference, not prose"] += 1
                 continue
             value = english.get(key) or caption.value
             if not value:
@@ -239,6 +282,7 @@ def quickstatements(
     captions_needed: list[str],
     translations: dict[str, dict[str, str]],
     untranslated: dict[str, list[str]] | None = None,
+    description: str = CAPTIONS.description,
 ) -> tuple[str, list[str]]:
     """Statements for every caption with a complete translation row.
 
@@ -265,7 +309,7 @@ def quickstatements(
         lines = ["CREATE"]
         lines += [f'LAST|L{language}|"{quote(texts[language])}"' for language in LANGUAGES]
         lines += [f"LAST|P40|{monolingual_value(language, texts[language])}" for language in LANGUAGES]
-        lines += [f'LAST|Den|"{quote(DESCRIPTION)}"', f"LAST|P8|{CONTENT_ITEM_TYPE}"]
+        lines += [f'LAST|Den|"{quote(description)}"', f"LAST|P8|{CONTENT_ITEM_TYPE}"]
         blocks.append("\n".join(lines))
     return ("\n\n".join(blocks) + "\n") if blocks else "", missing
 
@@ -274,45 +318,60 @@ def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     parser.add_argument("--repo-root", type=Path, default=DEFAULT_REPO_ROOT)
     parser.add_argument("--data-dir", type=Path, default=DEFAULT_DATA_DIR)
-    parser.add_argument("--translations", type=Path, default=DEFAULT_TRANSLATIONS)
+    parser.add_argument(
+        "--attribute",
+        nargs="+",
+        choices=sorted(TARGETS),
+        default=[ATTRIBUTE],
+        help="attributes to bind; those sharing a translation file share one output",
+    )
+    parser.add_argument("--translations", type=Path)
     parser.add_argument(
         "--quickstatements",
         type=Path,
         nargs="?",
-        const=DEFAULT_QUICKSTATEMENTS,
-        help="write CREATE blocks for unresolved captions that have translations",
+        const=True,
+        help="write CREATE blocks for unresolved values that have translations",
     )
     parser.add_argument("--apply", action="store_true", help="write bindings into the abstract pages")
     args = parser.parse_args(argv)
     repo_root = args.repo_root.resolve()
+    data_dir = args.data_dir.resolve()
 
-    bindings, unresolved, stats = plan(repo_root, args.data_dir.resolve())
-    for name, count in sorted(stats.items()):
-        print(f"{name}: {count}")
+    pending: dict[Target, set[str]] = {}
+    for attribute in args.attribute:
+        bindings, unresolved, stats = plan(repo_root, data_dir, attribute)
+        print(f"== {attribute}")
+        for name, count in sorted(stats.items()):
+            print(f"{name}: {count}")
+        if args.apply:
+            written = 0
+            for path, qids in sorted(bindings.items()):
+                text = path.read_text(encoding="utf-8")
+                updated, count = bind_text(text, qids, attribute)
+                if count:
+                    path.write_text(updated, encoding="utf-8")
+                    written += count
+            print(f"bound {written} {attribute} values in {len(bindings)} pages")
+        if unresolved:
+            print(f"{len(unresolved)} {attribute} values have no content item yet")
+        pending.setdefault(TARGETS[attribute], set()).update(unresolved)
 
-    if args.apply:
-        written = 0
-        for path, qids in sorted(bindings.items()):
-            text = path.read_text(encoding="utf-8")
-            updated, count = bind_text(text, qids)
-            if count:
-                path.write_text(updated, encoding="utf-8")
-                written += count
-        print(f"bound {written} captions in {len(bindings)} pages")
-
-    if unresolved:
-        print(f"{len(unresolved)} captions have no content item yet")
     if args.quickstatements:
-        output, missing = quickstatements(
-            list(unresolved),
-            load_translations(args.translations),
-            content_items_by_english(args.data_dir.resolve(), untranslated=True),
-        )
-        if output:
-            args.quickstatements.write_text(output, encoding="utf-8")
-            print(f"wrote {output.count('CREATE')} CREATE blocks and label fixes to {args.quickstatements}")
-        for caption in missing:
-            print(f"  no complete translation row: {caption!r}", file=sys.stderr)
+        untranslated = content_items_by_english(data_dir, untranslated=True)
+        for target, values in pending.items():
+            output_path = target.quickstatements if args.quickstatements is True else args.quickstatements
+            output, missing = quickstatements(
+                sorted(values),
+                load_translations(args.translations or target.translations),
+                untranslated,
+                target.description,
+            )
+            if output:
+                output_path.write_text(output, encoding="utf-8")
+                print(f"wrote {output.count('CREATE')} CREATE blocks and label fixes to {output_path}")
+            for value in missing:
+                print(f"  no complete translation row: {value!r}", file=sys.stderr)
     return 0
 
 
