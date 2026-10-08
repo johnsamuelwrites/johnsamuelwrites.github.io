@@ -109,6 +109,14 @@ python3 src/main/abstract/bind_location_captions.py --apply
 python3 src/main/abstract/render_page.py
 ```
 
+The other prose attributes follow the same rule: on an abstract page an `alt`,
+`aria-label`, `placeholder` or `title` is empty or a QID, never a literal.
+`--attribute aria-label placeholder title` binds them, with their translations
+in `interface-label-translations.csv` and items written to
+`interface-labels.quickstatements`. `build_q315_indexes.py` looks up the page
+registry's category and label QIDs by English label, so it needs those items
+imported before it can run.
+
 Both renderers and `validate_rendered_pages.py` take `--page QID` to scope to a
 single page. `validate_rendered_pages.py` catches untranslated prose labels in
 translated pages, bare `()` placeholders in Q315-owned rendered content, and

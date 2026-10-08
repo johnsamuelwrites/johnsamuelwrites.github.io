@@ -76,6 +76,20 @@ class BindTextTests(unittest.TestCase):
         self.assertEqual(text.count("<li>"), 2)
 
 
+class OtherAttributeTests(unittest.TestCase):
+    NAV = '<nav class="navbar" aria-label="Main navigation"></nav><nav aria-label="Q7"></nav>'
+
+    def test_an_aria_label_is_bound_like_a_caption(self):
+        text, count = bind_text(self.NAV, {("nav", "navbar", "", 0): "Q5"}, "aria-label")
+        self.assertEqual(count, 1)
+        self.assertIn('data-content-aria-label="local:Q5" aria-label="Q5"', text)
+        self.assertIn('aria-label="Q7"', text)
+
+    def test_the_attribute_is_found_by_its_own_name(self):
+        self.assertEqual(captions(self.NAV, "data-location"), {})
+        self.assertEqual(captions(self.NAV, "aria-label")[("nav", "navbar", "", 0)].value, "Main navigation")
+
+
 class QuickStatementsTests(unittest.TestCase):
     def test_only_complete_translation_rows_become_items(self):
         complete = {"en": "Bench", "fr": "Banc", "ml": "ബെഞ്ച്", "pa": "ਬੈਂਚ",
@@ -162,6 +176,17 @@ class ValidatorTests(unittest.TestCase):
     def test_a_bound_caption_is_accepted(self):
         self.assertEqual(
             self.errors('<a data-content-data-location="local:Q3365" data-location="Q3365"></a>'),
+            [],
+        )
+
+    def test_a_literal_prose_attribute_is_rejected(self):
+        errors = self.errors('<nav aria-label="Main navigation"></nav><input placeholder="Search..." />')
+        self.assertEqual(len(errors), 2)
+
+    def test_empty_or_qid_prose_attributes_are_accepted(self):
+        self.assertEqual(
+            self.errors('<img alt="" src="x" /><span title="Q315">Q315</span>'
+                        '<nav data-content-aria-label="local:Q5" aria-label="Q5"></nav>'),
             [],
         )
 

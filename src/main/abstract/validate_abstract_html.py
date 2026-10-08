@@ -17,6 +17,7 @@ from abstract.render_page import BINDABLE_ATTRIBUTES, CONTENT_ATTRIBUTE_PREFIX
 
 
 QUALIFIED_QID = re.compile(r"^(?:local|wikidata):Q[1-9][0-9]*$")
+QID_LIST = re.compile(r"Q[1-9][0-9]*(?:\s+Q[1-9][0-9]*)*")
 
 
 class AbstractHTMLValidator(HTMLParser):
@@ -93,6 +94,16 @@ class AbstractHTMLValidator(HTMLParser):
                     "data-location must show the QID bound by "
                     f"{CONTENT_ATTRIBUTE_PREFIX}data-location, found "
                     f"{attributes['data-location']!r}"
+                )
+
+        for attribute in sorted(BINDABLE_ATTRIBUTES - {"data-location"}):
+            value = (attributes.get(attribute) or "").strip()
+            # Prose attributes are content too: empty, or QIDs, never a literal
+            # an assistive technology or tooltip would read out in English.
+            if value and not QID_LIST.fullmatch(value):
+                self.error(
+                    f"{attribute} must be empty or a QID bound by "
+                    f"{CONTENT_ATTRIBUTE_PREFIX}{attribute}, found {value!r}"
                 )
 
     def handle_startendtag(self, tag: str, attrs) -> None:

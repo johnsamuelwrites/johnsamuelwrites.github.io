@@ -358,12 +358,17 @@ def main(argv: list[str] | None = None) -> int:
         pending.setdefault(TARGETS[attribute], set()).update(unresolved)
 
     if args.quickstatements:
+        items = content_items_by_english(data_dir)
         untranslated = content_items_by_english(data_dir, untranslated=True)
         for target, values in pending.items():
             output_path = target.quickstatements if args.quickstatements is True else args.quickstatements
+            translations = load_translations(args.translations or target.translations)
+            # A row can name text no page attribute holds yet, such as a label a
+            # generator emits; it needs its item all the same.
+            values |= {texts["en"] for key, texts in translations.items() if key not in items}
             output, missing = quickstatements(
-                sorted(values),
-                load_translations(args.translations or target.translations),
+                sorted(values, key=caption_key),
+                translations,
                 untranslated,
                 target.description,
             )

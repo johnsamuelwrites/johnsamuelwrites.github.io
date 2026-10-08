@@ -704,6 +704,39 @@ class ContentUpdateTests(unittest.TestCase):
         self.assertIn('alt=""', updated)
         self.assertIn("azure-scan", updated)
 
+    def test_a_cloned_card_does_not_keep_the_template_photo_bindings(self):
+        row = ContentRow(
+            family="photographies",
+            row_number=2,
+            data={
+                "page": "Q315/Q3062/Q3025/Q3082/Q3154.html",
+                "section": "Q3154",
+                "src": "https://example.org/new.jpg",
+                "alt": "A photograph nobody has described yet",
+            },
+        )
+        html = """
+        <html><body>
+            <h4 class="city-name">Q3154</h4>
+            <div class="links"><ul>
+                <li data-q315-source="local:Q1" data-q315-function="local:Q2">
+                    <a href="Q3154.html"><img alt="" data-content-alt="local:Q3" src="https://example.org/old.jpg" /></a>
+                </li>
+            </ul></div>
+        </body></html>
+        """
+        with mock.patch.object(content_update, "content_item_qid", return_value=""):
+            updated, added, _skipped, _repaired = render_photography_page(html, [row], "en")
+        self.assertEqual(added, 1)
+        soup = BeautifulSoup(updated, "html.parser")
+        image = soup.find("img", src="https://example.org/new.jpg")
+        card = content_update.photography_container_for_image(image)
+        self.assertNotIn("data-content-alt", image.attrs)
+        self.assertNotIn("data-q315-source", card.attrs)
+        self.assertNotIn("data-q315-function", card.attrs)
+        # The template card itself is untouched.
+        self.assertIn('data-content-alt="local:Q3"', updated)
+
     def test_photography_caption_without_content_item_is_refused(self):
         with self.assertRaises(content_update.ContentUpdateError):
             content_update.location_caption_qid("No such caption anywhere 1f3a")

@@ -108,6 +108,37 @@ def category_for(relative_path: str, qid: str) -> str:
     return "general"
 
 
+# English labels of the content items the page registry shows. The registry is
+# an abstract page, so these are bound QIDs there, never English literals.
+CATEGORY_LABELS = {
+    "travel": "Travel",
+    "research": "Research",
+    "writings": "Writings",
+    "teaching": "Teaching",
+    "linguistics": "Linguistics",
+    "search": "Search",
+    "general": "General",
+}
+INTERFACE_LABELS = ("Category", "Path", "Pages")
+
+
+def registry_qids() -> dict[str, str]:
+    """Content item QIDs for the registry's categories and labels, by English."""
+    from abstract.bind_location_captions import caption_key, content_items_by_english
+    from abstract.css_assets import DEFAULT_DATA_DIR
+
+    items = content_items_by_english(DEFAULT_DATA_DIR)
+    wanted = {*CATEGORY_LABELS.values(), *INTERFACE_LABELS}
+    missing = sorted(label for label in wanted if caption_key(label) not in items)
+    if missing:
+        raise ValueError(
+            f"no content item for {', '.join(missing)}; import "
+            "src/main/abstract/interface-labels.quickstatements and run "
+            "src/main/abstract/fetch_wikibase_labels.py"
+        )
+    return {label: items[caption_key(label)][0] for label in wanted}
+
+
 def replace_qids_with_labels(text: str, labels: dict[str, str]) -> str:
     """Expand QID tokens with labels while keeping the QID searchable."""
 
@@ -198,14 +229,17 @@ def write_search_index(
     )
 
 
-def page_list_markup(pages: Sequence[Q315Page]) -> str:
+def page_list_markup(pages: Sequence[Q315Page], qids: dict[str, str] | None = None) -> str:
     """Build the Q315 page registry section for Q3634.html."""
+    qids = qids or registry_qids()
+    category_qid, path_qid, pages_qid = (qids[label] for label in INTERFACE_LABELS)
     items: list[str] = []
     for position, page in enumerate(pages, start=1):
         title = html.escape(page.title)
         qid = html.escape(page.qid)
         url = html.escape(page.url, quote=True)
         category = html.escape(page.category)
+        shown = qids[CATEGORY_LABELS[page.category]]
         items.append(
             f"""
             <li property='itemListElement' typeof='ListItem' class="article-item" data-year="{page.year}" data-category="{category}">
@@ -218,8 +252,8 @@ def page_list_markup(pages: Sequence[Q315Page]) -> str:
                 </div>
                 <div class="article-meta">
                     <span class="meta-item creation-date" title="Q315">Q315</span>
-                    <span class="meta-item reading-time" title="Category">{category}</span>
-                    <span class="meta-item word-count" title="Path">{html.escape(page.relative_path)}</span>
+                    <span class="meta-item reading-time" title="{category_qid}" data-content-title="local:{category_qid}" data-content="local:{shown}">{shown}</span>
+                    <span class="meta-item word-count" title="{path_qid}" data-content-title="local:{path_qid}">{html.escape(page.relative_path)}</span>
                 </div>
             </li>
         """
@@ -229,7 +263,7 @@ def page_list_markup(pages: Sequence[Q315Page]) -> str:
                     <div class="year-section" id="year-2026">
                         <div class="year-header">
                             <h3 class="year-title">Q315</h3>
-                            <span class="year-count">{len(pages)} Q315 pages</span>
+                            <span class="year-count">{len(pages)} Q315 <span data-content="local:{pages_qid}">{pages_qid}</span></span>
                         </div>
                         <ul vocab='http://schema.org/' typeof='ItemList' class="article-list">
                             {''.join(items)}

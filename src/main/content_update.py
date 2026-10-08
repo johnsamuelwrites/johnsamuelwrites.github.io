@@ -1221,19 +1221,27 @@ def photography_is_abstract_page(row: ContentRow) -> bool:
     return any(page.startswith("Q315/") for _language, page in photography_pages_for_row(row))
 
 
-def location_caption_qid(caption: str) -> str:
-    """The content item a gallery caption is bound to on an abstract page."""
+def content_item_qid(text: str) -> str:
+    """The content item whose English label is ``text``, or ""."""
     from abstract.bind_location_captions import caption_key, content_items_by_english
     from abstract.css_assets import DEFAULT_DATA_DIR
 
-    qids = content_items_by_english(DEFAULT_DATA_DIR).get(caption_key(caption))
-    if not qids:
+    if re.fullmatch(r"Q[1-9][0-9]*", text.strip()):
+        return text.strip()
+    qids = content_items_by_english(DEFAULT_DATA_DIR).get(caption_key(text))
+    return qids[0] if qids else ""
+
+
+def location_caption_qid(caption: str) -> str:
+    """The content item a gallery caption is bound to on an abstract page."""
+    qid = content_item_qid(caption)
+    if not qid:
         raise ContentUpdateError(
             f"photographies: caption {caption!r} has no content item; add it to "
             "src/main/abstract/location-caption-translations.csv and run "
             "src/main/abstract/bind_location_captions.py --quickstatements"
         )
-    return qids[0]
+    return qid
 
 
 def update_photography_card(card: Tag, row: ContentRow, language: str, *, abstract: bool) -> None:
@@ -1242,6 +1250,13 @@ def update_photography_card(card: Tag, row: ContentRow, language: str, *, abstra
         image["src"] = row.data.get("src", "").strip()
         alt = row.localized("alt", language, required=False) or row.localized("title", language, required=False)
         image["alt"] = "" if abstract else alt
+        # A card cloned from the gallery's last card carries that photograph's
+        # description binding; keep a binding only if it describes this one.
+        description = content_item_qid(alt) if abstract and alt else ""
+        if description:
+            image["data-content-alt"] = f"local:{description}"
+        else:
+            image.attrs.pop("data-content-alt", None)
 
     href = row.data.get("href", "").strip()
     link = card if card.name == "a" else card.find("a", href=True)
@@ -1265,12 +1280,16 @@ def update_photography_card(card: Tag, row: ContentRow, language: str, *, abstra
     location = row.localized("location", language, required=False)
     location_node = card.find(class_=re.compile(r"(photo|bridge|boat)-(location|title)"))
     if location and isinstance(location_node, Tag):
-        location_node.string = location
+        # Abstract pages show a QID here; an English literal would leak.
+        location_node.string = location_caption_qid(location) if abstract else location
 
     year = row.data.get("year", "").strip()
     year_node = card.find(class_=re.compile(r"year-badge"))
     if year and isinstance(year_node, Tag):
         year_node.string = year
+    # Likewise the card-level source binding belongs to the template's photo.
+    card.attrs.pop("data-q315-source", None)
+    card.attrs.pop("data-q315-function", None)
     if row.local_qid:
         add_photography_binding(card, row)
 

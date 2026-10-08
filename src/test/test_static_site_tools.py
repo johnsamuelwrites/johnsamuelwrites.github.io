@@ -7,7 +7,13 @@ import sys
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "main"))
 
 from config import ALLOWED_UNREFERENCED_HTML_FILES, EXCLUDED_DIRECTORIES
-from build_q315_indexes import collect_q315_pages, load_english_labels
+from build_q315_indexes import (
+    CATEGORY_LABELS,
+    INTERFACE_LABELS,
+    collect_q315_pages,
+    load_english_labels,
+    page_list_markup,
+)
 from html_generator import HTMLTranslator
 from manifest import BuildManifest, fingerprint_paths
 from metadata import update_metadata_content
@@ -41,6 +47,16 @@ class StaticSiteToolTests(unittest.TestCase):
         self.assertIn("ui", EXCLUDED_DIRECTORIES)
         self.assertIn("404.html", ALLOWED_UNREFERENCED_HTML_FILES)
         self.assertIn("license.html", ALLOWED_UNREFERENCED_HTML_FILES)
+
+    def test_q315_page_registry_shows_bound_qids_not_english(self):
+        qids = {label: f"Q{index}" for index, label in enumerate(
+            [*CATEGORY_LABELS.values(), *INTERFACE_LABELS], start=100)}
+        pages = collect_q315_pages(labels={})
+        markup = page_list_markup(pages[:3], qids)
+        for literal in ('title="Path"', 'title="Category"', "Q315 pages", ">travel<", ">general<"):
+            self.assertNotIn(literal, markup)
+        path_qid = qids["Path"]
+        self.assertIn(f'title="{path_qid}" data-content-title="local:{path_qid}"', markup)
 
     def test_q315_index_uses_wikibase_labels_and_qid_routes(self):
         labels = load_english_labels()
