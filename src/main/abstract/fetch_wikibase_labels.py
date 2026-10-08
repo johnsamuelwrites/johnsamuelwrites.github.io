@@ -9,7 +9,9 @@ this fetcher reproduces the same CSV schema authoritatively.
 Items fetched are the union of every identifier already in the current export and
 every QID bound in a Q315 template (``data-content``/``data-entity``/
 ``data-content-<attribute>``), so bound
-items dropped by the broken export are recovered. ``itemtype`` is the item's
+items dropped by the broken export are recovered, and every item created since
+the newest one in the export -- an item just imported is neither, and the
+binders need its labels before they can bind it. ``itemtype`` is the item's
 first ``P8`` value, matching the export's column.
 """
 
@@ -88,6 +90,37 @@ def existing_identifiers(data_dir: Path) -> set[str]:
         }
 
 
+ITEM_NAMESPACE = 120
+
+
+def items_created_after(newest: int, pause: float) -> set[str]:
+    """QIDs above ``newest``, listed from the Item namespace."""
+    result: set[str] = set()
+    params = {
+        "action": "query",
+        "list": "allpages",
+        "apnamespace": str(ITEM_NAMESPACE),
+        "aplimit": "500",
+        "format": "json",
+    }
+    while True:
+        request = urllib.request.Request(
+            f"{API}?{urllib.parse.urlencode(params)}",
+            headers={"User-Agent": "Q315-label-fetcher/1.0"},
+        )
+        with urllib.request.urlopen(request, timeout=60) as response:
+            data = json.load(response)
+        for page in data.get("query", {}).get("allpages", []):
+            qid = page["title"].rsplit(":", 1)[-1]
+            if QID.fullmatch(qid) and int(qid[1:]) > newest:
+                result.add(qid)
+        if "continue" not in data:
+            return result
+        params.update(data["continue"])
+        if pause:
+            time.sleep(pause)
+
+
 def fetch(ids: list[str], pause: float) -> dict[str, dict[str, str]]:
     result: dict[str, dict[str, str]] = {}
     for start in range(0, len(ids), 50):
@@ -155,8 +188,10 @@ def main(argv: Sequence[str] | None = None) -> int:
     args = parser.parse_args(argv)
 
     repo_root = args.repo_root.resolve()
+    existing = existing_identifiers(args.data_dir.resolve())
+    newest = max((int(qid[1:]) for qid in existing), default=0)
     ids = sorted(
-        existing_identifiers(args.data_dir.resolve()) | bound_qids(repo_root),
+        existing | bound_qids(repo_root) | items_created_after(newest, args.pause),
         key=lambda value: int(value[1:]),
     )
     print(f"Fetching {len(ids)} items from {API}", file=sys.stderr)
