@@ -77,7 +77,13 @@ INTERFACE = Target(
     HERE / "interface-labels.quickstatements",
     "accessible label or hint text of a page control",
 )
+DESCRIPTIONS = Target(
+    HERE / "image-description-translations.csv",
+    HERE / "image-descriptions.quickstatements",
+    "description of a photograph (alt text)",
+)
 TARGETS = {
+    "alt": DESCRIPTIONS,
     "data-location": CAPTIONS,
     "aria-label": INTERFACE,
     "placeholder": INTERFACE,
@@ -218,8 +224,11 @@ def bind_text(text: str, qids: dict[tuple, str], attribute: str = ATTRIBUTE) -> 
         if caption is None or caption.bound:
             continue
         tag = text[caption.start : caption.end]
+        # An abstract image keeps alt="" (its description is the bound item);
+        # every other attribute shows the bound QID, as text slots do.
+        shown = "" if attribute == "alt" else qid
         rewritten, count = value.subn(
-            f'{binding(attribute)}="local:{qid}" {attribute}="{qid}"', tag, count=1
+            f'{binding(attribute)}="local:{qid}" {attribute}="{shown}"', tag, count=1
         )
         if count:
             edits.append((caption.start, caption.end, rewritten))

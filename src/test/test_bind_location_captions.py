@@ -85,6 +85,12 @@ class OtherAttributeTests(unittest.TestCase):
         self.assertIn('data-content-aria-label="local:Q5" aria-label="Q5"', text)
         self.assertIn('aria-label="Q7"', text)
 
+    def test_an_abstract_image_keeps_an_empty_alt(self):
+        image = '<img class="photo" alt="" src="x.jpg" />'
+        text, count = bind_text(image, {("img", "photo", "", 0): "Q9"}, "alt")
+        self.assertEqual(count, 1)
+        self.assertIn('data-content-alt="local:Q9" alt=""', text)
+
     def test_the_attribute_is_found_by_its_own_name(self):
         self.assertEqual(captions(self.NAV, "data-location"), {})
         self.assertEqual(captions(self.NAV, "aria-label")[("nav", "navbar", "", 0)].value, "Main navigation")

@@ -239,7 +239,9 @@ def main(argv: Sequence[str] | None = None) -> int:
     parser.add_argument("--api")
     parser.add_argument("--apply", action="store_true", help="perform writes")
     parser.add_argument("--summary", default="Import generated site data")
-    parser.add_argument("--pause", type=float, default=0.25)
+    # MediaWiki's default edit rate limit is 90 per minute per user; past it
+    # wbeditentity fails with a bare "failed-save", so stay just under it.
+    parser.add_argument("--pause", type=float, default=0.7)
     parser.add_argument("--limit", type=int)
     parser.add_argument("--state", type=Path)
     args = parser.parse_args(argv)
