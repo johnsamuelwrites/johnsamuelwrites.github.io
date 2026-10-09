@@ -129,6 +129,25 @@ documented 214-pair structural round-trip baseline. It also validates every
 HTML document below `Q315/`; passing a directory to `validate_abstract_html.py`
 discovers its HTML files recursively.
 
+## Reconciling reviewed translations with Wikibase
+
+A translation correction can update an item label while leaving its `P40`
+content stale. Audit the values changed since a reviewed Git revision before
+refreshing the label store:
+
+```bash
+python3 src/main/abstract/reconcile_translation_content.py \
+  --since REVISION --report /tmp/translation-content-review.json
+```
+
+Add `--apply` to synchronize existing atomic `P40` statements with the reviewed
+values. Live labels must already agree with the repository. The tool preserves
+statement IDs, ranks, qualifiers and references, excludes repository-only quote
+text, and stops for conflicting labels, duplicate language statements or
+composed content. It re-reads each item before writing; rerunning resumes with
+only remaining differences. The report records every proposed before/after
+value. Follow an applied batch with another audit to verify zero differences.
+
 ## Migrating pages linked by the Q315 home page
 
 Home-page destinations must point to canonical Q315 documents once migrated;

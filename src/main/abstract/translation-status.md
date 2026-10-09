@@ -5,6 +5,27 @@ Status checked: 4 July 2026, using the refreshed
 
 Supported languages are `en`, `fr`, `ml`, `pa`, `hi`, `pt`, `es`, and `it`.
 
+## Update — 9 October 2026: reviewed translation reconciliation
+
+Audited recent changes. The label store changed on 506 items, covering 1,941 language
+values. All eight labels on every touched item matched live Wikibase.
+
+The labels were current, but 1,531 existing `P40` statements on 438 atomic
+content items still held earlier wording. They were updated in place to match
+the reviewed labels, preserving statement IDs, ranks, qualifiers and references.
+Corrections by language: French 33, Malayalam 396, Punjabi 384, Hindi 399,
+Portuguese 118, Spanish 98, Italian 103. No labels or rendered pages needed edits.
+
+A fresh live audit after applying the batch found **zero P40 differences and
+zero blocked values**. Local validation found zero renderer rewrites, zero
+rendered-page issues and zero round-trip mismatches; all 204 canonical HTML
+documents validated and all 443 unit tests passed.
+
+`reconcile_translation_content.py` now provides a repeatable audit and guarded
+update path for future reviewed translation changes; see the README for usage.
+This verifies synchronization of reviewed wording, rather than independently
+certifying every translation's linguistic quality.
+
 ## Update — 5 July 2026: Q315 home-linked pages
 
 - Six English-only destinations linked by `Q315/index.html` were assigned
