@@ -13,7 +13,11 @@ import sys
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
-from abstract.render_page import BINDABLE_ATTRIBUTES, CONTENT_ATTRIBUTE_PREFIX
+from abstract.render_page import (
+    BINDABLE_ATTRIBUTES,
+    CAPTION_ATTRIBUTES,
+    CONTENT_ATTRIBUTE_PREFIX,
+)
 
 
 QUALIFIED_QID = re.compile(r"^(?:local|wikidata):Q[1-9][0-9]*$")
@@ -83,20 +87,20 @@ class AbstractHTMLValidator(HTMLParser):
                 continue
             self.qualified_qid(value, attribute)
 
-        if "data-location" in attributes:
+        for attribute in sorted(CAPTION_ATTRIBUTES & attributes.keys()):
             # A gallery caption is shown through CSS attr(); a literal here is
             # English text leaking into the abstract page and every language
             # page rendered from it.
-            binding = attributes.get(f"{CONTENT_ATTRIBUTE_PREFIX}data-location") or ""
+            binding = attributes.get(f"{CONTENT_ATTRIBUTE_PREFIX}{attribute}") or ""
             expected = binding.removeprefix("local:")
-            if not binding or attributes["data-location"] != expected:
+            if not binding or attributes[attribute] != expected:
                 self.error(
-                    "data-location must show the QID bound by "
-                    f"{CONTENT_ATTRIBUTE_PREFIX}data-location, found "
-                    f"{attributes['data-location']!r}"
+                    f"{attribute} must show the QID bound by "
+                    f"{CONTENT_ATTRIBUTE_PREFIX}{attribute}, found "
+                    f"{attributes[attribute]!r}"
                 )
 
-        for attribute in sorted(BINDABLE_ATTRIBUTES - {"data-location"}):
+        for attribute in sorted(BINDABLE_ATTRIBUTES - CAPTION_ATTRIBUTES):
             value = (attributes.get(attribute) or "").strip()
             # Prose attributes are content too: empty, or QIDs, never a literal
             # an assistive technology or tooltip would read out in English.

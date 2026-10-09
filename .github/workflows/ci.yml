@@ -108,3 +108,14 @@ jobs:
         run: |
           python src/main/abstract/verify_language_footer.py \
             --max-failing-pages 0
+
+      - name: Check Q315 pages carry QIDs, not natural-language literals
+        # A literal in an abstract page (English text in an element, or in an
+        # attribute the page displays, such as a gallery caption shown with CSS
+        # attr()) reaches every language page untranslated, and no other check
+        # sees it. The budget is a ratchet: 783 literals when the check was
+        # added (734 text, 49 data-city captions); only ever lower it as they
+        # are converted to QIDs, so no new literal can slip in.
+        run: |
+          python src/main/abstract/verify_abstract_literals.py \
+            --max-literals 783

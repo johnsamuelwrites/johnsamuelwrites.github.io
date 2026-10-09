@@ -145,6 +145,7 @@ class ContentItemLookupTests(unittest.TestCase):
 class RendererTests(unittest.TestCase):
     def test_data_location_is_bindable(self):
         self.assertIn("data-location", BINDABLE_ATTRIBUTES)
+        self.assertIn("data-city", BINDABLE_ATTRIBUTES)
 
     def test_the_language_page_caption_is_rewritten(self):
         source = '<a data-location="Door" href="a.html"></a>'
@@ -183,6 +184,13 @@ class ValidatorTests(unittest.TestCase):
         self.assertEqual(
             self.errors('<a data-content-data-location="local:Q3365" data-location="Q3365"></a>'),
             [],
+        )
+
+    def test_a_literal_city_caption_is_rejected(self):
+        """data-city is shown through CSS attr() exactly like data-location."""
+        self.assertEqual(len(self.errors('<a data-city="Church"></a>')), 1)
+        self.assertEqual(
+            self.errors('<a data-content-data-city="local:Q3327" data-city="Q3327"></a>'), []
         )
 
     def test_a_literal_prose_attribute_is_rejected(self):

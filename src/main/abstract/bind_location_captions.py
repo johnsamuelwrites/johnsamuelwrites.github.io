@@ -85,6 +85,7 @@ DESCRIPTIONS = Target(
 TARGETS = {
     "alt": DESCRIPTIONS,
     "data-location": CAPTIONS,
+    "data-city": CAPTIONS,
     "aria-label": INTERFACE,
     "placeholder": INTERFACE,
     "title": INTERFACE,

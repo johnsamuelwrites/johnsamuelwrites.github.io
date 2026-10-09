@@ -55,11 +55,13 @@ AttributeSlot = tuple[Signature, str]
 # text; `data-content-<attribute>` binds one of its attributes, so a single
 # abstract page can own both. Only attributes that hold prose are eligible:
 # binding `src` or `href` would make the renderer rewrite a URL from a label.
-# `data-location` is a gallery card's caption, shown by CSS `attr()`, so it is
-# read as prose; its binding is `data-content-data-location`.
+# `data-location` and `data-city` are gallery card captions, shown by CSS
+# `attr()`, so they are read as prose; their bindings are
+# `data-content-data-location` and `data-content-data-city`.
 CONTENT_ATTRIBUTE_PREFIX = "data-content-"
+CAPTION_ATTRIBUTES = frozenset({"data-location", "data-city"})
 BINDABLE_ATTRIBUTES = frozenset(
-    {"alt", "title", "aria-label", "placeholder", "data-location"}
+    {"alt", "title", "aria-label", "placeholder", *CAPTION_ATTRIBUTES}
 )
 
 
