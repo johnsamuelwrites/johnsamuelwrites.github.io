@@ -13,7 +13,7 @@
         <section class="panel settings"><h2>${t('Votre expérience','Your experiment')}</h2>
           <div><label for="mode">${t('Méthode','Method')}</label><select id="mode"><option value="1">${t('Stochastique · SGD','Stochastic · SGD')}</option><option value="2">${t('Mini-lot · 2 exemples','Mini-batch · 2 samples')}</option><option value="4">${t('Lot complet · 4 exemples','Full batch · 4 samples')}</option></select></div>
           <p class="hint wide" id="modeHint"></p>
-          <div><label for="rate">${t('Taux d’apprentissage η','Learning rate η')}</label><input id="rate" type="number" min="0.001" max="5" step="0.05" value="0.5"></div>
+          <div><label for="rate">${t('Taux d’apprentissage η','Learning rate η')}</label><input id="rate" type="text" inputmode="decimal" required aria-describedby="rateHint" value="${fr ? '0,5' : '0.5'}"><p class="hint" id="rateHint">${t('De 0,001 à 5 ; virgule ou point accepté.','From 0.001 to 5; comma or decimal point accepted.')}</p></div>
           <div><label for="seed">${t('Graine aléatoire','Random seed')}</label><input id="seed" type="number" min="0" max="4294967295" step="1" value="42"></div>
           <p class="hint wide">${t('Même graine = mêmes poids initiaux. Changer la méthode ou le taux restaure ces poids.','Same seed = same initial weights. Changing the method or rate restores those weights.')}</p>
           <div class="wide"><button id="random">${t('Nouvelle graine','New seed')}</button></div>
@@ -39,7 +39,13 @@
     </main>`;
     let weights, initial, pass, gradients, previousWeights, accumulated, epoch = 0, updates = 0, sampleIndex = -1;
     let observed = [], history = [], batchCount = 0, phase = 'forward', active = false, running = false, timer = null, selected = [1, 0];
-    const rate = () => Number($('rate').value);
+    const rate = () => Number($('rate').value.trim().replace(',', '.'));
+    function validRate() {
+        const raw = $('rate').value.trim();
+        const valid = /^(?:[0-9]+(?:[.,][0-9]*)?|[.,][0-9]+)$/.test(raw) && Number.isFinite(rate()) && rate() >= 0.001 && rate() <= 5;
+        $('rate').setCustomValidity(valid ? '' : t('Saisissez un taux entre 0,001 et 5 (par exemple 0,45).', 'Enter a rate between 0.001 and 5 (for example 0.45).'));
+        return valid;
+    }
     const size = () => Number($('mode').value);
     const status = (title, description) => { $('statusTitle').textContent = title; $('statusText').textContent = description; };
     function controls() {
@@ -59,14 +65,14 @@
         controls(); render();
     }
     function initialize() {
-        if (!$('seed').checkValidity() || !$('rate').checkValidity()) { $('seed').reportValidity(); $('rate').reportValidity(); return; }
+        if (!$('seed').checkValidity() || !validRate()) { $('seed').reportValidity(); $('rate').reportValidity(); return; }
         initial = M.create(Number($('seed').value)); restore();
     }
     function begin() {
         active = true; sampleIndex = 0; observed = []; accumulated = M.zeros(weights); batchCount = 0; phase = 'forward'; gradients = null;
     }
     function advance() {
-        if (!$('rate').checkValidity() || !$('seed').checkValidity()) { $('rate').reportValidity(); $('seed').reportValidity(); return; }
+        if (!validRate() || !$('seed').checkValidity()) { $('rate').reportValidity(); $('seed').reportValidity(); return; }
         if (!active) begin();
         const sample = M.data[sampleIndex];
         const label = t(`Exemple ${sampleIndex + 1}`, `Sample ${sampleIndex + 1}`);
@@ -97,7 +103,7 @@
         if (!running) return;
         timer = setTimeout(() => { if (!running) return; advance(); schedule(); }, $('motion').checked ? 40 : 900 / Number($('speed').value));
     }
-    function start() { if (!$('rate').checkValidity() || !$('seed').checkValidity()) { $('rate').reportValidity(); $('seed').reportValidity(); return; } if (!active) begin(); running = true; advance(); schedule(); controls(); }
+    function start() { if (!validRate() || !$('seed').checkValidity()) { $('rate').reportValidity(); $('seed').reportValidity(); return; } if (!active) begin(); running = true; advance(); schedule(); controls(); }
     function inspect() {
         const [l,j] = selected;
         if (l === 0) { $('inspector').textContent = t(`Entrée ${j+1} · valeur : `, `Input ${j+1} · value: `) + (pass ? fmt(pass.activations[l][j]) : '—'); return; }
@@ -125,13 +131,14 @@
     $('step').addEventListener('click',advance);
     $('pause').addEventListener('click',()=>{running=!running;clearTimeout(timer);controls();if(running)schedule();});
     $('reset').addEventListener('click',restore);
+    $('rate').addEventListener('input', validRate);
     ['mode','rate','seed'].forEach(id=>$(id).addEventListener('change',initialize));
     $('random').addEventListener('click',()=>{const seed=new Uint32Array(1);crypto.getRandomValues(seed);$('seed').value=seed[0];initialize();});
     $('speed').addEventListener('input',()=>{$('speedValue').textContent=$('speed').value+'×';});
     $('motion').checked = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     $('forward').addEventListener('click',()=>{sampleIndex=0;pass=M.forward(weights,M.data[0].input);gradients=null;status(t('Prédiction seule · exemple 1','Prediction only · sample 1'),`${t('Perte de cet exemple','Loss for this sample')}: ${fmt(M.loss(pass.output,M.data[0].target))}. ${t('Les poids restent inchangés.','Weights are unchanged.')}`);render();});
     $('compare').addEventListener('click',()=>{
-        if (!$('rate').checkValidity()) { $('rate').reportValidity(); return; }
+        if (!validRate()) { $('rate').reportValidity(); return; }
         const results=[1,2,4].map(b=>{const w=M.clone(initial);for(let e=0;e<30;e++){let sum=M.zeros(w),n=0;M.data.forEach(sample=>{M.accumulate(sum,M.gradient(w,M.forward(w,sample.input),sample.target));n++;if(n===b){M.update(w,sum,rate(),n);sum=M.zeros(w);n=0;}});}return [b,M.evaluate(w)];});
         $('comparison').innerHTML=`<p>${t('Même graine, même taux, ordre fixe. La comparaison utilise des copies des poids initiaux.','Same seed, same rate, fixed order. Comparison uses copies of the initial weights.')}</p><table><thead><tr><th>${t('Méthode','Method')}</th><th>${t('Perte finale','Final loss')}</th><th>${t('Mises à jour','Updates')}</th></tr></thead><tbody>${results.map(([b,v])=>`<tr><td>${b===1?'SGD':b===2?t('Mini-lot','Mini-batch'):t('Lot complet','Full batch')}</td><td>${fmt(v)}</td><td>${30*4/b}</td></tr>`).join('')}</tbody></table>`;
     });
