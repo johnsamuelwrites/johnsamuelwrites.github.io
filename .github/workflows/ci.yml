@@ -1,8 +1,29 @@
 name: CI
 
 on:
+  # Documentation-only changes touch nothing a check reads.
   push:
+    paths-ignore:
+      - "**/*.md"
+      - "**/*.ipynb"
+      - "LICENSE*"
+      - "CITATION.cff"
+      - ".gitignore"
   pull_request:
+    paths-ignore:
+      - "**/*.md"
+      - "**/*.ipynb"
+      - "LICENSE*"
+      - "CITATION.cff"
+      - ".gitignore"
+
+# A newer push to the same branch makes the running check obsolete.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
 
 jobs:
   test-and-validate:
@@ -10,33 +31,50 @@ jobs:
 
     steps:
       - name: Check out repository
+        # Only the commit under test, and none of its binary assets: no check
+        # opens an image or a model, and the link check resolves targets
+        # against the files git tracks (--tracked), so they need not be on disk.
+        # This skips the history and roughly a third of the tree.
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0
+          fetch-depth: 1
+          filter: blob:none
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /*
+            !*.png
+            !*.PNG
+            !*.jpg
+            !*.JPG
+            !*.jpeg
+            !*.gif
+            !*.bmp
+            !*.webp
+            !*.glb
+            !*.pdf
+            !*.woff2
+            !*.ico
+            !*.ipynb
 
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: "3.11"
+          cache: pip
+          cache-dependency-path: src/main/requirements-ci.txt
 
       - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          python -m pip install -r src/main/requirements.txt
+        # Only what the checks and tests import; the site-building tools'
+        # requirements.txt (gensim, nltk, pandas, pygit2) is not needed here.
+        run: python -m pip install -r src/main/requirements-ci.txt
 
       - name: Run unit tests
         run: python -m unittest discover -s src/test -p "test_*.py"
 
-      - name: Check internal broken links in changed HTML files
-        env:
-          GITHUB_DIFF_RANGE: ${{ github.event_name == 'pull_request' && format('{0}...{1}', github.event.pull_request.base.sha, github.sha) || format('{0}...{1}', github.event.before, github.sha) }}
-        run: python src/main/ci_internal_links.py
-
       - name: Check internal broken links across the whole site
-        run: python src/main/ci_internal_links.py --all
-
-      - name: Check Q315 links
-        run: python src/main/ci_internal_links.py --root Q315
+        # Covers every HTML file, Q315 included, so a changed-files pass or a
+        # separate Q315 pass would only repeat part of it.
+        run: python src/main/ci_internal_links.py --all --tracked
 
       - name: Check canonical abstract CSS references
         run: python src/main/abstract/css_assets.py check
@@ -114,8 +152,16 @@ jobs:
         # attribute the page displays, such as a gallery caption shown with CSS
         # attr()) reaches every language page untranslated, and no other check
         # sees it. The budget is a ratchet: 783 literals when the check was
-        # added (734 text, 49 data-city captions); only ever lower it as they
-        # are converted to QIDs, so no new literal can slip in.
+        # added; -> 734 after the 49 data-city gallery captions were bound;
+        # -> 539 after the 195 teaching-archive course and intervention lines
+        # were bound; -> 55 once paths, titles marked lang, names marked
+        # translate="no", the registry titles and the license line were done;
+        # -> 48 after labels with existing items (Cities, About me, regions);
+        # -> 18 after more labels were bound and the research pages' official
+        # names (address, degrees, job titles, co-authors) marked translate="no";
+        # -> 16 after the footers' author name was marked as a name too;
+        # -> 0 once the last labels, intros and paragraphs were bound. Keep it
+        # at 0: any new literal on a Q315 page now fails CI.
         run: |
           python src/main/abstract/verify_abstract_literals.py \
-            --max-literals 783
+            --max-literals 0
