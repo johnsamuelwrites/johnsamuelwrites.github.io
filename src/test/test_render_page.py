@@ -60,11 +60,21 @@ class SlotRewriterTests(unittest.TestCase):
         self.assertNotIn(("p", "a", "", 0), rw.applied)
 
     def test_non_text_tag_is_not_rewritten(self):
-        source = '<div class="a">x</div>'
-        result, rw = rewrite(source, {("div", "a", "", 0): "new"})
+        source = '<section class="a">x</section>'
+        result, rw = rewrite(source, {("section", "a", "", 0): "new"})
 
         self.assertEqual(result, source)
-        self.assertEqual(rw.structural, {("div", "a", "", 0)})
+        self.assertEqual(rw.structural, {("section", "a", "", 0)})
+
+    def test_a_plain_text_div_is_rewritten(self):
+        """A card's year line is a div holding only text; it is a text slot."""
+        result, rw = rewrite('<div class="a">x</div>', {("div", "a", "", 0): "new"})
+        self.assertEqual(result, '<div class="a">new</div>')
+
+    def test_a_div_with_child_elements_is_not_rewritten(self):
+        source = '<div class="a">x <span>y</span></div>'
+        result, rw = rewrite(source, {("div", "a", "", 0): "new"})
+        self.assertEqual(result, source)
 
     def test_absent_signature_is_reported(self):
         source = '<p class="a">only</p>'

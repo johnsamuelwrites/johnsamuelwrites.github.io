@@ -42,8 +42,9 @@ TRAVEL_CONTENT_EXCLUDED_QIDS = {"Q3838", "Q3839", "Q3840", "Q3841"}
 class DirectTextSlots(HTMLParser):
     """Collect direct text by stable element signature and occurrence."""
 
-    def __init__(self) -> None:
+    def __init__(self, text_tags: frozenset[str] | set[str] = TEXT_TAGS) -> None:
         super().__init__(convert_charrefs=True)
+        self.text_tags = text_tags
         self.stack: list[tuple[str, tuple[str, str, str, int], list[str]]] = []
         self.counts: Counter[tuple[str, str, str]] = Counter()
         self.slots: dict[tuple[str, str, str, int], str] = {}
@@ -70,7 +71,7 @@ class DirectTextSlots(HTMLParser):
         while self.stack:
             current, key, parts = self.stack.pop()
             text = " ".join("".join(parts).split())
-            if current in TEXT_TAGS and text:
+            if current in self.text_tags and text:
                 self.slots[key] = repair_mojibake(text)
             if current == tag:
                 break
@@ -80,8 +81,10 @@ class DirectTextSlots(HTMLParser):
             self.stack[-1][2].append(data)
 
 
-def slots(path: Path) -> dict[tuple[str, str, str, int], str]:
-    parser = DirectTextSlots()
+def slots(
+    path: Path, text_tags: frozenset[str] | set[str] = TEXT_TAGS
+) -> dict[tuple[str, str, str, int], str]:
+    parser = DirectTextSlots(text_tags)
     parser.feed(path.read_text(encoding="utf-8"))
     return parser.slots
 

@@ -28,7 +28,7 @@ from typing import Dict, Iterable, List, Optional, Set
 from urllib.parse import urlparse
 
 import requests
-from bs4 import BeautifulSoup
+from html.parser import HTMLParser
 from requests.adapters import HTTPAdapter
 from requests.packages.urllib3.util.retry import Retry
 
@@ -171,6 +171,43 @@ def scan_html_directory(
     return sorted(html_files)
 
 
+class _LinkCollector(HTMLParser):
+    """Collect the link-bearing start tags of a page without building a tree.
+
+    A full BeautifulSoup tree cost almost all of a site-wide check; links only
+    need each ``<a>``, ``<link>`` and ``<script>`` start tag's attributes.
+    ``HTMLParser`` unescapes attribute values exactly as BeautifulSoup's
+    ``html.parser`` backend does.
+    """
+
+    def __init__(self) -> None:
+        super().__init__(convert_charrefs=True)
+        self.anchors: List[str] = []
+        self.links: List[Dict[str, str]] = []
+        self.scripts: List[str] = []
+
+    def handle_starttag(self, tag, attrs) -> None:
+        if tag not in ("a", "link", "script"):
+            return
+        values = {name: value or "" for name, value in attrs}
+        if tag == "a" and "href" in values:
+            self.anchors.append(values["href"])
+        elif tag == "link":
+            self.links.append(values)
+        elif tag == "script" and "src" in values:
+            self.scripts.append(values["src"])
+
+    def handle_startendtag(self, tag, attrs) -> None:
+        self.handle_starttag(tag, attrs)
+
+
+def collect_links(content: str) -> _LinkCollector:
+    collector = _LinkCollector()
+    collector.feed(content)
+    collector.close()
+    return collector
+
+
 class LinkChecker:
     """Main class for checking broken links in HTML files"""
 
@@ -185,6 +222,7 @@ class LinkChecker:
         check_scripts: bool = True,
         fix_favicon: bool = False,
         exclude_dirs: Optional[List[str]] = None,
+        tracked_files: Optional[Iterable[Path]] = None,
     ):
         """
         Initialize the LinkChecker
@@ -199,6 +237,10 @@ class LinkChecker:
             check_scripts: Whether to check script links
             fix_favicon: Whether to auto-insert missing favicon link
             exclude_dirs: List of directory names or paths to exclude from scanning
+            tracked_files: Absolute paths of the files the repository tracks. When
+                given, an internal link is checked against this list instead of
+                the disk, so a checkout without binary assets (CI) still knows an
+                image exists.
         """
         self.timeout = timeout
         self.check_external = check_external
@@ -208,6 +250,12 @@ class LinkChecker:
         self.check_scripts = check_scripts
         self.fix_favicon = fix_favicon
         self.exclude_dirs = set(exclude_dirs) if exclude_dirs else set()
+        self.tracked_files: Optional[Set[Path]] = None
+        self.tracked_dirs: Set[Path] = set()
+        if tracked_files is not None:
+            self.tracked_files = set(tracked_files)
+            for path in self.tracked_files:
+                self.tracked_dirs.update(path.parents)
         self.session = self._create_session(max_retries)
         self.checked_urls: Dict[str, int] = {}  # Cache for external URLs
         self.fixed_favicon_files: Set[str] = set()
@@ -386,6 +434,13 @@ class LinkChecker:
             # Resolve the target path
             target_path = (source_dir / link_path).resolve()
 
+            if self.tracked_files is not None:
+                if target_path in self.tracked_files:
+                    return (False, None)
+                if target_path in self.tracked_dirs:
+                    return (True, "Path is not a file")
+                return (True, "File not found")
+
             # Check if file exists
             if not target_path.exists():
                 return (True, "File not found")
@@ -430,19 +485,18 @@ class LinkChecker:
 
         # Parse HTML
         try:
-            soup = BeautifulSoup(content, "html.parser")
+            page = collect_links(content)
         except Exception as e:
             logger.error(f"Cannot parse HTML in {filepath}: {e}")
             return broken_links
 
         # Detect and optionally fix missing favicon link
         if self.check_favicon:
-            favicon_links = []
-            for link_elem in soup.find_all("link"):
-                rel = link_elem.get("rel")
-                rel_str = " ".join(rel) if isinstance(rel, list) else (rel or "")
-                if "icon" in rel_str.lower():
-                    favicon_links.append(link_elem)
+            favicon_links = [
+                link_elem
+                for link_elem in page.links
+                if "icon" in " ".join(link_elem.get("rel", "").split()).lower()
+            ]
 
             if not favicon_links:
                 expected_href = self._expected_favicon_href(filepath)
@@ -454,7 +508,7 @@ class LinkChecker:
                                 f.write(updated_content)
                             self.fixed_favicon_files.add(filepath)
                             content = updated_content
-                            soup = BeautifulSoup(content, "html.parser")
+                            page = collect_links(content)
                             logger.info(
                                 f"Fixed missing favicon in {filepath} -> {expected_href}"
                             )
@@ -488,9 +542,7 @@ class LinkChecker:
                     )
 
         # Check regular anchor links
-        links = soup.find_all("a", href=True)
-        for link in links:
-            href = link.get("href")
+        for href in page.anchors:
             if not href:
                 continue
 
@@ -501,15 +553,12 @@ class LinkChecker:
 
         # Check favicon and stylesheet links in <head>
         if self.check_favicon or self.check_styles:
-            link_elements = soup.find_all("link", href=True)
-            for link_elem in link_elements:
+            for link_elem in page.links:
                 href = link_elem.get("href")
-                rel = link_elem.get("rel")
                 if not href:
                     continue
 
-                # Convert rel list to string if needed
-                rel_str = " ".join(rel) if isinstance(rel, list) else (rel or "")
+                rel_str = " ".join(link_elem.get("rel", "").split())
 
                 link_type = self.classify_link(href, element_type="link", rel=rel_str)
 
@@ -525,9 +574,7 @@ class LinkChecker:
 
         # Check script links in <head>
         if self.check_scripts:
-            script_elements = soup.find_all("script", src=True)
-            for script_elem in script_elements:
-                src = script_elem.get("src")
+            for src in page.scripts:
                 if not src:
                     continue
 

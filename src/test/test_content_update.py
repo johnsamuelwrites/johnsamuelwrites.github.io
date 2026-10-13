@@ -1637,5 +1637,43 @@ class ParityModeTests(unittest.TestCase):
         self.assertTrue(any("bound twice" in problem for problem in broken.problems))
 
 
+class BlockIndexTests(unittest.TestCase):
+    """The block index must pick exactly the block the per-row scan picked."""
+
+    INNER = """
+        <li><span property="name">Dune</span></li>
+        <li data-q315-source="local:Q9"><span property="name">Dune</span></li>
+        <li><span property="name">Queer as Folk</span><link property="sameAs" href="https://www.wikidata.org/wiki/Q1"/></li>
+        <li><span property="name">Queer as Folk</span><link property="sameAs" href="https://www.wikidata.org/wiki/Q2"/></li>
+        <li><span data-content="local:Q77">Q77</span></li>
+        <li><h3 class="quote-name">Words</h3></li>
+    """
+    PATTERN = r"\s*<li\b[\s\S]*?</li>"
+
+    def rows(self):
+        def row(family, **data):
+            return ContentRow(family=family, row_number=2, data=data)
+        return [
+            row("books", name="Dune", local_qid="Q9"),
+            row("books", name="Dune"),
+            row("books", name="Dune", local_qid="Q5"),
+            row("films", name="Queer as Folk", wikidata_url="https://www.wikidata.org/wiki/Q2"),
+            row("films", name="Queer as Folk", wikidata_url="https://www.wikidata.org/wiki/Q3"),
+            row("books", name="Anything", local_qid="Q77"),
+            row("quotes", name="Words"),
+            row("books", name="Missing"),
+        ]
+
+    def test_the_index_matches_the_scan_for_every_rule(self):
+        index = content_update.BlockIndex(self.INNER, self.PATTERN)
+        blocks = content_update.extract_blocks(self.INNER, self.PATTERN)
+        for row in self.rows():
+            with self.subTest(row=row.data):
+                self.assertEqual(
+                    index.match(row, "en"),
+                    content_update.matching_block(blocks, row, "en"),
+                )
+
+
 if __name__ == "__main__":
     unittest.main()

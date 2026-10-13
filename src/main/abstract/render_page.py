@@ -36,7 +36,13 @@ sys.path.insert(0, str(HERE.parent))
 from abstract.css_assets import DEFAULT_DATA_DIR, DEFAULT_REPO_ROOT
 from abstract.discover_content_migration import EXTERNALLY_GENERATED_INDEXES, discover
 from abstract.local_text import overlay
-from abstract.prepare_travel_content import LANGUAGES, TEXT_TAGS
+from abstract.prepare_travel_content import LANGUAGES, TEXT_TAGS as INVENTORY_TEXT_TAGS
+
+# A bound element is rewritten only when it holds text and no child element
+# (see `_finalize`), so a plain-text `div` -- a card's year or type line -- or
+# an inline label (`strong`, `option`, ...) is as safe as a `p`; without them
+# such bindings were silently never rendered.
+TEXT_TAGS = INVENTORY_TEXT_TAGS | {"div", "strong", "b", "em", "i", "cite", "small", "option"}
 
 DEFAULT_DATA = DEFAULT_DATA_DIR
 

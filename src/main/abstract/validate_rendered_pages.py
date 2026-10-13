@@ -164,14 +164,14 @@ def is_prose_slot(slot: BoundSlot, label: str) -> bool:
 
 
 def untranslated_label_errors(
-    repo_root: Path, data_dir: Path, page: str = ""
+    repo_root: Path, data_dir: Path, page: str = "", registry: list[dict[str, str]] | None = None
 ) -> list[str]:
     labels = load_labels(data_dir)
     errors: list[str] = []
     seen: set[tuple[str, str, str, str]] = set()
     rows = [
         row
-        for row in discover(repo_root)
+        for row in (discover(repo_root) if registry is None else registry)
         if row["abstract_path"] and (not page or row["page_qid"] == page)
     ]
     if page and not rows:
@@ -216,11 +216,13 @@ def visible_text(markup: str) -> str:
     return normalize_text(html.unescape(TAG.sub("", markup)))
 
 
-def bare_parentheses_errors(repo_root: Path, page: str = "") -> list[str]:
+def bare_parentheses_errors(
+    repo_root: Path, page: str = "", registry: list[dict[str, str]] | None = None
+) -> list[str]:
     errors: list[str] = []
     rows = [
         row
-        for row in discover(repo_root)
+        for row in (discover(repo_root) if registry is None else registry)
         if row["abstract_path"] and (not page or row["page_qid"] == page)
     ]
     if page and not rows:
@@ -247,12 +249,14 @@ def bare_parentheses_errors(repo_root: Path, page: str = "") -> list[str]:
 STRUCTURAL_PARITY_KEYS = ((("svg", "hero-svg"), "hero SVG"),)
 
 
-def structural_parity_errors(repo_root: Path, page: str = "") -> list[str]:
+def structural_parity_errors(
+    repo_root: Path, page: str = "", registry: list[dict[str, str]] | None = None
+) -> list[str]:
     """Check static visual structure that text round-trip cannot see."""
     errors: list[str] = []
     rows = [
         row
-        for row in discover(repo_root)
+        for row in (discover(repo_root) if registry is None else registry)
         if row["abstract_path"] and (not page or row["page_qid"] == page)
     ]
     if page and not rows:
@@ -284,10 +288,12 @@ def structural_parity_errors(repo_root: Path, page: str = "") -> list[str]:
 
 
 def validate(repo_root: Path, data_dir: Path, page: str = "") -> list[str]:
+    # The three checks read the same site registry; discover it once.
+    registry = discover(repo_root)
     return (
-        untranslated_label_errors(repo_root, data_dir, page)
-        + bare_parentheses_errors(repo_root, page)
-        + structural_parity_errors(repo_root, page)
+        untranslated_label_errors(repo_root, data_dir, page, registry)
+        + bare_parentheses_errors(repo_root, page, registry)
+        + structural_parity_errors(repo_root, page, registry)
     )
 
 

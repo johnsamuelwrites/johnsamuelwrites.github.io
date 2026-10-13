@@ -1399,9 +1399,11 @@ def render_block_container(
     added = 0
     skipped = 0
     repaired = 0
+    # Index the blocks once and only again after the container changes: matching
+    # every row against freshly re-parsed blocks was quadratic in the entries.
+    index = BlockIndex(inner, block_pattern)
     for row in rows:
-        blocks = extract_blocks(inner, block_pattern)
-        match = matching_block(blocks, row, language)
+        match = index.match(row, language)
         if match:
             skipped += 1
             start, end, block = match
@@ -1409,9 +1411,11 @@ def render_block_container(
             repaired_block = repair(block, row)
             if repaired_block != block:
                 inner = inner[:start] + repaired_block + inner[end:]
+                index = BlockIndex(inner, block_pattern)
                 repaired += 1
             continue
         inner = insert_block(inner, block_pattern, build_block(row), sort_entries)
+        index = BlockIndex(inner, block_pattern)
         added += 1
 
     if added == 0 and repaired == 0:
@@ -1473,6 +1477,75 @@ def extract_blocks(inner: str, block_pattern: str) -> list[tuple[int, int, str]]
         (match.start(), match.end(), match.group(0))
         for match in re.finditer(block_pattern, inner, re.IGNORECASE)
     ]
+
+
+QID_TOKEN = re.compile(r"\bQ\d+\b")
+BOUND_SOURCE = re.compile(r'data-q315-source=["\']local:(Q\d+)["\']')
+WIKIDATA_SAME_AS = re.compile(
+    r"<link\b(?=[^>]*property=[\"']sameAs[\"'])[^>]*href=[\"'][^\"']*wikidata\.org[^\"']*[\"']",
+    re.IGNORECASE,
+)
+SAME_AS_HREF = re.compile(
+    r"<link\b(?=[^>]*property=[\"']sameAs[\"'])[^>]*href=[\"']([^\"']+)[\"']",
+    re.IGNORECASE,
+)
+
+
+@dataclass
+class IndexedBlock:
+    start: int
+    end: int
+    text: str
+    qids: set[str]
+    wikidata_urls: set[str]
+    bound_source: str
+    has_wikidata_link: bool
+    names: set[str]
+
+
+class BlockIndex:
+    """The blocks of a container, pre-parsed for ``block_has_entry``'s tests.
+
+    ``match`` answers exactly what ``matching_block`` would -- the first block,
+    in page order, that ``block_has_entry`` accepts -- but parses each block
+    once instead of once per row.
+    """
+
+    def __init__(self, inner: str, block_pattern: str) -> None:
+        self.blocks = [
+            IndexedBlock(
+                start,
+                end,
+                block,
+                set(QID_TOKEN.findall(block)),
+                {canonical_wikidata_url(html.unescape(value)) for value in SAME_AS_HREF.findall(block)},
+                (bound.group(1) if (bound := BOUND_SOURCE.search(block)) else ""),
+                bool(WIKIDATA_SAME_AS.search(block)),
+                entry_name_candidates(block),
+            )
+            for start, end, block in extract_blocks(inner, block_pattern)
+        ]
+
+    def match(self, row: ContentRow, language: str) -> tuple[int, int, str] | None:
+        local_qid = row.local_qid
+        wikidata_url = canonical_wikidata_url(row.wikidata_url) if row.wikidata_url else ""
+        expected: str | None = None
+        for block in self.blocks:
+            if local_qid and local_qid in block.qids:
+                return block.start, block.end, block.text
+            if wikidata_url and wikidata_url in block.wikidata_urls:
+                return block.start, block.end, block.text
+            if row.family == "quotes":
+                continue
+            if block.bound_source and local_qid and block.bound_source != local_qid:
+                continue
+            if row.wikidata_url and block.has_wikidata_link:
+                continue
+            if expected is None:
+                expected = normalize_text(row.localized("name", language))
+            if expected in block.names:
+                return block.start, block.end, block.text
+        return None
 
 
 def matching_block(

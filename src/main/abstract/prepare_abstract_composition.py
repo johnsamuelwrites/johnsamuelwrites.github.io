@@ -43,6 +43,7 @@ HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE.parent))
 
 from abstract.css_assets import DEFAULT_DATA_DIR, DEFAULT_REPO_ROOT
+from abstract.render_page import TEXT_TAGS as RENDERED_TEXT_TAGS
 from abstract.prepare_missing_content import (
     alternate_pages,
     content_token,
@@ -239,7 +240,11 @@ def plan(
     slot_rows: list[dict[str, str]] = []
     for page_id, relative in sources:
         abstract_page = (repo_root / relative).resolve()
-        localized = [slots(page) for page in alternate_pages(repo_root, abstract_page)]
+        # Read every tag the renderer writes: a paragraph may sit in a `div`
+        # or an `i` as well as a `p`.
+        localized = [
+            slots(page, RENDERED_TEXT_TAGS) for page in alternate_pages(repo_root, abstract_page)
+        ]
         # Occurrence-based keys only align across languages when the pages share
         # the same repeated structure. When a language page has a different
         # number of same-signature elements (a list of different length, a
@@ -252,7 +257,7 @@ def plan(
         ]
         bindings = content_bindings(abstract_page)
         metadata = slot_metadata(abstract_page)
-        for key, abstract_text in slots(abstract_page).items():
+        for key, abstract_text in slots(abstract_page, RENDERED_TEXT_TAGS).items():
             if key in bindings or QID_TEXT.fullmatch(abstract_text):
                 continue
             english_count = signature_counts[0].get(key[:3], 0)

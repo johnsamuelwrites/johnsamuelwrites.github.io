@@ -11,7 +11,16 @@ import json
 from unittest import mock
 
 from abstract import fetch_wikibase_labels
-from abstract.fetch_wikibase_labels import _Bound, existing_identifiers, items_created_after, truncated
+import datetime
+from abstract.fetch_wikibase_labels import (
+    _Bound,
+    changed_items,
+    existing_identifiers,
+    items_created_after,
+    last_fetch,
+    state_path,
+    truncated,
+)
 
 
 class FetchWikibaseLabelsTests(unittest.TestCase):
@@ -61,6 +70,32 @@ class FetchWikibaseLabelsTests(unittest.TestCase):
         # A label that ends in an ellipsis on purpose keeps its translation.
         self.assertFalse(truncated("10+ lieux • Paris, Lyon...", "10+ Locations • Paris, Lyon..."))
         self.assertFalse(truncated("Bench", "Bench"))
+
+
+    def test_an_incremental_run_asks_only_for_items_changed_since_the_last(self):
+        pages = [
+            {"query": {"recentchanges": [{"title": "Item:Q8670"}, {"title": "Property:P40"}]},
+             "continue": {"rccontinue": "x", "continue": "-||"}},
+            {"query": {"recentchanges": [{"title": "Item:Q10071"}]}},
+        ]
+        requests = []
+
+        def respond(request, *args, **kwargs):
+            requests.append(request.full_url)
+            return io.BytesIO(json.dumps(pages[len(requests) - 1]).encode())
+
+        since = datetime.datetime(2026, 10, 9, 9, 0, tzinfo=datetime.timezone.utc)
+        with mock.patch.object(fetch_wikibase_labels.urllib.request, "urlopen", side_effect=respond):
+            self.assertEqual(changed_items(since, pause=0), {"Q8670", "Q10071"})
+        self.assertIn("rcstart=2026-10-09T09%3A00%3A00Z", requests[0])
+
+    def test_the_last_fetch_time_is_read_back(self):
+        with tempfile.TemporaryDirectory() as directory:
+            out = Path(directory, "labels-wikibase.csv")
+            self.assertIsNone(last_fetch(out))
+            out.write_text("identifier\n", encoding="utf-8")
+            state_path(out).write_text('{"fetched_at": "2026-10-09T09:54:01+00:00"}', encoding="utf-8")
+            self.assertEqual(last_fetch(out).hour, 9)
 
 
 if __name__ == "__main__":

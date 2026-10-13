@@ -18,10 +18,17 @@ Two kinds of literal are reported:
 
 * visible text that is not made of QIDs (outside scripts, styles, SVG, code
   and function calls), except the language switcher's endonyms, which name each
-  language in itself on purpose;
+  language in itself on purpose, and a bare path or file name (no spaces, a
+  ``/`` or an extension), which is an identifier rather than prose;
 * values of attributes that carry prose: the bindable attributes, plus every
   attribute a Q315 stylesheet displays with CSS ``attr()``, discovered from the
   stylesheets so a new one is covered without editing this file.
+
+Text the page marks as deliberately not Q315 content is not a literal: an
+element (or ancestor) with ``lang`` other than ``zxx`` holds text in that
+language on purpose -- the title of an article, quoted as published -- and
+``translate="no"`` marks a name that stays as written (ORCID, CPE Lyon, an
+address). Both are standard HTML and tell readers and tools the same thing.
 
 ``--max-literals`` is a ratchet like ``verify_language_footer.py``'s budget:
 lower it as literals are converted to QIDs; the check fails as soon as a new
@@ -44,6 +51,7 @@ sys.path.insert(0, str(HERE.parent))
 from abstract.css_assets import DEFAULT_REPO_ROOT
 from abstract.render_page import BINDABLE_ATTRIBUTES
 
+PATH = re.compile(r"\S*(?:/\S*|\.[a-z0-9]{2,5})")
 QID_TEXT = re.compile(r"(?:Q[1-9][0-9]*[\s,;:•·|/()\-–—.]*)+")
 WORD = re.compile(r"[^\W\d_]{2}")
 CSS_ATTR = re.compile(r"\battr\(\s*([a-zA-Z][\w-]*)\s*\)")
@@ -65,7 +73,12 @@ def displayed_attributes(stylesheets: Iterable[Path]) -> set[str]:
 
 def is_literal(value: str) -> bool:
     value = " ".join(value.split())
-    return bool(value) and bool(WORD.search(value)) and not QID_TEXT.fullmatch(value)
+    return (
+        bool(value)
+        and bool(WORD.search(value))
+        and not QID_TEXT.fullmatch(value)
+        and not PATH.fullmatch(value)
+    )
 
 
 class Literals(HTMLParser):
@@ -75,29 +88,42 @@ class Literals(HTMLParser):
         super().__init__(convert_charrefs=True)
         self.prose_attributes = prose_attributes
         self.stack: list[str] = []
+        # Whether each open element is marked as not Q315 content.
+        self.exempt: list[bool] = []
         self.found: list[tuple[int, str, str]] = []
 
     def handle_starttag(self, tag, attrs) -> None:
+        values = dict(attrs)
+        language = (values.get("lang") or "").strip()
+        exempt = (bool(self.exempt) and self.exempt[-1]) or values.get("translate") == "no" or (
+            bool(language) and language != "zxx"
+        )
         for name, value in attrs:
-            if name in self.prose_attributes and is_literal(value or ""):
+            if name in self.prose_attributes and not exempt and is_literal(value or ""):
                 self.found.append((self.getpos()[0], f"<{tag} {name}>", " ".join((value or "").split())))
         if tag not in VOID:
             self.stack.append(tag)
+            self.exempt.append(exempt)
 
     def handle_startendtag(self, tag, attrs) -> None:
         self.handle_starttag(tag, attrs)
         if tag not in VOID and self.stack and self.stack[-1] == tag:
             self.stack.pop()
+            self.exempt.pop()
 
     def handle_endtag(self, tag) -> None:
         if tag not in self.stack:
             return
-        while self.stack and self.stack.pop() != tag:
-            pass
+        while self.stack:
+            self.exempt.pop()
+            if self.stack.pop() == tag:
+                break
 
     def handle_data(self, data) -> None:
         text = " ".join(data.split())
         if not is_literal(text) or text in ENDONYMS or SKIPPED.intersection(self.stack):
+            return
+        if self.exempt and self.exempt[-1]:
             return
         self.found.append((self.getpos()[0], f"<{self.stack[-1] if self.stack else ''}>", text))
 

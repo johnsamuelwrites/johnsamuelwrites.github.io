@@ -81,6 +81,18 @@ def resolve_changed_html_files(diff_range: str) -> List[str]:
     return sorted(set(html_files))
 
 
+def tracked_files() -> List[Path]:
+    """Absolute paths of every file git tracks, whether checked out or not."""
+    repo_root = Path(__file__).resolve().parents[2]
+    listing = subprocess.run(
+        ["git", "ls-files", "-z"],
+        cwd=repo_root,
+        check=True,
+        capture_output=True,
+    ).stdout.decode("utf-8")
+    return [(repo_root / name).resolve() for name in listing.split("\0") if name]
+
+
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
         description="Run internal broken-link checks for HTML files in CI."
@@ -98,6 +110,14 @@ def parse_args() -> argparse.Namespace:
             "Scan every HTML file in the repository instead of only the files "
             "changed in the diff range. Use this to catch links that break when "
             "new files or folders are added."
+        ),
+    )
+    parser.add_argument(
+        "--tracked",
+        action="store_true",
+        help=(
+            "Resolve link targets against the files git tracks instead of the "
+            "disk, so a checkout without binary assets can still be checked."
         ),
     )
     parser.add_argument(
@@ -142,6 +162,7 @@ def main() -> int:
             return 0
 
     checker = LinkChecker(
+        tracked_files=tracked_files() if args.tracked else None,
         check_external=False,
         check_internal=True,
         check_favicon=False,

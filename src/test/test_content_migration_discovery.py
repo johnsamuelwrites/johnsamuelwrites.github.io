@@ -116,5 +116,37 @@ class ContentMigrationDiscoveryTests(unittest.TestCase):
             self.assertEqual(row["target_en"], "en/topic.html")
 
 
+class HeadOnlyMetadataTests(unittest.TestCase):
+    """Discovery reads only the head; a body must not change what it finds."""
+
+    def test_metadata_comes_from_the_head_and_the_digest_from_the_whole_file(self):
+        import hashlib
+        import tempfile
+        from abstract.discover_content_migration import read_metadata
+
+        head = (
+            '<html lang="zxx" data-abstract-page="local:Q7"><head>'
+            '<link rel="alternate" hreflang="fr" href="fr/page.html"/>'
+            '<meta name="generator" content="Q315 renderer"/></head>'
+        )
+        body = '<body><link rel="alternate" hreflang="it" href="it/page.html"/></body></html>'
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            (root / "page.html").write_text(head + body, encoding="utf-8")
+            (root / "bare.html").write_text(
+                '<html data-abstract-page="local:Q8"><link rel="alternate" hreflang="es" href="es.html"/>',
+                encoding="utf-8",
+            )
+            metadata = read_metadata(root, Path("page.html"))
+            self.assertEqual(metadata.qid, "Q7")
+            self.assertTrue(metadata.generated)
+            self.assertEqual(set(metadata.alternates), {"fr"})
+            self.assertEqual(
+                metadata.digest, hashlib.sha256((head + body).encode("utf-8")).hexdigest()
+            )
+            # Without </head> the whole page is read, as before.
+            self.assertEqual(set(read_metadata(root, Path("bare.html")).alternates), {"es"})
+
+
 if __name__ == "__main__":
     unittest.main()

@@ -68,8 +68,13 @@ def repository_path(repo_root: Path, source: Path, href: str) -> Path | None:
 def read_metadata(repo_root: Path, relative: Path) -> PageMetadata:
     source = repo_root / relative
     raw = source.read_bytes()
+    text = raw.decode("utf-8", errors="replace")
+    # Everything read here -- the html element's data-abstract-page, the
+    # hreflang alternates, the generator meta -- lives in the head; parsing the
+    # body as well cost most of every check that discovers the site.
+    head_end = text.lower().find("</head>")
     parser = PageMetadataParser()
-    parser.feed(raw.decode("utf-8", errors="replace"))
+    parser.feed(text if head_end < 0 else text[: head_end + len("</head>")])
     alternates = {
         language: target
         for language, href in parser.alternates.items()

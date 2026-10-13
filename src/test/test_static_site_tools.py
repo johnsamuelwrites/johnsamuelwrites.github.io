@@ -55,6 +55,10 @@ class StaticSiteToolTests(unittest.TestCase):
         markup = page_list_markup(pages[:3], qids)
         for literal in ('title="Path"', 'title="Category"', "Q315 pages", ">travel<", ">general<"):
             self.assertNotIn(literal, markup)
+        # Each entry names its page by QID: the English title is a literal.
+        first = pages[0]
+        self.assertIn(f'class="article-title" data-entity="local:{first.qid}">{first.qid}</span>', markup)
+        self.assertNotIn(f">{first.title}</span>", markup)
         path_qid = qids["Path"]
         self.assertIn(f'title="{path_qid}" data-content-title="local:{path_qid}"', markup)
 

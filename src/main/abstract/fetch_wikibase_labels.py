@@ -11,7 +11,13 @@ every QID bound in a Q315 template (``data-content``/``data-entity``/
 ``data-content-<attribute>``), so bound
 items dropped by the broken export are recovered, and every item created since
 the newest one in the export -- an item just imported is neither, and the
-binders need its labels before they can bind it. ``itemtype`` is the item's
+binders need its labels before they can bind it.
+
+Runs are incremental: the time of each fetch is kept beside the CSV, and the
+next run asks the wiki's recent changes which items were edited or created
+since, fetching only those (plus any bound item the CSV lacks) and merging them
+into the existing rows. ``--full`` refetches everything; so does a run with no
+recorded fetch or one older than the wiki's recent-changes window. ``itemtype`` is the item's
 first ``P8`` value, matching the export's column.
 """
 
@@ -19,6 +25,7 @@ from __future__ import annotations
 
 import argparse
 import csv
+import datetime
 import json
 import re
 import sys
@@ -133,6 +140,63 @@ def truncated(label: str, text: str) -> bool:
     return len(text) > len(stem) and text.startswith(stem) and text != label
 
 
+# MediaWiki keeps recent changes for 90 days by default; stay well inside it.
+INCREMENTAL_WINDOW = datetime.timedelta(days=30)
+# Edits saved while a fetch runs must not fall between two runs.
+SAFETY_MARGIN = datetime.timedelta(minutes=10)
+
+
+def state_path(out: Path) -> Path:
+    return out.with_name(out.stem + ".fetched.json")
+
+
+def last_fetch(out: Path) -> datetime.datetime | None:
+    path = state_path(out)
+    if not path.exists() or not out.exists():
+        return None
+    value = json.loads(path.read_text(encoding="utf-8")).get("fetched_at", "")
+    return datetime.datetime.fromisoformat(value) if value else None
+
+
+def changed_items(since: datetime.datetime, pause: float) -> set[str]:
+    """Items edited or created on the wiki since ``since``."""
+    result: set[str] = set()
+    params = {
+        "action": "query",
+        "list": "recentchanges",
+        "rcnamespace": str(ITEM_NAMESPACE),
+        "rctype": "edit|new",
+        "rcprop": "title",
+        "rcdir": "newer",
+        "rcstart": since.strftime("%Y-%m-%dT%H:%M:%SZ"),
+        "rclimit": "500",
+        "format": "json",
+    }
+    while True:
+        request = urllib.request.Request(
+            f"{API}?{urllib.parse.urlencode(params)}",
+            headers={"User-Agent": "Q315-label-fetcher/1.0"},
+        )
+        with urllib.request.urlopen(request, timeout=60) as response:
+            data = json.load(response)
+        for change in data.get("query", {}).get("recentchanges", []):
+            qid = change["title"].rsplit(":", 1)[-1]
+            if QID.fullmatch(qid):
+                result.add(qid)
+        if "continue" not in data:
+            return result
+        params.update(data["continue"])
+        if pause:
+            time.sleep(pause)
+
+
+def read_rows(path: Path) -> dict[str, dict[str, str]]:
+    if not path.exists():
+        return {}
+    with path.open(encoding="utf-8-sig", newline="") as source:
+        return {row["identifier"]: row for row in csv.DictReader(source)}
+
+
 def fetch(ids: list[str], pause: float) -> dict[str, dict[str, str]]:
     result: dict[str, dict[str, str]] = {}
     for start in range(0, len(ids), 50):
@@ -197,26 +261,43 @@ def main(argv: Sequence[str] | None = None) -> int:
         help="output CSV path (default: the canonical repo label store)",
     )
     parser.add_argument("--pause", type=float, default=0.1)
+    parser.add_argument("--full", action="store_true", help="refetch every item")
     args = parser.parse_args(argv)
 
     repo_root = args.repo_root.resolve()
+    started = datetime.datetime.now(datetime.timezone.utc)
     existing = existing_identifiers(args.data_dir.resolve())
-    newest = max((int(qid[1:]) for qid in existing), default=0)
-    ids = sorted(
-        existing | bound_qids(repo_root) | items_created_after(newest, args.pause),
-        key=lambda value: int(value[1:]),
-    )
-    print(f"Fetching {len(ids)} items from {API}", file=sys.stderr)
-    rows = fetch(ids, args.pause)
+    previous = None if args.full else last_fetch(args.out)
+    if previous and started - previous > INCREMENTAL_WINDOW:
+        previous = None
+    if previous:
+        changed = changed_items(previous - SAFETY_MARGIN, args.pause)
+        missing_bound = bound_qids(repo_root) - existing
+        wanted = changed | missing_bound
+        print(
+            f"Incremental fetch since {previous:%Y-%m-%d %H:%M} UTC: "
+            f"{len(changed)} changed, {len(missing_bound)} bound but missing",
+            file=sys.stderr,
+        )
+        rows = read_rows(args.out)
+        rows.update(fetch(sorted(wanted, key=lambda value: int(value[1:])), args.pause))
+    else:
+        newest = max((int(qid[1:]) for qid in existing), default=0)
+        wanted = existing | bound_qids(repo_root) | items_created_after(newest, args.pause)
+        print(f"Full fetch of {len(wanted)} items from {API}", file=sys.stderr)
+        rows = fetch(sorted(wanted, key=lambda value: int(value[1:])), args.pause)
     fields = ("identifier", "itemtype", *LANGUAGES)
     args.out.parent.mkdir(parents=True, exist_ok=True)
     with args.out.open("w", encoding="utf-8", newline="") as destination:
         writer = csv.DictWriter(destination, fieldnames=fields)
         writer.writeheader()
-        for qid in ids:
-            if qid in rows:
-                writer.writerow(rows[qid])
-    print(f"Wrote {len(rows)} rows to {args.out}")
+        for qid in sorted(rows, key=lambda value: int(value[1:])):
+            writer.writerow({field: rows[qid].get(field, "") for field in fields})
+    state_path(args.out).write_text(
+        json.dumps({"fetched_at": started.isoformat(timespec="seconds")}) + "\n",
+        encoding="utf-8",
+    )
+    print(f"Wrote {len(rows)} rows to {args.out} ({len(wanted)} fetched)")
     return 0
 
 

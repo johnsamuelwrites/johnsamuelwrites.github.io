@@ -235,7 +235,6 @@ def page_list_markup(pages: Sequence[Q315Page], qids: dict[str, str] | None = No
     category_qid, path_qid, pages_qid = (qids[label] for label in INTERFACE_LABELS)
     items: list[str] = []
     for position, page in enumerate(pages, start=1):
-        title = html.escape(page.title)
         qid = html.escape(page.qid)
         url = html.escape(page.url, quote=True)
         category = html.escape(page.category)
@@ -246,7 +245,7 @@ def page_list_markup(pages: Sequence[Q315Page], qids: dict[str, str] | None = No
                 <meta typeof="ListItem" property="position" content="{position}"/>
                 <div class="article-main">
                     <a property='item' typeof='WebPage' href="{url}" class="article-link">
-                        <span property='name' class="article-title">{title}</span>
+                        <span property='name' class="article-title" data-entity="local:{qid}">{qid}</span>
                     </a>
                     <span class="updated-badge" title="{qid}">{qid}</span>
                 </div>

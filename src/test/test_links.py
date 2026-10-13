@@ -6,7 +6,9 @@ import sys
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "main"))
 
-from links import BrokenLink, LinkChecker, LinkType, collect_html_files, write_json_report
+import tempfile
+
+from links import BrokenLink, LinkChecker, LinkType, collect_html_files, collect_links, write_json_report
 
 
 class LinkCheckerTests(unittest.TestCase):
@@ -71,6 +73,56 @@ class LinkCheckerTests(unittest.TestCase):
         finally:
             if report_path.exists():
                 report_path.unlink()
+
+
+class LinkCollectorTests(unittest.TestCase):
+    """The streaming collector must find the links a parsed tree would."""
+
+    def test_anchors_links_and_scripts_are_collected_with_entities_decoded(self):
+        page = collect_links(
+            '<a href="a.html?x=1&amp;y=2">x</a><a name="top">no href</a>'
+            '<link rel="icon stylesheet" href="s.css"/><script src="j.js"></script>'
+            "<script>var a = '<a href=\"inline.html\">';</script>"
+        )
+        self.assertEqual(page.anchors, ["a.html?x=1&y=2"])
+        self.assertEqual(page.links, [{"rel": "icon stylesheet", "href": "s.css"}])
+        self.assertEqual(page.scripts, ["j.js"])
+
+
+class TrackedFilesTests(unittest.TestCase):
+    """CI checks links against git's file list: binary assets are not checked out."""
+
+    def setUp(self):
+        self.directory = tempfile.TemporaryDirectory()
+        root = Path(self.directory.name).resolve()
+        self.page = root / "en" / "page.html"
+        self.page.parent.mkdir()
+        self.page.write_text(
+            '<a href="../images/photo.png">p</a><a href="../images/gone.png">g</a>'
+            '<a href="../images">d</a>',
+            encoding="utf-8",
+        )
+        # The image is tracked but, as in CI's sparse checkout, not on disk.
+        self.tracked = [self.page, root / "images" / "photo.png"]
+
+    def tearDown(self):
+        self.directory.cleanup()
+
+    def errors(self, tracked):
+        checker = LinkChecker(
+            check_external=False, check_favicon=False, check_styles=False,
+            check_scripts=False, tracked_files=tracked,
+        )
+        return {link.url: link.error for link in checker.check_files([str(self.page)]).get(str(self.page), [])}
+
+    def test_a_tracked_file_that_is_not_checked_out_is_not_broken(self):
+        errors = self.errors(self.tracked)
+        self.assertNotIn("../images/photo.png", errors)
+        self.assertEqual(errors["../images/gone.png"], "File not found")
+        self.assertEqual(errors["../images"], "Path is not a file")
+
+    def test_without_the_tracked_list_the_disk_decides(self):
+        self.assertEqual(self.errors(None)["../images/photo.png"], "File not found")
 
 
 if __name__ == "__main__":

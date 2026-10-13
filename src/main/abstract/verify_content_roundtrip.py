@@ -20,7 +20,11 @@ from abstract.css_assets import DEFAULT_DATA_DIR, DEFAULT_REPO_ROOT
 from abstract.local_text import overlay
 from abstract.prepare_missing_content import alternate_pages, page_sources
 from abstract.prepare_travel_content import LANGUAGES, slots
-from abstract.render_page import BINDABLE_ATTRIBUTES, CONTENT_ATTRIBUTE_PREFIX
+from abstract.render_page import (
+    BINDABLE_ATTRIBUTES,
+    CONTENT_ATTRIBUTE_PREFIX,
+    TEXT_TAGS as RENDERED_TEXT_TAGS,
+)
 
 DEFAULT_DATA = DEFAULT_DATA_DIR
 DEFAULT_REPORT = HERE / "content-roundtrip.json"
@@ -205,7 +209,10 @@ def verify(
         targets = alternate_pages(repo_root, abstract)
         for language, target in zip(LANGUAGES, targets):
             available = Counter(
-                normalize_text(value) for value in slots(target).values()
+                # Read every tag the renderer writes, or a bound value it
+                # placed (in a `div`, say) would look missing.
+                normalize_text(value)
+                for value in slots(target, RENDERED_TEXT_TAGS).values()
             )
             available.update(rendered_bound_values(target))
             available.update(rendered_attribute_values(target))

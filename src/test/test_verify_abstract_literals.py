@@ -53,6 +53,28 @@ class LiteralTextTests(unittest.TestCase):
         self.assertEqual(found("<p>Q1<br>About Me</p>"), ["About Me"])
 
 
+class DeliberateTextTests(unittest.TestCase):
+    """Text the page itself marks as not Q315 content is not a literal."""
+
+    def test_a_title_in_a_declared_language_is_allowed(self):
+        self.assertEqual(found('<a lang="fr" href="x">Les modèles d\'IA</a>'), [])
+
+    def test_a_name_marked_translate_no_is_allowed(self):
+        self.assertEqual(found('<a translate="no" href="x">CPE Lyon</a>'), [])
+
+    def test_the_marking_covers_descendants(self):
+        self.assertEqual(found('<p translate="no">43, bd du 11 novembre <b>1918</b> Villeurbanne</p>'), [])
+
+    def test_lang_zxx_is_still_checked(self):
+        self.assertEqual(found('<p lang="zxx">About Me</p>'), ["About Me"])
+
+    def test_a_path_is_an_identifier_not_prose(self):
+        self.assertEqual(found("<span>Q3062/Q3018.html</span><span>index.html</span>"), [])
+
+    def test_prose_after_a_marked_element_is_still_checked(self):
+        self.assertEqual(found('<p><a lang="en">Title</a> View Thesis</p>'), ["View Thesis"])
+
+
 class LiteralAttributeTests(unittest.TestCase):
     def test_the_gallery_caption_bug_is_caught(self):
         """The case that shipped "Door" to every language page."""
