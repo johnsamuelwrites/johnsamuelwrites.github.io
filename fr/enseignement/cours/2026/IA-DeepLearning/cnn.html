@@ -1,0 +1,564 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="shortcut icon" href="../../../../../images/logo/favicon.png" />
+        <title>Réseaux convolutifs et couches · IA et Deep Learning 2026–2027 · John Samuel</title>
+        <meta name="description"
+            content="Démonstrations interactives : un réseau convolutif entraîné, la convolution, les fonctions d'activation, le pooling, le champ récepteur, le dropout, la normalisation par lots et la softmax.">
+        <style>
+            * {
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
+            }
+
+            :root {
+                --bg-primary: #fafbfd;
+                --bg-secondary: #f0f4f9;
+                --accent-neural: #6b8cff;
+                --accent-synapse: #4a6edb;
+                --accent-deep: #2d4a8e;
+                --accent-gradient: #8fa3ff;
+                --text-primary: #1a2740;
+                --text-secondary: #4a5a7a;
+                --shadow-neural: rgba(107, 140, 255, 0.15);
+                --shadow-deep: rgba(45, 74, 142, 0.08);
+                --border-light: rgba(107, 140, 255, 0.12);
+            }
+
+            body {
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+                background: var(--bg-primary);
+                color: var(--text-primary);
+                line-height: 1.6;
+                overflow-x: hidden;
+            }
+
+            nav {
+                position: sticky;
+                top: 0;
+                background: rgba(250, 251, 253, 0.9);
+                backdrop-filter: blur(12px);
+                -webkit-backdrop-filter: blur(12px);
+                padding: 1rem 3rem;
+                z-index: 1000;
+                border-bottom: 1px solid var(--border-light);
+            }
+
+            .nav-content {
+                max-width: 1400px;
+                margin: 0 auto;
+                display: flex;
+                align-items: center;
+                flex-wrap: wrap;
+                gap: 0.4rem 1.2rem;
+                font-size: 0.95rem;
+            }
+
+            .nav-content a {
+                text-decoration: none;
+                color: var(--text-secondary);
+            }
+
+            .nav-content a.nav-name {
+                font-weight: 700;
+                color: var(--accent-deep);
+                font-size: 1.05rem;
+            }
+
+            .nav-content a[aria-current="page"] {
+                color: var(--accent-neural);
+            }
+
+            .hero {
+                padding: 4.5rem 3rem 3.5rem;
+                background: linear-gradient(135deg, #fafbfd 0%, #f0f4f9 100%);
+            }
+
+            .hero-content {
+                max-width: 1400px;
+                margin: 0 auto;
+                display: grid;
+                grid-template-columns: 1fr 340px;
+                gap: 4rem;
+                align-items: center;
+            }
+
+            .hero h1 {
+                font-size: 3.6rem;
+                font-weight: 800;
+                line-height: 1.1;
+                letter-spacing: -0.03em;
+                margin-bottom: 1.5rem;
+                background: linear-gradient(135deg, var(--accent-deep) 0%, var(--accent-neural) 100%);
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                background-clip: text;
+            }
+
+            .hero-description {
+                font-size: 1.15rem;
+                color: var(--text-secondary);
+                line-height: 1.8;
+                background: rgba(255, 255, 255, 0.6);
+                padding: 1.75rem;
+                border-radius: 16px;
+                border: 1px solid var(--border-light);
+                box-shadow: 0 4px 20px var(--shadow-deep);
+            }
+
+            .hero svg {
+                width: 100%;
+                height: auto;
+            }
+
+            .toc {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 0.5rem;
+                margin-top: 1.5rem;
+            }
+
+            .toc a {
+                background: white;
+                border: 1px solid var(--border-light);
+                border-radius: 20px;
+                padding: 0.35rem 0.9rem;
+                font-size: 0.9rem;
+                color: var(--accent-synapse);
+                text-decoration: none;
+            }
+
+            .toc a:hover {
+                border-color: var(--accent-neural);
+            }
+
+            main {
+                max-width: 1400px;
+                margin: 0 auto;
+                padding: 1rem 3rem 5rem;
+            }
+
+            .section-title {
+                font-size: 2.2rem;
+                font-weight: 700;
+                color: var(--accent-deep);
+                margin: 3.5rem 0 1.25rem;
+                display: flex;
+                align-items: center;
+                gap: 1.25rem;
+                letter-spacing: -0.02em;
+                scroll-margin-top: 5rem;
+            }
+
+            .section-title::before {
+                content: '';
+                width: 50px;
+                height: 5px;
+                flex: none;
+                background: linear-gradient(90deg, var(--accent-neural), var(--accent-gradient));
+                border-radius: 10px;
+            }
+
+            .lead {
+                max-width: 60rem;
+                color: var(--text-secondary);
+                font-size: 1.05rem;
+                line-height: 1.75;
+                margin-bottom: 1rem;
+            }
+
+            .lead code,
+            td code {
+                background: rgba(107, 140, 255, 0.08);
+                border-radius: 4px;
+                padding: 0.05rem 0.3rem;
+                font-size: 0.9em;
+            }
+
+            .ref-table {
+                width: 100%;
+                border-collapse: collapse;
+                background: white;
+                border: 2px solid var(--border-light);
+                border-radius: 16px;
+                overflow: hidden;
+                margin-bottom: 2rem;
+                font-size: 0.95rem;
+            }
+
+            .ref-table th,
+            .ref-table td {
+                padding: 0.65rem 1rem;
+                border-bottom: 1px solid var(--border-light);
+                text-align: left;
+                vertical-align: top;
+            }
+
+            .ref-table th {
+                background: var(--bg-secondary);
+                color: var(--accent-deep);
+            }
+
+            .ref-table td:nth-child(n+3) {
+                font-variant-numeric: tabular-nums;
+            }
+
+            .table-wrap {
+                overflow-x: auto;
+            }
+
+            footer {
+                background: var(--bg-secondary);
+                border-top: 2px solid var(--border-light);
+                padding: 2.5rem 3rem;
+            }
+
+            .footer-content {
+                max-width: 1400px;
+                margin: 0 auto;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                flex-wrap: wrap;
+                gap: 1rem;
+            }
+
+            .language-selector {
+                display: flex;
+                gap: 1rem;
+            }
+
+            .lang-btn {
+                padding: 0.6rem 1.4rem;
+                background: white;
+                border: 2px solid var(--border-light);
+                border-radius: 12px;
+                color: var(--accent-deep);
+                text-decoration: none;
+                font-weight: 500;
+            }
+
+            .lang-btn:hover {
+                border-color: var(--accent-neural);
+            }
+
+            .footer-info {
+                color: var(--text-secondary);
+                font-size: 0.9rem;
+            }
+
+            a:focus,
+            button:focus {
+                outline: 3px solid var(--accent-neural);
+                outline-offset: 2px;
+            }
+
+            @media (max-width: 900px) {
+                .hero-content {
+                    grid-template-columns: 1fr;
+                    gap: 2rem;
+                }
+
+                .hero svg {
+                    max-width: 320px;
+                }
+            }
+
+            @media (max-width: 768px) {
+
+                nav,
+                .hero,
+                main,
+                footer {
+                    padding-left: 1rem;
+                    padding-right: 1rem;
+                }
+
+                .hero h1 {
+                    font-size: 2.4rem;
+                }
+
+                .section-title {
+                    font-size: 1.6rem;
+                }
+            }
+        </style>
+        <link rel="stylesheet" href="../../../../../data/teaching/ia-deeplearning/pipeline-demo.css">
+        <link rel="stylesheet" href="../../../../../data/teaching/ia-deeplearning/cnn-demo.css">
+    </head>
+
+    <body>
+        <nav>
+            <div class="nav-content">
+                <a href="../../../../apropos.html" class="nav-name">John Samuel</a>
+                <a href="../../../../index.html">Accueil</a>
+                <a href="./index.html">IA et Deep Learning</a>
+                <a href="./pipeline.html">Pipeline</a>
+                <a href="#" aria-current="page">CNN et couches</a>
+            </div>
+        </nav>
+
+        <section class="hero">
+            <div class="hero-content">
+                <div>
+                    <h1>Réseaux convolutifs et leurs couches</h1>
+                    <div class="hero-description">
+                        Dessinez une forme et suivez-la à travers un vrai réseau convolutif entraîné, puis démontez-le
+                        couche par couche : convolution, activation, pooling, champ récepteur, dropout, normalisation
+                        par lots et softmax. Tous les calculs s'exécutent dans votre navigateur.
+                    </div>
+                    <div class="toc">
+                        <a href="#cnn">CNN en action</a>
+                        <a href="#convolution">Convolution</a>
+                        <a href="#activation">Activation</a>
+                        <a href="#pooling">Pooling</a>
+                        <a href="#champ-recepteur">Champ récepteur</a>
+                        <a href="#dropout">Dropout</a>
+                        <a href="#batchnorm">Normalisation par lots</a>
+                        <a href="#softmax">Softmax</a>
+                        <a href="#recapitulatif">Récapitulatif</a>
+                    </div>
+                </div>
+                <svg viewBox="0 0 340 260" role="img" aria-label="Une image traversant des couches de convolution de plus en plus petites">
+                    <g fill="none" stroke="#6b8cff" stroke-width="2">
+                        <rect x="10" y="40" width="120" height="120" rx="6" fill="#eef2ff" />
+                        <rect x="150" y="60" width="80" height="80" rx="5" fill="#dfe6ff" />
+                        <rect x="160" y="70" width="80" height="80" rx="5" fill="#d3ddff" />
+                        <rect x="170" y="80" width="80" height="80" rx="5" fill="#c6d3ff" />
+                        <rect x="270" y="95" width="16" height="50" rx="3" fill="#8fa3ff" />
+                        <rect x="300" y="105" width="16" height="30" rx="3" fill="#4a6edb" />
+                    </g>
+                    <polygon points="70,65 40,135 100,135" fill="#2d4a8e" />
+                    <rect x="34" y="62" width="36" height="36" fill="none" stroke="#ffb000" stroke-width="3" />
+                    <path d="M70 80 L170 100" stroke="#ffb000" stroke-width="1.5" stroke-dasharray="4 3" />
+                    <path d="M250 120 L270 120 M286 120 L300 120" stroke="#6b8cff" stroke-width="2" />
+                    <text x="70" y="185" font-size="13" text-anchor="middle" fill="#4a5a7a">entrée</text>
+                    <text x="200" y="185" font-size="13" text-anchor="middle" fill="#4a5a7a">cartes</text>
+                    <text x="295" y="185" font-size="13" text-anchor="middle" fill="#4a5a7a">sortie</text>
+                </svg>
+            </div>
+        </section>
+
+        <main>
+            <h2 class="section-title" id="cnn">Le CNN en action</h2>
+            <p class="lead">
+                Ce réseau a été entraîné à reconnaître un cercle, un carré ou un triangle dans une image 16×16
+                (voir la <a href="./pipeline.html">démonstration du pipeline</a>). Il ne compte que 1 619 paramètres :
+                8 filtres 3×3, un max-pooling et une couche dense. Dessinez dans la grille, décalez votre dessin,
+                ajoutez du bruit, et observez chaque étape du calcul se mettre à jour.
+            </p>
+            <div data-lab="cnn"></div>
+
+            <h2 class="section-title" id="convolution">La convolution</h2>
+            <p class="lead">
+                Un filtre (ou noyau) 3×3 glisse sur l'image. À chaque position, on multiplie les 9 pixels couverts
+                par les 9 poids du filtre et on additionne : le résultat est un pixel de la <b>carte de
+                caractéristiques</b>. Le même filtre est utilisé partout (<b>partage des poids</b>), d'où très peu de
+                paramètres : 9 poids + 1 biais par filtre et par canal d'entrée. Le <b>remplissage</b> (padding)
+                ajoute des zéros autour de l'image, le <b>pas</b> (stride) saute des positions, la
+                <b>dilatation</b> espace les points du filtre pour voir plus large sans plus de poids.
+            </p>
+            <p class="lead">
+                Choisissez un noyau classique (les détecteurs de bords de Sobel, par exemple), l'un des 8 filtres
+                appris par le CNN, ou tapez vos propres valeurs.
+            </p>
+            <div data-lab="convolution"></div>
+
+            <h2 class="section-title" id="activation">Les fonctions d'activation</h2>
+            <p class="lead">
+                Sans fonction non linéaire entre elles, plusieurs couches de convolution se réduiraient à une seule
+                convolution. <b>ReLU</b> (<code>max(0, x)</code>) est le choix par défaut : simple, rapide, et elle
+                met à zéro les réponses négatives. <b>Leaky ReLU</b> laisse passer une petite pente pour éviter les
+                neurones « morts ». <b>Sigmoïde</b> et <b>tanh</b> écrasent les valeurs dans un intervalle borné.
+                <b>GELU</b>, une version adoucie de ReLU, est utilisée dans les Transformers.
+            </p>
+            <div data-lab="activation"></div>
+
+            <h2 class="section-title" id="pooling">Le pooling</h2>
+            <p class="lead">
+                Le pooling résume chaque fenêtre par une seule valeur : le <b>maximum</b> (« le motif est-il présent
+                quelque part ici ? ») ou la <b>moyenne</b>. Il divise la taille des cartes, n'a aucun paramètre, et
+                rend le réseau moins sensible aux petits déplacements : comparez de combien les valeurs changent
+                quand l'image bouge d'un pixel, avant et après pooling (max contre moyenne). Le pooling <b>global</b> réduit chaque carte
+                à un seul nombre, souvent juste avant la couche de classification.
+            </p>
+            <div data-lab="pooling"></div>
+
+            <h2 class="section-title" id="champ-recepteur">Empiler les couches : le champ récepteur</h2>
+            <p class="lead">
+                Un neurone d'une couche profonde dépend d'une zone de l'image d'entrée de plus en plus grande : son
+                <b>champ récepteur</b>. Avec un noyau de taille <code>k</code>, chaque couche l'agrandit de
+                <code>(k − 1) × j</code>, où <code>j</code> est le saut cumulé, multiplié par le pas de chaque couche.
+                Deux convolutions 3×3 voient autant qu'une seule 5×5, avec moins de poids (18 contre 25) et une
+                non-linéarité de plus. Le pooling double le saut : les couches suivantes voient beaucoup plus loin.
+            </p>
+            <div data-lab="receptive"></div>
+
+            <h2 class="section-title" id="dropout">Le dropout</h2>
+            <p class="lead">
+                Pendant l'entraînement, le dropout éteint au hasard une fraction <code>p</code> des neurones à chaque
+                lot, et multiplie les autres par <code>1 / (1 − p)</code> pour garder la même moyenne. Le réseau ne
+                peut plus compter sur un neurone particulier : c'est une régularisation contre le surapprentissage.
+                À l'inférence, on le désactive. Notre CNN n'a pas été entraîné avec du dropout : regardez à quel point
+                un seul masque perturbe sa prédiction, et comment la moyenne de nombreux masques la stabilise.
+            </p>
+            <div data-lab="dropout"></div>
+
+            <h2 class="section-title" id="batchnorm">La normalisation par lots</h2>
+            <p class="lead">
+                La <b>normalisation par lots</b> (batch normalization) recentre et réduit les sorties d'un filtre sur
+                le lot courant : <code>x̂ = (x − μ) / σ</code>, puis applique une échelle <code>γ</code> et un décalage
+                <code>β</code> appris. Les couches suivantes reçoivent ainsi des valeurs de distribution stable, ce
+                qui permet des taux d'apprentissage plus élevés. À l'inférence, μ et σ sont remplacés par des
+                moyennes mesurées pendant l'entraînement.
+            </p>
+            <div data-lab="batchnorm"></div>
+
+            <h2 class="section-title" id="softmax">Softmax et température</h2>
+            <p class="lead">
+                La dernière couche produit des scores (<b>logits</b>) que la <b>softmax</b> transforme en
+                probabilités : <code>p<sub>i</sub> = e<sup>z<sub>i</sub>/T</sup> / Σ<sub>j</sub>
+                e<sup>z<sub>j</sub>/T</sup></code>. La température <code>T</code> ne change pas la classe prédite,
+                seulement la confiance : <code>T &lt; 1</code> accentue l'écart, <code>T &gt; 1</code> l'aplatit.
+                C'est le même réglage qui rend un modèle de langue plus ou moins « créatif ».
+            </p>
+            <div data-lab="softmax"></div>
+
+            <h2 class="section-title" id="recapitulatif">Récapitulatif : le CNN de la démonstration</h2>
+            <div class="table-wrap">
+                <table class="ref-table">
+                    <thead>
+                        <tr>
+                            <th>Couche</th>
+                            <th>Rôle</th>
+                            <th>Forme de sortie</th>
+                            <th>Paramètres</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Entrée</td>
+                            <td>image normalisée</td>
+                            <td><code>16 × 16 × 1</code></td>
+                            <td>0</td>
+                        </tr>
+                        <tr>
+                            <td>Conv2D 3×3, 8 filtres, padding 1</td>
+                            <td>détecter des motifs locaux</td>
+                            <td><code>16 × 16 × 8</code></td>
+                            <td>8 × (9 + 1) = 80</td>
+                        </tr>
+                        <tr>
+                            <td>ReLU</td>
+                            <td>non-linéarité</td>
+                            <td><code>16 × 16 × 8</code></td>
+                            <td>0</td>
+                        </tr>
+                        <tr>
+                            <td>MaxPool 2×2</td>
+                            <td>réduire, tolérer les décalages</td>
+                            <td><code>8 × 8 × 8</code></td>
+                            <td>0</td>
+                        </tr>
+                        <tr>
+                            <td>Flatten</td>
+                            <td>mettre à plat</td>
+                            <td><code>512</code></td>
+                            <td>0</td>
+                        </tr>
+                        <tr>
+                            <td>Dense + softmax</td>
+                            <td>classer</td>
+                            <td><code>3</code></td>
+                            <td>512 × 3 + 3 = 1 539</td>
+                        </tr>
+                        <tr>
+                            <th colspan="3">Total</th>
+                            <th>1 619</th>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <p class="lead">
+                Remarquez que 95 % des paramètres sont dans la couche dense. En remplaçant <i>Flatten</i> par un
+                <b>pooling global moyen</b>, la couche dense n'aurait plus que 8 × 3 + 3 = 27 paramètres : c'est le
+                choix des architectures modernes (ResNet, MobileNet…).
+            </p>
+
+            <h2 class="section-title" id="autres-couches">Autres couches à connaître</h2>
+            <div class="table-wrap">
+                <table class="ref-table">
+                    <thead>
+                        <tr>
+                            <th>Couche</th>
+                            <th>Idée</th>
+                            <th>Usage typique</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Convolution 1×1</td>
+                            <td>combine les canaux en chaque pixel, sans regarder les voisins</td>
+                            <td>changer le nombre de canaux à faible coût (Inception, ResNet)</td>
+                        </tr>
+                        <tr>
+                            <td>Convolution séparable en profondeur</td>
+                            <td>un filtre spatial par canal, puis une convolution 1×1</td>
+                            <td>réseaux légers pour mobiles (MobileNet)</td>
+                        </tr>
+                        <tr>
+                            <td>Convolution transposée</td>
+                            <td>agrandit une carte au lieu de la réduire</td>
+                            <td>segmentation (U-Net), génération d'images</td>
+                        </tr>
+                        <tr>
+                            <td>Connexion résiduelle</td>
+                            <td>ajoute l'entrée d'un bloc à sa sortie : <code>y = x + F(x)</code></td>
+                            <td>entraîner des réseaux très profonds (ResNet, Transformers)</td>
+                        </tr>
+                        <tr>
+                            <td>Normalisation de couche</td>
+                            <td>comme la normalisation par lots, mais sur les caractéristiques d'un seul exemple</td>
+                            <td>Transformers, petits lots</td>
+                        </tr>
+                        <tr>
+                            <td>Embedding</td>
+                            <td>table qui associe un vecteur appris à chaque identifiant</td>
+                            <td>mots, catégories (voir la partie texte du pipeline)</td>
+                        </tr>
+                        <tr>
+                            <td>Récurrente (LSTM, GRU)</td>
+                            <td>état interne mis à jour à chaque pas de temps</td>
+                            <td>séquences, séries temporelles</td>
+                        </tr>
+                        <tr>
+                            <td>Auto-attention</td>
+                            <td>chaque position pondère toutes les autres selon leur pertinence</td>
+                            <td>Transformers : texte, image (ViT), audio</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </main>
+
+        <footer>
+            <div class="footer-content">
+                <div class="language-selector">
+                    <a href="../../../../../en/teaching/courses/2026/AI-DeepLearning/cnn.html" class="lang-btn">English</a>
+                    <a href="../../../../../fr/enseignement/cours/2026/IA-DeepLearning/cnn.html" class="lang-btn">Français</a>
+                </div>
+                <div class="footer-info">
+                    <p>&copy; 2026 John Samuel | <a href="http://creativecommons.org/licenses/by-sa/4.0/">CC BY-SA
+                            4.0</a></p>
+                </div>
+            </div>
+        </footer>
+        <script src="../../../../../data/teaching/ia-deeplearning/demo-core.js" defer></script>
+        <script src="../../../../../data/teaching/ia-deeplearning/cnn-demo.js" defer></script>
+    </body>
+
+</html>

@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html lang="en">
+
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="shortcut icon" href="../../../../../images/logo/favicon.png" />
+        <title>Convolutional Networks and Layers · AI and Deep Learning 2026–2027 · John Samuel</title>
+        <meta name="description"
+            content="Interactive demos: a trained convolutional network, convolution, activation functions, pooling, receptive field, dropout, batch normalisation and softmax.">
+        <style>
+            * {
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
+            }
+
+            :root {
+                --bg-primary: #fafbfd;
+                --bg-secondary: #f0f4f9;
+                --accent-neural: #6b8cff;
+                --accent-synapse: #4a6edb;
+                --accent-deep: #2d4a8e;
+                --accent-gradient: #8fa3ff;
+                --text-primary: #1a2740;
+                --text-secondary: #4a5a7a;
+                --shadow-neural: rgba(107, 140, 255, 0.15);
+                --shadow-deep: rgba(45, 74, 142, 0.08);
+                --border-light: rgba(107, 140, 255, 0.12);
+            }
+
+            body {
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+                background: var(--bg-primary);
+                color: var(--text-primary);
+                line-height: 1.6;
+                overflow-x: hidden;
+            }
+
+            nav {
+                position: sticky;
+                top: 0;
+                background: rgba(250, 251, 253, 0.9);
+                backdrop-filter: blur(12px);
+                -webkit-backdrop-filter: blur(12px);
+                padding: 1rem 3rem;
+                z-index: 1000;
+                border-bottom: 1px solid var(--border-light);
+            }
+
+            .nav-content {
+                max-width: 1400px;
+                margin: 0 auto;
+                display: flex;
+                align-items: center;
+                flex-wrap: wrap;
+                gap: 0.4rem 1.2rem;
+                font-size: 0.95rem;
+            }
+
+            .nav-content a {
+                text-decoration: none;
+                color: var(--text-secondary);
+            }
+
+            .nav-content a.nav-name {
+                font-weight: 700;
+                color: var(--accent-deep);
+                font-size: 1.05rem;
+            }
+
+            .nav-content a[aria-current="page"] {
+                color: var(--accent-neural);
+            }
+
+            .hero {
+                padding: 4.5rem 3rem 3.5rem;
+                background: linear-gradient(135deg, #fafbfd 0%, #f0f4f9 100%);
+            }
+
+            .hero-content {
+                max-width: 1400px;
+                margin: 0 auto;
+                display: grid;
+                grid-template-columns: 1fr 340px;
+                gap: 4rem;
+                align-items: center;
+            }
+
+            .hero h1 {
+                font-size: 3.6rem;
+                font-weight: 800;
+                line-height: 1.1;
+                letter-spacing: -0.03em;
+                margin-bottom: 1.5rem;
+                background: linear-gradient(135deg, var(--accent-deep) 0%, var(--accent-neural) 100%);
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                background-clip: text;
+            }
+
+            .hero-description {
+                font-size: 1.15rem;
+                color: var(--text-secondary);
+                line-height: 1.8;
+                background: rgba(255, 255, 255, 0.6);
+                padding: 1.75rem;
+                border-radius: 16px;
+                border: 1px solid var(--border-light);
+                box-shadow: 0 4px 20px var(--shadow-deep);
+            }
+
+            .hero svg {
+                width: 100%;
+                height: auto;
+            }
+
+            .toc {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 0.5rem;
+                margin-top: 1.5rem;
+            }
+
+            .toc a {
+                background: white;
+                border: 1px solid var(--border-light);
+                border-radius: 20px;
+                padding: 0.35rem 0.9rem;
+                font-size: 0.9rem;
+                color: var(--accent-synapse);
+                text-decoration: none;
+            }
+
+            .toc a:hover {
+                border-color: var(--accent-neural);
+            }
+
+            main {
+                max-width: 1400px;
+                margin: 0 auto;
+                padding: 1rem 3rem 5rem;
+            }
+
+            .section-title {
+                font-size: 2.2rem;
+                font-weight: 700;
+                color: var(--accent-deep);
+                margin: 3.5rem 0 1.25rem;
+                display: flex;
+                align-items: center;
+                gap: 1.25rem;
+                letter-spacing: -0.02em;
+                scroll-margin-top: 5rem;
+            }
+
+            .section-title::before {
+                content: '';
+                width: 50px;
+                height: 5px;
+                flex: none;
+                background: linear-gradient(90deg, var(--accent-neural), var(--accent-gradient));
+                border-radius: 10px;
+            }
+
+            .lead {
+                max-width: 60rem;
+                color: var(--text-secondary);
+                font-size: 1.05rem;
+                line-height: 1.75;
+                margin-bottom: 1rem;
+            }
+
+            .lead code,
+            td code {
+                background: rgba(107, 140, 255, 0.08);
+                border-radius: 4px;
+                padding: 0.05rem 0.3rem;
+                font-size: 0.9em;
+            }
+
+            .ref-table {
+                width: 100%;
+                border-collapse: collapse;
+                background: white;
+                border: 2px solid var(--border-light);
+                border-radius: 16px;
+                overflow: hidden;
+                margin-bottom: 2rem;
+                font-size: 0.95rem;
+            }
+
+            .ref-table th,
+            .ref-table td {
+                padding: 0.65rem 1rem;
+                border-bottom: 1px solid var(--border-light);
+                text-align: left;
+                vertical-align: top;
+            }
+
+            .ref-table th {
+                background: var(--bg-secondary);
+                color: var(--accent-deep);
+            }
+
+            .ref-table td:nth-child(n+3) {
+                font-variant-numeric: tabular-nums;
+            }
+
+            .table-wrap {
+                overflow-x: auto;
+            }
+
+            footer {
+                background: var(--bg-secondary);
+                border-top: 2px solid var(--border-light);
+                padding: 2.5rem 3rem;
+            }
+
+            .footer-content {
+                max-width: 1400px;
+                margin: 0 auto;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                flex-wrap: wrap;
+                gap: 1rem;
+            }
+
+            .language-selector {
+                display: flex;
+                gap: 1rem;
+            }
+
+            .lang-btn {
+                padding: 0.6rem 1.4rem;
+                background: white;
+                border: 2px solid var(--border-light);
+                border-radius: 12px;
+                color: var(--accent-deep);
+                text-decoration: none;
+                font-weight: 500;
+            }
+
+            .lang-btn:hover {
+                border-color: var(--accent-neural);
+            }
+
+            .footer-info {
+                color: var(--text-secondary);
+                font-size: 0.9rem;
+            }
+
+            a:focus,
+            button:focus {
+                outline: 3px solid var(--accent-neural);
+                outline-offset: 2px;
+            }
+
+            @media (max-width: 900px) {
+                .hero-content {
+                    grid-template-columns: 1fr;
+                    gap: 2rem;
+                }
+
+                .hero svg {
+                    max-width: 320px;
+                }
+            }
+
+            @media (max-width: 768px) {
+
+                nav,
+                .hero,
+                main,
+                footer {
+                    padding-left: 1rem;
+                    padding-right: 1rem;
+                }
+
+                .hero h1 {
+                    font-size: 2.4rem;
+                }
+
+                .section-title {
+                    font-size: 1.6rem;
+                }
+            }
+        </style>
+        <link rel="stylesheet" href="../../../../../data/teaching/ia-deeplearning/pipeline-demo.css">
+        <link rel="stylesheet" href="../../../../../data/teaching/ia-deeplearning/cnn-demo.css">
+    </head>
+
+    <body>
+        <nav>
+            <div class="nav-content">
+                <a href="../../../../about.html" class="nav-name">John Samuel</a>
+                <a href="../../../../index.html">Home</a>
+                <a href="./index.html">AI and Deep Learning</a>
+                <a href="./pipeline.html">Pipeline</a>
+                <a href="#" aria-current="page">CNN and Layers</a>
+            </div>
+        </nav>
+
+        <section class="hero">
+            <div class="hero-content">
+                <div>
+                    <h1>Convolutional Networks and Their Layers</h1>
+                    <div class="hero-description">
+                        Draw a shape and follow it through a real trained convolutional network, then take the network
+                        apart layer by layer: convolution, activation, pooling, receptive field, dropout, batch
+                        normalisation and softmax. Every computation runs in your browser.
+                    </div>
+                    <div class="toc">
+                        <a href="#cnn">CNN in action</a>
+                        <a href="#convolution">Convolution</a>
+                        <a href="#activation">Activation</a>
+                        <a href="#pooling">Pooling</a>
+                        <a href="#receptive-field">Receptive field</a>
+                        <a href="#dropout">Dropout</a>
+                        <a href="#batchnorm">Batch normalisation</a>
+                        <a href="#softmax">Softmax</a>
+                        <a href="#summary">Summary</a>
+                    </div>
+                </div>
+                <svg viewBox="0 0 340 260" role="img" aria-label="An image flowing through smaller and smaller convolution layers">
+                    <g fill="none" stroke="#6b8cff" stroke-width="2">
+                        <rect x="10" y="40" width="120" height="120" rx="6" fill="#eef2ff" />
+                        <rect x="150" y="60" width="80" height="80" rx="5" fill="#dfe6ff" />
+                        <rect x="160" y="70" width="80" height="80" rx="5" fill="#d3ddff" />
+                        <rect x="170" y="80" width="80" height="80" rx="5" fill="#c6d3ff" />
+                        <rect x="270" y="95" width="16" height="50" rx="3" fill="#8fa3ff" />
+                        <rect x="300" y="105" width="16" height="30" rx="3" fill="#4a6edb" />
+                    </g>
+                    <polygon points="70,65 40,135 100,135" fill="#2d4a8e" />
+                    <rect x="34" y="62" width="36" height="36" fill="none" stroke="#ffb000" stroke-width="3" />
+                    <path d="M70 80 L170 100" stroke="#ffb000" stroke-width="1.5" stroke-dasharray="4 3" />
+                    <path d="M250 120 L270 120 M286 120 L300 120" stroke="#6b8cff" stroke-width="2" />
+                    <text x="70" y="185" font-size="13" text-anchor="middle" fill="#4a5a7a">input</text>
+                    <text x="200" y="185" font-size="13" text-anchor="middle" fill="#4a5a7a">maps</text>
+                    <text x="295" y="185" font-size="13" text-anchor="middle" fill="#4a5a7a">output</text>
+                </svg>
+            </div>
+        </section>
+
+        <main>
+            <h2 class="section-title" id="cnn">The CNN in Action</h2>
+            <p class="lead">
+                This network was trained to recognise a circle, a square or a triangle in a 16×16 image (see the
+                <a href="./pipeline.html">pipeline demo</a>). It has only 1,619 parameters: 8 filters of 3×3, a
+                max-pooling layer and a dense layer. Draw in the grid, shift your drawing, add noise, and watch every
+                step of the computation update.
+            </p>
+            <div data-lab="cnn"></div>
+
+            <h2 class="section-title" id="convolution">Convolution</h2>
+            <p class="lead">
+                A 3×3 filter (or kernel) slides over the image. At each position, the 9 covered pixels are multiplied
+                by the filter's 9 weights and summed: the result is one pixel of the <b>feature map</b>. The same
+                filter is used everywhere (<b>weight sharing</b>), so there are very few parameters: 9 weights + 1
+                bias per filter and input channel. <b>Padding</b> adds zeros around the image, <b>stride</b> skips
+                positions, and <b>dilation</b> spreads the filter's taps apart to see wider with no extra weights.
+            </p>
+            <p class="lead">
+                Pick a classic kernel (the Sobel edge detectors, for instance), one of the CNN's 8 learnt filters, or
+                type your own values.
+            </p>
+            <div data-lab="convolution"></div>
+
+            <h2 class="section-title" id="activation">Activation Functions</h2>
+            <p class="lead">
+                Without a non-linear function between them, several convolution layers would collapse into a single
+                convolution. <b>ReLU</b> (<code>max(0, x)</code>) is the default: simple, fast, and it zeroes negative
+                responses. <b>Leaky ReLU</b> keeps a small slope to avoid "dead" neurons. <b>Sigmoid</b> and
+                <b>tanh</b> squash values into a bounded range. <b>GELU</b>, a smoothed ReLU, is used in Transformers.
+            </p>
+            <div data-lab="activation"></div>
+
+            <h2 class="section-title" id="pooling">Pooling</h2>
+            <p class="lead">
+                Pooling summarises each window with a single value: the <b>maximum</b> ("is the pattern present
+                anywhere here?") or the <b>average</b>. It shrinks the maps, has no parameters, and makes the network
+                less sensitive to small shifts: compare how much the values change when the image moves by one
+                pixel, before and after pooling (max versus average). <b>Global</b> pooling reduces each map to a single number, often just
+                before the classification layer.
+            </p>
+            <div data-lab="pooling"></div>
+
+            <h2 class="section-title" id="receptive-field">Stacking Layers: the Receptive Field</h2>
+            <p class="lead">
+                A neuron in a deep layer depends on a larger and larger area of the input image: its <b>receptive
+                field</b>. With kernel size <code>k</code>, each layer grows it by <code>(k − 1) × j</code>, where
+                <code>j</code> is the cumulative jump, multiplied by each layer's stride. Two 3×3 convolutions see as
+                much as one 5×5, with fewer weights (18 versus 25) and one more non-linearity. Pooling doubles the
+                jump, so the following layers see much further.
+            </p>
+            <div data-lab="receptive"></div>
+
+            <h2 class="section-title" id="dropout">Dropout</h2>
+            <p class="lead">
+                During training, dropout randomly switches off a fraction <code>p</code> of the neurons in every
+                batch, and multiplies the others by <code>1 / (1 − p)</code> to keep the same mean. The network can
+                no longer rely on any single neuron: it is a regularisation against overfitting. At inference, it is
+                turned off. Our CNN was not trained with dropout: see how much a single mask disturbs its prediction,
+                and how averaging many masks stabilises it.
+            </p>
+            <div data-lab="dropout"></div>
+
+            <h2 class="section-title" id="batchnorm">Batch Normalisation</h2>
+            <p class="lead">
+                <b>Batch normalisation</b> centres and scales a filter's outputs over the current batch:
+                <code>x̂ = (x − μ) / σ</code>, then applies a learnt scale <code>γ</code> and shift <code>β</code>. The
+                following layers thus receive values with a stable distribution, which allows higher learning rates.
+                At inference, μ and σ are replaced by averages measured during training.
+            </p>
+            <div data-lab="batchnorm"></div>
+
+            <h2 class="section-title" id="softmax">Softmax and Temperature</h2>
+            <p class="lead">
+                The last layer produces scores (<b>logits</b>) that the <b>softmax</b> turns into probabilities:
+                <code>p<sub>i</sub> = e<sup>z<sub>i</sub>/T</sup> / Σ<sub>j</sub> e<sup>z<sub>j</sub>/T</sup></code>.
+                The temperature <code>T</code> does not change the predicted class, only the confidence:
+                <code>T &lt; 1</code> sharpens the gap, <code>T &gt; 1</code> flattens it. It is the same knob that
+                makes a language model more or less "creative".
+            </p>
+            <div data-lab="softmax"></div>
+
+            <h2 class="section-title" id="summary">Summary: the Demo CNN</h2>
+            <div class="table-wrap">
+                <table class="ref-table">
+                    <thead>
+                        <tr>
+                            <th>Layer</th>
+                            <th>Role</th>
+                            <th>Output shape</th>
+                            <th>Parameters</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Input</td>
+                            <td>normalised image</td>
+                            <td><code>16 × 16 × 1</code></td>
+                            <td>0</td>
+                        </tr>
+                        <tr>
+                            <td>Conv2D 3×3, 8 filters, padding 1</td>
+                            <td>detect local patterns</td>
+                            <td><code>16 × 16 × 8</code></td>
+                            <td>8 × (9 + 1) = 80</td>
+                        </tr>
+                        <tr>
+                            <td>ReLU</td>
+                            <td>non-linearity</td>
+                            <td><code>16 × 16 × 8</code></td>
+                            <td>0</td>
+                        </tr>
+                        <tr>
+                            <td>MaxPool 2×2</td>
+                            <td>shrink, tolerate shifts</td>
+                            <td><code>8 × 8 × 8</code></td>
+                            <td>0</td>
+                        </tr>
+                        <tr>
+                            <td>Flatten</td>
+                            <td>lay out as a vector</td>
+                            <td><code>512</code></td>
+                            <td>0</td>
+                        </tr>
+                        <tr>
+                            <td>Dense + softmax</td>
+                            <td>classify</td>
+                            <td><code>3</code></td>
+                            <td>512 × 3 + 3 = 1,539</td>
+                        </tr>
+                        <tr>
+                            <th colspan="3">Total</th>
+                            <th>1,619</th>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <p class="lead">
+                Notice that 95% of the parameters are in the dense layer. Replacing <i>Flatten</i> with <b>global
+                average pooling</b> would leave the dense layer with only 8 × 3 + 3 = 27 parameters: the choice made
+                by modern architectures (ResNet, MobileNet…).
+            </p>
+
+            <h2 class="section-title" id="other-layers">Other Layers to Know</h2>
+            <div class="table-wrap">
+                <table class="ref-table">
+                    <thead>
+                        <tr>
+                            <th>Layer</th>
+                            <th>Idea</th>
+                            <th>Typical use</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>1×1 convolution</td>
+                            <td>mixes the channels at each pixel, without looking at neighbours</td>
+                            <td>change the number of channels cheaply (Inception, ResNet)</td>
+                        </tr>
+                        <tr>
+                            <td>Depthwise separable convolution</td>
+                            <td>one spatial filter per channel, then a 1×1 convolution</td>
+                            <td>lightweight mobile networks (MobileNet)</td>
+                        </tr>
+                        <tr>
+                            <td>Transposed convolution</td>
+                            <td>enlarges a map instead of shrinking it</td>
+                            <td>segmentation (U-Net), image generation</td>
+                        </tr>
+                        <tr>
+                            <td>Residual connection</td>
+                            <td>adds a block's input to its output: <code>y = x + F(x)</code></td>
+                            <td>training very deep networks (ResNet, Transformers)</td>
+                        </tr>
+                        <tr>
+                            <td>Layer normalisation</td>
+                            <td>like batch normalisation, but over the features of a single example</td>
+                            <td>Transformers, small batches</td>
+                        </tr>
+                        <tr>
+                            <td>Embedding</td>
+                            <td>a table mapping each ID to a learnt vector</td>
+                            <td>words, categories (see the text part of the pipeline)</td>
+                        </tr>
+                        <tr>
+                            <td>Recurrent (LSTM, GRU)</td>
+                            <td>an internal state updated at every time step</td>
+                            <td>sequences, time series</td>
+                        </tr>
+                        <tr>
+                            <td>Self-attention</td>
+                            <td>each position weighs all the others by relevance</td>
+                            <td>Transformers: text, images (ViT), audio</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </main>
+
+        <footer>
+            <div class="footer-content">
+                <div class="language-selector">
+                    <a href="../../../../../en/teaching/courses/2026/AI-DeepLearning/cnn.html" class="lang-btn">English</a>
+                    <a href="../../../../../fr/enseignement/cours/2026/IA-DeepLearning/cnn.html" class="lang-btn">Français</a>
+                </div>
+                <div class="footer-info">
+                    <p>&copy; 2026 John Samuel | <a href="http://creativecommons.org/licenses/by-sa/4.0/">CC BY-SA
+                            4.0</a></p>
+                </div>
+            </div>
+        </footer>
+        <script src="../../../../../data/teaching/ia-deeplearning/demo-core.js" defer></script>
+        <script src="../../../../../data/teaching/ia-deeplearning/cnn-demo.js" defer></script>
+    </body>
+
+</html>
