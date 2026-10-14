@@ -19,7 +19,7 @@ sys.path.insert(0, str(HERE.parent))
 from abstract.css_assets import DEFAULT_DATA_DIR, DEFAULT_REPO_ROOT
 from abstract.local_text import overlay
 from abstract.prepare_missing_content import alternate_pages, page_sources
-from abstract.prepare_travel_content import LANGUAGES, slots
+from abstract.prepare_travel_content import LANGUAGES, DirectTextSlots
 from abstract.render_page import (
     BINDABLE_ATTRIBUTES,
     CONTENT_ATTRIBUTE_PREFIX,
@@ -195,6 +195,44 @@ def rendered_attribute_values(path: Path) -> list[str]:
     return parser.values
 
 
+class Fanout(HTMLParser):
+    """Parse a page once and hand every event to several collectors.
+
+    Each collector sees the same events it would see parsing the page itself:
+    all of them convert character references, and none reads the parser's
+    position or raw source.
+    """
+
+    def __init__(self, *collectors: HTMLParser) -> None:
+        super().__init__(convert_charrefs=True)
+        self.collectors = collectors
+
+    def handle_starttag(self, tag, attrs) -> None:
+        for collector in self.collectors:
+            collector.handle_starttag(tag, attrs)
+
+    def handle_startendtag(self, tag, attrs) -> None:
+        for collector in self.collectors:
+            collector.handle_startendtag(tag, attrs)
+
+    def handle_endtag(self, tag) -> None:
+        for collector in self.collectors:
+            collector.handle_endtag(tag)
+
+    def handle_data(self, data) -> None:
+        for collector in self.collectors:
+            collector.handle_data(data)
+
+
+def rendered_values(path: Path) -> tuple[dict, list[str], list[str]]:
+    """A rendered page's text slots, bound text and attribute values, in one parse."""
+    text_slots = DirectTextSlots(RENDERED_TEXT_TAGS)
+    bound = RenderedBoundText()
+    attributes = RenderedAttributes()
+    Fanout(text_slots, bound, attributes).feed(path.read_text(encoding="utf-8"))
+    return text_slots.slots, bound.values, attributes.values
+
+
 def verify(
     repo_root: Path,
     data_dir: Path,
@@ -208,14 +246,15 @@ def verify(
         page_bindings = bindings(abstract)
         targets = alternate_pages(repo_root, abstract)
         for language, target in zip(LANGUAGES, targets):
+            text_slots, bound_values, attribute_values = rendered_values(target)
             available = Counter(
                 # Read every tag the renderer writes, or a bound value it
                 # placed (in a `div`, say) would look missing.
                 normalize_text(value)
-                for value in slots(target, RENDERED_TEXT_TAGS).values()
+                for value in text_slots.values()
             )
-            available.update(rendered_bound_values(target))
-            available.update(rendered_attribute_values(target))
+            available.update(bound_values)
+            available.update(attribute_values)
             missing = []
             unresolved = []
             expected = Counter()

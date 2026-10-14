@@ -45,7 +45,7 @@ sys.path.insert(0, str(HERE))
 from abstract.css_assets import DEFAULT_DATA_DIR, DEFAULT_REPO_ROOT
 from abstract.prepare_missing_content import alternate_pages, page_sources
 from abstract.prepare_travel_content import LANGUAGES
-from abstract.render_page import _base_signature, base_counts
+from abstract.render_page import _base_signature
 from content_update import (
     wikibase_label_text,
     ABSTRACT_CONTENT_ITEM,
@@ -86,10 +86,18 @@ class Images(HTMLParser):
         self.handle_starttag(tag, attrs)
 
 
-def images(path: Path) -> dict[tuple, tuple[str | None, str, str]]:
+def scan(path: Path) -> tuple[dict[tuple, tuple[str | None, str, str]], collections.Counter]:
+    """A page's images and its base counts, from a single parse.
+
+    ``Images`` counts signatures exactly as ``render_page.base_counts`` does.
+    """
     parser = Images()
     parser.feed(path.read_text(encoding="utf-8", errors="replace"))
-    return parser.found
+    return parser.found, parser.counts
+
+
+def images(path: Path) -> dict[tuple, tuple[str | None, str, str]]:
+    return scan(path)[0]
 
 
 def load_labels(data_dir: Path) -> dict[str, dict[str, str]]:
@@ -115,21 +123,17 @@ def collect(repo_root: Path) -> tuple[list[dict], collections.Counter]:
     reasons: collections.Counter = collections.Counter()
     for page_qid, relative in page_sources(repo_root):
         abstract = repo_root / relative
-        abstract_images = images(abstract)
+        abstract_images, abstract_counts = scan(abstract)
         if not abstract_images:
             continue
         targets = list(zip(LANGUAGES, alternate_pages(repo_root, abstract)))
         if any(not target or not Path(target).exists() for _language, target in targets):
             reasons["page has no full set of language pages"] += 1
             continue
-        abstract_counts = base_counts(abstract.read_text(encoding="utf-8"))
         per_language = {}
         per_language_counts = {}
         for language, target in targets:
-            page = Path(target)
-            text = page.read_text(encoding="utf-8", errors="replace")
-            per_language[language] = images(page)
-            per_language_counts[language] = base_counts(text)
+            per_language[language], per_language_counts[language] = scan(Path(target))
         for key, (_alt, src, bound) in sorted(abstract_images.items()):
             base = key[:3]
             # The renderer only aligns a slot by occurrence when both sides hold

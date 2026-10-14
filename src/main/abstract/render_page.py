@@ -185,6 +185,11 @@ class SlotRewriter(HTMLParser):
 
     Rewrites are driven off the original source by character offset so scripts,
     styles, entities and every unbound byte pass through unchanged.
+
+    The page is parsed once. Whether a slot may be written depends on how many
+    same-signature elements the whole page holds, which is only known at the
+    end, so candidate writes are collected during the pass and settled in
+    ``rewrite()``; the counts this parser keeps are the page's base counts.
     """
 
     def __init__(
@@ -203,7 +208,6 @@ class SlotRewriter(HTMLParser):
         # language), occurrence N addresses different content and must not be
         # rewritten.
         self.template_counts = template_counts
-        self.local_counts = base_counts(source)
         self._line_starts = self._compute_line_starts(source)
         self.counts: Counter[tuple[str, str, str]] = Counter()
         self.stack: list[_Frame] = []
@@ -214,6 +218,16 @@ class SlotRewriter(HTMLParser):
         self.attribute_targets = attribute_targets or {}
         self.attributes_applied: set[AttributeSlot] = set()
         self.attributes_rewritten: set[AttributeSlot] = set()
+        # Candidate writes, settled once the page's base counts are known:
+        # (slot, region or None when the page already holds the target).
+        self._text_candidates: list[tuple[Signature, tuple[int, int, str, bool] | None]] = []
+        self._attribute_candidates: list[tuple[AttributeSlot, tuple[int, int, str, bool] | None]] = []
+
+    def _count_mismatch(self, base: tuple[str, str, str]) -> bool:
+        return (
+            self.template_counts is not None
+            and self.template_counts.get(base) != self.counts.get(base)
+        )
 
     @staticmethod
     def _compute_line_starts(source: str) -> list[int]:
@@ -254,14 +268,6 @@ class SlotRewriter(HTMLParser):
         """Replace bound attribute values inside this element's start tag."""
         if not self.attribute_targets:
             return
-        base = key[:3]
-        if (
-            self.template_counts is not None
-            and self.template_counts.get(base) != self.local_counts.get(base)
-        ):
-            # Same rule as text slots: when the counts differ, occurrence N is
-            # not the same element on both sides and must not be written.
-            return
         text = self.get_starttag_text() or ""
         for (slot_key, attribute), target in self.attribute_targets.items():
             if slot_key != key:
@@ -272,13 +278,10 @@ class SlotRewriter(HTMLParser):
             if not match:
                 # The language page has no such attribute to fill.
                 continue
-            self.attributes_applied.add((slot_key, attribute))
-            if html.unescape(match.group(1)) == target:
-                continue
-            self.regions.append(
-                (start + match.start(1), start + match.end(1), target, True)
-            )
-            self.attributes_rewritten.add((slot_key, attribute))
+            region = None
+            if html.unescape(match.group(1)) != target:
+                region = (start + match.start(1), start + match.end(1), target, True)
+            self._attribute_candidates.append(((slot_key, attribute), region))
 
     def handle_endtag(self, tag) -> None:
         if tag not in (frame.tag for frame in self.stack):
@@ -297,24 +300,42 @@ class SlotRewriter(HTMLParser):
     def _finalize(self, frame: _Frame, end: int) -> None:
         if frame.key not in self.targets:
             return
-        base = frame.key[:3]
-        count_mismatch = (
-            self.template_counts is not None
-            and self.template_counts.get(base) != self.local_counts.get(base)
-        )
-        if frame.had_child or frame.tag not in TEXT_TAGS or count_mismatch:
+        if frame.had_child or frame.tag not in TEXT_TAGS:
             self.structural.add(frame.key)
             return
         target = self.targets[frame.key]
         current = " ".join(html.unescape(self.source[frame.inner_start : end]).split())
-        self.applied.add(frame.key)
-        if current != target:
-            self.regions.append((frame.inner_start, end, target, False))
-            self.rewritten.add(frame.key)
+        region = (frame.inner_start, end, target, False) if current != target else None
+        self._text_candidates.append((frame.key, region))
+
+    def _settle(self) -> None:
+        """Keep only the writes whose signature counts match the template.
+
+        A slot is aligned by occurrence index only when the language page has
+        the same number of same-signature elements as the template; otherwise
+        occurrence N is not the same element on both sides. A text slot that
+        fails this is structural; an attribute slot is left unwritten.
+        """
+        for key, region in self._text_candidates:
+            if self._count_mismatch(key[:3]):
+                self.structural.add(key)
+                continue
+            self.applied.add(key)
+            if region:
+                self.regions.append(region)
+                self.rewritten.add(key)
+        for slot, region in self._attribute_candidates:
+            if self._count_mismatch(slot[0][:3]):
+                continue
+            self.attributes_applied.add(slot)
+            if region:
+                self.regions.append(region)
+                self.attributes_rewritten.add(slot)
 
     def rewrite(self) -> str:
         self.feed(self.source)
         self.close()
+        self._settle()
         result = self.source
         for start, end, text, is_attribute in sorted(self.regions, reverse=True):
             escaped = html.escape(text, quote=is_attribute)

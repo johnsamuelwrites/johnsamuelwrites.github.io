@@ -59,7 +59,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: "3.11"
+          python-version: "3.14"
           cache: pip
           cache-dependency-path: src/main/requirements-ci.txt
 
@@ -68,109 +68,11 @@ jobs:
         # requirements.txt (gensim, nltk, pandas, pygit2) is not needed here.
         run: python -m pip install -r src/main/requirements-ci.txt
 
-      - name: Run unit tests
-        run: python -m unittest discover -s src/test -p "test_*.py"
-
-      - name: Check internal broken links across the whole site
-        # Covers every HTML file, Q315 included, so a changed-files pass or a
-        # separate Q315 pass would only repeat part of it.
-        run: python src/main/ci_internal_links.py --all --tracked
-
-      - name: Check canonical abstract CSS references
-        run: python src/main/abstract/css_assets.py check
-
-      - name: Check every canonical Q315 document
-        run: python src/main/abstract/validate_abstract_html.py Q315
-
-      - name: Check rendered Q315 labels are current
-        run: python src/main/abstract/render_page.py --check
-
-      - name: Check Q315 structural repairs are current
-        run: python src/main/abstract/repair_structure.py --check
-
-      - name: Check rendered Q315 prose and links
-        run: python src/main/abstract/validate_rendered_pages.py
-
-      - name: Check content-update CSVs are in sync with their Q315 sources
-        # Validates every CSV in data/content-updates and asserts that applying it
-        # to its Q315 abstract source would be a no-op. Not a ratchet: it starts at
-        # zero drift and must stay there. A failure means a CSV row was added or
-        # edited without running --mode q315-apply and re-rendering.
-        run: python src/main/content_update.py --mode check
-
-      - name: Check translated pages link to their own language
-        # Q315 templates are built from the English page, so derived language
-        # pages inherit ../../en/ hrefs that render_page.py never rewrites. A
-        # link into another language's tree is allowed only when no counterpart
-        # exists, or when it is marked deliberate (hreflang/lang, a switcher).
-        # Fix with: python src/main/abstract/localize_links.py
-        run: python src/main/abstract/localize_links.py --check
-
-      - name: Check legacy pages link to their translations
-        # Each year's course introduction page in fr/enseignement/cours/ and its
-        # English page in en/teaching/courses/, and every group listed in
-        # src/main/abstract/data/language-groups.csv, must link to each other
-        # (head alternates + a visible link). An English course page must not
-        # keep pointing at last year's French material after the rollover.
-        # Fix with: python src/main/link_language_pairs.py --apply
-        run: python src/main/link_language_pairs.py --check
-
-      - name: Check CSV and Q315 sources bind the same content items
-        # Both directions: a CSV row whose QID is on no source, and a QID bound
-        # on a source that no CSV row claims. Catches entries added to a source
-        # by hand and CSV columns that point at nothing -- neither of which
-        # --mode check can see, because it only asks whether applying the CSV
-        # would change the source.
-        run: python src/main/content_update.py --mode diff
-
-      - name: Check every language page of a family carries the same entries
-        # The list pages are legacy documents that render_page.py does not
-        # regenerate, so nothing else notices when one language drifts. This
-        # compares the languages against each other and against the CSV, and
-        # catches the duplicate entries the retired apply path used to append.
-        run: python src/main/content_update.py --mode parity
-
-      - name: Check Q315 round-trip has no regressions
-        # Ratchet: only ever lower this budget as page-language pairs are made
-        # reproducible from their abstract bindings. It reaches 0 when every
-        # rendered page round-trips. Lowered 214 -> 70 after Q3640 (books) was
-        # aligned across all 8 languages; -> 68 after the es Teaching
-        # ("Enseñanza") pages were reconciled; -> 60 after Q3646 (detailed CV)
-        # labels were aligned to the published page text across all 8 languages;
-        # -> 59 after the pt travel-index research breadcrumb ("Pesquisa") was
-        # reconciled with its siblings; -> 0 after structurally divergent legacy
-        # slots were unbound from Q315 ownership pending full page migration.
-        run: |
-          python src/main/abstract/verify_content_roundtrip.py \
-            --max-mismatches 0 \
-            --report "${RUNNER_TEMP}/q315-content-roundtrip.json"
-
-      - name: Check every Q315 page has one language-switcher footer
-        # Every page rendered from Q315 must carry exactly one styled language
-        # switcher (the travel "langlist" grid or the section "lang-selector"
-        # buttons) linking all its languages including itself, current one
-        # highlighted, with no duplicate or bare language-switcher nav. The budget
-        # is a ratchet: only ever lower it as the remaining section pages are
-        # fixed; it reaches 0 when every Q315 page conforms.
-        run: |
-          python src/main/abstract/verify_language_footer.py \
-            --max-failing-pages 0
-
-      - name: Check Q315 pages carry QIDs, not natural-language literals
-        # A literal in an abstract page (English text in an element, or in an
-        # attribute the page displays, such as a gallery caption shown with CSS
-        # attr()) reaches every language page untranslated, and no other check
-        # sees it. The budget is a ratchet: 783 literals when the check was
-        # added; -> 734 after the 49 data-city gallery captions were bound;
-        # -> 539 after the 195 teaching-archive course and intervention lines
-        # were bound; -> 55 once paths, titles marked lang, names marked
-        # translate="no", the registry titles and the license line were done;
-        # -> 48 after labels with existing items (Cities, About me, regions);
-        # -> 18 after more labels were bound and the research pages' official
-        # names (address, degrees, job titles, co-authors) marked translate="no";
-        # -> 16 after the footers' author name was marked as a name too;
-        # -> 0 once the last labels, intros and paragraphs were bound. Keep it
-        # at 0: any new literal on a Q315 page now fails CI.
-        run: |
-          python src/main/abstract/verify_abstract_literals.py \
-            --max-literals 0
+      - name: Run the checks
+        # The unit tests and every site check, run in parallel (one per CPU):
+        # they only read the repository, so none depends on another. The list,
+        # with each check's purpose and ratchet history, is in ci_checks.py.
+        # Each check's output is a collapsible group in the log below, followed
+        # by a timing summary. Run one locally with:
+        #   python src/main/ci_checks.py <name>   (names: --list)
+        run: python src/main/ci_checks.py
