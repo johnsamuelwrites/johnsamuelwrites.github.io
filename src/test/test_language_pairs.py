@@ -4,11 +4,13 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 #
 
-"""French and English course introduction pages link to each other.
+"""Legacy pages link to their translations.
 
-``link_course_pairs.py`` adds the head alternate and the visible switcher to
-both pages of a year's pair, and moves links to last year's French material
-onto the copy made at the rollover, leaving past exam questions alone.
+``link_language_pairs.py`` adds the head alternates and, where a page has no
+visible link to a translation, a switcher. Course introduction pages are
+paired by rule and their English page's links to last year's French material
+are moved onto the copy made at the rollover, leaving past exam questions
+alone; other pages are grouped in ``language-groups.csv``.
 """
 
 import io
@@ -21,7 +23,7 @@ from pathlib import Path
 MAIN = Path(__file__).resolve().parents[1] / "main"
 sys.path.insert(0, str(MAIN))
 
-import link_course_pairs as pairs
+import link_language_pairs as pairs
 
 PAGE = """<!DOCTYPE html>
 <html lang="{lang}">
@@ -51,7 +53,7 @@ class CoursePairTests(unittest.TestCase):
 
     def run_tool(self, apply):
         with redirect_stdout(io.StringIO()), redirect_stderr(io.StringIO()):
-            return pairs.process(self.root, apply)
+            return pairs.process(self.root, apply, self.root / "groups.csv")
 
     def test_pair_is_linked_both_ways_and_material_rolled_forward(self):
         fr = self.write(
@@ -104,11 +106,43 @@ class CoursePairTests(unittest.TestCase):
         self.assertNotIn(pairs.SWITCHER_MARK, text)
         self.assertEqual(text.count("en/teaching/courses/2026/APDP/index.html"), 2)
 
-    def test_every_course_page_in_the_site_is_linked(self):
+    def test_csv_group_gets_alternates_and_switcher_only_where_missing(self):
+        self.write(
+            "groups.csv",
+            "en,fr,ml,pa,hi,pt,es,it\n"
+            "en/research/apple.html,fr/recherche/pomme.html,,,,,,\n"
+            "en/writings/a.html,fr/ecrits/a.html,ml/x/a.html,,,,,\n",
+        )
+        main = "<main><p>Apple</p></main>"
+        en = self.write("en/research/apple.html", PAGE.format(lang="en", body=main))
+        fr = self.write("fr/recherche/pomme.html", PAGE.format(lang="fr", body=main))
+        links = (
+            '<a href="../../en/writings/a.html">en</a><a href="../../fr/ecrits/a.html">fr</a>'
+            '<a href="../../ml/x/a.html">ml</a>'
+        )
+        group = [
+            self.write(path, PAGE.format(lang=path[:2], body=links))
+            for path in ("en/writings/a.html", "fr/ecrits/a.html", "ml/x/a.html")
+        ]
+
+        self.assertEqual(self.run_tool(apply=True), 0)
+        self.assertEqual(self.run_tool(apply=False), 0)
+
+        en_text = en.read_text()
+        self.assertIn('<link rel="alternate" hreflang="fr" href="../../fr/recherche/pomme.html" />', en_text)
+        self.assertIn('class="lang-btn active" href="apple.html" hreflang="en"', en_text)
+        self.assertLess(en_text.index(pairs.SWITCHER_MARK), en_text.index("</main>"))
+        self.assertIn('href="../../en/research/apple.html" hreflang="en" lang="en">English</a>', fr.read_text())
+        ml_text = group[2].read_text()
+        self.assertIn('<link rel="alternate" hreflang="en" href="../../en/writings/a.html" />', ml_text)
+        self.assertIn('<link rel="alternate" hreflang="fr" href="../../fr/ecrits/a.html" />', ml_text)
+        self.assertNotIn(pairs.SWITCHER_MARK, ml_text)
+
+    def test_every_translated_page_in_the_site_is_linked(self):
         with redirect_stdout(io.StringIO()) as output, redirect_stderr(io.StringIO()):
             status = pairs.process(pairs.REPO_ROOT, apply=False)
         self.assertEqual(
-            status, 0, "run: python src/main/link_course_pairs.py --apply\n" + output.getvalue()
+            status, 0, "run: python src/main/link_language_pairs.py --apply\n" + output.getvalue()
         )
 
 
