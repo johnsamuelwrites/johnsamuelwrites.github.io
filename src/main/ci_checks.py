@@ -118,6 +118,11 @@ CHECKS = (
     # keep pointing at last year's French material after the rollover.
     # Fix with: python src/main/link_language_pairs.py --apply
     Check("pairs", "Legacy pages link to their translations", ("src/main/link_language_pairs.py", "--check")),
+    # fr/enseignement/enseignement.html and en/teaching/teaching.html are
+    # generated from data/teaching/courses.csv; a hand edit or a CSV change
+    # without regenerating fails here, as does a CSV row naming a course page
+    # that does not exist. Fix with: python src/main/teaching_overview.py --apply
+    Check("teaching", "Teaching overview pages match their data", ("src/main/teaching_overview.py", "--check")),
 )
 
 
