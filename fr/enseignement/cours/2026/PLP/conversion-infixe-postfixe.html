@@ -1,0 +1,154 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Visualisez pas à pas la conversion d’une expression arithmétique infixée en notation postfixée grâce à une pile d’opérateurs.">
+    <title>Gérer les expressions avec parenthèses — PLP 2026-2027</title>
+    <link rel="shortcut icon" href="../../../../../images/logo/favicon.png">
+    <link rel="stylesheet" href="course.css">
+    <link rel="stylesheet" href="animations.css">
+    <script src="animations.js" defer></script>
+  </head>
+  <body data-mode="infix">
+    <nav>
+      <div class="nav-content">
+        <div><a href="../../../../apropos.html" class="nav-title">John Samuel</a></div>
+        <ul class="nav-links">
+          <li><a href="index.html">← Cours PLP</a></li>
+          <li><a href="conversion-infixe-postfixe.html">Conversion infixe</a></li>
+          <li><a href="evaluation-postfixee.html">Évaluation postfixée</a></li>
+          <li><a href="../../../index.html">Enseignement</a></li>
+        </ul>
+      </div>
+    </nav>
+    <main class="anim-main">
+      <section class="anim-hero">
+        <div class="eyebrow">
+          Principes de langages de programmation · Animation interactive
+        </div>
+        <h1>Gérer les expressions avec parenthèses</h1>
+        <p class="lede">Visualisez pas à pas la conversion d’une expression arithmétique infixée en notation postfixée grâce à une pile d’opérateurs.</p>
+      </section>
+      <div class="controls-row">
+        <section class="panel" aria-labelledby="test-title">
+          <h2 id="test-title" class="sr-only">Expérimenter une expression</h2>
+          <div class="setup">
+            <div class="field">
+              <label for="expression">Expression infixée</label>
+              <input id="expression" type="text" value="(3 + 4) * 5" autocomplete="off" spellcheck="false" aria-describedby="input-hint">
+            </div>
+            <button class="primary" id="compile" type="button">Charger l’expression</button>
+          </div>
+          <details class="help">
+            <summary>Aide et raccourcis</summary>
+            <p id="input-hint" class="hint">Nombres entiers ou décimaux (le signe moins est accepté devant un nombre : -3), opérateurs + - * / ^ et parenthèses. L’opérateur ^ (puissance) est associatif à droite.</p>
+            <p class="hint">Raccourcis : ← / → (étape précédente / suivante), Espace (lecture / pause), Début (retour au début).</p>
+          </details>
+          <div class="examples" aria-label="Exemples">
+            <button type="button" data-example="(3 + 4) * 5"><code>(3 + 4) * 5</code></button>
+            <button type="button" data-example="3 + 4 * 5"><code>3 + 4 * 5</code></button>
+            <button type="button" data-example="(8 - 2) / (1 + 2)"><code>(8 - 2) / (1 + 2)</code></button>
+            <button type="button" data-example="7 * (2 + 3) - 4"><code>7 * (2 + 3) - 4</code></button>
+            <button type="button" data-example="2 ^ 3 ^ 2"><code>2 ^ 3 ^ 2</code></button>
+            <button type="button" data-example="10 - 4 - 3"><code>10 - 4 - 3</code></button>
+          </div>
+          <div id="error" class="error hidden" role="alert"></div>
+        </section>
+        <section class="panel" aria-label="Commandes de lecture">
+          <div class="playback">
+            <button id="restart" type="button">↺ Début</button>
+            <button id="previous" type="button">← Précédent</button>
+            <button class="primary" id="play" type="button">▶ Lire</button>
+            <button id="pause" type="button">Ⅱ Pause</button>
+            <button id="next" type="button">Suivant →</button>
+            <span class="spacer"></span>
+            <label class="speed" for="speed">Vitesse
+              <select id="speed">
+                <option value="1800">Lente</option>
+                <option value="1000" selected>Normale</option>
+                <option value="450">Rapide</option>
+              </select>
+            </label>
+          </div>
+          <div class="scrubber">
+            <input id="slider" type="range" min="0" max="0" value="0" aria-label="Position dans l’animation">
+            <output id="step-counter" for="slider">—</output>
+          </div>
+          <label class="predict">
+            <input type="checkbox" id="predict"> Mode « Prédire l’étape suivante »
+          </label>
+          <div id="quiz" class="quiz hidden" role="group" aria-labelledby="quiz-question">
+            <p id="quiz-question" class="quiz-question"></p>
+            <div id="quiz-choices" class="quiz-choices"></div>
+            <p id="quiz-feedback" class="hint" aria-live="polite"></p>
+          </div>
+          <p id="quiz-score" class="hint hidden"></p>
+          <p class="hint" id="status">Animation prête.</p>
+        </section>
+      </div>
+      <section class="stage-grid" aria-label="Visualisation de l’algorithme">
+        <article class="panel">
+          <h2>Expression parcourue</h2>
+          <div id="tokens" class="tokens" aria-label="Jetons de l’expression"></div>
+          <div class="note">
+            <span class="step-number">Opération courante</span>
+            <p id="explanation" class="message" aria-live="polite"></p>
+          </div>
+          <div class="note detail-note">
+            <span class="step-number">Pourquoi ?</span>
+            <p id="detail" class="message"></p>
+          </div>
+          <p class="prio-line">Priorités :
+            <span data-ops="^"><code>^</code> 3 (assoc. droite)</span> ·
+            <span data-ops="* /"><code>*</code> <code>/</code> 2</span> ·
+            <span data-ops="+ -"><code>+</code> <code>-</code> 1</span>
+          </p>
+        </article>
+        <article class="panel">
+          <h2>Pile d’opérateurs</h2>
+          <p id="stack-count" class="hint">0 élément</p>
+          <div id="stack" class="stack" aria-label="Pile, du sommet vers la base"></div>
+          <div class="stack-base">
+            Base de la pile
+          </div>
+        </article>
+        <article class="panel">
+          <h2>Expression postfixée construite</h2>
+          <div id="output" class="output"></div>
+          <a id="other-page" class="button-link hidden" href="evaluation-postfixee.html">Évaluer ce résultat sur la page d’évaluation →</a>
+        </article>
+      </section>
+      <section class="panel">
+        <h2>Principe de l’algorithme</h2>
+        <ol class="algorithm">
+          <li>Lire l’expression de gauche à droite.</li>
+          <li>Copier immédiatement chaque nombre dans la sortie.</li>
+          <li>Empiler une parenthèse ouvrante <code class="code">(</code>.</li>
+          <li>À la fermeture <code class="code">)</code>, dépiler jusqu’à <code class="code">(</code> ; éliminer les deux parenthèses.</li>
+          <li>Avant d’empiler un opérateur, dépiler les opérateurs de priorité supérieure ou égale (strictement supérieure pour un opérateur associatif à droite comme <code class="code">^</code>).</li>
+          <li>À la fin, dépiler tous les opérateurs restants.</li>
+        </ol>
+        <p class="note">Exemple : (3 + 4) * 5 → 3 4 + 5 *. Les parenthèses ne figurent pas dans le résultat.</p>
+      </section>
+    </main>
+    <footer>
+      <div class="footer-content">
+        <div class="copyright">
+          <p>© 2026 John Samuel</p>
+          <p style="margin-top: 0.5rem;">
+            <a href="http://creativecommons.org/licenses/by-sa/4.0/" target="_blank" rel="noopener"
+              style="color: var(--accent-code); text-decoration: none;">
+              Creative Commons BY-SA 4.0
+            </a>
+          </p>
+        </div>
+        <div class="footer-links">
+          <a href="index.html">Retour au cours</a>
+          <a href="../../../index.html">Enseignement</a>
+          <a href="../../../../apropos.html">À propos</a>
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>
